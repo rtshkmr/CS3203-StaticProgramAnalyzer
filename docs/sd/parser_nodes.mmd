@@ -1,0 +1,24 @@
+sequenceDiagram
+	autonumber
+        Parser ->> Parser: newVariable(String var_name)
+        Parser -->> Parser: VARIABLE var_obj
+
+        Parser ->> Parser: newAssign(PARENT p)
+        Parser -->> Parser: ASSIGN_NODE a_node
+
+            participant a_node
+            Parser ->> a_node: addAssignmentTree(TREE t)
+
+        Parser ->> Parser: newIf(PARENT p)
+        Parser -->> Parser: IF_NODE i_node
+
+            participant i_node
+            Parser ->> i_node: addCondition(TREE t)
+            Parser ->> i_node: addStmtList(TREE t)
+
+        Parser ->> Parser: newWhile(PARENT p)
+        Parser -->> Parser: WHILE_NODE w_node
+
+            participant w_node
+            Parser ->> w_node: addCondition(TREE t)
+            Parser ->> w_node: addStmtList(TREE t)

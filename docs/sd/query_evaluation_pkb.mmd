@@ -1,0 +1,18 @@
+sequenceDiagram
+    autonumber
+    participant QueryEvaluator
+    participant PKB
+
+    loop Every clause
+        opt such that Follows
+            QueryEvaluator->>PKB: isFollows (STMT_NO stmt1, STMT_NO stmt2)
+        end
+        opt such that Follows*
+            QueryEvaluator->>PKB: isFollowsStar (STMT_NO stmt1, STMT_NO stmt2)
+        end
+        opt such that Parent
+            QueryEvaluator->>PKB: isParent (STMT_NO stmt1, STMT_NO stmt2)
+        end
+        opt such that Parent*
+            QueryEvaluator->>PKB: isParent (STMT_NO stmt1, STMT_NO stmt2)
+    end
