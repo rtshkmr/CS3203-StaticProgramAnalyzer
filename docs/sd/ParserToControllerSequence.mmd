@@ -25,7 +25,7 @@ sequenceDiagram
         loop hasNextStmt() && validState == True
 
         P ->>+ sub: sendStatement(stmt)
-        sub ->>+ Tokenizer: createToken(stmt)
+        sub ->>+ Tokenizer: createTokens(stmt)
 
         Tokenizer ->>+ CGV: checkForValidSyntax(List<TOKEN>) 
         
