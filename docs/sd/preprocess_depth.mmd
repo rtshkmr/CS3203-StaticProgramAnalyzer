@@ -1,0 +1,63 @@
+sequenceDiagram
+    autonumber
+    participant AT as AutoTester
+    participant P as Parser
+    %% subsystem creates nodes and storing AST while the lines are being read 
+    %% Psystem contains statement stacks.. 
+    participant sub as PSubsystem
+    participant Tokenizer
+    participant CGV as ConcreteGrammarValidator
+    participant C as Controller
+
+    %% parser ===> parses the entire program ==> controller 
+    %% parser ===> parses the entire program ==> controller 
+    
+    %% Assumption: This sd only focus on parsing %
+    AT ->>+ P: parse(sourcefile)
+
+        %% Assumption: P will check correctness while building tree %
+
+        P ->>+ sub: createNewTree()
+        sub -->>- P: initSuccess
+         
+        %% statement here refers to the source code in between two semicolons
+        %% If validState == false in reportParseStatus(Failure), the loop terminates
+        loop hasNextStmt() && validState == True
+
+        P ->>+ sub: sendStatement(stmt)
+        sub ->>+ Tokenizer: createToken(stmt)
+
+        Tokenizer ->>+ CGV: checkForValidSyntax(List<TOKEN>) 
+        
+        opt any close brackets
+        CGV ->>sub: configStackFlags()
+        end
+
+        CGV -->>- Tokenizer: reportValidationStatus(Boolean)
+        
+        %% Entity node refers to WHILE/IF/ASSIGN
+        %% nb: might need to add in a separate node creator here because there will be multiple types of ENTITY_NODE and having an interface here would be better
+        %% a token looks like: (<symbol>, <tokenTag>) brace_open brace_close
+        Tokenizer -->>- sub: ENTITY_NODE      
+        
+            alt ENTITY_NODE INVALID
+                sub -->> P: reportParseStatus(INVALID)
+            else
+                %% entity is an Abstract/Parent class here, 
+                %% addRelationships modifies the existing DataStructures we have 
+                %% TODO: discuss the logic behind this 
+                sub ->> sub: addRelationships(ENTITY_NODE) 
+                sub -->>- P: reportParseStatus(VALID)
+            end
+        end 
+
+        P -)+ sub: sendEOLStatus()
+        P -->>- AT: reportProgramStatus::int
+        
+        sub ->>- C: sendDeliverables(AST tree, hashtable, entitytable)
+
+        %% Transitive => Parents*, Children* Follows*, FollowedBy* Use, UsedBy, Modifies, ModifiesBy
+
+        %% By right, AST should not be used for resolving queries (anything, we try to add aux Data Structures)
+
+        %% This program ends when preprocessing is finish %% 
