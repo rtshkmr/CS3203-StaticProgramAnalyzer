@@ -4,7 +4,7 @@ sequenceDiagram
     participant P as Parser
     %% subsystem creates nodes and storing AST while the lines are being read 
     %% Psystem contains statement stacks.. 
-    participant sub as PSubsystem
+    participant PSub as PSubsystem
     participant Tokenizer
     participant CGV as ConcreteGrammarValidator
     participant C as Controller
@@ -17,20 +17,20 @@ sequenceDiagram
 
         %% Assumption: P will check correctness while building tree %
 
-        P ->>+ sub: createNewTree()
-        sub -->>- P: initSuccess
+        P ->>+ PSub: createNewTree()
+        PSub -->>- P: initStatus::IDENTIFIER
          
         %% statement here refers to the source code in between two semicolons
         %% If validState == false in reportParseStatus(Failure), the loop terminates
         loop hasNextStmt() && validState == True
 
-        P ->>+ sub: sendStatement(stmt)
-        sub ->>+ Tokenizer: createTokens(stmt)
+        P ->>+ PSub: sendStatement(stmt)
+        PSub ->>+ Tokenizer: createTokens(stmt)
 
         Tokenizer ->>+ CGV: checkForValidSyntax(List<TOKEN>) 
         
         opt any close brackets
-        CGV ->>sub: configStackFlags()
+        CGV ->>PSub: configStackFlags()
         end
 
         CGV -->>- Tokenizer: reportValidationStatus(Boolean)
@@ -38,23 +38,24 @@ sequenceDiagram
         %% Entity node refers to WHILE/IF/ASSIGN
         %% nb: might need to add in a separate node creator here because there will be multiple types of ENTITY_NODE and having an interface here would be better
         %% a token looks like: (<symbol>, <tokenTag>) brace_open brace_close
-        Tokenizer -->>- sub: ENTITY_NODE      
+        Tokenizer -->>- PSub: ENTITY_NODE      
         
             alt ENTITY_NODE INVALID
-                sub -->> P: reportParseStatus(INVALID)
+                PSub -->> P: reportParseStatus(INVALID)
             else
                 %% entity is an Abstract/Parent class here, 
                 %% addRelationships modifies the existing DataStructures we have 
                 %% TODO: discuss the logic behind this 
-                sub ->> sub: addRelationships(ENTITY_NODE) 
-                sub -->>- P: reportParseStatus(VALID)
+                PSub ->> PSub: addRelationships(ENTITY_NODE) 
+                PSub -->>- P: reportParseStatus(VALID)
             end
         end 
 
-        P -)+ sub: sendEOLStatus()
-        P -->>- AT: reportProgramStatus::int
-        
-        sub ->>- C: sendDeliverables(AST tree, hashtable, entitytable)
+        P -->> AT: programStatus::IDENTIFIER
+        P -)+ PSub: terminate()
+        PSub ->>-P: sendDeliverables(AST tree, hashtable, entitytable)
+        P->>-C: setDataStructures(AST tree, hashtable, entitytable)
+        %% PSub ->>- C: sendDeliverables(AST tree, hashtable, entitytable)
 
         %% Transitive => Parents*, Children* Follows*, FollowedBy* Use, UsedBy, Modifies, ModifiesBy
 

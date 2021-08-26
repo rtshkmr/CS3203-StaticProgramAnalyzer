@@ -8,10 +8,16 @@
 **Overview**: `Parser` is a facade class that takes in the source program from the `AutoTester`, 
 creates necessary data structures (AST, EntityTables, RelationshipTables) and sends these deliverables to the `Controller`. 
 #### API
-1. RETURN_TYPE functionName(ARG_TYPE argName)
+
+1. IDENTIFIER parse(FILE sourceFile) 
+
+2. VOID sendStatement(String stmt)
    * Requires: \<insert precondition\>
    * Description: \<insert description for abstract API call\>
-2. RETURN_TYPE functionName(ARG_TYPE argName)
+3. VOID sendEOLStatus()  
+   * Requires: \<insert precondition\>
+   * Description: \<insert description for abstract API call\>
+4. VOID reportProgramStatus(IDENTIFIER statusId)
    * Requires: \<insert precondition\>
    * Description: \<insert description for abstract API call\>
 
@@ -22,7 +28,10 @@ It receives a single Source Statement from the Parser and initiates a pipeline f
 tokenized then its syntax is validated, entity nodes are created and added to the AST, relationships are added.
 
 #### API
-1. RETURN_TYPE functionName(ARG_TYPE argName)
+1. VOID createNewTree()
+   * Requires: \<insert precondition\>
+   * Description: \<insert description for abstract API call\>
+1. VOID reportInitStatus(BOOLEAN initStatus)
    * Requires: \<insert precondition\>
    * Description: \<insert description for abstract API call\>
 2. RETURN_TYPE functionName(ARG_TYPE argName)

@@ -14,7 +14,7 @@ sequenceDiagram
     PqlPreprocessor->>QueryEvaluator: sendQueryStruct(q)
     
     %% Refer to query_evaluation_pkb.mmd
-    note right of PKB: info refers to relevant sub-structures <br/> (maybe a linked list...) that <br/> the QueryEvaluatorcan use <br/> to resolve the query.
+    note right of PKB: info refers to relevant PSub-structures <br/> (maybe a linked list...) that <br/> the QueryEvaluatorcan use <br/> to resolve the query.
     QueryEvaluator->>PKB: retrieveClauseInfo(clause) 
     
     %% MergeSets() represents union, intersect, join between the different clauses results. 
