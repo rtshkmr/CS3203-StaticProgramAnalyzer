@@ -3,14 +3,14 @@ sequenceDiagram
     participant AT as AutoTester
     participant SP as SourceProcessor
     participant P as Parser
-    %% subsystem creates nodes and storing AST while the lines are being read 
-    %% Psystem contains statement stacks.. 
+    %% subsystem creates nodes and storing AST while the lines are being read
+    %% Psystem contains statement stacks..
     participant PSub as PSubsystem
     participant Tkn as Tokenizer
     participant CGV as ConcreteGrammarValidator
     %% EntityFactory modifies necessary DSes (creates nodes in AST, add entries into relationship, entity tables ...)
-    %% To prevent the passing of multiple different objects, there's going to be a bi-directional relationship b/w EF and PSub where PSub will read the values of DSes and Helper Stacks kept inside PSub, and EF will be creating and modifying said objects within PSub. This might need an intermediary Relationship Class or smth to avoid circular dependency 
-    participant EF as EntityFactory 
+    %% To prevent the passing of multiple different objects, there's going to be a bi-directional relationship b/w EF and PSub where PSub will read the values of DSes and Helper Stacks kept inside PSub, and EF will be creating and modifying said objects within PSub. This might need an intermediary Relationship Class or smth to avoid circular dependency
+    participant EF as EntityFactory
     participant DE as DesignExtractor
     participant PKB as ProgramKnowledgeBase
 
@@ -28,55 +28,49 @@ sequenceDiagram
         P ->>+ PSub: processStatement(stmt)
         PSub ->>+ Tkn: createTokens(stmt)
         %% a token looks like: (<symbol>, <tokenTag>) brace_open brace_close
-        Tkn -->>- PSub: tokens::List<TOKEN>       
-    
+        Tkn -->>- PSub: tokens::List<TOKEN>
+
         %% We ask the validator to validate the syntax for a single statement, if there's an error at any token, it should fail early and return us the validationStatus
         %% SideEffect:Since the validator looks at tokens one by one, we let the validator modify "helper stacks" that are in the PSub
-        %% "Helper Stacks" are cumulative stacks or any other DSes kept in the PSubsystem. e.g. 
+        %% "Helper Stacks" are cumulative stacks or any other DSes kept in the PSubsystem. e.g.
         %% "Helper Stacks" are there to help keep track of tokens and determine how the DSes are being modified. e.g. if CGV current sees an open brace, it knows that it's a new container, hence the PSub's helper stack should be notified such that the AST will branch out, the relationship tables will create new entries...
-        PSub ->>+ CGV: validateConcreteSyntax(List<TOKEN>) 
+        PSub ->>+ CGV: validateConcreteSyntax(List<TOKEN>)
         CGV -->>-PSub: validationStatus::IDENTIFIER
 
-        %% create Entities:  Entity here refers to the Abstraction Entity as described by the wiki/lecture 1 slides 
+        %% create Entities:  Entity here refers to the Abstraction Entity as described by the wiki/lecture 1 slides
         PSub ->>+EF:createEntities(List<Tokens>)
         %% This method has responsibilities such as adding necessary Entity Nodes to the AST and updating the necessary tables to reflect relationships (this is where we add info about relationships b/w lines, vars...)
-        %% Entity node refers to WHILE/IF/ASSIGN... ref to 
+        %% Entity node refers to WHILE/IF/ASSIGN... ref to
         EF-->>-PSub:completionStatus::IDENTIFIER
-        
+
         PSub -->>-P: statementProcessStatus::IDENTIFIER
-        %% todo: handle the error handling opt code here 
+        %% todo: handle the error handling opt code here
     end
     %% at this point, all the statements have been processed, the parser is ready for deliverables to be sent to SP
     P ->>+PSub: sendDeliverables()
-    PSub->>P: setAst(AST tree)
-    PSub->>P: setRelationshipTables(List<RelationshipTables>)
-    PSub->>P: setEntityTables(List<EntityTables>)
-    PSub -->>-P: deliverablesCompletionStatus::IDENTIFIER
+    PSub -->>-P: deliverables::DELIVERABLES
 
     P -->>-SP: parseStatus::IDENTIFIER
 
     SP ->>+P: sendDeliverables()
-    P->>SP: setAst(AST tree)
-    P->>SP: setRelationshipTables(List<RelationshipTables>)
-    P->>SP: setEntityTables(List<EntityTables>)
-    P -->>-SP: deliverablesCompletionStatus::IDENTIFIER
+    P -->>-SP: deliverables::DELIVERABLES
 
-    %% todo: add in DE activities 
+    %% todo: add in DE activities
     SP ->>+DE:extractDesigns()
     %% DE and SP will comms with each other bidirectionally
     %% todo: these sequences will be fleshed out in a separate sequence diagram
     DE -->>-SP:extractionStatus::IDENTIFIER
 
 
-    alt valid sourceProcessStatus 
+    alt valid sourceProcessStatus
         SP ->>+PKB: populateDataStructures()
         PKB -->>-SP:pkbSuccessStatus::IDENTIFIER
-    else 
+    else
         SP ->>SP : handleSourceCodeError()
     end
-    
+
     SP -->>- AT: sourceProcessStatus::IDENTIFIER
 
     %% Transitive => Parents*, Children* Follows*, FollowedBy* Use, UsedBy, Modifies, ModifiesBy
     %% By right, AST should not be used for resolving queries (anything, we try to add aux Data Structures)
-    %% This sequence of steps ends when the source processing is done and deliverables sent to PKB %% 
+    %% This sequence of steps ends when the source processing is done and deliverables sent to PKB %%

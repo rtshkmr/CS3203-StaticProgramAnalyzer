@@ -27,7 +27,7 @@ checks the syntax, creates the necessary data structures and sends these Deliver
 1. IDENTIFIER parse(FILE sourceFile)
 
 2. IDENTIFIER sendDeliverables()
-   * Description: Sends the Deliverables to the SourceProcessor.
+   * Description: Wraps the necessary data structures in a Deliverables object and sends the Deliverables to the SourceProcessor.
 
 ### PSubsystem
 **Overview**: `PSubsystem` contains data structures that accumulate(AST, EntityTables, RelationshipTables, Helper Stacks that keep track of tokens and determine how the Deliverables are being modified).
@@ -39,7 +39,7 @@ tokenized then its syntax is validated, entity nodes are created and added to th
 2. IDENTIFIER processStatement(STRING stmt)
    * Description: Tokenizes the statement, validates its concrete syntax and creates Entities and relationships that will then be added to the Deliverables.
 3. IDENTIFIER sendDeliverables()
-   * Description: Sends the Deliverables to the Parser.
+   * Description: Wraps the necessary data structures in a Deliverables object and sends the Deliverables to the Parser.
 
 ### Tokenizer
 **Overview**: `Tokenizer` is responsible for converting the string format of a Source Statement into a list of lexical tokens, as defined in the Concrete Grammar Syntax.
