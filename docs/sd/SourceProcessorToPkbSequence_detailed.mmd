@@ -39,7 +39,6 @@ sequenceDiagram
 
         %% create Entities:  Entity here refers to the Abstraction Entity as described by the wiki/lecture 1 slides 
         PSub ->>+EF:createEntities(List<Tokens>)
-        %% TODO: consider description for this... entity is an Abstract/Parent class here, 
         %% This method has responsibilities such as adding necessary Entity Nodes to the AST and updating the necessary tables to reflect relationships (this is where we add info about relationships b/w lines, vars...)
         %% Entity node refers to WHILE/IF/ASSIGN... ref to 
         EF-->>-PSub:completionStatus::IDENTIFIER
@@ -79,6 +78,5 @@ sequenceDiagram
     SP -->>- AT: sourceProcessStatus::IDENTIFIER
 
     %% Transitive => Parents*, Children* Follows*, FollowedBy* Use, UsedBy, Modifies, ModifiesBy
-
     %% By right, AST should not be used for resolving queries (anything, we try to add aux Data Structures)
     %% This sequence of steps ends when the source processing is done and deliverables sent to PKB %% 
