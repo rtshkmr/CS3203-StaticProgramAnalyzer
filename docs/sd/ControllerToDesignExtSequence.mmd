@@ -1,0 +1,24 @@
+sequenceDiagram
+    autonumber
+    Controller ->>+ DesignExtractor: extractRelationships(List<HashTable> relationships, List<Node<Statement>> statementList, List<Node<Variable>> variableList)
+    activate DesignExtractor
+
+    Note right of Controller: List<HashTable> relationships includes the following hashtables: <br/> Follows::HashTable<Node<Statement>, Node<Statement>> [Complete]<br/> FollowedBy::HashTable<Node<Statement>, Node<Statement>> [Complete]<br/> Uses::HashTable<Node<Statement>, List<Node<Variable>>> [Partial] <br/> UsedBy::HashTable<Node<Variable>, List<Node<Statement>>> [Partial] <br/> Modifies::HashTable<Node<Statement>, List<Node<Variable>>> [Partial]<br/> ModifiedBy::HashTable<Node<Variable>, List<Node<Statement>>>[Partial] <br/> ParentOf::HashTable<Node<Statement>, List<Node<Statement>>>[Complete] <br/> ChildOf::HashTable<Node<Statement>, List<Node<Statement>>>[Complete]
+
+    DesignExtractor ->> DesignExtractor: getTransitiveUses()
+
+    DesignExtractor ->> DesignExtractor: getTransitiveUsedBy()
+
+    DesignExtractor ->> DesignExtractor: getTransitiveModifies()
+
+    DesignExtractor ->> DesignExtractor: getTransitiveModifiedBy()
+
+    DesignExtractor ->> DesignExtractor: getParentStarOf()
+
+    DesignExtractor ->> DesignExtractor: getChildStarOf()
+
+    DesignExtractor -->>+ Controller: List<HashTable> relationships
+    deactivate DesignExtractor
+    Note right of Controller: List<HashTable> relationships includes the following hashtables:<br/> Uses::HashTable<Node<Statement>, List<Node<Variable>>> [Complete] <br/> UsedBy::HashTable<Node<Variable>, List<Node<Statement>>> [Complete] <br/> Modifies::HashTable<Node<Statement>, List<Node<Variable>>> [Complete]<br/> ModifiedBy::HashTable<Node<Variable>, List<Node<Statement>>>[Complete] <br/> ParentStarOf::HashTable<Node<Statement>, List<Node<Statement>>>[Complete] <br/> ChildStarOf::HashTable<Node<Statement>, List<Node<Statement>>>[Complete]
+
+    Controller ->> PKB: populatePKB(List<HashTable> relationships, List<Node<Statement>> statementList, List<Node<Variable>> variableList)
