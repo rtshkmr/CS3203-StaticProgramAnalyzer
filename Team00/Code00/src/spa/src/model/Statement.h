@@ -3,29 +3,17 @@
  * Objects created from here should be of valid syntax and stored in their abstract form.
  */
 
-#include "Entity.h"
-#include "datatype/ConditionalExpression.h"
+#include <vector>
 #include "datatype/DataType.h"
 #include "datatype/AssignmentExpression.h"
+#include "datatype/ConditionalExpression.h"
+
+#include "Entity.h"
 
 #ifndef AUTOTESTER_STATEMENT_H
 #define AUTOTESTER_STATEMENT_H
 
-/**
- * Statement is an abstract class and derived from Entity.
- * This class contains the essential attributes that every statement-type object has, such as, line number,
- *     statement number, parent-node (for tracking Parent), and before-node (for tracking Follow).
- */
-class Statement : public Entity {
-protected:
-    LineNumber lineNumber;
-    StatementNumber statementNumber;
-    Statement parentNode;
-    Statement beforeNode;
-public:
-    virtual ~Statement() {};
-};
-
+class Else;
 /**
  * If is a derived class of Statement.
  * This object represents the abstract syntax grammar for an if-statement.
@@ -36,12 +24,16 @@ public:
  */
 class If : public Statement {
 private:
-    ConditionalExpression condExpr;
-    vector<Statement> ifStmtList;
-    Else elseStmtList; //TODO: check if keeping ELSE as object or merge ELSE object into IF object
+    ConditionalExpression* condExpr;
+    std::vector<Statement> ifStmtList;
+    Else* elseStmtList; //TODO: check if keeping ELSE as object or merge ELSE object into IF object
 
 public:
     If(std::string condition);
+    ConditionalExpression* getCondExpr();
+    std::vector<Statement>* getIfStmtList();
+    std::vector<Statement>* getElseStmtList();
+    bool setElseStmtList(Else *elseStmt);
 };
 
 /**
@@ -49,9 +41,10 @@ public:
  */
 class Else : public Statement {
 private:
-    vector<Statement> elseStmtList;
+    std::vector<Statement> elseStmtList;
 public:
     Else();
+    std::vector<Statement>* getElseStmtList();
 };
 
 /**
@@ -63,10 +56,13 @@ public:
  */
 class While : public Statement {
 private:
-    ConditionalExpression condExpr;
-    vector<Statement> stmtList;
+    ConditionalExpression* condExpr;
+    std::vector<Statement> stmtList;
 public:
     While(std::string condition);
+    ConditionalExpression* getCondExpr();
+    std::vector<Statement>* getStmtList();
+
 };
 
 /**
@@ -78,10 +74,12 @@ public:
  */
 class Assign : public Statement {
 private:
-    Variable assignTo;
-    AssignmentExpression expr;
+    Variable* assignTo;
+    AssignmentExpression* expr;
 public:
-    Assign(string variable, string expression);
+    Assign(Variable* v, std::string expression);
+    Variable* getVariable();
+    AssignmentExpression* getAssignmentExpr();
 };
 
 /**
@@ -92,10 +90,11 @@ public:
  */
 class Call : public Statement {
 private:
-    Procedure proc;
+    Procedure* proc;
 
 public:
-    Call(Procedure procName);
+    Call(Procedure* procName);
+    Procedure* getProcedure();
 };
 
 /**
@@ -106,9 +105,10 @@ public:
  */
 class Print : public Statement {
 private:
-    Variable var;
+    Variable* var;
 public:
-    Print(Variable var);
+    Print(Variable* vName);
+    Variable* getVariable();
 };
 
 /**
@@ -119,9 +119,10 @@ public:
  */
 class Read : public Statement {
 private:
-    Variable var;
+    Variable* var;
 public:
-    Read(Variable var);
+    Read(Variable* vName);
+    Variable* getVariable();
 };
 
 #endif //AUTOTESTER_STATEMENT_H

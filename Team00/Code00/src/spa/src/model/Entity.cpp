@@ -5,8 +5,8 @@
 #include <list>
 #include "Entity.h"
 
-Procedure::Procedure(ProcedureName const &pName) {
-    procedureName = &pName;
+Procedure::Procedure(ProcedureName* pName) {
+    procedureName = pName;
 }
 
 const ProcedureName* Procedure::getName() {
@@ -17,8 +17,8 @@ std::list<Statement>* Procedure::getStatementList() {
     return &statementList;
 }
 
-Variable::Variable(const VariableName &vName) {
-    variableName = &vName;
+Variable::Variable(VariableName *vName) {
+    variableName = vName;
 }
 
 const VariableName* Variable::getName() {
@@ -26,7 +26,7 @@ const VariableName* Variable::getName() {
 }
 
 Program::Program(Procedure p) {
-    procedureList.emplace_back(p);
+    procedureList.push_back(p);
 }
 
 std::list<Procedure>* Program::getProcedureList() {

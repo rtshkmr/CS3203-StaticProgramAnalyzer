@@ -3,6 +3,8 @@
  * Any data types used in this program should be immutable by default.
  */
 
+#include "string"
+
 #ifndef AUTOTESTER_DATATYPE_H
 #define AUTOTESTER_DATATYPE_H
 

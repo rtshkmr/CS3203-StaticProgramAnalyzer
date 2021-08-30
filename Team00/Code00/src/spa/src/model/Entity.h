@@ -4,8 +4,8 @@
 #ifndef AUTOTESTER_ENTITY_H
 #define AUTOTESTER_ENTITY_H
 
+#include <list>
 #include <datatype/DataType.h>
-#include "Statement.h"
 
 /**
  * Entity is an abstract class, an overarching class that covers any entity found in the program.
@@ -16,17 +16,32 @@ public:
 };
 
 /**
+ * Statement is an abstract class and derived from Entity.
+ * This class contains the essential attributes that every statement-type object has, such as, line number,
+ *     statement number, parent-node (for tracking Parent), and before-node (for tracking Follow).
+ */
+class Statement : public Entity {
+protected:
+    LineNumber* lineNumber;
+    StatementNumber* statementNumber;
+    Statement* parentNode;
+    Statement* beforeNode;
+public:
+    virtual ~Statement() {};
+};
+
+/**
  * Procedure is a derived class of Entity. This class contains the name and the list of statement
  *   within this procedure.
  */
 class Procedure : public Entity {
 private:
     const ProcedureName* procedureName;
-    list<Statement> statementList;
+    std::list<Statement> statementList;
 public:
-    Procedure(ProcedureName const &procedureName);
+    Procedure(ProcedureName *procedureName);
     const ProcedureName* getName();
-    list<Statement>* getStatementList();
+    std::list<Statement>* getStatementList();
 };
 
 /**
@@ -36,7 +51,7 @@ class Variable : public Entity {
 private:
     const VariableName* variableName;
 public:
-    Variable(VariableName const &variableName);
+    Variable(VariableName *variableName);
     const VariableName* getName();
 };
 
