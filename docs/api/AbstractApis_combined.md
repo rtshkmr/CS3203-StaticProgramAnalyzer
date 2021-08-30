@@ -1,5 +1,8 @@
 # APIs
 
+[![hackmd-github-sync-badge](https://hackmd.io/SzpXRChpTVSbmjd8zcvYSw/badge)](https://hackmd.io/SzpXRChpTVSbmjd8zcvYSw)
+
+
 ## PKB Abstract API
 
 ### Component: PKB
