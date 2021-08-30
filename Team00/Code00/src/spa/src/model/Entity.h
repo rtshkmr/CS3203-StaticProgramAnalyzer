@@ -1,11 +1,14 @@
 /**
- * This file contains the high level Entity object @code{Entity}, @code{Procedure}, @code{Variable}, @code{Program}.
+ * This file contains the high level Entity object Entity, Procedure, Variable, Program.
  */
 #ifndef AUTOTESTER_ENTITY_H
 #define AUTOTESTER_ENTITY_H
 
+#include <datatype/DataType.h>
+#include "Statement.h"
+
 /**
- * @code{Entity} is an abstract class, an overarching class that covers any entity found in the program.
+ * Entity is an abstract class, an overarching class that covers any entity found in the program.
  */
 class Entity {
 public:
@@ -13,38 +16,40 @@ public:
 };
 
 /**
- * @code{Procedure} is a derived class of @code{Entity}. This class contains the name and the list of statement
+ * Procedure is a derived class of Entity. This class contains the name and the list of statement
  *   within this procedure.
  */
 class Procedure : public Entity {
 private:
-    ProcedureName procedureName;
+    const ProcedureName* procedureName;
     list<Statement> statementList;
 public:
-    Procedure(ProcedureName procedureName);
+    Procedure(ProcedureName const &procedureName);
+    const ProcedureName* getName();
+    list<Statement>* getStatementList();
 };
 
 /**
- * @code{Variable} is a derived class of @code{Entity}. This class contains the name of the variable.
+ * Variable is a derived class of Entity. This class contains the name of the variable.
  */
 class Variable : public Entity {
 private:
-    VariableName variableName;
+    const VariableName* variableName;
 public:
-    Variable(string variableName);
+    Variable(VariableName const &variableName);
+    const VariableName* getName();
 };
 
 /**
- * @code{Program} is the root node of the AST. It contains the different Procedures found within the SIMPLE source code.
+ * Program is the root node of the AST. It contains the different Procedures found within the SIMPLE source code.
  */
 class Program {
 private:
-    list<Procedure> procedureList; //must be one or more
+    std::list<Procedure> procedureList; //must be one or more
 
 public:
-    Program(Procedure p) {
-        procedureList = { p };
-    }
+    Program(Procedure p);
+    std::list<Procedure>* getProcedureList();
 };
 
 #endif //AUTOTESTER_ENTITY_H

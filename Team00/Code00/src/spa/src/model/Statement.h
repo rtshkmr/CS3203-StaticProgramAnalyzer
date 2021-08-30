@@ -12,7 +12,7 @@
 #define AUTOTESTER_STATEMENT_H
 
 /**
- * @code{Statement} is an abstract class and derived from @code{Entity}.
+ * Statement is an abstract class and derived from Entity.
  * This class contains the essential attributes that every statement-type object has, such as, line number,
  *     statement number, parent-node (for tracking Parent), and before-node (for tracking Follow).
  */
@@ -27,12 +27,12 @@ public:
 };
 
 /**
- * @code{If} is a derived class of @code{Statement}.
- * This object represents the abstract syntax grammer for an if-statement.
+ * If is a derived class of Statement.
+ * This object represents the abstract syntax grammar for an if-statement.
  * This class contains the following:
- *   -  @code{ConditionalExpression} which is the conditional expression for the if-statement.
- *   -  A list of @code{Statement} to execute when the above condition is true.
- *   -  An @code{Else} object which contains the statements to execute if the conditional expression evaluates to false.
+ *   -  ConditionalExpression which is the conditional expression for the if-statement.
+ *   -  A list of Statement to execute when the above condition is true.
+ *   -  An Else object which contains the statements to execute if the conditional expression evaluates to false.
  */
 class If : public Statement {
 private:
@@ -45,7 +45,7 @@ public:
 };
 
 /**
- * @code{Else} is a derived class of @code{Statement} and a composition object of @code{If} object.
+ * Else is a derived class of Statement and a composition object of If object.
  */
 class Else : public Statement {
 private:
@@ -55,11 +55,11 @@ public:
 };
 
 /**
- * @code{While} is a derived class of @code{Statement}.
+ * While is a derived class of Statement.
  * This object represents the abstract syntax grammar for a while-statement.
  * This class contains the following:
- *   -  @code{ConditionalExpression} which is the conditional expression for the if-statement.
- *   -  A list of @code{Statement} to execute when the above condition is true.
+ *   -  ConditionalExpression which is the conditional expression for the if-statement.
+ *   -  A list of Statement to execute when the above condition is true.
  */
 class While : public Statement {
 private:
@@ -70,11 +70,11 @@ public:
 };
 
 /**
- * @code{Assign} is a derived class of @code{Statement}.
+ * Assign is a derived class of Statement.
  * This object represents the abstract syntax grammar for an assign-statement.
  * This class contains the following:
- *   -  @code{Variable} which is the variable that this expression is assigned to.
- *   -  An @code{AssignmentExpression} which contains the full expression to evaluate for this statement.
+ *   -  Variable which is the variable that this expression is assigned to.
+ *   -  An AssignmentExpression which contains the full expression to evaluate for this statement.
  */
 class Assign : public Statement {
 private:
@@ -85,10 +85,10 @@ public:
 };
 
 /**
- * @code{Call} is a derived class of @code{Statement}.
+ * Call is a derived class of Statement.
  * This object represents the abstract syntax grammar for a call-statement.
  * This class contains the following:
- *   -  @code{Procedure} which is the procedure that this statement is calling.
+ *   -  Procedure which is the procedure that this statement is calling.
  */
 class Call : public Statement {
 private:
@@ -99,10 +99,10 @@ public:
 };
 
 /**
- * @code{Print} is a derived class of @code{Statement}.
+ * Print is a derived class of Statement.
  * This object represents the abstract syntax grammar for a print-statement.
  * This class contains the following:
- *   -  @code{Variable} which is the variable that this statement is going to print.
+ *   -  Variable which is the variable that this statement is going to print.
  */
 class Print : public Statement {
 private:
@@ -112,10 +112,10 @@ public:
 };
 
 /**
- * @code{Read} is a derived class of @code{Statement}.
+ * Read is a derived class of Statement.
  * This object represents the abstract syntax grammar for a read-statement.
  * This class contains the following:
- *   -  @code{Variable} which is the variable that this statement is going to read.
+ *   -  Variable which is the variable that this statement is going to read.
  */
 class Read : public Statement {
 private:

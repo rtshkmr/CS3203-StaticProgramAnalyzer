@@ -1,11 +1,11 @@
 /**
- * This body file contains the implementation of @code{AssignmentExpression} functions.
+ * This body file contains the implementation of AssignmentExpression functions.
  */
 
 #include "AssignmentExpression.h"
 
 /**
- * This is the constructor for @code{AssignmentExpression}.
+ * This is the constructor for AssignmentExpression.
  * To create this object, you should be dealing with an assign-statement, and the input for this constructor
  *   is the exact expression found in SIMPLE program.
  * @param infix The infix assignment to be stored.

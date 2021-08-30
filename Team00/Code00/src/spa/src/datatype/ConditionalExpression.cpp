@@ -1,11 +1,11 @@
 /**
- * This body file contains the implementation of @code{ConditionalExpression} functions.
+ * This body file contains the implementation of ConditionalExpression functions.
  */
 
 #include "ConditionalExpression.h"
 
 /**
- * This is the constructor for @code{ConditionalExpression}.
+ * This is the constructor for ConditionalExpression.
  * To create this object, you should be dealing with an if-statement or while-statement,
  *   and the input for this constructor is the exact conditional expression found in SIMPLE program.
  * @param infix The conditional assignment to be stored.
