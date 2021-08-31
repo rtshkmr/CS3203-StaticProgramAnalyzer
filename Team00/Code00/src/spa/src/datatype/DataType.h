@@ -14,13 +14,13 @@
  *     statements, one statement, or partial statement.
  */
 class StatementNumber {
-private:
-    int num;
+ private:
+  int num_;
 
-public:
-    StatementNumber(int sn);
+ public:
+  StatementNumber(int sn);
 
-    int getNum();
+  int getNum();
 };
 
 /**
@@ -29,13 +29,13 @@ public:
  *     statements, one statement, or partial statement.
  */
 class LineNumber {
-private:
-    int num;
+ private:
+  int num_;
 
-public:
-    LineNumber(int ln);
+ public:
+  LineNumber(int ln);
 
-    int getNum();
+  int getNum();
 };
 
 /**
@@ -43,13 +43,13 @@ public:
  * This object checks and ensure that the received procedure name is correct according to the lexical tokens
  */
 class ProcedureName {
-private:
-    std::string name;
+ private:
+  std::string name_;
 
-public:
-    ProcedureName(std::string pName);
+ public:
+  ProcedureName(std::string pName);
 
-    std::string getName();
+  std::string getName();
 };
 
 /**
@@ -57,29 +57,29 @@ public:
  * This object checks and ensure that the received variable name is correct according to the lexical tokens
  */
 class VariableName {
-private:
-    std::string name;
+ private:
+  std::string name_;
 
-public:
-    VariableName(std::string vName);
+ public:
+  VariableName(std::string vName);
 
-    std::string getName();
+  std::string getName();
 };
 
 /**
- * Constant refers to a constant encountered in the program.
+ * ConstantValue refers to a constant encountered in the program.
  * This object checks and ensure that the received constants is correct according to the lexical tokens,
  *   and based on the program rule limiting the number of digits within a constant.
  * Side note: constants does not have a name to identify them.
  */
-class Constant {
-private:
-    int digits;
+class ConstantValue {
+ private:
+  int value_;
 
-public:
-    Constant(std::string constant);
+ public:
+  ConstantValue(std::string constant);
 
-    int get();
+  int get();
 };
 
 #endif //AUTOTESTER_DATATYPE_H

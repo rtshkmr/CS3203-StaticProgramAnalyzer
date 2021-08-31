@@ -24,33 +24,33 @@ class Else;
  *   -  An Else object which contains the statements to execute if the conditional expression evaluates to false.
  */
 class If : public Statement {
-private:
-    ConditionalExpression *condExpr;
-    std::vector<Statement> ifStmtList;
-    Else *elseStmtList; //TODO: check if keeping ELSE as object or merge ELSE object into IF object
+ private:
+  ConditionalExpression* cond_expr_;
+  std::vector<Statement> if_stmt_list_;
+  Else* else_stmt_list_; //TODO: check if keeping ELSE as object or merge ELSE object into IF object
 
-public:
-    If(std::string condition);
+ public:
+  If(std::string condition);
 
-    ConditionalExpression *getCondExpr();
+  ConditionalExpression* getCondExpr();
 
-    std::vector<Statement> *getIfStmtList();
+  std::vector<Statement>* getIfStmtList();
 
-    std::vector<Statement> *getElseStmtList();
+  std::vector<Statement>* getElseStmtList();
 
-    bool setElseStmtList(Else *elseStmt);
+  bool setElseStmtList(Else* else_stmt);
 };
 
 /**
  * Else is a derived class of Statement and a composition object of If object.
  */
 class Else : public Statement {
-private:
-    std::vector<Statement> elseStmtList;
-public:
-    Else();
+ private:
+  std::vector<Statement> else_stmt_list_;
+ public:
+  Else();
 
-    std::vector<Statement> *getElseStmtList();
+  std::vector<Statement>* getElseStmtList();
 };
 
 /**
@@ -61,15 +61,15 @@ public:
  *   -  A list of Statement to execute when the above condition is true.
  */
 class While : public Statement {
-private:
-    ConditionalExpression *condExpr;
-    std::vector<Statement> stmtList;
-public:
-    While(std::string condition);
+ private:
+  ConditionalExpression* cond_expr_;
+  std::vector<Statement> stmt_list_;
+ public:
+  While(std::string condition);
 
-    ConditionalExpression *getCondExpr();
+  ConditionalExpression* getCondExpr();
 
-    std::vector<Statement> *getStmtList();
+  std::vector<Statement>* getStmtList();
 
 };
 
@@ -81,15 +81,15 @@ public:
  *   -  An AssignmentExpression which contains the full expression to evaluate for this statement.
  */
 class Assign : public Statement {
-private:
-    Variable *assignTo;
-    AssignmentExpression *expr;
-public:
-    Assign(Variable *v, std::string expression);
+ private:
+  Variable* assigned_to_;
+  AssignmentExpression* expr_;
+ public:
+  Assign(Variable* var, std::string expression);
 
-    Variable *getVariable();
+  Variable* getVariable();
 
-    AssignmentExpression *getAssignmentExpr();
+  AssignmentExpression* getAssignmentExpr();
 };
 
 /**
@@ -99,13 +99,13 @@ public:
  *   -  Procedure which is the procedure that this statement is calling.
  */
 class Call : public Statement {
-private:
-    Procedure *proc;
+ private:
+  Procedure* proc_name_;
 
-public:
-    Call(Procedure *procName);
+ public:
+  Call(Procedure* proc_name);
 
-    Procedure *getProcedure();
+  Procedure* getProcedure();
 };
 
 /**
@@ -115,12 +115,12 @@ public:
  *   -  Variable which is the variable that this statement is going to print.
  */
 class Print : public Statement {
-private:
-    Variable *var;
-public:
-    Print(Variable *vName);
+ private:
+  Variable* var_name_;
+ public:
+  Print(Variable* var_name);
 
-    Variable *getVariable();
+  Variable* getVariable();
 };
 
 /**
@@ -130,12 +130,12 @@ public:
  *   -  Variable which is the variable that this statement is going to read.
  */
 class Read : public Statement {
-private:
-    Variable *var;
-public:
-    Read(Variable *vName);
+ private:
+  Variable* var_name_;
+ public:
+  Read(Variable* var_name);
 
-    Variable *getVariable();
+  Variable* getVariable();
 };
 
 #endif //AUTOTESTER_STATEMENT_H

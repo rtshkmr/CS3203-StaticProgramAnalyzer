@@ -11,7 +11,7 @@
  * @param infix The conditional assignment to be stored.
  */
 ConditionalExpression::ConditionalExpression(std::string expr) {
-    expression = parseExpression(expr);
+  expression_ = ParseExpression(expr);
 }
 
 /**
@@ -19,7 +19,7 @@ ConditionalExpression::ConditionalExpression(std::string expr) {
  * @param infix The conditional expression to be converted.
  * @return The expression which is transformed into <<SOME>> style.
  */
-std::string ConditionalExpression::parseExpression(std::string inExpression) {
-    //TODO: logic for parsing expression.
-    return inExpression;
+std::string ConditionalExpression::ParseExpression(std::string inExpression) {
+  //TODO: logic for parsing expression.
+  return inExpression;
 }

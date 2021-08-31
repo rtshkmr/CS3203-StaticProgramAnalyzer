@@ -8,14 +8,13 @@
 #include <string>
 
 class ConditionalExpression {
-private:
-    std::string expression;
+ private:
+  std::string expression_;
 
-    std::string parseExpression(std::string inExpression);
+  std::string ParseExpression(std::string inExpression);
 
-public:
-    ConditionalExpression(std::string expr);
+ public:
+  ConditionalExpression(std::string expr);
 };
-
 
 #endif //AUTOTESTER_CONDITIONALEXPRESSION_H
