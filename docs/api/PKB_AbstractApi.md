@@ -40,7 +40,6 @@
     * Description: Returns a list of VAR, v, where Uses (stmt, v). Empty list otherwise.
 13. STMT[] getStmtUsing(Var v)
     * Description: Returns a list of STMT, s, where Uses (s, v). Empty list otherwise.
-
 14. VAR[] getVarModified()
     * Description:  Returns a list of VAR, v, where Modifies (stmt, v). Empty list otherwise.
 15. STMT[] getStmtModifying()

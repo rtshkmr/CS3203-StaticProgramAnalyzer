@@ -1,0 +1,38 @@
+classDiagram
+    class Parser {
+        - sourceCode: FILE
+    }
+    class PSubsystem {
+
+        Subsystem State
+        - validState: Boolean
+        - followStack: Stack
+        - parentStack: Stack
+        - sourceNode:Program
+        - currentNode:Statement
+
+        Entity List
+        - variableList: List<Variable> 
+        - procList: List<Procedure>
+        - ifElseList: List<If>
+        - readList: List<Read>
+        - printList: List<Print>
+        - assignList: List<Assign> 
+        - callList: List<Call> 
+        - whileList: List<While> 
+
+        Relational Hashtable
+        - stmtToLine: Map<StatementNumber, LineNumber> 
+        - followHash: Map<Statement, Statement> 
+        - parentHash: Map<Statement, Statement> 
+        - useHash: Map<Statement, Statement> 
+        - modifiesHash: Map<Statement, Statement> 
+
+        - generateFollowStar()
+        - generateParentStar()
+        - generateUseStar()
+        - generateModifiesStar()
+    }
+
+    class Tokenizer { 
+    }
