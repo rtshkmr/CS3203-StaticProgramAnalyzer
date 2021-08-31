@@ -4,80 +4,80 @@
 
 #include "Statement.h"
 
-If::If(std::string condition) {
+IfEntity::IfEntity(std::string condition) {
   cond_expr_ = new ConditionalExpression(condition);
 }
 
-ConditionalExpression* If::getCondExpr() {
+ConditionalExpression* IfEntity::getCondExpr() {
   return cond_expr_;
 }
 
-std::vector<Statement>* If::getIfStmtList() {
+std::vector<Statement>* IfEntity::getIfStmtList() {
   return &if_stmt_list_;
 }
 
-std::vector<Statement>* If::getElseStmtList() {
+std::vector<Statement>* IfEntity::getElseStmtList() {
   return else_stmt_list_->getElseStmtList();
 }
 
-bool If::setElseStmtList(Else* else_stmt) {
+bool IfEntity::setElseStmtList(ElseEntity* else_stmt) {
   else_stmt_list_ = else_stmt;
   return true; //assume success setter
 }
 
-Else::Else() {
+ElseEntity::ElseEntity() {
 
 }
 
-std::vector<Statement>* Else::getElseStmtList() {
+std::vector<Statement>* ElseEntity::getElseStmtList() {
   return &else_stmt_list_;
 }
 
-While::While(std::string condition) {
+WhileEntity::WhileEntity(std::string condition) {
   cond_expr_ = new ConditionalExpression(condition);
 }
 
-ConditionalExpression* While::getCondExpr() {
+ConditionalExpression* WhileEntity::getCondExpr() {
   return cond_expr_;
 }
 
-std::vector<Statement>* While::getStmtList() {
+std::vector<Statement>* WhileEntity::getStmtList() {
   return &stmt_list_;
 }
 
-Assign::Assign(Variable* var, std::string expression) {
+AssignEntity::AssignEntity(Variable* var, std::string expression) {
   assigned_to_ = var;
   expr_ = new AssignmentExpression(expression);
 }
 
-Variable* Assign::getVariable() {
+Variable* AssignEntity::getVariable() {
   return assigned_to_;
 }
 
-AssignmentExpression* Assign::getAssignmentExpr() {
+AssignmentExpression* AssignEntity::getAssignmentExpr() {
   return expr_;
 }
 
-Call::Call(Procedure* proc_name) {
+CallEntity::CallEntity(Procedure* proc_name) {
   proc_name_ = proc_name;
 }
 
-Procedure* Call::getProcedure() {
+Procedure* CallEntity::getProcedure() {
   return proc_name_;
 }
 
-Print::Print(Variable* var_name) {
+PrintEntity::PrintEntity(Variable* var_name) {
   var_name_ = var_name;
 }
 
-Variable* Print::getVariable() {
+Variable* PrintEntity::getVariable() {
   return var_name_;
 }
 
-Read::Read(Variable* var_name) {
+ReadEntity::ReadEntity(Variable* var_name) {
   var_name_ = var_name;
 }
 
-Variable* Read::getVariable() {
+Variable* ReadEntity::getVariable() {
   return var_name_;
 }
