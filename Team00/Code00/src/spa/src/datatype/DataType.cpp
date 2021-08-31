@@ -13,9 +13,9 @@
  * @throws std::invalid_argument when a negative integer is passed in.
  */
 StatementNumber::StatementNumber(int sn) {
-    if (sn < 1)
-        throw std::invalid_argument("Statement Number should not be negative.");
-    num = sn;
+  if (sn < 1)
+    throw std::invalid_argument("Statement Number should not be negative.");
+  num = sn;
 }
 
 /**
@@ -23,7 +23,7 @@ StatementNumber::StatementNumber(int sn) {
  * @return [Not Null] The statement number
  */
 int StatementNumber::getNum() {
-    return num;
+  return num;
 }
 
 /**
@@ -33,9 +33,9 @@ int StatementNumber::getNum() {
  * @throws std::invalid_argument when a negative integer is passed in.
  */
 LineNumber::LineNumber(int ln) {
-    if (ln < 1)
-        throw std::invalid_argument("Line Number should not be negative.");
-    num = ln;
+  if (ln < 1)
+    throw std::invalid_argument("Line Number should not be negative.");
+  num = ln;
 }
 
 /**
@@ -43,7 +43,7 @@ LineNumber::LineNumber(int ln) {
  * @return [Not Null] The line number
  */
 int LineNumber::getNum() {
-    return num;
+  return num;
 }
 
 /**
@@ -53,8 +53,8 @@ int LineNumber::getNum() {
  * @throws std::invalid_argument when an invalid procedure name is passed in.
  */
 ProcedureName::ProcedureName(std::string pName) {
-    //TODO: validate name syntax
-    name = pName;
+  //TODO: validate name syntax
+  name = pName;
 }
 
 /**
@@ -62,7 +62,7 @@ ProcedureName::ProcedureName(std::string pName) {
  * @return [Not Null] The procedure name
  */
 std::string ProcedureName::getName() {
-    return name;
+  return name;
 }
 
 /**
@@ -72,8 +72,8 @@ std::string ProcedureName::getName() {
  * @throws std::invalid_argument when an invalid variable name is passed in.
  */
 VariableName::VariableName(std::string vName) {
-    //TODO: validate name syntax
-    name = vName;
+  //TODO: validate name syntax
+  name = vName;
 }
 
 /**
@@ -81,7 +81,7 @@ VariableName::VariableName(std::string vName) {
  * @return [Not Null] The variable name
  */
 std::string VariableName::getName() {
-    return name;
+  return name;
 }
 
 /**
@@ -91,8 +91,8 @@ std::string VariableName::getName() {
  * @throws std::invalid_argument when a non-integer in passed in.
  */
 Constant::Constant(std::string constant) {
-    //TODO: check if constant is valid.
-    digits = stoi(constant);
+  //TODO: check if constant is valid.
+  digits = stoi(constant);
 }
 
 /**
@@ -100,5 +100,16 @@ Constant::Constant(std::string constant) {
  * @return [Not Null] The constant value
  */
 int Constant::get() {
-    return digits;
+  return digits;
 }
+
+/**
+ * Constructor for token
+ * @param token_string [NOT NULL] The string representation of the SIMPLE programme statement.
+ * @param token_tag [NOT NULL] The enumerator object to the tag
+ */
+Token::Token(const std::string* token_string, TokenTag token_tag) {
+  token_string = token_string;
+  token_tag = token_tag;
+}
+
