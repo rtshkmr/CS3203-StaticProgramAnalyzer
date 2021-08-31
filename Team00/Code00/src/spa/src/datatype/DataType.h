@@ -100,8 +100,8 @@ enum class TokenTag {
  */
 class Token {
  private:
-  std::string* token_string;
-  TokenTag token_tag;
+  std::string* token_string_;
+  TokenTag token_tag_;
  public:
   explicit Token(const std::string* token_string, TokenTag token_tag);
 };

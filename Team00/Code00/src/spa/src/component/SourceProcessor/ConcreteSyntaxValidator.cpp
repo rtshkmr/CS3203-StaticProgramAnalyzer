@@ -7,10 +7,10 @@
 
 ConcreteSyntaxValidator::ConcreteSyntaxValidator() = default;
 
-bool ConcreteSyntaxValidator::validateToken(Token token) {
+bool ConcreteSyntaxValidator::ValidateToken(Token token) {
   return true;
 }
 
-bool ConcreteSyntaxValidator::validateConcreteSyntax(vector<Token> tokens) {
+bool ConcreteSyntaxValidator::ValidateConcreteSyntax(vector<Token> tokens) {
   return true;
 }

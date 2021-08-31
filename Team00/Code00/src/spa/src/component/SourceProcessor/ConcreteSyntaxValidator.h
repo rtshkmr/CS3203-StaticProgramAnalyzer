@@ -12,10 +12,10 @@ using namespace std;
 class ConcreteSyntaxValidator {
  public:
   ConcreteSyntaxValidator();
-  bool validateConcreteSyntax(vector<Token> tokens);
+  bool ValidateConcreteSyntax(vector<Token> tokens);
 
  private:
-  bool validateToken(Token token);
+  bool ValidateToken(Token token);
 };
 
 #endif //AUTOTESTER_TEAM00_CODE00_SRC_SPA_SRC_COMPONENT_SOURCEPROCESSOR_CONCRETESYNTAXVALIDATOR_H_
