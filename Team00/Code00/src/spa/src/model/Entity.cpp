@@ -5,30 +5,30 @@
 #include <list>
 #include "Entity.h"
 
-Procedure::Procedure(ProcedureName *pName) {
-    procedureName = pName;
+Procedure::Procedure(ProcedureName* pName) {
+  procedure_name_ = pName;
 }
 
-const ProcedureName *Procedure::getName() {
-    return procedureName;
+const ProcedureName* Procedure::getName() {
+  return procedure_name_;
 }
 
-std::list<Statement> *Procedure::getStatementList() {
-    return &statementList;
+std::list<Statement>* Procedure::getStatementList() {
+  return &statement_list_;
 }
 
-Variable::Variable(VariableName *vName) {
-    variableName = vName;
+Variable::Variable(VariableName* vName) {
+  variable_name_ = vName;
 }
 
-const VariableName *Variable::getName() {
-    return variableName;
+const VariableName* Variable::getName() {
+  return variable_name_;
 }
 
 Program::Program(Procedure p) {
-    procedureList.push_back(p);
+  procedure_list_.push_back(p);
 }
 
-std::list<Procedure> *Program::getProcedureList() {
-    return &procedureList;
+std::list<Procedure>* Program::getProcedureList() {
+  return &procedure_list_;
 }

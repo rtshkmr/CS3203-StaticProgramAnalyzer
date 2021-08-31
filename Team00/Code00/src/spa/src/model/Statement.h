@@ -13,129 +13,129 @@
 #ifndef AUTOTESTER_STATEMENT_H
 #define AUTOTESTER_STATEMENT_H
 
-class Else;
+class ElseEntity;
 
 /**
- * If is a derived class of Statement.
+ * IfEntity is a derived class of Statement.
  * This object represents the abstract syntax grammar for an if-statement.
  * This class contains the following:
  *   -  ConditionalExpression which is the conditional expression for the if-statement.
  *   -  A list of Statement to execute when the above condition is true.
- *   -  An Else object which contains the statements to execute if the conditional expression evaluates to false.
+ *   -  An ElseEntity object which contains the statements to execute if the conditional expression evaluates to false.
  */
-class If : public Statement {
-private:
-    ConditionalExpression *condExpr;
-    std::vector<Statement> ifStmtList;
-    Else *elseStmtList; //TODO: check if keeping ELSE as object or merge ELSE object into IF object
+class IfEntity : public Statement {
+ private:
+  ConditionalExpression* cond_expr_;
+  std::vector<Statement> if_stmt_list_;
+  ElseEntity* else_stmt_list_; //TODO: check if keeping ELSE as object or merge ELSE object into IF object
 
-public:
-    If(std::string condition);
+ public:
+  IfEntity(std::string condition);
 
-    ConditionalExpression *getCondExpr();
+  ConditionalExpression* getCondExpr();
 
-    std::vector<Statement> *getIfStmtList();
+  std::vector<Statement>* getIfStmtList();
 
-    std::vector<Statement> *getElseStmtList();
+  std::vector<Statement>* getElseStmtList();
 
-    bool setElseStmtList(Else *elseStmt);
+  bool setElseStmtList(ElseEntity* else_stmt);
 };
 
 /**
- * Else is a derived class of Statement and a composition object of If object.
+ * ElseEntity is a derived class of Statement and a composition object of IfEntity object.
  */
-class Else : public Statement {
-private:
-    std::vector<Statement> elseStmtList;
-public:
-    Else();
+class ElseEntity : public Statement {
+ private:
+  std::vector<Statement> else_stmt_list_;
+ public:
+  ElseEntity();
 
-    std::vector<Statement> *getElseStmtList();
+  std::vector<Statement>* getElseStmtList();
 };
 
 /**
- * While is a derived class of Statement.
+ * WhileEntity is a derived class of Statement.
  * This object represents the abstract syntax grammar for a while-statement.
  * This class contains the following:
  *   -  ConditionalExpression which is the conditional expression for the if-statement.
  *   -  A list of Statement to execute when the above condition is true.
  */
-class While : public Statement {
-private:
-    ConditionalExpression *condExpr;
-    std::vector<Statement> stmtList;
-public:
-    While(std::string condition);
+class WhileEntity : public Statement {
+ private:
+  ConditionalExpression* cond_expr_;
+  std::vector<Statement> stmt_list_;
+ public:
+  WhileEntity(std::string condition);
 
-    ConditionalExpression *getCondExpr();
+  ConditionalExpression* getCondExpr();
 
-    std::vector<Statement> *getStmtList();
+  std::vector<Statement>* getStmtList();
 
 };
 
 /**
- * Assign is a derived class of Statement.
+ * AssignEntity is a derived class of Statement.
  * This object represents the abstract syntax grammar for an assign-statement.
  * This class contains the following:
  *   -  Variable which is the variable that this expression is assigned to.
  *   -  An AssignmentExpression which contains the full expression to evaluate for this statement.
  */
-class Assign : public Statement {
-private:
-    Variable *assignTo;
-    AssignmentExpression *expr;
-public:
-    Assign(Variable *v, std::string expression);
+class AssignEntity : public Statement {
+ private:
+  Variable* assigned_to_;
+  AssignmentExpression* expr_;
+ public:
+  AssignEntity(Variable* var, std::string expression);
 
-    Variable *getVariable();
+  Variable* getVariable();
 
-    AssignmentExpression *getAssignmentExpr();
+  AssignmentExpression* getAssignmentExpr();
 };
 
 /**
- * Call is a derived class of Statement.
+ * CallEntity is a derived class of Statement.
  * This object represents the abstract syntax grammar for a call-statement.
  * This class contains the following:
  *   -  Procedure which is the procedure that this statement is calling.
  */
-class Call : public Statement {
-private:
-    Procedure *proc;
+class CallEntity : public Statement {
+ private:
+  Procedure* proc_name_;
 
-public:
-    Call(Procedure *procName);
+ public:
+  CallEntity(Procedure* proc_name);
 
-    Procedure *getProcedure();
+  Procedure* getProcedure();
 };
 
 /**
- * Print is a derived class of Statement.
+ * PrintEntity is a derived class of Statement.
  * This object represents the abstract syntax grammar for a print-statement.
  * This class contains the following:
  *   -  Variable which is the variable that this statement is going to print.
  */
-class Print : public Statement {
-private:
-    Variable *var;
-public:
-    Print(Variable *vName);
+class PrintEntity : public Statement {
+ private:
+  Variable* var_name_;
+ public:
+  PrintEntity(Variable* var_name);
 
-    Variable *getVariable();
+  Variable* getVariable();
 };
 
 /**
- * Read is a derived class of Statement.
+ * ReadEntity is a derived class of Statement.
  * This object represents the abstract syntax grammar for a read-statement.
  * This class contains the following:
  *   -  Variable which is the variable that this statement is going to read.
  */
-class Read : public Statement {
-private:
-    Variable *var;
-public:
-    Read(Variable *vName);
+class ReadEntity : public Statement {
+ private:
+  Variable* var_name_;
+ public:
+  ReadEntity(Variable* var_name);
 
-    Variable *getVariable();
+  Variable* getVariable();
 };
 
 #endif //AUTOTESTER_STATEMENT_H

@@ -4,80 +4,80 @@
 
 #include "Statement.h"
 
-If::If(std::string condition) {
-    condExpr = new ConditionalExpression(condition);
+IfEntity::IfEntity(std::string condition) {
+  cond_expr_ = new ConditionalExpression(condition);
 }
 
-ConditionalExpression *If::getCondExpr() {
-    return condExpr;
+ConditionalExpression* IfEntity::getCondExpr() {
+  return cond_expr_;
 }
 
-std::vector<Statement> *If::getIfStmtList() {
-    return &ifStmtList;
+std::vector<Statement>* IfEntity::getIfStmtList() {
+  return &if_stmt_list_;
 }
 
-std::vector<Statement> *If::getElseStmtList() {
-    return elseStmtList->getElseStmtList();
+std::vector<Statement>* IfEntity::getElseStmtList() {
+  return else_stmt_list_->getElseStmtList();
 }
 
-bool If::setElseStmtList(Else *elseStmt) {
-    elseStmtList = elseStmt;
-    return true; //assume success setter
+bool IfEntity::setElseStmtList(ElseEntity* else_stmt) {
+  else_stmt_list_ = else_stmt;
+  return true; //assume success setter
 }
 
-Else::Else() {
+ElseEntity::ElseEntity() {
 
 }
 
-std::vector<Statement> *Else::getElseStmtList() {
-    return &elseStmtList;
+std::vector<Statement>* ElseEntity::getElseStmtList() {
+  return &else_stmt_list_;
 }
 
-While::While(std::string condition) {
-    condExpr = new ConditionalExpression(condition);
+WhileEntity::WhileEntity(std::string condition) {
+  cond_expr_ = new ConditionalExpression(condition);
 }
 
-ConditionalExpression *While::getCondExpr() {
-    return condExpr;
+ConditionalExpression* WhileEntity::getCondExpr() {
+  return cond_expr_;
 }
 
-std::vector<Statement> *While::getStmtList() {
-    return &stmtList;
+std::vector<Statement>* WhileEntity::getStmtList() {
+  return &stmt_list_;
 }
 
-Assign::Assign(Variable *v, std::string expression) {
-    assignTo = v;
-    expr = new AssignmentExpression(expression);
+AssignEntity::AssignEntity(Variable* var, std::string expression) {
+  assigned_to_ = var;
+  expr_ = new AssignmentExpression(expression);
 }
 
-Variable *Assign::getVariable() {
-    return assignTo;
+Variable* AssignEntity::getVariable() {
+  return assigned_to_;
 }
 
-AssignmentExpression *Assign::getAssignmentExpr() {
-    return expr;
+AssignmentExpression* AssignEntity::getAssignmentExpr() {
+  return expr_;
 }
 
-Call::Call(Procedure *procName) {
-    proc = procName;
+CallEntity::CallEntity(Procedure* proc_name) {
+  proc_name_ = proc_name;
 }
 
-Procedure *Call::getProcedure() {
-    return proc;
+Procedure* CallEntity::getProcedure() {
+  return proc_name_;
 }
 
-Print::Print(Variable *vName) {
-    var = vName;
+PrintEntity::PrintEntity(Variable* var_name) {
+  var_name_ = var_name;
 }
 
-Variable *Print::getVariable() {
-    return var;
+Variable* PrintEntity::getVariable() {
+  return var_name_;
 }
 
-Read::Read(Variable *vName) {
-    var = vName;
+ReadEntity::ReadEntity(Variable* var_name) {
+  var_name_ = var_name;
 }
 
-Variable *Read::getVariable() {
-    return var;
+Variable* ReadEntity::getVariable() {
+  return var_name_;
 }

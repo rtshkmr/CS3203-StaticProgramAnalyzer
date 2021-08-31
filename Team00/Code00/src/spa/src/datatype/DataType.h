@@ -15,7 +15,7 @@
  */
 class StatementNumber {
  private:
-  int num;
+  int num_;
 
  public:
   StatementNumber(int sn);
@@ -30,7 +30,7 @@ class StatementNumber {
  */
 class LineNumber {
  private:
-  int num;
+  int num_;
 
  public:
   LineNumber(int ln);
@@ -44,7 +44,7 @@ class LineNumber {
  */
 class ProcedureName {
  private:
-  std::string name;
+  std::string name_;
 
  public:
   ProcedureName(std::string pName);
@@ -58,7 +58,7 @@ class ProcedureName {
  */
 class VariableName {
  private:
-  std::string name;
+  std::string name_;
 
  public:
   VariableName(std::string vName);
@@ -67,44 +67,19 @@ class VariableName {
 };
 
 /**
- * Constant refers to a constant encountered in the program.
+ * ConstantValue refers to a constant encountered in the program.
  * This object checks and ensure that the received constants is correct according to the lexical tokens,
  *   and based on the program rule limiting the number of digits within a constant.
  * Side note: constants does not have a name to identify them.
  */
-class Constant {
+class ConstantValue {
  private:
-  int digits;
+  int value_;
 
  public:
-  Constant(std::string constant);
+  ConstantValue(std::string constant);
 
   int get();
-};
-
-enum class TokenTag {
-  // todo: add fixed set of tags for token from the Concrete Grammar
-  //       these tags will determine the rule-set that is used by the CGV to validate syntax
-  kInteger,
-  kDigit,
-  kLetter,
-  kName,
-  kMetaSymbol,
-  kOpenBrace,
-  kCloseBrace,
-};
-
-
-/**
- * A Lexical Token represents a discrete unit within a particular source statement. It contains a string pointer to
- * the space-delimited string that it was originally created from as well as TokenTag that indicates the type of token it is.
- */
-class Token {
- private:
-  std::string* token_string;
-  TokenTag token_tag;
- public:
-  explicit Token(const std::string* token_string, TokenTag token_tag);
 };
 
 #endif //AUTOTESTER_DATATYPE_H
