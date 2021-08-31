@@ -10,7 +10,9 @@ add_library(spa ${srcs} ${headers}
         src/component/PKB/PKB.cpp src/component/PKB/PKB.h
         src/component/SourceProcessor/DesignExtractor.cpp
         src/component/SourceProcessor/Parser.h src/component/SourceProcessor/Parser.cpp
-        src/component/SourceProcessor/Tokenizer.cpp src/component/SourceProcessor/Tokenizer.h src/component/SourceProcessor/ConcreteSyntaxValidator.cpp src/component/SourceProcessor/ConcreteSyntaxValidator.h src/component/SourceProcessor/EntityFactory.cpp src/component/SourceProcessor/EntityFactory.h)
+        src/component/SourceProcessor/Tokenizer.cpp src/component/SourceProcessor/Tokenizer.h
+        src/component/SourceProcessor/ConcreteSyntaxValidator.cpp src/component/SourceProcessor/ConcreteSyntaxValidator.h
+        src/component/SourceProcessor/EntityFactory.cpp src/component/SourceProcessor/EntityFactory.h
         src/datatype/Identifier.cpp
         src/datatype/Identifier.h src/datatype/Deliverable.cpp
         src/datatype/Deliverable.h

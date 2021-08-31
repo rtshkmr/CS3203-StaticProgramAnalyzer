@@ -82,4 +82,27 @@ class ConstantValue {
   int get();
 };
 
+enum class TokenTag {
+  // todo: add fixed set of tags for token from the Concrete Grammar
+  //       these tags will determine the rule-set that is used by the CGV to validate syntax
+  kInteger,
+  kDigit,
+  kLetter,
+  kName,
+  kMetaSymbol,
+  kOpenBrace,
+  kCloseBrace,
+  };
+
+/**
+ * A Lexical Token represents a discrete unit within a particular source statement. It contains a string pointer to
+ * the space-delimited string that it was originally created from as well as TokenTag that indicates the type of token it is.
+ */
+class Token {
+ private:
+  std::string* token_string;
+  TokenTag token_tag;
+ public:
+  explicit Token(const std::string* token_string, TokenTag token_tag);
+};
 #endif //AUTOTESTER_DATATYPE_H

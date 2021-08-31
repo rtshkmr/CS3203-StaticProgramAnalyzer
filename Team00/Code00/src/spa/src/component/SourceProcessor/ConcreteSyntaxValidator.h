@@ -4,13 +4,18 @@
 #ifndef AUTOTESTER_TEAM00_CODE00_SRC_SPA_SRC_COMPONENT_SOURCEPROCESSOR_CONCRETESYNTAXVALIDATOR_H_
 #define AUTOTESTER_TEAM00_CODE00_SRC_SPA_SRC_COMPONENT_SOURCEPROCESSOR_CONCRETESYNTAXVALIDATOR_H_
 
-class ConcreteSyntaxValidator {
-  public:
-  ConcreteSyntaxValidator();
-  static bool validateConcreteSyntax(vector<Token> tokens);
+#include <datatype/DataType.h>
+#include <vector>
 
-  private:
-  static bool validateToken(Token token)
+using namespace std;
+
+class ConcreteSyntaxValidator {
+ public:
+  ConcreteSyntaxValidator();
+  bool validateConcreteSyntax(vector<Token> tokens);
+
+ private:
+  bool validateToken(Token token);
 };
 
 #endif //AUTOTESTER_TEAM00_CODE00_SRC_SPA_SRC_COMPONENT_SOURCEPROCESSOR_CONCRETESYNTAXVALIDATOR_H_
