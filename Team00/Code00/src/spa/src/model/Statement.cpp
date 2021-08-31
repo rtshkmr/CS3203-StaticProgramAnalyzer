@@ -8,19 +8,19 @@ If::If(std::string condition) {
     condExpr = new ConditionalExpression(condition);
 }
 
-ConditionalExpression* If::getCondExpr() {
+ConditionalExpression *If::getCondExpr() {
     return condExpr;
 }
 
-std::vector<Statement>* If::getIfStmtList() {
+std::vector<Statement> *If::getIfStmtList() {
     return &ifStmtList;
 }
 
-std::vector<Statement>* If::getElseStmtList() {
+std::vector<Statement> *If::getElseStmtList() {
     return elseStmtList->getElseStmtList();
 }
 
-bool If::setElseStmtList(Else* elseStmt) {
+bool If::setElseStmtList(Else *elseStmt) {
     elseStmtList = elseStmt;
     return true; //assume success setter
 }
@@ -29,7 +29,7 @@ Else::Else() {
 
 }
 
-std::vector<Statement>* Else::getElseStmtList() {
+std::vector<Statement> *Else::getElseStmtList() {
     return &elseStmtList;
 }
 
@@ -37,40 +37,40 @@ While::While(std::string condition) {
     condExpr = new ConditionalExpression(condition);
 }
 
-ConditionalExpression* While::getCondExpr() {
+ConditionalExpression *While::getCondExpr() {
     return condExpr;
 }
 
-std::vector<Statement>* While::getStmtList() {
+std::vector<Statement> *While::getStmtList() {
     return &stmtList;
 }
 
-Assign::Assign(Variable* v, std::string expression) {
+Assign::Assign(Variable *v, std::string expression) {
     assignTo = v;
     expr = new AssignmentExpression(expression);
 }
 
-Variable* Assign::getVariable() {
+Variable *Assign::getVariable() {
     return assignTo;
 }
 
-AssignmentExpression* Assign::getAssignmentExpr() {
+AssignmentExpression *Assign::getAssignmentExpr() {
     return expr;
 }
 
-Call::Call(Procedure* procName) {
+Call::Call(Procedure *procName) {
     proc = procName;
 }
 
-Procedure* Call::getProcedure() {
+Procedure *Call::getProcedure() {
     return proc;
 }
 
-Print::Print(Variable* vName) {
+Print::Print(Variable *vName) {
     var = vName;
 }
 
-Variable* Print::getVariable() {
+Variable *Print::getVariable() {
     return var;
 }
 

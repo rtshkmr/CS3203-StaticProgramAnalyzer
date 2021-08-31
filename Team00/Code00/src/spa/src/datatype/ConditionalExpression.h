@@ -10,7 +10,9 @@
 class ConditionalExpression {
 private:
     std::string expression;
+
     std::string parseExpression(std::string inExpression);
+
 public:
     ConditionalExpression(std::string expr);
 };

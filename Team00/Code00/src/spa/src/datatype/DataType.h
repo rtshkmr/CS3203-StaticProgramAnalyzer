@@ -19,6 +19,7 @@ private:
 
 public:
     StatementNumber(int sn);
+
     int getNum();
 };
 
@@ -33,6 +34,7 @@ private:
 
 public:
     LineNumber(int ln);
+
     int getNum();
 };
 
@@ -46,6 +48,7 @@ private:
 
 public:
     ProcedureName(std::string pName);
+
     std::string getName();
 };
 
@@ -59,6 +62,7 @@ private:
 
 public:
     VariableName(std::string vName);
+
     std::string getName();
 };
 
@@ -74,6 +78,7 @@ private:
 
 public:
     Constant(std::string constant);
+
     int get();
 };
 

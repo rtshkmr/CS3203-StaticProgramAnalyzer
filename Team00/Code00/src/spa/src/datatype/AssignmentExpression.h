@@ -10,12 +10,18 @@
 class AssignmentExpression {
 private:
     std::string expression;
+
     std::string parseInfixToPostfix(std::string infix);
+
 public:
     AssignmentExpression(std::string infix);
+
     bool checkExist(std::string pattern);
+
     bool checkExact(std::string pattern);
+
     bool checkBefore(std::string pattern);
+
     bool checkAfter(std::string pattern);
 };
 

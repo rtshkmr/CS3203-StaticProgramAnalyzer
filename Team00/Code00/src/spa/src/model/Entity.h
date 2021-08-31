@@ -22,10 +22,10 @@ public:
  */
 class Statement : public Entity {
 protected:
-    LineNumber* lineNumber;
-    StatementNumber* statementNumber;
-    Statement* parentNode;
-    Statement* beforeNode;
+    LineNumber *lineNumber;
+    StatementNumber *statementNumber;
+    Statement *parentNode;
+    Statement *beforeNode;
 public:
     virtual ~Statement() {};
 };
@@ -36,12 +36,14 @@ public:
  */
 class Procedure : public Entity {
 private:
-    const ProcedureName* procedureName;
+    const ProcedureName *procedureName;
     std::list<Statement> statementList;
 public:
     Procedure(ProcedureName *procedureName);
-    const ProcedureName* getName();
-    std::list<Statement>* getStatementList();
+
+    const ProcedureName *getName();
+
+    std::list<Statement> *getStatementList();
 };
 
 /**
@@ -49,10 +51,11 @@ public:
  */
 class Variable : public Entity {
 private:
-    const VariableName* variableName;
+    const VariableName *variableName;
 public:
     Variable(VariableName *variableName);
-    const VariableName* getName();
+
+    const VariableName *getName();
 };
 
 /**
@@ -64,7 +67,8 @@ private:
 
 public:
     Program(Procedure p);
-    std::list<Procedure>* getProcedureList();
+
+    std::list<Procedure> *getProcedureList();
 };
 
 #endif //AUTOTESTER_ENTITY_H

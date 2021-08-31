@@ -14,6 +14,7 @@
 #define AUTOTESTER_STATEMENT_H
 
 class Else;
+
 /**
  * If is a derived class of Statement.
  * This object represents the abstract syntax grammar for an if-statement.
@@ -24,15 +25,19 @@ class Else;
  */
 class If : public Statement {
 private:
-    ConditionalExpression* condExpr;
+    ConditionalExpression *condExpr;
     std::vector<Statement> ifStmtList;
-    Else* elseStmtList; //TODO: check if keeping ELSE as object or merge ELSE object into IF object
+    Else *elseStmtList; //TODO: check if keeping ELSE as object or merge ELSE object into IF object
 
 public:
     If(std::string condition);
-    ConditionalExpression* getCondExpr();
-    std::vector<Statement>* getIfStmtList();
-    std::vector<Statement>* getElseStmtList();
+
+    ConditionalExpression *getCondExpr();
+
+    std::vector<Statement> *getIfStmtList();
+
+    std::vector<Statement> *getElseStmtList();
+
     bool setElseStmtList(Else *elseStmt);
 };
 
@@ -44,7 +49,8 @@ private:
     std::vector<Statement> elseStmtList;
 public:
     Else();
-    std::vector<Statement>* getElseStmtList();
+
+    std::vector<Statement> *getElseStmtList();
 };
 
 /**
@@ -56,12 +62,14 @@ public:
  */
 class While : public Statement {
 private:
-    ConditionalExpression* condExpr;
+    ConditionalExpression *condExpr;
     std::vector<Statement> stmtList;
 public:
     While(std::string condition);
-    ConditionalExpression* getCondExpr();
-    std::vector<Statement>* getStmtList();
+
+    ConditionalExpression *getCondExpr();
+
+    std::vector<Statement> *getStmtList();
 
 };
 
@@ -74,12 +82,14 @@ public:
  */
 class Assign : public Statement {
 private:
-    Variable* assignTo;
-    AssignmentExpression* expr;
+    Variable *assignTo;
+    AssignmentExpression *expr;
 public:
-    Assign(Variable* v, std::string expression);
-    Variable* getVariable();
-    AssignmentExpression* getAssignmentExpr();
+    Assign(Variable *v, std::string expression);
+
+    Variable *getVariable();
+
+    AssignmentExpression *getAssignmentExpr();
 };
 
 /**
@@ -90,11 +100,12 @@ public:
  */
 class Call : public Statement {
 private:
-    Procedure* proc;
+    Procedure *proc;
 
 public:
-    Call(Procedure* procName);
-    Procedure* getProcedure();
+    Call(Procedure *procName);
+
+    Procedure *getProcedure();
 };
 
 /**
@@ -105,10 +116,11 @@ public:
  */
 class Print : public Statement {
 private:
-    Variable* var;
+    Variable *var;
 public:
-    Print(Variable* vName);
-    Variable* getVariable();
+    Print(Variable *vName);
+
+    Variable *getVariable();
 };
 
 /**
@@ -119,10 +131,11 @@ public:
  */
 class Read : public Statement {
 private:
-    Variable* var;
+    Variable *var;
 public:
-    Read(Variable* vName);
-    Variable* getVariable();
+    Read(Variable *vName);
+
+    Variable *getVariable();
 };
 
 #endif //AUTOTESTER_STATEMENT_H
