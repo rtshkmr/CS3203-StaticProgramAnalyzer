@@ -10,5 +10,5 @@ void PSubsystem::ProcessStatement(std::string statement) {
 }
 
 Deliverable PSubsystem::GetDeliverables() {
-    return this->deliverable;
+    return this->deliverable_;
 }

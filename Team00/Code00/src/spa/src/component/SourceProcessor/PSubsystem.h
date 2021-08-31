@@ -17,7 +17,7 @@ namespace psub {
      */
     class PSubsystem {
     private:
-        Deliverable deliverable;
+        Deliverable deliverable_;
         // attributes
     public:
         PSubsystem() = default;

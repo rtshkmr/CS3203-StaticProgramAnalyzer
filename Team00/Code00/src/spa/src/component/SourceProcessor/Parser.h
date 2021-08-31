@@ -14,7 +14,7 @@ namespace par {
      */
     class Parser {
     private:
-        Deliverable deliverable;
+        Deliverable deliverable_;
     public:
         Parser() = default;
 

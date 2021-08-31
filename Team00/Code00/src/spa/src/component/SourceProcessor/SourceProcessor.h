@@ -15,7 +15,7 @@ namespace sp {
      */
     class SourceProcessor {
     private:
-        Deliverable deliverable;
+        Deliverable deliverable_;
     public:
         SourceProcessor() = default;
 
