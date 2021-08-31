@@ -14,7 +14,7 @@ EntityFactory::EntityFactory() {
  */
 void EntityFactory::Init(int* psub) {
   if (!this->p_sub_) {
-    this->p_sub_ = p_sub;
+    this->p_sub_ = psub;
   }
 }
 vector<Entity> EntityFactory::CreateEntities(const vector<Token>& tokens) {
