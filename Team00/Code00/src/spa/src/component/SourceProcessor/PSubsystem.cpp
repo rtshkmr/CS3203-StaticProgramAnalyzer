@@ -19,7 +19,7 @@ void PSubsystem::ProcessStatement(std::string statement) {
   std::vector<Token> tokens = Tokenizer::CreateTokens(statement);
   bool valid = syntax_validator_.ValidateConcreteSyntax(tokens);
 
-  if (tokens[0].token_tag_ == TokenTag.kCloseBrace) {
+  if (tokens[0].token_tag_ == TokenTag::kCloseBrace) {
     //close brace, no need to create entity;
 
     //assertion: case 1: close brace for procedure --> type = 0 & parent_stack = empty
