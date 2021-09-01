@@ -15,6 +15,8 @@ class Entity {
   virtual ~Entity() {};
 };
 
+class Container;
+
 /**
  * Statement is an abstract class and derived from Entity.
  * This class contains the essential attributes that every statement-type object has, such as, line number,
@@ -24,18 +26,19 @@ class Statement : public Entity {
  protected:
   LineNumber* line_number_;
   StatementNumber* statement_number_;
-  Statement* parent_node_;
+  Container* parent_node_;
   Statement* before_node_;
  public:
   virtual ~Statement() {};
   void SetLineNumber(LineNumber* ln);
   void SetStatementNumber(StatementNumber* sn);
-  void SetParentNode(Statement* parent);
+  void SetParentNode(Container* parent);
   void SetBeforeNode(Statement* before);
+  Container* GetParentNode();
 };
 
 /**
- * Container is an abstract class which applies to all classes that can contain statements.
+ * Container is an interface which applies to all classes that can contain statements.
  */
 class Container {
  public:

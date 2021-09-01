@@ -45,10 +45,14 @@ void Statement::SetLineNumber(LineNumber* ln) {
   line_number_ = ln;
 }
 
-void Statement::SetParentNode(Statement* parent) {
+void Statement::SetParentNode(Container* parent) {
   parent_node_ = parent;
 }
 
 void Statement::SetBeforeNode(Statement* before) {
   before_node_ = before;
+}
+
+Container* Statement::GetParentNode() {
+  return parent_node_;
 }
