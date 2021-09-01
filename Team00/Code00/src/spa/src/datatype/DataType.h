@@ -105,4 +105,5 @@ class Token {
  public:
   explicit Token(const std::string* token_string, TokenTag token_tag);
 };
+
 #endif //AUTOTESTER_DATATYPE_H
