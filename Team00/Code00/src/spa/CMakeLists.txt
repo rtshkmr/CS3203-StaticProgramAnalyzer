@@ -7,8 +7,20 @@ add_library(spa ${srcs} ${headers}
         src/datatype/ConditionalExpression.cpp src/datatype/ConditionalExpression.h
         src/model/Statement.h src/model/Statement.cpp
         src/component/PKB/PKB.cpp src/component/PKB/PKB.h
+        src/component/SourceProcessor/Tokenizer.cpp src/component/SourceProcessor/Tokenizer.h
+        src/component/SourceProcessor/ConcreteSyntaxValidator.cpp src/component/SourceProcessor/ConcreteSyntaxValidator.h
+        src/component/SourceProcessor/EntityFactory.cpp src/component/SourceProcessor/EntityFactory.h
+        src/datatype/Identifier.cpp
+        src/datatype/Identifier.h src/datatype/Deliverable.cpp
+        src/datatype/Deliverable.h
+        src/component/SourceProcessor/SourceProcessor.cpp
+        src/component/SourceProcessor/SourceProcessor.h
+        src/component/SourceProcessor/Parser.cpp
+        src/component/SourceProcessor/Parser.h
+        src/component/SourceProcessor/PSubsystem.cpp
+        src/component/SourceProcessor/PSubsystem.h
         src/component/SourceProcessor/DesignExtractor.cpp
-        src/component/SourceProcessor/Parser.h src/component/SourceProcessor/Parser.cpp
+        src/component/SourceProcessor/DesignExtractor.h
         )
 # this makes the headers accessible for other projects which uses spa lib
 target_include_directories(spa PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)

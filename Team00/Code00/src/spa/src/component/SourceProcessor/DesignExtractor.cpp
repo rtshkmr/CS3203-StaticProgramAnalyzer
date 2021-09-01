@@ -1,13 +1,4 @@
-#include<stdio.h>
-#include <iostream>
-#include <string>
-#include <vector>
+#include "DesignExtractor.h"
 
-using namespace std;
-
-
-#include "component/PKB/PKB.h"
-
-int DesignExtractor() {
-    return 0;
+void de::DesignExtractor::extractDesignAbstractions() {
 }

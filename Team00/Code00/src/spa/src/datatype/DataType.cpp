@@ -102,3 +102,14 @@ ConstantValue::ConstantValue(std::string constant) {
 int ConstantValue::get() {
   return value_;
 }
+
+/**
+ * Constructor for token
+ * @param token_string [NOT NULL] The string representation of the SIMPLE programme statement.
+ * @param token_tag [NOT NULL] The enumerator object to the tag
+ */
+Token::Token(const std::string* token_string, TokenTag token_tag) {
+  token_string = token_string;
+  token_tag = token_tag;
+}
+
