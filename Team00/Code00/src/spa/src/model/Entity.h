@@ -28,13 +28,29 @@ class Statement : public Entity {
   Statement* before_node_;
  public:
   virtual ~Statement() {};
+  void SetLineNumber(LineNumber* ln);
+  void SetStatementNumber(StatementNumber* sn);
+  void SetParentNode(Statement* parent);
+  void SetBeforeNode(Statement* before);
+};
+
+/**
+ * Container is an abstract class which applies to all classes that can contain statements.
+ */
+class Container {
+ public:
+  virtual ~Container() {};
+
+  virtual void AddStatement(Statement* stmt);
+
+  virtual std::list<Statement>* GetStatementList();
 };
 
 /**
  * Procedure is a derived class of Entity. This class contains the name and the list of statement
  *   within this procedure.
  */
-class Procedure : public Entity {
+class Procedure : public Entity, public Container {
  private:
   const ProcedureName* procedure_name_;
   std::list<Statement> statement_list_;
@@ -43,7 +59,9 @@ class Procedure : public Entity {
 
   const ProcedureName* getName();
 
-  std::list<Statement>* getStatementList();
+  std::list<Statement>* GetStatementList();
+
+  void AddStatement(Statement stmt);
 };
 
 /**
