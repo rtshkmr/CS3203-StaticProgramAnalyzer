@@ -8,9 +8,11 @@ sequenceDiagram
     participant UI
 
     %% This sd is for per query (PQL statement) basis. 
-    AutoTester ->> PqlPreprocessor: query(q)
+    AutoTester ->> PqlPreprocessor: evaluate(q)
+    PqlPreprocessor->>PqlPreprocessor: tokenizePql(q)
+    PqlPreprocessor->>PqlPreprocessor: parsePql(q)
     PqlPreprocessor->>PqlPreprocessor: verifyPql(q)
-    PqlPreprocessor->>PqlPreprocessor: orderClause()
+    PqlPreprocessor->>PqlPreprocessor: orderClauses()
     PqlPreprocessor->>QueryEvaluator: sendQueryStruct(q)
     
     %% Refer to query_evaluation_pkb.mmd

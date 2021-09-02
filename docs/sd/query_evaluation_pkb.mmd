@@ -77,13 +77,15 @@ sequenceDiagram
         end
     end
 
-    opt has pattern clause
-        QueryEvaluator->>+PKB: getAllAssignStmt()
-        PKB-->>-QueryEvaluator: []AST_ASSIGN assignStatements
+    opt has >= 1 pattern-cl && notCached
+        QueryEvaluator ->> PKB: getAllAssignStmts()
+        PKB -->> QueryEvaluator: AST_ASSIGN[] assignStmts
+        QueryEvaluator ->> QueryEvaluator: cacheAssignStmts
     end
-
     loop Each pattern clause
         QueryEvaluator->>QueryEvaluator: STMT[] comparePattern(PATTERN p)
+        note right of QueryEvaluator: Case lhs: <br/>if "var_name" (exact match): filter assignStmts<br/>if synonym: variable filter assignStmts<br/>if _ (any match): do nothing
+    note right of QueryEvaluator: Case rhs: <br/> if "..." (exact match): filter assignStmts<br/>if _"..."_ (partial match): check AST_ASSIGNS for subtree match first<br/>if _ (any match): do nothing
     end
 
     % Consider extracting the work of combining clauses to another
