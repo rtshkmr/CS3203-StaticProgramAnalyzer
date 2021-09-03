@@ -11,7 +11,7 @@
  * @param infix The infix assignment to be stored.
  */
 AssignmentExpression::AssignmentExpression(std::string infix) {
-    expression = parseInfixToPostfix(infix);
+  expression_ = ParseInfixToPostfix(infix);
 }
 
 /**
@@ -19,9 +19,9 @@ AssignmentExpression::AssignmentExpression(std::string infix) {
  * @param infix The infix assignment to be converted.
  * @return The assignment which is transformed into postfix style.
  */
-std::string AssignmentExpression::parseInfixToPostfix(std::string infix) {
-    //TODO: change infix into postfix
-    return infix;
+std::string AssignmentExpression::ParseInfixToPostfix(std::string infix) {
+  //TODO: change infix into postfix
+  return infix;
 }
 
 /**
@@ -30,12 +30,12 @@ std::string AssignmentExpression::parseInfixToPostfix(std::string infix) {
  * @param pattern The pattern to evaluate against this assignment expression.
  * @return true if exist; false otherwise.
  */
-bool AssignmentExpression::checkExist(std::string pattern) {
-    std::string queryPostfix = parseInfixToPostfix(pattern);
+bool AssignmentExpression::CheckExist(std::string pattern) {
+  std::string queryPostfix = ParseInfixToPostfix(pattern);
 
-    //TODO: check if expression CONTAINS queryPostfix
+  //TODO: check if expression CONTAINS queryPostfix
 
-    return true;
+  return true;
 }
 
 /**
@@ -44,12 +44,12 @@ bool AssignmentExpression::checkExist(std::string pattern) {
  * @param pattern The pattern to evaluate against this assignment expression.
  * @return true if exist; false otherwise.
  */
-bool AssignmentExpression::checkExact(std::string pattern) {
-    std::string queryPostfix = parseInfixToPostfix(pattern);
+bool AssignmentExpression::CheckExact(std::string pattern) {
+  std::string queryPostfix = ParseInfixToPostfix(pattern);
 
-    //TODO: check if expression == queryPostfix
+  //TODO: check if expression == queryPostfix
 
-    return true;
+  return true;
 }
 
 /**
@@ -58,12 +58,12 @@ bool AssignmentExpression::checkExact(std::string pattern) {
  * @param pattern The pattern to evaluate against this assignment expression.
  * @return true if exist; false otherwise.
  */
-bool AssignmentExpression::checkBefore(std::string pattern) {
-    std::string queryPostfix = parseInfixToPostfix(pattern);
+bool AssignmentExpression::CheckBefore(std::string pattern) {
+  std::string queryPostfix = ParseInfixToPostfix(pattern);
 
-    //TODO: check if expression ENDS WITH pattern
+  //TODO: check if expression ENDS WITH pattern
 
-    return true;
+  return true;
 }
 
 /**
@@ -72,10 +72,10 @@ bool AssignmentExpression::checkBefore(std::string pattern) {
  * @param pattern The pattern to evaluate against this assignment expression.
  * @return true if exist; false otherwise.
  */
-bool AssignmentExpression::checkAfter(std::string pattern) {
-    std::string queryPostfix = parseInfixToPostfix(pattern);
+bool AssignmentExpression::CheckAfter(std::string pattern) {
+  std::string queryPostfix = ParseInfixToPostfix(pattern);
 
-    //TODO: check if expression STARTS WITH pattern
+  //TODO: check if expression STARTS WITH pattern
 
-    return true;
+  return true;
 }

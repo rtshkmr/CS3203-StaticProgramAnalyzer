@@ -8,21 +8,21 @@
 #include <string>
 
 class AssignmentExpression {
-private:
-    std::string expression;
+ private:
+  std::string expression_;
 
-    std::string parseInfixToPostfix(std::string infix);
+  std::string ParseInfixToPostfix(std::string infix);
 
-public:
-    AssignmentExpression(std::string infix);
+ public:
+  AssignmentExpression(std::string infix);
 
-    bool checkExist(std::string pattern);
+  bool CheckExist(std::string pattern);
 
-    bool checkExact(std::string pattern);
+  bool CheckExact(std::string pattern);
 
-    bool checkBefore(std::string pattern);
+  bool CheckBefore(std::string pattern);
 
-    bool checkAfter(std::string pattern);
+  bool CheckAfter(std::string pattern);
 };
 
 #endif //AUTOTESTER_ASSIGNMENTEXPRESSION_H

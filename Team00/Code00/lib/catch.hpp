@@ -2956,7 +2956,7 @@ namespace Catch {
         OcMethod( Class cls, SEL sel ) : m_cls( cls ), m_sel( sel ) {}
 
         virtual void invoke() const {
-            id obj = [[m_cls alloc] init];
+            id obj = [[m_cls alloc] Init];
 
             performOptionalSelector( obj, @selector(setUp)  );
             performOptionalSelector( obj, m_sel );
@@ -5696,7 +5696,7 @@ namespace detail {
 
     class TokenStream;
 
-    // Transport for raw args (copied from main args, or supplied via init list for testing)
+    // Transport for raw args (copied from main args, or supplied via Init list for testing)
     class Args {
         friend TokenStream;
         std::string m_exeName;
@@ -13059,7 +13059,7 @@ int main (int argc, char * argv[]) {
 // Objective-C entry point
 int main (int argc, char * const argv[]) {
 #if !CATCH_ARC_ENABLED
-    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] Init];
 #endif
 
     Catch::registerTestMethods();
