@@ -92,7 +92,7 @@ enum class TokenTag {
   kMetaSymbol,
   kOpenBrace,
   kCloseBrace,
-  };
+};
 
 /**
  * A Lexical Token represents a discrete unit within a particular source statement. It contains a string pointer to
@@ -101,9 +101,10 @@ enum class TokenTag {
 class Token {
  private:
   std::string* token_string_;
-  TokenTag token_tag_;
  public:
+  TokenTag token_tag_;
   explicit Token(const std::string* token_string, TokenTag token_tag);
+  std::string* GetTokenString();
 };
 
 #endif //AUTOTESTER_DATATYPE_H

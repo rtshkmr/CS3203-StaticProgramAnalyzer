@@ -113,3 +113,7 @@ Token::Token(const std::string* token_string, TokenTag token_tag) {
   token_tag = token_tag;
 }
 
+std::string* Token::GetTokenString() {
+  return token_string_;
+}
+

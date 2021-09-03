@@ -10,13 +10,10 @@
 using namespace std;
 class EntityFactory {
  public:
-  EntityFactory();
-  void Init(int* p_sub); // todo: set pointer to psub in order to  establish bi-directional relationship b/w the two.
-  //                              cause EF needs to set flags within helper stacks within psub.
-  std::vector<Entity> CreateEntities(const std::vector<Token>& tokens);
+  EntityFactory() = default;
+  static Entity CreateEntities(std::vector<Token> &tokens);
  private:
-  int* p_sub_;
-  Entity CreateEntity(Token& token);
+  static std::string GetExpression(vector<Token> &vector, std::string start, std::string end);
 };
 
 #endif //AUTOTESTER_TEAM00_CODE00_SRC_SPA_SRC_COMPONENT_SOURCEPROCESSOR_ENTITYFACTORY_H_
