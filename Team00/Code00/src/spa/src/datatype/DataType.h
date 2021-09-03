@@ -8,6 +8,8 @@
 #ifndef AUTOTESTER_DATATYPE_H
 #define AUTOTESTER_DATATYPE_H
 
+using namespace std;
+
 /**
  * StatementNumber refers to the numbering of statements (program counter).
  * Note: The difference between StatementNumber and LineNumber is that a single line could have multiple
@@ -82,16 +84,27 @@ class ConstantValue {
   int get();
 };
 
+enum class StatementHeader {
+  read,
+  print,
+  assign,
+};
+
+/*
+ * strm = <stmt_header><tokens>
+ * */
+
+
 enum class TokenTag {
   // todo: add fixed set of tags for token from the Concrete Grammar
   //       these tags will determine the rule-set that is used by the CGV to validate syntax
   kInteger,
-  kDigit,
-  kLetter,
+  kKeyword,
   kName,
   kMetaSymbol,
   kOpenBrace,
   kCloseBrace,
+  kSemicolon,
   };
 
 /**
@@ -100,10 +113,16 @@ enum class TokenTag {
  */
 class Token {
  private:
-  std::string* token_string_;
-  TokenTag token_tag_;
+  string token_string_;
  public:
-  explicit Token(const std::string* token_string, TokenTag token_tag);
+  string GetTokenString();
+
+  TokenTag token_tag_; // todo: temp changes to fix  build issues
+
+//  Token(std::string& token_string, TokenTag token_tag);
+  Token(string token_string, TokenTag token_tag);
+//  Token& operator=(const Token& token); // copy assignment function
+  TokenTag GetTokenTag() const;
 };
 
 #endif //AUTOTESTER_DATATYPE_H
