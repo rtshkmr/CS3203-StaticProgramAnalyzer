@@ -25,6 +25,10 @@ add_library(spa ${srcs} ${headers}
         src/component/QueryProcessor/QueryEvaluator.h src/component/QueryProcessor/QueryEvaluator.cpp
         src/component/QueryProcessor/QueryProjector.h src/component/QueryProcessor/QueryProjector.cpp
         src/component/SourceProcessor/DesignExtractor.h
+        src/component/SourceProcessor/Parser.h src/component/SourceProcessor/Parser.cpp
+        src/component/QueryProcessor/QueryExtractor.h src/component/QueryProcessor/QueryExtractor.cpp
+        src/component/QueryProcessor/QueryEvaluator.h src/component/QueryProcessor/QueryEvaluator.cpp
+        src/component/QueryProcessor/QueryProjector.h src/component/QueryProcessor/QueryProjector.cpp
         )
 # this makes the headers accessible for other projects which uses spa lib
 target_include_directories(spa PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
