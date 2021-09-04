@@ -43,7 +43,7 @@ Entity* EntityFactory::CreateEntities(vector<Token> tokens) {
     std::string expression_string = GetExpression(tokens, "=", ";");
     return new AssignEntity(new Variable(new VariableName(keyword_token_string)), expression_string);
   } else {
-    throw std::logic_error("Tokens cannot be made into entity in EF.");
+    throw std::invalid_argument("Tokens cannot be made into entity in EF.");
   }
 }
 
