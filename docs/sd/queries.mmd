@@ -1,0 +1,25 @@
+sequenceDiagram
+    autonumber
+    participant AutoTester
+    participant PqlPreprocessor
+    participant QueryEvaluator
+    participant PKB
+    participant QueryResultProjector
+    participant UI
+
+    %% This sd is for per query (PQL statement) basis. 
+    AutoTester ->> PqlPreprocessor: evaluate(q)
+    PqlPreprocessor->>PqlPreprocessor: tokenizePql(q)
+    PqlPreprocessor->>PqlPreprocessor: parsePql(q)
+    PqlPreprocessor->>PqlPreprocessor: verifyPql(q)
+    PqlPreprocessor->>PqlPreprocessor: orderClauses()
+    PqlPreprocessor->>QueryEvaluator: sendQueryStruct(q)
+    
+    %% Refer to query_evaluation_pkb.mmd
+    note right of PKB: info refers to relevant PSub-structures <br/> (maybe a linked list...) that <br/> the QueryEvaluatorcan use <br/> to resolve the query.
+    QueryEvaluator->>PKB: retrieveClauseInfo(clause) 
+    
+    %% MergeSets() represents union, intersect, join between the different clauses results. 
+    QueryEvaluator ->>QueryEvaluator:mergeSets() 
+    QueryEvaluator ->>QueryResultProjector: generateResultFormatter(RESULT r)
+    QueryResultProjector ->> UI: finalResult(FORMATTED_RESULT fr)

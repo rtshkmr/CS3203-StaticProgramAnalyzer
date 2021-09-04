@@ -1,0 +1,73 @@
+classDiagram
+
+    Entity <|-- Variable
+    Entity <|-- Procedure
+    Entity <|-- Statement
+
+    ControlNode <|-- ClosingBrace
+    ControlNode <|-- Exception
+
+    Program "1" *-- "1..*" Procedure :contains
+
+    Procedure "1" *-- "0..*" Statement :has
+
+    Statement <|-- Read
+    Statement <|-- Print
+    Statement <|-- Call
+    Statement <|-- Assign
+    Statement <|-- While
+    Statement <|-- If
+    Statement <|-- Else
+
+    class Entity {
+        <<abstract>>
+    }
+
+    class Variable {
+        -variableName: VariableName
+    }
+
+    class Procedure {
+        -procedureName: ProcedureName
+    }
+
+    class Statement {
+        <<abstract>>
+        #lineNumber: LineNumber
+        #stmtNumber: StatementNumber
+        #parentNode: Statement 
+        #beforeNode: Statement
+    }
+
+    class Read {
+        - var: Variable
+    }
+
+    class Print {
+        - var: Varable
+    }
+
+    class Call {
+        - proc: Procedure
+    }
+
+    class Assign {
+        - assignedTo: Variable
+        - expr: AssignmentExpression
+    }
+
+    class While {
+        - condExpr: ConditionalExpression
+        - stmtList: List<Statement>
+    }
+
+    class If {
+        - condExpr: ConditionalExpression
+        - ifStmtList: List<Statement>
+    }
+
+    class Else {
+        - elseStmtList: List<Statement> 
+    }
+    
+    If "1" *-- "0-1" Else :contains

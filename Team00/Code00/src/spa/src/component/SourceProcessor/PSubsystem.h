@@ -2,7 +2,9 @@
 #define AUTOTESTER_PSUBSYSTEM_H
 
 #include <string>
+#include <stack>
 #include <datatype/Deliverable.h>
+#include "ConcreteSyntaxValidator.h"
 
 /**
  * This namespace provides a scope for PSubsystem related declarations.
@@ -18,7 +20,26 @@ namespace psub {
     class PSubsystem {
     private:
         Deliverable deliverable_;
-        // attributes
+        ConcreteSyntaxValidator syntax_validator_;
+
+        bool valid_state = true;
+        Container* current_node_;
+        int current_node_type_ = -1; // -1 => no current node; 0 = procedure; 1 = while; 2 = if; 3 = else;
+        stack<Container*> parent_stack_;
+        stack<Statement*> follow_stack_;
+        int program_counter_ = 0;
+
+        // private methods for selfcall
+      void PerformNewProcedureSteps(Procedure* procedure);
+      void SetStatementObject(Statement* statement);
+      void HandleIfStmt(IfEntity* if_entity);
+      void HandleElseStmt(ElseEntity* else_entity);
+      void HandleWhileStmt(WhileEntity* while_entity);
+      void HandleAssignStmt(AssignEntity* assign_entity);
+      void HandleCallStmt(CallEntity* call_entity);
+      void HandleReadStmt(ReadEntity* read_entity);
+      void HandlePrintStmt(PrintEntity* print_entity);
+
     public:
         PSubsystem() = default;
 
