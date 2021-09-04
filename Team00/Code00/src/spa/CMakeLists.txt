@@ -22,7 +22,8 @@ add_library(spa ${srcs} ${headers}
         src/component/SourceProcessor/DesignExtractor.cpp
         src/component/SourceProcessor/DesignExtractor.h
         src/component/SourceProcessor/Parser.h src/component/SourceProcessor/Parser.cpp
-        src/component/QueryProcessor/QueryExtractor.h src/component/QueryProcessor/QueryExtractor.cpp
+        src/component/QueryProcessor/types/Types.h src/component/QueryProcessor/types/Types.cpp
+        src/component/QueryProcessor/QueryExtractor/QueryExtractor.h src/component/QueryProcessor/QueryExtractor/QueryExtractor.cpp
         src/component/QueryProcessor/QueryEvaluator.h src/component/QueryProcessor/QueryEvaluator.cpp
         src/component/QueryProcessor/QueryProjector.h src/component/QueryProcessor/QueryProjector.cpp
         )
