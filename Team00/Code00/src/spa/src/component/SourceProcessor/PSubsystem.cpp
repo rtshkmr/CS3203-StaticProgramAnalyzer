@@ -65,10 +65,10 @@ void PSubsystem::ProcessStatement(std::string statement) {
     return; //TODO: probably throw an error
   }
 
-  Entity entityObj = EntityFactory::CreateEntities(tokens);
+  Entity* entityObj = EntityFactory::CreateEntities(tokens);
 
   if (current_node_type_ == -1) { //when current_node_ is null. Only happens when not reading within a procedure.
-    if (Procedure* procedure = dynamic_cast<Procedure*>(&entityObj)) {
+    if (Procedure* procedure = dynamic_cast<Procedure*>(entityObj)) {
       PerformNewProcedureSteps(procedure);
       return;
     } else {
@@ -78,7 +78,7 @@ void PSubsystem::ProcessStatement(std::string statement) {
 
   //From here onwards, Entity must be a Statement type;
 
-  if (Statement* stmt = dynamic_cast<Statement*>(&entityObj)) {
+  if (Statement* stmt = dynamic_cast<Statement*>(entityObj)) {
     SetStatementObject(stmt);
 
     //evaluate what type of stmt it is:

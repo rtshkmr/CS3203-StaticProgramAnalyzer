@@ -125,8 +125,3 @@ Token::Token(string token_string, TokenTag token_tag):
  token_tag_(token_tag) {
   token_string_ = std::move(token_string);
 }
-
-std::string* Token::GetTokenString() {
-  return token_string_;
-}
-

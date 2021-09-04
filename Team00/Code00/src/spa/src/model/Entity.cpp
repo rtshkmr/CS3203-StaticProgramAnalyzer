@@ -56,3 +56,12 @@ void Statement::SetBeforeNode(Statement* before) {
 Container* Statement::GetParentNode() {
   return parent_node_;
 }
+
+void Container::AddStatement(Statement* stmt) {
+  // todo
+}
+
+std::list<Statement>* Container::GetStatementList() {
+  // todo
+  return nullptr;
+}

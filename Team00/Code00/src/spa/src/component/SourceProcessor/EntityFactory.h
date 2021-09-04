@@ -11,9 +11,9 @@ using namespace std;
 class EntityFactory {
  public:
   EntityFactory() = default;
-  static Entity CreateEntities(std::vector<Token> &tokens);
+  static Entity* CreateEntities(std::vector<Token> tokens);
  private:
-  static std::string GetExpression(vector<Token> &vector, std::string start, std::string end);
+  static std::string GetExpression(vector<Token> vector, const std::string& start, const std::string& end);
 };
 
 #endif //AUTOTESTER_TEAM00_CODE00_SRC_SPA_SRC_COMPONENT_SOURCEPROCESSOR_ENTITYFACTORY_H_

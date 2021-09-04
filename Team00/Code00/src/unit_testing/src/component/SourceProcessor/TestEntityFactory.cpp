@@ -1,20 +1,23 @@
 #include <model/Statement.h>
 #include <iostream>
+#include <regex>
 #include "catch.hpp"
 #include "component/SourceProcessor/EntityFactory.h"
 
 TEST_CASE("CreateEntities") {
-  std::string procedure_name_1 = "proc1";
-  cout << "cant run?";
   // procedure test
   vector<Token> procedure_tokens = {
-      Token(new string("procedure"), TokenTag()),
-      Token(new string("proc1"), TokenTag()),
-      Token(new string("{"), TokenTag())
+      Token(string("procedure"), TokenTag::kName),
+      Token(string("proc1"), TokenTag::kName),
+      Token(string("{"), TokenTag::kName)
   };
-  Procedure expected_procedure_entity = Procedure(new ProcedureName(procedure_name_1));
-  Entity actual_procedure_entity = EntityFactory::CreateEntities(procedure_tokens);
-  REQUIRE(dynamic_cast<Procedure*>(&actual_procedure_entity) == &expected_procedure_entity);
+  Procedure expected_procedure_entity = Procedure(new ProcedureName("proc1"));
+  Entity* actual_procedure_entity = EntityFactory::CreateEntities(procedure_tokens);
+  Procedure* actual_procedure = dynamic_cast<Procedure*>(actual_procedure_entity);
+  ProcedureName* actual_procedure_name = const_cast<ProcedureName*>(actual_procedure->getName());
+  std::string actual_str_name = actual_procedure_name->getName();
+
+  REQUIRE(actual_str_name == "proc1");
 
   /*
   // read test
