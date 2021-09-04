@@ -84,29 +84,35 @@ class ConstantValue {
   int get();
 };
 
-enum class StatementHeader {
-  read,
-  print,
-  assign,
-};
-
 /*
  * strm = <stmt_header><tokens>
  * */
 
 
+enum class StatementTypeTag {
+  kReadStatement,
+  kPrintStatement,
+  kCallStatement,
+  kWhileStatement,
+  kIfStatement,
+  kAssignStatement,
+};
+
 enum class TokenTag {
   // todo: add fixed set of tags for token from the Concrete Grammar
   //       these tags will determine the rule-set that is used by the CGV to validate syntax
   kInteger,
-  kKeyword,
+  kKeyword, // for SIMPLE keywords like call, print...
   kName,
-  kMetaSymbol,
-  kOpenBrace,
+  kBinaryOperator, //  for binary math operations (=, +, -...)
+  kOpenBrace, // for containers procName{...}
   kCloseBrace,
-  kSemicolon,
-  };
+  kLeftBracket,  // for if() and while()
+  kRightBracket,
+  kSemicolon, // statement terminator
+};
 
+// QQ : is it better to make Token into a struct? was going to encapsulate other methods into it
 /**
  * A Lexical Token represents a discrete unit within a particular source statement. It contains a string pointer to
  * the space-delimited string that it was originally created from as well as TokenTag that indicates the type of token it is.
@@ -116,13 +122,15 @@ class Token {
   string token_string_;
  public:
   string GetTokenString();
-
-  TokenTag token_tag_; // todo: temp changes to fix  build issues
-
-//  Token(std::string& token_string, TokenTag token_tag);
+  TokenTag token_tag_; // fixme: make this private
   Token(string token_string, TokenTag token_tag);
-//  Token& operator=(const Token& token); // copy assignment function
-  TokenTag GetTokenTag() const;
+  [[nodiscard]] TokenTag GetTokenTag() const;
 };
+
+//// psub should call for a TokenizedStatement
+//typedef struct TokenizedStatement {
+//  list<Token> tokens;
+//  StatementTypeTag tag;
+//} TokenizedStatement;
 
 #endif //AUTOTESTER_DATATYPE_H

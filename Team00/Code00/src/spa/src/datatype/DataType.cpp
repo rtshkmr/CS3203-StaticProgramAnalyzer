@@ -121,8 +121,8 @@ std::string Token::GetTokenString() {
 //Token& Token::operator=(const Token& token) {
 //  return *this;
 //}
-Token::Token(string token_string, TokenTag token_tag):
- token_tag_(token_tag) {
+Token::Token(string token_string, TokenTag token_tag) :
+    token_tag_(token_tag) {
   token_string_ = std::move(token_string);
 }
 

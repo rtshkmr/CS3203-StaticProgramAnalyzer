@@ -16,6 +16,10 @@ class Tokenizer {
   static vector<Token> CreateTokens(const string& statement_string);
  private:
   static Token* CreateToken(string string_token);
+  static vector<string> SplitString(const string& delimiter, const string& input, bool retain_delimiter);
+  static vector<string> SplitSubTokens(string& string_token, vector<Token>* tokens);
+  static bool IsDelimiter(string& test_string);
+  static bool IsWhiteSpace(string& test_string);
 };
 
 #endif //AUTOTESTER_TEAM00_CODE00_SRC_SPA_SRC_COMPONENT_SOURCEPROCESSOR_TOKENIZER_H_
