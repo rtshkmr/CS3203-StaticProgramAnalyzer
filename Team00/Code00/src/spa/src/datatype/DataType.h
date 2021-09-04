@@ -125,6 +125,7 @@ class Token {
   TokenTag token_tag_; // fixme: make this private
   Token(string token_string, TokenTag token_tag);
   [[nodiscard]] TokenTag GetTokenTag() const;
+  bool operator==(Token other);
 };
 
 //// psub should call for a TokenizedStatement

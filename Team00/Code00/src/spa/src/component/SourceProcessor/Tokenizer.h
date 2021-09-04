@@ -17,7 +17,7 @@ class Tokenizer {
  private:
   static Token* CreateToken(string string_token);
   static vector<string> SplitString(const string& delimiter, const string& input, bool retain_delimiter);
-  static vector<string> SplitSubTokens(string& string_token, vector<Token>* tokens);
+  static vector<string> SplitSubTokens(string& string_token);
   static bool IsDelimiter(string& test_string);
   static bool IsWhiteSpace(string& test_string);
 };

@@ -108,8 +108,6 @@ int ConstantValue::get() {
  * @param token_string [NOT NULL] The string representation of the SIMPLE programme statement.
  * @param token_tag [NOT NULL] The enumerator object to the tag
  */
-//Token::Token(const std::string& token_string, TokenTag token_tag):
-//token_string_(token_string), token_tag_(token_tag) {}
 
 TokenTag Token::GetTokenTag() const {
   return this->token_tag_;
@@ -118,11 +116,17 @@ std::string Token::GetTokenString() {
   return this->token_string_;
 }
 
-//Token& Token::operator=(const Token& token) {
-//  return *this;
-//}
 Token::Token(string token_string, TokenTag token_tag) :
     token_tag_(token_tag) {
   token_string_ = std::move(token_string);
+}
+
+/**
+ * Equality operator checks the string kept in the token todo: add the tag also
+ * @param other
+ * @return
+ */
+bool Token::operator==(Token other) {
+  return this->GetTokenString() == other.GetTokenString();
 }
 
