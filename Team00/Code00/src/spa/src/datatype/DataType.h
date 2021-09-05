@@ -3,6 +3,7 @@
  * Any data types used in this program should be immutable by default.
  */
 
+#include <regex>
 #include "string"
 
 #ifndef AUTOTESTER_DATATYPE_H
@@ -110,7 +111,10 @@ enum class TokenTag {
   kLeftBracket,  // for if() and while()
   kRightBracket,
   kSemicolon, // statement terminator
+  kInvalid,
 };
+
+
 
 // QQ : is it better to make Token into a struct? was going to encapsulate other methods into it
 /**
@@ -126,6 +130,7 @@ class Token {
   Token(string token_string, TokenTag token_tag);
   [[nodiscard]] TokenTag GetTokenTag() const;
   bool operator==(Token other);
+  static TokenTag TagStringWithToken(string const& reference);
 };
 
 //// psub should call for a TokenizedStatement

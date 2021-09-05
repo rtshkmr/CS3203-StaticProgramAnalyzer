@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <component/SourceProcessor/Tokenizer.h>
+#include <regex>
 
 using namespace std;
 vector<string> program_lines = {
@@ -60,11 +61,11 @@ TEST_CASE(
     vector<Token> other = starting_outputs.at(i);
     REQUIRE(starting_variation_reference.capacity() == other.capacity());
     // fixme: fix equality operator after implementing tagging
-//    for(int x = 0; x < starting_variation_reference.capacity();x++) {
-//      Token reference_token = starting_variation_reference.at(x);
-//      Token other_token = other.at(x);
-//      REQUIRE(reference_token == other_token);
-//    }
+    //    for(int x = 0; x < starting_variation_reference.capacity();x++) {
+    //      Token reference_token = starting_variation_reference.at(x);
+    //      Token other_token = other.at(x);
+    //      REQUIRE(reference_token == other_token);
+    //    }
   }
 
   vector<vector<Token>> ending_outputs;
@@ -77,4 +78,49 @@ TEST_CASE(
     vector<Token> other = ending_outputs.at(i);
     REQUIRE(ending_variation_reference.capacity() == other.capacity());
   }
+}
+
+TEST_CASE("Regex pattern tests for token_strings") {
+  regex fixed_keyword_pat(R"(procedure|read|print|call|while|if|)");
+  regex fixed_char_pat(R"(\{|\}|;)"); // for braces, semicolon...
+  regex binary_operator_pat(R"(\+|\-|\*|\/|%|=|==|>|>=|<|<=|!=)"); // for math and comparator chars
+  regex name_pat(R"(^[[:alpha:]]+([0-9]+|[[:alpha:]]+)*)"); // names, integers... todo: check alphanum
+  regex integer_pat(R"([0-9]+)");
+
+  bool handle_valid_names_integers = regex_match("procedure", fixed_keyword_pat)
+      && regex_match("if", fixed_keyword_pat)
+      && regex_match("read", fixed_keyword_pat)
+      && regex_match("call", fixed_keyword_pat)
+      && (regex_match("1", integer_pat)) // single digit
+      && (regex_match("1124124", integer_pat)) // multiple digit numbers
+      && (regex_match("h1", name_pat)) // letter + digit
+      && (regex_match("h1h1h1h1h1h1", name_pat)) // letter + digit
+      && (regex_match("h1continue", name_pat)); // letter + digit + letter
+
+  bool handle_invalid_names_integers = !regex_match("Proc", fixed_keyword_pat)
+      && !regex_match("proceDure", fixed_keyword_pat)
+      && !(regex_match("h", integer_pat)) // single letter
+      && !(regex_match("hello", integer_pat)) // a word as a name
+      && !(regex_match("HeLlo", integer_pat)) // a varying upper and lower cases
+      && !(regex_match("HELLO", integer_pat)) // upper case
+      && !(regex_match("1hello", name_pat)); // illegal starting char
+
+  bool regex_checking_success = (handle_valid_names_integers && handle_invalid_names_integers);
+  REQUIRE(regex_checking_success);
+}
+
+TEST_CASE("Test successful tagging of strings") {
+  Token keyword_proc = Token("procedure", TokenTag::kKeyword);
+  Token keyword_call = Token("call", TokenTag::kKeyword);
+  Token plus_token = Token("+", TokenTag::kBinaryOperator);
+  Token open_brace_token = Token("{", TokenTag::kOpenBrace);
+  Token close_brace_token = Token("}", TokenTag::kCloseBrace);
+
+  bool successful_tagging = Token("procedure", Token::TagStringWithToken("procedure")) == keyword_proc
+      && Token("call", Token::TagStringWithToken("call")) == keyword_call
+      && Token("+", Token::TagStringWithToken("+")) == plus_token
+      && Token("{", Token::TagStringWithToken("{")) == open_brace_token
+      && Token("}", Token::TagStringWithToken("}")) == close_brace_token
+      && Token("call", Token::TagStringWithToken("call")) == keyword_call;
+  REQUIRE(successful_tagging);
 }

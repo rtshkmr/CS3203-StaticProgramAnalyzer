@@ -130,3 +130,37 @@ bool Token::operator==(Token other) {
   return this->GetTokenString() == other.GetTokenString();
 }
 
+TokenTag Token::TagStringWithToken(const string& reference) {
+  regex fixed_keyword_pat(R"(procedure|read|print|call|while|if|)");
+  regex fixed_char_pat(R"(\{|\}|;)"); // for braces, semicolon...
+  regex binary_operator_pat(R"(\+|\-|\*|\/|%|=|==|>|>=|<|<=|!=)"); // for math and comparator chars
+  regex name_pat(R"(^[[:alpha:]]+([0-9]+|[[:alpha:]]+)*)"); // names, integers... todo: check alphanum
+  regex integer_pat(R"([0-9]+)");
+
+  // QQ: can it have a separation like that: "x > = 1"
+  if (regex_match(reference, fixed_keyword_pat)) {
+    // handle keywords:
+    return TokenTag::kKeyword;
+  } else if (regex_match(reference, fixed_char_pat)) {
+    // todo: handle open and close brackets
+    // handle key characters:
+    if (reference == "{") {
+      return TokenTag::kOpenBrace;
+    } else if (reference == "}") {
+      return TokenTag::kCloseBrace;
+    } else if (reference == ";") {
+      return TokenTag::kSemicolon;
+    } else {
+      return TokenTag::kInvalid;
+    }
+  } else if (regex_match(reference, binary_operator_pat)) {
+    // tag binary operators:
+    return TokenTag::kBinaryOperator; // todo: separate into comparison and arithmetic operators
+  } else if (regex_match(reference, name_pat)) {
+    return TokenTag::kName;
+  } else if (regex_match(reference, integer_pat)) {
+    return TokenTag::kInteger;
+  } else {
+    return TokenTag::kInvalid;
+  }
+}
