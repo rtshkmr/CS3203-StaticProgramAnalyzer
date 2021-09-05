@@ -1,4 +1,4 @@
 #include "DesignExtractor.h"
 
-void de::DesignExtractor::extractDesignAbstractions() {
+void de::DesignExtractor::ExtractDesignAbstractions() {
 }

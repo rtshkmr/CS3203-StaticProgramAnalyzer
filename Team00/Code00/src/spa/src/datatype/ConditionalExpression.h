@@ -15,6 +15,8 @@ class ConditionalExpression {
 
  public:
   ConditionalExpression(std::string expr);
+
+  std::string GetExpressionString();
 };
 
 #endif //AUTOTESTER_CONDITIONALEXPRESSION_H

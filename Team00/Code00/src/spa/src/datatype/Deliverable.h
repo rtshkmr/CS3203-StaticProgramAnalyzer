@@ -14,7 +14,9 @@ class Deliverable {
   Deliverable() = default;    // should be initializing the data structures here
   void AddProc(Procedure* proc);
   void AddVariable(Variable* var);
-  void AddConstants(ConstantValue* constant);
+  void AddVariableVector(const vector<Variable*> &var_vector);
+  void AddConstant(ConstantValue* constant);
+  void AddConstantVector(const vector<ConstantValue*> &constants_vector);
   void AddStatement(Statement* stmt);
 
   void AddIfEntity(IfEntity* if_entity);

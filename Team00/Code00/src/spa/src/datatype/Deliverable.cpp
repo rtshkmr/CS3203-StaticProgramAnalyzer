@@ -11,8 +11,20 @@ void Deliverable::AddVariable(Variable* var) {
   var_list_.push_back(var);
 }
 
-void Deliverable::AddConstants(ConstantValue* constant) {
+void Deliverable::AddVariableVector(const vector<Variable*> &var_vector) {
+  for (auto &var : var_vector) {
+    Deliverable::AddVariable(var);
+  }
+}
+
+void Deliverable::AddConstant(ConstantValue* constant) {
   const_list_.push_back(constant);
+}
+
+void Deliverable::AddConstantVector(const vector<ConstantValue*> &constants_vector) {
+  for (auto &con : constants_vector) {
+    Deliverable::AddConstant(con);
+  }
 }
 
 void Deliverable::AddStatement(Statement* stmt) {

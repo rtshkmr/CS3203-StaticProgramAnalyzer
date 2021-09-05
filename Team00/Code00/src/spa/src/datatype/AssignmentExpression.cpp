@@ -24,6 +24,10 @@ std::string AssignmentExpression::ParseInfixToPostfix(std::string infix) {
   return infix;
 }
 
+std::string AssignmentExpression::GetExpressionString() {
+  return expression_;
+}
+
 /**
  * This function will check if the expression contains the pattern given.
  * This is used in condition of _"infix"_

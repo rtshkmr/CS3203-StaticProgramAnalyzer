@@ -203,4 +203,3 @@ TokenTag Token::TagStringWithToken(const string& reference) {
     return TokenTag::kInvalid;
   }
 }
-

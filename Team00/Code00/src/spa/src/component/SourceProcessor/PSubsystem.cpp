@@ -34,13 +34,13 @@ void PSubsystem::ProcessStatement(std::string statement) {
     } else {
       Container* current_nest = parent_stack_.top();
       parent_stack_.pop();
-      current_node_ = dynamic_cast<Statement*>(current_nest) ->GetParentNode();
+      current_node_ = dynamic_cast<Statement*>(current_nest)->GetParentNode();
 
       //why? Else is wrap within If. So it is 2 steps in AST, so need to parent 2x.
       // however, no need to pop 2x because the "parent" is the same.
       if (current_node_type_ == 3) {
         assert(dynamic_cast<IfEntity*>(current_node_) != nullptr);
-        current_node_ = dynamic_cast<Statement*>(current_node_) ->GetParentNode();
+        current_node_ = dynamic_cast<Statement*>(current_node_)->GetParentNode();
       }
 
       if (parent_stack_.empty()) { //back to procedure stmtlist
@@ -65,10 +65,10 @@ void PSubsystem::ProcessStatement(std::string statement) {
     return; //TODO: probably throw an error
   }
 
-  Entity entityObj = EntityFactory::CreateEntities(tokens);
+  Entity* entityObj = EntityFactory::CreateEntities(tokens);
 
   if (current_node_type_ == -1) { //when current_node_ is null. Only happens when not reading within a procedure.
-    if (Procedure* procedure = dynamic_cast<Procedure*>(&entityObj)) {
+    if (Procedure* procedure = dynamic_cast<Procedure*>(entityObj)) {
       PerformNewProcedureSteps(procedure);
       return;
     } else {
@@ -78,7 +78,7 @@ void PSubsystem::ProcessStatement(std::string statement) {
 
   //From here onwards, Entity must be a Statement type;
 
-  if (Statement* stmt = dynamic_cast<Statement*>(&entityObj)) {
+  if (Statement* stmt = dynamic_cast<Statement*>(entityObj)) {
     SetStatementObject(stmt);
 
     //evaluate what type of stmt it is:
@@ -141,6 +141,8 @@ void PSubsystem::HandleIfStmt(IfEntity* if_entity) {
   parent_stack_.push(if_entity);
   current_node_type_ = 2;
   current_node_ = if_entity;
+  deliverable_.AddVariableVector(if_entity->GetExpressionVariables());
+  deliverable_.AddConstantVector(if_entity->GetExpressionConstants());
 }
 
 void PSubsystem::HandleElseStmt(ElseEntity* else_entity) {
@@ -150,12 +152,17 @@ void PSubsystem::HandleElseStmt(ElseEntity* else_entity) {
 
 void PSubsystem::HandleWhileStmt(WhileEntity* while_entity) {
   parent_stack_.push(while_entity);
-  current_node_type_= 1;
+  current_node_type_ = 1;
   current_node_ = while_entity;
+  deliverable_.AddVariableVector(while_entity->GetExpressionVariables());
+  deliverable_.AddConstantVector(while_entity->GetExpressionConstants());
 }
 
 void PSubsystem::HandleAssignStmt(AssignEntity* assign_entity) {
   deliverable_.AddAssignEntity(assign_entity);
+  deliverable_.AddVariable(assign_entity->getVariable());
+  deliverable_.AddVariableVector(assign_entity->GetExpressionVariables());
+  deliverable_.AddConstantVector(assign_entity->GetExpressionConstants());
 }
 
 void PSubsystem::HandleCallStmt(CallEntity* call_entity) {
@@ -164,10 +171,12 @@ void PSubsystem::HandleCallStmt(CallEntity* call_entity) {
 
 void PSubsystem::HandlePrintStmt(PrintEntity* print_entity) {
   deliverable_.AddPrintEntity(print_entity);
+  deliverable_.AddVariable(print_entity->getVariable());
 }
 
 void PSubsystem::HandleReadStmt(ReadEntity* read_entity) {
   deliverable_.AddReadEntity(read_entity);
+  deliverable_.AddVariable(read_entity->getVariable());
 }
 
 Deliverable PSubsystem::GetDeliverables() {
