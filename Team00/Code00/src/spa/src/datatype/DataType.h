@@ -90,6 +90,7 @@ class ConstantValue {
  * */
 
 
+// header:
 enum class StatementTypeTag {
   kReadStatement,
   kPrintStatement,
@@ -105,7 +106,8 @@ enum class TokenTag {
   kInteger,
   kKeyword, // for SIMPLE keywords like call, print...
   kName,
-  kBinaryOperator, //  for binary math operations (=, +, -...)
+  kBinaryArithmeticOperator, //  for binary math operations (=, +, -...)
+  kBinaryComparisonOperator,
   kOpenBrace, // for containers procName{...}
   kCloseBrace,
   kLeftBracket,  // for if() and while()
@@ -134,9 +136,9 @@ class Token {
 };
 
 //// psub should call for a TokenizedStatement
-//typedef struct TokenizedStatement {
-//  list<Token> tokens;
-//  StatementTypeTag tag;
+//[[maybe_unused]] typedef struct TokenizedStatement {
+//  std::list<Token> tokens;
+//  StatementTypeTag header;
 //} TokenizedStatement;
 
 #endif //AUTOTESTER_DATATYPE_H

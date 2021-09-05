@@ -11,7 +11,8 @@ vector<string> program_lines = {
     R"(    print x; )",
     R"( y = 1;)",
     R"(z                                                                                                   = 3;)",
-    R"(call Z;})"
+    R"(call Z;})",
+    R"(if(x >= 1) {read x; call helloProc;})",
 };
 
 TEST_CASE("Tokenizer display current tokenization status") {
@@ -83,7 +84,8 @@ TEST_CASE(
 TEST_CASE("Regex pattern tests for token_strings") {
   regex fixed_keyword_pat(R"(procedure|read|print|call|while|if|)");
   regex fixed_char_pat(R"(\{|\}|;)"); // for braces, semicolon...
-  regex binary_operator_pat(R"(\+|\-|\*|\/|%|=|==|>|>=|<|<=|!=)"); // for math and comparator chars
+  regex binary_arithmetic_operator_pat(R"(\+|\-|\*|\/|%|=|==|>|>=|<|<=|!=)"); // for math
+  regex binary_comparison_operator_pat(R"(==|>|>=|<|<=|!=)"); // for comparator chars
   regex name_pat(R"(^[[:alpha:]]+([0-9]+|[[:alpha:]]+)*)"); // names, integers... todo: check alphanum
   regex integer_pat(R"([0-9]+)");
 
@@ -105,14 +107,28 @@ TEST_CASE("Regex pattern tests for token_strings") {
       && !(regex_match("HELLO", integer_pat)) // upper case
       && !(regex_match("1hello", name_pat)); // illegal starting char
 
-  bool regex_checking_success = (handle_valid_names_integers && handle_invalid_names_integers);
+  bool handle_valid_comparators = regex_match(">", binary_comparison_operator_pat)
+      && regex_match("<=", binary_comparison_operator_pat)
+      && regex_match("==", binary_comparison_operator_pat)
+      && !regex_match("=", binary_comparison_operator_pat); // not a comparator
+  bool handle_valid_arithmetic_operators = regex_match("+", binary_arithmetic_operator_pat)
+      && regex_match("/", binary_arithmetic_operator_pat)
+      && regex_match("%", binary_arithmetic_operator_pat)
+      && !regex_match("+=", binary_arithmetic_operator_pat) // not a comparator
+      && !regex_match("+++", binary_arithmetic_operator_pat); // not a comparator
+
+  bool regex_checking_success = (handle_valid_names_integers
+      && handle_invalid_names_integers
+      && handle_valid_comparators
+      && handle_valid_arithmetic_operators);
+
   REQUIRE(regex_checking_success);
 }
 
 TEST_CASE("Test successful tagging of strings") {
   Token keyword_proc = Token("procedure", TokenTag::kKeyword);
   Token keyword_call = Token("call", TokenTag::kKeyword);
-  Token plus_token = Token("+", TokenTag::kBinaryOperator);
+  Token plus_token = Token("+", TokenTag::kBinaryArithmeticOperator);
   Token open_brace_token = Token("{", TokenTag::kOpenBrace);
   Token close_brace_token = Token("}", TokenTag::kCloseBrace);
 
