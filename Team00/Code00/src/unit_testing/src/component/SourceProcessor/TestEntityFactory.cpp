@@ -8,7 +8,7 @@ TEST_CASE("CreateEntities") {
   vector<Token> procedure_tokens = {
       Token(string("procedure"), TokenTag::kKeyword),
       Token(string("proc1"), TokenTag::kName),
-      Token(string("{"), TokenTag::kName)
+      Token(string("{"), TokenTag::kOpenBrace)
   };
 //  Procedure expected_procedure_entity = Procedure(new ProcedureName("proc1"));
   Entity* actual_procedure_entity = EntityFactory::CreateEntities(procedure_tokens);
@@ -24,7 +24,7 @@ TEST_CASE("CreateEntities") {
   vector<Token> read_tokens = {
       Token(string("read"), TokenTag::kKeyword),
       Token(string("x"), TokenTag::kName),
-      Token(string(";"), TokenTag::kName),
+      Token(string(";"), TokenTag::kSemicolon),
   };
 //  ReadEntity expected_read_entity = ReadEntity(new Variable(new VariableName("x")));
   Entity* actual_read_entity = EntityFactory::CreateEntities(read_tokens);
@@ -37,7 +37,7 @@ TEST_CASE("CreateEntities") {
   vector<Token> print_tokens = {
       Token(string("print"), TokenTag::kKeyword),
       Token(string("x"), TokenTag::kName),
-      Token(string(";"), TokenTag::kName),
+      Token(string(";"), TokenTag::kSemicolon),
   };
 //  PrintEntity expected_print_entity = PrintEntity(new Variable(new VariableName("x")));
   Entity* actual_print_entity = EntityFactory::CreateEntities(print_tokens);
@@ -50,7 +50,7 @@ TEST_CASE("CreateEntities") {
   vector<Token> call_tokens = {
       Token(string("call"), TokenTag::kKeyword),
       Token(string("anotherProc"), TokenTag::kName),
-      Token(string(";"), TokenTag::kName),
+      Token(string(";"), TokenTag::kSemicolon),
   };
 //  CallEntity expected_call_entity =
 //      CallEntity(
@@ -65,9 +65,9 @@ TEST_CASE("CreateEntities") {
   // ass test
   vector<Token> assign_tokens = {
       Token(string("y"), TokenTag::kName),
-      Token(string("="), TokenTag::kName),
-      Token(string("8"), TokenTag::kName),
-      Token(string(";"), TokenTag::kName),
+      Token(string("="), TokenTag::kBinaryOperator),
+      Token(string("8"), TokenTag::kInteger),
+      Token(string(";"), TokenTag::kSemicolon),
   };
 //  AssignEntity expected_assignment_entity =
 //      AssignEntity(
