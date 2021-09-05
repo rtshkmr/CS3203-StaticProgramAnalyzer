@@ -6,7 +6,7 @@
 TEST_CASE("CreateEntities") {
   // procedure test
   vector<Token> procedure_tokens = {
-      Token(string("procedure"), TokenTag::kKeyword),
+      Token(string("procedure"), TokenTag::kProcedureKeyword),
       Token(string("proc1"), TokenTag::kName),
       Token(string("{"), TokenTag::kOpenBrace)
   };
@@ -22,7 +22,7 @@ TEST_CASE("CreateEntities") {
 
   // read test
   vector<Token> read_tokens = {
-      Token(string("read"), TokenTag::kKeyword),
+      Token(string("read"), TokenTag::kReadKeyword),
       Token(string("x"), TokenTag::kName),
       Token(string(";"), TokenTag::kSemicolon),
   };
@@ -35,7 +35,7 @@ TEST_CASE("CreateEntities") {
 
   // print test
   vector<Token> print_tokens = {
-      Token(string("print"), TokenTag::kKeyword),
+      Token(string("print"), TokenTag::kPrintKeyword),
       Token(string("x"), TokenTag::kName),
       Token(string(";"), TokenTag::kSemicolon),
   };
@@ -48,7 +48,7 @@ TEST_CASE("CreateEntities") {
 
   // call test
   vector<Token> call_tokens = {
-      Token(string("call"), TokenTag::kKeyword),
+      Token(string("call"), TokenTag::kCallKeyword),
       Token(string("anotherProc"), TokenTag::kName),
       Token(string(";"), TokenTag::kSemicolon),
   };
@@ -65,56 +65,60 @@ TEST_CASE("CreateEntities") {
   // ass test
   vector<Token> assign_tokens = {
       Token(string("y"), TokenTag::kName),
-      Token(string("="), TokenTag::kBinaryOperator),
+      Token(string("="), TokenTag::kAssignmentOperator),
       Token(string("8"), TokenTag::kInteger),
       Token(string(";"), TokenTag::kSemicolon),
   };
-//  AssignEntity expected_assignment_entity =
-//      AssignEntity(
-//          new Variable(
-//              new VariableName("y")), "8");
   Entity* actual_assign_entity = EntityFactory::CreateEntities(assign_tokens);
   auto* actual_casted_assign = dynamic_cast<AssignEntity*>(actual_assign_entity);
   auto* actual_assign_variable_name = const_cast<VariableName*>(actual_casted_assign->getVariable()->getName());
+  auto actual_assign_expr = actual_casted_assign->getAssignmentExpr()->GetExpressionString();
 
   CHECK(actual_assign_variable_name->getName() == "y");
+  CHECK(actual_assign_expr == "8");
 
-  /*
   // while test
   vector<Token> while_tokens = {
-      Token(new string("while"), TokenTag()),
-      Token(new string("("), TokenTag()),
-      Token(new string("x"), TokenTag()),
-      Token(new string("=="), TokenTag()),
-      Token(new string("1"), TokenTag()),
-      Token(new string(")"), TokenTag()),
-      Token(new string("{"), TokenTag()),
+      Token(string("while"), TokenTag::kWhileKeyword),
+      Token(string("("), TokenTag::kOpenBracket),
+      Token(string("x"), TokenTag::kName),
+      Token(string("=="), TokenTag::kBinaryComparisonOperator),
+      Token(string("1"), TokenTag::kInteger),
+      Token(string(")"), TokenTag::kCloseBracket),
+      Token(string("{"), TokenTag::kOpenBrace),
   };
-  WhileEntity expected_while_entity = WhileEntity("x==1");
+  Entity* actual_while_entity = EntityFactory::CreateEntities(while_tokens);
+  auto* actual_casted_while = dynamic_cast<WhileEntity*>(actual_while_entity);
+  auto actual_while_expr = actual_casted_while->getCondExpr()->GetExpressionString();
+
+  CHECK(actual_while_expr == "x==1");
 
   // if test
   vector<Token> if_tokens = {
-      Token(new string("if"), TokenTag()),
-      Token(new string("("), TokenTag()),
-      Token(new string("yyy"), TokenTag()),
-      Token(new string("!="), TokenTag()),
-      Token(new string("abc"), TokenTag()),
-      Token(new string(")"), TokenTag()),
-      Token(new string("then"), TokenTag()),
+      Token(string("if"), TokenTag::kIfKeyword),
+      Token(string("("), TokenTag::kOpenBracket),
+      Token(string("yyy"), TokenTag::kName),
+      Token(string("!="), TokenTag::kBinaryComparisonOperator),
+      Token(string("abc"), TokenTag::kName),
+      Token(string(")"), TokenTag::kCloseBracket),
+      Token(string("then"), TokenTag::kThenKeyword),
   };
-  IfEntity expected_if_entity = IfEntity("yyy!=abc");
+  Entity* actual_if_entity = EntityFactory::CreateEntities(if_tokens);
+  auto* actual_casted_if = dynamic_cast<IfEntity*>(actual_if_entity);
+  auto actual_if_expr = actual_casted_if->getCondExpr()->GetExpressionString();
+
+  CHECK(actual_if_expr == "yyy!=abc");
 
   // else test
   vector<Token> else_tokens = {
-      Token(new string("else"), TokenTag()),
-      Token(new string("{"), TokenTag()),
+      Token(string("else"), TokenTag::kElseKeyword),
+      Token(string("{"), TokenTag::kOpenBrace),
   };
   ElseEntity expected_else_entity = ElseEntity();
-*/
 
   // negative test
   vector<Token> wrong_keyword_tokens = {
-      Token(string("wrongKeyword"), TokenTag::kKeyword),
+      Token(string("wrongKeyword"), TokenTag::kInvalid),
   };
   CHECK_THROWS_AS(EntityFactory::CreateEntities(wrong_keyword_tokens), std::invalid_argument);
 }

@@ -13,7 +13,7 @@ class EntityFactory {
   EntityFactory() = default;
   static Entity* CreateEntities(std::vector<Token> tokens);
  private:
-  static vector<Token> GetExpressionTokens(vector<Token> tokens, const std::string &start, const std::string &end);
+  static vector<Token> GetExpressionTokens(vector<Token> tokens, TokenTag startTag, TokenTag endTag);
   static string ConvertTokensToString(vector<Token> tokens);
   static vector<Variable*> GetVariablesFromExpressionTokens(vector<Token> tokens);
   static vector<ConstantValue*> GetConstantsFromExpressionTokens(vector<Token> tokens);
