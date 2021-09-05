@@ -8,7 +8,7 @@ using namespace psub;
 
 void PSubsystem::InitDataStructures() {
   deliverable_ = Deliverable();
-  syntax_validator_ = ConcreteSyntaxValidator();
+  syntax_validator_ = SyntaxValidator();
 }
 
 void PSubsystem::ProcessStatement(std::string statement) {
@@ -17,7 +17,7 @@ void PSubsystem::ProcessStatement(std::string statement) {
   }
 
   std::vector<Token> tokens = Tokenizer::CreateTokens(statement);
-  bool valid = syntax_validator_.ValidateConcreteSyntax(tokens);
+  bool valid = syntax_validator_.ValidateSemanticSyntax(tokens);
 
   if (tokens[0].token_tag_ == TokenTag::kCloseBrace) {
     //close brace, no need to create entity;
