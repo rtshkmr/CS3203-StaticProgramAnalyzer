@@ -15,7 +15,6 @@ Entity* EntityFactory::CreateEntities(vector<Token> tokens) {
   if (first_token.token_tag_ == TokenTag::kProcedureKeyword) {
     assert(tokens[1].token_tag_ == TokenTag::kName);
     std::string token_string = tokens[1].GetTokenString();
-    // todo: supposed to link statement list, to do in psub
     return new Procedure(new ProcedureName(token_string));
   } else if (first_token.token_tag_ == TokenTag::kReadKeyword) {
     std::string read_var_string = tokens[1].GetTokenString();
@@ -28,7 +27,6 @@ Entity* EntityFactory::CreateEntities(vector<Token> tokens) {
   } else if (first_token.token_tag_ == TokenTag::kCallKeyword) {
     std::string call_proc_string = tokens[1].GetTokenString();
     assert(tokens[1].token_tag_ == TokenTag::kName);
-    // todo: supposed to link an existing procedure with this call entity?
     return new CallEntity(new Procedure(new ProcedureName(call_proc_string)));
   } else if (first_token.token_tag_ == TokenTag::kWhileKeyword) {
     assert(tokens[1].token_tag_ == TokenTag::kOpenBracket);
@@ -36,7 +34,6 @@ Entity* EntityFactory::CreateEntities(vector<Token> tokens) {
     std::string expression_string = ConvertTokensToString(expression_tokens);
     vector<Variable*> expression_variables = GetVariablesFromExpressionTokens(expression_tokens);
     vector<ConstantValue*> expression_constants = GetConstantsFromExpressionTokens(expression_tokens);
-    // todo: supposed to link statement list to this while entity, to do in psub
     return new WhileEntity(expression_string, expression_variables, expression_constants);
   } else if (first_token.token_tag_ == TokenTag::kIfKeyword) {
     assert(tokens[1].token_tag_ == TokenTag::kOpenBracket);
@@ -44,7 +41,6 @@ Entity* EntityFactory::CreateEntities(vector<Token> tokens) {
     std::string expression_string = ConvertTokensToString(expression_tokens);
     vector<Variable*> expression_variables = GetVariablesFromExpressionTokens(expression_tokens);
     vector<ConstantValue*> expression_constants = GetConstantsFromExpressionTokens(expression_tokens);
-    // todo: supposed to link statement list to this if entity, to do in psub
     return new IfEntity(expression_string, expression_variables, expression_constants);
   } else if (first_token.token_tag_ == TokenTag::kElseKeyword) {
     return new ElseEntity();
