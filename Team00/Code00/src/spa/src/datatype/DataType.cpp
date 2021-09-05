@@ -168,7 +168,6 @@ TokenTag Token::TagStringWithToken(const string& reference) {
       return TokenTag::kInvalid;
     }
   } else if (regex_match(reference, fixed_char_pat)) {
-    // todo: handle open and close brackets
     // handle key characters:
     if (reference == "{") {
       return TokenTag::kOpenBrace;
@@ -176,6 +175,10 @@ TokenTag Token::TagStringWithToken(const string& reference) {
       return TokenTag::kCloseBrace;
     } else if (reference == ";") {
       return TokenTag::kSemicolon;
+    } else if (reference == "(") {
+      return TokenTag::kOpenBracket;
+    } else if (reference == ")") {
+      return TokenTag::kCloseBracket;
     } else {
       return TokenTag::kInvalid;
     }

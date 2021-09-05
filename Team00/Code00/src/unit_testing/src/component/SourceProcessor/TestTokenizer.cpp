@@ -5,6 +5,7 @@
 #include <regex>
 
 using namespace std;
+
 vector<string> program_lines = {
 //    R"(procedure         Week4 {read x;)",
     R"(procedure Week4 {read x;)",
@@ -12,7 +13,7 @@ vector<string> program_lines = {
     R"( y = 1;)",
     R"(z                                                                                                   = 3;)",
     R"(call Z;})",
-    R"(if(x >= 1) {read x; call helloProc;})",
+    R"(if(x >= 1) {read x; call helloProc;})", // cond_expr encapsulated by brackets
 };
 
 TEST_CASE("Tokenizer display current tokenization status") {
@@ -125,18 +126,34 @@ TEST_CASE("Regex pattern tests for token_strings") {
   REQUIRE(regex_checking_success);
 }
 
-TEST_CASE("Test successful tagging of strings") {
+TEST_CASE("Test successful handling of tagging strings") {
   Token keyword_proc = Token("procedure", TokenTag::kProcedureKeyword);
   Token keyword_call = Token("call", TokenTag::kCallKeyword);
   Token plus_token = Token("+", TokenTag::kBinaryArithmeticOperator);
   Token open_brace_token = Token("{", TokenTag::kOpenBrace);
+  Token open_bracket_token = Token("(", TokenTag::kOpenBracket);
   Token close_brace_token = Token("}", TokenTag::kCloseBrace);
+  Token close_bracket_token = Token(")", TokenTag::kCloseBracket);
 
-  bool successful_tagging = Token("procedure", Token::TagStringWithToken("procedure")) == keyword_proc
+  string invalid_token_strings[] = {"1Hello", "}}", ">>"};
+  vector<Token> invalid_tokens;
+  for(const auto& token_string:invalid_token_strings) {
+    invalid_tokens.emplace_back(token_string, Token::TagStringWithToken(token_string));
+  }
+
+  bool successful_handling_valid_inputs = Token("procedure", Token::TagStringWithToken("procedure")) == keyword_proc
       && Token("call", Token::TagStringWithToken("call")) == keyword_call
       && Token("+", Token::TagStringWithToken("+")) == plus_token
       && Token("{", Token::TagStringWithToken("{")) == open_brace_token
       && Token("}", Token::TagStringWithToken("}")) == close_brace_token
-      && Token("call", Token::TagStringWithToken("call")) == keyword_call;
+      && Token("(", Token::TagStringWithToken("(")) == open_bracket_token
+      && Token(")", Token::TagStringWithToken(")")) == close_bracket_token;
+
+  bool successful_handling_invalid_inputs = true;
+  for(auto& token : invalid_tokens) {
+    successful_handling_invalid_inputs = (token.GetTokenTag()==TokenTag::kInvalid);
+  }
+
+  bool successful_tagging = (successful_handling_valid_inputs && successful_handling_invalid_inputs) ;
   REQUIRE(successful_tagging);
 }

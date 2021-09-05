@@ -85,11 +85,6 @@ class ConstantValue {
   int get();
 };
 
-/*
- * strm = <stmt_header><tokens>
- * */
-
-
 // header:
 enum class StatementTypeTag {
   kReadStatement,
@@ -117,8 +112,8 @@ enum class TokenTag {
   kAssignmentOperator,
   kOpenBrace, // for containers procName{...}
   kCloseBrace,
-  kLeftBracket,  // for if() and while()
-  kRightBracket,
+  kOpenBracket,  // for if() and while()
+  kCloseBracket,
   kSemicolon, // statement terminator
   kInvalid,
 };
