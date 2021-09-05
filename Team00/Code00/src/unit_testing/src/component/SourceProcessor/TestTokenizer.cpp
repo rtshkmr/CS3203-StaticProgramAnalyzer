@@ -126,8 +126,8 @@ TEST_CASE("Regex pattern tests for token_strings") {
 }
 
 TEST_CASE("Test successful tagging of strings") {
-  Token keyword_proc = Token("procedure", TokenTag::kKeyword);
-  Token keyword_call = Token("call", TokenTag::kKeyword);
+  Token keyword_proc = Token("procedure", TokenTag::kProcedureKeyword);
+  Token keyword_call = Token("call", TokenTag::kCallKeyword);
   Token plus_token = Token("+", TokenTag::kBinaryArithmeticOperator);
   Token open_brace_token = Token("{", TokenTag::kOpenBrace);
   Token close_brace_token = Token("}", TokenTag::kCloseBrace);

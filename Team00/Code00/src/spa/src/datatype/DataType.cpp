@@ -130,6 +130,17 @@ bool Token::operator==(Token other) {
   return this->GetTokenString() == other.GetTokenString();
 }
 
+bool Token::IsKeywordToken(Token token) {
+  TokenTag tag = token.GetTokenTag();
+  return tag == TokenTag::kProcedureKeyword
+      || tag == TokenTag::kReadKeyword
+      || tag == TokenTag::kPrintKeyword
+      || tag == TokenTag::kCallKeyword
+      || tag == TokenTag::kWhileKeyword
+      || tag == TokenTag::kIfKeyword
+      || tag == TokenTag::kWhileKeyword;
+}
+
 TokenTag Token::TagStringWithToken(const string& reference) {
   regex fixed_keyword_pat(R"(procedure|read|print|call|while|if|)");
   regex fixed_char_pat(R"(\{|\}|;)"); // for braces, semicolon...
@@ -140,8 +151,22 @@ TokenTag Token::TagStringWithToken(const string& reference) {
 
   // QQ: can it have a separation like that: "x > = 1"
   if (regex_match(reference, fixed_keyword_pat)) {
-    // handle keywords:
-    return TokenTag::kKeyword;
+    // instead of having a header, we'll use these keywords for now
+    if (reference == "procedure") {
+      return TokenTag::kProcedureKeyword;
+    } else if (reference == "read") {
+      return TokenTag::kReadKeyword;
+    } else if (reference == "print") {
+      return TokenTag::kPrintKeyword;
+    } else if (reference == "call") {
+      return TokenTag::kCallKeyword;
+    } else if (reference == "while") {
+      return TokenTag::kWhileKeyword;
+    } else if (reference == "if") {
+      return TokenTag::kIfKeyword;
+    } else {
+      return TokenTag::kInvalid;
+    }
   } else if (regex_match(reference, fixed_char_pat)) {
     // todo: handle open and close brackets
     // handle key characters:
@@ -155,8 +180,11 @@ TokenTag Token::TagStringWithToken(const string& reference) {
       return TokenTag::kInvalid;
     }
   } else if (regex_match(reference, binary_arithmetic_operator_pat)) {
-    // tag binary operators:
-    return TokenTag::kBinaryArithmeticOperator;
+    if (reference == "=") {
+      return TokenTag::kAssignmentOperator;
+    } else {
+      return TokenTag::kBinaryArithmeticOperator;
+    }
   } else if (regex_match(reference, binary_comparison_operator_pat)) {
     return TokenTag::kBinaryComparisonOperator;
   } else if (regex_match(reference, name_pat)) {

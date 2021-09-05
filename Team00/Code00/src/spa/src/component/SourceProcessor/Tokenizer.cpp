@@ -87,7 +87,6 @@ vector<string> Tokenizer::SplitSubTokens(string& string_token) {
     for (auto& delimiter : delimiters) {
       bool contains_delim = (string_token.find(delimiter) != string::npos);
       // todo: add some invariant check: at any time, a string_token may only contain one delim e.g."proc{" and not "proc {;"
-      // qq: explore edge cases for delimiting edge cases: Z};
       if (contains_delim) { // found a valid delim:
         vector<string> new_token_strings = SplitString(delimiter, string_token, true);
         extra_token_strings.insert(extra_token_strings.end(), new_token_strings.begin(), new_token_strings.end());

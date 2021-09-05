@@ -105,9 +105,16 @@ enum class TokenTag {
   //       these tags will determine the rule-set that is used by the CGV to validate syntax
   kInteger,
   kKeyword, // for SIMPLE keywords like call, print...
+  kProcedureKeyword,
+  kIfKeyword,
+  kReadKeyword,
+  kPrintKeyword,
+  kCallKeyword,
+  kWhileKeyword,
   kName,
   kBinaryArithmeticOperator, //  for binary math operations (=, +, -...)
   kBinaryComparisonOperator,
+  kAssignmentOperator,
   kOpenBrace, // for containers procName{...}
   kCloseBrace,
   kLeftBracket,  // for if() and while()
@@ -133,6 +140,7 @@ class Token {
   [[nodiscard]] TokenTag GetTokenTag() const;
   bool operator==(Token other);
   static TokenTag TagStringWithToken(string const& reference);
+  static bool IsKeywordToken(Token token);
 };
 
 //// psub should call for a TokenizedStatement
