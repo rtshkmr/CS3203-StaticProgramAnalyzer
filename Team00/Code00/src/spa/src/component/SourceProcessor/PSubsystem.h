@@ -4,7 +4,7 @@
 #include <string>
 #include <stack>
 #include <datatype/Deliverable.h>
-#include "ConcreteSyntaxValidator.h"
+#include "SyntaxValidator.h"
 
 /**
  * This namespace provides a scope for PSubsystem related declarations.
@@ -20,7 +20,7 @@ namespace psub {
     class PSubsystem {
     private:
         Deliverable deliverable_;
-        ConcreteSyntaxValidator syntax_validator_;
+        SyntaxValidator syntax_validator_;
 
         bool valid_state = true;
         Container* current_node_;

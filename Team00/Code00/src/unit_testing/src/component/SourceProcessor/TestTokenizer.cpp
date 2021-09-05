@@ -1,5 +1,4 @@
 #include "catch.hpp"
-
 #include <iostream>
 #include <component/SourceProcessor/Tokenizer.h>
 #include <regex>
@@ -20,6 +19,8 @@ vector<string> program_lines = {
 //    R"(if(x >= 1) then {read x; call helloProc;} else {x=1;})", // todo: the {x=1;} is not supported by tokenizer (i.e. more than 2 special delimiters. if necessary, need to make the splitting functions do a recursive call)
 };
 
+
+
 TEST_CASE("Tokenizer display current tokenization status") {
   vector<Token> program_tokens = {};
   int line_counter = 0;
@@ -32,6 +33,7 @@ TEST_CASE("Tokenizer display current tokenization status") {
     cout << "=============[Line Number: " << ++line_counter << " ]===================\n";
     int token_counter = 0;
     vector<Token> tokens = Tokenizer::CreateTokens(line);
+    program_tokens.insert(program_tokens.end(), tokens.begin(), tokens.end());
     for (auto token : tokens) {
       cout << "[" << ++token_counter << "]token string:  " + token.GetTokenString() << "\n";
     }
