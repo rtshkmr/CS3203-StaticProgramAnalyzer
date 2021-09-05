@@ -33,14 +33,20 @@ Entity* EntityFactory::CreateEntities(vector<Token> tokens) {
       return new CallEntity(new Procedure(new ProcedureName(call_proc_string)));
     } else if (keyword_token_string == "while") {
       assert(tokens[1].token_tag_ == TokenTag::kLeftBracket);
-      std::string expression_string = GetExpression(tokens, "(", ")");
+      vector<Token> expression_tokens = GetExpressionTokens(tokens, "(", ")");
+      std::string expression_string = ConvertTokensToString(expression_tokens);
+      vector<Variable*> expression_variables = GetVariablesFromExpressionTokens(expression_tokens);
+      vector<ConstantValue*> expression_constants = GetConstantsFromExpressionTokens(expression_tokens);
       // todo: supposed to link statement list to this while entity, to do in psub
-      return new WhileEntity(expression_string);
+      return new WhileEntity(expression_string, expression_variables, expression_constants);
     } else if (keyword_token_string == "if") {
       assert(tokens[1].token_tag_ == TokenTag::kLeftBracket);
-      std::string expression_string = GetExpression(tokens, "(", ")");
+      vector<Token> expression_tokens = GetExpressionTokens(tokens, "(", ")");
+      std::string expression_string = ConvertTokensToString(tokens);
+      vector<Variable*> expression_variables = GetVariablesFromExpressionTokens(expression_tokens);
+      vector<ConstantValue*> expression_constants = GetConstantsFromExpressionTokens(expression_tokens);
       // todo: supposed to link statement list to this if entity, to do in psub
-      return new IfEntity(expression_string);
+      return new IfEntity(expression_string, expression_variables, expression_constants);
     } else if (keyword_token_string == "else") {
       return new ElseEntity();
     } else {
@@ -48,24 +54,59 @@ Entity* EntityFactory::CreateEntities(vector<Token> tokens) {
     }
   } else if (first_token.token_tag_ == TokenTag::kName) {
     assert(tokens[1].GetTokenString() == "=");
-    std::string expression_string = GetExpression(tokens, "=", ";");
-    return new AssignEntity(new Variable(new VariableName(keyword_token_string)), expression_string);
+    vector<Token> expression_tokens = GetExpressionTokens(tokens, "=", ";");
+    std::string expression_string = ConvertTokensToString(tokens);
+    vector<Variable*> expression_variables = GetVariablesFromExpressionTokens(expression_tokens);
+    vector<ConstantValue*> expression_constants = GetConstantsFromExpressionTokens(expression_tokens);
+    return new AssignEntity(
+        new Variable(new VariableName(keyword_token_string)),
+        expression_string,
+        expression_variables,
+        expression_constants);
   } else {
     throw std::invalid_argument("Tokens cannot be made into entity in EF.");
   }
 }
 
-std::string EntityFactory::GetExpression(vector<Token> tokens, const std::string &start, const std::string &end) {
+vector<Token> EntityFactory::GetExpressionTokens(vector<Token> tokens, const string &start, const string &end) {
   assert(tokens[1].GetTokenString() == start);
   int iterator = 2;
-  std::string expression_string;
+  vector<Token> expression_tokens;
   int tokens_size = tokens.size();
   while (tokens[iterator].GetTokenString() != end && iterator != tokens_size) {
-    expression_string += tokens[iterator].GetTokenString();
+    expression_tokens.push_back(tokens[iterator]);
     iterator++;
     if (iterator > tokens_size) {
       throw std::out_of_range("Tokens do not contain end-of-expression token when passed into EF.");
     }
   }
+  return expression_tokens;
+}
+
+string EntityFactory::ConvertTokensToString(vector<Token> tokens) {
+  std::string expression_string;
+  for (auto &token : tokens) {
+    expression_string += token.GetTokenString();
+  }
   return expression_string;
+}
+
+vector<Variable*> EntityFactory::GetVariablesFromExpressionTokens(vector<Token> tokens) {
+  vector<Variable*> variables;
+  for (auto &token: tokens) {
+    if (token.token_tag_ == TokenTag::kName) {
+      variables.push_back(new Variable(new VariableName(token.GetTokenString())));
+    }
+  }
+  return variables;
+}
+
+vector<ConstantValue*> EntityFactory::GetConstantsFromExpressionTokens(vector<Token> tokens) {
+  vector<ConstantValue*> constants;
+  for (auto &token: tokens) {
+    if (token.token_tag_ == TokenTag::kInteger) {
+      constants.push_back(new ConstantValue(token.GetTokenString()));
+    }
+  }
+  return constants;
 }
