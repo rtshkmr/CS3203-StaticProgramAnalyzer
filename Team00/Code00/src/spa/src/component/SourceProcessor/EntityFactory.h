@@ -11,9 +11,8 @@ using namespace std;
 class EntityFactory {
  public:
   EntityFactory();
-  void Init(int* p_sub); // todo: set pointer to psub in order to  establish bi-directional relationship b/w the two.
-  //                              cause EF needs to set flags within helper stacks within psub.
-  std::vector<Entity> CreateEntities(const std::vector<Token>& tokens);
+  void Init(int* p_sub);
+  static Entity CreateEntities(const std::vector<Token>& tokens);
  private:
   int* p_sub_;
   Entity CreateEntity(Token& token);

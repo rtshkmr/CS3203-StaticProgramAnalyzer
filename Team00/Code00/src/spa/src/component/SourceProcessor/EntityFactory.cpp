@@ -17,12 +17,15 @@ void EntityFactory::Init(int* psub) {
     this->p_sub_ = psub;
   }
 }
-vector<Entity> EntityFactory::CreateEntities(const vector<Token>& tokens) {
+
+/*
+ vector<Entity> EntityFactory::CreateEntities(const vector<Token>& tokens) {
   for (auto t:tokens) {
     Entity entity = CreateEntity(t);
   }
   return {};
 }
+*/
 
 Entity EntityFactory::CreateEntity(Token& token) {
   // todo add logic for creating a single entity

@@ -108,8 +108,99 @@ int ConstantValue::get() {
  * @param token_string [NOT NULL] The string representation of the SIMPLE programme statement.
  * @param token_tag [NOT NULL] The enumerator object to the tag
  */
-Token::Token(const std::string* token_string, TokenTag token_tag) {
-  token_string = token_string;
-  token_tag = token_tag;
+
+TokenTag Token::GetTokenTag() const {
+  return this->token_tag_;
+}
+std::string Token::GetTokenString() {
+  return this->token_string_;
+}
+
+Token::Token(string token_string, TokenTag token_tag) :
+    token_tag_(token_tag) {
+  token_string_ = std::move(token_string);
+}
+
+/**
+ * Equality operator checks the string kept in the token todo: add the tag also
+ * @param other
+ * @return
+ */
+bool Token::operator==(Token other) {
+  return this->GetTokenString() == other.GetTokenString();
+}
+
+bool Token::IsKeywordToken(Token token) {
+  TokenTag tag = token.GetTokenTag();
+  return tag == TokenTag::kProcedureKeyword
+      || tag == TokenTag::kReadKeyword
+      || tag == TokenTag::kPrintKeyword
+      || tag == TokenTag::kCallKeyword
+      || tag == TokenTag::kWhileKeyword
+      || tag == TokenTag::kIfKeyword
+      || tag == TokenTag::kWhileKeyword
+      || tag == TokenTag::kThenKeyword;
+}
+
+TokenTag Token::TagStringWithToken(const string& reference) {
+  regex fixed_keyword_pat(R"(procedure|read|print|call|while|if|then|else)");
+  regex fixed_char_pat(R"(\{|\}|;|\(|\))"); // for braces, semicolon...
+  regex binary_arithmetic_operator_pat(R"(\+|\-|\*|\/|%|=)"); // for math and comparator chars
+  regex binary_comparison_operator_pat(R"(==|>|>=|<|<=|!=)"); // for math and comparator chars
+  regex name_pat(R"(^[[:alpha:]]+([0-9]+|[[:alpha:]]+)*)"); // names, integers... todo: check alphanum
+  regex integer_pat(R"([0-9]+)");
+
+  // QQ: can it have a separation like that: "x > = 1"
+  if (regex_match(reference, fixed_keyword_pat)) {
+    // instead of having a header, we'll use these keywords for now
+    if (reference == "procedure") {
+      return TokenTag::kProcedureKeyword;
+    } else if (reference == "read") {
+      return TokenTag::kReadKeyword;
+    } else if (reference == "print") {
+      return TokenTag::kPrintKeyword;
+    } else if (reference == "call") {
+      return TokenTag::kCallKeyword;
+    } else if (reference == "while") {
+      return TokenTag::kWhileKeyword;
+    } else if (reference == "if") {
+      return TokenTag::kIfKeyword;
+    } else if (reference == "then") {
+      return TokenTag::kThenKeyword;
+    } else if (reference == "else") {
+      return TokenTag::kElseKeyword;
+    } else {
+      return TokenTag::kInvalid;
+    }
+  } else if (regex_match(reference, fixed_char_pat)) {
+    // handle key characters:
+    if (reference == "{") {
+      return TokenTag::kOpenBrace;
+    } else if (reference == "}") {
+      return TokenTag::kCloseBrace;
+    } else if (reference == ";") {
+      return TokenTag::kSemicolon;
+    } else if (reference == "(") {
+      return TokenTag::kOpenBracket;
+    } else if (reference == ")") {
+      return TokenTag::kCloseBracket;
+    } else {
+      return TokenTag::kInvalid;
+    }
+  } else if (regex_match(reference, binary_arithmetic_operator_pat)) {
+    if (reference == "=") {
+      return TokenTag::kAssignmentOperator;
+    } else {
+      return TokenTag::kBinaryArithmeticOperator;
+    }
+  } else if (regex_match(reference, binary_comparison_operator_pat)) {
+    return TokenTag::kBinaryComparisonOperator;
+  } else if (regex_match(reference, name_pat)) {
+    return TokenTag::kName;
+  } else if (regex_match(reference, integer_pat)) {
+    return TokenTag::kInteger;
+  } else {
+    return TokenTag::kInvalid;
+  }
 }
 

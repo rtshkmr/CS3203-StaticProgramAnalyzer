@@ -8,7 +8,7 @@ add_library(spa ${srcs} ${headers}
         src/model/Statement.h src/model/Statement.cpp
         src/component/PKB/PKB.cpp src/component/PKB/PKB.h
         src/component/SourceProcessor/Tokenizer.cpp src/component/SourceProcessor/Tokenizer.h
-        src/component/SourceProcessor/ConcreteSyntaxValidator.cpp src/component/SourceProcessor/ConcreteSyntaxValidator.h
+        src/component/SourceProcessor/SyntaxValidator.cpp src/component/SourceProcessor/SyntaxValidator.h
         src/component/SourceProcessor/EntityFactory.cpp src/component/SourceProcessor/EntityFactory.h
         src/datatype/Identifier.cpp
         src/datatype/Identifier.h src/datatype/Deliverable.cpp

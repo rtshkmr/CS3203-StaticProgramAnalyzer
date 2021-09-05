@@ -13,10 +13,14 @@ using namespace std;
 
 class Tokenizer {
  public:
-  Tokenizer();
   static vector<Token> CreateTokens(const string& statement_string);
  private:
-  static Token CreateToken(const string& string_token);
+  static Token* CreateToken(string string_token);
+  static vector<string> SplitString(const string& delimiter, const string& input, bool retain_delimiter);
+  static vector<string> SplitSubTokens(string& string_token);
+  static bool IsDelimiter(string& test_string);
+  static bool IsWhiteSpace(string& test_string);
+  static TokenTag TagTokenString(string token_string);
 };
 
 #endif //AUTOTESTER_TEAM00_CODE00_SRC_SPA_SRC_COMPONENT_SOURCEPROCESSOR_TOKENIZER_H_

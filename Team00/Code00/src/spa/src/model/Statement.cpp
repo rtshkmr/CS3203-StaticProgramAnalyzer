@@ -12,12 +12,16 @@ ConditionalExpression* IfEntity::getCondExpr() {
   return cond_expr_;
 }
 
-std::vector<Statement>* IfEntity::getIfStmtList() {
+std::list<Statement>* IfEntity::GetStatementList() {
   return &if_stmt_list_;
 }
 
-std::vector<Statement>* IfEntity::getElseStmtList() {
-  return else_stmt_list_->getElseStmtList();
+void IfEntity::AddStatement(Statement stmt) {
+  if_stmt_list_.push_back(stmt);
+}
+
+std::list<Statement>* IfEntity::getElseStmtList() {
+  return else_stmt_list_->GetStatementList();
 }
 
 bool IfEntity::setElseStmtList(ElseEntity* else_stmt) {
@@ -29,8 +33,12 @@ ElseEntity::ElseEntity() {
 
 }
 
-std::vector<Statement>* ElseEntity::getElseStmtList() {
+std::list<Statement>* ElseEntity::GetStatementList() {
   return &else_stmt_list_;
+}
+
+void ElseEntity::AddStatement(Statement stmt) {
+  else_stmt_list_.push_back(stmt);
 }
 
 WhileEntity::WhileEntity(std::string condition) {
@@ -41,8 +49,12 @@ ConditionalExpression* WhileEntity::getCondExpr() {
   return cond_expr_;
 }
 
-std::vector<Statement>* WhileEntity::getStmtList() {
+std::list<Statement>* WhileEntity::GetStatementList() {
   return &stmt_list_;
+}
+
+void WhileEntity::AddStatement(Statement stmt) {
+  stmt_list_.push_back(stmt);
 }
 
 AssignEntity::AssignEntity(Variable* var, std::string expression) {
