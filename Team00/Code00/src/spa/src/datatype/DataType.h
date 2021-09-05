@@ -3,6 +3,7 @@
  * Any data types used in this program should be immutable by default.
  */
 
+#include <regex>
 #include "string"
 
 #ifndef AUTOTESTER_DATATYPE_H
@@ -84,11 +85,7 @@ class ConstantValue {
   int get();
 };
 
-/*
- * strm = <stmt_header><tokens>
- * */
-
-
+// header:
 enum class StatementTypeTag {
   kReadStatement,
   kPrintStatement,
@@ -99,18 +96,28 @@ enum class StatementTypeTag {
 };
 
 enum class TokenTag {
-  // todo: add fixed set of tags for token from the Concrete Grammar
-  //       these tags will determine the rule-set that is used by the CGV to validate syntax
   kInteger,
-  kKeyword, // for SIMPLE keywords like call, print...
+  kProcedureKeyword,
+  kIfKeyword,
+  kThenKeyword,
+  kElseKeyword,
+  kReadKeyword,
+  kPrintKeyword,
+  kCallKeyword,
+  kWhileKeyword,
   kName,
-  kBinaryOperator, //  for binary math operations (=, +, -...)
+  kBinaryArithmeticOperator, //  for binary math operations (=, +, -...)
+  kBinaryComparisonOperator,
+  kAssignmentOperator,
   kOpenBrace, // for containers procName{...}
   kCloseBrace,
-  kLeftBracket,  // for if() and while()
-  kRightBracket,
+  kOpenBracket,  // for if() and while()
+  kCloseBracket,
   kSemicolon, // statement terminator
+  kInvalid,
 };
+
+
 
 // QQ : is it better to make Token into a struct? was going to encapsulate other methods into it
 /**
@@ -120,18 +127,21 @@ enum class TokenTag {
 class Token {
  private:
   string token_string_;
+
  public:
   string GetTokenString();
   TokenTag token_tag_; // fixme: make this private
   Token(string token_string, TokenTag token_tag);
   [[nodiscard]] TokenTag GetTokenTag() const;
   bool operator==(Token other);
+  static TokenTag TagStringWithToken(string const& reference);
+  static bool IsKeywordToken(Token token);
 };
 
 //// psub should call for a TokenizedStatement
-//typedef struct TokenizedStatement {
-//  list<Token> tokens;
-//  StatementTypeTag tag;
+//[[maybe_unused]] typedef struct TokenizedStatement {
+//  std::list<Token> tokens;
+//  StatementTypeTag header;
 //} TokenizedStatement;
 
 #endif //AUTOTESTER_DATATYPE_H

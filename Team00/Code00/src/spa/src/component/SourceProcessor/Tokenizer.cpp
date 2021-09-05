@@ -35,7 +35,9 @@ vector<Token> Tokenizer::CreateTokens(const string& statement_string) {
 }
 
 Token* Tokenizer::CreateToken(string token_string) {
-  return new Token(std::move(token_string), TokenTag::kInteger);
+  TokenTag token_tag = Token::TagStringWithToken(token_string);
+//  return new Token(std::move(token_string), TokenTag::kInteger);
+  return new Token(std::move(token_string), token_tag);
 }
 
 vector<string> Tokenizer::SplitString(const string& delimiter, const string& input, bool retain_delimiter) {
@@ -81,16 +83,14 @@ vector<string> Tokenizer::SplitSubTokens(string& string_token) {
     return {};
   } else {
     vector<string> extra_token_strings;
-    string delimiters[]{"{", ";", "}"};
+    string delimiters[]{"{","(",")", ";", "}"};
     for (auto& delimiter : delimiters) {
       bool contains_delim = (string_token.find(delimiter) != string::npos);
       // todo: add some invariant check: at any time, a string_token may only contain one delim e.g."proc{" and not "proc {;"
-      // qq: explore edge cases for delimiting edge cases: Z};
       if (contains_delim) { // found a valid delim:
-        // get left of delim, get delim, get right of delim:
         vector<string> new_token_strings = SplitString(delimiter, string_token, true);
         extra_token_strings.insert(extra_token_strings.end(), new_token_strings.begin(), new_token_strings.end());
-        break; // run this once only(?)
+        break; // run this once only
       }
     }
     return extra_token_strings;
@@ -117,3 +117,5 @@ bool Tokenizer::IsWhiteSpace(string& test_string) {
   }
   return false;
 }
+
+
