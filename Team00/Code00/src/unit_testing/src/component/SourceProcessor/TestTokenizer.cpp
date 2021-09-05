@@ -7,13 +7,17 @@
 using namespace std;
 
 vector<string> program_lines = {
-//    R"(procedure         Week4 {read x;)",
+    R"(procedure         Week4 {read x;)",
     R"(procedure Week4 {read x;)",
     R"(    print x; )",
     R"( y = 1;)",
     R"(z                                                                                                   = 3;)",
     R"(call Z;})",
     R"(if(x >= 1) {read x; call helloProc;})", // cond_expr encapsulated by brackets
+    R"(if(x >= 1) {read x; call helloProc;} else { x = 1; })", // cond_expr encapsulated by brackets todo: this fails to separate the =1;
+//    R"(if(x >= 1) {read x; call helloProc;} else {x= 1; })", // cond_expr encapsulated by brackets todo: this fails to separate the =1;
+//    R"(if(x >= 1) {read x; call helloProc;} else {x =1; })", // cond_expr encapsulated by brackets todo: this fails to separate the =1
+//    R"(if(x >= 1) then {read x; call helloProc;} else {x=1;})", // todo: the {x=1;} is not supported by tokenizer (i.e. more than 2 special delimiters. if necessary, need to make the splitting functions do a recursive call)
 };
 
 TEST_CASE("Tokenizer display current tokenization status") {
@@ -83,8 +87,8 @@ TEST_CASE(
 }
 
 TEST_CASE("Regex pattern tests for token_strings") {
-  regex fixed_keyword_pat(R"(procedure|read|print|call|while|if|)");
-  regex fixed_char_pat(R"(\{|\}|;)"); // for braces, semicolon...
+  regex fixed_keyword_pat(R"(procedure|read|print|call|while|if|then|else)");
+  regex fixed_char_pat(R"(\{|\}|;|\(|\))"); // for braces, semicolon...
   regex binary_arithmetic_operator_pat(R"(\+|\-|\*|\/|%|=|==|>|>=|<|<=|!=)"); // for math
   regex binary_comparison_operator_pat(R"(==|>|>=|<|<=|!=)"); // for comparator chars
   regex name_pat(R"(^[[:alpha:]]+([0-9]+|[[:alpha:]]+)*)"); // names, integers... todo: check alphanum
@@ -134,10 +138,12 @@ TEST_CASE("Test successful handling of tagging strings") {
   Token open_bracket_token = Token("(", TokenTag::kOpenBracket);
   Token close_brace_token = Token("}", TokenTag::kCloseBrace);
   Token close_bracket_token = Token(")", TokenTag::kCloseBracket);
+  Token then_token = Token("then", TokenTag::kThenKeyword);
+  Token else_token = Token("else", TokenTag::kElseKeyword);
 
   string invalid_token_strings[] = {"1Hello", "}}", ">>"};
   vector<Token> invalid_tokens;
-  for(const auto& token_string:invalid_token_strings) {
+  for (const auto& token_string:invalid_token_strings) {
     invalid_tokens.emplace_back(token_string, Token::TagStringWithToken(token_string));
   }
 
@@ -147,13 +153,14 @@ TEST_CASE("Test successful handling of tagging strings") {
       && Token("{", Token::TagStringWithToken("{")) == open_brace_token
       && Token("}", Token::TagStringWithToken("}")) == close_brace_token
       && Token("(", Token::TagStringWithToken("(")) == open_bracket_token
-      && Token(")", Token::TagStringWithToken(")")) == close_bracket_token;
+      && Token(")", Token::TagStringWithToken(")")) == close_bracket_token
+      && Token("then", Token::TagStringWithToken("then")) == then_token;
 
   bool successful_handling_invalid_inputs = true;
-  for(auto& token : invalid_tokens) {
-    successful_handling_invalid_inputs = (token.GetTokenTag()==TokenTag::kInvalid);
+  for (auto& token : invalid_tokens) {
+    successful_handling_invalid_inputs = (token.GetTokenTag() == TokenTag::kInvalid);
   }
 
-  bool successful_tagging = (successful_handling_valid_inputs && successful_handling_invalid_inputs) ;
+  bool successful_tagging = (successful_handling_valid_inputs && successful_handling_invalid_inputs);
   REQUIRE(successful_tagging);
 }

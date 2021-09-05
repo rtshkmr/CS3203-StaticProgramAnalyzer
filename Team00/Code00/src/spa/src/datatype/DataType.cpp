@@ -138,12 +138,13 @@ bool Token::IsKeywordToken(Token token) {
       || tag == TokenTag::kCallKeyword
       || tag == TokenTag::kWhileKeyword
       || tag == TokenTag::kIfKeyword
-      || tag == TokenTag::kWhileKeyword;
+      || tag == TokenTag::kWhileKeyword
+      || tag == TokenTag::kThenKeyword;
 }
 
 TokenTag Token::TagStringWithToken(const string& reference) {
-  regex fixed_keyword_pat(R"(procedure|read|print|call|while|if|)");
-  regex fixed_char_pat(R"(\{|\}|;)"); // for braces, semicolon...
+  regex fixed_keyword_pat(R"(procedure|read|print|call|while|if|then|else)");
+  regex fixed_char_pat(R"(\{|\}|;|\(|\))"); // for braces, semicolon...
   regex binary_arithmetic_operator_pat(R"(\+|\-|\*|\/|%|=)"); // for math and comparator chars
   regex binary_comparison_operator_pat(R"(==|>|>=|<|<=|!=)"); // for math and comparator chars
   regex name_pat(R"(^[[:alpha:]]+([0-9]+|[[:alpha:]]+)*)"); // names, integers... todo: check alphanum
@@ -164,6 +165,10 @@ TokenTag Token::TagStringWithToken(const string& reference) {
       return TokenTag::kWhileKeyword;
     } else if (reference == "if") {
       return TokenTag::kIfKeyword;
+    } else if (reference == "then") {
+      return TokenTag::kThenKeyword;
+    } else if (reference == "else") {
+      return TokenTag::kElseKeyword;
     } else {
       return TokenTag::kInvalid;
     }
@@ -198,3 +203,4 @@ TokenTag Token::TagStringWithToken(const string& reference) {
     return TokenTag::kInvalid;
   }
 }
+

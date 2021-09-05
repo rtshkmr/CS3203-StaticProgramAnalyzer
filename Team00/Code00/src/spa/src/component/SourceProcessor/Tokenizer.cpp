@@ -90,7 +90,7 @@ vector<string> Tokenizer::SplitSubTokens(string& string_token) {
       if (contains_delim) { // found a valid delim:
         vector<string> new_token_strings = SplitString(delimiter, string_token, true);
         extra_token_strings.insert(extra_token_strings.end(), new_token_strings.begin(), new_token_strings.end());
-        break; // run this once only(?)
+        break; // run this once only
       }
     }
     return extra_token_strings;

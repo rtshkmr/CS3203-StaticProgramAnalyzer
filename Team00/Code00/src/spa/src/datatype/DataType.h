@@ -96,12 +96,11 @@ enum class StatementTypeTag {
 };
 
 enum class TokenTag {
-  // todo: add fixed set of tags for token from the Concrete Grammar
-  //       these tags will determine the rule-set that is used by the CGV to validate syntax
   kInteger,
-  kKeyword, // for SIMPLE keywords like call, print...
   kProcedureKeyword,
   kIfKeyword,
+  kThenKeyword,
+  kElseKeyword,
   kReadKeyword,
   kPrintKeyword,
   kCallKeyword,
@@ -128,6 +127,7 @@ enum class TokenTag {
 class Token {
  private:
   string token_string_;
+
  public:
   string GetTokenString();
   TokenTag token_tag_; // fixme: make this private
