@@ -127,10 +127,10 @@ enum class TokenTag {
 class Token {
  private:
   string token_string_;
+  TokenTag token_tag_;
 
  public:
   string GetTokenString();
-  TokenTag token_tag_; // fixme: make this private
   Token(string token_string, TokenTag token_tag);
   [[nodiscard]] TokenTag GetTokenTag() const;
   bool operator==(Token other);

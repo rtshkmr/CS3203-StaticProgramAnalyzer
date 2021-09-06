@@ -12,40 +12,40 @@
 Entity* EntityFactory::CreateEntities(vector<Token> tokens) {
   Token first_token = tokens.front();
   const std::string keyword_token_string = first_token.GetTokenString();
-  if (first_token.token_tag_ == TokenTag::kProcedureKeyword) {
-    assert(tokens[1].token_tag_ == TokenTag::kName);
+  if (first_token.GetTokenTag() == TokenTag::kProcedureKeyword) {
+    assert(tokens[1].GetTokenTag() == TokenTag::kName);
     std::string token_string = tokens[1].GetTokenString();
     return new Procedure(new ProcedureName(token_string));
-  } else if (first_token.token_tag_ == TokenTag::kReadKeyword) {
+  } else if (first_token.GetTokenTag() == TokenTag::kReadKeyword) {
     std::string read_var_string = tokens[1].GetTokenString();
-    assert(tokens[1].token_tag_ == TokenTag::kName);
+    assert(tokens[1].GetTokenTag() == TokenTag::kName);
     return new ReadEntity(new Variable(new VariableName(read_var_string)));
-  } else if (first_token.token_tag_ == TokenTag::kPrintKeyword) {
+  } else if (first_token.GetTokenTag() == TokenTag::kPrintKeyword) {
     std::string print_var_string = tokens[1].GetTokenString();
-    assert(tokens[1].token_tag_ == TokenTag::kName);
+    assert(tokens[1].GetTokenTag() == TokenTag::kName);
     return new PrintEntity(new Variable(new VariableName(print_var_string)));
-  } else if (first_token.token_tag_ == TokenTag::kCallKeyword) {
+  } else if (first_token.GetTokenTag() == TokenTag::kCallKeyword) {
     std::string call_proc_string = tokens[1].GetTokenString();
-    assert(tokens[1].token_tag_ == TokenTag::kName);
+    assert(tokens[1].GetTokenTag() == TokenTag::kName);
     return new CallEntity(new Procedure(new ProcedureName(call_proc_string)));
-  } else if (first_token.token_tag_ == TokenTag::kWhileKeyword) {
-    assert(tokens[1].token_tag_ == TokenTag::kOpenBracket);
+  } else if (first_token.GetTokenTag() == TokenTag::kWhileKeyword) {
+    assert(tokens[1].GetTokenTag() == TokenTag::kOpenBracket);
     vector<Token> expression_tokens = GetExpressionTokens(tokens, TokenTag::kOpenBracket, TokenTag::kCloseBracket);
     std::string expression_string = ConvertTokensToString(expression_tokens);
     vector<Variable*> expression_variables = GetVariablesFromExpressionTokens(expression_tokens);
     vector<ConstantValue*> expression_constants = GetConstantsFromExpressionTokens(expression_tokens);
     return new WhileEntity(expression_string, expression_variables, expression_constants);
-  } else if (first_token.token_tag_ == TokenTag::kIfKeyword) {
-    assert(tokens[1].token_tag_ == TokenTag::kOpenBracket);
+  } else if (first_token.GetTokenTag() == TokenTag::kIfKeyword) {
+    assert(tokens[1].GetTokenTag() == TokenTag::kOpenBracket);
     vector<Token> expression_tokens = GetExpressionTokens(tokens, TokenTag::kOpenBracket, TokenTag::kCloseBracket);
     std::string expression_string = ConvertTokensToString(expression_tokens);
     vector<Variable*> expression_variables = GetVariablesFromExpressionTokens(expression_tokens);
     vector<ConstantValue*> expression_constants = GetConstantsFromExpressionTokens(expression_tokens);
     return new IfEntity(expression_string, expression_variables, expression_constants);
-  } else if (first_token.token_tag_ == TokenTag::kElseKeyword) {
+  } else if (first_token.GetTokenTag() == TokenTag::kElseKeyword) {
     return new ElseEntity();
-  } else if (first_token.token_tag_ == TokenTag::kName) {
-    assert(tokens[1].token_tag_ == TokenTag::kAssignmentOperator);
+  } else if (first_token.GetTokenTag() == TokenTag::kName) {
+    assert(tokens[1].GetTokenTag() == TokenTag::kAssignmentOperator);
     vector<Token> expression_tokens = GetExpressionTokens(tokens, TokenTag::kAssignmentOperator, TokenTag::kSemicolon);
     std::string expression_string = ConvertTokensToString(expression_tokens);
     vector<Variable*> expression_variables = GetVariablesFromExpressionTokens(expression_tokens);
@@ -61,11 +61,11 @@ Entity* EntityFactory::CreateEntities(vector<Token> tokens) {
 }
 
 vector<Token> EntityFactory::GetExpressionTokens(vector<Token> tokens, TokenTag startTag, TokenTag endTag) {
-  assert(tokens[1].token_tag_ == startTag);
+  assert(tokens[1].GetTokenTag() == startTag);
   int iterator = 2;
   vector<Token> expression_tokens;
   int tokens_size = tokens.size();
-  while (tokens[iterator].token_tag_ != endTag && iterator != tokens_size) {
+  while (tokens[iterator].GetTokenTag() != endTag && iterator != tokens_size) {
     expression_tokens.push_back(tokens[iterator]);
     iterator++;
     if (iterator > tokens_size) {
@@ -86,7 +86,7 @@ string EntityFactory::ConvertTokensToString(vector<Token> tokens) {
 vector<Variable*> EntityFactory::GetVariablesFromExpressionTokens(vector<Token> tokens) {
   vector<Variable*> variables;
   for (auto &token: tokens) {
-    if (token.token_tag_ == TokenTag::kName) {
+    if (token.GetTokenTag() == TokenTag::kName) {
       variables.push_back(new Variable(new VariableName(token.GetTokenString())));
     }
   }
@@ -96,7 +96,7 @@ vector<Variable*> EntityFactory::GetVariablesFromExpressionTokens(vector<Token> 
 vector<ConstantValue*> EntityFactory::GetConstantsFromExpressionTokens(vector<Token> tokens) {
   vector<ConstantValue*> constants;
   for (auto &token: tokens) {
-    if (token.token_tag_ == TokenTag::kInteger) {
+    if (token.GetTokenTag() == TokenTag::kInteger) {
       constants.push_back(new ConstantValue(token.GetTokenString()));
     }
   }
