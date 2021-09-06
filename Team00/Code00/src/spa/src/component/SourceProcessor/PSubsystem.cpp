@@ -18,6 +18,7 @@ void PSubsystem::ProcessStatement(std::string statement) {
 
   std::vector<Token> tokens = Tokenizer::CreateTokens(statement);
   bool valid = syntax_validator_.ValidateSemanticSyntax(tokens);
+  valid = true; //TODO: remove this after validation check is complete
 
   if (tokens[0].GetTokenTag() == TokenTag::kCloseBrace) {
     //close brace, no need to create entity;
@@ -128,7 +129,7 @@ void PSubsystem::SetStatementObject(Statement* statement) {
     follow_stack_.pop();
     follow_stack_.push(statement);
   }
-  current_node_->AddStatement(statement);
+  current_node_->AddStatement(*statement);
 
   if (!parent_stack_.empty()) {
     assert(current_node_type_ == 1 || current_node_type_ == 2);

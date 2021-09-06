@@ -44,9 +44,9 @@ class Container {
  public:
   virtual ~Container() {};
 
-  virtual void AddStatement(Statement* stmt);
+  virtual void AddStatement(Statement stmt) = 0;
 
-  virtual std::list<Statement>* GetStatementList();
+  virtual std::list<Statement>* GetStatementList() = 0;
 };
 
 /**
