@@ -27,6 +27,16 @@ int StatementNumber::getNum() {
 }
 
 /**
+ * Performs a comparison between the current StatementNumber with the input StatementNumber.
+ * This method is similar to Java's Comparator, thus by creating this method, vectors<StatementNumber> can be sorted.
+ * @param other The StatementNumber object to compare to
+ * @return true if this.num_ is smaller than other.num_
+ */
+bool StatementNumber::operator<(const StatementNumber &other) const {
+  return num_ < other.num_;
+}
+
+/**
  * This LineNumber constructor check if the line number input is valid,
  *   and stores as a LineNumber object.
  * @param ln [NOT NULL] The line number
@@ -44,6 +54,16 @@ LineNumber::LineNumber(int ln) {
  */
 int LineNumber::getNum() {
   return num_;
+}
+
+/**
+ * Performs a comparison between the current LineNumber with the input LineNumber.
+ * This method is similar to Java's Comparator, thus by creating this method, vectors<LineNumber> can be sorted.
+ * @param other The LineNumber object to compare to
+ * @return true if this.num_ is smaller than other.num_
+ */
+bool LineNumber::operator<(const LineNumber &other) const {
+  return num_ < other.num_;
 }
 
 /**
@@ -66,6 +86,17 @@ std::string ProcedureName::getName() {
 }
 
 /**
+ * Performs a comparison between the current ProcedureName with the input ProcedureName.
+ * This method is similar to Java's Comparator, thus by creating this method, vectors<ProcedureName> can be sorted.
+ * @param other The ProcedureName object to compare to
+ * @return true if this.name_ is strictly smaller than other.name_. Note that if both strings are equivalent,
+ *    it will return false;
+ */
+bool ProcedureName::operator<(const ProcedureName &other) const {
+  return (strcmp(this->name_.data(), other.name_.data()) < 0);
+}
+
+/**
  * This VariableName constructor check if the variable name is valid,
  *   and stores as a VariableName object.
  * @param vName [NOT NULL] The variable name (in string) as extracted from SIMPLE program
@@ -85,6 +116,17 @@ std::string VariableName::getName() {
 }
 
 /**
+ * Performs a comparison between the current VariableName with the input VariableName.
+ * This method is similar to Java's Comparator, thus by creating this method, vectors<VariableName> can be sorted.
+ * @param other The VariableName object to compare to
+ * @return true if this.name_ is strictly smaller than other.name_. Note that if both strings are equivalent,
+ *    it will return false;
+ */
+bool VariableName::operator<(const VariableName &other) const {
+  return (strcmp(this->name_.data(), other.name_.data()) < 0);
+}
+
+/**
  * This ConstantValue constructor check if the constant received is valid (valid = integer),
  *   and stores as a ConstantValue object.
  * @param constant [NOT NULL] The constant (in string) as extracted from SIMPLE program
@@ -101,6 +143,16 @@ ConstantValue::ConstantValue(std::string constant) {
  */
 int ConstantValue::get() {
   return value_;
+}
+
+/**
+ * Performs a comparison between the current ConstantValue with the input ConstantValue.
+ * This method is similar to Java's Comparator, thus by creating this method, vectors<ConstantValue> can be sorted.
+ * @param other The ConstantValue object to compare to
+ * @return true if this.value_ is smaller than other.value_
+ */
+bool ConstantValue::operator<(const ConstantValue &other) const {
+  return value_ < other.value_;
 }
 
 /**

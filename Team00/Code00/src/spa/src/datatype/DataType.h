@@ -24,6 +24,8 @@ class StatementNumber {
   StatementNumber(int sn);
 
   int getNum();
+
+  bool operator<(const StatementNumber &other) const;
 };
 
 /**
@@ -39,6 +41,8 @@ class LineNumber {
   LineNumber(int ln);
 
   int getNum();
+
+  bool operator<(const LineNumber &other) const;
 };
 
 /**
@@ -53,6 +57,8 @@ class ProcedureName {
   ProcedureName(std::string pName);
 
   std::string getName();
+
+  bool operator<(const ProcedureName &other) const;
 };
 
 /**
@@ -67,6 +73,8 @@ class VariableName {
   VariableName(std::string vName);
 
   std::string getName();
+
+  bool operator<(const VariableName &other) const;
 };
 
 /**
@@ -83,6 +91,8 @@ class ConstantValue {
   ConstantValue(std::string constant);
 
   int get();
+
+  bool operator<(const ConstantValue &other) const;
 };
 
 // header:
