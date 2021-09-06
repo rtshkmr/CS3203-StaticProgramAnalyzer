@@ -44,9 +44,9 @@ class Container {
  public:
   virtual ~Container() {};
 
-  virtual void AddStatement(Statement stmt) = 0;
+  virtual void AddStatement(Statement* stmt) = 0;
 
-  virtual std::list<Statement>* GetStatementList() = 0;
+  virtual std::list<Statement*>* GetStatementList() = 0;
 };
 
 /**
@@ -56,15 +56,15 @@ class Container {
 class Procedure : public Entity, public Container {
  private:
   const ProcedureName* procedure_name_;
-  std::list<Statement> statement_list_;
+  std::list<Statement*> statement_list_;
  public:
   Procedure(ProcedureName* procedureName);
 
   const ProcedureName* getName();
 
-  std::list<Statement>* GetStatementList();
+  std::list<Statement*>* GetStatementList();
 
-  void AddStatement(Statement stmt);
+  void AddStatement(Statement* stmt);
 };
 
 /**
@@ -84,12 +84,12 @@ class Variable : public Entity {
  */
 class Program {
  private:
-  std::list<Procedure> procedure_list_; //must be one or more
+  std::list<Procedure*> procedure_list_; //must be one or more
 
  public:
-  Program(Procedure p);
+  Program(Procedure* p);
 
-  std::list<Procedure>* getProcedureList();
+  std::list<Procedure*>* getProcedureList();
 };
 
 #endif //AUTOTESTER_ENTITY_H

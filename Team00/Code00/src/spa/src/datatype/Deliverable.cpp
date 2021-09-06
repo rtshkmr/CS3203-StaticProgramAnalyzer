@@ -2,7 +2,7 @@
 
 void Deliverable::AddProc(Procedure* proc) {
   if (proc_list_.empty()) {
-    program_ = new Program(*proc);
+    program_ = new Program(proc);
   }
   proc_list_.push_back(proc);
 }

@@ -117,8 +117,9 @@ void PSubsystem::PerformNewProcedureSteps(Procedure* procedure) {
 
 void PSubsystem::SetStatementObject(Statement* statement) {
   program_counter_++;
-  StatementNumber statement_number = StatementNumber(program_counter_);
-  statement->SetStatementNumber(&statement_number);
+  StatementNumber* statement_number = new StatementNumber(program_counter_);
+  statement->SetStatementNumber(statement_number);
+  deliverable_.AddStatement(statement);
 
   if (current_node_->GetStatementList()->empty()) {
     //just entered a stack, follow nothing.
@@ -129,7 +130,7 @@ void PSubsystem::SetStatementObject(Statement* statement) {
     follow_stack_.pop();
     follow_stack_.push(statement);
   }
-  current_node_->AddStatement(*statement);
+  current_node_->AddStatement(statement);
 
   if (!parent_stack_.empty()) {
     assert(current_node_type_ == 1 || current_node_type_ == 2);

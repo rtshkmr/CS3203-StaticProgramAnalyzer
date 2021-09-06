@@ -28,7 +28,7 @@ class IfEntity : public Statement, public Container {
   ConditionalExpression* cond_expr_;
   vector<Variable*> expr_variables;
   vector<ConstantValue*> expr_constants;
-  std::list<Statement> if_stmt_list_;
+  std::list<Statement*> if_stmt_list_;
   ElseEntity* else_stmt_list_; //TODO: check if keeping ELSE as object or merge ELSE object into IF object
 
  public:
@@ -40,11 +40,11 @@ class IfEntity : public Statement, public Container {
 
   vector<ConstantValue*> GetExpressionConstants();
 
-  std::list<Statement>* GetStatementList();
+  std::list<Statement*>* GetStatementList();
 
-  void AddStatement(Statement stmt);
+  void AddStatement(Statement* stmt);
 
-  std::list<Statement>* getElseStmtList();
+  std::list<Statement*>* getElseStmtList();
 
   bool setElseStmtList(ElseEntity* else_stmt);
 };
@@ -54,13 +54,13 @@ class IfEntity : public Statement, public Container {
  */
 class ElseEntity : public Statement, public Container {
  private:
-  std::list<Statement> else_stmt_list_;
+  std::list<Statement*> else_stmt_list_;
  public:
   ElseEntity();
 
-  std::list<Statement>* GetStatementList();
+  std::list<Statement*>* GetStatementList();
 
-  void AddStatement(Statement stmt);
+  void AddStatement(Statement* stmt);
 };
 
 /**
@@ -73,7 +73,7 @@ class ElseEntity : public Statement, public Container {
 class WhileEntity : public Statement, public Container {
  private:
   ConditionalExpression* cond_expr_;
-  std::list<Statement> stmt_list_;
+  std::list<Statement*> stmt_list_;
   vector<Variable*> expr_variables;
   vector<ConstantValue*> expr_constants;
  public:
@@ -81,9 +81,9 @@ class WhileEntity : public Statement, public Container {
 
   ConditionalExpression* getCondExpr();
 
-  std::list<Statement>* GetStatementList();
+  std::list<Statement*>* GetStatementList();
 
-  void AddStatement(Statement stmt);
+  void AddStatement(Statement* stmt);
 
   vector<Variable*> GetExpressionVariables();
 
