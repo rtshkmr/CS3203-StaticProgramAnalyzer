@@ -1,6 +1,4 @@
-#include <iostream>
 #include "Tokenizer.h"
-#include <regex>
 #include <string>
 #include <utility>
 #include <vector>
@@ -83,7 +81,7 @@ vector<string> Tokenizer::SplitSubTokens(string& string_token) {
     return {};
   } else {
     vector<string> extra_token_strings;
-    string delimiters[]{"{","(",")", ";", "}"};
+    string delimiters[]{"{", "(", ")", ";", "}"};
     for (auto& delimiter : delimiters) {
       bool contains_delim = (string_token.find(delimiter) != string::npos);
       // todo: add some invariant check: at any time, a string_token may only contain one delim e.g."proc{" and not "proc {;"

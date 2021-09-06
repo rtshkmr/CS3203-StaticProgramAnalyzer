@@ -204,7 +204,6 @@ TokenTag Token::TagStringWithToken(const string& reference) {
   regex name_pat = RegexPatterns::GetNamePattern(); // names, integers... todo: check alphanum
   regex integer_pat = RegexPatterns::GetIntegerPattern();
 
-  // QQ: can it have a separation like that: "x > = 1"
   if (regex_match(reference, fixed_keyword_pat)) {
     // instead of having a header, we'll use these keywords for now
     if (reference == "procedure") {
