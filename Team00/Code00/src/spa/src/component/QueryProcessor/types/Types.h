@@ -13,7 +13,7 @@ enum class DesignEntity {
   kAssign,
   kVariable,
   kConstant,
-  kProcedure
+  kProcedure,
 };
 
 enum class RelRef {
@@ -78,5 +78,7 @@ private:
   std::vector<Clause> clauses;
   bool hasTargetSynonym;
 };
+
+
 
 #endif //AUTOTESTER_TYPES_H
