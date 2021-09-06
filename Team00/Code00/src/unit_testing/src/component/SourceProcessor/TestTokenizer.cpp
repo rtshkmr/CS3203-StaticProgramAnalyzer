@@ -1,11 +1,12 @@
 #include "catch.hpp"
 #include <iostream>
 #include <component/SourceProcessor/Tokenizer.h>
+#include <datatype/RegexPatterns.h>
 #include <regex>
 
 using namespace std;
 
-vector<string> program_lines = {
+vector<string> lines = {
     R"(procedure         Week4 {read x;)",
     R"(procedure Week4 {read x;)",
     R"(    print x; )",
@@ -25,11 +26,11 @@ TEST_CASE("Tokenizer display current tokenization status") {
   vector<Token> program_tokens = {};
   int line_counter = 0;
   cout << " currently testing:   \n";
-  for (const auto& line: program_lines) {
+  for (const auto& line: lines) {
     cout << line << "\n";
   }
   cout << "\n\n";
-  for (const auto& line : program_lines) {
+  for (const auto& line : lines) {
     cout << "=============[Line Number: " << ++line_counter << " ]===================\n";
     int token_counter = 0;
     vector<Token> tokens = Tokenizer::CreateTokens(line);
@@ -88,13 +89,14 @@ TEST_CASE(
   }
 }
 
-TEST_CASE("Regex pattern tests for token_strings") {
-  regex fixed_keyword_pat(R"(procedure|read|print|call|while|if|then|else)");
-  regex fixed_char_pat(R"(\{|\}|;|\(|\))"); // for braces, semicolon...
-  regex binary_arithmetic_operator_pat(R"(\+|\-|\*|\/|%|=|==|>|>=|<|<=|!=)"); // for math
-  regex binary_comparison_operator_pat(R"(==|>|>=|<|<=|!=)"); // for comparator chars
-  regex name_pat(R"(^[[:alpha:]]+([0-9]+|[[:alpha:]]+)*)"); // names, integers... todo: check alphanum
-  regex integer_pat(R"([0-9]+)");
+TEST_CASE("RegexPatterns pattern tests for token_strings") {
+
+  regex fixed_keyword_pat = RegexPatterns::GetFixedKeywordPattern();
+  regex fixed_char_pat = RegexPatterns::GetFixedCharPattern(); // for braces, semicolon...
+  regex binary_arithmetic_operator_pat = RegexPatterns::GetBinaryArithmeticOperatorPattern(); // for math
+  regex binary_comparison_operator_pat = RegexPatterns::GetBinaryComparisonPattern(); // for comparator chars
+  regex name_pat = RegexPatterns::GetNamePattern(); // names, integers... todo: check alphanum
+  regex integer_pat = RegexPatterns::GetIntegerPattern();
 
   bool handle_valid_names_integers = regex_match("procedure", fixed_keyword_pat)
       && regex_match("if", fixed_keyword_pat)

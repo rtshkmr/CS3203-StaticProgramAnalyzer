@@ -43,6 +43,7 @@ bool SyntaxValidator::ValidateSemanticSyntax(vector<Token> tokens) {
 }
 
 bool SyntaxValidator::ValidateProcedureSemantics(const vector<Token>& tokens) {
+  int x = 1;
   return false;
 }
 bool SyntaxValidator::ValidateMacroFunctionSemantics(const vector<Token>& tokens) {

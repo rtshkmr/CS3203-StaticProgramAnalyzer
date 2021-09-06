@@ -21,7 +21,7 @@ add_library(spa ${srcs} ${headers}
         src/component/SourceProcessor/PSubsystem.h
         src/component/SourceProcessor/DesignExtractor.cpp
         src/component/SourceProcessor/DesignExtractor.h
-        )
+        src/datatype/RegexPatterns.cpp src/datatype/RegexPatterns.h)
 # this makes the headers accessible for other projects which uses spa lib
 target_include_directories(spa PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
