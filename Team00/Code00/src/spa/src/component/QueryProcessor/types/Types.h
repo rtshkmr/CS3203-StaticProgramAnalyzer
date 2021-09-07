@@ -2,6 +2,7 @@
 #define AUTOTESTER_TYPES_H
 
 #include <string>
+#include <vector>
 
 enum class DesignEntity {
   kStmt,
@@ -42,13 +43,6 @@ class Synonym {
     DesignEntity getType() { return type; };
 };
 
-struct Clause {
-  ClauseType ct;
-  std::string leftHandSide;
-  std::string rightHandSide;
-
-};
-
 class Clause {
   public:
   std::string leftHandSide;
@@ -70,13 +64,14 @@ class Pattern : Clause {
 };
 
 class Group {
-public:
-  bool addClauseToVector(Clause clause);
-  std::vector<Clause> getClauses();
-  bool containsTargetSynonym();
-private:
-  std::vector<Clause> clauses;
-  bool hasTargetSynonym;
+  private:
+    std::vector<Clause> clauses;
+    bool hasTargetSynonym;
+  public:
+    Group(std::vector<Clause> clauses, bool hasTargetSynonym) : hasTargetSynonym(hasTargetSynonym), clauses(clauses) {};
+    bool addClauseToVector(Clause clause);
+    std::vector<Clause> getClauses();
+    bool containsTargetSynonym();
 };
 
 
