@@ -5,6 +5,14 @@
 #include "EntityFactory.h"
 #include "model/Statement.h"
 
+EntityFactory::EntityFactory(std::list<Procedure*>* proc_list,
+                             std::list<Variable*>* var_list,
+                             std::list<ConstantValue*>* const_list) {
+  proc_list_ = proc_list;
+  var_list_ = var_list;
+  const_list_ = const_list;
+}
+
 /**
  * Creates Entities out of the given tokens.
  * Must assume that the tokens are in the form of a statement e.g. the 1st word is the keyword
@@ -17,22 +25,22 @@ Entity* EntityFactory::CreateEntities(vector<Token> tokens) {
     case TokenTag::kProcedureKeyword: {
       assert(tokens[1].GetTokenTag() == TokenTag::kName);
       std::string proc_token_string = tokens[1].GetTokenString();
-      return new Procedure(new ProcedureName(proc_token_string));
+      return CreateProcedure(proc_token_string);
     }
     case TokenTag::kReadKeyword: {
       assert(tokens[1].GetTokenTag() == TokenTag::kName);
       std::string read_var_string = tokens[1].GetTokenString();
-      return new ReadEntity(new Variable(new VariableName(read_var_string)));
+      return new ReadEntity(RetrieveVariable(read_var_string));
     }
     case TokenTag::kPrintKeyword: {
       assert(tokens[1].GetTokenTag() == TokenTag::kName);
       std::string print_var_string = tokens[1].GetTokenString();
-      return new PrintEntity(new Variable(new VariableName(print_var_string)));
+      return new PrintEntity(RetrieveVariable(print_var_string));
     }
     case TokenTag::kCallKeyword: {
       assert(tokens[1].GetTokenTag() == TokenTag::kName);
       std::string call_proc_string = tokens[1].GetTokenString();
-      return new CallEntity(new Procedure(new ProcedureName(call_proc_string)));
+      return new CallEntity(RetrieveProcedure(call_proc_string));
     }
     case TokenTag::kWhileKeyword: {
       return CreateConditionalEntity(tokens, TokenTag::kWhileKeyword);
@@ -51,7 +59,7 @@ Entity* EntityFactory::CreateEntities(vector<Token> tokens) {
       vector<Variable*> expression_variables = GetVariablesFromExpressionTokens(expression_tokens);
       vector<ConstantValue*> expression_constants = GetConstantsFromExpressionTokens(expression_tokens);
       return new AssignEntity(
-          new Variable(new VariableName(keyword_token_string)),
+          RetrieveVariable(keyword_token_string),
           expression_string,
           expression_variables,
           expression_constants);
@@ -123,7 +131,7 @@ vector<Token> EntityFactory::GetExpressionTokens(vector<Token> tokens, TokenTag 
 
 string EntityFactory::ConvertTokensToString(vector<Token> tokens) {
   std::string expression_string;
-  for (auto &token : tokens) {
+  for (auto &token: tokens) {
     expression_string += token.GetTokenString();
   }
   return expression_string;
@@ -133,7 +141,7 @@ vector<Variable*> EntityFactory::GetVariablesFromExpressionTokens(vector<Token> 
   vector<Variable*> variables;
   for (auto &token: tokens) {
     if (token.GetTokenTag() == TokenTag::kName) {
-      variables.push_back(new Variable(new VariableName(token.GetTokenString())));
+      variables.push_back(RetrieveVariable(token.GetTokenString()));
     }
   }
   return variables;
@@ -143,8 +151,75 @@ vector<ConstantValue*> EntityFactory::GetConstantsFromExpressionTokens(vector<To
   vector<ConstantValue*> constants;
   for (auto &token: tokens) {
     if (token.GetTokenTag() == TokenTag::kInteger) {
-      constants.push_back(new ConstantValue(token.GetTokenString()));
+      constants.push_back(CreateConstantValue(token.GetTokenString()));
     }
   }
   return constants;
 }
+
+Procedure* EntityFactory::CreateProcedure(std::string proc_name) {
+  Procedure* p = new Procedure(new ProcedureName(proc_name));
+  proc_list_->push_back(p);
+  return p;
+}
+
+Variable* EntityFactory::CreateVariable(std::string var_name) {
+  Variable* v = new Variable(new VariableName(var_name));
+  var_list_->push_back(v);
+  return v;
+}
+
+ConstantValue* EntityFactory::CreateConstantValue(std::string const_val) {
+  ConstantValue* val = new ConstantValue(const_val);
+  const_list_->push_back(val);
+  return val;
+}
+
+/**
+ * Tries to retrieve the correct procedure object using the name. If fails, create a new Procedure object.
+ */
+Procedure* EntityFactory::RetrieveProcedure(std::string proc_name) {
+  //TODO: improve the algo
+
+  bool new_proc_ = true;
+  Procedure* get_proc_ = CreateProcedure(proc_name);
+  for (auto const& i : *proc_list_) {
+    if (i->getName() == get_proc_->getName()) {
+      //TODO: Create destructor for ProcedureName and Procedure.
+      delete get_proc_;
+      get_proc_ = i;
+      new_proc_ = false;
+      break;
+    }
+  }
+
+  if (!new_proc_)
+    proc_list_->pop_back(); //pop back because CreateProcedure push it to the back.
+
+  return get_proc_;
+}
+
+/**
+ * Tries to retrieve the correct variable object using the name. If fails, create a new Variable object.
+ */
+Variable* EntityFactory::RetrieveVariable(std::string var_name) {
+  //TODO: improve the algo
+
+  bool new_var_ = true;
+  Variable* get_var_ = CreateVariable(var_name);
+  for (auto const& i : *var_list_) {
+    if (i->getName() == get_var_->getName()) {
+      //TODO: Create destructor for VariableName and Variable.
+      delete get_var_;
+      get_var_ = i;
+      new_var_ = false;
+      break;
+    }
+  }
+
+  if (!new_var_)
+    var_list_->pop_back(); //pop back because CreateVariable push it to the back.
+
+  return get_var_;
+}
+

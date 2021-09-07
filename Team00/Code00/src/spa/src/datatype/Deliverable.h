@@ -12,11 +12,7 @@
 class Deliverable {
  public:
   Deliverable() = default;    // should be initializing the data structures here
-  void AddProc(Procedure* proc);
-  void AddVariable(Variable* var);
-  void AddVariableVector(const vector<Variable*> &var_vector);
-  void AddConstant(ConstantValue* constant);
-  void AddConstantVector(const vector<ConstantValue*> &constants_vector);
+  // Adding of Procedure, Variable, ConstantValue are added using pointers to the list in EntityFactory.
   void AddStatement(Statement* stmt);
 
   void AddIfEntity(IfEntity* if_entity);
@@ -29,6 +25,11 @@ class Deliverable {
   void AddFollowRelationship(Statement* f1, Statement* f2);
   void AddParentRelationship(Statement* p1, Statement* p2);
   //TODO: Add uses / modifies hashmaps functions
+
+
+  std::list<Procedure*>* GetProcList();
+  std::list<Variable*>* GetVariableList();
+  std::list<ConstantValue*>* GetConstantValue();
 
  private:
   //root-node of AST
