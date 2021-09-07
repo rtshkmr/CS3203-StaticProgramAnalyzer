@@ -5,6 +5,7 @@
 #include <string>
 #include <stdexcept>
 #include "DataType.h"
+#include <datatype/RegexPatterns.h>
 
 /**
  * This StatementNumber constructor check if the statement number input is valid,
@@ -32,7 +33,7 @@ int StatementNumber::getNum() {
  * @param other The StatementNumber object to compare to
  * @return true if this.num_ is smaller than other.num_
  */
-bool StatementNumber::operator<(const StatementNumber &other) const {
+bool StatementNumber::operator<(const StatementNumber& other) const {
   return num_ < other.num_;
 }
 
@@ -62,7 +63,7 @@ int LineNumber::getNum() {
  * @param other The LineNumber object to compare to
  * @return true if this.num_ is smaller than other.num_
  */
-bool LineNumber::operator<(const LineNumber &other) const {
+bool LineNumber::operator<(const LineNumber& other) const {
   return num_ < other.num_;
 }
 
@@ -92,7 +93,7 @@ std::string ProcedureName::getName() {
  * @return true if this.name_ is strictly smaller than other.name_. Note that if both strings are equivalent,
  *    it will return false;
  */
-bool ProcedureName::operator<(const ProcedureName &other) const {
+bool ProcedureName::operator<(const ProcedureName& other) const {
   return (strcmp(this->name_.data(), other.name_.data()) < 0);
 }
 
@@ -122,7 +123,7 @@ std::string VariableName::getName() {
  * @return true if this.name_ is strictly smaller than other.name_. Note that if both strings are equivalent,
  *    it will return false;
  */
-bool VariableName::operator<(const VariableName &other) const {
+bool VariableName::operator<(const VariableName& other) const {
   return (strcmp(this->name_.data(), other.name_.data()) < 0);
 }
 
@@ -151,7 +152,7 @@ int ConstantValue::get() {
  * @param other The ConstantValue object to compare to
  * @return true if this.value_ is smaller than other.value_
  */
-bool ConstantValue::operator<(const ConstantValue &other) const {
+bool ConstantValue::operator<(const ConstantValue& other) const {
   return value_ < other.value_;
 }
 
@@ -195,14 +196,14 @@ bool Token::IsKeywordToken(Token token) {
 }
 
 TokenTag Token::TagStringWithToken(const string& reference) {
-  regex fixed_keyword_pat(R"(procedure|read|print|call|while|if|then|else)");
-  regex fixed_char_pat(R"(\{|\}|;|\(|\))"); // for braces, semicolon...
-  regex binary_arithmetic_operator_pat(R"(\+|\-|\*|\/|%|=)"); // for math and comparator chars
-  regex binary_comparison_operator_pat(R"(==|>|>=|<|<=|!=)"); // for math and comparator chars
-  regex name_pat(R"(^[[:alpha:]]+([0-9]+|[[:alpha:]]+)*)"); // names, integers... todo: check alphanum
-  regex integer_pat(R"([0-9]+)");
 
-  // QQ: can it have a separation like that: "x > = 1"
+  regex fixed_keyword_pat = RegexPatterns::GetFixedKeywordPattern();
+  regex fixed_char_pat = RegexPatterns::GetFixedCharPattern(); // for braces, semicolon...
+  regex binary_arithmetic_operator_pat = RegexPatterns::GetBinaryArithmeticOperatorPattern(); // for math
+  regex binary_comparison_operator_pat = RegexPatterns::GetBinaryComparisonPattern(); // for comparator chars
+  regex name_pat = RegexPatterns::GetNamePattern(); // names, integers... todo: check alphanum
+  regex integer_pat = RegexPatterns::GetIntegerPattern();
+
   if (regex_match(reference, fixed_keyword_pat)) {
     // instead of having a header, we'll use these keywords for now
     if (reference == "procedure") {

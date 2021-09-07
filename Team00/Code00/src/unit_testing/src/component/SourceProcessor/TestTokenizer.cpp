@@ -1,11 +1,12 @@
 #include "catch.hpp"
 #include <iostream>
 #include <component/SourceProcessor/Tokenizer.h>
+#include <datatype/RegexPatterns.h>
 #include <regex>
 
 using namespace std;
 
-vector<string> program_lines = {
+vector<string> lines = {
     R"(procedure         Week4 {read x;)",
     R"(procedure Week4 {read x;)",
     R"(    print x; )",
@@ -19,17 +20,15 @@ vector<string> program_lines = {
 //    R"(if(x >= 1) then {read x; call helloProc;} else {x=1;})", // todo: the {x=1;} is not supported by tokenizer (i.e. more than 2 special delimiters. if necessary, need to make the splitting functions do a recursive call)
 };
 
-
-
 TEST_CASE("Tokenizer display current tokenization status") {
   vector<Token> program_tokens = {};
   int line_counter = 0;
   cout << " currently testing:   \n";
-  for (const auto& line: program_lines) {
+  for (const auto& line: lines) {
     cout << line << "\n";
   }
   cout << "\n\n";
-  for (const auto& line : program_lines) {
+  for (const auto& line : lines) {
     cout << "=============[Line Number: " << ++line_counter << " ]===================\n";
     int token_counter = 0;
     vector<Token> tokens = Tokenizer::CreateTokens(line);
@@ -88,13 +87,14 @@ TEST_CASE(
   }
 }
 
-TEST_CASE("Regex pattern tests for token_strings") {
-  regex fixed_keyword_pat(R"(procedure|read|print|call|while|if|then|else)");
-  regex fixed_char_pat(R"(\{|\}|;|\(|\))"); // for braces, semicolon...
-  regex binary_arithmetic_operator_pat(R"(\+|\-|\*|\/|%|=|==|>|>=|<|<=|!=)"); // for math
-  regex binary_comparison_operator_pat(R"(==|>|>=|<|<=|!=)"); // for comparator chars
-  regex name_pat(R"(^[[:alpha:]]+([0-9]+|[[:alpha:]]+)*)"); // names, integers... todo: check alphanum
-  regex integer_pat(R"([0-9]+)");
+TEST_CASE("RegexPatterns pattern tests for token_strings") {
+
+  regex fixed_keyword_pat = RegexPatterns::GetFixedKeywordPattern();
+  regex fixed_char_pat = RegexPatterns::GetFixedCharPattern(); // for braces, semicolon...
+  regex binary_arithmetic_operator_pat = RegexPatterns::GetBinaryArithmeticOperatorPattern(); // for math
+  regex binary_comparison_operator_pat = RegexPatterns::GetBinaryComparisonPattern(); // for comparator chars
+  regex name_pat = RegexPatterns::GetNamePattern(); // names, integers... todo: check alphanum
+  regex integer_pat = RegexPatterns::GetIntegerPattern();
 
   bool handle_valid_names_integers = regex_match("procedure", fixed_keyword_pat)
       && regex_match("if", fixed_keyword_pat)
@@ -106,6 +106,7 @@ TEST_CASE("Regex pattern tests for token_strings") {
       && (regex_match("h1h1h1h1h1h1", name_pat)) // letter + digit
       && (regex_match("h1continue", name_pat)); // letter + digit + letter
 
+
   bool handle_invalid_names_integers = !regex_match("Proc", fixed_keyword_pat)
       && !regex_match("proceDure", fixed_keyword_pat)
       && !(regex_match("h", integer_pat)) // single letter
@@ -114,25 +115,31 @@ TEST_CASE("Regex pattern tests for token_strings") {
       && !(regex_match("HELLO", integer_pat)) // upper case
       && !(regex_match("1hello", name_pat)); // illegal starting char
 
+  SECTION("Tokenizer successfully handles variable names and integers") {
+    REQUIRE(handle_valid_names_integers);
+    REQUIRE(handle_invalid_names_integers);
+  }
   bool handle_valid_comparators = regex_match(">", binary_comparison_operator_pat)
       && regex_match("<=", binary_comparison_operator_pat)
       && regex_match("==", binary_comparison_operator_pat)
       && !regex_match("=", binary_comparison_operator_pat); // not a comparator
+
   bool handle_valid_arithmetic_operators = regex_match("+", binary_arithmetic_operator_pat)
       && regex_match("/", binary_arithmetic_operator_pat)
       && regex_match("%", binary_arithmetic_operator_pat)
       && !regex_match("+=", binary_arithmetic_operator_pat) // not a comparator
       && !regex_match("+++", binary_arithmetic_operator_pat); // not a comparator
 
-  bool regex_checking_success = (handle_valid_names_integers
-      && handle_invalid_names_integers
-      && handle_valid_comparators
-      && handle_valid_arithmetic_operators);
+  SECTION("Tokenizer successfully handles valid comparators") {
+    REQUIRE(handle_valid_comparators);
+  }
 
-  REQUIRE(regex_checking_success);
+  SECTION("Tokenizer successfully handles valid arithmetic operators") {
+    REQUIRE(handle_valid_arithmetic_operators);
+  }
 }
 
-TEST_CASE("Test successful handling of tagging strings") {
+TEST_CASE("Tokenizer successfully handles the tagging strings with a TokenTag") {
   Token keyword_proc = Token("procedure", TokenTag::kProcedureKeyword);
   Token keyword_call = Token("call", TokenTag::kCallKeyword);
   Token plus_token = Token("+", TokenTag::kBinaryArithmeticOperator);
@@ -163,6 +170,11 @@ TEST_CASE("Test successful handling of tagging strings") {
     successful_handling_invalid_inputs = (token.GetTokenTag() == TokenTag::kInvalid);
   }
 
-  bool successful_tagging = (successful_handling_valid_inputs && successful_handling_invalid_inputs);
-  REQUIRE(successful_tagging);
+  SECTION("Tagging of token strings successfully handles valid inputs") {
+    REQUIRE(successful_handling_valid_inputs);
+  }
+  SECTION("Tagging of token strings successfully handles invalid inputs") {
+    REQUIRE(successful_handling_invalid_inputs);
+  }
+
 }

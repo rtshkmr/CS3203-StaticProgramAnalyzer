@@ -25,7 +25,7 @@ class StatementNumber {
 
   int getNum();
 
-  bool operator<(const StatementNumber &other) const;
+  bool operator<(const StatementNumber& other) const;
 };
 
 /**
@@ -42,7 +42,7 @@ class LineNumber {
 
   int getNum();
 
-  bool operator<(const LineNumber &other) const;
+  bool operator<(const LineNumber& other) const;
 };
 
 /**
@@ -58,7 +58,7 @@ class ProcedureName {
 
   std::string getName();
 
-  bool operator<(const ProcedureName &other) const;
+  bool operator<(const ProcedureName& other) const;
 };
 
 /**
@@ -74,7 +74,7 @@ class VariableName {
 
   std::string getName();
 
-  bool operator<(const VariableName &other) const;
+  bool operator<(const VariableName& other) const;
 };
 
 /**
@@ -92,17 +92,7 @@ class ConstantValue {
 
   int get();
 
-  bool operator<(const ConstantValue &other) const;
-};
-
-// header:
-enum class StatementTypeTag {
-  kReadStatement,
-  kPrintStatement,
-  kCallStatement,
-  kWhileStatement,
-  kIfStatement,
-  kAssignStatement,
+  bool operator<(const ConstantValue& other) const;
 };
 
 enum class TokenTag {
@@ -127,9 +117,6 @@ enum class TokenTag {
   kInvalid,
 };
 
-
-
-// QQ : is it better to make Token into a struct? was going to encapsulate other methods into it
 /**
  * A Lexical Token represents a discrete unit within a particular source statement. It contains a string pointer to
  * the space-delimited string that it was originally created from as well as TokenTag that indicates the type of token it is.
@@ -147,11 +134,5 @@ class Token {
   static TokenTag TagStringWithToken(string const& reference);
   static bool IsKeywordToken(Token token);
 };
-
-//// psub should call for a TokenizedStatement
-//[[maybe_unused]] typedef struct TokenizedStatement {
-//  std::list<Token> tokens;
-//  StatementTypeTag header;
-//} TokenizedStatement;
 
 #endif //AUTOTESTER_DATATYPE_H

@@ -13,6 +13,7 @@ class EntityFactory {
   EntityFactory() = default;
   static Entity* CreateEntities(std::vector<Token> tokens);
  private:
+  static Entity* CreateConditionalEntity(vector<Token> tokens, TokenTag entity_type);
   static vector<Token> GetExpressionTokens(vector<Token> tokens, TokenTag startTag, TokenTag endTag);
   static string ConvertTokensToString(vector<Token> tokens);
   static vector<Variable*> GetVariablesFromExpressionTokens(vector<Token> tokens);

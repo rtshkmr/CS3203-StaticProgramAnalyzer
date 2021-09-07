@@ -20,7 +20,6 @@ class Tokenizer {
   static vector<string> SplitSubTokens(string& string_token);
   static bool IsDelimiter(string& test_string);
   static bool IsWhiteSpace(string& test_string);
-  static TokenTag TagTokenString(string token_string);
 };
 
 #endif //AUTOTESTER_TEAM00_CODE00_SRC_SPA_SRC_COMPONENT_SOURCEPROCESSOR_TOKENIZER_H_
