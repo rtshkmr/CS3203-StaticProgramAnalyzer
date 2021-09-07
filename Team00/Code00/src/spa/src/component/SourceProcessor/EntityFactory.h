@@ -26,8 +26,9 @@ class EntityFactory {
   Variable*  RetrieveVariable(std::string var_name);
 
   Entity* CreateConditionalEntity(vector<Token> tokens, TokenTag entity_type);
+  Entity* CreateAssignEntity(vector<Token> tokens);
   vector<Token> GetExpressionTokens(vector<Token> tokens, TokenTag startTag, TokenTag endTag);
-  string ConvertTokensToString(vector<Token> tokens);
+  static string ConvertTokensToString(vector<Token> tokens);
   vector<Variable*> GetVariablesFromExpressionTokens(vector<Token> tokens);
   vector<ConstantValue*> GetConstantsFromExpressionTokens(vector<Token> tokens);
 };
