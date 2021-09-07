@@ -13,6 +13,21 @@ bool QueryEvaluatorTable::addColumn(std::string synonym) {
   if (um.find(synonym) == um.end()) {
     std::vector<std::string> synonymList;
     um.insert(std::make_pair(synonym, synonymList));
+    return true;
+  } else {
+    return false;
+  }
+};
+
+// Add target synonym column with values to table
+bool QueryEvaluatorTable::addTargetSynonym(std::string synonym, std::list<std::string> synonymList) {
+  if (um.find(synonym) == um.end()) {
+    std::vector<std::string> synonymVector;
+
+    for (std::string const &value : synonymList) {
+      synonymVector.push_back(value);
+    }
+    um[synonym] = synonymVector;
   }
 };
 
