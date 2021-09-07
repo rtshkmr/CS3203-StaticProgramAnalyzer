@@ -4,6 +4,6 @@ add_executable(unit_testing ${srcs}
         src/component/SourceProcessor/TestTokenizer.cpp
         src/component/SourceProcessor/TestSyntaxValidator.cpp
         src/component/SourceProcessor/TestEntityFactory.cpp
-        utils/TestUtils.cpp)
+        utils/TestUtils.cpp utils/TestUtils.h)
 target_link_libraries(unit_testing spa)
 
