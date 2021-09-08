@@ -27,7 +27,7 @@ bool SyntaxValidator::ValidateSemanticSyntax(vector<Token> tokens) {
       case TokenTag::kIfKeyword:return ValidateIfStatementSemantics(tokens);
       case TokenTag::kElseKeyword:return ValidateElseKeyword(tokens);
       case TokenTag::kWhileKeyword:return ValidateWhileKeyword(tokens);
-        // QQ: will if and then appear in the same line always or can they separate?
+        // QQ: will if and then appear in the same line always or can they separate? will put it as true by default first
       case TokenTag::kThenKeyword:return ValidateThenKeyword(tokens);
       default: {
         assert(false);
@@ -43,23 +43,53 @@ bool SyntaxValidator::ValidateSemanticSyntax(vector<Token> tokens) {
 }
 
 bool SyntaxValidator::ValidateProcedureSemantics(const vector<Token>& tokens) {
-  int x = 1;
-  return false;
+  // QQ: is this part (fixed number of tokens for every type of statement a valid guarantee? Feels like it's
+  //     very hardcode-y though :(
+  return tokens.capacity() == 3
+      && tokens.at(1).GetTokenTag() == TokenTag::kName
+      && tokens.at(2).GetTokenTag() == TokenTag::kOpenBrace;
 }
+// for read, print and call keywords
 bool SyntaxValidator::ValidateMacroFunctionSemantics(const vector<Token>& tokens) {
-  return false;
+  return tokens.capacity() == 3
+      && tokens.at(1).GetTokenTag() == TokenTag::kName
+      && tokens.at(2).GetTokenTag() == TokenTag::kSemicolon;
 }
 bool SyntaxValidator::ValidateIfStatementSemantics(const vector<Token>& tokens) {
-  return false;
+  // todo: 1. this is a very rudimentary implementation.
+  //       2. Future implementation needs to support recursive check of conditional expressions, possibly need to do
+  //       something like : identify open and close brace to identify scope, then check recursively within each scope.
+  //       Doing that would allow us to handle nested conditional_expressions.
+  //       possible future choice: separate into IsCondExpr and ValidateCondExpr
+
+  // comms: check if entity factory can handle nested cond_expr
+  bool output =  tokens.capacity() == 8
+      && tokens.at(1).GetTokenTag() == TokenTag::kOpenBracket
+      && (tokens.at(2).GetTokenTag() == TokenTag::kName || tokens.at(2).GetTokenTag() == TokenTag::kInteger)
+      && tokens.at(3).GetTokenTag() == TokenTag::kBinaryComparisonOperator
+      && (tokens.at(4).GetTokenTag() == TokenTag::kName || tokens.at(4).GetTokenTag() == TokenTag::kInteger)
+      && tokens.at(5).GetTokenTag() == TokenTag::kCloseBracket
+      && tokens.at(6).GetTokenTag() == TokenTag::kThenKeyword
+      && tokens.at(7).GetTokenTag() == TokenTag::kOpenBrace;
+  return output;
 }
+
 bool SyntaxValidator::ValidateThenKeyword(const vector<Token>& tokens) {
-  return false;
+  return true;
 }
 bool SyntaxValidator::ValidateElseKeyword(const vector<Token>& tokens) {
-  return false;
+  return tokens.capacity()==2 && tokens.at(1).GetTokenTag()==TokenTag::kOpenBrace;
 }
 bool SyntaxValidator::ValidateWhileKeyword(const vector<Token>& tokens) {
-  return false;
+  bool output =  tokens.capacity() == 8
+      && tokens.at(1).GetTokenTag() == TokenTag::kOpenBracket
+      && (tokens.at(2).GetTokenTag() == TokenTag::kName || tokens.at(2).GetTokenTag() == TokenTag::kInteger)
+      && tokens.at(3).GetTokenTag() == TokenTag::kBinaryComparisonOperator
+      && (tokens.at(4).GetTokenTag() == TokenTag::kName || tokens.at(4).GetTokenTag() == TokenTag::kInteger)
+      && tokens.at(5).GetTokenTag() == TokenTag::kCloseBracket
+      && tokens.at(6).GetTokenTag() == TokenTag::kThenKeyword
+      && tokens.at(7).GetTokenTag() == TokenTag::kOpenBrace;
+  return output;
 }
 bool SyntaxValidator::ValidateAssignmentSemantics(const vector<Token>& tokens) {
   return false;

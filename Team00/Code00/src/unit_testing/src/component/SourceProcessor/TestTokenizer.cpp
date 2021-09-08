@@ -27,6 +27,7 @@ TEST_CASE("Tokenizer display current tokenization status") {
   vector<Token> program_tokens = {};
   int line_counter = 0;
   cout << " currently testing:   \n";
+//  vector<string> valid_program_lines =
   for (const auto& line: lines) {
     cout << line << "\n";
   }
@@ -44,7 +45,7 @@ TEST_CASE("Tokenizer display current tokenization status") {
 }
 
 TEST_CASE(
-    "Tokenize Starting lines with variable white spacing between important delimiting characters should give the same number of tokens") {
+    "Tokenize Starting valid_program_lines with variable white spacing between important delimiting characters should give the same number of tokens") {
   vector<string> starting_variations = {
       R"(procedure Week4{read x;)", // no extra white space
       R"(procedure Week4 { read x;)", // formatted whitespace
@@ -124,6 +125,7 @@ TEST_CASE("RegexPatterns pattern tests for token_strings") {
   }
   bool handle_valid_comparators = regex_match(">", binary_comparison_operator_pat)
       && regex_match("<=", binary_comparison_operator_pat)
+      && regex_match(">=", binary_comparison_operator_pat)
       && regex_match("==", binary_comparison_operator_pat)
       && !regex_match("=", binary_comparison_operator_pat); // not a comparator
 
