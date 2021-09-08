@@ -280,6 +280,7 @@ TokenTag Token::TagStringWithToken(const string& reference) {
   regex fixed_char_pat = RegexPatterns::GetFixedCharPattern();
   regex binary_arithmetic_operator_pat = RegexPatterns::GetBinaryArithmeticOperatorPattern();
   regex binary_comparison_operator_pat = RegexPatterns::GetBinaryComparisonPattern();
+  regex boolean_operator_pat = RegexPatterns::GetBooleanOperatorPattern();
   regex name_pat = RegexPatterns::GetNamePattern();
   regex integer_pat = RegexPatterns::GetIntegerPattern();
 
@@ -325,7 +326,10 @@ TokenTag Token::TagStringWithToken(const string& reference) {
     }
   } else if (regex_match(reference, binary_comparison_operator_pat)) {
     return TokenTag::kBinaryComparisonOperator;
-  } else if (regex_match(reference, name_pat)) {
+  } else if (regex_match(reference, boolean_operator_pat)) {
+    return TokenTag::kBooleanOperator;
+  }
+  else if (regex_match(reference, name_pat)) {
     return TokenTag::kName;
   } else if (regex_match(reference, integer_pat)) {
     return TokenTag::kInteger;

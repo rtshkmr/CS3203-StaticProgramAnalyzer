@@ -119,6 +119,7 @@ enum class TokenTag {
   kName,
   kBinaryArithmeticOperator, //  for binary math operations (=, +, -...)
   kBinaryComparisonOperator,
+  kBooleanOperator, // &&, ||, ...
   kAssignmentOperator,
   kOpenBrace, // for containers procName{...}
   kCloseBrace,

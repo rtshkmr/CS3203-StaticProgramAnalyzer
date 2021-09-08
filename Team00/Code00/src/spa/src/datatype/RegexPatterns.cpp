@@ -18,6 +18,10 @@ std::regex RegexPatterns::GetBinaryComparisonPattern() {
 }
 
 // todo: add binary boolean operators
+std::regex RegexPatterns::GetBooleanOperatorPattern() {
+  return std::regex(R"(&&|\|\||!)");
+  // todo: check if ! is a regex metacharacter
+}
 
 std::regex RegexPatterns::GetNamePattern() {
   return std::regex(R"(^[[:alpha:]]+([0-9]+|[[:alpha:]]+)*)");
