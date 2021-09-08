@@ -1,10 +1,11 @@
 #include "QueryExtractor.h"
-
-#include <iostream>
+#include "QueryParser.h"
+#include "QueryTokenizer.h"
 
 void QueryExtractor::extractQuery() {
-  /*
-   * tokenize, parse, validation logic goes here. Can call helper classes to achieve the aforementioned.
-   * store required values in attributes of QueryExtractor instance.
-   */
+  // tokenize, parse, validation logic. Call helper classes to achieve the aforementioned.
+  auto tokenizer = QueryTokenizer();
+  tokenizer.setQueryString(&query);
+  QueryParser parser = QueryParser(groups, synonyms, target, tokenizer);
+  parser.parse();
 }
