@@ -25,8 +25,8 @@ TEST_CASE("1.EntityFactory.CreateEntities") {
 
     CHECK(actual_procedure_name->getName() == "proc1");
 
-    Entity* duplicate_proc = entity_factory.CreateEntities(procedure_tokens);
-    CHECK(actual_procedure_entity == duplicate_proc);
+//    Entity* duplicate_proc = entity_factory.CreateEntities(procedure_tokens);
+//    CHECK(actual_procedure_entity == duplicate_proc);
   }
 
   SECTION("read test") {
