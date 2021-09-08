@@ -13,7 +13,7 @@ std::regex RegexPatterns::GetFixedCharPattern() {
   return std::regex(R"(\{|\}|;|\(|\))");
 }
 std::regex RegexPatterns::GetBinaryArithmeticOperatorPattern() {
-  return std::regex(R"(\+|\-|\*|\/|%|=|==|>|>=|<|<=|!=)");
+  return std::regex(R"(\+|\-|\*|\/|%|=)");
 }
 std::regex RegexPatterns::GetBinaryComparisonPattern() {
   return std::regex(R"(==|>|>=|<|<=|!=)");

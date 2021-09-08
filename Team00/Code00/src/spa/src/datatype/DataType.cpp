@@ -262,6 +262,7 @@ bool Token::IsKeywordToken(Token token) {
       || tag == TokenTag::kWhileKeyword
       || tag == TokenTag::kIfKeyword
       || tag == TokenTag::kWhileKeyword
+      || tag == TokenTag::kElseKeyword
       || tag == TokenTag::kThenKeyword;
 }
 
