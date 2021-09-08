@@ -27,8 +27,13 @@ void TestWrapper::parse(std::string file_name) {
 void TestWrapper::evaluate(std::string query, std::list<std::string>& results){
 // call your evaluator to evaluate the query here
   // ...code to extract query...
-  auto query_extractor = new QueryExtractor(query);
-  query_extractor->extractQuery();
+  auto query_extractor = new QueryExtractor(&query);
+  try {
+    query_extractor->extractQuery();
+  } catch (const runtime_error& error) {
+    // cerr << error.what()<< endl;
+    return;
+  }
   // ...code to evaluate query...
   // e.g. evaluateQuery(query_extractor->getSynonymList(), query_extractor->getTarget(), query_extractor->getGroups());
 

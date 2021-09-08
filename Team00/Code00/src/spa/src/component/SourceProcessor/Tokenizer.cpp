@@ -10,6 +10,6 @@ std::vector<Token> Tokenizer::CreateTokens(const string& statement_string) {
   return {};
 }
 Token Tokenizer::CreateToken(const string& string_token) {
-  return Token(nullptr, TokenTag::kDigit);
+  return Token(nullptr, TokenTag::kInteger);
 }
 Tokenizer::Tokenizer() = default;

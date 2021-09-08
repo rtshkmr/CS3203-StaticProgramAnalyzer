@@ -1,8 +1,8 @@
 #ifndef INC_21S1_CP_SPA_TEAM_35_QUERYEXTRACTOR_H
 #define INC_21S1_CP_SPA_TEAM_35_QUERYEXTRACTOR_H
 
-#include <list>
 #include <string>
+#include <list>
 #include <component/QueryProcessor/types/Types.h>
 
 /**
@@ -12,12 +12,13 @@
 
 class QueryExtractor {
   private:
-    std::string& query;
+    std::string query;
     std::list<Group> groups;
     std::list<Synonym> synonyms;
-    Synonym target;
+    Synonym target = Synonym("", DesignEntity::kInvalid);
+    void test_print_items();
   public:
-    QueryExtractor(std::string& query) : query(query) {};
+    explicit QueryExtractor(std::string *query) : query(*query) {};
     void extractQuery();
     std::list<Group> getGroups() { return groups; };
     std::list<Synonym> getSynonymList() { return synonyms; };

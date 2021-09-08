@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <datatype/DataType.h>
 
 enum class DesignEntity {
   kStmt,
@@ -15,7 +16,34 @@ enum class DesignEntity {
   kVariable,
   kConstant,
   kProcedure,
+  kInvalid
 };
+
+static DesignEntity getDesignEntity(std::string reference) {
+  if (reference == "stmt") {
+    return DesignEntity::kStmt;
+  } else if (reference == "read") {
+      return DesignEntity::kRead;
+  } else if (reference == "print") {
+      return DesignEntity::kPrint;
+  } else if (reference == "call") {
+      return DesignEntity::kCall;
+  } else if (reference == "while") {
+      return DesignEntity::kWhile;
+  } else if (reference == "if") {
+      return DesignEntity::kIf;
+  } else if (reference == "assign") {
+      return DesignEntity::kAssign;
+  } else if (reference == "variable") {
+      return DesignEntity::kVariable;
+  } else if (reference == "constant") {
+      return DesignEntity::kConstant;
+  } else if (reference == "procedure") {
+      return DesignEntity::kProcedure;
+  }
+  // TODO: Throw an error if this line is reached.
+  return DesignEntity::kInvalid;
+}
 
 enum class RelRef {
   kModifiesP,
@@ -39,6 +67,7 @@ class Synonym {
     std::string name;
     DesignEntity type;
   public:
+    Synonym(std::string name, DesignEntity type): name(name), type(type) {};
     std::string getName() { return name; };
     DesignEntity getType() { return type; };
 };
@@ -73,7 +102,5 @@ class Group {
     std::vector<Clause> getClauses();
     bool containsTargetSynonym();
 };
-
-
 
 #endif //AUTOTESTER_TYPES_H
