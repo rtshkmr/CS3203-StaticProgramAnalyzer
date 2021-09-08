@@ -16,6 +16,7 @@ class RegexPatterns {
   static std::regex GetNamePattern();
   static std::regex GetIntegerPattern();
 
+//  static string* GetSpecialDelimiters();
 };
 
 #endif //AUTOTESTER_TEAM00_CODE00_SRC_SPA_SRC_DATATYPE_REGEXPATTERNS_H_

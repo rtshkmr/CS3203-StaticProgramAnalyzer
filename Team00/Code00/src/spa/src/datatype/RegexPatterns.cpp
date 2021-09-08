@@ -2,8 +2,8 @@
 // Created by mkrit on 6/9/2021.
 //
 
+#include <list>
 #include "RegexPatterns.h"
-
 
 // hidden within accessors to prevent accidental modification
 std::regex RegexPatterns::GetFixedKeywordPattern() {
@@ -15,6 +15,40 @@ std::regex RegexPatterns::GetFixedCharPattern() {
 std::regex RegexPatterns::GetBinaryArithmeticOperatorPattern() {
   return std::regex(R"(\+|\-|\*|\/|%|=|==|>|>=|<|<=|!=)");
 }
+
+//std::vector<std::string> RegexPatterns::GetSpecialDelimiters() {
+//  std::vector special_delimiters{
+//      "{", "(", ")", ";", "}", // important delims
+//      "==", ">=", "<=", "!=", // double char comparison operators
+//      ">",
+//      "=", "<", // single char comparison operators
+//      "+", "-", "*", "%", "/",
+//  };
+//  return special_delimiters;
+//}
+
+//std::list<std::string> RegexPatterns::GetSpecialDelimiters() {
+//  std::vector special_delimiters{
+//    "{", "(", ")", ";", "}", // important delims
+//    "==", ">=", "<=", "!=", // double char comparison operators
+//    ">",
+//    "=", "<", // single char comparison operators
+//    "+", "-", "*", "%", "/",
+//    };
+//  return special_delimiters;
+//}
+
+//std::string* RegexPatterns::GetSpecialDelimiters() {
+//  std::string special_delimiters[] = {
+//    "{", "(", ")", ";", "}", // important delims
+//    "==", ">=", "<=", "!=", // double char comparison operators
+//    ">",
+//    "=", "<", // single char comparison operators
+//    "+", "-", "*", "%", "/",
+//    };
+//  return special_delimiters;
+//}
+
 std::regex RegexPatterns::GetBinaryComparisonPattern() {
   return std::regex(R"(==|>|>=|<|<=|!=)");
 }
