@@ -19,7 +19,7 @@ class QueryEvaluatorTable {
     bool addColumn(std::string synonym);
 
     // Add target synonym column with values to table
-    bool addTargetSynonym(std::string synonym, std::list<std::string> synonymList);
+    bool addTargetSynonym(std::list<std::string> synonymList);
 
     // Delete row
     bool deleteRow(int index);
@@ -30,7 +30,10 @@ class QueryEvaluatorTable {
     // Return vector of target synonym
     std::vector<std::string> getResults();
 
-    // Empty column
+    // Return vector of specified synonym
+    std::vector<std::string> getColumn(std::string synonym);
+
+    // Empty column but keep the synonym (header) in the table
     bool removeColumn(std::string synonym);
 
     int getSize();
