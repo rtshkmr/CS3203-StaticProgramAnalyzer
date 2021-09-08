@@ -142,6 +142,7 @@ void PSubsystem::SetStatementObject(Statement* statement) {
 }
 
 void PSubsystem::HandleIfStmt(IfEntity* if_entity) {
+  deliverable_->AddIfEntity(if_entity);
   parent_stack_.push(if_entity);
   current_node_type_ = 2;
   current_node_ = if_entity;
@@ -153,6 +154,7 @@ void PSubsystem::HandleElseStmt(ElseEntity* else_entity) {
 }
 
 void PSubsystem::HandleWhileStmt(WhileEntity* while_entity) {
+  deliverable_->AddWhileEntity(while_entity);
   parent_stack_.push(while_entity);
   current_node_type_ = 1;
   current_node_ = while_entity;
