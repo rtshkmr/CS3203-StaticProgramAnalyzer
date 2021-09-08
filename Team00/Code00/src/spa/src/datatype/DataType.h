@@ -3,10 +3,13 @@
  * Any data types used in this program should be immutable by default.
  */
 
+#include <regex>
 #include "string"
 
 #ifndef AUTOTESTER_DATATYPE_H
 #define AUTOTESTER_DATATYPE_H
+
+using namespace std;
 
 /**
  * StatementNumber refers to the numbering of statements (program counter).
@@ -14,13 +17,17 @@
  *     statements, one statement, or partial statement.
  */
 class StatementNumber {
- private:
+private:
   int num_;
 
- public:
+public:
   StatementNumber(int sn);
 
   int getNum();
+
+  bool operator<(const StatementNumber &other) const;
+
+  bool operator==(StatementNumber other) const;
 };
 
 /**
@@ -29,13 +36,17 @@ class StatementNumber {
  *     statements, one statement, or partial statement.
  */
 class LineNumber {
- private:
+private:
   int num_;
 
- public:
+public:
   LineNumber(int ln);
 
   int getNum();
+
+  bool operator<(const LineNumber &other) const;
+
+  bool operator==(LineNumber other) const;
 };
 
 /**
@@ -43,13 +54,17 @@ class LineNumber {
  * This object checks and ensure that the received procedure name is correct according to the lexical tokens
  */
 class ProcedureName {
- private:
+private:
   std::string name_;
 
- public:
+public:
   ProcedureName(std::string pName);
 
   std::string getName();
+
+  bool operator<(const ProcedureName &other) const;
+
+  bool operator==(ProcedureName other) const;
 };
 
 /**
@@ -57,13 +72,17 @@ class ProcedureName {
  * This object checks and ensure that the received variable name is correct according to the lexical tokens
  */
 class VariableName {
- private:
+private:
   std::string name_;
 
- public:
+public:
   VariableName(std::string vName);
 
   std::string getName();
+
+  bool operator<(const VariableName &other) const;
+
+  bool operator==(VariableName other) const;
 };
 
 /**
@@ -73,25 +92,40 @@ class VariableName {
  * Side note: constants does not have a name to identify them.
  */
 class ConstantValue {
- private:
+private:
   int value_;
 
- public:
+public:
   ConstantValue(std::string constant);
 
   int get();
+
+  bool operator<(const ConstantValue &other) const;
+
+  bool operator==(ConstantValue other) const;
 };
 
 enum class TokenTag {
-  // todo: add fixed set of tags for token from the Concrete Grammar
-  //       these tags will determine the rule-set that is used by the CGV to validate syntax
   kInteger,
-  kDigit,
-  kLetter,
+  kProcedureKeyword,
+  kIfKeyword,
+  kThenKeyword,
+  kElseKeyword,
+  kReadKeyword,
+  kPrintKeyword,
+  kCallKeyword,
+  kWhileKeyword,
   kName,
-  kMetaSymbol,
-  kOpenBrace,
+  kBinaryArithmeticOperator, //  for binary math operations (=, +, -...)
+  kBinaryComparisonOperator,
+  kAssignmentOperator,
+  kOpenBrace, // for containers procName{...}
   kCloseBrace,
+  kOpenBracket,  // for if() and while()
+  kCloseBracket,
+  kSemicolon, // statement terminator
+  kInvalid,
+  kSelect
   };
 
 /**
@@ -99,11 +133,17 @@ enum class TokenTag {
  * the space-delimited string that it was originally created from as well as TokenTag that indicates the type of token it is.
  */
 class Token {
- private:
-  std::string* token_string_;
+private:
+  string token_string_;
   TokenTag token_tag_;
- public:
-  explicit Token(const std::string* token_string, TokenTag token_tag);
+
+public:
+  string GetTokenString();
+  Token(string token_string, TokenTag token_tag);
+  [[nodiscard]] TokenTag GetTokenTag() const;
+  bool operator==(Token other);
+  static TokenTag TagStringWithToken(string const& reference);
+  static bool IsKeywordToken(Token token);
 };
 
 #endif //AUTOTESTER_DATATYPE_H
