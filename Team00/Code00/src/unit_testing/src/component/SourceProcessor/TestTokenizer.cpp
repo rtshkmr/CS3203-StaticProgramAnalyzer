@@ -15,11 +15,12 @@ vector<string> lines = {
 //    R"(call Z;})",
 //    R"(if(x >= 1) {read x; call helloProc;})", // cond_expr encapsulated by brackets
 //    R"(if(x >= 1))", // cond_expr encapsulated by brackets
-//    R"(if(x >= 1) {read x; call helloProc;} else { x = 1; })", // cond_expr encapsulated by brackets todo: this fails to separate the =1;
-//    R"(x=1;)", // cond_expr encapsulated by brackets todo: this fails to separate the =1;
-//    R"(if(x >= 1) {read x; call helloProc;} else {x= 1; })", // cond_expr encapsulated by brackets todo: this fails to separate the =1;
-//    R"(if(x >= 1) {read x; call helloProc;} else {x =1; })", // cond_expr encapsulated by brackets todo: this fails to separate the =1
-    R"(if(x >= 1) then {read x; call helloProc;} else {x=1;})", // todo: the {x=1;} is not supported by tokenizer (i.e. more than 2 special delimiters. if necessary, need to make the splitting functions do a recursive call)
+//    R"(if(x >= 1) {read x; call helloProc;} else { x = 1; })", // cond_expr encapsulated by brackets
+//    R"(x=1;)", // cond_expr encapsulated by brackets : this fails to separate the =1;
+//    R"(if(x >= 1) {read x; call helloProc;} else {x= 1; })",
+//    R"(if(x >= 1) {read x; call helloProc;} else {x =1; })", // cond_expr encapsulated by brackets
+    R"(if((x>=1)&&((y>69)||(z<0))){)", // nested cond expr without any spacing b/w any impt characters
+//    R"(if(x >= 1) then {read x; call helloProc;} else {x=1;})", // todo: the {x=1;} is not supported by tokenizer (i.e. more than 2 special delimiters. if necessary, need to make the splitting functions do a recursive call)
 };
 
 TEST_CASE("Tokenizer display current tokenization status") {
