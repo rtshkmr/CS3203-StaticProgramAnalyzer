@@ -49,8 +49,8 @@ class Deliverable {
 
   // RelationshipTables
   std::unordered_map<Statement*, Statement*> follow_hash_;
-  std::unordered_map<Statement*, Statement*> parent_hash_;
-  std::unordered_map<Statement*, Statement*> use_hash_;
+  std::unordered_map<Statement*, std::list<Statement*>*> parent_hash_;
+  std::unordered_map<Statement*, std::list<Statement*>*> use_hash_;
   std::unordered_map<Statement*, Statement*> modifies_hash_;
 
 };
