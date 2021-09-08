@@ -1,32 +1,5 @@
 #include "Deliverable.h"
 
-void Deliverable::AddProc(Procedure* proc) {
-  if (proc_list_.empty()) {
-    program_ = new Program(proc);
-  }
-  proc_list_.push_back(proc);
-}
-
-void Deliverable::AddVariable(Variable* var) {
-  var_list_.push_back(var);
-}
-
-void Deliverable::AddVariableVector(const vector<Variable*> &var_vector) {
-  for (auto &var : var_vector) {
-    Deliverable::AddVariable(var);
-  }
-}
-
-void Deliverable::AddConstant(ConstantValue* constant) {
-  const_list_.push_back(constant);
-}
-
-void Deliverable::AddConstantVector(const vector<ConstantValue*> &constants_vector) {
-  for (auto &con : constants_vector) {
-    Deliverable::AddConstant(con);
-  }
-}
-
 void Deliverable::AddStatement(Statement* stmt) {
   stmt_list_.push_back(stmt);
 }
@@ -61,4 +34,15 @@ void Deliverable::AddFollowRelationship(Statement* f1, Statement* f2) {
 
 void Deliverable::AddParentRelationship(Statement* p1, Statement* p2) {
   parent_hash_.insert({p1, p2});
+}
+
+std::list<Procedure*>* Deliverable::GetProcList() {
+  return &proc_list_;
+}
+
+std::list<Variable*>* Deliverable::GetVariableList() {
+  return &var_list_;
+}
+std::list<ConstantValue*>* Deliverable::GetConstantValue() {
+  return &const_list_;
 }

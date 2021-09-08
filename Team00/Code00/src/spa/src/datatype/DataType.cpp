@@ -38,6 +38,16 @@ bool StatementNumber::operator<(const StatementNumber& other) const {
 }
 
 /**
+ * Performs an equality comparison between the current StatementNumber with the input StatementNumber.
+ * This method is similar to Java's equals().
+ * @param other The StatementNumber object to compare to
+ * @return true if this.num_ is equal to other.num_
+ */
+bool StatementNumber::operator==(StatementNumber other) const {
+  return this->num_ == other.num_;
+}
+
+/**
  * This LineNumber constructor check if the line number input is valid,
  *   and stores as a LineNumber object.
  * @param ln [NOT NULL] The line number
@@ -65,6 +75,16 @@ int LineNumber::getNum() {
  */
 bool LineNumber::operator<(const LineNumber& other) const {
   return num_ < other.num_;
+}
+
+/**
+ * Performs an equality comparison between the current LineNumber with the input LineNumber.
+ * This method is similar to Java's equals().
+ * @param other The LineNumber object to compare to
+ * @return true if this.num_ is equal to other.num_
+ */
+bool LineNumber::operator==(LineNumber other) const {
+  return this->num_ == other.num_;
 }
 
 /**
@@ -98,6 +118,16 @@ bool ProcedureName::operator<(const ProcedureName& other) const {
 }
 
 /**
+ * Performs an equality comparison between the current ProcedureName with the input ProcedureName.
+ * This method is similar to Java's equals().
+ * @param other The ProcedureName object to compare to
+ * @return true if this.name_ is equal to other.name_
+ */
+bool ProcedureName::operator==(ProcedureName other) const {
+  return this->name_ == other.name_;
+}
+
+/**
  * This VariableName constructor check if the variable name is valid,
  *   and stores as a VariableName object.
  * @param vName [NOT NULL] The variable name (in string) as extracted from SIMPLE program
@@ -128,6 +158,16 @@ bool VariableName::operator<(const VariableName& other) const {
 }
 
 /**
+ * Performs an equality comparison between the current VariableName with the input VariableName.
+ * This method is similar to Java's equals().
+ * @param other The VariableName object to compare to
+ * @return true if this.name_ is equal to other.name_
+ */
+bool VariableName::operator==(VariableName other) const {
+  return this->name_ == other.name_;
+}
+
+/**
  * This ConstantValue constructor check if the constant received is valid (valid = integer),
  *   and stores as a ConstantValue object.
  * @param constant [NOT NULL] The constant (in string) as extracted from SIMPLE program
@@ -154,6 +194,16 @@ int ConstantValue::get() {
  */
 bool ConstantValue::operator<(const ConstantValue& other) const {
   return value_ < other.value_;
+}
+
+/**
+ * Performs an equality comparison between the current ConstantValue with the input ConstantValue.
+ * This method is similar to Java's equals().
+ * @param other The ConstantValue object to compare to
+ * @return true if this.name_ is equal to other.name_
+ */
+bool ConstantValue::operator==(ConstantValue other) const {
+  return this->value_ == other.value_;
 }
 
 /**
