@@ -94,8 +94,9 @@ vector<string> Tokenizer::SplitSubTokenStrings(string& string_token) {
     std::string special_delimiters[] = {
         "{", "(", ")", ";", "}", // important containerizing delims
         "==", ">=", "<=", "!=", // double char comparison operators
-        ">",
-        "=", "<", // single char comparison operators
+        ">",  "<", // single char comparison operators
+        "=",
+        "!",
         "+", "-", "*", "%", "/",
     };
     for (auto& delimiter : special_delimiters) {
