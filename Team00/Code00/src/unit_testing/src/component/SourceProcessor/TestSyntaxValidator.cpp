@@ -86,7 +86,7 @@ static void CheckAgainstSampleLines(int start, int end, vector<string>& lines, b
   }
 }
 
-TEST_CASE("Validator handles basic statements:") {
+TEST_CASE("1.SyntaxValidator.Validator handles basic statements:") {
   SECTION("handles procedure statement") {
     SECTION("positive cases") {
       CheckAgainstSampleLines(0, 0, valid_program_lines, true);
