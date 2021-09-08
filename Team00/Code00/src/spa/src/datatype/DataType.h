@@ -10,6 +10,7 @@
 #define AUTOTESTER_DATATYPE_H
 
 using namespace std;
+bool ValidateName(std::string name);
 
 /**
  * StatementNumber refers to the numbering of statements (program counter).
