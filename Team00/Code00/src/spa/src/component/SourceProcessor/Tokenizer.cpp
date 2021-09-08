@@ -2,7 +2,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include <datatype/RegexPatterns.h>
 
 using namespace std;
 
@@ -15,38 +14,32 @@ using namespace std;
 vector<Token> Tokenizer::CreateTokens(const string& statement_string) {
   vector<Token> tokens;
   vector<string> split_strings = SplitString(" ", statement_string, false);
-
   for (auto& string_token : split_strings) {
-    if (IsWhiteSpace(string_token)) {
-      continue; // ignore white spaces
+    if (!IsWhiteSpace(string_token)) {
+      // example: "abc=1;"
+      vector<string> split_sub_tokens_strings = SplitSubTokenStrings(string_token);
+      for (auto& sub_token_string: split_sub_tokens_strings) {
+        if (!IsWhiteSpace(sub_token_string)) {
+          tokens.push_back(*(CreateToken(sub_token_string)));
+        }
+      }
     }
-
-    // example: "abc=1;"
-    vector<string> split_sub_tokens_strings = SplitSubTokenStrings(string_token);
-    for (auto& sub_token_string: split_sub_tokens_strings) {
-      tokens.push_back(*(CreateToken(sub_token_string)));
-    }
-
-
-
-//    if (split_sub_tokens_strings.empty()) {
-//      tokens.push_back(*(CreateToken(string_token)));
-//    } else {
-//      for (auto& sub_token_string: split_sub_tokens_strings) {
-//        tokens.push_back(*(CreateToken(sub_token_string)));
-//      }
-//    }
   }
   return tokens;
 }
 
+/**
+ *  Creates a new Token object for a given string that represents a possible token
+ * @param token_string is a non-whitespace character/string that will be tokenized
+ * @return  pointer to a newly created Token object for a given token_string
+ */
 Token* Tokenizer::CreateToken(string token_string) {
   TokenTag token_tag = Token::TagStringWithToken(token_string);
   return new Token(std::move(token_string), token_tag);
 }
 
 /**
- *  Splits a given string via the delimiter provided and retains the delimiter if @param retain_delimiter is true
+ *  Splits a given string via the single delimiter provided and retains the delimiter if retain_delimiter is true
  * @param delimiter string representation of the delimiter to split the string by
  * @param input the reference string to split
  * @param retain_delimiter  retains the delimiter within the result vector if set to true
@@ -84,7 +77,9 @@ vector<string> Tokenizer::SplitString(const string& delimiter, const string& inp
 }
 
 /**
- * Given a token_string, recursively checks if there are any other delimiters that are contained within it.
+ * Given a token_string, recursively looks for sub tokens that are nested within. For example, the string_token
+ * "x=y+1;" would have "=" and ";" and delimiters to split the string_token by and this is to be done
+ * recursively.
  * @param string_token
  * @param tokens
  * @return
@@ -92,13 +87,12 @@ vector<string> Tokenizer::SplitString(const string& delimiter, const string& inp
 vector<string> Tokenizer::SplitSubTokenStrings(string& string_token) {
   // base case: string of one char or is a special delim
   vector<string> result;
-  if (/*IsSpecialDelimiter(string_token) || */string_token.size() == 1) {
+  if (string_token.size() == 1) {
     result.push_back(string_token);
-    return (result);
-  } else {
+  } else { // recursive cases:
     // the order of the delimiters matter here, use the 2-char comparison operators first:
     std::string special_delimiters[] = {
-        "{", "(", ")", ";", "}", // important delims
+        "{", "(", ")", ";", "}", // important containerizing delims
         "==", ">=", "<=", "!=", // double char comparison operators
         ">",
         "=", "<", // single char comparison operators
@@ -114,34 +108,32 @@ vector<string> Tokenizer::SplitSubTokenStrings(string& string_token) {
         }
         result.push_back(delimiter);
         if (delim_idx < string_token.size() - 1) { // right substring exists:
-          string right_substring = string_token.substr(delim_idx + 1, string_token.size() - 1 - delim_idx);
+          string
+              right_substring = string_token.substr(delim_idx + delimiter.size(),
+                                                    string_token.size() - 1 - delim_idx);
           vector<string> right_token_strings = SplitSubTokenStrings(right_substring);
           result.insert(result.end(), right_token_strings.begin(), right_token_strings.end());
         }
-        break; // find first delim
+        break; // only need to find first delim to recurse
       } else {
-
       }
     }
-    // if code reaches here, it means there are no delimiters within the string_token, so the whole string_token
-    // should be added to result:
   }
-  if(result.empty()) { // wasn't a single string and didn't have any delim inside it
+  // last base case: string_token was not a single char and didn't have any delim inside it
+  if (result.empty()) {
     result.push_back(string_token);
   }
   return result;
 }
 
-bool Tokenizer::IsSpecialDelimiter(string& test_string) {
-  string delimiters[]{"{", ";", "}"};
-  for (auto& delimiter : delimiters) {
-    if (delimiter == test_string) {
-      return true;
-    }
-  }
-  return false;
-}
-
+/**
+ * Checks whether test_string exactly matches a list of possible whitespace characters
+ *
+ * todo: deprecate this in the future, this exists in case any control chars or other whitespace chars slip through
+ *       then we'd only need to mod this function
+ * @param test_string
+ * @return
+ */
 bool Tokenizer::IsWhiteSpace(string& test_string) {
   if (test_string.empty()) return true;
   string targets[]{" "};

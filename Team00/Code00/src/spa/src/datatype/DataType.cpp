@@ -265,17 +265,25 @@ bool Token::IsKeywordToken(Token token) {
       || tag == TokenTag::kThenKeyword;
 }
 
+/**
+ * Tags a @param reference string with a TokenTag by comparing with a various regex that represent a fixed set of
+ * concrete syntax grammar rules. As a side-effect, any @param reference string that doesn't match the given regex
+ * patterns would violate the Concrete Grammar Syntax for SIMPLE and therefore would be tagged with a kInvalid tag for
+ * further error handling
+ *
+ * @param reference  a string that will be tagged
+ * @return a TokenTag enum object
+ */
 TokenTag Token::TagStringWithToken(const string& reference) {
 
   regex fixed_keyword_pat = RegexPatterns::GetFixedKeywordPattern();
-  regex fixed_char_pat = RegexPatterns::GetFixedCharPattern(); // for braces, semicolon...
-  regex binary_arithmetic_operator_pat = RegexPatterns::GetBinaryArithmeticOperatorPattern(); // for math
-  regex binary_comparison_operator_pat = RegexPatterns::GetBinaryComparisonPattern(); // for comparator chars
-  regex name_pat = RegexPatterns::GetNamePattern(); // names, integers... todo: check alphanum
+  regex fixed_char_pat = RegexPatterns::GetFixedCharPattern();
+  regex binary_arithmetic_operator_pat = RegexPatterns::GetBinaryArithmeticOperatorPattern();
+  regex binary_comparison_operator_pat = RegexPatterns::GetBinaryComparisonPattern();
+  regex name_pat = RegexPatterns::GetNamePattern();
   regex integer_pat = RegexPatterns::GetIntegerPattern();
 
   if (regex_match(reference, fixed_keyword_pat)) {
-    // instead of having a header, we'll use these keywords for now
     if (reference == "procedure") {
       return TokenTag::kProcedureKeyword;
     } else if (reference == "read") {
@@ -296,7 +304,6 @@ TokenTag Token::TagStringWithToken(const string& reference) {
       return TokenTag::kInvalid;
     }
   } else if (regex_match(reference, fixed_char_pat)) {
-    // handle key characters:
     if (reference == "{") {
       return TokenTag::kOpenBrace;
     } else if (reference == "}") {
