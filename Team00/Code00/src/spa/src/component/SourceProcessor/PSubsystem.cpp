@@ -7,8 +7,11 @@
 using namespace psub;
 
 void PSubsystem::InitDataStructures() {
-  deliverable_ = Deliverable();
+  deliverable_ = new Deliverable(); //created in heap so that can pass this object to PKB
   syntax_validator_ = SyntaxValidator();
+  entity_factory_ =
+      EntityFactory(deliverable_->GetProcList(), deliverable_->GetVariableList(),
+                    deliverable_->GetConstantValue());
 }
 
 void PSubsystem::ProcessStatement(std::string statement) {
@@ -66,7 +69,7 @@ void PSubsystem::ProcessStatement(std::string statement) {
     return; //TODO: probably throw an error
   }
 
-  Entity* entityObj = EntityFactory::CreateEntities(tokens);
+  Entity* entityObj = entity_factory_.CreateEntities(tokens);
 
   if (current_node_type_ == -1) { //when current_node_ is null. Only happens when not reading within a procedure.
     if (Procedure* procedure = dynamic_cast<Procedure*>(entityObj)) {
@@ -109,7 +112,6 @@ void PSubsystem::ProcessStatement(std::string statement) {
 }
 
 void PSubsystem::PerformNewProcedureSteps(Procedure* procedure) {
-  deliverable_.AddProc(procedure);
   current_node_ = procedure;
   current_node_type_ = 0;
   //TODO: add proc_var_name;
@@ -119,14 +121,14 @@ void PSubsystem::SetStatementObject(Statement* statement) {
   program_counter_++;
   StatementNumber* statement_number = new StatementNumber(program_counter_);
   statement->SetStatementNumber(statement_number);
-  deliverable_.AddStatement(statement);
+  deliverable_->AddStatement(statement);
 
   if (current_node_->GetStatementList()->empty()) {
     //just entered a stack, follow nothing.
     follow_stack_.push(statement);
   } else {
     statement->SetBeforeNode(follow_stack_.top());
-    deliverable_.AddFollowRelationship(follow_stack_.top(), statement);
+    deliverable_->AddFollowRelationship(follow_stack_.top(), statement);
     follow_stack_.pop();
     follow_stack_.push(statement);
   }
@@ -135,16 +137,15 @@ void PSubsystem::SetStatementObject(Statement* statement) {
   if (!parent_stack_.empty()) {
     assert(current_node_type_ == 1 || current_node_type_ == 2);
     statement->SetParentNode(parent_stack_.top());
-    deliverable_.AddParentRelationship(reinterpret_cast<Statement*>(parent_stack_.top()), statement);
+    deliverable_->AddParentRelationship(reinterpret_cast<Statement*>(parent_stack_.top()), statement);
   }
 }
 
 void PSubsystem::HandleIfStmt(IfEntity* if_entity) {
+  deliverable_->AddIfEntity(if_entity);
   parent_stack_.push(if_entity);
   current_node_type_ = 2;
   current_node_ = if_entity;
-  deliverable_.AddVariableVector(if_entity->GetExpressionVariables());
-  deliverable_.AddConstantVector(if_entity->GetExpressionConstants());
 }
 
 void PSubsystem::HandleElseStmt(ElseEntity* else_entity) {
@@ -153,34 +154,28 @@ void PSubsystem::HandleElseStmt(ElseEntity* else_entity) {
 }
 
 void PSubsystem::HandleWhileStmt(WhileEntity* while_entity) {
+  deliverable_->AddWhileEntity(while_entity);
   parent_stack_.push(while_entity);
   current_node_type_ = 1;
   current_node_ = while_entity;
-  deliverable_.AddVariableVector(while_entity->GetExpressionVariables());
-  deliverable_.AddConstantVector(while_entity->GetExpressionConstants());
 }
 
 void PSubsystem::HandleAssignStmt(AssignEntity* assign_entity) {
-  deliverable_.AddAssignEntity(assign_entity);
-  deliverable_.AddVariable(assign_entity->getVariable());
-  deliverable_.AddVariableVector(assign_entity->GetExpressionVariables());
-  deliverable_.AddConstantVector(assign_entity->GetExpressionConstants());
+  deliverable_->AddAssignEntity(assign_entity);
 }
 
 void PSubsystem::HandleCallStmt(CallEntity* call_entity) {
-  deliverable_.AddCallEntity(call_entity);
+  deliverable_->AddCallEntity(call_entity);
 }
 
 void PSubsystem::HandlePrintStmt(PrintEntity* print_entity) {
-  deliverable_.AddPrintEntity(print_entity);
-  deliverable_.AddVariable(print_entity->getVariable());
+  deliverable_->AddPrintEntity(print_entity);
 }
 
 void PSubsystem::HandleReadStmt(ReadEntity* read_entity) {
-  deliverable_.AddReadEntity(read_entity);
-  deliverable_.AddVariable(read_entity->getVariable());
+  deliverable_->AddReadEntity(read_entity);
 }
 
-Deliverable PSubsystem::GetDeliverables() {
-  return this->deliverable_;
+Deliverable* PSubsystem::GetDeliverables() {
+  return deliverable_;
 }

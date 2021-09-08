@@ -10,6 +10,7 @@
 #define AUTOTESTER_DATATYPE_H
 
 using namespace std;
+bool ValidateName(std::string name);
 
 /**
  * StatementNumber refers to the numbering of statements (program counter).
@@ -25,7 +26,9 @@ class StatementNumber {
 
   int getNum();
 
-  bool operator<(const StatementNumber& other) const;
+  bool operator<(const StatementNumber &other) const;
+
+  bool operator==(StatementNumber other) const;
 };
 
 /**
@@ -42,7 +45,9 @@ class LineNumber {
 
   int getNum();
 
-  bool operator<(const LineNumber& other) const;
+  bool operator<(const LineNumber &other) const;
+
+  bool operator==(LineNumber other) const;
 };
 
 /**
@@ -58,7 +63,9 @@ class ProcedureName {
 
   std::string getName();
 
-  bool operator<(const ProcedureName& other) const;
+  bool operator<(const ProcedureName &other) const;
+
+  bool operator==(ProcedureName other) const;
 };
 
 /**
@@ -74,7 +81,9 @@ class VariableName {
 
   std::string getName();
 
-  bool operator<(const VariableName& other) const;
+  bool operator<(const VariableName &other) const;
+
+  bool operator==(VariableName other) const;
 };
 
 /**
@@ -92,7 +101,9 @@ class ConstantValue {
 
   int get();
 
-  bool operator<(const ConstantValue& other) const;
+  bool operator<(const ConstantValue &other) const;
+
+  bool operator==(ConstantValue other) const;
 };
 
 enum class TokenTag {

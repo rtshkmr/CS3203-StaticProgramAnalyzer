@@ -8,6 +8,16 @@
 #include <datatype/RegexPatterns.h>
 
 /**
+ * This method checks if the given string as in the correct name syntax.
+ * @param name The name to be checked.
+ * @return true if it is in the correct name syntax; false otherwise.
+ */
+bool ValidateName(std::string name) {
+  std::regex name_regex("^[A-Za-z][A-Za-z0-9]*$");
+  return std::regex_search(name, name_regex);
+}
+
+/**
  * This StatementNumber constructor check if the statement number input is valid,
  *   and stores as a StatementNumber object.
  * @param sn [NOT NULL] The statement number
@@ -35,6 +45,16 @@ int StatementNumber::getNum() {
  */
 bool StatementNumber::operator<(const StatementNumber& other) const {
   return num_ < other.num_;
+}
+
+/**
+ * Performs an equality comparison between the current StatementNumber with the input StatementNumber.
+ * This method is similar to Java's equals().
+ * @param other The StatementNumber object to compare to
+ * @return true if this.num_ is equal to other.num_
+ */
+bool StatementNumber::operator==(StatementNumber other) const {
+  return this->num_ == other.num_;
 }
 
 /**
@@ -68,14 +88,27 @@ bool LineNumber::operator<(const LineNumber& other) const {
 }
 
 /**
+ * Performs an equality comparison between the current LineNumber with the input LineNumber.
+ * This method is similar to Java's equals().
+ * @param other The LineNumber object to compare to
+ * @return true if this.num_ is equal to other.num_
+ */
+bool LineNumber::operator==(LineNumber other) const {
+  return this->num_ == other.num_;
+}
+
+/**
  * This ProcedureName constructor check if the procedure name is valid,
  *   and stores as a ProcedureName object.
  * @param pName [NOT NULL] The procedure name (in string) as extracted from SIMPLE program
  * @throws invalid_argument when an invalid procedure name is passed in.
  */
 ProcedureName::ProcedureName(std::string pName) {
-  //TODO: validate name syntax
-  name_ = pName;
+  if (ValidateName(pName)) {
+    name_ = pName;
+  } else {
+    throw std::invalid_argument("Invalid Procedure Name given.");
+  }
 }
 
 /**
@@ -98,14 +131,27 @@ bool ProcedureName::operator<(const ProcedureName& other) const {
 }
 
 /**
+ * Performs an equality comparison between the current ProcedureName with the input ProcedureName.
+ * This method is similar to Java's equals().
+ * @param other The ProcedureName object to compare to
+ * @return true if this.name_ is equal to other.name_
+ */
+bool ProcedureName::operator==(ProcedureName other) const {
+  return this->name_ == other.name_;
+}
+
+/**
  * This VariableName constructor check if the variable name is valid,
  *   and stores as a VariableName object.
  * @param vName [NOT NULL] The variable name (in string) as extracted from SIMPLE program
  * @throws invalid_argument when an invalid variable name is passed in.
  */
 VariableName::VariableName(std::string vName) {
-  //TODO: validate name syntax
-  name_ = vName;
+  if (ValidateName(vName)) {
+    name_ = vName;
+  } else {
+    throw std::invalid_argument("Invalid Variable Name given.");
+  }
 }
 
 /**
@@ -128,14 +174,28 @@ bool VariableName::operator<(const VariableName& other) const {
 }
 
 /**
- * This ConstantValue constructor check if the constant received is valid (valid = integer),
+ * Performs an equality comparison between the current VariableName with the input VariableName.
+ * This method is similar to Java's equals().
+ * @param other The VariableName object to compare to
+ * @return true if this.name_ is equal to other.name_
+ */
+bool VariableName::operator==(VariableName other) const {
+  return this->name_ == other.name_;
+}
+
+/**
+ * This ConstantValue constructor check if the constant received is valid (valid = integer up to +- 2,147,483,647),
  *   and stores as a ConstantValue object.
  * @param constant [NOT NULL] The constant (in string) as extracted from SIMPLE program
- * @throws invalid_argument when a non-integer in passed in.
+ * @throws invalid_argument when a non-integer in passed in
+ * @throws out_of_range when integers that had exceeded the range.
  */
 ConstantValue::ConstantValue(std::string constant) {
-  //TODO: check if constant is valid.
-  value_ = stoi(constant);
+  size_t num_chars = 0;
+  value_ = stoi(constant, &num_chars);
+  if (num_chars != constant.size()) {
+    throw std::invalid_argument("Constant is not valid. Numbers mixed with letters.");
+  }
 }
 
 /**
@@ -154,6 +214,16 @@ int ConstantValue::get() {
  */
 bool ConstantValue::operator<(const ConstantValue& other) const {
   return value_ < other.value_;
+}
+
+/**
+ * Performs an equality comparison between the current ConstantValue with the input ConstantValue.
+ * This method is similar to Java's equals().
+ * @param other The ConstantValue object to compare to
+ * @return true if this.name_ is equal to other.name_
+ */
+bool ConstantValue::operator==(ConstantValue other) const {
+  return this->value_ == other.value_;
 }
 
 /**
