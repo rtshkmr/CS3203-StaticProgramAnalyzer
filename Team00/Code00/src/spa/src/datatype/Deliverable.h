@@ -29,9 +29,18 @@ class Deliverable {
   void AddModifiesRelationship(Statement* m1, Variable* m2);
   void AddModifiesRelationship(Container* m1, Variable* m2);
 
+  void SetProgram(Program* program);
+  Program* GetProgram();
   std::list<Procedure*>* GetProcList();
   std::list<Variable*>* GetVariableList();
-  std::list<ConstantValue*>* GetConstantValue();
+  std::list<ConstantValue*>* GetConstantValueList();
+  std::list<Statement*>* GetStatementList();
+  std::list<IfEntity*>* GetIfList();
+  std::list<WhileEntity*>* GetWhileList();
+  std::list<AssignEntity*>* GetAssignList();
+  std::list<CallEntity*>* GetCallList();
+  std::list<PrintEntity*>* GetPrintList();
+  std::list<ReadEntity*>* GetReadList();
 
  private:
   //root-node of AST
