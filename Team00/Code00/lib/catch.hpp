@@ -697,7 +697,7 @@ namespace Catch {
 
 namespace Catch {
 
-    std::ostream& cout(const char string[12]);
+    std::ostream& cout();
     std::ostream& cerr();
     std::ostream& clog();
 
@@ -2956,7 +2956,7 @@ namespace Catch {
         OcMethod( Class cls, SEL sel ) : m_cls( cls ), m_sel( sel ) {}
 
         virtual void invoke() const {
-            id obj = [[m_cls alloc] Init];
+            id obj = [[m_cls alloc] init];
 
             performOptionalSelector( obj, @selector(setUp)  );
             performOptionalSelector( obj, m_sel );
@@ -4351,7 +4351,7 @@ namespace Catch {
             mutable XmlWriter* m_writer = nullptr;
         };
 
-        XmlWriter( std::ostream& os = Catch::cout(nullptr));
+        XmlWriter( std::ostream& os = Catch::cout() );
         ~XmlWriter();
 
         XmlWriter( XmlWriter const& ) = delete;
@@ -5696,7 +5696,7 @@ namespace detail {
 
     class TokenStream;
 
-    // Transport for raw args (copied from main args, or supplied via Init list for testing)
+    // Transport for raw args (copied from main args, or supplied via init list for testing)
     class Args {
         friend TokenStream;
         std::string m_exeName;
@@ -7818,9 +7818,9 @@ namespace Catch {
     std::size_t listTests( Config const& config ) {
         TestSpec testSpec = config.testSpec();
         if( config.hasTestFilters() )
-          Catch::cout(nullptr) << "Matching test cases:\n";
+            Catch::cout() << "Matching test cases:\n";
         else {
-          Catch::cout(nullptr) << "All available test cases:\n";
+            Catch::cout() << "All available test cases:\n";
         }
 
         auto matchedTestCases = filterTests( getAllTestCasesSorted( config ), testSpec, config );
@@ -7830,22 +7830,22 @@ namespace Catch {
                 : Colour::None;
             Colour colourGuard( colour );
 
-          Catch::cout(nullptr) << Column(testCaseInfo.name ).initialIndent(2 ).indent(4 ) << "\n";
+            Catch::cout() << Column( testCaseInfo.name ).initialIndent( 2 ).indent( 4 ) << "\n";
             if( config.verbosity() >= Verbosity::High ) {
-              Catch::cout(nullptr) << Column(Catch::Detail::stringify(testCaseInfo.lineInfo ) ).indent(4) << std::endl;
+                Catch::cout() << Column( Catch::Detail::stringify( testCaseInfo.lineInfo ) ).indent(4) << std::endl;
                 std::string description = testCaseInfo.description;
                 if( description.empty() )
                     description = "(NO DESCRIPTION)";
-              Catch::cout(nullptr) << Column(description ).indent(4) << std::endl;
+                Catch::cout() << Column( description ).indent(4) << std::endl;
             }
             if( !testCaseInfo.tags.empty() )
-              Catch::cout(nullptr) << Column(testCaseInfo.tagsAsString() ).indent(6 ) << "\n";
+                Catch::cout() << Column( testCaseInfo.tagsAsString() ).indent( 6 ) << "\n";
         }
 
         if( !config.hasTestFilters() )
-          Catch::cout(nullptr) << pluralise(matchedTestCases.size(), "test case" ) << '\n' << std::endl;
+            Catch::cout() << pluralise( matchedTestCases.size(), "test case" ) << '\n' << std::endl;
         else
-          Catch::cout(nullptr) << pluralise(matchedTestCases.size(), "matching test case" ) << '\n' << std::endl;
+            Catch::cout() << pluralise( matchedTestCases.size(), "matching test case" ) << '\n' << std::endl;
         return matchedTestCases.size();
     }
 
@@ -7856,12 +7856,12 @@ namespace Catch {
         for( auto const& testCaseInfo : matchedTestCases ) {
             matchedTests++;
             if( startsWith( testCaseInfo.name, '#' ) )
-              Catch::cout(nullptr) << '"' << testCaseInfo.name << '"';
+               Catch::cout() << '"' << testCaseInfo.name << '"';
             else
-              Catch::cout(nullptr) << testCaseInfo.name;
+               Catch::cout() << testCaseInfo.name;
             if ( config.verbosity() >= Verbosity::High )
-              Catch::cout(nullptr) << "\t@" << testCaseInfo.lineInfo;
-          Catch::cout(nullptr) << std::endl;
+                Catch::cout() << "\t@" << testCaseInfo.lineInfo;
+            Catch::cout() << std::endl;
         }
         return matchedTests;
     }
@@ -7881,9 +7881,9 @@ namespace Catch {
     std::size_t listTags( Config const& config ) {
         TestSpec testSpec = config.testSpec();
         if( config.hasTestFilters() )
-          Catch::cout(nullptr) << "Tags for matching test cases:\n";
+            Catch::cout() << "Tags for matching test cases:\n";
         else {
-          Catch::cout(nullptr) << "All available tags:\n";
+            Catch::cout() << "All available tags:\n";
         }
 
         std::map<std::string, TagInfo> tagCounts;
@@ -7907,21 +7907,21 @@ namespace Catch {
                                                     .initialIndent( 0 )
                                                     .indent( str.size() )
                                                     .width( CATCH_CONFIG_CONSOLE_WIDTH-10 );
-          Catch::cout(nullptr) << str << wrapper << '\n';
+            Catch::cout() << str << wrapper << '\n';
         }
-      Catch::cout(nullptr) << pluralise(tagCounts.size(), "tag" ) << '\n' << std::endl;
+        Catch::cout() << pluralise( tagCounts.size(), "tag" ) << '\n' << std::endl;
         return tagCounts.size();
     }
 
     std::size_t listReporters( Config const& /*config*/ ) {
-      Catch::cout(nullptr) << "Available reporters:\n";
+        Catch::cout() << "Available reporters:\n";
         IReporterRegistry::FactoryMap const& factories = getRegistryHub().getReporterRegistry().getFactories();
         std::size_t maxNameLen = 0;
         for( auto const& factoryKvp : factories )
             maxNameLen = (std::max)( maxNameLen, factoryKvp.first.size() );
 
         for( auto const& factoryKvp : factories ) {
-          Catch::cout(nullptr)
+            Catch::cout()
                     << Column( factoryKvp.first + ":" )
                             .indent(2)
                             .width( 5+maxNameLen )
@@ -7931,7 +7931,7 @@ namespace Catch {
                             .width( CATCH_CONFIG_CONSOLE_WIDTH - maxNameLen-8 )
                     << "\n";
         }
-      Catch::cout(nullptr) << std::endl;
+        Catch::cout() << std::endl;
         return factories.size();
     }
 
@@ -8408,7 +8408,7 @@ namespace Catch {
         m_originalStream.rdbuf( m_prevBuf );
     }
 
-    RedirectedStdOut::RedirectedStdOut() : m_cout(Catch::cout(nullptr), m_rss.get() ) {}
+    RedirectedStdOut::RedirectedStdOut() : m_cout( Catch::cout(), m_rss.get() ) {}
     auto RedirectedStdOut::str() const -> std::string { return m_rss.str(); }
 
     RedirectedStdErr::RedirectedStdErr()
@@ -9468,13 +9468,13 @@ namespace Catch {
     }
 
     void Session::showHelp() const {
-      Catch::cout(nullptr)
+        Catch::cout()
                 << "\nCatch v" << libraryVersion() << "\n"
                 << m_cli << std::endl
                 << "For more detailed usage please see the project docs\n" << std::endl;
     }
     void Session::libIdentify() {
-      Catch::cout(nullptr)
+        Catch::cout()
                 << std::left << std::setw(16) << "description: " << "A Catch test executable\n"
                 << std::left << std::setw(16) << "category: " << "testframework\n"
                 << std::left << std::setw(16) << "framework: " << "Catch Test\n"
@@ -9543,12 +9543,12 @@ namespace Catch {
 #endif
     int Session::run() {
         if( ( m_configData.waitForKeypress & WaitForKeypress::BeforeStart ) != 0 ) {
-          Catch::cout(nullptr) << "...waiting for enter/ return before starting" << std::endl;
+            Catch::cout() << "...waiting for enter/ return before starting" << std::endl;
             static_cast<void>(std::getchar());
         }
         int exitCode = runInternal();
         if( ( m_configData.waitForKeypress & WaitForKeypress::BeforeExit ) != 0 ) {
-          Catch::cout(nullptr) << "...waiting for enter/ return before exiting, with code: " << exitCode << std::endl;
+            Catch::cout() << "...waiting for enter/ return before exiting, with code: " << exitCode << std::endl;
             static_cast<void>(std::getchar());
         }
         return exitCode;
@@ -9709,7 +9709,7 @@ namespace Catch {
         public:
             // Store the streambuf from cout up-front because
             // cout may get redirected when running tests
-            CoutStream() : m_os(Catch::cout(nullptr).rdbuf() ) {}
+            CoutStream() : m_os( Catch::cout().rdbuf() ) {}
             ~CoutStream() override = default;
 
         public: // IStream
@@ -9810,7 +9810,7 @@ namespace Catch {
     ///////////////////////////////////////////////////////////////////////////
 
 #ifndef CATCH_CONFIG_NOSTDOUT // If you #define this you must implement these functions
-    std::ostream& cout(const char string[12]) { return std::cout; }
+    std::ostream& cout() { return std::cout; }
     std::ostream& cerr() { return std::cerr; }
     std::ostream& clog() { return std::clog; }
 #endif
@@ -13059,7 +13059,7 @@ int main (int argc, char * argv[]) {
 // Objective-C entry point
 int main (int argc, char * const argv[]) {
 #if !CATCH_ARC_ENABLED
-    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] Init];
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 #endif
 
     Catch::registerTestMethods();
