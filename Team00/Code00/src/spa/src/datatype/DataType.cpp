@@ -7,7 +7,6 @@
 #include "DataType.h"
 #include <datatype/RegexPatterns.h>
 
-
 /**
  * This method checks if the given string as in the correct name syntax.
  * @param name The name to be checked.
@@ -17,7 +16,6 @@ bool ValidateName(std::string name) {
   std::regex name_regex("^[A-Za-z][A-Za-z0-9]*$");
   return std::regex_search(name, name_regex);
 }
-
 
 /**
  * This StatementNumber constructor check if the statement number input is valid,
@@ -254,44 +252,6 @@ Token::Token(std::string token_string, TokenTag token_tag) :
 bool Token::operator==(Token other) {
   return this->GetTokenString() == other.GetTokenString();
 }
-std::string Token::GetTokenString() {
-  return this->token_string_;
-}
-
-Token::Token(string token_string, TokenTag token_tag) :
-token_tag_(token_tag) {
-  token_string_ = std::move(token_string);
-}
-
-/**
- * Equality operator checks the string kept in the token todo: add the tag also
- * @param other
- * @return
- */
-bool Token::operator==(Token other) {
-  return this->GetTokenString() == other.GetTokenString();
-}
-
-bool Token::IsKeywordToken(Token token) {
-  TokenTag tag = token.GetTokenTag();
-  return tag == TokenTag::kProcedureKeyword
-  || tag == TokenTag::kReadKeyword
-  || tag == TokenTag::kPrintKeyword
-  || tag == TokenTag::kCallKeyword
-  || tag == TokenTag::kWhileKeyword
-  || tag == TokenTag::kIfKeyword
-  || tag == TokenTag::kWhileKeyword
-  || tag == TokenTag::kThenKeyword;
-}
-
-TokenTag Token::TagStringWithToken(const string& reference) {
-
-  regex fixed_keyword_pat = RegexPatterns::GetFixedKeywordPattern();
-  regex fixed_char_pat = RegexPatterns::GetFixedCharPattern(); // for braces, semicolon...
-  regex binary_arithmetic_operator_pat = RegexPatterns::GetBinaryArithmeticOperatorPattern(); // for math
-  regex binary_comparison_operator_pat = RegexPatterns::GetBinaryComparisonPattern(); // for comparator chars
-  regex name_pat = RegexPatterns::GetNamePattern(); // names, integers... todo: check alphanum
-  regex integer_pat = RegexPatterns::GetIntegerPattern();
 
 bool Token::IsKeywordToken(Token token) {
   TokenTag tag = token.GetTokenTag();
@@ -326,7 +286,6 @@ TokenTag Token::TagStringWithToken(const std::string& reference) {
   std::regex integer_pat = RegexPatterns::GetIntegerPattern();
 
   if (regex_match(reference, fixed_keyword_pat)) {
-
     if (reference == "procedure") {
       return TokenTag::kProcedureKeyword;
     } else if (reference == "read") {
@@ -368,7 +327,6 @@ TokenTag Token::TagStringWithToken(const std::string& reference) {
     }
   } else if (regex_match(reference, binary_comparison_operator_pat)) {
     return TokenTag::kBinaryComparisonOperator;
-
   } else if (regex_match(reference, boolean_operator_pat)) {
     return TokenTag::kBooleanOperator;
   }
@@ -380,4 +338,3 @@ TokenTag Token::TagStringWithToken(const std::string& reference) {
     return TokenTag::kInvalid;
   }
 }
-

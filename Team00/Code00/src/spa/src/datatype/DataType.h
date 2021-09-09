@@ -9,18 +9,18 @@
 #ifndef AUTOTESTER_DATATYPE_H
 #define AUTOTESTER_DATATYPE_H
 
-
 bool ValidateName(std::string name);
+
 /**
  * StatementNumber refers to the numbering of statements (program counter).
  * Note: The difference between StatementNumber and LineNumber is that a single line could have multiple
  *     statements, one statement, or partial statement.
  */
 class StatementNumber {
-private:
+ private:
   int num_;
 
-public:
+ public:
   StatementNumber(int sn);
 
   int getNum();
@@ -36,10 +36,10 @@ public:
  *     statements, one statement, or partial statement.
  */
 class LineNumber {
-private:
+ private:
   int num_;
 
-public:
+ public:
   LineNumber(int ln);
 
   int getNum();
@@ -54,10 +54,10 @@ public:
  * This object checks and ensure that the received procedure name is correct according to the lexical tokens
  */
 class ProcedureName {
-private:
+ private:
   std::string name_;
 
-public:
+ public:
   ProcedureName(std::string pName);
 
   std::string getName();
@@ -72,10 +72,10 @@ public:
  * This object checks and ensure that the received variable name is correct according to the lexical tokens
  */
 class VariableName {
-private:
+ private:
   std::string name_;
 
-public:
+ public:
   VariableName(std::string vName);
 
   std::string getName();
@@ -92,10 +92,10 @@ public:
  * Side note: constants does not have a name to identify them.
  */
 class ConstantValue {
-private:
+ private:
   int value_;
 
-public:
+ public:
   ConstantValue(std::string constant);
 
   int get();
