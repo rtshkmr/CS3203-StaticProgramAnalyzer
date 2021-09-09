@@ -9,8 +9,8 @@
 #ifndef AUTOTESTER_DATATYPE_H
 #define AUTOTESTER_DATATYPE_H
 
-using namespace std;
 
+bool ValidateName(std::string name);
 /**
  * StatementNumber refers to the numbering of statements (program counter).
  * Note: The difference between StatementNumber and LineNumber is that a single line could have multiple
@@ -118,6 +118,7 @@ enum class TokenTag {
   kName,
   kBinaryArithmeticOperator, //  for binary math operations (=, +, -...)
   kBinaryComparisonOperator,
+  kBooleanOperator, // &&, ||, ...
   kAssignmentOperator,
   kOpenBrace, // for containers procName{...}
   kCloseBrace,
@@ -125,24 +126,23 @@ enum class TokenTag {
   kCloseBracket,
   kSemicolon, // statement terminator
   kInvalid,
-  kSelect
-  };
+};
 
 /**
  * A Lexical Token represents a discrete unit within a particular source statement. It contains a string pointer to
  * the space-delimited string that it was originally created from as well as TokenTag that indicates the type of token it is.
  */
 class Token {
-private:
-  string token_string_;
+ private:
+  std::string token_string_;
   TokenTag token_tag_;
 
-public:
-  string GetTokenString();
-  Token(string token_string, TokenTag token_tag);
+ public:
+  std::string GetTokenString();
+  Token(std::string token_string, TokenTag token_tag);
   [[nodiscard]] TokenTag GetTokenTag() const;
   bool operator==(Token other);
-  static TokenTag TagStringWithToken(string const& reference);
+  static TokenTag TagStringWithToken(std::string const& reference);
   static bool IsKeywordToken(Token token);
 };
 

@@ -16,6 +16,8 @@ class AssignmentExpression {
  public:
   AssignmentExpression(std::string infix);
 
+  std::string GetExpressionString();
+
   bool CheckExist(std::string pattern);
 
   bool CheckExact(std::string pattern);

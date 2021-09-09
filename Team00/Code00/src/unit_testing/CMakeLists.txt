@@ -4,7 +4,10 @@ add_executable(unit_testing ${srcs}
         src/component/QueryProcessor/types/TestQueryEvaluatorTable.cpp
         src/component/QueryProcessor/TestQueryProjector.cpp
         src/component/QueryProcessor/QueryExtractor/TestQueryExtractor.cpp
-)
-
+        src/component/SourceProcessor/TestTokenizer.cpp
+        src/component/SourceProcessor/TestSyntaxValidator.cpp
+        src/component/SourceProcessor/TestEntityFactory.cpp
+        utils/TestUtils.cpp utils/TestUtils.h
+        utils/TestUtils.cpp src/datatype/TestDataType.cpp src/component/SourceProcessor/TestPsubsystem.cpp)
 target_link_libraries(unit_testing spa)
 SET(CMAKE_BUILD_TYPE Debug)

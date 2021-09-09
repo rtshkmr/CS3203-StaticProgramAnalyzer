@@ -8,7 +8,7 @@ add_library(spa ${srcs} ${headers}
         src/model/Statement.h src/model/Statement.cpp
         src/component/PKB/PKB.cpp src/component/PKB/PKB.h
         src/component/SourceProcessor/Tokenizer.cpp src/component/SourceProcessor/Tokenizer.h
-        src/component/SourceProcessor/ConcreteSyntaxValidator.cpp src/component/SourceProcessor/ConcreteSyntaxValidator.h
+        src/component/SourceProcessor/SyntaxValidator.cpp src/component/SourceProcessor/SyntaxValidator.h
         src/component/SourceProcessor/EntityFactory.cpp src/component/SourceProcessor/EntityFactory.h
         src/datatype/Identifier.cpp
         src/datatype/Identifier.h src/datatype/Deliverable.cpp
@@ -32,6 +32,7 @@ add_library(spa ${srcs} ${headers}
         src/component/QueryProcessor/QueryProjector.h src/component/QueryProcessor/QueryProjector.cpp
         src/component/QueryProcessor/types/QueryEvaluatorTable.h src/component/QueryProcessor/types/QueryEvaluatorTable.cpp
         )
+  
 # this makes the headers accessible for other projects which uses spa lib
 target_include_directories(spa PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 

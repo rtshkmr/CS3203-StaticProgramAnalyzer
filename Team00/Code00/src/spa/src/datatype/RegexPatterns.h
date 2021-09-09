@@ -8,7 +8,7 @@
 
 class RegexPatterns {
 
-public:
+ public:
   static std::regex GetFixedKeywordPattern();
   static std::regex GetFixedCharPattern();
   static std::regex GetBinaryArithmeticOperatorPattern();
@@ -16,6 +16,7 @@ public:
   static std::regex GetNamePattern();
   static std::regex GetIntegerPattern();
   static std::regex GetDesignEntityPattern();
+  static std::regex GetBooleanOperatorPattern();
 };
 
 #endif //AUTOTESTER_TEAM00_CODE00_SRC_SPA_SRC_DATATYPE_REGEXPATTERNS_H_

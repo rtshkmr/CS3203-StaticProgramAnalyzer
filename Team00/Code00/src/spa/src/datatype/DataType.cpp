@@ -7,6 +7,18 @@
 #include "DataType.h"
 #include <datatype/RegexPatterns.h>
 
+
+/**
+ * This method checks if the given string as in the correct name syntax.
+ * @param name The name to be checked.
+ * @return true if it is in the correct name syntax; false otherwise.
+ */
+bool ValidateName(std::string name) {
+  std::regex name_regex("^[A-Za-z][A-Za-z0-9]*$");
+  return std::regex_search(name, name_regex);
+}
+
+
 /**
  * This StatementNumber constructor check if the statement number input is valid,
  *   and stores as a StatementNumber object.
@@ -94,8 +106,11 @@ bool LineNumber::operator==(LineNumber other) const {
  * @throws invalid_argument when an invalid procedure name is passed in.
  */
 ProcedureName::ProcedureName(std::string pName) {
-  //TODO: validate name syntax
-  name_ = pName;
+  if (ValidateName(pName)) {
+    name_ = pName;
+  } else {
+    throw std::invalid_argument("Invalid Procedure Name given.");
+  }
 }
 
 /**
@@ -134,8 +149,11 @@ bool ProcedureName::operator==(ProcedureName other) const {
  * @throws invalid_argument when an invalid variable name is passed in.
  */
 VariableName::VariableName(std::string vName) {
-  //TODO: validate name syntax
-  name_ = vName;
+  if (ValidateName(vName)) {
+    name_ = vName;
+  } else {
+    throw std::invalid_argument("Invalid Variable Name given.");
+  }
 }
 
 /**
@@ -168,14 +186,18 @@ bool VariableName::operator==(VariableName other) const {
 }
 
 /**
- * This ConstantValue constructor check if the constant received is valid (valid = integer),
+ * This ConstantValue constructor check if the constant received is valid (valid = integer up to +- 2,147,483,647),
  *   and stores as a ConstantValue object.
  * @param constant [NOT NULL] The constant (in string) as extracted from SIMPLE program
- * @throws invalid_argument when a non-integer in passed in.
+ * @throws invalid_argument when a non-integer in passed in
+ * @throws out_of_range when integers that had exceeded the range.
  */
 ConstantValue::ConstantValue(std::string constant) {
-  //TODO: check if constant is valid.
-  value_ = stoi(constant);
+  size_t num_chars = 0;
+  value_ = stoi(constant, &num_chars);
+  if (num_chars != constant.size()) {
+    throw std::invalid_argument("Constant is not valid. Numbers mixed with letters.");
+  }
 }
 
 /**
@@ -219,6 +241,23 @@ std::string Token::GetTokenString() {
   return this->token_string_;
 }
 
+Token::Token(std::string token_string, TokenTag token_tag) :
+    token_tag_(token_tag) {
+  token_string_ = std::move(token_string);
+}
+
+/**
+ * Equality operator checks the string kept in the token todo: add the tag also
+ * @param other
+ * @return
+ */
+bool Token::operator==(Token other) {
+  return this->GetTokenString() == other.GetTokenString();
+}
+std::string Token::GetTokenString() {
+  return this->token_string_;
+}
+
 Token::Token(string token_string, TokenTag token_tag) :
 token_tag_(token_tag) {
   token_string_ = std::move(token_string);
@@ -254,8 +293,40 @@ TokenTag Token::TagStringWithToken(const string& reference) {
   regex name_pat = RegexPatterns::GetNamePattern(); // names, integers... todo: check alphanum
   regex integer_pat = RegexPatterns::GetIntegerPattern();
 
+bool Token::IsKeywordToken(Token token) {
+  TokenTag tag = token.GetTokenTag();
+  return tag == TokenTag::kProcedureKeyword
+      || tag == TokenTag::kReadKeyword
+      || tag == TokenTag::kPrintKeyword
+      || tag == TokenTag::kCallKeyword
+      || tag == TokenTag::kWhileKeyword
+      || tag == TokenTag::kIfKeyword
+      || tag == TokenTag::kWhileKeyword
+      || tag == TokenTag::kElseKeyword
+      || tag == TokenTag::kThenKeyword;
+}
+
+/**
+ * Tags a @param reference string with a TokenTag by comparing with a various regex that represent a fixed set of
+ * concrete syntax grammar rules. As a side-effect, any @param reference string that doesn't match the given regex
+ * patterns would violate the Concrete Grammar Syntax for SIMPLE and therefore would be tagged with a kInvalid tag for
+ * further error handling
+ *
+ * @param reference  a string that will be tagged
+ * @return a TokenTag enum object
+ */
+TokenTag Token::TagStringWithToken(const std::string& reference) {
+
+  std::regex fixed_keyword_pat = RegexPatterns::GetFixedKeywordPattern();
+  std::regex fixed_char_pat = RegexPatterns::GetFixedCharPattern();
+  std::regex binary_arithmetic_operator_pat = RegexPatterns::GetBinaryArithmeticOperatorPattern();
+  std::regex binary_comparison_operator_pat = RegexPatterns::GetBinaryComparisonPattern();
+  std::regex boolean_operator_pat = RegexPatterns::GetBooleanOperatorPattern();
+  std::regex name_pat = RegexPatterns::GetNamePattern();
+  std::regex integer_pat = RegexPatterns::GetIntegerPattern();
+
   if (regex_match(reference, fixed_keyword_pat)) {
-    // instead of having a header, we'll use these keywords for now
+
     if (reference == "procedure") {
       return TokenTag::kProcedureKeyword;
     } else if (reference == "read") {
@@ -276,7 +347,6 @@ TokenTag Token::TagStringWithToken(const string& reference) {
       return TokenTag::kInvalid;
     }
   } else if (regex_match(reference, fixed_char_pat)) {
-    // handle key characters:
     if (reference == "{") {
       return TokenTag::kOpenBrace;
     } else if (reference == "}") {
@@ -298,7 +368,11 @@ TokenTag Token::TagStringWithToken(const string& reference) {
     }
   } else if (regex_match(reference, binary_comparison_operator_pat)) {
     return TokenTag::kBinaryComparisonOperator;
-  } else if (regex_match(reference, name_pat)) {
+
+  } else if (regex_match(reference, boolean_operator_pat)) {
+    return TokenTag::kBooleanOperator;
+  }
+  else if (regex_match(reference, name_pat)) {
     return TokenTag::kName;
   } else if (regex_match(reference, integer_pat)) {
     return TokenTag::kInteger;
@@ -306,3 +380,4 @@ TokenTag Token::TagStringWithToken(const string& reference) {
     return TokenTag::kInvalid;
   }
 }
+
