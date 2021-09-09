@@ -8,6 +8,8 @@ add_executable(unit_testing ${srcs}
         src/component/SourceProcessor/TestSyntaxValidator.cpp
         src/component/SourceProcessor/TestEntityFactory.cpp
         utils/TestUtils.cpp utils/TestUtils.h
-        utils/TestUtils.cpp src/datatype/TestDataType.cpp src/component/SourceProcessor/TestPsubsystem.cpp src/component/PKB/PKB.cpp src/component/PKB/PKB.h)
+        utils/TestUtils.cpp src/datatype/TestDataType.cpp
+        src/component/SourceProcessor/TestPsubsystem.cpp
+        src/component/PKB/TestPKB.cpp)
 target_link_libraries(unit_testing spa)
 SET(CMAKE_BUILD_TYPE Debug)
