@@ -3,8 +3,6 @@
 #include <component/PKB/PKB.h>
 #include <datatype/Deliverable.h>
 
-using namespace std;
-
 
 TEST_CASE("PKB population and retrieval") {
 
@@ -19,8 +17,8 @@ TEST_CASE("PKB population and retrieval") {
   AssignEntity *a1_ = new AssignEntity
       (v1_,
        "v1=1+2",
-       vector<Variable*>{},
-       vector<ConstantValue*>{const1_, const2_}
+       std::vector<Variable*>{},
+       std::vector<ConstantValue*>{const1_, const2_}
        );
   CallEntity *call1_ = new CallEntity(p1_);
   PrintEntity *print1_ = new PrintEntity(v1_);
@@ -62,34 +60,34 @@ TEST_CASE("PKB population and retrieval") {
   SECTION("Get DesignEntity") {
 
     SECTION("Variable") {
-      list<string> var_list {"v1", "v2"};
+      std::list<std::string> var_list {"v1", "v2"};
       REQUIRE(var_list == pkb.GetDesignEntity(DesignEntity::kVariable));
     }
 
     SECTION("Statement") {
-      list<string> stmt_list {"1", "2", "3", "4"};
+      std::list<std::string> stmt_list {"1", "2", "3", "4"};
       REQUIRE(stmt_list == pkb.GetDesignEntity(DesignEntity::kStmt));
     }
     SECTION("Assign") {
-      list<string> assign_list {"1"};
+      std::list<std::string> assign_list {"1"};
       REQUIRE(assign_list == pkb.GetDesignEntity(DesignEntity::kAssign));
     }
     SECTION("Call") {
-      list<string> call_list {"2"};
+      std::list<std::string> call_list {"2"};
       REQUIRE(call_list == pkb.GetDesignEntity(DesignEntity::kCall));
     }
     SECTION("Print") {
-      list<string> print_list {"3"};
+      std::list<std::string> print_list {"3"};
       REQUIRE(print_list == pkb.GetDesignEntity(DesignEntity::kPrint));
     }
     SECTION("Read") {
-      list<string> read_list {"4"};
+      std::list<std::string> read_list {"4"};
       REQUIRE(read_list == pkb.GetDesignEntity(DesignEntity::kRead));
     }
   }
   SECTION("Get Relationship") {
     SECTION("Follows") {
-      list<tuple<DesignEntity,string>> follows_list {make_tuple(DesignEntity::kCall,"2")};
+      std::list<std::tuple<DesignEntity,std::string>> follows_list {std::make_tuple(DesignEntity::kCall,"2")};
       REQUIRE(follows_list == pkb.GetFollows("1"));
     }
   }

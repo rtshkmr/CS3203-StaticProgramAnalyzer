@@ -1,8 +1,5 @@
 #include <stdio.h>
 #include <iostream>
-//#include <std::string>
-//#include <vector>
-//#include <component/QueryProcessor/types/Types.h>
 
 #include "PKB.h"
 
