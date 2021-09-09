@@ -2,10 +2,10 @@
 #include "QueryParser.h"
 #include "QueryTokenizer.h"
 
-void QueryExtractor::extractQuery() {
+void QueryExtractor::ExtractQuery() {
   // tokenize, parse, validation logic. Call helper classes to achieve the aforementioned.
   auto tokenizer = QueryTokenizer();
-  tokenizer.setQueryString(&query);
+  tokenizer.SetQueryString(&query);
   QueryParser parser = QueryParser(groups, synonyms, target, tokenizer);
   parser.parse();
 }

@@ -16,30 +16,30 @@ class QueryEvaluatorTable {
     QueryEvaluatorTable(std::string target);
 
     // Add column to table
-    bool addColumn(std::string synonym);
+    bool AddColumn(std::string synonym);
 
     // Add target synonym column with values to table
-    bool addTargetSynonym(std::list<std::string> synonymList);
+    bool AddTargetSynonym(std::list<std::string> synonymList);
 
     // Delete row
-    bool deleteRow(int index);
+    bool DeleteRow(int index);
 
     // Add row (and new col)
-    bool addRow(std::string synonym, int index, std::string value);
+    bool AddRow(std::string synonym, int index, std::string value);
 
     // Return vector of target synonym
-    std::vector<std::string> getResults();
+    std::vector<std::string> GetResults();
 
     // Return vector of specified synonym
-    std::vector<std::string> getColumn(std::string synonym);
+    std::vector<std::string> GetColumn(std::string synonym);
 
     // Empty column but keep the synonym (header) in the table
-    bool removeColumn(std::string synonym);
+    bool RemoveColumn(std::string synonym);
 
-    int getSize();
+    int GetSize();
   private:
     std::unordered_map<std::string, std::vector<std::string>> um;
-    std::string targetSynonym;
+    std::string target_synonym;
 };
 
 #endif //INC_21S1_CP_SPA_TEAM_35_QUERYEVALUATORTABLE_H

@@ -11,12 +11,12 @@ class QueryTokenizer {
   private:
     std::string query;
     std::int16_t cursor = 0;
-    TokenTag getPqlTokenType(std::string type);
+    TokenTag GetPqlTokenType(std::string type);
   public:
     QueryTokenizer() {};
-    void setQueryString(std::string* query) { this->query = *query; };
-    bool hasMoreTokens();
-    Token getNextToken();
+    void SetQueryString(std::string* query) { this->query = *query; };
+    bool HasMoreTokens();
+    Token GetNextToken();
 };
 
 #endif //AUTOTESTER_QUERYTOKENIZER_H

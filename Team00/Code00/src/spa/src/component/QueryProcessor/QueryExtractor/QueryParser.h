@@ -20,9 +20,9 @@ class QueryParser {
     void parse_query();
     void parse_declarations();
     void parse_select();
-    void getTarget();
-    void getDeclaration();
-    std::vector<Token> getSynonyms();
+    void GetTarget();
+    void GetDeclaration();
+    std::vector<Token> GetSynonyms();
   public:
   QueryParser(std::list<Group>& groups, std::list<Synonym>& synonyms, Synonym& target, QueryTokenizer tokenizer) :
               groups(groups), synonyms(synonyms), target(target), tokenizer(tokenizer) {};

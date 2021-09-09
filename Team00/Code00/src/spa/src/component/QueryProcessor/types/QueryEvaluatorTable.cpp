@@ -5,14 +5,14 @@
 #include "QueryEvaluatorTable.h"
 
 QueryEvaluatorTable::QueryEvaluatorTable(std::string target) {
-  targetSynonym = target;
+  target_synonym = target;
 }
 
 // Add column to table
-bool QueryEvaluatorTable::addColumn(std::string synonym) {
+bool QueryEvaluatorTable::AddColumn(std::string synonym) {
   if (um.find(synonym) == um.end()) {
-    std::vector<std::string> synonymList;
-    um.insert(std::make_pair(synonym, synonymList));
+    std::vector<std::string> synonym_list;
+    um.insert(std::make_pair(synonym, synonym_list));
     return true;
   } else {
     return false;
@@ -20,35 +20,35 @@ bool QueryEvaluatorTable::addColumn(std::string synonym) {
 };
 
 // Add target synonym column with values to table
-bool QueryEvaluatorTable::addTargetSynonym(std::list<std::string> synonymList) {
-  std::vector<std::string> synonymVector;
-
-  for (std::string const &value : synonymList) {
-    synonymVector.push_back(value);
+bool QueryEvaluatorTable::AddTargetSynonym(std::list<std::string> synonym_list) {
+  std::vector<std::string> synonym_vector;
+  // TODO: Change internal pql API input to be a vector instead of a list to avoid this.
+  for (std::string const &value : synonym_list) {
+    synonym_vector.push_back(value);
   }
-  um[targetSynonym] = synonymVector;
+  um[target_synonym] = synonym_vector;
   return true;
 
 };
 
 // Delete row
-bool QueryEvaluatorTable::deleteRow(int index) {
-  if (um[targetSynonym].size() - 1 < index) {
+bool QueryEvaluatorTable::DeleteRow(int index) {
+  if (um[target_synonym].size() - 1 < index) {
     return false;
   }
   for ( auto iter = um.begin(); iter != um.end(); ++iter ) {
-    std::vector<std::string> currentColumn = iter->second;
-    int size = currentColumn.size();
+    std::vector<std::string> current_column = iter->second;
+    int size = current_column.size();
     if (index < size) {
-      currentColumn.erase(currentColumn.begin());
-      iter->second = currentColumn;
+      current_column.erase(current_column.begin());
+      iter->second = current_column;
     }
   }
   return true;
 };
 
 // Add row (and new col)
-bool QueryEvaluatorTable::addRow(std::string synonym, int index, std::string value) {
+bool QueryEvaluatorTable::AddRow(std::string synonym, int index, std::string value) {
   // assert that index == size
   if (index != um[synonym].size()) {
     return false;
@@ -58,21 +58,21 @@ bool QueryEvaluatorTable::addRow(std::string synonym, int index, std::string val
 };
 
 // Return vector of target synonym
-std::vector<std::string> QueryEvaluatorTable::getResults() {
-  auto search = um.find(targetSynonym);
+std::vector<std::string> QueryEvaluatorTable::GetResults() {
+  auto search = um.find(target_synonym);
   //assert search != um.end()
   return search->second;
 };
 
 // Return vector of specified synonym
-std::vector<std::string> QueryEvaluatorTable::getColumn(std::string synonym) {
+std::vector<std::string> QueryEvaluatorTable::GetColumn(std::string synonym) {
   auto search = um.find(synonym);
   //assert search != um.end()
   return search->second;
 };
 
 // Empty column
-bool QueryEvaluatorTable::removeColumn(std::string synonym) {
+bool QueryEvaluatorTable::RemoveColumn(std::string synonym) {
   auto search = um.find(synonym);
   if (search == um.end()) {
     return false;
@@ -82,7 +82,7 @@ bool QueryEvaluatorTable::removeColumn(std::string synonym) {
   }
 };
 
-int QueryEvaluatorTable::getSize() {
+int QueryEvaluatorTable::GetSize() {
   return um.size();
 };
 

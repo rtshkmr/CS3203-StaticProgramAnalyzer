@@ -16,13 +16,12 @@ class QueryExtractor {
     std::list<Group> groups;
     std::list<Synonym> synonyms;
     Synonym target = Synonym("", DesignEntity::kInvalid);
-    void test_print_items();
   public:
     explicit QueryExtractor(std::string *query) : query(*query) {};
-    void extractQuery();
-    std::list<Group> getGroups() { return groups; };
-    std::list<Synonym> getSynonymList() { return synonyms; };
-    Synonym getTarget() { return target; };
+    void ExtractQuery();
+    std::list<Group> GetGroupsList() { return groups; };
+    std::list<Synonym> GetSynonymsList() { return synonyms; };
+    Synonym GetTarget() { return target; };
 };
 
 #endif //INC_21S1_CP_SPA_TEAM_35_QUERYEXTRACTOR_H

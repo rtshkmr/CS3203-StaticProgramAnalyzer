@@ -29,13 +29,13 @@ void TestWrapper::evaluate(std::string query, std::list<std::string>& results){
   // ...code to extract query...
   auto query_extractor = new QueryExtractor(&query);
   try {
-    query_extractor->extractQuery();
+    query_extractor->ExtractQuery();
   } catch (const runtime_error& error) {
     // cerr << error.what()<< endl;
     return;
   }
   // ...code to evaluate query...
-  // e.g. evaluateQuery(query_extractor->getSynonymList(), query_extractor->getTarget(), query_extractor->getGroups());
+  // evaluateQuery(query_extractor->GetSynonymsList(), query_extractor->GetTarget(), query_extractor->GetGroupsList());
 
   // store the answers to the query in the results list (it is initially empty)
   // each result must be a string.

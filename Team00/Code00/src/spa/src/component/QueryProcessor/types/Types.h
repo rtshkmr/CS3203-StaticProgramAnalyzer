@@ -19,7 +19,7 @@ enum class DesignEntity {
   kInvalid
 };
 
-static DesignEntity getDesignEntity(std::string reference) {
+static DesignEntity GetDesignEntity(std::string reference) {
   if (reference == "stmt") {
     return DesignEntity::kStmt;
   } else if (reference == "read") {
@@ -68,39 +68,39 @@ class Synonym {
     DesignEntity type;
   public:
     Synonym(std::string name, DesignEntity type): name(name), type(type) {};
-    std::string getName() { return name; };
-    DesignEntity getType() { return type; };
+    std::string GetName() { return name; };
+    DesignEntity GetType() { return type; };
 };
 
 class Clause {
   public:
-  std::string leftHandSide;
-  std::string rightHandSide;
+  std::string left_hand_side;
+  std::string right_hand_side;
 };
 
 class SuchThat : Clause {
   public:
-    RelRef relRef;
-    bool leftIsSynonym;
-    bool rightIsSynonym;
+    RelRef rel_ref;
+    bool left_is_synonym;
+    bool right_is_synonym;
 };
 
 class Pattern : Clause {
   public:
-    std::string assignSynonym;
-    bool leftIsSynonym;
-    bool isExact;
+    std::string assign_synonym;
+    bool left_is_synonym;
+    bool is_exact;
 };
 
 class Group {
   private:
     std::vector<Clause> clauses;
-    bool hasTargetSynonym;
+    bool has_target_synonym;
   public:
-    Group(std::vector<Clause> clauses, bool hasTargetSynonym) : hasTargetSynonym(hasTargetSynonym), clauses(clauses) {};
-    bool addClauseToVector(Clause clause);
-    std::vector<Clause> getClauses();
-    bool containsTargetSynonym();
+    Group(std::vector<Clause> clauses, bool has_target_synonym) : has_target_synonym(has_target_synonym), clauses(clauses) {};
+    bool AddClauseToVector(Clause clause);
+    std::vector<Clause> GetClauses();
+    bool ContainsTargetSynonym();
 };
 
 #endif //AUTOTESTER_TYPES_H
