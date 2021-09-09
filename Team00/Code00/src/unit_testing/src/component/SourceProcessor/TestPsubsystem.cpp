@@ -1,0 +1,43 @@
+#include "catch.hpp"
+#include "component/SourceProcessor/PSubsystem.h"
+
+using psub::PSubsystem;
+
+/// These test is made with assumption that Tokenizer and CreateEntities are correct. (Higher level testing)
+
+TEST_CASE("1.PSubsystem.Basic Single Line Creation") {
+  PSubsystem p_subsystem;
+  p_subsystem.InitDataStructures();
+
+  //TODO: expand on other single line
+  //TODO: do test case with all kinds of statement
+  SECTION("Procedure Test with 1 Assign") {
+    p_subsystem.ProcessStatement("procedure firstProc {");
+    p_subsystem.ProcessStatement("x = x + 100;");
+    Deliverable* deliverable = p_subsystem.GetDeliverables();
+
+    ProcedureName pname("firstProc");
+    REQUIRE(deliverable->GetProcList()->size() == 1);
+    REQUIRE(*(*deliverable->GetProcList()->front()).getName() == pname);
+
+    VariableName vname("x");
+    REQUIRE(deliverable->GetVariableList()->size() == 1);
+    REQUIRE(*(*deliverable->GetVariableList()->front()).getName() == vname);
+
+    REQUIRE(deliverable->GetConstantValueList()->size() == 1);
+    REQUIRE((*deliverable->GetConstantValueList()->front()).get() == 100);
+
+    //ensure StmtList and AssignList holds the same object
+    REQUIRE(deliverable->GetStatementList()->size() == 1);
+    AssignEntity* assign_entity = static_cast<AssignEntity*>(*(deliverable->GetStatementList()->begin()));
+    AssignEntity* assign_entity2 = deliverable->GetAssignList()->front();
+    REQUIRE(assign_entity == assign_entity2);
+    REQUIRE(*assign_entity->getVariable()->getName() == vname);
+    REQUIRE(assign_entity->getAssignmentExpr()->CheckExact("x + 100"));
+    REQUIRE(assign_entity->GetExpressionConstants().front()->get() == 100);
+
+    //ensure trace down from Program is the same variable
+    REQUIRE(deliverable->GetProgram()->getProcedureList()->front() == deliverable->GetProcList()->front());
+  }
+
+}

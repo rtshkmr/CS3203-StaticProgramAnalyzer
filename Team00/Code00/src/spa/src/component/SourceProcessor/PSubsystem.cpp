@@ -11,7 +11,7 @@ void PSubsystem::InitDataStructures() {
   syntax_validator_ = SyntaxValidator();
   entity_factory_ =
       EntityFactory(deliverable_->GetProcList(), deliverable_->GetVariableList(),
-                    deliverable_->GetConstantValue());
+                    deliverable_->GetConstantValueList());
 }
 
 void PSubsystem::ProcessStatement(std::string statement) {
@@ -189,5 +189,7 @@ void PSubsystem::HandleReadStmt(ReadEntity* read_entity) {
 }
 
 Deliverable* PSubsystem::GetDeliverables() {
+  Program* program = new Program(deliverable_->GetProcList()->front());
+  deliverable_->SetProgram(program);
   return deliverable_;
 }

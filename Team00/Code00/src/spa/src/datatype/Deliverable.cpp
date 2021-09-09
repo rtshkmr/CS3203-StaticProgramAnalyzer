@@ -82,6 +82,14 @@ void Deliverable::AddModifiesRelationship(Container* m1, Variable* m2) {
   }
 }
 
+void Deliverable::SetProgram(Program* program) {
+  this->program_ = program;
+}
+
+Program* Deliverable::GetProgram() {
+  return program_;
+}
+
 std::list<Procedure*>* Deliverable::GetProcList() {
   return &proc_list_;
 }
@@ -89,6 +97,34 @@ std::list<Procedure*>* Deliverable::GetProcList() {
 std::list<Variable*>* Deliverable::GetVariableList() {
   return &var_list_;
 }
-std::list<ConstantValue*>* Deliverable::GetConstantValue() {
+std::list<ConstantValue*>* Deliverable::GetConstantValueList() {
   return &const_list_;
+}
+
+std::list<Statement*>* Deliverable::GetStatementList() {
+  return &stmt_list_;
+}
+
+std::list<IfEntity*>* Deliverable::GetIfList() {
+  return &if_list_;
+}
+
+std::list<WhileEntity*>* Deliverable::GetWhileList() {
+  return &while_list_;
+}
+
+std::list<AssignEntity*>* Deliverable::GetAssignList() {
+  return &assign_list_;
+}
+
+std::list<CallEntity*>* Deliverable::GetCallList() {
+  return &call_list_;
+}
+
+std::list<PrintEntity*>* Deliverable::GetPrintList() {
+  return &print_list_;
+}
+
+std::list<ReadEntity*>* Deliverable::GetReadList() {
+  return &read_list_;
 }
