@@ -44,6 +44,7 @@ TEST_CASE("1.Tokenizer.Tokenizer displays current tokenization status") {
   }
 }
 
+/*
 TEST_CASE(
     "1.Tokenizer.Tokenize Starting valid_program_lines with variable white spacing between important delimiting characters should give the same number of tokens") {
   vector<string> starting_variations = {
@@ -90,6 +91,7 @@ TEST_CASE(
     REQUIRE(ending_variation_reference.capacity() == other.capacity());
   }
 }
+*/
 
 TEST_CASE("1.Tokenizer.RegexPatterns pattern tests for token_strings") {
 
