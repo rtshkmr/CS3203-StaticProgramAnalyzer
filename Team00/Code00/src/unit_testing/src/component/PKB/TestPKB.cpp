@@ -31,11 +31,14 @@ TEST_CASE("PKB population and retrieval") {
   print1_->SetStatementNumber(new StatementNumber(3));
   read1_->SetStatementNumber(new StatementNumber(4));
 
-  d1_.AddProc(p1_);
-  d1_.AddVariable(v1_);
-  d1_.AddVariable(v2_);
-  d1_.AddConstant(const1_);
-  d1_.AddConstant(const2_);
+//  d1_.AddProc(p1_);
+//  d1_.AddVariable(v1_);
+//  d1_.AddVariable(v2_);
+//  d1_.AddConstant(const1_);
+//  d1_.AddConstant(const2_);
+
+  d1_.var_list_.push_back(v1_);
+  d1_.var_list_.push_back(v2_);
 
   d1_.AddStatement(a1_);
   d1_.AddStatement(call1_);
@@ -57,37 +60,31 @@ TEST_CASE("PKB population and retrieval") {
 
 
   SECTION("Get DesignEntity") {
-    SECTION("Procedure") {
-      list<string> proc_list {"p1"};
-      REQUIRE(proc_list == pkb.GetDesignEntity(DesignEntity::kProcedure));
-    }
+
     SECTION("Variable") {
-      list<string> proc_list {"v1", "v2"};
-      REQUIRE(proc_list == pkb.GetDesignEntity(DesignEntity::kVariable));
+      list<string> var_list {"v1", "v2"};
+      REQUIRE(var_list == pkb.GetDesignEntity(DesignEntity::kVariable));
     }
-    SECTION("Constant") {
-      list<string> proc_list {"1", "2"};
-      REQUIRE(proc_list == pkb.GetDesignEntity(DesignEntity::kConstant));
-    }
+
     SECTION("Statement") {
-      list<string> proc_list {"1", "2", "3", "4"};
-      REQUIRE(proc_list == pkb.GetDesignEntity(DesignEntity::kStmt));
+      list<string> stmt_list {"1", "2", "3", "4"};
+      REQUIRE(stmt_list == pkb.GetDesignEntity(DesignEntity::kStmt));
     }
     SECTION("Assign") {
-      list<string> proc_list {"1"};
-      REQUIRE(proc_list == pkb.GetDesignEntity(DesignEntity::kAssign));
+      list<string> assign_list {"1"};
+      REQUIRE(assign_list == pkb.GetDesignEntity(DesignEntity::kAssign));
     }
     SECTION("Call") {
-      list<string> proc_list {"2"};
-      REQUIRE(proc_list == pkb.GetDesignEntity(DesignEntity::kCall));
+      list<string> call_list {"2"};
+      REQUIRE(call_list == pkb.GetDesignEntity(DesignEntity::kCall));
     }
     SECTION("Print") {
-      list<string> proc_list {"3"};
-      REQUIRE(proc_list == pkb.GetDesignEntity(DesignEntity::kPrint));
+      list<string> print_list {"3"};
+      REQUIRE(print_list == pkb.GetDesignEntity(DesignEntity::kPrint));
     }
     SECTION("Read") {
-      list<string> proc_list {"4"};
-      REQUIRE(proc_list == pkb.GetDesignEntity(DesignEntity::kRead));
+      list<string> read_list {"4"};
+      REQUIRE(read_list == pkb.GetDesignEntity(DesignEntity::kRead));
     }
   }
   SECTION("Get Relationship") {

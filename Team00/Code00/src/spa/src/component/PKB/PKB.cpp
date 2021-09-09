@@ -14,33 +14,33 @@ list<string> PKB::GetDesignEntity(DesignEntity de) {
     case DesignEntity::kStmt:
       return stmt_table_;
       break;
-      case DesignEntity::kRead:
-        return read_table_;
-        break;
-        case DesignEntity::kPrint:
-          return print_table_;
-          break;
-          case DesignEntity::kCall:
-            return call_table_;
-            break;
-            case DesignEntity::kWhile:
-              return while_table_;
-              break;
-              case DesignEntity::kIf:
-                return if_table_;
-                break;
-                case DesignEntity::kAssign:
-                  return assign_table_;
-                  break;
-                  case DesignEntity::kVariable:
-                    return var_table_;
-                    break;
-                    case DesignEntity::kConstant:
-                      return const_table_;
-                      break;
-                      case DesignEntity::kProcedure:
-                        return proc_table_;
-                        break;
+    case DesignEntity::kRead:
+      return read_table_;
+      break;
+    case DesignEntity::kPrint:
+      return print_table_;
+      break;
+    case DesignEntity::kCall:
+      return call_table_;
+      break;
+    case DesignEntity::kWhile:
+      return while_table_;
+      break;
+    case DesignEntity::kIf:
+      return if_table_;
+      break;
+    case DesignEntity::kAssign:
+      return assign_table_;
+      break;
+    case DesignEntity::kVariable:
+      return var_table_;
+      break;
+    case DesignEntity::kConstant:
+      return const_table_;
+      break;
+    case DesignEntity::kProcedure:
+      return proc_table_;
+      break;
   }
 }
 
@@ -200,7 +200,7 @@ void PKB::PopulateReadList(const list<ReadEntity *>& read_list) {
   }
 }
 
-void PKB::PopulateFollowsMap(const unordered_map<Statement *, Statement *>& follow_hash) {
+void PKB::PopulateFollowsMap(std::unordered_map<Statement*, Statement*> follow_hash) {
   for (pair<Statement *, Statement *> kv : follow_hash)
   {
     auto *kNumber = const_cast<StatementNumber *>(kv.first->GetStatementNumber());
@@ -213,17 +213,18 @@ void PKB::PopulateFollowsMap(const unordered_map<Statement *, Statement *>& foll
   }
 }
 
-void PKB::PopulateParentMap(const unordered_map<Statement *, list<Statement *>>& parent_hash) {
-  for (pair<Statement *, list<Statement *>> kv : parent_hash)
+void PKB::PopulateParentMap(std::unordered_map<Statement*, std::list<Statement*>*> parent_hash) {
+  for (pair<Statement *, list<Statement *>*> kv : parent_hash)
   {
     auto *kNumber = const_cast<StatementNumber *>(kv.first->GetStatementNumber());
     string kString = to_string(kNumber->getNum());
     auto result = list<tuple<DesignEntity,string>>();
 
-    list<Statement *> children = kv.second;
+    list<Statement *> *children = kv.second;
+
     string cString;
 
-    for (Statement *child : children) {
+    for (Statement *child : *children) {
       cString = to_string(child->GetStatementNumber()->getNum());
       tuple<DesignEntity,string> entity = make_tuple(type_map_[cString], cString);
       result.push_back(entity);

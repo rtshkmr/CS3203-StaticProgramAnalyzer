@@ -57,10 +57,10 @@ class PKB {
   void PopulatePrintList(const list<PrintEntity*>& print_list);
   void PopulateReadList(const list<ReadEntity*>& read_list);
 
-  void PopulateFollowsMap(const unordered_map<Statement*, Statement*>& follow_hash);
+  void PopulateFollowsMap(std::unordered_map<Statement*, Statement*> follow_hash);
   //    void PopulateFollowedByMap(const unordered_map<Statement*, Statement*>& follow_hash);
 
-  void PopulateParentMap(const unordered_map<Statement*, list<Statement*>>& parent_hash);
+  void PopulateParentMap(std::unordered_map<Statement*, std::list<Statement*>*> parent_hash);
   //    void PopulateChildMap(const unordered_map<Statement*, Statement*>& parent_hash);
 
   //    void PopulateUseMap(const unordered_map<Statement*, Entity*>& use_hash);
