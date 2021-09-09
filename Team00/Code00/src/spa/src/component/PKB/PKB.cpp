@@ -1,15 +1,13 @@
 #include <stdio.h>
 #include <iostream>
-//#include <string>
+//#include <std::string>
 //#include <vector>
 //#include <component/QueryProcessor/types/Types.h>
 
-using namespace std;
-
 #include "PKB.h"
 
-list<string> PKB::GetDesignEntity(DesignEntity de) {
-  list<string> result = list<string>();
+std::list<std::string> PKB::GetDesignEntity(DesignEntity de) {
+  std::list<std::string> result = std::list<std::string>();
   switch(de) {
     case DesignEntity::kStmt:
       return stmt_table_;
@@ -41,6 +39,8 @@ list<string> PKB::GetDesignEntity(DesignEntity de) {
     case DesignEntity::kProcedure:
       return proc_table_;
       break;
+    case DesignEntity::kInvalid:
+      return {};
   }
 }
 
@@ -70,49 +70,49 @@ void PKB::PopulateDataStructures(Deliverable d) {
   //    PopulateModifiedByMap(d.modifies_hash_);
 }
 
-list<tuple<DesignEntity,string>> PKB::GetFollows(string stmt) {
-  list<tuple<DesignEntity,string>> ret_list = list<tuple<DesignEntity,string>>();
+std::list<std::tuple<DesignEntity,std::string>> PKB::GetFollows(std::string stmt) {
+  std::list<std::tuple<DesignEntity,std::string>> ret_list = std::list<std::tuple<DesignEntity,std::string>>();
   auto follows_iter = follows_map_.find(stmt);
   if ( follows_iter == follows_map_.end() ) {
     return ret_list;
   }
   else {
-    tuple<DesignEntity,string> follows = follows_iter->second;
+    std::tuple<DesignEntity,std::string> follows = follows_iter->second;
     ret_list.push_back(follows);
     return ret_list;
   }
 }
 
-//list<tuple<DesignEntity,string>> PKB::GetPrevious(string stmt) {
-//    list<tuple<DesignEntity,string>> ret_list = list<tuple<DesignEntity,string>>();
+//std::list<std::tuple<DesignEntity,std::string>> PKB::GetPrevious(std::string stmt) {
+//    std::list<std::tuple<DesignEntity,std::string>> ret_list = std::list<std::tuple<DesignEntity,std::string>>();
 //    auto previous_iter = previous_map_.find(stmt);
-//    tuple<DesignEntity,string> previous = previous_iter->second;
+//    std::tuple<DesignEntity,std::string> previous = previous_iter->second;
 //    ret_list.push_back(previous);
 //    return ret_list;
 //}
 
-list<tuple<DesignEntity,string>> PKB::GetParent(string stmt) {
-  list<tuple<DesignEntity,string>> ret_list = list<tuple<DesignEntity,string>>();
+std::list<std::tuple<DesignEntity,std::string>> PKB::GetParent(std::string stmt) {
+  std::list<std::tuple<DesignEntity,std::string>> ret_list = std::list<std::tuple<DesignEntity,std::string>>();
   auto parent_iter = parent_map_.find(stmt);
   if ( parent_iter == parent_map_.end() ) {
     return ret_list;
   }
   else {
-    list<tuple<DesignEntity,string>> parent = parent_iter->second;
+    std::list<std::tuple<DesignEntity,std::string>> parent = parent_iter->second;
     return parent;
   }
 }
 
-//list<tuple<DesignEntity,string>> PKB::GetChild(string stmt) {
-//    list<tuple<DesignEntity,string>> ret_list = list<tuple<DesignEntity,string>>();
+//std::list<std::tuple<DesignEntity,std::string>> PKB::GetChild(std::string stmt) {
+//    std::list<std::tuple<DesignEntity,std::string>> ret_list = std::list<std::tuple<DesignEntity,std::string>>();
 //    auto child_iter = child_map_.find(stmt);
-//    tuple<DesignEntity,string> child = child_iter->second;
+//    std::tuple<DesignEntity,std::string> child = child_iter->second;
 //    ret_list.push_back(child);
 //    return ret_list;
 //}
 
-void PKB::PopulateProcList(const list<Procedure *>& proc_list) {
-  proc_table_ = list<string>();
+void PKB::PopulateProcList(const std::list<Procedure *>& proc_list) {
+  proc_table_ = std::list<std::string>();
   for (auto const& i : proc_list) {
     auto *pName = const_cast<ProcedureName *>(i->getName());
     proc_table_.push_back(pName->getName());
@@ -120,8 +120,8 @@ void PKB::PopulateProcList(const list<Procedure *>& proc_list) {
   }
 }
 
-void PKB::PopulateVarList(const list<Variable *>& var_list) {
-  var_table_ = list<string>();
+void PKB::PopulateVarList(const std::list<Variable *>& var_list) {
+  var_table_ = std::list<std::string>();
   for (auto const& i : var_list) {
     auto *vName = const_cast<VariableName *>(i->getName());
     var_table_.push_back(vName->getName());
@@ -129,104 +129,104 @@ void PKB::PopulateVarList(const list<Variable *>& var_list) {
   }
 }
 
-void PKB::PopulateConstList(const list<ConstantValue *>& const_list) {
-  const_table_ = list<string>();
+void PKB::PopulateConstList(const std::list<ConstantValue *>& const_list) {
+  const_table_ = std::list<std::string>();
   for (auto const& i : const_list) {
     int cValue = i->get();
-    const_table_.push_back(to_string(cValue));
-    type_map_[to_string(cValue)] = DesignEntity::kConstant;
+    const_table_.push_back(std::to_string(cValue));
+    type_map_[std::to_string(cValue)] = DesignEntity::kConstant;
   }
 }
 
-void PKB::PopulateStmtList(const list<Statement *>& stmt_list) {
-  stmt_table_ = list<string>();
+void PKB::PopulateStmtList(const std::list<Statement *>& stmt_list) {
+  stmt_table_ = std::list<std::string>();
   for (auto const& i : stmt_list) {
     auto *sNumber = const_cast<StatementNumber *>(i->GetStatementNumber());
-    stmt_table_.push_back(to_string(sNumber->getNum()));
+    stmt_table_.push_back(std::to_string(sNumber->getNum()));
   }
 }
 
-void PKB::PopulateIfList(const list<IfEntity *>& if_list) {
-  if_table_ = list<string>();
+void PKB::PopulateIfList(const std::list<IfEntity *>& if_list) {
+  if_table_ = std::list<std::string>();
   for (auto const& i : if_list) {
     auto *sNumber = const_cast<StatementNumber *>(i->GetStatementNumber());
-    if_table_.push_back(to_string(sNumber->getNum()));
-    type_map_[to_string(sNumber->getNum())] = DesignEntity::kIf;
+    if_table_.push_back(std::to_string(sNumber->getNum()));
+    type_map_[std::to_string(sNumber->getNum())] = DesignEntity::kIf;
   }
 }
 
-void PKB::PopulateWhileList(const list<WhileEntity *>& while_list) {
-  while_table_ = list<string>();
+void PKB::PopulateWhileList(const std::list<WhileEntity *>& while_list) {
+  while_table_ = std::list<std::string>();
   for (auto const& i : while_list) {
     auto *sNumber = const_cast<StatementNumber *>(i->GetStatementNumber());
-    while_table_.push_back(to_string(sNumber->getNum()));
-    type_map_[to_string(sNumber->getNum())] = DesignEntity::kWhile;
+    while_table_.push_back(std::to_string(sNumber->getNum()));
+    type_map_[std::to_string(sNumber->getNum())] = DesignEntity::kWhile;
   }
 }
 
-void PKB::PopulateAssignList(const list<AssignEntity *>& assign_list) {
-  assign_table_ = list<string>();
+void PKB::PopulateAssignList(const std::list<AssignEntity *>& assign_list) {
+  assign_table_ = std::list<std::string>();
   for (auto const& i : assign_list) {
     auto *sNumber = const_cast<StatementNumber *>(i->GetStatementNumber());
-    assign_table_.push_back(to_string(sNumber->getNum()));
-    type_map_[to_string(sNumber->getNum())] = DesignEntity::kAssign;
+    assign_table_.push_back(std::to_string(sNumber->getNum()));
+    type_map_[std::to_string(sNumber->getNum())] = DesignEntity::kAssign;
   }
 }
 
-void PKB::PopulateCallList(const list<CallEntity *>& call_list) {
-  call_table_ = list<string>();
+void PKB::PopulateCallList(const std::list<CallEntity *>& call_list) {
+  call_table_ = std::list<std::string>();
   for (auto const& i : call_list) {
     auto *sNumber = const_cast<StatementNumber *>(i->GetStatementNumber());
-    call_table_.push_back(to_string(sNumber->getNum()));
-    type_map_[to_string(sNumber->getNum())] = DesignEntity::kCall;
+    call_table_.push_back(std::to_string(sNumber->getNum()));
+    type_map_[std::to_string(sNumber->getNum())] = DesignEntity::kCall;
   }
 }
 
-void PKB::PopulatePrintList(const list<PrintEntity *>& print_list) {
-  print_table_ = list<string>();
+void PKB::PopulatePrintList(const std::list<PrintEntity *>& print_list) {
+  print_table_ = std::list<std::string>();
   for (auto const& i : print_list) {
     auto *sNumber = const_cast<StatementNumber *>(i->GetStatementNumber());
-    print_table_.push_back(to_string(sNumber->getNum()));
-    type_map_[to_string(sNumber->getNum())] = DesignEntity::kPrint;
+    print_table_.push_back(std::to_string(sNumber->getNum()));
+    type_map_[std::to_string(sNumber->getNum())] = DesignEntity::kPrint;
   }
 }
 
-void PKB::PopulateReadList(const list<ReadEntity *>& read_list) {
-  read_table_ = list<string>();
+void PKB::PopulateReadList(const std::list<ReadEntity *>& read_list) {
+  read_table_ = std::list<std::string>();
   for (auto const& i : read_list) {
     auto *sNumber = const_cast<StatementNumber *>(i->GetStatementNumber());
-    read_table_.push_back(to_string(sNumber->getNum()));
-    type_map_[to_string(sNumber->getNum())] = DesignEntity::kRead;
+    read_table_.push_back(std::to_string(sNumber->getNum()));
+    type_map_[std::to_string(sNumber->getNum())] = DesignEntity::kRead;
   }
 }
 
 void PKB::PopulateFollowsMap(std::unordered_map<Statement*, Statement*> follow_hash) {
-  for (pair<Statement *, Statement *> kv : follow_hash)
+  for (std::pair<Statement *, Statement *> kv : follow_hash)
   {
     auto *kNumber = const_cast<StatementNumber *>(kv.first->GetStatementNumber());
-    string kString = to_string(kNumber->getNum());
+    std::string kString = std::to_string(kNumber->getNum());
     auto *vNumber = const_cast<StatementNumber *>(kv.second->GetStatementNumber());
-    string vString = to_string(vNumber->getNum());
+    std::string vString = std::to_string(vNumber->getNum());
     DesignEntity vType = type_map_.find(vString)->second;
-    tuple<DesignEntity,string> result = make_tuple(vType, vString);
+    std::tuple<DesignEntity,std::string> result = make_tuple(vType, vString);
     follows_map_[kString] = result;
   }
 }
 
 void PKB::PopulateParentMap(std::unordered_map<Statement*, std::list<Statement*>*> parent_hash) {
-  for (pair<Statement *, list<Statement *>*> kv : parent_hash)
+  for (std::pair<Statement *, std::list<Statement *>*> kv : parent_hash)
   {
     auto *kNumber = const_cast<StatementNumber *>(kv.first->GetStatementNumber());
-    string kString = to_string(kNumber->getNum());
-    auto result = list<tuple<DesignEntity,string>>();
+    std::string kString = std::to_string(kNumber->getNum());
+    auto result = std::list<std::tuple<DesignEntity,std::string>>();
 
-    list<Statement *> *children = kv.second;
+    std::list<Statement *> *children = kv.second;
 
-    string cString;
+    std::string cString;
 
     for (Statement *child : *children) {
-      cString = to_string(child->GetStatementNumber()->getNum());
-      tuple<DesignEntity,string> entity = make_tuple(type_map_[cString], cString);
+      cString = std::to_string(child->GetStatementNumber()->getNum());
+      std::tuple<DesignEntity,std::string> entity = make_tuple(type_map_[cString], cString);
       result.push_back(entity);
     }
 
@@ -235,27 +235,27 @@ void PKB::PopulateParentMap(std::unordered_map<Statement*, std::list<Statement*>
 }
 
 //void PKB::PopulateUseMap(const unordered_map<Statement *, Entity *>& use_hash) {
-//    for (pair<Statement *, Entity *> kv : use_hash)
+//    for (std::pair<Statement *, Entity *> kv : use_hash)
 //    {
 //        auto *kNumber = const_cast<StatementNumber *>(kv.first->GetStatementNumber());
-//        string kString = to_string(kNumber->getNum());
+//        std::string kString = std::to_string(kNumber->getNum());
 //        Variable* var = dynamic_cast<Variable*>(kv.second);
 //        VariableName* vName = const_cast<VariableName *>(var->getName());
-//        string vString = vName->getName();
-//        tuple<DesignEntity,string> result = make_tuple(DesignEntity::kVariable, vString);
+//        std::string vString = vName->getName();
+//        std::tuple<DesignEntity,std::string> result = make_tuple(DesignEntity::kVariable, vString);
 //        use_map_[kString] = result;
 //    }
 //}
 
 //void PKB::PopulateModifiesMap(const unordered_map<Statement *, Entity *>& modifies_hash) {
-//    for (pair<Statement *, Entity *> kv : modifies_hash)
+//    for (std::pair<Statement *, Entity *> kv : modifies_hash)
 //    {
 //        auto *kNumber = const_cast<StatementNumber *>(kv.first->GetStatementNumber());
-//        string kString = to_string(kNumber->getNum());
+//        std::string kString = std::to_string(kNumber->getNum());
 //        Variable* var = dynamic_cast<Variable*>(kv.second);
 //        VariableName* vName = const_cast<VariableName *>(var->getName());
-//        string vString = vName->getName();
-//        tuple<DesignEntity,string> result = make_tuple(DesignEntity::kVariable, vString);
+//        std::string vString = vName->getName();
+//        std::tuple<DesignEntity,std::string> result = make_tuple(DesignEntity::kVariable, vString);
 //        modifies_map_[kString] = result;
 //    }
 //}
