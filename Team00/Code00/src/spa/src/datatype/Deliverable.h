@@ -24,8 +24,10 @@ class Deliverable {
 
   void AddFollowRelationship(Statement* f1, Statement* f2);
   void AddParentRelationship(Statement* p1, Statement* p2);
-  //TODO: Add uses / modifies hashmaps functions
-
+  void AddUsesRelationship(Statement* u1, Variable* u2);
+  void AddUsesRelationship(Container* u1, Variable* u2);
+  void AddModifiesRelationship(Statement* m1, Variable* m2);
+  void AddModifiesRelationship(Container* m1, Variable* m2);
 
   std::list<Procedure*>* GetProcList();
   std::list<Variable*>* GetVariableList();
@@ -50,8 +52,10 @@ class Deliverable {
   // RelationshipTables
   std::unordered_map<Statement*, Statement*> follow_hash_;
   std::unordered_map<Statement*, std::list<Statement*>*> parent_hash_;
-  std::unordered_map<Statement*, std::list<Statement*>*> use_hash_;
-  std::unordered_map<Statement*, Statement*> modifies_hash_;
+  std::unordered_map<Statement*, std::list<Variable*>*> use_hash_; //to store Uses(x,_), where x is stmt
+  std::unordered_map<Container*, std::list<Variable*>*> container_use_hash_; //to store Uses(x,_), where x is if, while, procedure
+  std::unordered_map<Statement*, std::list<Variable*>*> modifies_hash_; //to store Modifies(x,_), where x is stmt
+  std::unordered_map<Container*, std::list<Variable*>*> container_modifies_hash_; //to store Modifies(x,_), where x is if, while, procedure
 
 };
 

@@ -162,18 +162,30 @@ void PSubsystem::HandleWhileStmt(WhileEntity* while_entity) {
 
 void PSubsystem::HandleAssignStmt(AssignEntity* assign_entity) {
   deliverable_->AddAssignEntity(assign_entity);
+  deliverable_->AddModifiesRelationship(assign_entity, assign_entity->getVariable());
+  deliverable_->AddModifiesRelationship(current_node_, assign_entity->getVariable());  //container level
+
+  for (Variable* v : assign_entity->GetExpressionVariables()) {
+    deliverable_->AddUsesRelationship(assign_entity, v);
+    deliverable_->AddUsesRelationship(current_node_, v);   //container level
+  }
 }
 
 void PSubsystem::HandleCallStmt(CallEntity* call_entity) {
   deliverable_->AddCallEntity(call_entity);
+  //TODO: cater for cross procedure call modifies and uses
 }
 
 void PSubsystem::HandlePrintStmt(PrintEntity* print_entity) {
   deliverable_->AddPrintEntity(print_entity);
+  deliverable_->AddUsesRelationship(print_entity, print_entity->getVariable());
+  deliverable_->AddUsesRelationship(current_node_, print_entity->getVariable());   //container level
 }
 
 void PSubsystem::HandleReadStmt(ReadEntity* read_entity) {
   deliverable_->AddReadEntity(read_entity);
+  deliverable_->AddModifiesRelationship(read_entity, read_entity->getVariable());
+  deliverable_->AddModifiesRelationship(current_node_, read_entity->getVariable());  //container level
 }
 
 Deliverable* PSubsystem::GetDeliverables() {
