@@ -3,6 +3,9 @@
 #include "catch.hpp"
 #include "component/SourceProcessor/EntityFactory.h"
 
+using std::string;
+using std::vector;
+
 TEST_CASE("1.EntityFactory.CreateEntities") {
   std::list<Procedure*> proc_list;
   std::list<Variable*> var_list;

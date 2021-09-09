@@ -9,7 +9,6 @@
 #ifndef AUTOTESTER_DATATYPE_H
 #define AUTOTESTER_DATATYPE_H
 
-using namespace std;
 bool ValidateName(std::string name);
 
 /**
@@ -135,15 +134,15 @@ enum class TokenTag {
  */
 class Token {
  private:
-  string token_string_;
+  std::string token_string_;
   TokenTag token_tag_;
 
  public:
-  string GetTokenString();
-  Token(string token_string, TokenTag token_tag);
+  std::string GetTokenString();
+  Token(std::string token_string, TokenTag token_tag);
   [[nodiscard]] TokenTag GetTokenTag() const;
   bool operator==(Token other);
-  static TokenTag TagStringWithToken(string const& reference);
+  static TokenTag TagStringWithToken(std::string const& reference);
   static bool IsKeywordToken(Token token);
 };
 

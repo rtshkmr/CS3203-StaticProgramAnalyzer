@@ -36,7 +36,7 @@ void Deliverable::AddParentRelationship(Statement* p1, Statement* p2) {
   if (parent_hash_.count(p1)) {
     parent_hash_.find(p1)->second->push_back(p2);
   } else {
-    std::list<Statement*>* lst = new list<Statement*>();
+    std::list<Statement*>* lst = new std::list<Statement*>();
     lst->push_back(p2);
     parent_hash_.insert(make_pair(p1, lst));
   }
@@ -46,7 +46,7 @@ void Deliverable::AddUsesRelationship(Statement* u1, Variable* u2) {
   if (use_hash_.count(u1)) {
     use_hash_.find(u1)->second->push_back(u2);
   } else {
-    std::list<Variable*>* lst = new list<Variable*>();
+    std::list<Variable*>* lst = new std::list<Variable*>();
     lst->push_back(u2);
     use_hash_.insert(make_pair(u1, lst));
   }
@@ -56,7 +56,7 @@ void Deliverable::AddUsesRelationship(Container* u1, Variable* u2) {
   if (container_use_hash_.count(u1)) {
     container_use_hash_.find(u1)->second->push_back(u2);
   } else {
-    std::list<Variable*>* lst = new list<Variable*>();
+    std::list<Variable*>* lst = new std::list<Variable*>();
     lst->push_back(u2);
     container_use_hash_.insert(make_pair(u1, lst));
   }
@@ -66,7 +66,7 @@ void Deliverable::AddModifiesRelationship(Statement* m1, Variable* m2) {
   if (modifies_hash_.count(m1)) {
     modifies_hash_.find(m1)->second->push_back(m2);
   } else {
-    std::list<Variable*>* lst = new list<Variable*>();
+    std::list<Variable*>* lst = new std::list<Variable*>();
     lst->push_back(m2);
     modifies_hash_.insert(make_pair(m1, lst));
   }
@@ -76,7 +76,7 @@ void Deliverable::AddModifiesRelationship(Container* m1, Variable* m2) {
   if (container_modifies_hash_.count(m1)) {
     container_modifies_hash_.find(m1)->second->push_back(m2);
   } else {
-    std::list<Variable*>* lst = new list<Variable*>();
+    std::list<Variable*>* lst = new std::list<Variable*>();
     lst->push_back(m2);
     container_modifies_hash_.insert(make_pair(m1, lst));
   }

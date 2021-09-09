@@ -239,7 +239,7 @@ std::string Token::GetTokenString() {
   return this->token_string_;
 }
 
-Token::Token(string token_string, TokenTag token_tag) :
+Token::Token(std::string token_string, TokenTag token_tag) :
     token_tag_(token_tag) {
   token_string_ = std::move(token_string);
 }
@@ -275,15 +275,15 @@ bool Token::IsKeywordToken(Token token) {
  * @param reference  a string that will be tagged
  * @return a TokenTag enum object
  */
-TokenTag Token::TagStringWithToken(const string& reference) {
+TokenTag Token::TagStringWithToken(const std::string& reference) {
 
-  regex fixed_keyword_pat = RegexPatterns::GetFixedKeywordPattern();
-  regex fixed_char_pat = RegexPatterns::GetFixedCharPattern();
-  regex binary_arithmetic_operator_pat = RegexPatterns::GetBinaryArithmeticOperatorPattern();
-  regex binary_comparison_operator_pat = RegexPatterns::GetBinaryComparisonPattern();
-  regex boolean_operator_pat = RegexPatterns::GetBooleanOperatorPattern();
-  regex name_pat = RegexPatterns::GetNamePattern();
-  regex integer_pat = RegexPatterns::GetIntegerPattern();
+  std::regex fixed_keyword_pat = RegexPatterns::GetFixedKeywordPattern();
+  std::regex fixed_char_pat = RegexPatterns::GetFixedCharPattern();
+  std::regex binary_arithmetic_operator_pat = RegexPatterns::GetBinaryArithmeticOperatorPattern();
+  std::regex binary_comparison_operator_pat = RegexPatterns::GetBinaryComparisonPattern();
+  std::regex boolean_operator_pat = RegexPatterns::GetBooleanOperatorPattern();
+  std::regex name_pat = RegexPatterns::GetNamePattern();
+  std::regex integer_pat = RegexPatterns::GetIntegerPattern();
 
   if (regex_match(reference, fixed_keyword_pat)) {
     if (reference == "procedure") {

@@ -26,19 +26,19 @@ class ElseEntity;
 class IfEntity : public Statement, public Container {
  private:
   ConditionalExpression* cond_expr_;
-  vector<Variable*> expr_variables;
-  vector<ConstantValue*> expr_constants;
+  std::vector<Variable*> expr_variables;
+  std::vector<ConstantValue*> expr_constants;
   std::list<Statement*> if_stmt_list_;
   ElseEntity* else_stmt_list_; //TODO: check if keeping ELSE as object or merge ELSE object into IF object
 
  public:
-  IfEntity(std::string condition, vector<Variable*> expr_variables, vector<ConstantValue*> expr_constants);
+  IfEntity(std::string condition, std::vector<Variable*> expr_variables, std::vector<ConstantValue*> expr_constants);
 
   ConditionalExpression* getCondExpr();
 
-  vector<Variable*> GetExpressionVariables();
+  std::vector<Variable*> GetExpressionVariables();
 
-  vector<ConstantValue*> GetExpressionConstants();
+  std::vector<ConstantValue*> GetExpressionConstants();
 
   std::list<Statement*>* GetStatementList();
 
@@ -74,10 +74,10 @@ class WhileEntity : public Statement, public Container {
  private:
   ConditionalExpression* cond_expr_;
   std::list<Statement*> stmt_list_;
-  vector<Variable*> expr_variables;
-  vector<ConstantValue*> expr_constants;
+  std::vector<Variable*> expr_variables;
+  std::vector<ConstantValue*> expr_constants;
  public:
-  WhileEntity(std::string condition, vector<Variable*> expr_variables, vector<ConstantValue*> expr_constants);
+  WhileEntity(std::string condition, std::vector<Variable*> expr_variables, std::vector<ConstantValue*> expr_constants);
 
   ConditionalExpression* getCondExpr();
 
@@ -85,9 +85,9 @@ class WhileEntity : public Statement, public Container {
 
   void AddStatement(Statement* stmt);
 
-  vector<Variable*> GetExpressionVariables();
+  std::vector<Variable*> GetExpressionVariables();
 
-  vector<ConstantValue*> GetExpressionConstants();
+  std::vector<ConstantValue*> GetExpressionConstants();
 };
 
 /**
@@ -101,21 +101,21 @@ class AssignEntity : public Statement {
  private:
   Variable* assigned_to_;
   AssignmentExpression* expr_;
-  vector<Variable*> expr_variables;
-  vector<ConstantValue*> expr_constants;
+  std::vector<Variable*> expr_variables;
+  std::vector<ConstantValue*> expr_constants;
  public:
   AssignEntity(Variable* var,
                std::string expression,
-               vector<Variable*> expr_variables,
-               vector<ConstantValue*> expr_constants);
+               std::vector<Variable*> expr_variables,
+               std::vector<ConstantValue*> expr_constants);
 
   Variable* getVariable();
 
   AssignmentExpression* getAssignmentExpr();
 
-  vector<Variable*> GetExpressionVariables();
+  std::vector<Variable*> GetExpressionVariables();
 
-  vector<ConstantValue*> GetExpressionConstants();
+  std::vector<ConstantValue*> GetExpressionConstants();
 };
 
 /**
