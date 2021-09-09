@@ -10,6 +10,7 @@ std::regex RegexPatterns::GetFixedCharPattern() {
   return std::regex(R"(\{|\}|;|\(|\))");
 }
 std::regex RegexPatterns::GetBinaryArithmeticOperatorPattern() {
+
   return std::regex(R"(\+|\-|\*|\/|%|=)");
 }
 
@@ -17,7 +18,6 @@ std::regex RegexPatterns::GetBinaryComparisonPattern() {
   return std::regex(R"(==|>|>=|<|<=|!=)");
 }
 
-// todo: add binary boolean operators
 std::regex RegexPatterns::GetBooleanOperatorPattern() {
   return std::regex(R"(&&|\|\||!)");
   // todo: check if ! is a regex metacharacter
@@ -29,3 +29,7 @@ std::regex RegexPatterns::GetNamePattern() {
 std::regex RegexPatterns::GetIntegerPattern() {
   return std::regex(R"([0-9]+)");
 }
+std::regex RegexPatterns::GetDesignEntityPattern() {
+  return std::regex(R"(stmt|read|print|call|while|if|assign|variable|constant|procedure)");
+};
+

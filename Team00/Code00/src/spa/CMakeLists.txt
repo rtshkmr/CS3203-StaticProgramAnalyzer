@@ -13,6 +13,7 @@ add_library(spa ${srcs} ${headers}
         src/datatype/Identifier.cpp
         src/datatype/Identifier.h src/datatype/Deliverable.cpp
         src/datatype/Deliverable.h
+        src/datatype/RegexPatterns.h src/datatype/RegexPatterns.cpp
         src/component/SourceProcessor/SourceProcessor.cpp
         src/component/SourceProcessor/SourceProcessor.h
         src/component/SourceProcessor/Parser.cpp
@@ -20,9 +21,19 @@ add_library(spa ${srcs} ${headers}
         src/component/SourceProcessor/PSubsystem.cpp
         src/component/SourceProcessor/PSubsystem.h
         src/component/SourceProcessor/DesignExtractor.cpp
+        src/component/SourceProcessor/Parser.h src/component/SourceProcessor/Parser.cpp
         src/component/SourceProcessor/DesignExtractor.h
-        src/datatype/RegexPatterns.cpp src/datatype/RegexPatterns.h)
+        src/component/QueryProcessor/types/Exceptions.h
+        src/component/QueryProcessor/types/Types.h src/component/QueryProcessor/types/Types.cpp
+        src/component/QueryProcessor/QueryExtractor/QueryTokenizer.h src/component/QueryProcessor/QueryExtractor/QueryTokenizer.cpp
+        src/component/QueryProcessor/QueryExtractor/QueryParser.h src/component/QueryProcessor/QueryExtractor/QueryParser.cpp
+        src/component/QueryProcessor/QueryExtractor/QueryExtractor.h src/component/QueryProcessor/QueryExtractor/QueryExtractor.cpp
+        src/component/QueryProcessor/QueryEvaluator.h src/component/QueryProcessor/QueryEvaluator.cpp
+        src/component/QueryProcessor/QueryProjector.h src/component/QueryProcessor/QueryProjector.cpp
+        src/component/QueryProcessor/types/QueryEvaluatorTable.h src/component/QueryProcessor/types/QueryEvaluatorTable.cpp
+        )
+  
 # this makes the headers accessible for other projects which uses spa lib
 target_include_directories(spa PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-
+SET(CMAKE_BUILD_TYPE Debug)

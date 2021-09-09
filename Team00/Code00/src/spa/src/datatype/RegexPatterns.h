@@ -15,6 +15,7 @@ class RegexPatterns {
   static std::regex GetBinaryComparisonPattern();
   static std::regex GetNamePattern();
   static std::regex GetIntegerPattern();
+  static std::regex GetDesignEntityPattern();
   static std::regex GetBooleanOperatorPattern();
 };
 
