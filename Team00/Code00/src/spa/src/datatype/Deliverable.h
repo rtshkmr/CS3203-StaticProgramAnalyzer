@@ -42,7 +42,6 @@ class Deliverable {
   std::list<PrintEntity*>* GetPrintList();
   std::list<ReadEntity*>* GetReadList();
 
- private:
   //root-node of AST
   Program* program_;
 
