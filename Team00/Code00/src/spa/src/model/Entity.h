@@ -35,6 +35,7 @@ class Statement : public Entity {
   void SetParentNode(Container* parent);
   void SetBeforeNode(Statement* before);
   Container* GetParentNode();
+  StatementNumber* GetStatementNumber();
 };
 
 /**

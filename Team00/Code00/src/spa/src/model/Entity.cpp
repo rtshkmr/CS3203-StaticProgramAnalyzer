@@ -56,3 +56,7 @@ void Statement::SetBeforeNode(Statement* before) {
 Container* Statement::GetParentNode() {
   return parent_node_;
 }
+
+StatementNumber* Statement::GetStatementNumber() {
+  return statement_number_;
+}
