@@ -3,10 +3,13 @@
  * Any data types used in this program should be immutable by default.
  */
 
+#include <regex>
 #include "string"
 
 #ifndef AUTOTESTER_DATATYPE_H
 #define AUTOTESTER_DATATYPE_H
+
+bool ValidateName(std::string name);
 
 /**
  * StatementNumber refers to the numbering of statements (program counter).
@@ -21,6 +24,10 @@ class StatementNumber {
   StatementNumber(int sn);
 
   int getNum();
+
+  bool operator<(const StatementNumber &other) const;
+
+  bool operator==(StatementNumber other) const;
 };
 
 /**
@@ -36,6 +43,10 @@ class LineNumber {
   LineNumber(int ln);
 
   int getNum();
+
+  bool operator<(const LineNumber &other) const;
+
+  bool operator==(LineNumber other) const;
 };
 
 /**
@@ -50,6 +61,10 @@ class ProcedureName {
   ProcedureName(std::string pName);
 
   std::string getName();
+
+  bool operator<(const ProcedureName &other) const;
+
+  bool operator==(ProcedureName other) const;
 };
 
 /**
@@ -64,6 +79,10 @@ class VariableName {
   VariableName(std::string vName);
 
   std::string getName();
+
+  bool operator<(const VariableName &other) const;
+
+  bool operator==(VariableName other) const;
 };
 
 /**
@@ -80,19 +99,34 @@ class ConstantValue {
   ConstantValue(std::string constant);
 
   int get();
+
+  bool operator<(const ConstantValue &other) const;
+
+  bool operator==(ConstantValue other) const;
 };
 
 enum class TokenTag {
-  // todo: add fixed set of tags for token from the Concrete Grammar
-  //       these tags will determine the rule-set that is used by the CGV to validate syntax
   kInteger,
-  kDigit,
-  kLetter,
+  kProcedureKeyword,
+  kIfKeyword,
+  kThenKeyword,
+  kElseKeyword,
+  kReadKeyword,
+  kPrintKeyword,
+  kCallKeyword,
+  kWhileKeyword,
   kName,
-  kMetaSymbol,
-  kOpenBrace,
+  kBinaryArithmeticOperator, //  for binary math operations (=, +, -...)
+  kBinaryComparisonOperator,
+  kBooleanOperator, // &&, ||, ...
+  kAssignmentOperator,
+  kOpenBrace, // for containers procName{...}
   kCloseBrace,
-  };
+  kOpenBracket,  // for if() and while()
+  kCloseBracket,
+  kSemicolon, // statement terminator
+  kInvalid,
+};
 
 /**
  * A Lexical Token represents a discrete unit within a particular source statement. It contains a string pointer to
@@ -100,10 +134,16 @@ enum class TokenTag {
  */
 class Token {
  private:
-  std::string* token_string_;
+  std::string token_string_;
   TokenTag token_tag_;
+
  public:
-  explicit Token(const std::string* token_string, TokenTag token_tag);
+  std::string GetTokenString();
+  Token(std::string token_string, TokenTag token_tag);
+  [[nodiscard]] TokenTag GetTokenTag() const;
+  bool operator==(Token other);
+  static TokenTag TagStringWithToken(std::string const& reference);
+  static bool IsKeywordToken(Token token);
 };
 
 #endif //AUTOTESTER_DATATYPE_H

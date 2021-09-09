@@ -23,20 +23,28 @@ class ElseEntity;
  *   -  A list of Statement to execute when the above condition is true.
  *   -  An ElseEntity object which contains the statements to execute if the conditional expression evaluates to false.
  */
-class IfEntity : public Statement {
+class IfEntity : public Statement, public Container {
  private:
   ConditionalExpression* cond_expr_;
-  std::vector<Statement> if_stmt_list_;
+  std::vector<Variable*> expr_variables;
+  std::vector<ConstantValue*> expr_constants;
+  std::list<Statement*> if_stmt_list_;
   ElseEntity* else_stmt_list_; //TODO: check if keeping ELSE as object or merge ELSE object into IF object
 
  public:
-  IfEntity(std::string condition);
+  IfEntity(std::string condition, std::vector<Variable*> expr_variables, std::vector<ConstantValue*> expr_constants);
 
   ConditionalExpression* getCondExpr();
 
-  std::vector<Statement>* getIfStmtList();
+  std::vector<Variable*> GetExpressionVariables();
 
-  std::vector<Statement>* getElseStmtList();
+  std::vector<ConstantValue*> GetExpressionConstants();
+
+  std::list<Statement*>* GetStatementList();
+
+  void AddStatement(Statement* stmt);
+
+  std::list<Statement*>* getElseStmtList();
 
   bool setElseStmtList(ElseEntity* else_stmt);
 };
@@ -44,13 +52,15 @@ class IfEntity : public Statement {
 /**
  * ElseEntity is a derived class of Statement and a composition object of IfEntity object.
  */
-class ElseEntity : public Statement {
+class ElseEntity : public Statement, public Container {
  private:
-  std::vector<Statement> else_stmt_list_;
+  std::list<Statement*> else_stmt_list_;
  public:
   ElseEntity();
 
-  std::vector<Statement>* getElseStmtList();
+  std::list<Statement*>* GetStatementList();
+
+  void AddStatement(Statement* stmt);
 };
 
 /**
@@ -60,17 +70,24 @@ class ElseEntity : public Statement {
  *   -  ConditionalExpression which is the conditional expression for the if-statement.
  *   -  A list of Statement to execute when the above condition is true.
  */
-class WhileEntity : public Statement {
+class WhileEntity : public Statement, public Container {
  private:
   ConditionalExpression* cond_expr_;
-  std::vector<Statement> stmt_list_;
+  std::list<Statement*> stmt_list_;
+  std::vector<Variable*> expr_variables;
+  std::vector<ConstantValue*> expr_constants;
  public:
-  WhileEntity(std::string condition);
+  WhileEntity(std::string condition, std::vector<Variable*> expr_variables, std::vector<ConstantValue*> expr_constants);
 
   ConditionalExpression* getCondExpr();
 
-  std::vector<Statement>* getStmtList();
+  std::list<Statement*>* GetStatementList();
 
+  void AddStatement(Statement* stmt);
+
+  std::vector<Variable*> GetExpressionVariables();
+
+  std::vector<ConstantValue*> GetExpressionConstants();
 };
 
 /**
@@ -84,12 +101,21 @@ class AssignEntity : public Statement {
  private:
   Variable* assigned_to_;
   AssignmentExpression* expr_;
+  std::vector<Variable*> expr_variables;
+  std::vector<ConstantValue*> expr_constants;
  public:
-  AssignEntity(Variable* var, std::string expression);
+  AssignEntity(Variable* var,
+               std::string expression,
+               std::vector<Variable*> expr_variables,
+               std::vector<ConstantValue*> expr_constants);
 
   Variable* getVariable();
 
   AssignmentExpression* getAssignmentExpr();
+
+  std::vector<Variable*> GetExpressionVariables();
+
+  std::vector<ConstantValue*> GetExpressionConstants();
 };
 
 /**

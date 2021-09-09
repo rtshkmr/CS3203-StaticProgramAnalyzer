@@ -15,6 +15,6 @@ void SourceProcessor::ProcessSourceFile(std::string file_name) {
     parser.Parse(file_name);
     parser.GetDeliverables();
     de::DesignExtractor design_extractor;
-    design_extractor.extractDesignAbstractions();
+    design_extractor.ExtractDesignAbstractions();
     // pkb.PopulateDataStructures();
 }

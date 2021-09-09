@@ -23,3 +23,7 @@ std::string ConditionalExpression::ParseExpression(std::string inExpression) {
   //TODO: logic for parsing expression.
   return inExpression;
 }
+
+std::string ConditionalExpression::GetExpressionString() {
+  return expression_;
+}

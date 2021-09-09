@@ -3,6 +3,8 @@
 
 #include "catch.hpp"
 
+#include <iostream>
+
 using namespace std;
 
 void require(bool b) {
@@ -10,11 +12,8 @@ void require(bool b) {
 }
 
 TEST_CASE("1st Test") {
-
     TNode T;
-
-
-    require(1 == 1);
+   require(1 == 1);
 }
 
 

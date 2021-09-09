@@ -15,7 +15,7 @@ namespace de {
     public:
         DesignExtractor() = default;
 
-        void extractDesignAbstractions();
+        void ExtractDesignAbstractions();
     };
 }
 
