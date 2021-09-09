@@ -27,8 +27,8 @@ class PSubsystem {
   bool valid_state = true;
   Container* current_node_;
   int current_node_type_ = -1; // -1 => no current node; 0 = procedure; 1 = while; 2 = if; 3 = else;
-  stack<Container*> parent_stack_;
-  stack<Statement*> follow_stack_;
+  std::stack<Container*> parent_stack_;
+  std::stack<Statement*> follow_stack_;
   int program_counter_ = 0;
 
   // private methods for selfcall

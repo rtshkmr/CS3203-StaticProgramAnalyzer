@@ -4,6 +4,9 @@
 
 #include "Statement.h"
 
+using std::string;
+using std::vector;
+
 IfEntity::IfEntity(std::string condition, vector<Variable*> expr_variables, vector<ConstantValue*> expr_constants) {
   cond_expr_ = new ConditionalExpression(condition);
   this->expr_variables = std::move(expr_variables);

@@ -9,17 +9,18 @@
 #include <vector>
 #include <string>
 #include <datatype/DataType.h>
-using namespace std;
 
 class Tokenizer {
  public:
-  static vector<Token> CreateTokens(const string& statement_string);
+  static std::vector<Token> CreateTokens(const std::string &statement_string);
  private:
-  static Token* CreateToken(string string_token);
-  static vector<string> SplitString(const string& delimiter, const string& input, bool retain_delimiter);
-  static vector<string> SplitSubTokenStrings(string& string_token);
-  static bool IsSpecialDelimiter(string& test_string);
-  static bool IsWhiteSpace(string& test_string);
+  static Token* CreateToken(std::string string_token);
+  static std::vector<std::string> SplitString(const std::string &delimiter,
+                                              const std::string &input,
+                                              bool retain_delimiter);
+  static std::vector<std::string> SplitSubTokenStrings(std::string &string_token);
+  static bool IsSpecialDelimiter(std::string &test_string);
+  static bool IsWhiteSpace(std::string &test_string);
 };
 
 #endif //AUTOTESTER_TEAM00_CODE00_SRC_SPA_SRC_COMPONENT_SOURCEPROCESSOR_TOKENIZER_H_

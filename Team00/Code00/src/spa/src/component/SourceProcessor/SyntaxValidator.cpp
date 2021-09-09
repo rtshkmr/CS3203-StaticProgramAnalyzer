@@ -6,6 +6,9 @@
 #include "SyntaxValidator.h"
 #include <cassert>
 
+using std::string;
+using std::vector;
+
 SyntaxValidator::SyntaxValidator() = default;
 
 /**

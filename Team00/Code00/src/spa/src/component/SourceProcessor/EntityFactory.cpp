@@ -5,6 +5,9 @@
 #include "EntityFactory.h"
 #include "model/Statement.h"
 
+using std::string;
+using std::vector;
+
 EntityFactory::EntityFactory(std::list<Procedure*>* proc_list,
                              std::list<Variable*>* var_list,
                              std::list<ConstantValue*>* const_list) {

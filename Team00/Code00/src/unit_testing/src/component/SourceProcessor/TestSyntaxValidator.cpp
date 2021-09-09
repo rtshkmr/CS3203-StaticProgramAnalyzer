@@ -5,6 +5,9 @@
 #include <component/SourceProcessor/SyntaxValidator.h>
 #include <regex>
 
+using std::string;
+using std::vector;
+
 static vector<string> valid_program_lines = {
     // procedure:
     R"(procedure         Week4{)", // idx 0
