@@ -66,20 +66,30 @@ TEST_CASE("PKB population and retrieval") {
         SECTION("Statement") {
             std::list<std::string> stmt_list{"1", "2", "3", "4"};
             REQUIRE(stmt_list == pkb.GetDesignEntity(DesignEntity::kStmt));
-        }SECTION("Assign") {
+        }
+
+        SECTION("Assign") {
             std::list<std::string> assign_list{"1"};
             REQUIRE(assign_list == pkb.GetDesignEntity(DesignEntity::kAssign));
-        }SECTION("Call") {
+        }
+
+        SECTION("Call") {
             std::list<std::string> call_list{"2"};
             REQUIRE(call_list == pkb.GetDesignEntity(DesignEntity::kCall));
-        }SECTION("Print") {
+        }
+
+        SECTION("Print") {
             std::list<std::string> print_list{"3"};
             REQUIRE(print_list == pkb.GetDesignEntity(DesignEntity::kPrint));
-        }SECTION("Read") {
+        }
+
+        SECTION("Read") {
             std::list<std::string> read_list{"4"};
             REQUIRE(read_list == pkb.GetDesignEntity(DesignEntity::kRead));
         }
-    }SECTION("Get Relationship") {
+    }
+
+    SECTION("Get Relationship") {
         SECTION("Follows") {
             std::list<std::tuple<DesignEntity, std::string>> follows_list{std::make_tuple(DesignEntity::kCall, "2")};
             REQUIRE(follows_list == pkb.GetFollows("1"));
