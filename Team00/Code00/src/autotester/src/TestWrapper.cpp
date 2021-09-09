@@ -30,7 +30,7 @@ void TestWrapper::evaluate(std::string query, std::list<std::string>& results){
   auto query_extractor = new QueryExtractor(&query);
   try {
     query_extractor->ExtractQuery();
-  } catch (const runtime_error& error) {
+  } catch (const std::runtime_error& error) {
     // cerr << error.what()<< endl;
     return;
   }
