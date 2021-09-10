@@ -21,10 +21,6 @@ class AssignmentExpression {
   bool CheckExist(std::string pattern);
 
   bool CheckExact(std::string pattern);
-
-  bool CheckBefore(std::string pattern);
-
-  bool CheckAfter(std::string pattern);
 };
 
 #endif //AUTOTESTER_ASSIGNMENTEXPRESSION_H

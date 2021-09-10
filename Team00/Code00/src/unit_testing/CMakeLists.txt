@@ -10,6 +10,6 @@ add_executable(unit_testing ${srcs}
         utils/TestUtils.cpp utils/TestUtils.h
         utils/TestUtils.cpp src/datatype/TestDataType.cpp
         src/component/SourceProcessor/TestPsubsystem.cpp
-        src/component/PKB/TestPKB.cpp)
+        src/component/PKB/TestPKB.cpp src/datatype/TestAssignmentExpression.cpp)
 target_link_libraries(unit_testing spa)
 SET(CMAKE_BUILD_TYPE Debug)
