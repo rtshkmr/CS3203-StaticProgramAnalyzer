@@ -8,13 +8,13 @@
 TEST_CASE("Source processing to PKB retrieval") {
 
 //    std::ifstream source_file ("./Team00/Code00/tests/basic_source.txt");
-    std::ifstream source_file ("../../../tests/basic_source.txt");
+//    std::ifstream source_file ("../../../tests/basic_source.txt");
 
-    REQUIRE(source_file.good());
+//    REQUIRE(source_file.good());
 
     par::Parser parser;
-//    parser.Parse("./Team00/Code00/tests/basic_source.txt");
-    parser.Parse("../../../tests/basic_source.txt");
+    parser.Parse("./Team00/Code00/tests/basic_source.txt"); // Uncomment this when pushing / Comment on local
+//    parser.Parse("../../../tests/basic_source.txt"); // Comment this when pushing / Uncomment on local
     Deliverable deliverable = parser.GetDeliverables();
     de::DesignExtractor design_extractor;
     design_extractor.ExtractDesignAbstractions();
