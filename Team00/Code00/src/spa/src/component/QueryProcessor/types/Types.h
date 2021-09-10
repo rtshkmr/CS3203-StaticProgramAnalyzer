@@ -72,24 +72,22 @@ class Synonym {
     DesignEntity GetType() { return type; };
 };
 
-class Clause {
-  public:
+struct Clause {
   std::string left_hand_side;
   std::string right_hand_side;
+  virtual ~Clause() {}
 };
 
-class SuchThat : public Clause {
-  public:
-    RelRef rel_ref;
-    bool left_is_synonym;
-    bool right_is_synonym;
+struct SuchThat : Clause {
+  RelRef rel_ref;
+  bool left_is_synonym;
+  bool right_is_synonym;
 };
 
-class Pattern : public Clause {
-  public:
-    std::string assign_synonym;
-    bool left_is_synonym;
-    bool is_exact;
+struct Pattern : Clause {
+  std::string assign_synonym;
+  bool left_is_synonym;
+  bool is_exact;
 };
 
 class Group {
