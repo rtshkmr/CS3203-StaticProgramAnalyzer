@@ -3,8 +3,13 @@
 #include "component/SourceProcessor/Parser.h"
 #include "component/SourceProcessor/DesignExtractor.h"
 #include "component/PKB/PKB.h"
+#include <fstream>
 
 TEST_CASE("Source processing to PKB retrieval") {
+
+    std::ifstream source_file ("../../../tests/basic_source.txt");
+
+    REQUIRE(source_file.good());
 
     par::Parser parser;
     parser.Parse("../../../tests/basic_source.txt");
