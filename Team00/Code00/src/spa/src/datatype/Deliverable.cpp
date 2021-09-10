@@ -30,6 +30,7 @@ void Deliverable::AddReadEntity(ReadEntity* read_entity) {
 
 void Deliverable::AddFollowRelationship(Statement* f1, Statement* f2) {
   follow_hash_.insert({f1, f2});
+  followed_by_hash_.insert({f2, f1});
 }
 
 void Deliverable::AddParentRelationship(Statement* p1, Statement* p2) {
@@ -40,6 +41,8 @@ void Deliverable::AddParentRelationship(Statement* p1, Statement* p2) {
     lst->push_back(p2);
     parent_hash_.insert(make_pair(p1, lst));
   }
+
+  parent_of_hash_.insert({p2, p1});
 }
 
 void Deliverable::AddUsesRelationship(Statement* u1, Variable* u2) {
@@ -49,6 +52,14 @@ void Deliverable::AddUsesRelationship(Statement* u1, Variable* u2) {
     std::list<Variable*>* lst = new std::list<Variable*>();
     lst->push_back(u2);
     use_hash_.insert(make_pair(u1, lst));
+  }
+
+  if (used_by_hash_.count(u2)) {
+    used_by_hash_.find(u2)->second->push_back(u1);
+  } else {
+    std::list<Statement*>* lst = new std::list<Statement*>();
+    lst->push_back(u1);
+    used_by_hash_.insert(make_pair(u2, lst));
   }
 }
 
@@ -60,6 +71,14 @@ void Deliverable::AddUsesRelationship(Container* u1, Variable* u2) {
     lst->push_back(u2);
     container_use_hash_.insert(make_pair(u1, lst));
   }
+
+  if (container_used_by_hash_.count(u2)) {
+    container_used_by_hash_.find(u2)->second->push_back(u1);
+  } else {
+    std::list<Container*>* lst = new std::list<Container*>();
+    lst->push_back(u1);
+    container_used_by_hash_.insert(make_pair(u2, lst));
+  }
 }
 
 void Deliverable::AddModifiesRelationship(Statement* m1, Variable* m2) {
@@ -70,6 +89,14 @@ void Deliverable::AddModifiesRelationship(Statement* m1, Variable* m2) {
     lst->push_back(m2);
     modifies_hash_.insert(make_pair(m1, lst));
   }
+
+  if (modified_by_hash_.count(m2)) {
+    modified_by_hash_.find(m2)->second->push_back(m1);
+  } else {
+    std::list<Statement*>* lst = new std::list<Statement*>();
+    lst->push_back(m1);
+    modified_by_hash_.insert(make_pair(m2, lst));
+  }
 }
 
 void Deliverable::AddModifiesRelationship(Container* m1, Variable* m2) {
@@ -79,6 +106,14 @@ void Deliverable::AddModifiesRelationship(Container* m1, Variable* m2) {
     std::list<Variable*>* lst = new std::list<Variable*>();
     lst->push_back(m2);
     container_modifies_hash_.insert(make_pair(m1, lst));
+  }
+
+  if (container_modified_by_hash_.count(m2)) {
+    container_modified_by_hash_.find(m2)->second->push_back(m1);
+  } else {
+    std::list<Container*>* lst = new std::list<Container*>();
+    lst->push_back(m1);
+    container_modified_by_hash_.insert(make_pair(m2, lst));
   }
 }
 
