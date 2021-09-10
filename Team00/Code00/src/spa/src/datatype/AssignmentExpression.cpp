@@ -46,7 +46,7 @@ std::string ConvertToStringAndClearBuffer(std::vector<char>* chara) {
 
   if (!s.empty()) {
     if (s.back() != ' ') {
-      s.push_back(' '); /// IMPORTANT: delimit variable 'a' and 'b' with 'ab'
+      s.push_back(' '); /// IMPORTANT: separate variable 'a' and 'b' with 'ab'
     }
   }
 
@@ -56,6 +56,9 @@ std::string ConvertToStringAndClearBuffer(std::vector<char>* chara) {
 std::vector<std::string> ConvertEquationIntoTokens(std::string eqn) {
   std::vector<char> chara;
   std::vector<std::string> tokens;
+  std::string space;
+  space.push_back(' ');
+  tokens.push_back(space); // Insert a space in front of variable -- so that CheckExist does not match partial var
 
   std::stack<char> operator_stack;
 
@@ -109,8 +112,12 @@ std::vector<std::string> ConvertEquationIntoTokens(std::string eqn) {
       } else {
         operator_stack.push(c);
       }
-    } else if (c != ' ') {
+    } else if (!(c == ' ' || c == '0')) {
       chara.push_back(c);
+    } else if (c == '0') {
+      if (!chara.empty()) {
+        chara.push_back(c);
+      }
     }
   }
 
@@ -151,10 +158,11 @@ std::string AssignmentExpression::ParseInfixToPostfix(std::string infix) {
 }
 
 std::string AssignmentExpression::GetExpressionString() {
+  // start from 1 because the first chara is a space.
   if (expression_.back() == ' ') {
-    return expression_.substr(0, expression_.size() - 1);
+    return expression_.substr(1, expression_.size() - 2);
   } else {
-    return expression_;
+    return expression_.substr(1, expression_.size() - 1);
   }
 }
 

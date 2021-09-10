@@ -4,6 +4,12 @@
 TEST_CASE("1.DataType.AssignmentExpression") {
   SECTION("Check Postfix Expression") {
 
+    /// 0 NO OPERATOR TEST
+    REQUIRE(AssignmentExpression("02").GetExpressionString() == "2");
+    REQUIRE(AssignmentExpression("102").GetExpressionString() == "102");
+    REQUIRE(AssignmentExpression("Weeeeew").GetExpressionString() == "Weeeeew");
+    REQUIRE(AssignmentExpression("AssignmentExpression").GetExpressionString() == "AssignmentExpression");
+
     /// 1 OPERATOR TEST
     REQUIRE(AssignmentExpression("a+b").GetExpressionString() == "a b +");
     REQUIRE(AssignmentExpression("a-b").GetExpressionString() == "a b -");
@@ -55,6 +61,8 @@ TEST_CASE("1.DataType.AssignmentExpression") {
   SECTION("Check Equation Exact") {
 
     /// CHECK EXACT - EXACT
+    REQUIRE(AssignmentExpression("102").CheckExact("102"));
+    REQUIRE(AssignmentExpression("hotd0g").CheckExact("hotd0g"));
     REQUIRE(AssignmentExpression("a+b").CheckExact("a+b"));
     REQUIRE(AssignmentExpression("(a+b)").CheckExact("(a+b)"));
     REQUIRE(AssignmentExpression("1 * (5 + xyz) / q * LOL").CheckExact("1 * (5 + xyz) / q * LOL"));
@@ -62,6 +70,7 @@ TEST_CASE("1.DataType.AssignmentExpression") {
     /// CHECK EXACT AFTER REMOVE BRACKET
     /// IF CHECKEXACT IS TRUE AFTER REMOVING BRACKET, THEN THE BRACKET IS USELESS.
     ///    OTHERWISE, IT IS NOT EXACT
+    REQUIRE(AssignmentExpression("(102)").CheckExact("102"));
     REQUIRE(AssignmentExpression("a+b").CheckExact("(a+b)"));
     REQUIRE(AssignmentExpression("(a+b)").CheckExact("a+b"));
     REQUIRE(AssignmentExpression("(a+b)+c").CheckExact("a+b+c"));
@@ -74,6 +83,10 @@ TEST_CASE("1.DataType.AssignmentExpression") {
   }
 
   SECTION("Check Equation Contains") {
+    REQUIRE(AssignmentExpression("102").CheckExact("102"));
+    REQUIRE_FALSE(AssignmentExpression("102").CheckExact("10"));
+    REQUIRE_FALSE(AssignmentExpression("hotd0g").CheckExist("d0g"));
+    REQUIRE_FALSE(AssignmentExpression("hotd0g").CheckExist("hot"));
     REQUIRE(AssignmentExpression("a+b").CheckExist("a"));
     REQUIRE(AssignmentExpression("a+b").CheckExist("b"));
     REQUIRE(AssignmentExpression("a+b").CheckExist("a+b"));
