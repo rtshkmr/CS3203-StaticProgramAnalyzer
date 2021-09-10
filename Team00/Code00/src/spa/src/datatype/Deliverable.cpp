@@ -34,15 +34,15 @@ void Deliverable::AddFollowRelationship(Statement* f1, Statement* f2) {
 }
 
 void Deliverable::AddParentRelationship(Statement* p1, Statement* p2) {
-  if (parent_hash_.count(p1)) {
-    parent_hash_.find(p1)->second->push_back(p2);
+  if (parent_to_child_hash_.count(p1)) {
+    parent_to_child_hash_.find(p1)->second->push_back(p2);
   } else {
     std::list<Statement*>* lst = new std::list<Statement*>();
     lst->push_back(p2);
-    parent_hash_.insert(make_pair(p1, lst));
+    parent_to_child_hash_.insert(make_pair(p1, lst));
   }
 
-  parent_of_hash_.insert({p2, p1});
+  child_to_parent_hash_.insert({p2, p1});
 }
 
 void Deliverable::AddUsesRelationship(Statement* u1, Variable* u2) {

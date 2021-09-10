@@ -46,8 +46,8 @@ void PKB::PopulateDataStructures(Deliverable d) {
     PopulateFollowsMap(d.follow_hash_);
     //    PopulateFollowedByMap(d.follow_hash_);
 
-    PopulateParentMap(d.parent_hash_);
-    //    PopulateChildMap(d.parent_hash_);
+    PopulateParentMap(d.parent_to_child_hash_);
+    //    PopulateChildMap(d.parent_to_child_hash_);
 
     //    PopulateUseMap(d.use_hash_);
     //    PopulateUsedByMap(d.use_hash_);

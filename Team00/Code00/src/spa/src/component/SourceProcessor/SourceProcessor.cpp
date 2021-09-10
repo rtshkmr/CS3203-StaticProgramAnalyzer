@@ -11,10 +11,10 @@ using namespace sp;
  * @return Source process status
  */
 void SourceProcessor::ProcessSourceFile(std::string file_name) {
-    par::Parser parser;
-    parser.Parse(file_name);
-    parser.GetDeliverables();
-    de::DesignExtractor design_extractor;
-    design_extractor.ExtractDesignAbstractions();
-    // pkb.PopulateDataStructures();
+  par::Parser parser;
+  parser.Parse(file_name);
+  Deliverable* deliverable = parser.GetDeliverables();
+  DesignExtractor design_extractor;
+  design_extractor.ExtractDesignAbstractions(deliverable);
+  // pkb.PopulateDataStructures();
 }

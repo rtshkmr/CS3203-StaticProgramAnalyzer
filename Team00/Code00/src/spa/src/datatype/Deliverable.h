@@ -59,7 +59,9 @@ class Deliverable {
 
   // RelationshipTables
   std::unordered_map<Statement*, Statement*> follow_hash_;
-  std::unordered_map<Statement*, std::list<Statement*>*> parent_hash_;
+  std::unordered_map<Statement*, std::list<Statement*>*> follows_T_hash_; // Follows*
+  std::unordered_map<Statement*, std::list<Statement*>*> parent_to_child_hash_;
+  std::unordered_map<Statement*, std::list<Statement*>*> parent_to_child_T_hash_; // Parent*
   std::unordered_map<Statement*, std::list<Variable*>*> use_hash_; //to store Uses(x,_), where x is stmt
   std::unordered_map<Container*, std::list<Variable*>*> container_use_hash_; //to store Uses(x,_), where x is if, while, procedure
   std::unordered_map<Statement*, std::list<Variable*>*> modifies_hash_; //to store Modifies(x,_), where x is stmt
@@ -67,7 +69,9 @@ class Deliverable {
 
   //Relationship (Reverse) Tables
   std::unordered_map<Statement*, Statement*> followed_by_hash_;
-  std::unordered_map<Statement*, Statement*> parent_of_hash_;
+  std::unordered_map<Statement*, std::list<Statement*>*> followed_by_T_hash_; // FollowedBy*
+  std::unordered_map<Statement*, Statement*> child_to_parent_hash_;
+  std::unordered_map<Statement*, std::list<Statement*>*> child_to_parent_T_hash_; // ParentOf*
   std::unordered_map<Variable*, std::list<Statement*>*> used_by_hash_; //to store Uses(x,_), where x is stmt
   std::unordered_map<Variable*, std::list<Container*>*> container_used_by_hash_; //to store Uses(x,_), where x is if, while, procedure
   std::unordered_map<Variable*, std::list<Statement*>*> modified_by_hash_; //to store Modifies(x,_), where x is stmt
