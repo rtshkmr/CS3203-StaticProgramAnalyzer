@@ -8,7 +8,9 @@
 
 TEST_CASE("Source processing to PKB retrieval") {
 
-    REQUIRE(std::filesystem::current_path() == "");
+    char * cwd;
+    cwd = (char*) malloc( FILENAME_MAX * sizeof(char) );
+    REQUIRE("" == getcwd(cwd,FILENAME_MAX));
 
     std::ifstream source_file ("../../../tests/basic_source.txt");
 
