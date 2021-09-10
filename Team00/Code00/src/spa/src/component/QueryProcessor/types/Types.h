@@ -78,14 +78,14 @@ class Clause {
   std::string right_hand_side;
 };
 
-class SuchThat : Clause {
+class SuchThat : public Clause {
   public:
     RelRef rel_ref;
     bool left_is_synonym;
     bool right_is_synonym;
 };
 
-class Pattern : Clause {
+class Pattern : public Clause {
   public:
     std::string assign_synonym;
     bool left_is_synonym;
@@ -94,12 +94,13 @@ class Pattern : Clause {
 
 class Group {
   private:
-    std::vector<Clause> clauses;
+    std::vector<Clause*> clauses;
     bool has_target_synonym;
   public:
-    Group(std::vector<Clause> clauses, bool has_target_synonym) : has_target_synonym(has_target_synonym), clauses(clauses) {};
-    bool AddClauseToVector(Clause clause);
-    std::vector<Clause> GetClauses();
+    Group(std::vector<Clause*> clauses, bool has_target_synonym) :
+            has_target_synonym(has_target_synonym), clauses(clauses) {};
+    bool AddClauseToVector(Clause* clause);
+    std::vector<Clause*> GetClauses();
     bool ContainsTargetSynonym();
 };
 
