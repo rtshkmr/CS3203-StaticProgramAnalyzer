@@ -10,7 +10,7 @@
  * the source file.
  */
 class Deliverable {
- public:
+ public: //TODO: create getters before turning private
   Deliverable() = default;    // should be initializing the data structures here
   // Adding of Procedure, Variable, ConstantValue are added using pointers to the list in EntityFactory.
   void AddStatement(Statement* stmt);
@@ -64,6 +64,14 @@ class Deliverable {
   std::unordered_map<Container*, std::list<Variable*>*> container_use_hash_; //to store Uses(x,_), where x is if, while, procedure
   std::unordered_map<Statement*, std::list<Variable*>*> modifies_hash_; //to store Modifies(x,_), where x is stmt
   std::unordered_map<Container*, std::list<Variable*>*> container_modifies_hash_; //to store Modifies(x,_), where x is if, while, procedure
+
+  //Relationship (Reverse) Tables
+  std::unordered_map<Statement*, Statement*> followed_by_hash_;
+  std::unordered_map<Statement*, Statement*> parent_of_hash_;
+  std::unordered_map<Variable*, std::list<Statement*>*> used_by_hash_; //to store Uses(x,_), where x is stmt
+  std::unordered_map<Variable*, std::list<Container*>*> container_used_by_hash_; //to store Uses(x,_), where x is if, while, procedure
+  std::unordered_map<Variable*, std::list<Statement*>*> modified_by_hash_; //to store Modifies(x,_), where x is stmt
+  std::unordered_map<Variable*, std::list<Container*>*> container_modified_by_hash_; //to store Modifies(x,_), where x is if, while, procedure
 
 };
 
