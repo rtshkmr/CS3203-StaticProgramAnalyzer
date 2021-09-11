@@ -13,9 +13,9 @@ class PKB {
 
   std::list<std::string> GetDesignEntity(DesignEntity de);
   std::list<std::tuple<DesignEntity, std::string>> GetFollows(std::string stmt);
-  //    std::list<std::tuple<DesignEntity,std::string>> GetPrevious(std::string stmt);
+  std::list<std::tuple<DesignEntity, std::string>> GetPrevious(std::string stmt);
   std::list<std::tuple<DesignEntity, std::string>> GetParent(std::string stmt);
-  //    std::list<std::tuple<DesignEntity,std::string>> GetChild(std::string stmt);
+  std::list<std::tuple<DesignEntity, std::string>> GetChild(std::string stmt);
   PKB() = default;
  private:
 
@@ -33,9 +33,9 @@ class PKB {
   std::unordered_map<std::string, DesignEntity> type_map_;
 
   std::unordered_map<std::string, std::tuple<DesignEntity, std::string>> follows_map_;
-  //    std::unordered_map<std::string, std::tuple<DesignEntity,std::string>> previous_map_;
+  std::unordered_map<std::string, std::tuple<DesignEntity,std::string>> previous_map_;
   std::unordered_map<std::string, std::list<std::tuple<DesignEntity, std::string>>> parent_map_;
-  //    std::unordered_map<std::string, std::tuple<DesignEntity,std::string>> child_map_;
+  std::unordered_map<std::string, std::tuple<DesignEntity,std::string>> child_map_;
 
   //    std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> use_map_;
   //    std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> modifies_map_;
@@ -51,11 +51,11 @@ class PKB {
   void PopulatePrintList(const std::list<PrintEntity *> &print_list);
   void PopulateReadList(const std::list<ReadEntity *> &read_list);
 
-  void PopulateFollowsMap(std::unordered_map<Statement *, Statement *> follow_hash);
-  //    void PopulateFollowedByMap(const std::unordered_map<Statement*, Statement*>& follow_hash);
+  void PopulateFollowsMap(const std::unordered_map<Statement *, Statement *>& follow_hash);
+  void PopulatePreviousMap(const std::unordered_map<Statement*, Statement*>& followed_by_hash);
 
   void PopulateParentMap(std::unordered_map<Statement *, std::list<Statement *> *> parent_hash);
-  //    void PopulateChildMap(const std::unordered_map<Statement*, Statement*>& parent_hash);
+  void PopulateChildMap(const std::unordered_map<Statement*, Statement*>& parent_of_hash);
 
   //    void PopulateUseMap(const std::unordered_map<Statement*, Entity*>& use_hash);
   //    void PopulateUsedByMap(const std::unordered_map<Statement*, Entity*>& use_hash);

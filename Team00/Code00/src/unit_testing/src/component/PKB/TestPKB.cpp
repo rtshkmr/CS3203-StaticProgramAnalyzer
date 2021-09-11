@@ -94,5 +94,15 @@ TEST_CASE("PKB population and retrieval") {
             std::list<std::tuple<DesignEntity, std::string>> follows_list{std::make_tuple(DesignEntity::kCall, "2")};
             REQUIRE(follows_list == pkb.GetFollows("1"));
         }
+
+        SECTION("FollowedBy") {
+            std::list<std::tuple<DesignEntity, std::string>> previous_list{std::make_tuple(DesignEntity::kAssign, "1")};
+            REQUIRE(previous_list == pkb.GetPrevious("2"));
+        }
+
+//        SECTION("Follows") {
+//            std::list<std::tuple<DesignEntity, std::string>> follows_list{std::make_tuple(DesignEntity::kCall, "2")};
+//            REQUIRE(follows_list == pkb.GetFollows("1"));
+//        }
     }
 }
