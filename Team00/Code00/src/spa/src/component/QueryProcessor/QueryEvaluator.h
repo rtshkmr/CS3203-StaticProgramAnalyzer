@@ -11,6 +11,7 @@
 #include "types/QueryEvaluatorTable.h"
 #include "../PKB/PKB.h"
 #include "QueryPKB.h"
+#include "EvaluateSuchThatDoubleSynonyms.h"
 
 class QueryEvaluator {
   public:

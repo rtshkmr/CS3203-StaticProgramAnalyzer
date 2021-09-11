@@ -56,26 +56,7 @@ QueryEvaluatorTable QueryEvaluator::processDoubleStmtRef(SuchThat such_that_clau
   if (such_that_clause.left_is_synonym && such_that_clause.right_is_synonym) {
     // Both are in the target table
     if (table.ContainsColumn(firstValue) && table.ContainsColumn(secondValue)) {
-      std::vector<std::string> firstStmtList = table.GetColumn(firstValue);
-      std::vector<std::string> secondStmtList = table.GetColumn(secondValue);
-
-      for (int i = 0; i < firstStmtList.size(); i++) {
-        std::string firstStmtRef = firstStmtList[i];
-        std::string secondStmtRef = secondStmtList[i];
-        std::list<std::tuple<DesignEntity, std::string>> output =
-                queryPKBSuchThat(pkb, such_that_clause.rel_ref, firstStmtRef, true);
-        bool relationshipHolds = false;
-        for (auto iter = output.begin(); iter != output.end(); iter++) {
-          if (std::get<1>(*iter) == secondStmtRef) {
-            relationshipHolds = true;
-            break;
-          }
-        }
-        if (!relationshipHolds) {
-          table.DeleteRow(i);
-          i--;
-        }
-      }
+      table = BothSynonymInTable(pkb, such_that_clause, query_relation, table);
 
       // First synonym in table, the other is not.
     } else if (table.ContainsColumn(firstValue)) {
@@ -99,9 +80,8 @@ QueryEvaluatorTable QueryEvaluator::processDoubleStmtRef(SuchThat such_that_clau
       ProcessNewColumn(secondValue, newSynonym, table, such_that_clause.rel_ref, false);
     } else {
       // None in the target table
-      // Nothing should execute here, if the code comes here, there is a bug.
+      // Nothing should execute here, if the code comes here, maybe throw an error.
     }
-
 
   } else if (!such_that_clause.left_is_synonym && !such_that_clause.right_is_synonym) {
     // Boolean case where both are not synonyms. Only supported in 1.3
