@@ -30,6 +30,16 @@ class DesignExtractor {
   void ExtractUsesInCallContainer(CallEntity* call_entity,
                                   Container* container,
                                   std::vector<Procedure*>* extracted_procedures);
+  std::list<Variable*>* ExtractModifiesInContainer(Container* container, std::vector<Procedure*>* extracted_procedures);
+  void ExtractModifiesInIfContainer(IfEntity* if_entity,
+                                    Container* container,
+                                    std::vector<Procedure*>* extracted_procedures);
+  void ExtractModifiesInWhileContainer(WhileEntity* while_entity,
+                                       Container* container,
+                                       std::vector<Procedure*>* extracted_procedures);
+  void ExtractModifiesInCallContainer(CallEntity* call_entity,
+                                      Container* container,
+                                      std::vector<Procedure*>* extracted_procedures);
 };
 
 #endif //AUTOTESTER_DESIGNEXTRACTOR_H

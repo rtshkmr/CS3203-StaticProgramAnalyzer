@@ -29,6 +29,7 @@ class Deliverable {
   void AddUsesRelationship(Container* container, std::list<Variable*>* var_list);
   void AddModifiesRelationship(Statement* m1, Variable* m2);
   void AddModifiesRelationship(Container* m1, Variable* m2);
+  void AddModifiesRelationship(Container* container, std::list<Variable*>* var_list);
 
   void SetProgram(Program* program);
   Program* GetProgram();

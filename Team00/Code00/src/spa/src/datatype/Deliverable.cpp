@@ -139,6 +139,12 @@ void Deliverable::AddModifiesRelationship(Container* m1, Variable* m2) {
   }
 }
 
+void Deliverable::AddModifiesRelationship(Container* container, std::list<Variable*>* var_list) {
+  for (Variable* var: *var_list) {
+    AddModifiesRelationship(container, var);
+  }
+}
+
 void Deliverable::SetProgram(Program* program) {
   this->program_ = program;
 }

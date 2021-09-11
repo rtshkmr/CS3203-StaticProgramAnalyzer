@@ -48,7 +48,15 @@ void DesignExtractor::ExtractUses() {
  * A procedure can also call another procedure.
  */
 void DesignExtractor::ExtractModifies() {
-
+  // same algorithm as ExtractUses
+  std::vector<Procedure*> extracted_procedures;
+  for (Procedure* proc: deliverable_->proc_list_) {
+    if (std::find(extracted_procedures.begin(), extracted_procedures.end(), proc)
+        == extracted_procedures.end()) { // procedure not found in extracted_procedures
+      ExtractModifiesInContainer(proc, &extracted_procedures);
+      extracted_procedures.push_back(proc);
+    }
+  }
 }
 
 void DesignExtractor::ExtractParentT(std::unordered_map<Statement*, std::list<Statement*>*> parent_hash) {
@@ -145,4 +153,85 @@ void DesignExtractor::ExtractUsesInCallContainer(CallEntity* call_entity,
     extracted_procedures->push_back(called_proc);
   }
   deliverable_->AddUsesRelationship(container, var_list);
+}
+
+/**
+ * This is a private recursive helper function that extracts Modifies relationship from a Container and adds to the
+ * deliverable.
+ * Assumes that the variables of the direct children Statements of the container has already been added into the
+ * deliverable.
+ *
+ * @param container Stores a list of Statements.
+ * @param extracted_procedures Vector that stores the procedures that have been extracted.
+ * @return A list of Variables that are found in a Container.
+ */
+std::list<Variable*>* DesignExtractor::ExtractModifiesInContainer(Container* container,
+                                                                  std::vector<Procedure*>* extracted_procedures) {
+  for (Statement* statement: *container->GetStatementList()) {
+    if (IfEntity* if_entity = dynamic_cast<IfEntity*>(statement)) {
+      ExtractModifiesInIfContainer(if_entity, container, extracted_procedures);
+    } else if (WhileEntity* while_entity = dynamic_cast<WhileEntity*>(statement)) {
+      ExtractModifiesInWhileContainer(while_entity, container, extracted_procedures);
+    } else if (CallEntity* call_entity = dynamic_cast<CallEntity*>(statement)) {
+      ExtractModifiesInCallContainer(call_entity, container, extracted_procedures);
+    }
+  }
+
+  std::unordered_map<Container*, std::list<Variable*>*> cmh = deliverable_->container_modifies_hash_;
+  if (cmh.find(container) != cmh.end()) {
+    // container found
+    return cmh.find(container)->second;
+  } else {
+    return new std::list<Variable*>();
+  }
+}
+
+/**
+ * Helper function to handle if condition in ExtractModifiesInContainer.
+ */
+void DesignExtractor::ExtractModifiesInIfContainer(IfEntity* if_entity,
+                                                   Container* container,
+                                                   std::vector<Procedure*>* extracted_procedures) {
+  std::list<Variable*>* nested_if_var_list = ExtractModifiesInContainer(if_entity, extracted_procedures);
+  deliverable_->AddModifiesRelationship(container, nested_if_var_list);
+
+  std::list<Variable*>
+      * nested_else_var_list = ExtractModifiesInContainer(if_entity->GetElseEntity(), extracted_procedures);
+  deliverable_->AddModifiesRelationship(container, nested_else_var_list);
+}
+
+/**
+ * Helper function to handle while condition in ExtractModifiesInContainer.
+ */
+void DesignExtractor::ExtractModifiesInWhileContainer(WhileEntity* while_entity,
+                                                      Container* container,
+                                                      std::vector<Procedure*>* extracted_procedures) {
+  std::list<Variable*>* nested_var_list = ExtractModifiesInContainer(while_entity, extracted_procedures);
+  deliverable_->AddModifiesRelationship(container, nested_var_list);
+}
+
+/**
+ * Helper function to handle call condition in ExtractModifiesInContainer.
+ */
+void DesignExtractor::ExtractModifiesInCallContainer(CallEntity* call_entity,
+                                                     Container* container,
+                                                     std::vector<Procedure*>* extracted_procedures) {
+  Procedure* called_proc = call_entity->getProcedure();
+  std::list<Variable*>* var_list;
+  if (std::find(extracted_procedures->begin(), extracted_procedures->end(), called_proc)
+      != extracted_procedures->end()) { // procedure found in extracted_procedures
+
+    std::unordered_map<Container*, std::list<Variable*>*> cmh = deliverable_->container_modifies_hash_;
+    if (cmh.find(called_proc) != cmh.end()) {
+      // container found in container_use_hash_ in deliverable
+      var_list = cmh.find(called_proc)->second;
+    } else {
+      var_list = new std::list<Variable*>();
+    }
+
+  } else {
+    var_list = ExtractModifiesInContainer(called_proc, extracted_procedures);
+    extracted_procedures->push_back(called_proc);
+  }
+  deliverable_->AddModifiesRelationship(container, var_list);
 }

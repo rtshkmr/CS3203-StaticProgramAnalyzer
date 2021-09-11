@@ -52,6 +52,11 @@ static inline AssignEntity* assign_7_ = new AssignEntity(var_i_,
                                                          "z",
                                                          std::vector<Variable*>{var_z_},
                                                          std::vector<ConstantValue*>());
+// x = z
+static inline AssignEntity* assign_8_ = new AssignEntity(var_x_,
+                                                         "z",
+                                                         std::vector<Variable*>{var_z_},
+                                                         std::vector<ConstantValue*>());
 
 // if
 static inline IfEntity* if_1_ = new IfEntity("x==0",
