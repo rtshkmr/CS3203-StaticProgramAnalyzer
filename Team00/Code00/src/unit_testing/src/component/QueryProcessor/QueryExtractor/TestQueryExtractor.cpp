@@ -9,6 +9,7 @@ bool AreSynonymsEqual(Synonym s1, Synonym s2) {
   return s1.GetType() == s2.GetType() && s1.GetName() == s2.GetName();
 }
 
+// Queries without 'such that' and 'pattern'
 TEST_CASE("3.QueryExtractor.Extract single synonym + select declared synonym; should PASS") {
   std::string query = "assign a1; Select a1";
 
@@ -63,3 +64,30 @@ TEST_CASE("3.QueryExtractor.Extract multiple unique synonym + select undeclared 
   auto query_extractor = QueryExtractor(&query);
   REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(), Catch::Contains("Incorrect target synonym"));
 }
+
+// Queries with 1 'such that'
+TEST_CASE("3.QueryExtractor.Single malformed such that with typo; should FAIL") {
+  std::string query = "assign a; procedure p; Select a Such that Follows (w, a)";
+}
+
+TEST_CASE("3.QueryExtractor.Single malformed such that with extra delimiters; should FAIL") {
+  std::string query = "assign a; while w; Select a such  that Follows (w, a)";
+}
+
+TEST_CASE("3.QueryExtractor.Single well-formed such that with incorrect relRef; should FAIL") {
+  std::string query = "assign a; while w; Select a such that Foll0ws (w, a)";
+}
+
+TEST_CASE("3.QueryExtractor.Single well-formed such that with correct relRef but incorrect left argument; should FAIL") {
+  std::string query = "assign a; while w; Select a such that Follows (w1, a)";
+}
+
+TEST_CASE("3.QueryExtractor.Single well-formed such that with correct relRef but incorrect right argument; should FAIL") {
+  std::string query = "assign a; while w; Select a such that Follows (w, a1)";
+}
+
+TEST_CASE("3.QueryExtractor.Single well-formed such that with correct relRef and correct argument; should PASS") {
+  std::string query = "assign a; procedure p; Select a such that Follows (w, a)";
+}
+
+// 'pattern'
