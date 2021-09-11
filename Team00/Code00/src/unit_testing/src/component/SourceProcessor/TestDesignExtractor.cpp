@@ -24,8 +24,8 @@ TEST_CASE("1.DesignExtractor.ExtractUses basic conditions") {
     };
     deliverable.container_use_hash_.insert(std::make_pair(proc1, &proc_var_list));
 
-    DesignExtractor design_extractor;
-    design_extractor.ExtractDesignAbstractions(&deliverable);
+    DesignExtractor design_extractor = DesignExtractor(&deliverable);
+    design_extractor.ExtractUses();
 
     std::list<Variable*> actual_var_list = *deliverable.container_use_hash_.find(proc1)->second;
     std::list<Variable*> expected_var_list = {var_x_};
@@ -45,8 +45,8 @@ TEST_CASE("1.DesignExtractor.ExtractUses basic conditions") {
 
     deliverable.proc_list_.push_back(proc1);
 
-    DesignExtractor design_extractor;
-    design_extractor.ExtractDesignAbstractions(&deliverable);
+    DesignExtractor design_extractor = DesignExtractor(&deliverable);
+    design_extractor.ExtractUses();
 
     REQUIRE(deliverable.container_use_hash_.find(proc1) == deliverable.container_use_hash_.end());
   }
@@ -69,8 +69,8 @@ TEST_CASE("1.DesignExtractor.ExtractUses basic conditions") {
     deliverable.proc_list_.push_back(proc1);
     deliverable.proc_list_.push_back(proc2);
 
-    DesignExtractor design_extractor;
-    design_extractor.ExtractDesignAbstractions(&deliverable);
+    DesignExtractor design_extractor = DesignExtractor(&deliverable);
+    design_extractor.ExtractUses();
 
     REQUIRE(deliverable.container_use_hash_.find(proc1) == deliverable.container_use_hash_.end());
   }
@@ -113,8 +113,8 @@ TEST_CASE("1.DesignExtractor.ExtractUses basic conditions") {
     };
     deliverable.container_use_hash_.insert(std::make_pair(else_1_, &else_var_list));
 
-    DesignExtractor design_extractor;
-    design_extractor.ExtractDesignAbstractions(&deliverable);
+    DesignExtractor design_extractor = DesignExtractor(&deliverable);
+    design_extractor.ExtractUses();
 
     std::list<Variable*> actual_var_list = *deliverable.container_use_hash_.find(proc1)->second;
     std::list<Variable*> expected_var_list = {var_y_, var_x_, var_z_, var_i_};
@@ -158,8 +158,8 @@ TEST_CASE("1.DesignExtractor.ExtractUses basic conditions") {
     };
     deliverable.container_use_hash_.insert(std::make_pair(while_1_, &while_var_list));
 
-    DesignExtractor design_extractor;
-    design_extractor.ExtractDesignAbstractions(&deliverable);
+    DesignExtractor design_extractor = DesignExtractor(&deliverable);
+    design_extractor.ExtractUses();
 
     std::list<Variable*> actual_var_list = *deliverable.container_use_hash_.find(proc2)->second;
     std::list<Variable*> expected_var_list = {var_y_, var_z_, var_x_, var_i_};
@@ -195,8 +195,8 @@ TEST_CASE("1.DesignExtractor.ExtractUses basic conditions") {
     };
     deliverable.container_use_hash_.insert(std::make_pair(proc4, &proc4_var_list));
 
-    DesignExtractor design_extractor;
-    design_extractor.ExtractDesignAbstractions(&deliverable);
+    DesignExtractor design_extractor = DesignExtractor(&deliverable);
+    design_extractor.ExtractUses();
 
     std::list<Variable*> actual_var_list = *deliverable.container_use_hash_.find(proc3)->second;
     std::list<Variable*> expected_var_list = {var_z_, var_i_};
@@ -269,8 +269,8 @@ TEST_CASE("1.DesignExtractor.ExtractUses nested containers") {
     };
     deliverable.container_use_hash_.insert(std::make_pair(if_3_, &if3_var_list));
 
-    DesignExtractor design_extractor;
-    design_extractor.ExtractDesignAbstractions(&deliverable);
+    DesignExtractor design_extractor = DesignExtractor(&deliverable);
+    design_extractor.ExtractUses();
 
     std::list<Variable*> actual_var_list = *deliverable.container_use_hash_.find(proc1)->second;
     std::list<Variable*> expected_var_list = {var_x_, var_z_, var_y_, var_i_};
@@ -318,8 +318,8 @@ TEST_CASE("1.DesignExtractor.ExtractUses nested containers") {
     };
     deliverable.container_use_hash_.insert(std::make_pair(while_3_, &while3_var_list));
 
-    DesignExtractor design_extractor;
-    design_extractor.ExtractDesignAbstractions(&deliverable);
+    DesignExtractor design_extractor = DesignExtractor(&deliverable);
+    design_extractor.ExtractUses();
 
     std::list<Variable*> actual_var_list = *deliverable.container_use_hash_.find(proc2)->second;
     std::list<Variable*> expected_var_list = {var_x_, var_z_, var_y_, var_i_};
@@ -363,8 +363,8 @@ TEST_CASE("1.DesignExtractor.ExtractUses nested containers") {
     };
     deliverable.container_use_hash_.insert(std::make_pair(proc4, &proc2_var_list));
 
-    DesignExtractor design_extractor;
-    design_extractor.ExtractDesignAbstractions(&deliverable);
+    DesignExtractor design_extractor = DesignExtractor(&deliverable);
+    design_extractor.ExtractUses();
 
     std::list<Variable*> actual_var_list = *deliverable.container_use_hash_.find(proc3)->second;
     std::list<Variable*> expected_var_list = {var_z_, var_i_};
@@ -409,8 +409,8 @@ TEST_CASE("1.DesignExtractor.ExtractUses nested containers") {
     };
     deliverable.container_use_hash_.insert(std::make_pair(while_1_, &while_var_list));
 
-    DesignExtractor design_extractor;
-    design_extractor.ExtractDesignAbstractions(&deliverable);
+    DesignExtractor design_extractor = DesignExtractor(&deliverable);
+    design_extractor.ExtractUses();
 
     std::list<Variable*> actual_var_list = *deliverable.container_use_hash_.find(proc1)->second;
     std::list<Variable*> expected_var_list = {var_x_, var_z_, var_i_};

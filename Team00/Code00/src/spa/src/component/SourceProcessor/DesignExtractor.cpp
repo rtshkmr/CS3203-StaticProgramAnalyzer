@@ -1,17 +1,19 @@
 #include "DesignExtractor.h"
 
+DesignExtractor::DesignExtractor(Deliverable* deliverable) {
+  this->deliverable_ = deliverable;
+}
+
 /**
  * Extracts transitive relationships using the lists and tables from the deliverable.
  */
-void DesignExtractor::ExtractDesignAbstractions(Deliverable* deliverable) {
-  this->deliverable_ = deliverable;
-
+void DesignExtractor::ExtractDesignAbstractions() {
   ExtractUses();
   ExtractModifies();
-  ExtractParentT(deliverable->parent_to_child_hash_);
-  ExtractFollowsT(deliverable->follow_hash_);
-  ExtractParentOfT(deliverable->child_to_parent_hash_);
-  ExtractFollowedByT(deliverable->followed_by_hash_);
+  ExtractParentT(deliverable_->parent_to_child_hash_);
+  ExtractFollowsT(deliverable_->follow_hash_);
+  ExtractParentOfT(deliverable_->child_to_parent_hash_);
+  ExtractFollowedByT(deliverable_->followed_by_hash_);
 }
 
 /**
@@ -87,8 +89,8 @@ std::list<Variable*>* DesignExtractor::ExtractUsesInContainer(Container* contain
     }
   }
 
-  std::unordered_map<Container *, std::list<Variable *> *> cuh = deliverable_->container_use_hash_;
-  if (cuh.find(container) != cuh.end()){
+  std::unordered_map<Container*, std::list<Variable*>*> cuh = deliverable_->container_use_hash_;
+  if (cuh.find(container) != cuh.end()) {
     // container found
     return cuh.find(container)->second;
   } else {
@@ -130,8 +132,8 @@ void DesignExtractor::ExtractUsesInCallContainer(CallEntity* call_entity,
   if (std::find(extracted_procedures->begin(), extracted_procedures->end(), called_proc)
       != extracted_procedures->end()) { // procedure found in extracted_procedures
 
-    std::unordered_map<Container *, std::list<Variable *> *> cuh = deliverable_->container_use_hash_;
-    if (cuh.find(called_proc) != cuh.end()){
+    std::unordered_map<Container*, std::list<Variable*>*> cuh = deliverable_->container_use_hash_;
+    if (cuh.find(called_proc) != cuh.end()) {
       // container found in container_use_hash_ in deliverable
       var_list = cuh.find(called_proc)->second;
     } else {
