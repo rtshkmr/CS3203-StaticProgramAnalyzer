@@ -18,6 +18,8 @@ class QueryEvaluatorTable {
     // Add column to table
     bool AddColumn(std::string synonym);
 
+    bool AddRowForAllColumn(std::string synonym, int index, std::string value);
+
     // Add target synonym column with values to table
     bool AddTargetSynonym(std::list<std::string> synonymList);
 
@@ -35,6 +37,8 @@ class QueryEvaluatorTable {
 
     // Empty column but keep the synonym (header) in the table
     bool RemoveColumn(std::string synonym);
+
+    bool ContainsColumn(std::string synonym);
 
     int GetSize();
   private:
