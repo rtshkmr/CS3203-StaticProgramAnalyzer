@@ -34,6 +34,7 @@ add_library(spa ${srcs} ${headers}
         src/component/QueryProcessor/QueryPKB.h src/component/QueryProcessor/QueryPKB.cpp
         src/component/QueryProcessor/QueryEvaluator.h src/component/QueryProcessor/QueryEvaluator.cpp
         src/component/QueryProcessor/QueryProjector.h src/component/QueryProcessor/QueryProjector.cpp
+        src/component/QueryProcessor/QuerySystemController.h src/component/QueryProcessor/QuerySystemController.cpp
         )
   
 # this makes the headers accessible for other projects which uses spa lib
