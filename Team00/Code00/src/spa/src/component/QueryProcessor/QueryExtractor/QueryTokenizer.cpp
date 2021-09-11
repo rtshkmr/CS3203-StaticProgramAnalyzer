@@ -5,6 +5,8 @@
 #include <datatype/RegexPatterns.h>
 
 static std::map<std::string, std::regex> spec_table {
+  // note: order of regex evaluation matters! Be careful before reordering.
+  {"SUCH_THAT", std::regex("^Such that")},
   {"IDENT", RegexPatterns::GetNamePattern()}, // IDENT is TokenTag:kName
   {";", std::regex("^;")},
   {"SPACINGS", std::regex("^\\s+")} // TODO: add tabs & newline (including carriage return) to regex
