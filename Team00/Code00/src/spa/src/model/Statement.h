@@ -16,11 +16,12 @@
 class ElseEntity;
 
 /**
- * IfEntity is a derived class of Statement.
+ * IfEntity is a derived class of Statement and Container.
  * This object represents the abstract syntax grammar for an if-statement.
  * This class contains the following:
  *   -  ConditionalExpression which is the conditional expression for the if-statement.
- *   -  A list of Statement to execute when the above condition is true.
+ *   -  A list of Statement to execute when the above condition is true, which is defined in the inherited Container
+ *   abstract class.
  *   -  An ElseEntity object which contains the statements to execute if the conditional expression evaluates to false.
  */
 class IfEntity : public Statement, public Container {
@@ -28,8 +29,7 @@ class IfEntity : public Statement, public Container {
   ConditionalExpression* cond_expr_;
   std::vector<Variable*> expr_variables;
   std::vector<ConstantValue*> expr_constants;
-  std::list<Statement*> if_stmt_list_;
-  ElseEntity* else_stmt_list_; //TODO: check if keeping ELSE as object or merge ELSE object into IF object
+  ElseEntity* else_entity_; //TODO: check if keeping ELSE as object or merge ELSE object into IF object
 
  public:
   IfEntity(std::string condition, std::vector<Variable*> expr_variables, std::vector<ConstantValue*> expr_constants);
@@ -40,50 +40,39 @@ class IfEntity : public Statement, public Container {
 
   std::vector<ConstantValue*> GetExpressionConstants();
 
-  std::list<Statement*>* GetStatementList();
+  ElseEntity* GetElseEntity();
 
-  void AddStatement(Statement* stmt);
+  void SetElseEntity(ElseEntity* else_entity);
 
   std::list<Statement*>* getElseStmtList();
-
-  bool setElseStmtList(ElseEntity* else_stmt);
 };
 
 /**
- * ElseEntity is a derived class of Statement and a composition object of IfEntity object.
+ * ElseEntity is a derived class of Statement and Container, and a composition object of IfEntity object.
+ * It contains a list of statement defined in the inherited Container abstract class.
  */
 class ElseEntity : public Statement, public Container {
- private:
-  std::list<Statement*> else_stmt_list_;
  public:
   ElseEntity();
-
-  std::list<Statement*>* GetStatementList();
-
-  void AddStatement(Statement* stmt);
 };
 
 /**
- * WhileEntity is a derived class of Statement.
+ * WhileEntity is a derived class of Statement and Container.
  * This object represents the abstract syntax grammar for a while-statement.
  * This class contains the following:
  *   -  ConditionalExpression which is the conditional expression for the if-statement.
- *   -  A list of Statement to execute when the above condition is true.
+ *   -  A list of Statement to execute when the above condition is true, which is defined in the inherited Container
+ *   abstract class.
  */
 class WhileEntity : public Statement, public Container {
  private:
   ConditionalExpression* cond_expr_;
-  std::list<Statement*> stmt_list_;
   std::vector<Variable*> expr_variables;
   std::vector<ConstantValue*> expr_constants;
  public:
   WhileEntity(std::string condition, std::vector<Variable*> expr_variables, std::vector<ConstantValue*> expr_constants);
 
   ConditionalExpression* getCondExpr();
-
-  std::list<Statement*>* GetStatementList();
-
-  void AddStatement(Statement* stmt);
 
   std::vector<Variable*> GetExpressionVariables();
 

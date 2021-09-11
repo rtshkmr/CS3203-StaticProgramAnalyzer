@@ -25,33 +25,20 @@ vector<ConstantValue*> IfEntity::GetExpressionConstants() {
   return expr_constants;
 }
 
-std::list<Statement*>* IfEntity::GetStatementList() {
-  return &if_stmt_list_;
+ElseEntity* IfEntity::GetElseEntity() {
+  return else_entity_;
 }
 
-void IfEntity::AddStatement(Statement* stmt) {
-  if_stmt_list_.push_back(stmt);
+void IfEntity::SetElseEntity(ElseEntity* else_entity) {
+  else_entity_ = else_entity;
 }
 
 std::list<Statement*>* IfEntity::getElseStmtList() {
-  return else_stmt_list_->GetStatementList();
-}
-
-bool IfEntity::setElseStmtList(ElseEntity* else_stmt) {
-  else_stmt_list_ = else_stmt;
-  return true; //assume success setter
+  return else_entity_->GetStatementList();
 }
 
 ElseEntity::ElseEntity() {
 
-}
-
-std::list<Statement*>* ElseEntity::GetStatementList() {
-  return &else_stmt_list_;
-}
-
-void ElseEntity::AddStatement(Statement* stmt) {
-  else_stmt_list_.push_back(stmt);
 }
 
 WhileEntity::WhileEntity(std::string condition,
@@ -64,14 +51,6 @@ WhileEntity::WhileEntity(std::string condition,
 
 ConditionalExpression* WhileEntity::getCondExpr() {
   return cond_expr_;
-}
-
-std::list<Statement*>* WhileEntity::GetStatementList() {
-  return &stmt_list_;
-}
-
-void WhileEntity::AddStatement(Statement* stmt) {
-  stmt_list_.push_back(stmt);
 }
 
 vector<Variable*> WhileEntity::GetExpressionVariables() {

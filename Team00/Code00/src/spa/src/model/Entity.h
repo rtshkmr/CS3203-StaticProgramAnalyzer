@@ -39,33 +39,30 @@ class Statement : public Entity {
 };
 
 /**
- * Container is an interface which applies to all classes that can contain statements.
+ * Container is an abstract class which applies to all classes that can contain statements.
  */
 class Container {
+ private:
+  std::list<Statement*> statement_list_;
  public:
   virtual ~Container() {};
 
-  virtual void AddStatement(Statement* stmt) = 0;
+  void AddStatement(Statement* stmt);
 
-  virtual std::list<Statement*>* GetStatementList() = 0;
+  std::list<Statement*>* GetStatementList();
 };
 
 /**
- * Procedure is a derived class of Entity. This class contains the name and the list of statement
- *   within this procedure.
+ * Procedure is a derived class of Entity and Container. This class contains the name and the list of statement
+ *   within this procedure. The list of statement is defined in the inherited Container abstract class.
  */
 class Procedure : public Entity, public Container {
  private:
   const ProcedureName* procedure_name_;
-  std::list<Statement*> statement_list_;
  public:
   Procedure(ProcedureName* procedureName);
 
   const ProcedureName* getName();
-
-  std::list<Statement*>* GetStatementList();
-
-  void AddStatement(Statement* stmt);
 };
 
 /**

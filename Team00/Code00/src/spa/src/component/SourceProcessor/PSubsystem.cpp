@@ -169,7 +169,7 @@ void PSubsystem::HandleElseStmt(ElseEntity* else_entity) {
   assert (if_entity != nullptr); //If assertion failed, Else did not follow If
   parent_stack_.push(if_entity);
 
-  if_entity->setElseStmtList(else_entity);
+  if_entity->SetElseEntity(else_entity);
   current_node_type_ = 3;
   current_node_ = else_entity;
 }
