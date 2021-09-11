@@ -162,7 +162,7 @@ TEST_CASE("1.DesignExtractor.ExtractUses basic conditions") {
     design_extractor.ExtractDesignAbstractions(&deliverable);
 
     std::list<Variable*> actual_var_list = *deliverable.container_use_hash_.find(proc2)->second;
-    std::list<Variable*> expected_var_list = {var_y_, var_z_, var_x_, var_z_, var_i_};
+    std::list<Variable*> expected_var_list = {var_y_, var_z_, var_x_, var_i_};
 
     REQUIRE(actual_var_list == expected_var_list);
   }
@@ -273,7 +273,7 @@ TEST_CASE("1.DesignExtractor.ExtractUses nested containers") {
     design_extractor.ExtractDesignAbstractions(&deliverable);
 
     std::list<Variable*> actual_var_list = *deliverable.container_use_hash_.find(proc1)->second;
-    std::list<Variable*> expected_var_list = {var_x_, var_z_, var_y_, var_z_, var_z_, var_i_};
+    std::list<Variable*> expected_var_list = {var_x_, var_z_, var_y_, var_i_};
 
     REQUIRE(actual_var_list == expected_var_list);
   }
@@ -318,12 +318,11 @@ TEST_CASE("1.DesignExtractor.ExtractUses nested containers") {
     };
     deliverable.container_use_hash_.insert(std::make_pair(while_3_, &while3_var_list));
 
-
     DesignExtractor design_extractor;
     design_extractor.ExtractDesignAbstractions(&deliverable);
 
     std::list<Variable*> actual_var_list = *deliverable.container_use_hash_.find(proc2)->second;
-    std::list<Variable*> expected_var_list = {var_x_, var_z_, var_y_, var_y_, var_z_, var_i_};
+    std::list<Variable*> expected_var_list = {var_x_, var_z_, var_y_, var_i_};
 
     REQUIRE(actual_var_list == expected_var_list);
   }
@@ -399,7 +398,7 @@ TEST_CASE("1.DesignExtractor.ExtractUses nested containers") {
     std::list<Variable*> if_var_list = {
         var_x_, // from if condition
         var_z_,
-        };
+    };
     deliverable.container_use_hash_.insert(std::make_pair(if_1_, &if_var_list));
     std::list<Variable*> else_var_list = {
         var_i_
@@ -414,7 +413,7 @@ TEST_CASE("1.DesignExtractor.ExtractUses nested containers") {
     design_extractor.ExtractDesignAbstractions(&deliverable);
 
     std::list<Variable*> actual_var_list = *deliverable.container_use_hash_.find(proc1)->second;
-    std::list<Variable*> expected_var_list = {var_x_, var_z_, var_i_, var_z_};
+    std::list<Variable*> expected_var_list = {var_x_, var_z_, var_i_};
 
     REQUIRE(actual_var_list == expected_var_list);
   }
