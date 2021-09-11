@@ -57,8 +57,15 @@ class PKB {
   void PopulateParentMap(std::unordered_map<Statement *, std::list<Statement *> *> parent_hash);
   void PopulateChildMap(const std::unordered_map<Statement*, Statement*>& parent_of_hash);
 
-  //    void PopulateUseMap(const std::unordered_map<Statement*, Entity*>& use_hash);
-  //    void PopulateUsedByMap(const std::unordered_map<Statement*, Entity*>& use_hash);
-  //    void PopulateModifiesMap(const std::unordered_map<Statement*, Entity*>& modifies_hash);
-  //    void PopulateModifiedByMap(const std::unordered_map<Statement*, Entity*>& modifies_hash);
+  void PopulateUseSMap(const std::unordered_map<Statement*, Entity*>& use_hash);
+  void PopulateUsedBySMap(const std::unordered_map<Statement*, std::list<Entity*>*> used_by_hash);
+
+  void PopulateUseCMap(const std::unordered_map<Statement*, Entity*>& container_use_hash);
+  void PopulateUsedByCMap(const std::unordered_map<Statement*, std::list<Entity*>*> container_used_by_hash);
+
+  void PopulateModifiesSMap(const std::unordered_map<Statement*, Entity*>& modifies_hash);
+  void PopulateModifiedBySMap(const std::unordered_map<Statement*, std::list<Entity*>*> modified_by_hash);
+
+  void PopulateModifiesCMap(const std::unordered_map<Statement*, Entity*>& container_modifies_hash);
+  void PopulateModifiedByCMap(const std::unordered_map<Statement*, std::list<Entity*>*> container_modified_by_hash);
 };
