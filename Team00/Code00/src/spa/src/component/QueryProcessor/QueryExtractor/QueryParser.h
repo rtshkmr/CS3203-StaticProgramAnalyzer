@@ -5,6 +5,7 @@
 #include <vector>
 #include <list>
 #include "QueryTokenizer.h"
+#include <component/QueryProcessor/types/Types.h>
 
 class QueryParser {
   private:
@@ -19,6 +20,10 @@ class QueryParser {
     // helpers for recursive descent parsing
     void parse_query();
     void parse_declarations();
+    std::tuple<std::string, bool, bool> parse_stmtRef();
+    std::pair<Clause*, bool> parse_relRef();
+    void parse_such_that();
+    void parse_pattern();
     void parse_select();
     void GetTarget();
     void GetDeclaration();

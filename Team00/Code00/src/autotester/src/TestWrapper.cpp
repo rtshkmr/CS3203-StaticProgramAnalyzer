@@ -20,7 +20,7 @@ TestWrapper::TestWrapper() {
 // method for parsing the SIMPLE source
 void TestWrapper::parse(std::string file_name) {
     sp::SourceProcessor source_processor;
-    sp::SourceProcessor::ProcessSourceFile(file_name);
+    // sp::SourceProcessor::ProcessSourceFile(file_name);
 }
 
 // method to evaluating a query
