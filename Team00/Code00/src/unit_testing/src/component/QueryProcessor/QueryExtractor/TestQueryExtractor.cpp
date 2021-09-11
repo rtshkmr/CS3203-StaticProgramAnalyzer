@@ -85,33 +85,32 @@ TEST_CASE("3.QueryExtractor.Extract multiple unique synonym + select undeclared 
 TEST_CASE("3.QueryExtractor.Single malformed such that with typo; should FAIL") {
   std::string query = "assign a; while w; Select a Such that Follows (w, a)";
   auto query_extractor = QueryExtractor(&query);
-  REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(), Catch::Contains("Incorrect clause"));
+  REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(), Catch::Contains("Incorrect query."));
 }
 
 TEST_CASE("3.QueryExtractor.Single malformed such that with extra delimiters; should FAIL") {
   std::string query = "assign a; while w; Select a such  that Follows (w, a)";
   auto query_extractor = QueryExtractor(&query);
-  REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(), Catch::Contains("Incorrect clause"));
+  REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(), Catch::Contains("Incorrect query."));
 }
 
 TEST_CASE("3.QueryExtractor.Single well-formed such that with incorrect relRef; should FAIL") {
   std::string query = "assign a; while w; Select a such that Foll0ws (w, a)";
   auto query_extractor = QueryExtractor(&query);
-  REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(), Catch::Contains("Incorrect"));
+  REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(), Catch::Contains("Invalid relRef"));
 }
 
 TEST_CASE("3.QueryExtractor.Single well-formed such that with correct relRef but incorrect left argument; should FAIL") {
   std::string query = "assign a; while w; Select a such that Follows (w1, a)";
   auto query_extractor = QueryExtractor(&query);
-  REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(), Catch::Contains("Incorrect"));
+  REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(), Catch::Contains("Unknown synonym supplied"));
 }
 
 TEST_CASE("3.QueryExtractor.Single well-formed such that with correct relRef but incorrect right argument; should FAIL") {
   std::string query = "assign a; while w; Select a such that Follows (w, a1)";
   auto query_extractor = QueryExtractor(&query);
-  REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(), Catch::Contains("Incorrect"));
+  REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(), Catch::Contains("Unknown synonym supplied"));
 }
-*/
 
 TEST_CASE("3.QueryExtractor.Single well-formed such that with correct relRef and correct argument; should PASS") {
   std::string query = "assign a; while w; Select a such that Follows (w, a)";
@@ -149,6 +148,5 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that with correct relRef and
   }
   delete cl;
 }
-
 
 // 'pattern'
