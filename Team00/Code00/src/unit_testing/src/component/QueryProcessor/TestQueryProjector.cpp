@@ -7,12 +7,12 @@
 
 TEST_CASE( "Given list of string of statement ref" ) {
   std::vector<std::string> input_list = {"2", "3", "5"};
-  std::string output = FormatQuery(input_list);
+  std::string output = QueryProjector::FormatQuery(input_list);
   REQUIRE( output == "2, 3, 5");
 }
 
 TEST_CASE( "Given list of string of variable names" ) {
   std::vector<std::string> input_list = {"x", "count", "p5"};
-  std::string output = FormatQuery(input_list);
+  std::string output = QueryProjector::FormatQuery(input_list);
   REQUIRE( output == "x, count, p5");
 }
