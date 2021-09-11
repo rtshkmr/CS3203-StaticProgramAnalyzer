@@ -82,12 +82,26 @@ struct SuchThat : Clause {
   RelRef rel_ref;
   bool left_is_synonym;
   bool right_is_synonym;
+  SuchThat(std::string lhs, std::string rhs, RelRef rf, bool lhs_is_syn, bool rhs_is_syn) {
+    left_hand_side = lhs;
+    right_hand_side = rhs;
+    rel_ref = rf;
+    left_is_synonym = lhs_is_syn;
+    right_is_synonym = rhs_is_syn;
+  }
 };
 
 struct Pattern : Clause {
   std::string assign_synonym;
   bool left_is_synonym;
   bool is_exact;
+  Pattern(std::string lhs, std::string rhs, std::string assn_syn, bool lhs_is_syn, bool is_exact) {
+    left_hand_side = lhs;
+    right_hand_side = rhs;
+    assign_synonym = assn_syn;
+    left_is_synonym = lhs_is_syn;
+    is_exact = is_exact;
+  }
 };
 
 class Group {
