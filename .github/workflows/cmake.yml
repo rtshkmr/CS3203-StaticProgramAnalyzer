@@ -32,16 +32,31 @@ jobs:
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run: cmake -S ${{env.working-directory}} -B ${{env.working-directory}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
-    - name: Build
+    - name: Build SPA
       # Build your program with the given configuration
-      run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target all
+      run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target spa
 
-    - name: Unit Test
+    - name: Build Unit Test
+      run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target unit_testing
+
+    - name: Run Unit Test
       #Running Catch2 natively on terminal
       run: ${{env.working-directory}}/build/src/unit_testing/unit_testing
+      
+    - name: Build Integration Test
+      run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target integration_testing
 
     - name: Integration Test
       run: ${{env.working-directory}}/build/src/integration_testing/integration_testing
       
-    - name: AutoTester 
-      run: echo 'AutoTester run is not ready.'
+    - name: Build AutoTester #GUI is excluded
+      run:  cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target autotester
+      
+    - name: Run AutoTester 
+      run: | 
+        cp ${{env.working-directory}}/tests/* ${{env.working-directory}}/build/src/autotester
+        cd ${{env.working-directory}}/build/src/autotester/tests
+        ./../autotester Source_simple.txt Source_queries.txt output.xml
+      
+    - name: Build All # Take all previous build and build autotester_gui for completeness
+      run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target all
