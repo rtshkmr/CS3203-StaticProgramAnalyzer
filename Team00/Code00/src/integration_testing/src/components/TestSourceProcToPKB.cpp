@@ -8,7 +8,7 @@
 TEST_CASE("Source processing to PKB retrieval") {
 
     par::Parser parser;
-    parser.Parse("./basic_source.txt"); // Uncomment this when pushing / Comment on local
+    parser.Parse("./integration_test_files/basic_source.txt"); // Uncomment this when pushing / Comment on local
 //    parser.Parse("../../../tests/basic_source.txt"); // Comment this when pushing / Uncomment on local
     Deliverable deliverable = parser.GetDeliverables();
     de::DesignExtractor design_extractor;
