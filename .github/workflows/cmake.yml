@@ -50,7 +50,7 @@ jobs:
 
     - name: Run Integration Test
       run: |
-        cp -r ${{env.working-directory}}/tests/integration_test ${{env.working-directory}}/build/src/integration_testing/
+        cp -r ${{env.working-directory}}/tests/integration_testing ${{env.working-directory}}/build/src/integration_testing/
         ${{env.working-directory}}/build/src/integration_testing/integration_testing
   
   autotester:
