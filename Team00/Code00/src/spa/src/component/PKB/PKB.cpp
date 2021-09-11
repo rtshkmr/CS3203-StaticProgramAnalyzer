@@ -49,11 +49,14 @@ void PKB::PopulateDataStructures(Deliverable d) {
     PopulateParentMap(d.parent_hash_);
     PopulateChildMap(d.parent_of_hash_);
 
-    //    PopulateUseMap(d.use_hash_);
-    //    PopulateUsedByMap(d.use_hash_);
-    //
-    //    PopulateModifiesMap(d.modifies_hash_);
-    //    PopulateModifiedByMap(d.modifies_hash_);
+    PopulateUseSMap(d.use_hash_);
+    PopulateUsedBySMap(d.used_by_hash_);
+    PopulateUseCMap(d.container_use_hash_);
+    PopulateUsedByCMap(d.container_used_by_hash_);
+    PopulateModifiesSMap(d.modifies_hash_);
+    PopulateModifiedBySMap(d.modified_by_hash_);
+    PopulateModifiesCMap(d.container_modifies_hash_);
+    PopulateModifiedByCMap(d.container_modified_by_hash_);
 }
 
 std::list<std::tuple<DesignEntity, std::string>> PKB::GetFollows(std::string stmt) {
@@ -92,6 +95,82 @@ std::list<std::tuple<DesignEntity,std::string>> PKB::GetChild(std::string stmt) 
     auto child_iter = child_map_.find(stmt);
     std::tuple<DesignEntity,std::string> child = child_iter->second;
     ret_list.push_back(child);
+    return ret_list;
+}
+
+std::list<std::tuple<DesignEntity, std::string>> PKB::GetUses(std::string stmt) {
+    std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
+    auto use_s_iter = use_s_map_.find(stmt);
+    if (use_s_iter == use_s_map_.end()) {
+        ;
+    } else {
+        std::list<std::tuple<DesignEntity, std::string>> use_s = use_s_iter->second;
+        ret_list.insert(ret_list.end(), use_s.begin(), use_s.end());
+    }
+    auto use_c_iter = use_c_map_.find(stmt);
+    if (use_c_iter == use_c_map_.end()) {
+        ;
+    } else {
+        std::list<std::tuple<DesignEntity, std::string>> use_c = use_c_iter->second;
+        ret_list.insert(ret_list.end(), use_c.begin(), use_c.end());
+    }
+    return ret_list;
+}
+
+std::list<std::tuple<DesignEntity, std::string>> PKB::GetUsedBy(std::string stmt) {
+    std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
+    auto used_by_s_iter = used_by_s_map_.find(stmt);
+    if (used_by_s_iter == used_by_s_map_.end()) {
+        ;
+    } else {
+        std::list<std::tuple<DesignEntity, std::string>> used_by_s = used_by_s_iter->second;
+        ret_list.insert(ret_list.end(), used_by_s.begin(), used_by_s.end());
+    }
+    auto used_by_c_iter = used_by_c_map_.find(stmt);
+    if (used_by_c_iter == used_by_c_map_.end()) {
+        ;
+    } else {
+        std::list<std::tuple<DesignEntity, std::string>> used_by_c = used_by_c_iter->second;
+        ret_list.insert(ret_list.end(), used_by_c.begin(), used_by_c.end());
+    }
+    return ret_list;
+}
+
+std::list<std::tuple<DesignEntity, std::string>> PKB::GetModifies(std::string stmt) {
+    std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
+    auto modifies_s_iter = modifies_s_map_.find(stmt);
+    if (modifies_s_iter == modifies_s_map_.end()) {
+        ;
+    } else {
+        std::list<std::tuple<DesignEntity, std::string>> modifies_s = modifies_s_iter->second;
+        ret_list.insert(ret_list.end(), modifies_s.begin(), modifies_s.end());
+    }
+    auto modifies_c_iter = modifies_c_map_.find(stmt);
+    if (modifies_c_iter == modifies_c_map_.end()) {
+        ;
+    } else {
+        std::list<std::tuple<DesignEntity, std::string>> modifies_c = modifies_c_iter->second;
+        ret_list.insert(ret_list.end(), modifies_c.begin(), modifies_c.end());
+    }
+    return ret_list;
+}
+
+std::list<std::tuple<DesignEntity, std::string>> PKB::GetModifiedBy(std::string stmt) {
+    std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
+    auto modified_by_s_iter = modified_by_s_map_.find(stmt);
+    if (modified_by_s_iter == modified_by_s_map_.end()) {
+        ;
+    } else {
+        std::list<std::tuple<DesignEntity, std::string>> modified_by_s = modified_by_s_iter->second;
+        ret_list.insert(ret_list.end(), modified_by_s.begin(), modified_by_s.end());
+    }
+    auto modified_by_c_iter = modified_by_c_map_.find(stmt);
+    if (modified_by_c_iter == modified_by_c_map_.end()) {
+        ;
+    } else {
+        std::list<std::tuple<DesignEntity, std::string>> modified_by_c = modified_by_c_iter->second;
+        ret_list.insert(ret_list.end(), modified_by_c.begin(), modified_by_c.end());
+    }
     return ret_list;
 }
 
@@ -275,7 +354,7 @@ void PKB::PopulateUsedBySMap(std::unordered_map<Variable *, std::list<Statement 
             auto *stmtNum = const_cast<StatementNumber *>(stmt->GetStatementNumber());
             std::string stmtRef = std::to_string(stmtNum->getNum());
 
-            std::tuple<DesignEntity, std::string> entity = make_tuple(DesignEntity::kStmt, stmtRef);
+            std::tuple<DesignEntity, std::string> entity = make_tuple(type_map_[stmtRef], stmtRef);
             result.push_back(entity);
         }
 
@@ -320,7 +399,7 @@ void PKB::PopulateUsedByCMap(std::unordered_map<Variable *, std::list<Container 
             auto *stmtNum = const_cast<StatementNumber *>(c_stmt->GetStatementNumber());
             std::string stmtRef = std::to_string(stmtNum->getNum());
 
-            std::tuple<DesignEntity, std::string> entity = make_tuple(DesignEntity::kStmt, stmtRef);
+            std::tuple<DesignEntity, std::string> entity = make_tuple(type_map_[stmtRef], stmtRef);
             result.push_back(entity);
         }
 
@@ -364,7 +443,7 @@ void PKB::PopulateModifiedBySMap(std::unordered_map<Variable *, std::list<Statem
             auto *stmtNum = const_cast<StatementNumber *>(stmt->GetStatementNumber());
             std::string stmtRef = std::to_string(stmtNum->getNum());
 
-            std::tuple<DesignEntity, std::string> entity = make_tuple(DesignEntity::kStmt, stmtRef);
+            std::tuple<DesignEntity, std::string> entity = make_tuple(type_map_[stmtRef], stmtRef);
             result.push_back(entity);
         }
 
@@ -409,7 +488,7 @@ void PKB::PopulateModifiedByCMap(std::unordered_map<Variable *, std::list<Contai
             auto *stmtNum = const_cast<StatementNumber *>(c_stmt->GetStatementNumber());
             std::string stmtRef = std::to_string(stmtNum->getNum());
 
-            std::tuple<DesignEntity, std::string> entity = make_tuple(DesignEntity::kStmt, stmtRef);
+            std::tuple<DesignEntity, std::string> entity = make_tuple(type_map_[stmtRef], stmtRef);
             result.push_back(entity);
         }
 
