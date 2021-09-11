@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <datatype/DataType.h>
+#include <typeinfo>
 
 enum class DesignEntity {
   kStmt,
@@ -75,7 +76,9 @@ class Synonym {
 struct Clause {
   std::string left_hand_side;
   std::string right_hand_side;
-  virtual ~Clause() {}
+  virtual std::string getType() { return ""; };
+  virtual bool isEqual(Clause toObj) { return 1; };
+  virtual ~Clause() {};
 };
 
 struct SuchThat : Clause {
@@ -88,6 +91,21 @@ struct SuchThat : Clause {
     rel_ref = rf;
     left_is_synonym = lhs_is_syn;
     right_is_synonym = rhs_is_syn;
+  }
+  std::string getType() const { return typeid(this).name(); }
+  bool isEqual(Clause* toObj) {
+    if (this->getType() == toObj->getType()) {
+      SuchThat *obj =  (SuchThat *) &toObj;
+      return (
+        this->left_hand_side == obj->left_hand_side &&
+        this->right_hand_side == obj->right_hand_side &&
+        this->rel_ref == obj->rel_ref &&
+        this->left_is_synonym == obj->left_is_synonym &&
+        this->right_is_synonym == obj->right_is_synonym
+      );
+    } else {
+      return false;
+    }
   }
 };
 
