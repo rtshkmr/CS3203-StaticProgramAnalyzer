@@ -34,8 +34,11 @@ TEST_CASE("PKB population and retrieval") {
 //  d1_.AddConstant(const1_);
 //  d1_.AddConstant(const2_);
 
+    d1_.proc_list_.push_back(p1_);
     d1_.var_list_.push_back(v1_);
     d1_.var_list_.push_back(v2_);
+    d1_.const_list_.push_back(const1_);
+    d1_.const_list_.push_back(const2_);
 
     d1_.AddStatement(a1_);
     d1_.AddStatement(call1_);
@@ -58,9 +61,19 @@ TEST_CASE("PKB population and retrieval") {
 
     SECTION("Get DesignEntity") {
 
+        SECTION("Procedure") {
+            std::list<std::string> proc_list{"p1"};
+            REQUIRE(proc_list == pkb.GetDesignEntity(DesignEntity::kProcedure));
+        }
+
         SECTION("Variable") {
             std::list<std::string> var_list{"v1", "v2"};
             REQUIRE(var_list == pkb.GetDesignEntity(DesignEntity::kVariable));
+        }
+
+        SECTION("Constant") {
+            std::list<std::string> const_list{"1", "2"};
+            REQUIRE(const_list == pkb.GetDesignEntity(DesignEntity::kConstant));
         }
 
         SECTION("Statement") {
@@ -93,6 +106,11 @@ TEST_CASE("PKB population and retrieval") {
         SECTION("Follows") {
             std::list<std::tuple<DesignEntity, std::string>> follows_list{std::make_tuple(DesignEntity::kCall, "2")};
             REQUIRE(follows_list == pkb.GetFollows("1"));
+        }
+
+        SECTION("FollowedBy") {
+            std::list<std::tuple<DesignEntity, std::string>> previous_list{std::make_tuple(DesignEntity::kAssign, "1")};
+            REQUIRE(previous_list == pkb.GetPrevious("2"));
         }
     }
 }

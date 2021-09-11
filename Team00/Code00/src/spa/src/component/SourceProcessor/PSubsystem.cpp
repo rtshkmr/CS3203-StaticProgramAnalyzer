@@ -40,12 +40,15 @@ void PSubsystem::ProcessStatement(std::string statement) {
       parent_stack_.pop();
       current_node_ = dynamic_cast<Statement*>(current_nest)->GetParentNode();
 
+      /* [INVALID LOGIC]
       //why? Else is wrap within If. So it is 2 steps in AST, so need to parent 2x.
       // however, no need to pop 2x because the "parent" is the same.
       if (current_node_type_ == 3) {
         assert(dynamic_cast<IfEntity*>(current_node_) != nullptr);
         current_node_ = dynamic_cast<Statement*>(current_node_)->GetParentNode();
       }
+      */
+
 
       if (parent_stack_.empty()) { //back to procedure stmtlist
         current_node_type_ = 0;
@@ -73,6 +76,10 @@ void PSubsystem::ProcessStatement(std::string statement) {
 
   if (current_node_type_ == -1) { //when current_node_ is null. Only happens when not reading within a procedure.
     if (Procedure* procedure = dynamic_cast<Procedure*>(entityObj)) {
+      if (deliverable_->GetProcList()->size() != 1) {
+        valid_state = false; //TODO: change this into elegant manner. Reason -> iter1 only max 1 procedure.
+        return;
+      }
       PerformNewProcedureSteps(procedure);
       return;
     } else {
@@ -118,12 +125,27 @@ void PSubsystem::PerformNewProcedureSteps(Procedure* procedure) {
 }
 
 void PSubsystem::SetStatementObject(Statement* statement) {
+  if (dynamic_cast<ElseEntity*>(statement) != nullptr)
+    return;
+
   program_counter_++;
   StatementNumber* statement_number = new StatementNumber(program_counter_);
   statement->SetStatementNumber(statement_number);
   deliverable_->AddStatement(statement);
+  current_node_->AddStatement(statement);
 
-  if (current_node_->GetStatementList()->empty()) {
+  if (!parent_stack_.empty()) {
+    assert(current_node_type_ == 1 || current_node_type_ == 2 || current_node_type_ == 3);
+    statement->SetParentNode(parent_stack_.top());
+    deliverable_->AddParentRelationship(reinterpret_cast<Statement*>(parent_stack_.top()), statement);
+  }
+
+  //no need modify follow stack for If and While.
+  if (dynamic_cast<IfEntity*>(statement) != nullptr || dynamic_cast<WhileEntity*>(current_node_) != nullptr) {
+    return;
+  }
+
+  if (current_node_->GetStatementList()->size() == 1) { // 1 because this is newly added in Line curr - 13
     //just entered a stack, follow nothing.
     follow_stack_.push(statement);
   } else {
@@ -132,13 +154,7 @@ void PSubsystem::SetStatementObject(Statement* statement) {
     follow_stack_.pop();
     follow_stack_.push(statement);
   }
-  current_node_->AddStatement(statement);
 
-  if (!parent_stack_.empty()) {
-    assert(current_node_type_ == 1 || current_node_type_ == 2);
-    statement->SetParentNode(parent_stack_.top());
-    deliverable_->AddParentRelationship(reinterpret_cast<Statement*>(parent_stack_.top()), statement);
-  }
 }
 
 void PSubsystem::HandleIfStmt(IfEntity* if_entity) {
@@ -149,6 +165,11 @@ void PSubsystem::HandleIfStmt(IfEntity* if_entity) {
 }
 
 void PSubsystem::HandleElseStmt(ElseEntity* else_entity) {
+  IfEntity* if_entity = dynamic_cast<IfEntity*>(current_node_->GetStatementList()->back());
+  assert (if_entity != nullptr); //If assertion failed, Else did not follow If
+  parent_stack_.push(if_entity);
+
+  if_entity->setElseStmtList(else_entity);
   current_node_type_ = 3;
   current_node_ = else_entity;
 }
@@ -165,7 +186,7 @@ void PSubsystem::HandleAssignStmt(AssignEntity* assign_entity) {
   deliverable_->AddModifiesRelationship(assign_entity, assign_entity->getVariable());
   deliverable_->AddModifiesRelationship(current_node_, assign_entity->getVariable());  //container level
 
-  for (Variable* v : assign_entity->GetExpressionVariables()) {
+  for (Variable* v: assign_entity->GetExpressionVariables()) {
     deliverable_->AddUsesRelationship(assign_entity, v);
     deliverable_->AddUsesRelationship(current_node_, v);   //container level
   }
