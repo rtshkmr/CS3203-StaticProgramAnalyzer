@@ -51,7 +51,8 @@ jobs:
     - name: Run Integration Test
       run: |
         cp -r ${{env.working-directory}}/tests/integration_test_files ${{env.working-directory}}/build/src/integration_testing/
-        ${{env.working-directory}}/build/src/integration_testing/integration_testing
+        cd ${{env.working-directory}}/build/src/integration_testing/
+        ./integration_testing
   
   autotester:
    runs-on: self-hosted
