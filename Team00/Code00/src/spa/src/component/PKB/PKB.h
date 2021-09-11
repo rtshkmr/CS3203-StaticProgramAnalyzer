@@ -37,8 +37,17 @@ class PKB {
   std::unordered_map<std::string, std::list<std::tuple<DesignEntity, std::string>>> parent_map_;
   std::unordered_map<std::string, std::tuple<DesignEntity,std::string>> child_map_;
 
-  //    std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> use_map_;
-  //    std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> modifies_map_;
+  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> use_s_map_;
+  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> used_by_s_map_;
+
+  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> use_c_map_;
+  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> used_by_c_map_;
+
+  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> modifies_s_map_;
+  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> modified_by_s_map_;
+
+  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> modifies_c_map_;
+  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> modified_by_c_map_;
 
   void PopulateProcList(const std::list<Procedure *> &proc_list);
   void PopulateVarList(const std::list<Variable *> &var_list);
@@ -57,15 +66,15 @@ class PKB {
   void PopulateParentMap(std::unordered_map<Statement *, std::list<Statement *> *> parent_hash);
   void PopulateChildMap(const std::unordered_map<Statement*, Statement*>& parent_of_hash);
 
-  void PopulateUseSMap(const std::unordered_map<Statement*, Entity*>& use_hash);
-  void PopulateUsedBySMap(const std::unordered_map<Statement*, std::list<Entity*>*> used_by_hash);
+  void PopulateUseSMap(std::unordered_map<Statement *, std::list<Variable *> *> use_hash);
+  void PopulateUsedBySMap(std::unordered_map<Variable *, std::list<Statement *> *> used_by_hash);
 
-  void PopulateUseCMap(const std::unordered_map<Statement*, Entity*>& container_use_hash);
-  void PopulateUsedByCMap(const std::unordered_map<Statement*, std::list<Entity*>*> container_used_by_hash);
+  void PopulateUseCMap(std::unordered_map<Container *, std::list<Variable *> *> c_use_hash);
+  void PopulateUsedByCMap(std::unordered_map<Variable *, std::list<Container *> *> c_used_by_hash);
 
-  void PopulateModifiesSMap(const std::unordered_map<Statement*, Entity*>& modifies_hash);
-  void PopulateModifiedBySMap(const std::unordered_map<Statement*, std::list<Entity*>*> modified_by_hash);
+  void PopulateModifiesSMap(std::unordered_map<Statement *, std::list<Variable *> *> modifies_hash);
+  void PopulateModifiedBySMap(std::unordered_map<Variable *, std::list<Statement *> *> modified_by_hash);
 
-  void PopulateModifiesCMap(const std::unordered_map<Statement*, Entity*>& container_modifies_hash);
-  void PopulateModifiedByCMap(const std::unordered_map<Statement*, std::list<Entity*>*> container_modified_by_hash);
+  void PopulateModifiesCMap(std::unordered_map<Container *, std::list<Variable *> *> c_modifies_hash);
+  void PopulateModifiedByCMap(std::unordered_map<Variable *, std::list<Container *> *> c_modified_by_hash);
 };
