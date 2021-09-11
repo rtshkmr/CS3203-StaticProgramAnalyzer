@@ -49,7 +49,9 @@ jobs:
       run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target integration_testing
 
     - name: Run Integration Test
-      run: ${{env.working-directory}}/build/src/integration_testing/integration_testing
+      run: |
+        cp -r ${{env.working-directory}}/tests/integration_test ${{env.working-directory}}/build/src/integration_testing/
+        ${{env.working-directory}}/build/src/integration_testing/integration_testing
   
   autotester:
    runs-on: self-hosted
