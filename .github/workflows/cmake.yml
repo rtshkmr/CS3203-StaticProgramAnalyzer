@@ -54,7 +54,7 @@ jobs:
       
     - name: Run AutoTester 
       run: | 
-        cp ${{env.working-directory}}/tests/* ${{env.working-directory}}/build/src/autotester
+        cp ${{env.working-directory}}/tests/* ${{env.working-directory}}/build/src/autotester/tests
         cd ${{env.working-directory}}/build/src/autotester/tests
         ./../autotester Source_simple.txt Source_queries.txt output.xml
       
