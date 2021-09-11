@@ -4,6 +4,7 @@ add_executable(unit_testing ${srcs}
         src/component/QueryProcessor/types/TestQueryEvaluatorTable.cpp
         src/component/QueryProcessor/TestQueryProjector.cpp
         src/component/QueryProcessor/QueryExtractor/TestQueryExtractor.cpp
+        src/component/QueryProcessor/TestQueryEvaluator.cpp
         src/component/SourceProcessor/TestTokenizer.cpp
         src/component/SourceProcessor/TestSyntaxValidator.cpp
         src/component/SourceProcessor/TestEntityFactory.cpp

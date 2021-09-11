@@ -2,6 +2,7 @@
 // Created by Max Ng on 6/9/21.
 //
 
+#include <typeinfo>
 #include "QueryEvaluatorTable.h"
 
 QueryEvaluatorTable::QueryEvaluatorTable(std::string target) {
@@ -40,7 +41,7 @@ bool QueryEvaluatorTable::DeleteRow(int index) {
     std::vector<std::string> current_column = iter->second;
     int size = current_column.size();
     if (index < size) {
-      current_column.erase(current_column.begin());
+      current_column.erase(current_column.begin() + index);
       iter->second = current_column;
     }
   }
@@ -56,6 +57,17 @@ bool QueryEvaluatorTable::AddRow(std::string synonym, int index, std::string val
   um[synonym].push_back(value);
   return true;
 };
+
+bool QueryEvaluatorTable::AddRowForAllColumn(std::string synonym, int index, std::string value) {
+  for (auto tableIterator = um.begin(); tableIterator != um.end(); tableIterator++) {
+    if (tableIterator->first == synonym) {
+      AddRow(synonym, index, value);
+    } else {
+      std::vector<std::string> currList = tableIterator->second;
+      currList.insert(currList.begin() + index, currList[index]);
+    }
+  }
+}
 
 // Return vector of target synonym
 std::vector<std::string> QueryEvaluatorTable::GetResults() {
@@ -81,6 +93,11 @@ bool QueryEvaluatorTable::RemoveColumn(std::string synonym) {
     return true;
   }
 };
+
+bool QueryEvaluatorTable::ContainsColumn(std::string synonym) {
+  auto search = um.find(synonym);
+  return search != um.end();
+}
 
 int QueryEvaluatorTable::GetSize() {
   return um.size();

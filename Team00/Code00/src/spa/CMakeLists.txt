@@ -25,12 +25,14 @@ add_library(spa ${srcs} ${headers}
         src/component/SourceProcessor/DesignExtractor.h
         src/component/QueryProcessor/types/Exceptions.h
         src/component/QueryProcessor/types/Types.h src/component/QueryProcessor/types/Types.cpp
+        src/component/QueryProcessor/types/QueryEvaluatorTable.h src/component/QueryProcessor/types/QueryEvaluatorTable.cpp
         src/component/QueryProcessor/QueryExtractor/QueryTokenizer.h src/component/QueryProcessor/QueryExtractor/QueryTokenizer.cpp
         src/component/QueryProcessor/QueryExtractor/QueryParser.h src/component/QueryProcessor/QueryExtractor/QueryParser.cpp
         src/component/QueryProcessor/QueryExtractor/QueryExtractor.h src/component/QueryProcessor/QueryExtractor/QueryExtractor.cpp
+        src/component/QueryProcessor/EvaluateSuchThatSingleSynonym.h src/component/QueryProcessor/EvaluateSuchThatSingleSynonym.cpp
+        src/component/QueryProcessor/QueryPKB.h src/component/QueryProcessor/QueryPKB.cpp
         src/component/QueryProcessor/QueryEvaluator.h src/component/QueryProcessor/QueryEvaluator.cpp
         src/component/QueryProcessor/QueryProjector.h src/component/QueryProcessor/QueryProjector.cpp
-        src/component/QueryProcessor/types/QueryEvaluatorTable.h src/component/QueryProcessor/types/QueryEvaluatorTable.cpp
         )
   
 # this makes the headers accessible for other projects which uses spa lib

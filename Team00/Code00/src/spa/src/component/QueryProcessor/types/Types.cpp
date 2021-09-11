@@ -13,3 +13,5 @@ std::vector<Clause*> Group::GetClauses() {
 bool Group::ContainsTargetSynonym() {
   return has_target_synonym;
 }
+
+
