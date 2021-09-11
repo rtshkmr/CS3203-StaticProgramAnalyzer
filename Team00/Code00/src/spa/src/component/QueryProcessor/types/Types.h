@@ -61,7 +61,42 @@ enum class RelRef {
   kNextT,
   kAffects,
   kAffectsT,
+  kInvalid
 };
+
+static RelRef GetRelRef(std::string reference) {
+  if (reference == "ModifiesP") {
+    return RelRef::kModifiesP;
+  } else if (reference == "ModifiesS") {
+    return RelRef::kModifiesS;
+  } else if (reference == "UsesP") {
+    return RelRef::kUsesP;
+  } else if (reference == "UsesS") {
+    return RelRef::kUsesS;
+  } else if (reference == "Calls") {
+    return RelRef::kCalls;
+  } else if (reference == "Calls*") {
+    return RelRef::kCallsT;
+  } else if (reference == "Parent") {
+    return RelRef::kParent;
+  } else if (reference == "Parent*") {
+    return RelRef::kParentT;
+  } else if (reference == "Follows") {
+    return RelRef::kFollows;
+  } else if (reference == "Follows*") {
+    return RelRef::kFollowsT;
+  } else if (reference == "Next") {
+    return RelRef::kNext;
+  } else if (reference == "Next*") {
+    return RelRef::kNextT;
+  } else if (reference == "Affects") {
+    return RelRef::kAffects;
+  } else if (reference == "Affects*") {
+    return RelRef::kAffectsT;
+  }
+  // TODO: Throw an error if this line is reached.
+  return RelRef::kInvalid;
+}
 
 class Synonym {
   private:
