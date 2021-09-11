@@ -1,0 +1,7 @@
+procedure Week4 {
+    read x;
+    print x;
+    y = 1;
+    z = 3;
+    z = x + y + 3;
+}
