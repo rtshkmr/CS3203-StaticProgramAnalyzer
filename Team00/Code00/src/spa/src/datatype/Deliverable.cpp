@@ -81,6 +81,12 @@ void Deliverable::AddUsesRelationship(Container* u1, Variable* u2) {
   }
 }
 
+void Deliverable::AddUsesRelationship(Container* container, std::list<Variable*>* var_list) {
+  for (Variable* var: *var_list) {
+    AddUsesRelationship(container, var);
+  }
+}
+
 void Deliverable::AddModifiesRelationship(Statement* m1, Variable* m2) {
   if (modifies_hash_.count(m1)) {
     modifies_hash_.find(m1)->second->push_back(m2);

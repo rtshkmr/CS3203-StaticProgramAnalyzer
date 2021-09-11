@@ -20,6 +20,17 @@ class DesignExtractor {
   void ExtractFollowsT(std::unordered_map<Statement*, Statement*> follow_hash);
   void ExtractParentOfT(std::unordered_map<Statement*, Statement*> child_to_parent_hash);
   void ExtractFollowedByT(std::unordered_map<Statement*, Statement*> followed_by_hash);
+
+  std::list<Variable*>* ExtractUsesInContainer(Container* container, std::vector<Procedure*>* extracted_procedures);
+  void ExtractUsesInIfContainer(IfEntity* if_entity,
+                                Container* container,
+                                std::vector<Procedure*>* extracted_procedures);
+  void ExtractUsesInWhileContainer(WhileEntity* while_entity,
+                                   Container* container,
+                                   std::vector<Procedure*>* extracted_procedures);
+  void ExtractUsesInCallContainer(CallEntity* call_entity,
+                                  Container* container,
+                                  std::vector<Procedure*>* extracted_procedures);
 };
 
 #endif //AUTOTESTER_DESIGNEXTRACTOR_H

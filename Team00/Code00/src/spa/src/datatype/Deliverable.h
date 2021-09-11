@@ -11,7 +11,7 @@
  */
 class Deliverable {
  public: //TODO: create getters before turning private
-  Deliverable() = default;    // should be initializing the data structures here
+  Deliverable() = default;
   // Adding of Procedure, Variable, ConstantValue are added using pointers to the list in EntityFactory.
   void AddStatement(Statement* stmt);
 
@@ -26,6 +26,7 @@ class Deliverable {
   void AddParentRelationship(Statement* p1, Statement* p2);
   void AddUsesRelationship(Statement* u1, Variable* u2);
   void AddUsesRelationship(Container* u1, Variable* u2);
+  void AddUsesRelationship(Container* container, std::list<Variable*>* var_list);
   void AddModifiesRelationship(Statement* m1, Variable* m2);
   void AddModifiesRelationship(Container* m1, Variable* m2);
 
