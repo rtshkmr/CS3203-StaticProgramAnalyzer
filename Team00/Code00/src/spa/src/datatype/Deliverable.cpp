@@ -34,15 +34,15 @@ void Deliverable::AddFollowRelationship(Statement* f1, Statement* f2) {
 }
 
 void Deliverable::AddParentRelationship(Statement* p1, Statement* p2) {
-  if (parent_hash_.count(p1)) {
-    parent_hash_.find(p1)->second->push_back(p2);
+  if (parent_to_child_hash_.count(p1)) {
+    parent_to_child_hash_.find(p1)->second->push_back(p2);
   } else {
     std::list<Statement*>* lst = new std::list<Statement*>();
     lst->push_back(p2);
-    parent_hash_.insert(make_pair(p1, lst));
+    parent_to_child_hash_.insert(make_pair(p1, lst));
   }
 
-  parent_of_hash_.insert({p2, p1});
+  child_to_parent_hash_.insert({p2, p1});
 }
 
 void Deliverable::AddUsesRelationship(Statement* u1, Variable* u2) {
@@ -65,7 +65,11 @@ void Deliverable::AddUsesRelationship(Statement* u1, Variable* u2) {
 
 void Deliverable::AddUsesRelationship(Container* u1, Variable* u2) {
   if (container_use_hash_.count(u1)) {
-    container_use_hash_.find(u1)->second->push_back(u2);
+    std::list<Variable*>* used_vars = container_use_hash_.find(u1)->second;
+    if (std::find(used_vars->begin(), used_vars->end(), u2) == used_vars->end()) {
+      // var does not exist in used_vars
+      container_use_hash_.find(u1)->second->push_back(u2);
+    }
   } else {
     std::list<Variable*>* lst = new std::list<Variable*>();
     lst->push_back(u2);
@@ -73,11 +77,21 @@ void Deliverable::AddUsesRelationship(Container* u1, Variable* u2) {
   }
 
   if (container_used_by_hash_.count(u2)) {
-    container_used_by_hash_.find(u2)->second->push_back(u1);
+    std::list<Container*>* used_by_conts = container_used_by_hash_.find(u2)->second;
+    if (std::find(used_by_conts->begin(), used_by_conts->end(), u1) == used_by_conts->end()) {
+      // container does not exist in used_by_conts
+      container_used_by_hash_.find(u2)->second->push_back(u1);
+    }
   } else {
     std::list<Container*>* lst = new std::list<Container*>();
     lst->push_back(u1);
     container_used_by_hash_.insert(make_pair(u2, lst));
+  }
+}
+
+void Deliverable::AddUsesRelationship(Container* container, std::list<Variable*>* var_list) {
+  for (Variable* var: *var_list) {
+    AddUsesRelationship(container, var);
   }
 }
 
@@ -101,7 +115,11 @@ void Deliverable::AddModifiesRelationship(Statement* m1, Variable* m2) {
 
 void Deliverable::AddModifiesRelationship(Container* m1, Variable* m2) {
   if (container_modifies_hash_.count(m1)) {
-    container_modifies_hash_.find(m1)->second->push_back(m2);
+    std::list<Variable*>* modified_vars = container_modifies_hash_.find(m1)->second;
+    if (std::find(modified_vars->begin(), modified_vars->end(), m2) == modified_vars->end()) {
+      // var does not exist in modified_vars
+      container_modifies_hash_.find(m1)->second->push_back(m2);
+    }
   } else {
     std::list<Variable*>* lst = new std::list<Variable*>();
     lst->push_back(m2);
@@ -109,11 +127,21 @@ void Deliverable::AddModifiesRelationship(Container* m1, Variable* m2) {
   }
 
   if (container_modified_by_hash_.count(m2)) {
-    container_modified_by_hash_.find(m2)->second->push_back(m1);
+    std::list<Container*>* modified_by_conts = container_modified_by_hash_.find(m2)->second;
+    if (std::find(modified_by_conts->begin(), modified_by_conts->end(), m1) == modified_by_conts->end()) {
+      // container does not exist in modified_by_conts
+      container_modified_by_hash_.find(m2)->second->push_back(m1);
+    }
   } else {
     std::list<Container*>* lst = new std::list<Container*>();
     lst->push_back(m1);
     container_modified_by_hash_.insert(make_pair(m2, lst));
+  }
+}
+
+void Deliverable::AddModifiesRelationship(Container* container, std::list<Variable*>* var_list) {
+  for (Variable* var: *var_list) {
+    AddModifiesRelationship(container, var);
   }
 }
 

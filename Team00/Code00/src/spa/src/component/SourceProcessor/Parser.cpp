@@ -47,6 +47,6 @@ void Parser::Parse(std::string file_name) {
 
 }
 
-Deliverable Parser::GetDeliverables() {
-  return this->deliverable_;
+Deliverable* Parser::GetDeliverables() {
+  return &this->deliverable_;
 }

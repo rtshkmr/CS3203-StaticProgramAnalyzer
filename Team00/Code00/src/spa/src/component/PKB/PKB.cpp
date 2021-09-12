@@ -79,8 +79,8 @@ void PKB::PopulateDataStructures(Deliverable d) {
     PopulateFollowsMap(d.follow_hash_);
     PopulatePreviousMap(d.followed_by_hash_);
 
-    PopulateParentMap(d.parent_hash_);
-    PopulateChildMap(d.parent_of_hash_);
+    PopulateParentMap(d.parent_to_child_hash_);
+    PopulateChildMap(d.child_to_parent_hash_);
 
     PopulateUseSMap(d.use_hash_);
     PopulateUsedBySMap(d.used_by_hash_);
@@ -344,8 +344,8 @@ void PKB::PopulateParentMap(std::unordered_map<Statement *, std::list<Statement 
     }
 }
 
-void PKB::PopulateChildMap(const std::unordered_map<Statement *, Statement *> &parent_of_hash) {
-    for (std::pair<Statement *, Statement *> kv : parent_of_hash) {
+void PKB::PopulateChildMap(const std::unordered_map<Statement *, Statement *> &child_to_parent_hash_) {
+    for (std::pair<Statement *, Statement *> kv : child_to_parent_hash_) {
         auto *kNumber = const_cast<StatementNumber *>(kv.first->GetStatementNumber());
         std::string kString = std::to_string(kNumber->getNum());
         auto *vNumber = const_cast<StatementNumber *>(kv.second->GetStatementNumber());

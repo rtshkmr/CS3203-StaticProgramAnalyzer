@@ -5,20 +5,20 @@
 #include <list>
 #include "Entity.h"
 
+void Container::AddStatement(Statement* stmt) {
+  statement_list_.push_back(stmt);
+}
+
+std::list<Statement*>* Container::GetStatementList() {
+  return &statement_list_;
+}
+
 Procedure::Procedure(ProcedureName* pName) {
   procedure_name_ = pName;
 }
 
-void Procedure::AddStatement(Statement* stmt) {
-  statement_list_.push_back(stmt);
-}
-
 const ProcedureName* Procedure::getName() {
   return procedure_name_;
-}
-
-std::list<Statement*>* Procedure::GetStatementList() {
-  return &statement_list_;
 }
 
 Variable::Variable(VariableName* vName) {

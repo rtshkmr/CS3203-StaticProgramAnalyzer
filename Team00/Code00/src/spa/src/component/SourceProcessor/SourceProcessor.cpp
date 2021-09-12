@@ -12,11 +12,12 @@ using namespace sp;
  * @return Source process status
  */
 void SourceProcessor::ProcessSourceFile(std::string file_name) {
-    par::Parser parser;
-    parser.Parse(file_name);
-    Deliverable deliverable = parser.GetDeliverables();
-    de::DesignExtractor design_extractor;
-    design_extractor.ExtractDesignAbstractions();
-    PKB pkb = PKB();
-    pkb.PopulateDataStructures(deliverable);
+  par::Parser parser;
+  parser.Parse(file_name);
+  Deliverable* deliverable = parser.GetDeliverables();
+  DesignExtractor design_extractor = DesignExtractor(deliverable);
+  design_extractor.ExtractDesignAbstractions();
+  PKB pkb = PKB();
+  pkb.PopulateDataStructures(*deliverable);
+
 }
