@@ -9,9 +9,18 @@ std::regex RegexPatterns::GetFixedKeywordPattern() {
 std::regex RegexPatterns::GetFixedCharPattern() {
   return std::regex(R"(\{|\}|;|\(|\))");
 }
+
 std::regex RegexPatterns::GetBinaryArithmeticOperatorPattern() {
 
   return std::regex(R"(\+|\-|\*|\/|%|=)");
+}
+
+std::regex RegexPatterns::GetTermDelimiterPattern() {
+  return std::regex(R"(\*|\/|%)");
+}
+
+std::regex RegexPatterns::GetExprDelimiterPattern() {
+  return std::regex(R"(\+|\-)");
 }
 
 std::regex RegexPatterns::GetBinaryComparisonPattern() {
@@ -20,16 +29,22 @@ std::regex RegexPatterns::GetBinaryComparisonPattern() {
 
 std::regex RegexPatterns::GetBooleanOperatorPattern() {
   return std::regex(R"(&&|\|\||!)");
-  // todo: check if ! is a regex metacharacter
+}
+std::regex RegexPatterns::GetBinaryBooleanOperatorPattern() {
+  return std::regex(R"(&&|\|\|)");
 }
 
+std::regex RegexPatterns::GetUnaryBooleanOperatorPattern() {
+  return std::regex(R"(!)");
+}
 std::regex RegexPatterns::GetNamePattern() {
   return std::regex(R"(^[[:alpha:]]+([0-9]+|[[:alpha:]]+)*)");
 }
 std::regex RegexPatterns::GetIntegerPattern() {
-  return std::regex(R"([0-9]+)");
+  return std::regex(R"(^(0|[1-9][0-9]*)$)");
 }
 std::regex RegexPatterns::GetDesignEntityPattern() {
   return std::regex(R"(stmt|read|print|call|while|if|assign|variable|constant|procedure)");
 };
+
 

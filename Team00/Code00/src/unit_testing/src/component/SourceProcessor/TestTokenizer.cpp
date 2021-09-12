@@ -3,6 +3,7 @@
 #include <component/SourceProcessor/Tokenizer.h>
 #include <datatype/RegexPatterns.h>
 #include <regex>
+#include <random>
 
 using namespace std;
 
@@ -182,6 +183,18 @@ TEST_CASE("1.Tokenizer.Successfully handles the tagging strings with a TokenTag"
   }
   SECTION("Tagging of token strings successfully handles invalid inputs") {
     REQUIRE(successful_handling_invalid_inputs);
+  }
+
+  SECTION("Tags constants properly: if multiple digits, doesn't start with 0") {
+    Token negative_integer_input = Token("01", TokenTag::kInvalid);
+    Token positive_integer_input = Token("10", TokenTag::kInteger);
+    Token zero = Token("0", TokenTag::kInteger);
+    Token one = Token("1", TokenTag::kInteger);
+    bool matches = negative_integer_input == Token("01", Token::TagStringWithToken("01"))
+        && positive_integer_input == Token("10", Token::TagStringWithToken("10"))
+        && zero == Token("0", Token::TagStringWithToken("0"))
+        && one == Token("1", Token::TagStringWithToken("1"));
+    REQUIRE(matches);
   }
 
 }

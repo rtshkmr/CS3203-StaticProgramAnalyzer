@@ -4,6 +4,7 @@
 #include <component/SourceProcessor/Tokenizer.h>
 #include <component/SourceProcessor/SyntaxValidator.h>
 #include <regex>
+#include <datatype/RegexPatterns.h>
 
 using std::string;
 using std::vector;
@@ -79,63 +80,188 @@ static vector<string> invalid_program_lines = {
 //    R"(z                                                                                                   = 3;)",
 };
 
-static void CheckAgainstSampleLines(int start, int end, vector<string>& lines, bool expected) {
+static bool CheckAgainstSampleLines(int start, int end, vector<string>& lines, bool expected) {
   for (int i = start; i <= end; i++) {
     string line = lines.at(i);
     vector<Token> tokens = Tokenizer::CreateTokens(line);
     bool output = SyntaxValidator::ValidateSemanticSyntax(tokens);
-    bool matches_with_expected = output == expected;
-    REQUIRE(matches_with_expected);
+    return output == expected;
+
+//    REQUIRE(matches_with_expected);
+  }
+}
+
+TEST_CASE("1.SyntaxValidator.Test helper functions") {
+  SECTION("Test count tokens") {
+    string input = "> > +++ ??? nothingElseMattersssss trust ! 5eek I find In U  >= || &&  ||  <= ! &&  || <= hello ";
+    vector<Token> tokens = Tokenizer::CreateTokens(input);
+    Token target_token = Token("&&", TokenTag::kBooleanOperator);
+//    Token* target_token = new Token("&&", TokenTag::kBooleanOperator);
+    auto iterator = std::find_if(tokens.begin(), tokens.end(), [target_token](auto elem) {
+      return elem == target_token;
+    });
+    int num_boolean_operators = SyntaxValidator::CountTokens(tokens, TokenTag::kBooleanOperator);
+    int num_not_operators = SyntaxValidator::CountTokens(tokens, TokenTag::kBooleanOperator, "!");
+    SECTION("only with token tags") {
+      REQUIRE(num_boolean_operators == 7); // hardcoded test
+    }
+    SECTION("with token tags and string") {
+      REQUIRE(num_not_operators == 2);
+    }
+  }
+
+  SECTION("Is Factor function check") {
+    string line = "0 1 2 3 4 5 varName";
+    // todo: add test for IsExpr based factor
+    vector<Token> tokens = Tokenizer::CreateTokens(line);
+//    [0] = {Token} {token_string_="0", token_tag_=kInteger}
+//    [1] = {Token} {token_string_="1", token_tag_=kInteger}
+//    [2] = {Token} {token_string_="2", token_tag_=kInteger}
+//    [3] = {Token} {token_string_="3", token_tag_=kInteger}
+//    [4] = {Token} {token_string_="4", token_tag_=kInteger}
+//    [5] = {Token} {token_string_="5", token_tag_=kInteger}
+//    [6] = {Token} {token_string_="varName", token_tag_=kName}
+    REQUIRE_FALSE(SyntaxValidator::IsFactor(tokens, 0, 3)); // because only accepts if it's a single int
+    REQUIRE(SyntaxValidator::IsFactor(tokens, 0, 0)); // because only accepts if it's a single int
+    REQUIRE(SyntaxValidator::IsFactor(tokens, 6, 6)); // because only accepts if it's a single varName
+  }
+  SECTION("Is Term function check") {
+    string line = "VarNameIsASingleFactor "
+                  "var1 * var2 % var3 / var4 % var5 * var6 var7 + var8 % ";
+
+    vector<Token> tokens = Tokenizer::CreateTokens(line);
+
+//    [0] = {Token} {token_string_="VarNameIsASingeFactor", token_tag_=kName}
+//    [1] = {Token} {token_string_="var1", token_tag_=kName}
+//    [2] = {Token} {token_string_="*", token_tag_=kBinaryArithmeticOperator}
+//    [3] = {Token} {token_string_="var2", token_tag_=kName}
+//    [4] = {Token} {token_string_="%", token_tag_=kBinaryArithmeticOperator}
+//    [5] = {Token} {token_string_="var3", token_tag_=kName}
+//    [6] = {Token} {token_string_="/", token_tag_=kBinaryArithmeticOperator}
+//    [7] = {Token} {token_string_="var4", token_tag_=kName}
+//    [8] = {Token} {token_string_="%", token_tag_=kBinaryArithmeticOperator}
+//    [9] = {Token} {token_string_="var5", token_tag_=kName}
+//    [10] = {Token} {token_string_="*", token_tag_=kBinaryArithmeticOperator}
+//    [11] = {Token} {token_string_="var6", token_tag_=kName}
+//    [12] = {Token} {token_string_="var7", token_tag_=kName}
+//    [13] = {Token} {token_string_="+", token_tag_=kBinaryArithmeticOperator}
+//    [14] = {Token} {token_string_="var8", token_tag_=kName}
+//    [15] = {Token} {token_string_="%", token_tag_=kBinaryArithmeticOperator}
+
+    REQUIRE(SyntaxValidator::IsTerm(tokens, 0, 0)); // justa factor
+    REQUIRE(SyntaxValidator::IsTerm(tokens, 1, 3)); // delim by *
+    REQUIRE(SyntaxValidator::IsTerm(tokens, 7, 9)); // delim by %
+    REQUIRE(SyntaxValidator::IsTerm(tokens, 1, 9)); // delim by %
+    REQUIRE_FALSE(SyntaxValidator::IsTerm(tokens, 10, 12)); // invalid start with a delim
+    REQUIRE_FALSE(SyntaxValidator::IsTerm(tokens, 1, 10)); // invalid ends with a delim
+    REQUIRE_FALSE(SyntaxValidator::IsTerm(tokens, 2, 10)); // invalid starts and ends with a delim
+    REQUIRE_FALSE(SyntaxValidator::IsTerm(tokens, 12, 14)); // invalid delim
+  }
+
+
+  // expr: expr ‘+’ term | expr ‘-’ term | term
+  SECTION("Is Expr Function Check") {
+    string line = "VarNameIsASingeFactor "
+                  "var1 + var2 - var3 - var4 + var5 - var6 var7 / var8";
+
+    vector<Token> tokens = Tokenizer::CreateTokens(line);
+
+//    [0] = {Token} {token_string_="VarNameIsASingeFactor", token_tag_=kName}
+//    [1] = {Token} {token_string_="var1", token_tag_=kName}
+//    [2] = {Token} {token_string_="+", token_tag_=kBinaryArithmeticOperator}
+//    [3] = {Token} {token_string_="var2", token_tag_=kName}
+//    [4] = {Token} {token_string_="-", token_tag_=kBinaryArithmeticOperator}
+//    [5] = {Token} {token_string_="var3", token_tag_=kName}
+//    [6] = {Token} {token_string_="-", token_tag_=kBinaryArithmeticOperator}
+//    [7] = {Token} {token_string_="var4", token_tag_=kName}
+//    [8] = {Token} {token_string_="+", token_tag_=kBinaryArithmeticOperator}
+//    [9] = {Token} {token_string_="var5", token_tag_=kName}
+//    [10] = {Token} {token_string_="-", token_tag_=kBinaryArithmeticOperator}
+//    [11] = {Token} {token_string_="var6", token_tag_=kName}
+//    [12] = {Token} {token_string_="var7", token_tag_=kName}
+//    [13] = {Token} {token_string_="/", token_tag_=kBinaryArithmeticOperator}
+//    [14] = {Token} {token_string_="var8", token_tag_=kName}
+
+    REQUIRE(SyntaxValidator::IsExpr(tokens, 0, 0)); // justa factor
+    REQUIRE(SyntaxValidator::IsExpr(tokens, 1, 3)); // delim by *
+    REQUIRE(SyntaxValidator::IsExpr(tokens, 7, 9)); // delim by %
+    REQUIRE(SyntaxValidator::IsExpr(tokens, 1, 9)); // delim by %
+    REQUIRE_FALSE(SyntaxValidator::IsExpr(tokens, 10, 12)); // invalid start with a delim
+    REQUIRE_FALSE(SyntaxValidator::IsExpr(tokens, 1, 10)); // invalid ends with a delim
+    REQUIRE_FALSE(SyntaxValidator::IsExpr(tokens, 2, 10)); // invalid starts and ends with a delim
+  }
+
+  // expr: expr ‘+’ term | expr ‘-’ term | term
+  SECTION("Is RelFactor Function Check") {
+    string line = "if (myLifeSavings >= (myBeginningBalance + 3 * myStripperFees)) {";
+//      [0] = {Token} {token_string_="if", token_tag_=kIfKeyword}
+//      [1] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//      [2] = {Token} {token_string_="myLifeSavings", token_tag_=kName}
+//      [3] = {Token} {token_string_=">=", token_tag_=kBinaryComparisonOperator}
+//      [4] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//      [5] = {Token} {token_string_="myBeginningBalance", token_tag_=kName}
+//      [6] = {Token} {token_string_="+", token_tag_=kBinaryArithmeticOperator}
+//      [7] = {Token} {token_string_="3", token_tag_=kInteger}
+//      [8] = {Token} {token_string_="*", token_tag_=kBinaryArithmeticOperator}
+//      [9] = {Token} {token_string_="myStripperFees", token_tag_=kName}
+//      [10] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//      [11] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//      [12] = {Token} {token_string_="{", token_tag_=kOpenBrace}
+    vector<Token> tokens = Tokenizer::CreateTokens(line);
+    REQUIRE(SyntaxValidator::IsRelFactor(tokens, 2, 2)); // justa factor
+    REQUIRE(SyntaxValidator::IsRelFactor(tokens, 5, 9)); // it's a relative factor cuz it's an expression
+    // rel-factor can only be surrounded on one end by a boolean comparison operator and the other by an open/close bracket
+    // todo: fix this test, should allow redundant brackets
+    REQUIRE(SyntaxValidator::IsRelFactor(tokens, 4, 10));
+    REQUIRE_FALSE(SyntaxValidator::IsRelFactor(tokens, 1, 2));
+    REQUIRE_FALSE(SyntaxValidator::IsRelFactor(tokens, 4, 11)); // unequal bracketing
   }
 }
 
 TEST_CASE("1.SyntaxValidator.Validator handles basic statements:") {
   SECTION("handles procedure statement") {
     SECTION("positive cases") {
-      CheckAgainstSampleLines(0, 0, valid_program_lines, true);
+      REQUIRE(CheckAgainstSampleLines(0, 0, valid_program_lines, true));
     }
     SECTION("negative cases") {
-      CheckAgainstSampleLines(0, 1, invalid_program_lines, false);
+      REQUIRE(CheckAgainstSampleLines(0, 1, invalid_program_lines, false));
     }
   }
 
   SECTION("handles macro function calls like read, print and call") {
     SECTION("positive cases") {
-      CheckAgainstSampleLines(1, 3, valid_program_lines, true);
+      REQUIRE(CheckAgainstSampleLines(1, 3, valid_program_lines, true));
     }
     SECTION("negative cases") {
-      CheckAgainstSampleLines(2, 8, invalid_program_lines, false);
+      REQUIRE(CheckAgainstSampleLines(2, 8, invalid_program_lines, false));
     }
   }
   SECTION("handles \"if\" statements") {
     SECTION("positive cases") {
-      CheckAgainstSampleLines(4, 6, valid_program_lines, true);
+      REQUIRE(CheckAgainstSampleLines(4, 6, valid_program_lines, true));
     }
     SECTION("negative cases") {
-      CheckAgainstSampleLines(9, 16, invalid_program_lines, false);
+      REQUIRE(CheckAgainstSampleLines(9, 16, invalid_program_lines, false));
     }
   }
-
 
   SECTION("handles \"else\" statements") {
     SECTION("positive cases") {
-      CheckAgainstSampleLines(7, 8, valid_program_lines, true);
+      REQUIRE(CheckAgainstSampleLines(7, 8, valid_program_lines, true));
     }
     SECTION("negative cases") {
-      CheckAgainstSampleLines(17, 17, invalid_program_lines, false);
+      REQUIRE(CheckAgainstSampleLines(17, 17, invalid_program_lines, false));
     }
   }
-
 
   SECTION("handles while statements") {
     SECTION("positive cases") {
-      CheckAgainstSampleLines(9, 9, valid_program_lines, true);
+      REQUIRE(CheckAgainstSampleLines(9, 9, valid_program_lines, true));
     }
     SECTION("negative cases") {
-      CheckAgainstSampleLines(18, 25, invalid_program_lines, false);
+      REQUIRE(CheckAgainstSampleLines(18, 25, invalid_program_lines, false));
     }
   }
-
 
 }
 
