@@ -249,6 +249,44 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
     REQUIRE_FALSE(SyntaxValidator::IsRelExpr(tokens, 16, 19)); // uneven bracketing
     REQUIRE_FALSE(SyntaxValidator::IsRelExpr(tokens, 8, 20)); // Rel expression is not cond expr
   }
+  SECTION("Is CondExpr tests") {
+    string line = "if((x>=1)&&((y>69)||(z<0)) || !(3 > 1)){";
+    vector<Token> tokens = Tokenizer::CreateTokens(line);
+//    [0] = {Token} {token_string_="if", token_tag_=kIfKeyword}
+//    [1] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [2] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [3] = {Token} {token_string_="x", token_tag_=kName}
+//    [4] = {Token} {token_string_=">=", token_tag_=kBinaryComparisonOperator}
+//    [5] = {Token} {token_string_="1", token_tag_=kInteger}
+//    [6] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//    [7] = {Token} {token_string_="&&", token_tag_=kBooleanOperator}
+//    [8] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [9] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [10] = {Token} {token_string_="y", token_tag_=kName}
+//    [11] = {Token} {token_string_=">", token_tag_=kBinaryComparisonOperator}
+//    [12] = {Token} {token_string_="69", token_tag_=kInteger}
+//    [13] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//    [14] = {Token} {token_string_="||", token_tag_=kBooleanOperator}
+//    [15] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [16] = {Token} {token_string_="z", token_tag_=kName}
+//    [17] = {Token} {token_string_="<", token_tag_=kBinaryComparisonOperator}
+//    [18] = {Token} {token_string_="0", token_tag_=kInteger}
+//    [19] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//    [20] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//    [21] = {Token} {token_string_="||", token_tag_=kBooleanOperator}
+//    [22] = {Token} {token_string_="!", token_tag_=kBooleanOperator}
+//    [23] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [24] = {Token} {token_string_="3", token_tag_=kInteger}
+//    [25] = {Token} {token_string_=">", token_tag_=kBinaryComparisonOperator}
+//    [26] = {Token} {token_string_="1", token_tag_=kInteger}
+//    [27] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//    [28] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//    [29] = {Token} {token_string_="{", token_tag_=kOpenBrace}
+    REQUIRE(SyntaxValidator::IsCondExpr(tokens, 9, 13)); // is just a rel_expr
+    REQUIRE(SyntaxValidator::IsCondExpr(tokens, 9, 19)); // (<cond_expr>) || (<cond_expr>)
+    REQUIRE(SyntaxValidator::IsCondExpr(tokens, 22, 27)); // !(<cond_expr>)
+//    REQUIRE(SyntaxValidator::IsCondExpr(tokens, 2, 20)); // (<cond_expr>) || (<cond_expr>)
+  }
 }
 
 TEST_CASE("1.SyntaxValidator.Validator handles basic statements:") {
