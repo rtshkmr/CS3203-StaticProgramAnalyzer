@@ -10,11 +10,11 @@ TEST_CASE("Source processing to PKB retrieval") {
     par::Parser parser;
     parser.Parse("./integration_test_files/basic_source.txt"); // Uncomment this when pushing / Comment on local
 //    parser.Parse("../../../tests/basic_source.txt"); // Comment this when pushing / Uncomment on local
-    Deliverable deliverable = parser.GetDeliverables();
-    de::DesignExtractor design_extractor;
+    Deliverable* deliverable = parser.GetDeliverables();
+    DesignExtractor design_extractor = DesignExtractor(deliverable);
     design_extractor.ExtractDesignAbstractions();
     PKB pkb = PKB();
-    pkb.PopulateDataStructures(deliverable);
+    pkb.PopulateDataStructures(*deliverable);
     SECTION("Procedure") {
         REQUIRE(std::list<std::string>{"Week4"} == pkb.GetDesignEntity(DesignEntity::kProcedure));
     }

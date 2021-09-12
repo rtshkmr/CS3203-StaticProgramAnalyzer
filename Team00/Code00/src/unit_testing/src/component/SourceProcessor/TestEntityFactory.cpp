@@ -18,7 +18,6 @@ TEST_CASE("1.EntityFactory.CreateEntities") {
         Token(string("proc1"), TokenTag::kName),
         Token(string("{"), TokenTag::kOpenBrace)
     };
-    //  Procedure expected_procedure_entity = Procedure(new ProcedureName("proc1"));
     Entity* actual_procedure_entity = entity_factory.CreateEntities(procedure_tokens);
     auto* actual_casted_procedure = dynamic_cast<Procedure*>(actual_procedure_entity);
     auto* actual_procedure_name = const_cast<ProcedureName*>(actual_casted_procedure->getName());

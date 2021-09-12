@@ -20,7 +20,7 @@ namespace par {
 
         void Parse(std::string file_name);
 
-        Deliverable GetDeliverables();
+        Deliverable* GetDeliverables();
     };
 }
 
