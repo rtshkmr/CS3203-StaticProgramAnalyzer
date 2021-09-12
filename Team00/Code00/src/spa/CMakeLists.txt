@@ -29,10 +29,11 @@ add_library(spa ${srcs} ${headers}
         src/component/QueryProcessor/QueryExtractor/QueryTokenizer.h src/component/QueryProcessor/QueryExtractor/QueryTokenizer.cpp
         src/component/QueryProcessor/QueryExtractor/QueryParser.h src/component/QueryProcessor/QueryExtractor/QueryParser.cpp
         src/component/QueryProcessor/QueryExtractor/QueryExtractor.h src/component/QueryProcessor/QueryExtractor/QueryExtractor.cpp
-        src/component/QueryProcessor/EvaluateSuchThatSingleSynonym.h src/component/QueryProcessor/EvaluateSuchThatSingleSynonym.cpp
-        src/component/QueryProcessor/EvaluateSuchThatDoubleSynonyms.h src/component/QueryProcessor/EvaluateSuchThatDoubleSynonyms.cpp
-        src/component/QueryProcessor/QueryPKB.h src/component/QueryProcessor/QueryPKB.cpp
-        src/component/QueryProcessor/QueryEvaluator.h src/component/QueryProcessor/QueryEvaluator.cpp
+        src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatSingleSynonym.h src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatSingleSynonym.cpp
+        src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatDoubleSynonyms.h src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatDoubleSynonyms.cpp
+        src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatNoSynonym.h src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatNoSynonym.cpp
+        src/component/QueryProcessor/QueryEvaluator/QueryPKB.h src/component/QueryProcessor/QueryEvaluator/QueryPKB.cpp
+        src/component/QueryProcessor/QueryEvaluator/QueryEvaluator.h src/component/QueryProcessor/QueryEvaluator/QueryEvaluator.cpp
         src/component/QueryProcessor/QueryProjector.h src/component/QueryProcessor/QueryProjector.cpp
         src/component/QueryProcessor/QuerySystemController.h src/component/QueryProcessor/QuerySystemController.cpp
         )

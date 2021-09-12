@@ -3,7 +3,7 @@
 //
 
 #include "QuerySystemController.h"
-#include "QueryEvaluator.h"
+#include "component/QueryProcessor/QueryEvaluator/QueryEvaluator.h"
 #include "QueryProjector.h"
 #include <component/QueryProcessor/QueryExtractor/QueryExtractor.h>
 

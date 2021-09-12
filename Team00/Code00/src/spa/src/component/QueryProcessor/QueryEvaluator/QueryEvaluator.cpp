@@ -1,7 +1,7 @@
 #include "QueryEvaluator.h"
 
 QueryEvaluator::QueryEvaluator(std::list<Synonym> syn_list, Synonym target, std::list<Group> groups, PKB pkb)
-        : synonymlist{syn_list}, targetSynonym{target}, groupList{groups}, pkb{pkb} {}
+        : synonymlist{syn_list}, targetSynonym{target}, groupList{groups}, pkb{pkb}, booleanResult{true} {}
 
 std::vector<std::string> QueryEvaluator::EvaluateQuery() {
 
@@ -32,9 +32,59 @@ std::vector<std::string> QueryEvaluator::EvaluateQuery() {
           // Evaluate pattern clause here
         }
       }
+
     } else {
-      // Evaluate boolean type clauses here
+      // Each boolean group has their own table.
+      std::vector<Clause*> clauseList = iter->GetClauses();
+      Clause* firstClause = clauseList[0];
+      std::string synonymName = "";
+      if (typeid(*firstClause) == typeid(SuchThat)) {
+        SuchThat* st = dynamic_cast<SuchThat*>(firstClause);
+        if (st->left_is_synonym) {
+          synonymName = st->left_hand_side;
+        } else if (st->right_is_synonym) {
+          synonymName = st->right_hand_side;
+        } else {
+          // If no synonym, no need for a table. Also, should be in a group of size 1.
+          bool result = EvaluateNoSynonym(*st, pkb);
+          if (result == false) {
+            booleanResult = false;
+            break;
+          }
+          continue;
+        }
+      } else if (typeid(*firstClause) == typeid(Pattern)) {
+        Pattern* pattern = dynamic_cast<Pattern*>(firstClause);
+        synonymName = pattern->assign_synonym;
+      } else {
+        // No code should run here for iter 1 since there is only suchthat and pattern clause.
+      }
+
+      if (synonymName != "") {
+        QueryEvaluatorTable currTable(synonymName);
+        for (auto iter = clauseList.begin(); iter != clauseList.end(); iter++) {
+          Clause* currentClause = *iter;
+          if (typeid(*currentClause) == typeid(SuchThat)) {
+            // Evaluate such that clause here
+            SuchThat* currentSuchThat = dynamic_cast<SuchThat*>(currentClause);
+            currTable = processBooleanSuchThat(*currentSuchThat);
+          } else {
+            // Evaluate pattern clause here
+          }
+        }
+
+        if (currTable.GetSize() == 0) {
+          booleanResult = false;
+          break;
+        }
+      }
     }
+  }
+
+  // Check the boolean conditions
+  if (booleanResult == false) {
+    std::vector<std::string> emptyList = {};
+    return emptyList;
   }
 
   // return the final results
@@ -44,11 +94,11 @@ std::vector<std::string> QueryEvaluator::EvaluateQuery() {
 QueryEvaluatorTable QueryEvaluator::evaluateSuchThat(Clause* clause, QueryEvaluatorTable table) {
   SuchThat* st = dynamic_cast<SuchThat*>(clause);
   RelRef relationship = st->rel_ref;
-  table = processDoubleStmtRef(*st, table, relationship);
+  table = processNonBooleanSuchThat(*st, table, relationship);
   return table;
 };
 
-QueryEvaluatorTable QueryEvaluator::processDoubleStmtRef(SuchThat such_that_clause, QueryEvaluatorTable table, RelRef query_relation) {
+QueryEvaluatorTable QueryEvaluator::processNonBooleanSuchThat(SuchThat such_that_clause, QueryEvaluatorTable table, RelRef query_relation) {
   std::string firstValue = such_that_clause.left_hand_side;
   std::string secondValue = such_that_clause.right_hand_side;
   // All possible cases:
@@ -67,7 +117,8 @@ QueryEvaluatorTable QueryEvaluator::processDoubleStmtRef(SuchThat such_that_clau
           newSynonym = *iter;
         }
       }
-      table = ProcessNewColumn(firstValue, newSynonym, table, such_that_clause.rel_ref, true);
+      table = ProcessNewColumn(firstValue, newSynonym, table,
+                               such_that_clause.rel_ref, true, pkb);
 
       // Second synonym in table, the other is not.
     } else if (table.ContainsColumn(secondValue)) {
@@ -77,14 +128,16 @@ QueryEvaluatorTable QueryEvaluator::processDoubleStmtRef(SuchThat such_that_clau
           newSynonym = *iter;
         }
       }
-      ProcessNewColumn(secondValue, newSynonym, table, such_that_clause.rel_ref, false);
+      table = ProcessNewColumn(secondValue, newSynonym, table,
+                       such_that_clause.rel_ref, false, pkb);
     } else {
-      // None in the target table
+      // Neither synonym in the target table
       // Nothing should execute here, if the code comes here, maybe throw an error.
     }
 
   } else if (!such_that_clause.left_is_synonym && !such_that_clause.right_is_synonym) {
-    // Boolean case where both are not synonyms. Only supported in 1.3
+    // Boolean case where both are not synonyms.
+    // This should throw an error since it belongs to a group with target synonym.
   } else {
     // Only 1 synonym
     if (such_that_clause.left_is_synonym) {
@@ -101,49 +154,6 @@ QueryEvaluatorTable QueryEvaluator::processDoubleStmtRef(SuchThat such_that_clau
   return table;
 }
 
-/**
- * Adds a new table column header, then adds or deletes the rows in the table by checking if there is a relationship
- * between the values in the table with all valid stmtRef belonging to the Synonym's DesignEntity.
- *
- * @param target_synonym_name The name of the synonym currently in the table
- * @param new_synonym The synonym to be added.
- * @param table The table which contains the current synonym.
- * @param relationship The type of such-that relationship between the 2 synonyms in question.
- * @param givenFirstParam Checks if the given Synonym is the First or Second Param when querying the PKB
- * @return IfEntity or WhileEntity.
- */
-QueryEvaluatorTable QueryEvaluator::ProcessNewColumn(std::string target_synonym_name, Synonym new_synonym, QueryEvaluatorTable table
-                                      , RelRef relationship, bool givenFirstParam) {
+QueryEvaluatorTable QueryEvaluator::processBooleanSuchThat(SuchThat such_that_clause) {
 
-  table.AddColumn(new_synonym.GetName()); // Add a new column in the table first
-
-  std::vector<std::string> targetSynonymList = table.GetColumn(target_synonym_name);
-  int numberOfTimesToTraverse = targetSynonymList.size();
-  for (int i = 0; i < numberOfTimesToTraverse; i++) {    // For each synonym in the table
-    std::string currStmtRef = targetSynonymList[i];
-    // Get the list of possible stmtRef for the current stmtRef.
-    std::list<std::tuple<DesignEntity, std::string>> possibleStmtRef =
-            queryPKBSuchThat(pkb, relationship, currStmtRef, givenFirstParam);
-
-    bool hasValidRelationship = false;
-    for (auto iter = possibleStmtRef.begin(); iter != possibleStmtRef.end(); iter++) {
-      DesignEntity currentStatementType = std::get<0>(*iter);
-      std::string currentStatementRef = std::get<1>(*iter);
-      if (currentStatementType == new_synonym.GetType()) {
-        hasValidRelationship = true;
-        // Add new row for each col in table
-        table.AddRowForAllColumn(new_synonym.GetName(), i, currentStatementRef);
-      }
-    }
-
-    // If there are no valid relationships, delete currRow from table.
-    if (!hasValidRelationship) {
-      table.DeleteRow(i);
-      i--;
-      numberOfTimesToTraverse--;
-    }
-
-  }
-  return table;
 }
-

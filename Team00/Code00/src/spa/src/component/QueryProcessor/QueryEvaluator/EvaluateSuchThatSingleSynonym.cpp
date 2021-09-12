@@ -3,8 +3,8 @@
 //
 
 #include "EvaluateSuchThatSingleSynonym.h"
-#include "types/QueryEvaluatorTable.h"
-#include "types/Types.h"
+#include "component/QueryProcessor/types/QueryEvaluatorTable.h"
+#include "component/QueryProcessor/types/Types.h"
 #include "QueryPKB.h"
 
 // Only 1 synonym
