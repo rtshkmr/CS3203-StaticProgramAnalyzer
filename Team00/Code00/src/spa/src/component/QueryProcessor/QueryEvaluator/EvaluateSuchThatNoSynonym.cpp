@@ -2,7 +2,7 @@
 // Created by Max Ng on 12/9/21.
 //
 
-#import "EvaluateSuchThatNoSynonym.h"
+#include "EvaluateSuchThatNoSynonym.h"
 
 bool EvaluateNoSynonym(SuchThat st, PKB pkb) {
   std::string firstParam = st.left_hand_side;
