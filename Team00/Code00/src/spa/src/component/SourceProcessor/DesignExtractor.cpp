@@ -112,11 +112,16 @@ std::list<Variable*>* DesignExtractor::ExtractUsesInContainer(Container* contain
 void DesignExtractor::ExtractUsesInIfContainer(IfEntity* if_entity,
                                                Container* container,
                                                std::vector<Procedure*>* extracted_procedures) {
+  // Variables in Else container may be added to the deliverable, but must also be added to the If container entry of
+  // the map in deliverable
+  // Then the nested Variables in If can be extracted and added to the outer container
+  std::list<Variable*>* nested_else_var_list = ExtractUsesInContainer(if_entity->GetElseEntity(), extracted_procedures);
+  deliverable_->AddUsesRelationship(container, nested_else_var_list);
+  deliverable_->AddUsesRelationship(if_entity, nested_else_var_list);
+
   std::list<Variable*>* nested_if_var_list = ExtractUsesInContainer(if_entity, extracted_procedures);
   deliverable_->AddUsesRelationship(container, nested_if_var_list);
 
-  std::list<Variable*>* nested_else_var_list = ExtractUsesInContainer(if_entity->GetElseEntity(), extracted_procedures);
-  deliverable_->AddUsesRelationship(container, nested_else_var_list);
 }
 
 /**
@@ -192,12 +197,17 @@ std::list<Variable*>* DesignExtractor::ExtractModifiesInContainer(Container* con
 void DesignExtractor::ExtractModifiesInIfContainer(IfEntity* if_entity,
                                                    Container* container,
                                                    std::vector<Procedure*>* extracted_procedures) {
+  // Variables in Else container may be added to the deliverable, but must also be added to the If container entry of
+  // the map in deliverable
+  // Then the nested Variables in If can be extracted and added to the outer container
+  std::list<Variable*>* nested_else_var_list
+      = ExtractModifiesInContainer(if_entity->GetElseEntity(), extracted_procedures);
+  deliverable_->AddModifiesRelationship(container, nested_else_var_list);
+  deliverable_->AddModifiesRelationship(if_entity, nested_else_var_list);
+
   std::list<Variable*>* nested_if_var_list = ExtractModifiesInContainer(if_entity, extracted_procedures);
   deliverable_->AddModifiesRelationship(container, nested_if_var_list);
 
-  std::list<Variable*>
-      * nested_else_var_list = ExtractModifiesInContainer(if_entity->GetElseEntity(), extracted_procedures);
-  deliverable_->AddModifiesRelationship(container, nested_else_var_list);
 }
 
 /**
