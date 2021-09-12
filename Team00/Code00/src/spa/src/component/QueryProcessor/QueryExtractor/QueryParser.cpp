@@ -2,6 +2,7 @@
 #include "QueryTokenizer.h"
 #include <component/QueryProcessor/types/Exceptions.h>
 #include <datatype/RegexPatterns.h>
+#include <unordered_set>
 
 /* Checks that current lookahead has the same expected type. If valid, advances tokenizer to next lookahead.*/
 Token QueryParser::eat(TokenTag token_type) {
@@ -70,13 +71,117 @@ void QueryParser::GetTarget() {
    }
 }
 
+// stmtRef: synonym | ‘_’ | INTEGER
+// returns a tuple of values corresponding to <stmtref string, isSynonym, isTargetSyononym>
+std::tuple<std::string, bool, bool> QueryParser::parse_stmtRef() {
+  std::string stmtRef_string;
+  bool is_synonym = false;
+  bool is_target_synonym = false;
+  std::string curr_lookahead = lookahead.GetTokenString();
+
+  if (lookahead.GetTokenTag() == TokenTag::kName) {
+    // parse as synonym
+    // std::cout << "parsing stmtref with value: " + curr_lookahead + " as SYONONYM" << std::endl;
+    // validate that synonym is known.
+    for (Synonym& s : synonyms) {
+      if (s.GetName() == curr_lookahead) {
+        is_synonym = true;
+        if (curr_lookahead == this->target.GetName()) {
+          is_target_synonym = true;
+        }
+        break;
+      }
+    }
+    if (!is_synonym) {
+      throw PQLParseException("Unknown synonym supplied in clause.");
+    }
+  } else if (lookahead.GetTokenTag() == TokenTag::kInteger) {
+    // parse as INTEGER
+    // std::cout << "parsing stmtref with value: " + lookahead.GetTokenString() + " as INTEGER" << std::endl;
+  } else if (lookahead.GetTokenTag() == TokenTag::kUnderscore) {
+    // parse as underscore
+    // std::cout << "parsing stmtref with value: " + lookahead.GetTokenString() + " as UNDERSCORE" << std::endl;
+  } else {
+    throw PQLParseException("Incorrect stmtRef supplied in clause.");
+  }
+  eat(lookahead.GetTokenTag());
+  return std::make_tuple(curr_lookahead, is_synonym, is_target_synonym);
+}
+std::pair<Clause*, bool> QueryParser::parse_relRef() {
+  // std::cout << "parsing relress" << std::endl;
+  // std::cout << lookahead.GetTokenString() << std::endl;
+  std::unordered_set<std::string> relRefs = {"Follows", "Follows*", "Parent", "Parent*", "Uses", "Modifies"};
+  // std::cout << "parsing relrefsss" << std::endl;
+  std::unordered_set<std::string>::const_iterator got = relRefs.find(lookahead.GetTokenString());
+  if (got == relRefs.end()) {
+    throw PQLParseException("Invalid relRef in such that clause.");
+  }
+  std::string rel_type = lookahead.GetTokenString();
+  eat(TokenTag::kName);
+  eat(TokenTag::kOpenBracket);
+  // std::cout << "parsing relref of type " + rel_type << std::endl;
+  // std::cout << "lookahead: " + lookahead.GetTokenString() << std::endl;
+
+  // TODO: add support in the future for modifiesP, usesP case: (entRef ‘,’ entRef)
+  std::string lhs; bool is_syn; bool is_tgt_syn;
+  std::tie(lhs, is_syn, is_tgt_syn) = parse_stmtRef();
+
+  if (lhs.compare("_") == 0 && (rel_type.compare("Modifies") == 0 || rel_type.compare("Uses") == 0)) {
+    throw PQLValidationException("Semantically invalid to have _ as first argument for " + rel_type);
+  }
+
+  eat(TokenTag::kComma);
+  std::string rhs; bool is_syn_; bool is_tgt_syn_;
+  std::tie(lhs, is_syn_, is_tgt_syn_) = parse_stmtRef();
+
+  eat(TokenTag::kCloseBracket);
+
+  // temporary
+  if (rel_type.compare("Uses") == 0 || rel_type.compare("Modifies") == 0) {
+    rel_type = std::string(rel_type + "S");
+  }
+
+  // TODO: this could introduce a memory leak...
+  Clause* cl = new SuchThat(lhs, rhs, GetRelRef(rel_type), is_syn, is_syn_);
+  return std::make_pair(cl, is_tgt_syn || is_tgt_syn_);
+}
+
+void QueryParser::parse_such_that() {
+  // TODO: add support for multiple relRefs (separated by and)
+  eat(TokenTag::kSuchThat);
+  std::pair<Clause*, bool> clause_info = parse_relRef();
+  // add group.
+  std::vector<Clause*> clauses;
+  clauses.emplace_back(clause_info.first);
+  Group group = Group(clauses, clause_info.second);
+  groups.push_back(group);
+}
+
+void QueryParser::parse_pattern() {
+  return;
+}
+
 void QueryParser::parse_select() {
   if (lookahead.GetTokenString().compare("Select") != 0) {
     throw PQLParseException("Expected \'Select\' keyword, instead got " + lookahead.GetTokenString());
   }
   eat(TokenTag::kName); // 'Select' is tokenized as a name.
-  // TODO: add more advanced implementation for select. Following implementation just handles 'Select <target>'
   GetTarget();
+  // if there are more tokens, we are expecting either such that or pattern clauses.
+  if (lookahead.GetTokenTag() == TokenTag::kInvalid) {
+    return;
+  }
+  // std::cout << "Expecting such that or pattern clause..." << std::endl;
+  if (lookahead.GetTokenTag() == TokenTag::kSuchThat) {
+    // std::cout << "parsing such that" << std::endl;
+    parse_such_that();
+  } else if (lookahead.GetTokenTag() == TokenTag::kName && lookahead.GetTokenString().compare("pattern") == 0) {
+    // std::cout << "parsing pattern" << std::endl;
+    parse_pattern();
+  } else {
+    // std::cout << "Incorrect query. Expected such that or pattern clause but got lookahead: " + lookahead.GetTokenString() << std::endl;
+    throw PQLParseException("Incorrect query. Expected such that or pattern clause.");
+  }
 }
 
 void QueryParser::parse_query() {

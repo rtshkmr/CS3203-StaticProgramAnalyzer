@@ -1,6 +1,7 @@
 #include "SourceProcessor.h"
 #include "Parser.h"
 #include "DesignExtractor.h"
+#include "../PKB/PKB.h"
 
 using namespace sp;
 
@@ -16,5 +17,7 @@ void SourceProcessor::ProcessSourceFile(std::string file_name) {
   Deliverable* deliverable = parser.GetDeliverables();
   DesignExtractor design_extractor = DesignExtractor(deliverable);
   design_extractor.ExtractDesignAbstractions();
-  // pkb.PopulateDataStructures();
+  PKB pkb = PKB();
+  pkb.PopulateDataStructures(*deliverable);
+
 }

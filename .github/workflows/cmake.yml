@@ -10,17 +10,11 @@ on:
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
+  working-directory: ${{github.workspace}}/Team00/Code00
 
 jobs:
-  build:
-    # The CMake configure and build commands are platform agnostic and should work equally
-    # well on Windows or Mac.  You can convert this to a matrix build if you need
-    # cross-platform coverage.
-    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+  build_spa:
     runs-on: self-hosted
-    env:
-      working-directory: ${{github.workspace}}/Team00/Code00
-
     steps:
     - uses: actions/checkout@v2
     
@@ -32,16 +26,50 @@ jobs:
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run: cmake -S ${{env.working-directory}} -B ${{env.working-directory}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
-    - name: Build
+    - name: Build SPA
       # Build your program with the given configuration
-      run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target all
+      run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target spa
+      
+  unit_test:
+    runs-on: self-hosted
+    needs: build_spa
+    steps:
+    - name: Build Unit Test
+      run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target unit_testing
 
-    - name: Unit Test
+    - name: Run Unit Test
       #Running Catch2 natively on terminal
       run: ${{env.working-directory}}/build/src/unit_testing/unit_testing
+  
+  integration_test:
+    runs-on: self-hosted
+    needs: build_spa
+    steps:
+    - name: Build Integration Test
+      run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target integration_testing
 
-    - name: Integration Test
-      run: ${{env.working-directory}}/build/src/integration_testing/integration_testing
-      
-    - name: AutoTester 
-      run: echo 'AutoTester run is not ready.'
+    - name: Run Integration Test
+      run: |
+        cp -r ${{env.working-directory}}/tests/integration_test_files ${{env.working-directory}}/build/src/integration_testing/
+        cd ${{env.working-directory}}/build/src/integration_testing/
+        ./integration_testing
+  
+  autotester:
+   runs-on: self-hosted
+   needs: build_spa
+   steps:
+    - name: Build AutoTester # GUI is excluded
+      run:  cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target autotester
+    
+    - name: Run AutoTester 
+      run: | 
+        cp -r ${{env.working-directory}}/tests ${{env.working-directory}}/build/src/autotester
+        cd ${{env.working-directory}}/build/src/autotester/tests
+#        ./../autotester Source_simple.txt Source_queries.txt output.xml
+
+  build_all:
+    runs-on: self-hosted
+    needs: [build_spa, unit_test, integration_test, autotester] 
+    steps:
+    - name: Build All # Take all previous build and build autotester_gui for completeness
+      run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target all
