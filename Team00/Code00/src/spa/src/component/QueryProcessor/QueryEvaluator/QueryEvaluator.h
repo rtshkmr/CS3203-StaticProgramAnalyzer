@@ -4,14 +4,15 @@
 #include <list>
 #include <string>
 #include <vector>
-#include "types/Types.h"
+#include "component/QueryProcessor/types/Types.h"
 #include "component/QueryProcessor/types/QueryEvaluatorTable.h"
 #include "component/PKB/PKB.h"
 #include "EvaluateSuchThatSingleSynonym.h"
-#include "types/QueryEvaluatorTable.h"
-#include "../PKB/PKB.h"
+#include "component/QueryProcessor/types/QueryEvaluatorTable.h"
+#include "component/PKB/PKB.h"
 #include "QueryPKB.h"
 #include "EvaluateSuchThatDoubleSynonyms.h"
+#include "EvaluateSuchThatNoSynonym.h"
 
 class QueryEvaluator {
   public:
@@ -22,9 +23,10 @@ class QueryEvaluator {
     Synonym targetSynonym;
     std::list<Group> groupList;
     PKB pkb;
+    bool booleanResult;
     QueryEvaluatorTable evaluateSuchThat(Clause* clause, QueryEvaluatorTable table);
-    QueryEvaluatorTable processDoubleStmtRef(SuchThat st, QueryEvaluatorTable table, RelRef query_relation);
-    QueryEvaluatorTable ProcessNewColumn(std::string targetSynonymName, Synonym newSynonym, QueryEvaluatorTable table, RelRef rs, bool givenFirstParam);
+    QueryEvaluatorTable processNonBooleanSuchThat(SuchThat st, QueryEvaluatorTable table, RelRef query_relation);
+    QueryEvaluatorTable processBooleanSuchThat(SuchThat such_that_clause);
 };
 
 #endif //INC_21S1_CP_SPA_TEAM_35_QUERYEVALUATOR_H
