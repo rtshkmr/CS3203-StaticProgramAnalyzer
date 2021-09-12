@@ -12,6 +12,10 @@ std::list<std::tuple<DesignEntity, std::string>> queryPKBSuchThat(PKB database, 
     case RelRef::kParent:
       return isFirstParam ? database.GetParent(stmt) : database.GetChild(stmt);
       // CHANGE PARENT TO CHILD
+    case RelRef::kUsesS:
+      return isFirstParam ? database.GetUsedBy(stmt) : database.GetUses(stmt);
+    case RelRef::kModifiesS:
+      return isFirstParam ? database.GetModifiedBy(stmt) : database.GetModifies(stmt);
     default:
       std::list<std::tuple<DesignEntity, std::string>> list;
       return list;

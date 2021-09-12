@@ -24,9 +24,11 @@ class QueryEvaluator {
     std::list<Group> groupList;
     PKB pkb;
     bool booleanResult;
-    QueryEvaluatorTable evaluateSuchThat(Clause* clause, QueryEvaluatorTable table);
-    QueryEvaluatorTable processNonBooleanSuchThat(SuchThat st, QueryEvaluatorTable table, RelRef query_relation);
-    QueryEvaluatorTable processBooleanSuchThat(SuchThat such_that_clause);
+    std::unordered_map<DesignEntity, std::list<std::string>> map_of_synonym_values;
+    QueryEvaluatorTable ProcessSuchThat(Clause* clause, QueryEvaluatorTable table);
+    QueryEvaluatorTable EvaluateSuchThatClause(SuchThat st, QueryEvaluatorTable table, RelRef query_relation);
+    void ProcessBooleanSuchThat(std::vector<Clause*> clauseList);
+    // QueryEvaluatorTable ProcessPatternClause(Pattern pattern, QueryEvaluatorTable table);
 };
 
 #endif //INC_21S1_CP_SPA_TEAM_35_QUERYEVALUATOR_H
