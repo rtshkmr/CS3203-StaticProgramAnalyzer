@@ -44,10 +44,10 @@ void PKB::PopulateDataStructures(Deliverable d) {
     PopulateStmtList(d.stmt_list_);
 
     PopulateFollowsMap(d.follow_hash_);
-    //    PopulateFollowedByMap(d.follow_hash_);
+    PopulatePreviousMap(d.followed_by_hash_);
 
     PopulateParentMap(d.parent_hash_);
-    //    PopulateChildMap(d.parent_hash_);
+    PopulateChildMap(d.parent_of_hash_);
 
     //    PopulateUseMap(d.use_hash_);
     //    PopulateUsedByMap(d.use_hash_);
@@ -68,13 +68,13 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetFollows(std::string stm
     }
 }
 
-//std::list<std::tuple<DesignEntity,std::string>> PKB::GetPrevious(std::string stmt) {
-//    std::list<std::tuple<DesignEntity,std::string>> ret_list = std::list<std::tuple<DesignEntity,std::string>>();
-//    auto previous_iter = previous_map_.find(stmt);
-//    std::tuple<DesignEntity,std::string> previous = previous_iter->second;
-//    ret_list.push_back(previous);
-//    return ret_list;
-//}
+std::list<std::tuple<DesignEntity,std::string>> PKB::GetPrevious(std::string stmt) {
+    std::list<std::tuple<DesignEntity,std::string>> ret_list = std::list<std::tuple<DesignEntity,std::string>>();
+    auto previous_iter = previous_map_.find(stmt);
+    std::tuple<DesignEntity,std::string> previous = previous_iter->second;
+    ret_list.push_back(previous);
+    return ret_list;
+}
 
 std::list<std::tuple<DesignEntity, std::string>> PKB::GetParent(std::string stmt) {
     std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
@@ -87,13 +87,13 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetParent(std::string stmt
     }
 }
 
-//std::list<std::tuple<DesignEntity,std::string>> PKB::GetChild(std::string stmt) {
-//    std::list<std::tuple<DesignEntity,std::string>> ret_list = std::list<std::tuple<DesignEntity,std::string>>();
-//    auto child_iter = child_map_.find(stmt);
-//    std::tuple<DesignEntity,std::string> child = child_iter->second;
-//    ret_list.push_back(child);
-//    return ret_list;
-//}
+std::list<std::tuple<DesignEntity,std::string>> PKB::GetChild(std::string stmt) {
+    std::list<std::tuple<DesignEntity,std::string>> ret_list = std::list<std::tuple<DesignEntity,std::string>>();
+    auto child_iter = child_map_.find(stmt);
+    std::tuple<DesignEntity,std::string> child = child_iter->second;
+    ret_list.push_back(child);
+    return ret_list;
+}
 
 void PKB::PopulateProcList(const std::list<Procedure *> &proc_list) {
     proc_table_ = std::list<std::string>();
@@ -184,7 +184,7 @@ void PKB::PopulateReadList(const std::list<ReadEntity *> &read_list) {
     }
 }
 
-void PKB::PopulateFollowsMap(std::unordered_map<Statement *, Statement *> follow_hash) {
+void PKB::PopulateFollowsMap(const std::unordered_map<Statement *, Statement *> &follow_hash) {
     for (std::pair<Statement *, Statement *> kv : follow_hash) {
         auto *kNumber = const_cast<StatementNumber *>(kv.first->GetStatementNumber());
         std::string kString = std::to_string(kNumber->getNum());
@@ -193,6 +193,18 @@ void PKB::PopulateFollowsMap(std::unordered_map<Statement *, Statement *> follow
         DesignEntity vType = type_map_.find(vString)->second;
         std::tuple<DesignEntity, std::string> result = make_tuple(vType, vString);
         follows_map_[kString] = result;
+    }
+}
+
+void PKB::PopulatePreviousMap(const std::unordered_map<Statement *, Statement *> &followed_by_hash) {
+    for (std::pair<Statement *, Statement *> kv : followed_by_hash) {
+        auto *kNumber = const_cast<StatementNumber *>(kv.first->GetStatementNumber());
+        std::string kString = std::to_string(kNumber->getNum());
+        auto *vNumber = const_cast<StatementNumber *>(kv.second->GetStatementNumber());
+        std::string vString = std::to_string(vNumber->getNum());
+        DesignEntity vType = type_map_.find(vString)->second;
+        std::tuple<DesignEntity, std::string> result = make_tuple(vType, vString);
+        previous_map_[kString] = result;
     }
 }
 
@@ -213,6 +225,18 @@ void PKB::PopulateParentMap(std::unordered_map<Statement *, std::list<Statement 
         }
 
         parent_map_[kString] = result;
+    }
+}
+
+void PKB::PopulateChildMap(const std::unordered_map<Statement *, Statement *> &parent_of_hash) {
+    for (std::pair<Statement *, Statement *> kv : parent_of_hash) {
+        auto *kNumber = const_cast<StatementNumber *>(kv.first->GetStatementNumber());
+        std::string kString = std::to_string(kNumber->getNum());
+        auto *vNumber = const_cast<StatementNumber *>(kv.second->GetStatementNumber());
+        std::string vString = std::to_string(vNumber->getNum());
+        DesignEntity vType = type_map_.find(vString)->second;
+        std::tuple<DesignEntity, std::string> result = make_tuple(vType, vString);
+        child_map_[kString] = result;
     }
 }
 

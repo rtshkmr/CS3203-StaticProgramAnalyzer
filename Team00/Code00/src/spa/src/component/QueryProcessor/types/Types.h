@@ -103,6 +103,7 @@ class Synonym {
     std::string name;
     DesignEntity type;
   public:
+    Synonym() {};
     Synonym(std::string name, DesignEntity type): name(name), type(type) {};
     std::string GetName() { return name; };
     DesignEntity GetType() { return type; };
