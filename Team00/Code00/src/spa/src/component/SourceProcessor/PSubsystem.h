@@ -20,6 +20,7 @@ namespace psub {
  */
 class PSubsystem {
  private:
+  Procedure* current_procedure;
   Deliverable* deliverable_;
   SyntaxValidator syntax_validator_;
   EntityFactory entity_factory_;
