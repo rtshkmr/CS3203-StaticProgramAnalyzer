@@ -126,6 +126,9 @@ enum class TokenTag {
   kCloseBracket,
   kSemicolon, // statement terminator
   kInvalid,
+  kComma, // TODO: place this tag into a subclassed enum, since its specific to pql and not frontend.
+  kSuchThat, // TODO: place this tag into a subclassed enum, since its specific to pql and not frontend.
+  kUnderscore // TODO: place this tag into a subclassed enum, since its specific to pql and not frontend.
 };
 
 /**
