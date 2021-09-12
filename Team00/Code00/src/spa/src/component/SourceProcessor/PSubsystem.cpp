@@ -132,7 +132,15 @@ void PSubsystem::SetStatementObject(Statement* statement) {
   StatementNumber* statement_number = new StatementNumber(program_counter_);
   statement->SetStatementNumber(statement_number);
   deliverable_->AddStatement(statement);
-  current_node_->AddStatement(statement);
+
+  //to check if adding stmt to Else block
+  if (current_node_type_ == 3) {
+    IfEntity* if_entity = dynamic_cast<IfEntity*>(current_node_);
+    assert (if_entity != nullptr);
+    if_entity->getElseStmtList()->push_back(statement);
+  } else {
+    current_node_->AddStatement(statement);
+  }
 
   if (!parent_stack_.empty()) {
     assert(current_node_type_ == 1 || current_node_type_ == 2 || current_node_type_ == 3);
@@ -171,7 +179,7 @@ void PSubsystem::HandleElseStmt(ElseEntity* else_entity) {
 
   if_entity->setElseStmtList(else_entity);
   current_node_type_ = 3;
-  current_node_ = else_entity;
+  current_node_ = if_entity;
 }
 
 void PSubsystem::HandleWhileStmt(WhileEntity* while_entity) {
