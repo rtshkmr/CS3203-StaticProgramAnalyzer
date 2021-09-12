@@ -26,9 +26,9 @@ class SyntaxValidator {
   static bool IsFactor(const std::vector<Token>& statement_tokens, int left_boundary_idx, int right_boundary_idx);
   static bool IsTerm(const std::vector<Token>& statement_tokens, int left_boundary_idx, int right_boundary_idx);
   static bool IsExpr(const std::vector<Token>& statement_tokens, int left_boundary_idx, int right_boundary_idx);
-  static bool IsRelFactor(const std::vector<Token>& statement_tokens, int left_idx, int right_idx);
-  static bool IsRelExpr(const std::vector<Token>& statement_tokens, int left_idx, int right_idx);
-  static bool IsCondExpr(const std::vector<Token>& statement_tokens, int left_idx, int right_idx);
+  static bool IsRelFactor(const std::vector<Token>& statement_tokens, int left_boundary_idx, int right_boundary_idx);
+  static bool IsRelExpr(const std::vector<Token>& statement_tokens, int left_boundary_idx, int right_boundary_idx);
+  static bool IsCondExpr(const std::vector<Token>& statement_tokens, int left_boundary_idx, int right_boundary_idx);
   static auto GetTokenMatchReverseIterator(const std::vector<Token>& tokens,
                                            const std::regex& desired_pattern,
                                            int left_boundary_idx,

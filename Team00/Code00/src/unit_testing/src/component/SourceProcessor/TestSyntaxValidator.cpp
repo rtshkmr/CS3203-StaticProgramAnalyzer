@@ -211,10 +211,43 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
     REQUIRE(SyntaxValidator::IsRelFactor(tokens, 2, 2)); // justa factor
     REQUIRE(SyntaxValidator::IsRelFactor(tokens, 5, 9)); // it's a relative factor cuz it's an expression
     // rel-factor can only be surrounded on one end by a boolean comparison operator and the other by an open/close bracket
-    // todo: fix this test, should allow redundant brackets
     REQUIRE(SyntaxValidator::IsRelFactor(tokens, 4, 10));
     REQUIRE_FALSE(SyntaxValidator::IsRelFactor(tokens, 1, 2));
     REQUIRE_FALSE(SyntaxValidator::IsRelFactor(tokens, 4, 11)); // unequal bracketing
+  }
+  SECTION("Is RelExpr tests") {
+    string line = "if((x>=1)&&((y>69)||(z<0))){";
+    vector<Token> tokens = Tokenizer::CreateTokens(line);
+//    [0] = {Token} {token_string_="if", token_tag_=kIfKeyword}
+//    [1] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [2] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [3] = {Token} {token_string_="x", token_tag_=kName}
+//    [4] = {Token} {token_string_=">=", token_tag_=kBinaryComparisonOperator}
+//    [5] = {Token} {token_string_="1", token_tag_=kInteger}
+//    [6] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//    [7] = {Token} {token_string_="&&", token_tag_=kBooleanOperator}
+//    [8] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [9] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [10] = {Token} {token_string_="y", token_tag_=kName}
+//    [11] = {Token} {token_string_=">", token_tag_=kBinaryComparisonOperator}
+//    [12] = {Token} {token_string_="69", token_tag_=kInteger}
+//    [13] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//    [14] = {Token} {token_string_="||", token_tag_=kBooleanOperator}
+//    [15] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [16] = {Token} {token_string_="z", token_tag_=kName}
+//    [17] = {Token} {token_string_="<", token_tag_=kBinaryComparisonOperator}
+//    [18] = {Token} {token_string_="0", token_tag_=kInteger}
+//    [19] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//    [20] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//    [21] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//    [22] = {Token} {token_string_="{", token_tag_=kOpenBrace}
+    REQUIRE(SyntaxValidator::IsRelExpr(tokens, 3, 5)); // no brackets just rel_expr
+    REQUIRE(SyntaxValidator::IsRelExpr(tokens, 2, 6)); // one layer of brackets around rel_expr
+    REQUIRE(SyntaxValidator::IsRelExpr(tokens, 9, 13)); // one layer of brackets around rel_expr
+    REQUIRE(SyntaxValidator::IsRelExpr(tokens, 9, 13)); // one layer of brackets around rel_expr
+    REQUIRE(SyntaxValidator::IsRelExpr(tokens, 16, 18)); // one layer of brackets around rel_expr
+    REQUIRE_FALSE(SyntaxValidator::IsRelExpr(tokens, 16, 19)); // uneven bracketing
+    REQUIRE_FALSE(SyntaxValidator::IsRelExpr(tokens, 8, 20)); // Rel expression is not cond expr
   }
 }
 
