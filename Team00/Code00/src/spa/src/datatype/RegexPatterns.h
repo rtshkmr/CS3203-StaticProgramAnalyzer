@@ -17,6 +17,11 @@ class RegexPatterns {
   static std::regex GetIntegerPattern();
   static std::regex GetDesignEntityPattern();
   static std::regex GetBooleanOperatorPattern();
+  // for validator:
+  static std::regex GetTermDelimiterPattern();
+  static std::regex GetExprDelimiterPattern();
+  static std::regex GetUnaryBooleanOperatorPattern(); // only NOT
+  static std::regex GetBinaryBooleanOperatorPattern();
 };
 
 #endif //AUTOTESTER_TEAM00_CODE00_SRC_SPA_SRC_DATATYPE_REGEXPATTERNS_H_
