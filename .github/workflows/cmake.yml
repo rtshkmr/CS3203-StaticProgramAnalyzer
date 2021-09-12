@@ -13,7 +13,7 @@ env:
   working-directory: ${{github.workspace}}/Team35/Code35
 
 jobs:
-  build_spa:
+  build_and_test:
     runs-on: self-hosted
     steps:
     - uses: actions/checkout@v2
@@ -30,21 +30,15 @@ jobs:
       # Build your program with the given configuration
       run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target spa
       
-  unit_test:
-    runs-on: self-hosted
-    needs: build_spa
-    steps:
     - name: Build Unit Test
       run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target unit_testing
 
     - name: Run Unit Test
       #Running Catch2 natively on terminal
-      run: ${{env.working-directory}}/build/src/unit_testing/unit_testing
-  
-  integration_test:
-    runs-on: self-hosted
-    needs: build_spa
-    steps:
+      run: |
+        cd ${{env.working-directory}}/build/src/unit_testing/
+        ./unit_testing
+
     - name: Build Integration Test
       run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target integration_testing
 
@@ -54,10 +48,6 @@ jobs:
         cd ${{env.working-directory}}/build/src/integration_testing/
         ./integration_testing
   
-  autotester:
-   runs-on: self-hosted
-   needs: build_spa
-   steps:
     - name: Build AutoTester # GUI is excluded
       run:  cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target autotester
     
@@ -67,9 +57,5 @@ jobs:
         cd ${{env.working-directory}}/build/src/autotester/tests
 #        ./../autotester Source_simple.txt Source_queries.txt output.xml
 
-  build_all:
-    runs-on: self-hosted
-    needs: [build_spa, unit_test, integration_test, autotester] 
-    steps:
     - name: Build All # Take all previous build and build autotester_gui for completeness
       run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target all
