@@ -155,5 +155,6 @@ QueryEvaluatorTable QueryEvaluator::processNonBooleanSuchThat(SuchThat such_that
 }
 
 QueryEvaluatorTable QueryEvaluator::processBooleanSuchThat(SuchThat such_that_clause) {
-
+  QueryEvaluatorTable table ("to be changed");
+  return table;
 }

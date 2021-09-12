@@ -16,17 +16,21 @@ TestWrapper::TestWrapper() {
   // create any objects here as instance variables of this class
   // as well as any initialization required for your spa program
   pkb = new PKB();
+  std::cout << "Point 1 in test wrapper" << std::endl;
 }
 
 // method for parsing the SIMPLE source
 void TestWrapper::parse(std::string file_name) {
+    std::cout << "Point 2 in test wrapper" << std::endl;
     sp::SourceProcessor source_processor;
+    std::cout << "Point 2 exit" << std::endl;
     sp::SourceProcessor::ProcessSourceFile(file_name);
 }
 
 // method to evaluating a query
 void TestWrapper::evaluate(std::string query, std::list<std::string>& results){
 // call your evaluator to evaluate the query here
+  std::cout << "Point 3 in test wrapper" << std::endl;
   std::optional<std::string> s = QuerySystemController::Evaluate(&query, pkb);
   if (s) {
     results.push_back(s.value());;
