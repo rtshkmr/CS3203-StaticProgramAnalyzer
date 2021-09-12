@@ -10,9 +10,8 @@ DesignExtractor::DesignExtractor(Deliverable* deliverable) {
 void DesignExtractor::ExtractDesignAbstractions() {
   ExtractUses();
   ExtractModifies();
-  ExtractParentT(deliverable_->parent_to_child_hash_);
+  ExtractParentTRelationship();
   ExtractFollowsT(deliverable_->follow_hash_);
-  ExtractParentOfT(deliverable_->child_to_parent_hash_);
   ExtractFollowedByT(deliverable_->followed_by_hash_);
 }
 
@@ -59,15 +58,51 @@ void DesignExtractor::ExtractModifies() {
   }
 }
 
-void DesignExtractor::ExtractParentT(std::unordered_map<Statement*, std::list<Statement*>*> parent_hash) {
+/**
+ * Extracts Parent* recursively on each child.
+ */
+void DesignExtractor::ExtractParentTRelationship() {
+  /*
+   * for each proc in proc list
+   *  for each stmt in stmt list
+   *    recurse helper(stmt)
+   *    get children list
+   *    base case: no children list, return empty list
+   *    for each child
+   *      recurse(child) and get childrenT list
+   *      add this child and its childrenT list to parentT
+   *    return all childrenT of this stmt
+   */
+  for (Procedure* proc: deliverable_->proc_list_) {
+    for (Statement* stmt: *proc->GetStatementList()) {
+      ExtractChildrenTFromParent(stmt);
+    }
+  }
+}
 
+std::list<Statement*>* DesignExtractor::ExtractChildrenTFromParent(Statement* parent) {
+  std::unordered_map<Statement*, std::list<Statement*>*> ptc = deliverable_->parent_to_child_hash_;
+
+  // base case: children list not found
+  if (ptc.find(parent) == ptc.end()) {
+    // does not return itself bcos this function is meant to return its childrenT
+    return new std::list<Statement*>();
+  }
+
+  std::list<Statement*>* children = ptc.find(parent)->second;
+  for (Statement* child: *children) {
+    std::list<Statement*>* children_T_list = ExtractChildrenTFromParent(child);
+    // add this child to the parent
+    deliverable_->AddParentTransitiveRelationship(parent, child);
+    // add this child's childrenT to the parent
+    deliverable_->AddParentTransitiveRelationshipForList(parent, children_T_list);
+  }
+
+  // return all childrenT
+  return deliverable_->parent_to_child_T_hash_.find(parent)->second;
 }
 
 void DesignExtractor::ExtractFollowsT(std::unordered_map<Statement*, Statement*> follow_hash) {
-
-}
-
-void DesignExtractor::ExtractParentOfT(std::unordered_map<Statement*, Statement*> child_to_parent_hash) {
 
 }
 

@@ -45,6 +45,30 @@ void Deliverable::AddParentRelationship(Statement* p1, Statement* p2) {
   child_to_parent_hash_.insert({p2, p1});
 }
 
+void Deliverable::AddParentTransitiveRelationship(Statement* parent, Statement* child) {
+  if (parent_to_child_T_hash_.find(parent) != parent_to_child_T_hash_.end()) {
+    parent_to_child_T_hash_.find(parent)->second->push_back(child);
+  } else {
+    auto* list = new std::list<Statement*>();
+    list->push_back(child);
+    parent_to_child_T_hash_.insert(std::make_pair(parent, list));
+  }
+
+  if (child_to_parent_T_hash_.find(child) != child_to_parent_T_hash_.end()) {
+    child_to_parent_T_hash_.find(child)->second->push_back(parent);
+  } else {
+    auto* list = new std::list<Statement*>();
+    list->push_back(parent);
+    child_to_parent_T_hash_.insert(std::make_pair(child, list));
+  }
+}
+
+void Deliverable::AddParentTransitiveRelationshipForList(Statement* parent, std::list<Statement*>* children) {
+  for (Statement* child: *children) {
+    AddParentTransitiveRelationship(parent, child);
+  }
+}
+
 void Deliverable::AddUsesRelationship(Statement* u1, Variable* u2) {
   if (use_hash_.count(u1)) {
     use_hash_.find(u1)->second->push_back(u2);
