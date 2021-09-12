@@ -136,4 +136,38 @@ TEST_CASE("PKB population and retrieval") {
             REQUIRE(uses_list == pkb.GetModifiedBy("v1"));
         }
     }
+
+    SECTION("Has Relationship") {
+        SECTION("Follows") {
+            REQUIRE(pkb.hasFollows());
+        }
+
+        SECTION("Previous") {
+            REQUIRE(pkb.hasPrevious());
+        }
+
+        SECTION("Parent") {
+            REQUIRE(!pkb.hasParent());
+        }
+
+        SECTION("Child") {
+            REQUIRE(!pkb.hasChild());
+        }
+
+        SECTION("Uses") {
+            REQUIRE(pkb.hasUses());
+        }
+
+        SECTION("UsedBy") {
+            REQUIRE(pkb.hasUsedBy());
+        }
+
+        SECTION("Modifies") {
+            REQUIRE(pkb.hasModifies());
+        }
+
+        SECTION("ModifiedBy") {
+            REQUIRE(pkb.hasModifiedBy());
+        }
+    }
 }

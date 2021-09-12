@@ -30,6 +30,39 @@ std::list<std::string> PKB::GetDesignEntity(DesignEntity de) {
     }
 }
 
+bool PKB::hasFollows() {
+    return !follows_map_.empty();
+};
+
+bool PKB::hasPrevious() {
+    return !previous_map_.empty();
+}
+
+bool PKB::hasParent() {
+    return !parent_map_.empty();
+}
+
+bool PKB::hasChild() {
+    return !child_map_.empty();
+}
+
+bool PKB::hasUses() {
+    return !use_s_map_.empty() || !use_c_map_.empty();
+}
+
+bool PKB::hasUsedBy() {
+    return !used_by_s_map_.empty() || !used_by_c_map_.empty();
+
+}
+
+bool PKB::hasModifies() {
+    return !modifies_s_map_.empty() || !modifies_c_map_.empty();
+}
+
+bool PKB::hasModifiedBy() {
+    return !modified_by_s_map_.empty() || !modified_by_c_map_.empty();
+}
+
 void PKB::PopulateDataStructures(Deliverable d) {
 
     PopulateProcList(d.proc_list_);

@@ -20,6 +20,17 @@ class PKB {
   std::list<std::tuple<DesignEntity, std::string>> GetUsedBy(std::string stmt);
   std::list<std::tuple<DesignEntity, std::string>> GetModifies(std::string stmt);
   std::list<std::tuple<DesignEntity, std::string>> GetModifiedBy(std::string stmt);
+
+  bool hasFollows();
+  bool hasPrevious();
+  bool hasParent();
+  bool hasChild();
+  bool hasUses();
+  bool hasUsedBy();
+  bool hasModifies();
+  bool hasModifiedBy();
+
+
   PKB() = default;
  private:
 
@@ -52,8 +63,6 @@ class PKB {
 
   std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> modifies_c_map_;
   std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> modified_by_c_map_;
-
-  std::list<std::tuple<DesignEntity, std::string>> GetPluralRelationships(std::string stmt, RelRef rel);
 
   void PopulateProcList(const std::list<Procedure *> &proc_list);
   void PopulateVarList(const std::list<Variable *> &var_list);
