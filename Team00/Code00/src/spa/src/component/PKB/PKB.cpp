@@ -71,9 +71,13 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetFollows(std::string stm
 std::list<std::tuple<DesignEntity,std::string>> PKB::GetPrevious(std::string stmt) {
     std::list<std::tuple<DesignEntity,std::string>> ret_list = std::list<std::tuple<DesignEntity,std::string>>();
     auto previous_iter = previous_map_.find(stmt);
-    std::tuple<DesignEntity,std::string> previous = previous_iter->second;
-    ret_list.push_back(previous);
-    return ret_list;
+    if (previous_iter == previous_map_.end()) {
+      return ret_list;
+    } else {
+      std::tuple<DesignEntity,std::string> previous = previous_iter->second;
+      ret_list.push_back(previous);
+      return ret_list;
+    }
 }
 
 std::list<std::tuple<DesignEntity, std::string>> PKB::GetParent(std::string stmt) {

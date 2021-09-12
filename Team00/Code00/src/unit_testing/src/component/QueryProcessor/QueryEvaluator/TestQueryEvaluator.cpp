@@ -193,22 +193,22 @@ TEST_CASE("3.QueryProcessor.Query select only") {
       REQUIRE(output == answer);
     }
 
-//    SECTION( "With no synonyms and left side is _ with incorrect result") {
-//      st.right_is_synonym = false;
-//      st.left_is_synonym = false;
-//      st.right_hand_side = "1";
-//      st.left_hand_side = "_";
-//
-//      std::vector<Clause*> clauseList = {&st};
-//      Group firstGroup (clauseList, false);
-//      std::list<Group> groupList = {firstGroup};
-//
-//      Synonym targetSynonym = Synonym("s2", DesignEntity::kStmt);
-//      QueryEvaluator evaluator(synonymList, targetSynonym, groupList, pkb);
-//
-//      std::vector<std::string> output = evaluator.EvaluateQuery();
-//      std::vector<std::string> answer = {};
-//      REQUIRE(output == answer);
-//    }
+    SECTION( "With no synonyms and left side is _ with incorrect result") {
+      st.right_is_synonym = false;
+      st.left_is_synonym = false;
+      st.right_hand_side = "1";
+      st.left_hand_side = "_";
+
+      std::vector<Clause*> clauseList = {&st};
+      Group firstGroup (clauseList, false);
+      std::list<Group> groupList = {firstGroup};
+
+      Synonym targetSynonym = Synonym("s2", DesignEntity::kStmt);
+      QueryEvaluator evaluator(synonymList, targetSynonym, groupList, pkb);
+
+      std::vector<std::string> output = evaluator.EvaluateQuery();
+      std::vector<std::string> answer = {};
+      REQUIRE(output == answer);
+    }
   }
 }
