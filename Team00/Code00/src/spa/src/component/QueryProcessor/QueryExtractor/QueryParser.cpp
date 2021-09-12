@@ -125,6 +125,11 @@ std::pair<Clause*, bool> QueryParser::parse_relRef() {
   // TODO: add support in the future for modifiesP, usesP case: (entRef ‘,’ entRef)
   std::string lhs; bool is_syn; bool is_tgt_syn;
   std::tie(lhs, is_syn, is_tgt_syn) = parse_stmtRef();
+
+  if (lhs.compare("_") == 0 && (rel_type.compare("Modifies") == 0 || rel_type.compare("Uses") == 0)) {
+    throw PQLValidationException("Semantically invalid to have _ as first argument for " + rel_type);
+  }
+
   eat(TokenTag::kComma);
   std::string rhs; bool is_syn_; bool is_tgt_syn_;
   std::tie(lhs, is_syn_, is_tgt_syn_) = parse_stmtRef();
