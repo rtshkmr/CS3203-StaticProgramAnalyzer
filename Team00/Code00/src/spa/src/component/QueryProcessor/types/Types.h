@@ -121,6 +121,7 @@ struct SuchThat : Clause {
   RelRef rel_ref;
   bool left_is_synonym;
   bool right_is_synonym;
+  SuchThat() {};
   SuchThat(std::string lhs, std::string rhs, RelRef rf, bool lhs_is_syn, bool rhs_is_syn) {
     left_hand_side = lhs;
     right_hand_side = rhs;
@@ -149,6 +150,7 @@ struct Pattern : Clause {
   std::string assign_synonym;
   bool left_is_synonym;
   bool is_exact;
+  Pattern() {};
   Pattern(std::string lhs, std::string rhs, std::string assn_syn, bool lhs_is_syn, bool is_exact) {
     left_hand_side = lhs;
     right_hand_side = rhs;
