@@ -133,11 +133,15 @@ void PSubsystem::SetStatementObject(Statement* statement) {
   statement->SetStatementNumber(statement_number);
   deliverable_->AddStatement(statement);
 
+  bool new_else = false;
   //to check if adding stmt to Else block
   if (current_node_type_ == 3) {
     IfEntity* if_entity = dynamic_cast<IfEntity*>(current_node_);
     assert (if_entity != nullptr);
     if_entity->getElseStmtList()->push_back(statement);
+
+    if (if_entity->getElseStmtList()->size() == 1)
+      new_else = true;
   } else {
     current_node_->AddStatement(statement);
   }
@@ -148,12 +152,15 @@ void PSubsystem::SetStatementObject(Statement* statement) {
     deliverable_->AddParentRelationship(reinterpret_cast<Statement*>(parent_stack_.top()), statement);
   }
 
+  /*
   //no need modify follow stack for If and While.
   if (dynamic_cast<IfEntity*>(statement) != nullptr || dynamic_cast<WhileEntity*>(current_node_) != nullptr) {
     return;
   }
+  */
 
-  if (current_node_->GetStatementList()->size() == 1) { // 1 because this is newly added in Line curr - 13
+  if (current_node_->GetStatementList()->size() == 1 || // 1 because this is newly added in Line curr - 13
+      (current_node_type_ == 3 && new_else)) {
     //just entered a stack, follow nothing.
     follow_stack_.push(statement);
   } else {
