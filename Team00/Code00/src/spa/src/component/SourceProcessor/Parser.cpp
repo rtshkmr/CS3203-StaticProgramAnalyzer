@@ -41,6 +41,7 @@ void Parser::Parse(std::string file_name) {
         chara.clear();
       }
     }
+    deliverable_ = *p_subsystem.GetDeliverables();
     source_file.close();
   }
 
