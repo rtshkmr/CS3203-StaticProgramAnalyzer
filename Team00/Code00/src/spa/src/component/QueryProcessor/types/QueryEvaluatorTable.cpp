@@ -67,6 +67,7 @@ bool QueryEvaluatorTable::AddRowForAllColumn(std::string synonym, int index, std
       currList.insert(currList.begin() + index, currList[index]);
     }
   }
+  return true;
 }
 
 // Return vector of target synonym
