@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include <cassert>
+#include <iostream>
 #include "PSubsystem.h"
 #include "Tokenizer.h"
 #include "EntityFactory.h"
@@ -52,7 +53,7 @@ void PSubsystem::ProcessStatement(std::string statement) {
 
       if (parent_stack_.empty()) { //back to procedure stmtlist
         current_node_type_ = 0;
-        //TODO: check if uninitialised parent_node == NULL.
+        current_node_ = current_procedure;
       } else {
         current_nest = parent_stack_.top();
         if (WhileEntity* while_entity = dynamic_cast<WhileEntity*>(current_nest)) {
@@ -72,14 +73,18 @@ void PSubsystem::ProcessStatement(std::string statement) {
     return; //TODO: probably throw an error
   }
 
-  Entity* entityObj = entity_factory_.CreateEntities(tokens);
+  /// TO BE DELETED AFTER ITERATION 1;
+  if (tokens[0].GetTokenTag() == TokenTag::kProcedureKeyword && !deliverable_->GetProcList()->empty()) {
+    std::cout << "Encountered multiple procedure \n";
+    //TODO: Perform exception handling here.
+    valid_state = false;
+    return;
+  }
+
+    Entity* entityObj = entity_factory_.CreateEntities(tokens);
 
   if (current_node_type_ == -1) { //when current_node_ is null. Only happens when not reading within a procedure.
     if (Procedure* procedure = dynamic_cast<Procedure*>(entityObj)) {
-      if (deliverable_->GetProcList()->size() != 1) {
-        valid_state = false; //TODO: change this into elegant manner. Reason -> iter1 only max 1 procedure.
-        return;
-      }
       PerformNewProcedureSteps(procedure);
       return;
     } else {
@@ -119,6 +124,7 @@ void PSubsystem::ProcessStatement(std::string statement) {
 }
 
 void PSubsystem::PerformNewProcedureSteps(Procedure* procedure) {
+  current_procedure = procedure;
   current_node_ = procedure;
   current_node_type_ = 0;
   //TODO: add proc_var_name;
@@ -153,7 +159,7 @@ void PSubsystem::SetStatementObject(Statement* statement) {
     return;
   }
 
-  if (current_node_->GetStatementList()->size() == 1) { // 1 because this is newly added in Line curr - 13
+  if (current_node_->GetStatementList()->size() == 1 || follow_stack_.empty()) { // 1 because this is newly added in Line curr - 13
     //just entered a stack, follow nothing.
     follow_stack_.push(statement);
   } else {
