@@ -21,6 +21,9 @@ class PKB {
   std::list<std::tuple<DesignEntity, std::string>> GetModifies(std::string stmt);
   std::list<std::tuple<DesignEntity, std::string>> GetModifiedBy(std::string stmt);
 
+  std::vector<AssignEntity> GetPatternByAssign(std::string stmtRef);
+  std::vector<AssignEntity> GetPatternByVariable(std::string varName);
+
   bool hasFollows();
   bool hasPrevious();
   bool hasParent();
@@ -63,6 +66,8 @@ class PKB {
 
   std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> modifies_c_map_;
   std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> modified_by_c_map_;
+
+  std::unordered_map<std::string, std::vector<AssignEntity>> assign_expr_map_;
 
   void PopulateProcList(const std::list<Procedure *> &proc_list);
   void PopulateVarList(const std::list<Variable *> &var_list);

@@ -211,6 +211,14 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetModifiedBy(std::string 
     return ret_list;
 }
 
+std::vector<AssignEntity> PKB::GetPatternByAssign(std::string stmtRef) {
+    return assign_expr_map_[stmtRef];
+}
+
+std::vector<AssignEntity> PKB::GetPatternByVariable(std::string varName) {
+    return assign_expr_map_[varName];
+}
+
 void PKB::PopulateProcList(const std::list<Procedure *> &proc_list) {
     proc_table_ = std::list<std::string>();
     for (auto const &i : proc_list) {
@@ -269,7 +277,20 @@ void PKB::PopulateAssignList(const std::list<AssignEntity *> &assign_list) {
     for (auto const &i : assign_list) {
         auto *sNumber = const_cast<StatementNumber *>(i->GetStatementNumber());
         assign_table_.push_back(std::to_string(sNumber->getNum()));
+
         type_map_[std::to_string(sNumber->getNum())] = DesignEntity::kAssign;
+
+        AssignEntity entity = *const_cast<AssignEntity*>(i);
+        std::vector<AssignEntity> stmtMapVect{entity};
+        std::vector<AssignEntity> varMapVect{entity};
+        assign_expr_map_[std::to_string(sNumber->getNum())] = stmtMapVect;
+
+        VariableName varName = *entity.getVariable()->getName();
+        if (assign_expr_map_.find(varName.getName()) != assign_expr_map_.end()) {
+            assign_expr_map_[varName.getName()].push_back(entity);
+        } else {
+            assign_expr_map_[varName.getName()] = varMapVect;
+        }
     }
 }
 
