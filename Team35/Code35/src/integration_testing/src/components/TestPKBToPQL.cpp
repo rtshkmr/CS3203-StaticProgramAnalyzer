@@ -147,7 +147,6 @@ TEST_CASE("5. Miscellaneous entity and relationship retrievals") {
         "read r; Select r;",
         "procedure p; Select p;",
         "read r; print p; Select r such that Follows(r, p)",
-        "assign 1a; Select 1a",
         "assign procedure; Select procedure",
 
 
@@ -170,7 +169,6 @@ TEST_CASE("5. Miscellaneous entity and relationship retrievals") {
         "1",
         "Week4",
         "1",
-        "",
         "3, 4, 5",
 
         "dummy"
