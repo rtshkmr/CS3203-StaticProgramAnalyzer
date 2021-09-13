@@ -37,7 +37,8 @@ TEST_CASE("1.FollowsTExtractor.Extract FollowsT basic conditions") {
     follows_t_extractor.Extract(&deliverable);
 
     // Follows*(1, _)
-    std::list<Statement*> expected_follows_1 = std::list<Statement*>{assign_3_, read_x_, print_y_, assign_4_, assign_5_};
+    std::list<Statement*>
+        expected_follows_1 = std::list<Statement*>{assign_3_, read_x_, print_y_, assign_4_, assign_5_};
     std::list<Statement*>* actual_follows_1 = deliverable.follows_T_hash_.find(assign_1_)->second;
     CHECK(*actual_follows_1 == expected_follows_1);
     // Follows*(2, _)

@@ -50,7 +50,7 @@ std::list<Statement*>* ParentTExtractor::ExtractChildrenTFromParent(Statement* p
     deliverable_->AddParentTransitiveRelationshipForList(parent, children_T_list);
   }
 
-  std::unordered_map<Statement*, std::list<Statement*>*> ptct = deliverable_->parent_to_child_hash_;
+  std::unordered_map<Statement*, std::list<Statement*>*> ptct = deliverable_->parent_to_child_T_hash_;
   assert(ptct.find(parent) != ptct.end());  // there must be some ParentT bcos there is a children list
   // return all childrenT
   return ptct.find(parent)->second;

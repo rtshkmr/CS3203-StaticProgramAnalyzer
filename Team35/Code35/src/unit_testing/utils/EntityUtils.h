@@ -114,12 +114,12 @@ static inline IfEntity* if_3_ = new IfEntity("z>1",
                                                  const_1_
                                              });
 static inline IfEntity* if_4_ = new IfEntity("i!=2",
-                                   std::vector<Variable*>{
-                                       var_i_
-                                    },
-                                   std::vector<ConstantValue*>{
-                                       const_2_
-                                   });
+                                             std::vector<Variable*>{
+                                                 var_i_
+                                             },
+                                             std::vector<ConstantValue*>{
+                                                 const_2_
+                                             });
 static inline ElseEntity* else_1_ = new ElseEntity();
 static inline ElseEntity* else_2_ = new ElseEntity();
 static inline ElseEntity* else_3_ = new ElseEntity();
