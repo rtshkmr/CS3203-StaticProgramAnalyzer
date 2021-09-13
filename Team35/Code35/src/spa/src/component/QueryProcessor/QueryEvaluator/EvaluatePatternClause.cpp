@@ -4,21 +4,21 @@
 
 #include "EvaluatePatternClause.h"
 
-QueryEvaluatorTable ProcessPatternClause(Pattern pattern, QueryEvaluatorTable table, PKB pkb) {
+void ProcessPatternClause(const Pattern pattern, QueryEvaluatorTable* table, const PKB pkb) {
   std::string assignSynonymName = pattern.assign_synonym;
   std::string variableValue = pattern.left_hand_side;
 
   if (pattern.left_is_synonym) {
     // Case for 2 synonyms
-    if (table.ContainsColumn(variableValue) && table.ContainsColumn(assignSynonymName)) {
+    if (table->ContainsColumn(variableValue) && table->ContainsColumn(assignSynonymName)) {
       // Both synonym in table
-      table = EvaluatePatternDoubleSynonym(pattern, table, pkb);
-    } else if (table.ContainsColumn(assignSynonymName)) {
+      EvaluatePatternDoubleSynonym(pattern, table, pkb);
+    } else if (table->ContainsColumn(assignSynonymName)) {
       // Table only contains assign synonym
-      table = EvaluatePatternDoubleSynonymFirstPresent(pattern, table, pkb);
-    } else if (table.ContainsColumn(variableValue)) {
+      EvaluatePatternDoubleSynonymFirstPresent(pattern, table, pkb);
+    } else if (table->ContainsColumn(variableValue)) {
       // Table only contains variable synonym
-      table = EvaluatePatternDoubleSynonymSecondPresent(pattern, table, pkb);
+      EvaluatePatternDoubleSynonymSecondPresent(pattern, table, pkb);
     } else {
       // Table contains no synonym
       // Technically this is not possible
@@ -26,20 +26,18 @@ QueryEvaluatorTable ProcessPatternClause(Pattern pattern, QueryEvaluatorTable ta
   } else {
     // Case of 1 synonym (assign)
     // This section to be targeted in issue 92
-    if (table.ContainsColumn(assignSynonymName)) {
-      table = EvaluatePatternSingleSynonym(pattern, table, pkb);
+    if (table->ContainsColumn(assignSynonymName)) {
+      EvaluatePatternSingleSynonym(pattern, table, pkb);
     } else {
       // Technically this should never run
     }
   }
-
-  return table;
 }
 
-QueryEvaluatorTable EvaluatePatternDoubleSynonym(Pattern p, QueryEvaluatorTable table, PKB pkb) {
+void EvaluatePatternDoubleSynonym(Pattern p, QueryEvaluatorTable* table, PKB pkb) {
   // Both synonyms are in table
-  std::vector<std::string> assign_stmt_list = table.GetColumn(p.assign_synonym);
-  std::vector<std::string> variable_list = table.GetColumn(p.left_hand_side);
+  std::vector<std::string> assign_stmt_list = table->GetColumn(p.assign_synonym);
+  std::vector<std::string> variable_list = table->GetColumn(p.left_hand_side);
   int number_of_iterations = assign_stmt_list.size();
 
   for (int i = 0; i < number_of_iterations; i++) {
@@ -59,16 +57,16 @@ QueryEvaluatorTable EvaluatePatternDoubleSynonym(Pattern p, QueryEvaluatorTable 
     }
 
     if (!has_relationship) {
-      table.DeleteRow(i);
+      table->DeleteRow(i);
       i--;
       number_of_iterations--;
     }
   }
 }
 
-QueryEvaluatorTable EvaluatePatternDoubleSynonymFirstPresent(Pattern p, QueryEvaluatorTable table, PKB pkb) {
+void EvaluatePatternDoubleSynonymFirstPresent(Pattern p, QueryEvaluatorTable* table, PKB pkb) {
   // Both are synonyms but only assign synonym in table
-  std::vector<std::string> assign_stmt_list = table.GetColumn(p.assign_synonym);
+  std::vector<std::string> assign_stmt_list = table->GetColumn(p.assign_synonym);
 
   for (int i = 0; i < assign_stmt_list.size(); i++) {
     std::string current_assign_stmt = assign_stmt_list[i];
@@ -85,15 +83,15 @@ QueryEvaluatorTable EvaluatePatternDoubleSynonymFirstPresent(Pattern p, QueryEva
       const VariableName* variable_name = assign_entity.getVariable()->getName();
       VariableName vn = *variable_name;
       std::string name = vn.getName();
-      table.AddRowForAllColumn(p.left_hand_side, i, name);
+      table->AddRowForAllColumn(p.left_hand_side, i, name);
     }
 
   }
 }
 
-QueryEvaluatorTable EvaluatePatternDoubleSynonymSecondPresent(Pattern p, QueryEvaluatorTable table, PKB pkb) {
+void EvaluatePatternDoubleSynonymSecondPresent(Pattern p, QueryEvaluatorTable* table, PKB pkb) {
   // Both are synonyms but only assign synonym in table
-  std::vector<std::string> variable_list = table.GetColumn(p.left_hand_side);
+  std::vector<std::string> variable_list = table->GetColumn(p.left_hand_side);
   int table_size = variable_list.size();
 
   for (int table_index = 0; table_index < table_size; table_index++) {
@@ -102,7 +100,7 @@ QueryEvaluatorTable EvaluatePatternDoubleSynonymSecondPresent(Pattern p, QueryEv
     std::vector<AssignEntity> assign_entity_list = QueryPkbPattern(pkb, false, current_variable);
 
     if (assign_entity_list.size() == 0) {
-      table.DeleteRow(table_index);
+      table->DeleteRow(table_index);
       table_index--;
       table_size--;
       continue;
@@ -118,16 +116,16 @@ QueryEvaluatorTable EvaluatePatternDoubleSynonymSecondPresent(Pattern p, QueryEv
       const VariableName* variable_name = assign_entity.getVariable()->getName();
       VariableName vn = *variable_name;
       std::string name = vn.getName();
-      table.AddRowForAllColumn(p.left_hand_side, i, name);
+      table->AddRowForAllColumn(p.left_hand_side, i, name);
       // Might have to change the table size pointer here.
     }
 
   }
 }
 
-QueryEvaluatorTable EvaluatePatternSingleSynonym(Pattern p, QueryEvaluatorTable table, PKB pkb) {
+void EvaluatePatternSingleSynonym(Pattern p, QueryEvaluatorTable* table, PKB pkb) {
   // Both are synonyms but only assign synonym in table
-  std::vector<std::string> assign_stmt_list = table.GetColumn(p.assign_synonym);
+  std::vector<std::string> assign_stmt_list = table->GetColumn(p.assign_synonym);
   int table_size = assign_stmt_list.size();
 
   for (int i = 0; i < table_size; i++) {
@@ -147,7 +145,7 @@ QueryEvaluatorTable EvaluatePatternSingleSynonym(Pattern p, QueryEvaluatorTable 
       continue;
     }
 
-    table.DeleteRow(i);
+    table->DeleteRow(i);
     i--;
     table_size--;
   }

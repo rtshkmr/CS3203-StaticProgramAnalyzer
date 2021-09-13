@@ -6,13 +6,10 @@
 #include <vector>
 #include "component/QueryProcessor/types/Types.h"
 #include "component/QueryProcessor/types/QueryEvaluatorTable.h"
-#include "component/PKB/PKB.h"
-#include "EvaluateSuchThatSingleSynonym.h"
 #include "component/QueryProcessor/types/QueryEvaluatorTable.h"
 #include "component/PKB/PKB.h"
 #include "QueryPKB.h"
-#include "EvaluateSuchThatDoubleSynonyms.h"
-#include "EvaluateSuchThatNoSynonym.h"
+#include "EvaluateSuchThatClause.h"
 #include "EvaluatePatternClause.h"
 
 class QueryEvaluator {
@@ -26,9 +23,11 @@ class QueryEvaluator {
     PKB pkb;
     bool booleanResult;
     std::unordered_map<DesignEntity, std::list<std::string>> map_of_synonym_values;
-    QueryEvaluatorTable ProcessSuchThat(Clause* clause, QueryEvaluatorTable table);
-    QueryEvaluatorTable EvaluateSuchThatClause(SuchThat st, QueryEvaluatorTable table, RelRef query_relation);
+    void PopulateSynonymValues(QueryEvaluatorTable* table);
+    void EvaluateAllGroups(QueryEvaluatorTable* table);
+    void EvaluateSuchThatClause(SuchThat st, QueryEvaluatorTable* table);
     void ProcessBooleanGroup(std::vector<Clause*> clauseList);
+    void ProcessNonBooleanGroup(std::vector<Clause*> clauseList, QueryEvaluatorTable* table);
 };
 
 #endif //INC_21S1_CP_SPA_TEAM_35_QUERYEVALUATOR_H

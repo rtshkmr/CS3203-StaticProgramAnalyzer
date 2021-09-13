@@ -12,11 +12,11 @@
 #include "QueryPKB.h"
 #include "model/Statement.h"
 
-QueryEvaluatorTable ProcessPatternClause(Pattern pattern, QueryEvaluatorTable table, PKB pkb);
-QueryEvaluatorTable EvaluatePatternDoubleSynonym(Pattern p, QueryEvaluatorTable table, PKB pkb);
-QueryEvaluatorTable EvaluatePatternDoubleSynonymFirstPresent(Pattern p, QueryEvaluatorTable table, PKB pkb);
-QueryEvaluatorTable EvaluatePatternDoubleSynonymSecondPresent(Pattern p, QueryEvaluatorTable table, PKB pkb);
-QueryEvaluatorTable EvaluatePatternSingleSynonym(Pattern p, QueryEvaluatorTable table, PKB pkb);
+void ProcessPatternClause(Pattern pattern, QueryEvaluatorTable* table, PKB pkb);
+void EvaluatePatternDoubleSynonym(Pattern p, QueryEvaluatorTable* table, PKB pkb);
+void EvaluatePatternDoubleSynonymFirstPresent(Pattern p, QueryEvaluatorTable* table, PKB pkb);
+void EvaluatePatternDoubleSynonymSecondPresent(Pattern p, QueryEvaluatorTable* table, PKB pkb);
+void EvaluatePatternSingleSynonym(Pattern p, QueryEvaluatorTable* table, PKB pkb);
 bool HasExpressionMatch(Pattern p, AssignEntity assign_entity);
 
 #endif //AUTOTESTER_EVALUATEPATTERNCLAUSE_H

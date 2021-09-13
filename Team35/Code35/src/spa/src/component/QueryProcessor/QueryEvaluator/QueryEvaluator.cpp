@@ -8,68 +8,76 @@ std::vector<std::string> QueryEvaluator::EvaluateQuery() {
 
   QueryEvaluatorTable targetSynonymTable(targetSynonym.GetName());
 
+  PopulateSynonymValues(&targetSynonymTable);
+  EvaluateAllGroups(&targetSynonymTable);
+
+  // Check the boolean conditions and return the final results
+  if (!booleanResult) {
+    std::vector<std::string> emptyList = {};
+    return emptyList;
+  } else {
+    return targetSynonymTable.GetResults();
+  }
+}
+
+void QueryEvaluator::PopulateSynonymValues(QueryEvaluatorTable* table) {
   // Query all the design entities and add them to an unordered_map.
   for (auto iter = synonymlist.begin(); iter != synonymlist.end(); iter++) {
     DesignEntity synonym_design_entity = iter->GetType();
     std::list<std::string> list_of_synonym_values = pkb.GetDesignEntity(synonym_design_entity);
     map_of_synonym_values[synonym_design_entity] = list_of_synonym_values;
     if (iter->GetName() == targetSynonym.GetName()) {
-      targetSynonymTable.AddTargetSynonym(list_of_synonym_values);
+      table->AddTargetSynonym(list_of_synonym_values);
     }
   }
+}
 
+void QueryEvaluator::EvaluateAllGroups(QueryEvaluatorTable* table) {
   // For each group, evaluate the group with target synonym first if applicable
   for (auto iter = groupList.begin(); iter != groupList.end(); iter++) {
     std::vector<Clause*> clauseList = iter->GetClauses();
 
+    // This Group contains the target synonym
     if (iter->ContainsTargetSynonym()) {
-      for (auto iter = clauseList.begin(); iter != clauseList.end(); iter++) {
-        Clause* currentClause = *iter;
-        if (typeid(*currentClause) == typeid(SuchThat)) {
-          // Evaluate such that clause here
-          targetSynonymTable = ProcessSuchThat(currentClause, targetSynonymTable);
-        } else {
-          // Evaluate pattern clause here
-          Pattern* p = dynamic_cast<Pattern*>(currentClause);
-          targetSynonymTable = ProcessPatternClause(*p, targetSynonymTable, pkb);
-        }
-      }
+      ProcessNonBooleanGroup(clauseList, table);
 
+      // This Group contains no target synonym and is treated as a boolean type group
     } else {
       // Each boolean group has their own table.
       ProcessBooleanGroup(clauseList);
     }
   }
+}
 
-  // Check the boolean conditions
-  if (!booleanResult) {
-    std::vector<std::string> emptyList = {};
-    return emptyList;
+void QueryEvaluator::ProcessNonBooleanGroup(std::vector<Clause*> clauseList, QueryEvaluatorTable* table) {
+
+  for (auto iter = clauseList.begin(); iter != clauseList.end(); iter++) {
+    Clause* currentClause = *iter;
+
+    if (typeid(*currentClause) == typeid(SuchThat)) {
+      // Evaluate such that clause here
+      SuchThat* st = dynamic_cast<SuchThat*>(currentClause);
+      EvaluateSuchThatClause(*st, table);
+    } else {
+      // Evaluate pattern clause here
+      Pattern* p = dynamic_cast<Pattern*>(currentClause);
+      ProcessPatternClause(*p, table, pkb);
+    }
   }
-
-  // return the final results
-  return targetSynonymTable.GetResults();
 }
 
-QueryEvaluatorTable QueryEvaluator::ProcessSuchThat(Clause* clause, QueryEvaluatorTable table) {
-  SuchThat* st = dynamic_cast<SuchThat*>(clause);
-  RelRef relationship = st->rel_ref;
-  table = EvaluateSuchThatClause(*st, table, relationship);
-  return table;
-}
-
-QueryEvaluatorTable QueryEvaluator::EvaluateSuchThatClause(SuchThat such_that_clause, QueryEvaluatorTable table, RelRef query_relation) {
+void QueryEvaluator::EvaluateSuchThatClause(SuchThat such_that_clause, QueryEvaluatorTable* table) {
   std::string firstValue = such_that_clause.left_hand_side;
   std::string secondValue = such_that_clause.right_hand_side;
   // All possible cases:
   // Both are synonym
   if (such_that_clause.left_is_synonym && such_that_clause.right_is_synonym) {
     // Both are in the target table
-    if (table.ContainsColumn(firstValue) && table.ContainsColumn(secondValue)) {
-      table = BothSynonymInTable(pkb, such_that_clause, query_relation, table);
+    if (table->ContainsColumn(firstValue) && table->ContainsColumn(secondValue)) {
+      BothSynonymInTable(pkb, such_that_clause, table);
 
       // First synonym in table, the other is not.
-    } else if (table.ContainsColumn(firstValue)) {
+    } else if (table->ContainsColumn(firstValue)) {
       // e.g Parent(a1, a2) where a2 is not in the table
       Synonym newSynonym;
       for (auto iter = synonymlist.begin(); iter != synonymlist.end(); iter++) {
@@ -77,18 +85,18 @@ QueryEvaluatorTable QueryEvaluator::EvaluateSuchThatClause(SuchThat such_that_cl
           newSynonym = *iter;
         }
       }
-      table = ProcessNewColumn(firstValue, newSynonym, table,
+      ProcessNewColumn(firstValue, newSynonym, table,
                                such_that_clause.rel_ref, true, pkb);
 
       // Second synonym in table, the other is not.
-    } else if (table.ContainsColumn(secondValue)) {
+    } else if (table->ContainsColumn(secondValue)) {
       Synonym newSynonym;
       for (auto iter = synonymlist.begin(); iter != synonymlist.end(); iter++) {
         if (iter->GetName() == firstValue) {
           newSynonym = *iter;
         }
       }
-      table = ProcessNewColumn(secondValue, newSynonym, table,
+      ProcessNewColumn(secondValue, newSynonym, table,
                        such_that_clause.rel_ref, false, pkb);
     } else {
       // Neither synonym in the target table
@@ -101,17 +109,10 @@ QueryEvaluatorTable QueryEvaluator::EvaluateSuchThatClause(SuchThat such_that_cl
   } else {
     // Only 1 synonym
     if (such_that_clause.left_is_synonym) {
-      //e.g Parent(a1, "_")
-      // For each row of the synonym in the table, we check if it contains any, or the given stmt number.
-      table = ProcessQueryGivenFirstSynonym(pkb, such_that_clause, query_relation, table);
-    } else if (such_that_clause.right_is_synonym) {
-      table = ProcessQueryGivenSecondSynonym(pkb, such_that_clause, query_relation, table);
+      ProcessQueryGivenFirstSynonym(pkb, such_that_clause, table);
     } else {
-      // Assert that no code should ever run here. Throw an error if needed.
-    }
+      ProcessQueryGivenSecondSynonym(pkb, such_that_clause, table);
   }
-  // None is a synonym
-  return table;
 }
 
 void QueryEvaluator::ProcessBooleanGroup(std::vector<Clause*> clauseList) {
@@ -144,9 +145,10 @@ void QueryEvaluator::ProcessBooleanGroup(std::vector<Clause*> clauseList) {
       if (typeid(*currentClause) == typeid(SuchThat)) {
         // Evaluate such that clause here
         SuchThat* currentSuchThat = dynamic_cast<SuchThat*>(currentClause);
-        currTable = EvaluateSuchThatClause(*currentSuchThat, currTable, currentSuchThat->rel_ref);
+        EvaluateSuchThatClause(*currentSuchThat, &currTable);
       } else {
         // Evaluate pattern clause here
+        // Technically not possible here
       }
     }
 
