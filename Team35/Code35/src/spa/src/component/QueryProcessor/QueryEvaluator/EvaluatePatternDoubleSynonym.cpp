@@ -15,7 +15,7 @@ QueryEvaluatorTable EvaluatePatternDoubleSynonym(Pattern p, QueryEvaluatorTable 
     VariableName current_variable_name = VariableName(current_variable_value);
     bool has_relationship = false;
 
-    std::vector<AssignEntity> possible_variable_list = QueryPkbPattern(pkb, true);
+    std::vector<AssignEntity> possible_variable_list = QueryPkbPattern(pkb, true, current_assign_stmt);
     for (int i = 0; i < possible_variable_list.size(); i++) {
       AssignEntity possible_variable = possible_variable_list[i];
       const VariableName* possible_variable_name = possible_variable.getVariable()->getName();

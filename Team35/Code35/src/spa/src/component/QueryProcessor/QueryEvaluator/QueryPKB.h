@@ -11,6 +11,6 @@
 #include "model/Statement.h"
 
 std::list<std::tuple<DesignEntity, std::string>> QueryPKBSuchThat(PKB pkb, RelRef r, std::string stmt, bool is_first_param);
-std::vector<AssignEntity> QueryPkbPattern(PKB database, bool is_assign_synonym);
+std::vector<AssignEntity> QueryPkbPattern(PKB database, bool is_assign_synonym, std::string value);
 
 #endif //AUTOTESTER_QUERYPKB_H
