@@ -21,8 +21,12 @@ void FollowsTExtractor::Extract(Deliverable* deliverable) {
   this->deliverable_ = deliverable;
 
   for (Procedure* proc: deliverable_->proc_list_) {
-    Statement* first_statement = proc->GetStatementList()->front();
-    ExtractFollowsTFromThread(first_statement);
+    if (proc->GetStatementList()->size() > 0) {
+      // todo: change to assert when empty procs are handled in iter1
+      // empty procs are created when there is a call but the procedure was not defined
+      Statement* first_statement = proc->GetStatementList()->front();
+      ExtractFollowsTFromThread(first_statement);
+    }
   }
 }
 /**
