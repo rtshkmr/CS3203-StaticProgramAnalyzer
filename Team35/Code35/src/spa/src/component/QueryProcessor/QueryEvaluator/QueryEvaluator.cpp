@@ -1,18 +1,17 @@
 #include "QueryEvaluator.h"
 
 QueryEvaluator::QueryEvaluator(std::list<Synonym> syn_list, Synonym target, std::list<Group> groups, PKB pkb)
-        : synonymlist{syn_list}, targetSynonym{target}, groupList{groups}, pkb{pkb}, booleanResult{true} {}
+        : synonymlist{syn_list}, targetSynonym{target}, groupList{groups}, pkb{pkb}, booleanResult{true},
+        map_of_synonym_values{} {}
 
 std::vector<std::string> QueryEvaluator::EvaluateQuery() {
 
   QueryEvaluatorTable targetSynonymTable(targetSynonym.GetName());
-  PKB database = pkb;
-  std::unordered_map<DesignEntity, std::list<std::string>> map_of_synonym_values;
 
   // Query all the design entities and add them to an unordered_map.
   for (auto iter = synonymlist.begin(); iter != synonymlist.end(); iter++) {
     DesignEntity synonym_design_entity = iter->GetType();
-    std::list<std::string> list_of_synonym_values = database.GetDesignEntity(synonym_design_entity);
+    std::list<std::string> list_of_synonym_values = pkb.GetDesignEntity(synonym_design_entity);
     map_of_synonym_values[synonym_design_entity] = list_of_synonym_values;
     if (iter->GetName() == targetSynonym.GetName()) {
       targetSynonymTable.AddTargetSynonym(list_of_synonym_values);
@@ -27,78 +26,39 @@ std::vector<std::string> QueryEvaluator::EvaluateQuery() {
         Clause* currentClause = *iter;
         if (typeid(*currentClause) == typeid(SuchThat)) {
           // Evaluate such that clause here
-          targetSynonymTable = evaluateSuchThat(currentClause, targetSynonymTable);
+          targetSynonymTable = ProcessSuchThat(currentClause, targetSynonymTable);
         } else {
           // Evaluate pattern clause here
+          Pattern* p = dynamic_cast<Pattern*>(currentClause);
+          // targetSynonymTable = ProcessPatternClause(*p, targetSynonymTable);
         }
       }
 
     } else {
       // Each boolean group has their own table.
       std::vector<Clause*> clauseList = iter->GetClauses();
-      Clause* firstClause = clauseList[0];
-      std::string synonymName = "";
-      if (typeid(*firstClause) == typeid(SuchThat)) {
-        SuchThat* st = dynamic_cast<SuchThat*>(firstClause);
-        if (st->left_is_synonym) {
-          synonymName = st->left_hand_side;
-        } else if (st->right_is_synonym) {
-          synonymName = st->right_hand_side;
-        } else {
-          // If no synonym, no need for a table. Also, should be in a group of size 1.
-          bool result = EvaluateNoSynonym(*st, pkb);
-          if (result == false) {
-            booleanResult = false;
-            break;
-          }
-          continue;
-        }
-      } else if (typeid(*firstClause) == typeid(Pattern)) {
-        Pattern* pattern = dynamic_cast<Pattern*>(firstClause);
-        synonymName = pattern->assign_synonym;
-      } else {
-        // No code should run here for iter 1 since there is only suchthat and pattern clause.
-      }
-
-      if (synonymName != "") {
-        QueryEvaluatorTable currTable(synonymName);
-        for (auto iter = clauseList.begin(); iter != clauseList.end(); iter++) {
-          Clause* currentClause = *iter;
-          if (typeid(*currentClause) == typeid(SuchThat)) {
-            // Evaluate such that clause here
-            SuchThat* currentSuchThat = dynamic_cast<SuchThat*>(currentClause);
-            currTable = processBooleanSuchThat(*currentSuchThat);
-          } else {
-            // Evaluate pattern clause here
-          }
-        }
-
-        if (currTable.GetSize() == 0) {
-          booleanResult = false;
-          break;
-        }
-      }
+      ProcessBooleanSuchThat(clauseList);
     }
   }
 
   // Check the boolean conditions
-  if (booleanResult == false) {
+  if (!booleanResult) {
     std::vector<std::string> emptyList = {};
     return emptyList;
   }
 
   // return the final results
   return targetSynonymTable.GetResults();
-};
+}
 
-QueryEvaluatorTable QueryEvaluator::evaluateSuchThat(Clause* clause, QueryEvaluatorTable table) {
+QueryEvaluatorTable QueryEvaluator::ProcessSuchThat(Clause* clause, QueryEvaluatorTable table) {
   SuchThat* st = dynamic_cast<SuchThat*>(clause);
   RelRef relationship = st->rel_ref;
-  table = processNonBooleanSuchThat(*st, table, relationship);
+  table = EvaluateSuchThatClause(*st, table, relationship);
   return table;
-};
+}
 
-QueryEvaluatorTable QueryEvaluator::processNonBooleanSuchThat(SuchThat such_that_clause, QueryEvaluatorTable table, RelRef query_relation) {
+QueryEvaluatorTable QueryEvaluator::EvaluateSuchThatClause(SuchThat such_that_clause, QueryEvaluatorTable table, RelRef query_relation) {
   std::string firstValue = such_that_clause.left_hand_side;
   std::string secondValue = such_that_clause.right_hand_side;
   // All possible cases:
@@ -154,7 +114,48 @@ QueryEvaluatorTable QueryEvaluator::processNonBooleanSuchThat(SuchThat such_that
   return table;
 }
 
-QueryEvaluatorTable QueryEvaluator::processBooleanSuchThat(SuchThat such_that_clause) {
-  QueryEvaluatorTable table ("to be changed");
-  return table;
+void QueryEvaluator::ProcessBooleanSuchThat(std::vector<Clause*> clauseList) {
+  Clause* firstClause = clauseList[0];
+  std::string synonymName = "";
+  if (typeid(*firstClause) == typeid(SuchThat)) {
+    SuchThat* st = dynamic_cast<SuchThat*>(firstClause);
+    if (st->left_is_synonym) {
+      synonymName = st->left_hand_side;
+    } else if (st->right_is_synonym) {
+      synonymName = st->right_hand_side;
+    } else {
+      // If no synonym, no need for a table. Also, should be in a group of size 1.
+      bool result = EvaluateNoSynonym(*st, pkb);
+      if (result == false) {
+        booleanResult = false;        // Call to the class variable directly
+      }
+    }
+  } else if (typeid(*firstClause) == typeid(Pattern)) {
+    Pattern* pattern = dynamic_cast<Pattern*>(firstClause);
+    synonymName = pattern->assign_synonym;
+  } else {
+    // No code should run here for iter 1 since there is only such that and pattern clause.
+  }
+
+  if (synonymName != "") {
+    QueryEvaluatorTable currTable(synonymName);
+    for (auto iter = clauseList.begin(); iter != clauseList.end(); iter++) {
+      Clause* currentClause = *iter;
+      if (typeid(*currentClause) == typeid(SuchThat)) {
+        // Evaluate such that clause here
+        SuchThat* currentSuchThat = dynamic_cast<SuchThat*>(currentClause);
+        currTable = EvaluateSuchThatClause(*currentSuchThat, currTable, currentSuchThat->rel_ref);
+      } else {
+        // Evaluate pattern clause here
+      }
+    }
+
+    if (currTable.GetSize() == 0) {
+      booleanResult = false;
+    }
+  }
 }
+
+//QueryEvaluatorTable QueryEvaluator::ProcessPatternClause(Pattern pattern, QueryEvaluatorTable table) {
+//
+//}
