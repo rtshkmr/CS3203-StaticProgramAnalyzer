@@ -3,6 +3,7 @@
 #include <component/QueryProcessor/types/Exceptions.h>
 #include <datatype/RegexPatterns.h>
 #include <unordered_set>
+#include <sstream>
 
 /* Checks that current lookahead has the same expected type. If valid, advances tokenizer to next lookahead.*/
 Token QueryParser::eat(TokenTag token_type) {
@@ -153,115 +154,151 @@ void QueryParser::parse_such_that() {
   eat(TokenTag::kSuchThat);
   std::pair<Clause*, bool> clause_info = parse_relRef();
   // add group.
-  std::vector<Clause*> clauses;
   clauses.emplace_back(clause_info.first);
-  Group group = Group(clauses, clause_info.second);
-  groups.push_back(group);
 }
 
 // entRef : synonym | ‘_’ | ‘"’ IDENT ‘"’
-void QueryParser::parse_entRef() {
+Token QueryParser::parse_entRef() {
+  std::cout << "parsing entRef..." << std::endl;
+  std::string token_name;
+  TokenTag token_type;
   if (lookahead.GetTokenTag() == TokenTag::kName) {
     // parse as synonym
-    eat(TokenTag::kName);
+    if (!is_valid_synonym(lookahead)) {
+      throw PQLParseException("Unknown synonym received as entRef in lhs of pattern cl.");
+    }
+    token_name = eat(TokenTag::kName).GetTokenString();
+    token_type = TokenTag::kName;
   } else if (lookahead.GetTokenTag() == TokenTag::kUnderscore) {
     // parse as underscore
     eat(TokenTag::kUnderscore);
+    token_name = "_";
+    token_type = TokenTag::kUnderscore;
   } else {
     // parse as "’ IDENT ‘"
     eat(TokenTag::kStringQuote);
-    eat(TokenTag::kName);
+    token_name = eat(TokenTag::kName).GetTokenString();
+    token_type = TokenTag::kName;
     eat(TokenTag::kStringQuote);
   }
+  return Token(token_name, token_type);
 }
 
 // factor: var_name | const_value | ‘(’ expr ‘)’
-void QueryParser::parse_factor() {
+std::string QueryParser::parse_factor() {
   std::cout << "parsing factor..." << std::endl;
+  std::stringstream ss;
   if (lookahead.GetTokenTag() == TokenTag::kInteger) {
     // parse as constant
-    eat(TokenTag::kInteger);
+    ss << eat(TokenTag::kInteger).GetTokenString();
   } else if (lookahead.GetTokenTag() == TokenTag::kOpenBracket) {
     // parse as ‘(’ expr ‘)’
-    eat(TokenTag::kOpenBracket);
-    parse_expr();
-    eat(TokenTag::kCloseBracket);
+    ss << eat(TokenTag::kOpenBracket).GetTokenString();
+    ss << parse_expr();
+    ss << eat(TokenTag::kCloseBracket).GetTokenString();
   } else if (lookahead.GetTokenTag() == TokenTag::kName){
     // parse as var_name
-    eat(TokenTag::kName);
+    ss << eat(TokenTag::kName).GetTokenString();
   } else {
     throw PQLParseException("Received invalid factor in rhs of pattern cl.");
   }
+  return ss.str();
 }
 
 // term: term ‘*’ factor | term ‘/’ factor | term ‘%’ factor | factor
-void QueryParser::parse_term() {
+std::string QueryParser::parse_term() {
+  std::stringstream ss;
   std::cout << "parsing term..." << std::endl;
   // initial check to prevent term from starting with + or -
   if (lookahead.GetTokenTag() == TokenTag::kTimes || lookahead.GetTokenTag() == TokenTag::kDivide ||
       lookahead.GetTokenTag() == TokenTag::kModulo) {
     throw PQLParseException("Term in rhs of pattern clause cannot start with " + lookahead.GetTokenString());
   }
-  parse_factor();
+  ss << parse_factor();
   while (lookahead.GetTokenTag() != TokenTag::kStringQuote && lookahead.GetTokenTag() != TokenTag::kPlus &&
         lookahead.GetTokenTag() != TokenTag::kMinus) {
     if (lookahead.GetTokenTag() == TokenTag::kTimes) {
-      eat(TokenTag::kTimes);
+      ss << eat(TokenTag::kTimes).GetTokenString();
     } else if (lookahead.GetTokenTag() == TokenTag::kDivide) {
-      eat(TokenTag::kDivide);
+      ss << eat(TokenTag::kDivide).GetTokenString();
     } else if (lookahead.GetTokenTag() == TokenTag::kModulo) {
-      eat(TokenTag::kModulo);
+      ss << eat(TokenTag::kModulo).GetTokenString();
     } else {
       throw PQLParseException("Expected valid term for pattern cl, instead got " + lookahead.GetTokenString());
     }
-    parse_factor();
+    ss << parse_factor();
   }
+  return ss.str();
 }
 
 // expr: expr ‘+’ term | expr ‘-’ term | term
-void QueryParser::parse_expr() {
+std::string QueryParser::parse_expr() {
+  std::stringstream ss;
   std::cout << "parsing expr..." << std::endl;
   // initial check to prevent expr from starting with + or -
   if (lookahead.GetTokenTag() == TokenTag::kPlus || lookahead.GetTokenTag() == TokenTag::kMinus) {
     throw PQLParseException("Expr in rhs of pattern clause cannot start with " + lookahead.GetTokenString());
   }
-  parse_term();
+  ss << parse_term();
   while (lookahead.GetTokenTag() != TokenTag::kStringQuote) {
     if (lookahead.GetTokenTag() == TokenTag::kPlus) {
-      eat(TokenTag::kPlus);
+      ss << eat(TokenTag::kPlus).GetTokenString();
     } else if (lookahead.GetTokenTag() == TokenTag::kMinus) {
-      eat(TokenTag::kMinus);
+      ss << eat(TokenTag::kMinus).GetTokenString();
     } else {
       throw PQLParseException("expected '+' or '-' in expr in pattern cl,"
                               "instead got " + lookahead.GetTokenString());
     }
-    parse_term();
+    ss << parse_term();
   }
+  return ss.str();
 }
 // expression-spec : ‘"‘ expr’"’ | ‘_’ ‘"’ expr ‘"’ ‘_’ | ‘_’
-void QueryParser::parse_expressionSpec() {
+std::pair<std::string, bool> QueryParser::parse_expressionSpec() {
   std::cout << "parsing expressionSpec..." << std::endl;
+  bool is_exact_match = false;
+  std::string rhs_string;
   if (lookahead.GetTokenTag() == TokenTag::kStringQuote) {
     // parse as "‘ expr’"
     eat(TokenTag::kStringQuote);
-    parse_expr();
+    rhs_string = parse_expr();
     eat(TokenTag::kStringQuote);
+    is_exact_match = true;
   } else if (lookahead.GetTokenTag() == TokenTag::kUnderscore) {
     eat(TokenTag::kUnderscore);
-    if (lookahead.GetTokenTag() != TokenTag::kComma) {
-      throw PQLParseException("Expected valid expr-spec for pattern cl, instead got " + lookahead.GetTokenString());
+    if (lookahead.GetTokenTag() != TokenTag::kStringQuote) {
+      return std::make_pair("_", is_exact_match);
     }
     // continue parsing as ‘_’ ‘"’ expr ‘"’ ‘_’
-    eat(TokenTag::kComma);
-    parse_expr();
-    eat(TokenTag::kComma);
+    eat(TokenTag::kStringQuote);
+    rhs_string = parse_expr();
+    eat(TokenTag::kStringQuote);
   } else {
     throw PQLParseException("Received invalid expression-spec in pattern cl.");
   }
+  return std::make_pair(rhs_string, is_exact_match);
 }
 
+bool QueryParser::is_valid_synonym(Token token) {
+  if (token.GetTokenTag() != TokenTag::kName) {
+    return 0;
+  }
+  std::string syn_name = token.GetTokenString();
+  // syn_name must be a known synonym.
+  bool is_valid = false;
+  for (Synonym& s : synonyms) {
+    if (s.GetName() == syn_name) {
+      is_valid = true;
+      break;
+    }
+  }
+  if (!is_valid) {
+    return 0;
+  }
+  return 1;
+}
 // returns 1 if syn for pattern clause is valid name and type, 0 otherwise.
-bool QueryParser::is_valid_syn_assign(Token token) {
+bool QueryParser::is_valid_synonym(Token token, DesignEntity de) {
   if (token.GetTokenTag() != TokenTag::kName) {
     return 0;
   }
@@ -269,7 +306,7 @@ bool QueryParser::is_valid_syn_assign(Token token) {
   // syn_name must be a known synonym, and of permitted type.
   bool is_valid = false;
   for (Synonym& s : synonyms) {
-    if (s.GetName() == syn_name && s.GetType() == DesignEntity::kAssign) {
+    if (s.GetName() == syn_name && s.GetType() == de) {
       is_valid = true;
       break;
     }
@@ -284,18 +321,27 @@ void QueryParser::parse_pattern() {
   std::cout << "parsing pattern clause..." << std::endl;
   eat(TokenTag::kName); // eat 'pattern' keyword
   // check if syn-assign valid
-  if (!is_valid_syn_assign(lookahead)) {
+  if (!is_valid_synonym(lookahead, DesignEntity::kAssign)) {
     throw PQLParseException("Expected valid syn-assign for pattern cl, instead got " + lookahead.GetTokenString());
   }
   std::cout << "Got valid syn assign: " + lookahead.GetTokenString() << std::endl;
+  std::string assn_syn = lookahead.GetTokenString();
+
   eat(TokenTag::kName); // eat 'syn-assign'
   eat(TokenTag::kOpenBracket);
   // parse_lhs
-  parse_entRef();
+  Token lhs_token = parse_entRef();
   eat(TokenTag::kComma);
+  std::string lhs = lhs_token.GetTokenString();
+  bool lhs_is_syn = is_valid_synonym(lhs_token, DesignEntity::kVariable);
+  std::cout << "lhs_is_syn has value "; std::cout << lhs_is_syn << std::endl;
   //parse_rhs
-  parse_expressionSpec();
-  eat(TokenTag::kCloseBracket);
+  std::pair<std::string, bool> rhs_info = parse_expressionSpec();
+  std::cout << "grouping clauses...";
+
+  // TODO: this could introduce a memory leak...
+  Clause* cl = new Pattern(lhs, rhs_info.first, assn_syn, lhs_is_syn, rhs_info.second);
+  clauses.emplace_back(cl);
 }
 
 void QueryParser::parse_select() {
@@ -333,8 +379,86 @@ void QueryParser::parse_query() {
   parse_select();
 }
 
+void QueryParser::group_clauses() {
+  // TODO: implement grouping algorithm.
+  // current implementation assumes only 1 such that and 1 pattern clause; manually grouping by common synonym.
+  std::cout << "There are ";
+  std::cout << clauses.size();
+
+  if (clauses.size() == 0) {
+    return;
+  }
+  std::cout << " clauses. Applying grouping algorithm." << std::endl;
+
+  if (clauses.size() == 1) {
+    // expecting 1 such that or 1 pattern clause
+    bool has_target_syn = false;
+    // such that clause
+    std::cout << "printing typeids..." << std::endl;
+    //std::cout << typeid(*clauses[0]).;
+    //std::cout << typeid(SuchThat);
+
+    if (typeid(*clauses[0]) == typeid(SuchThat)) {
+      std::cout << "received such that clause for grouping" << std::endl;
+      SuchThat* st = dynamic_cast<SuchThat*>(clauses[0]);
+      if (st->left_is_synonym && st->left_hand_side.compare(target.GetName()) == 0) {
+        has_target_syn = true;
+      } else if (st->right_is_synonym && st->right_hand_side.compare(target.GetName()) == 0) {
+        has_target_syn = true;
+      }
+      std::cout << "printing value of has_target_syn for 1x such that... ";
+      std::cout << has_target_syn << std::endl;
+    } else {
+      // pattern clause
+      std::cout << "received pattern clause for grouping" << std::endl;
+      Pattern* pt = dynamic_cast<Pattern*>(clauses[0]);
+      if (pt->left_is_synonym && pt->left_hand_side.compare(target.GetName()) == 0) {
+        has_target_syn = true;
+      }
+    }
+    // add clause into its own group
+    std::vector<Clause*> cl1;
+    cl1.push_back(clauses[0]);
+    Group g1 = Group(cl1, has_target_syn);
+    groups.push_back(g1);
+
+  } else if (clauses.size() == 2) {
+    // expecting 1 such that followed by 1 pattern clause
+    bool has_target_syn = false;
+    if (typeid(clauses[0]) == typeid(SuchThat)) {
+      SuchThat* st = dynamic_cast<SuchThat*>(clauses[0]);
+      if (st->left_is_synonym && st->left_hand_side.compare(target.GetName()) == 0) {
+        has_target_syn = true;
+      } else if (st->right_is_synonym && st->right_hand_side.compare(target.GetName()) == 0) {
+        has_target_syn = true;
+      }
+    }
+    std::vector<Clause*> cl1;
+    cl1.push_back(clauses[0]);
+    Group g1 = Group(cl1, has_target_syn);
+    groups.push_back(g1);
+
+    // if 1x pattern cl has common synonym, it goes in the same group.
+    Pattern* pt = dynamic_cast<Pattern*>(clauses[1]);
+    if (pt->left_is_synonym && (pt->left_hand_side.compare(cl1[0]->left_hand_side) == 0 ||
+    pt->right_hand_side.compare(cl1[0]->right_hand_side) == 0)) {
+      g1.AddClauseToVector(pt);
+    } else {
+      std::vector<Clause*> cl2;
+      cl2.push_back(pt);
+      groups.push_back(Group(cl2, false));
+    }
+  } else {
+    std::cout << clauses.size() << std::endl;
+    throw PQLValidationException("Got more than 2 clauses.");
+  }
+}
+
 void QueryParser::parse() {
   // lookahead is used for LL(1) predictive parsing.
   lookahead = tokenizer.GetNextToken();
   parse_query();
+  group_clauses();
+  std::cout << "printing group stats..." << std::endl;
+  std::cout << groups.size() << std::endl;
 }
