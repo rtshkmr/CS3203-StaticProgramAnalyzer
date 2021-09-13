@@ -11,36 +11,8 @@ class DesignExtractor {
  public:
   DesignExtractor(Deliverable* deliverable);
   void ExtractDesignAbstractions();
-  void ExtractUses();
-  void ExtractModifies();
-  void ExtractParentTRelationship();
-  void ExtractFollowsTRelationship();
  private:
   Deliverable* deliverable_;
-
-  std::list<Variable*>* ExtractUsesInContainer(Container* container, std::vector<Procedure*>* extracted_procedures);
-  void ExtractUsesInIfContainer(IfEntity* if_entity,
-                                Container* container,
-                                std::vector<Procedure*>* extracted_procedures);
-  void ExtractUsesInWhileContainer(WhileEntity* while_entity,
-                                   Container* container,
-                                   std::vector<Procedure*>* extracted_procedures);
-  void ExtractUsesInCallContainer(CallEntity* call_entity,
-                                  Container* container,
-                                  std::vector<Procedure*>* extracted_procedures);
-  std::list<Variable*>* ExtractModifiesInContainer(Container* container, std::vector<Procedure*>* extracted_procedures);
-  void ExtractModifiesInIfContainer(IfEntity* if_entity,
-                                    Container* container,
-                                    std::vector<Procedure*>* extracted_procedures);
-  void ExtractModifiesInWhileContainer(WhileEntity* while_entity,
-                                       Container* container,
-                                       std::vector<Procedure*>* extracted_procedures);
-  void ExtractModifiesInCallContainer(CallEntity* call_entity,
-                                      Container* container,
-                                      std::vector<Procedure*>* extracted_procedures);
-
-  std::list<Statement*>* ExtractChildrenTFromParent(Statement* parent);
-  std::list<Statement*>* ExtractFollowsTFromThread(Statement* top);
 };
 
 #endif //AUTOTESTER_DESIGNEXTRACTOR_H
