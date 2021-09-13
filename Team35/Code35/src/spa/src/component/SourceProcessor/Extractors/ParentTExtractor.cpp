@@ -43,6 +43,8 @@ std::list<Statement*>* ParentTExtractor::ExtractChildrenTFromParent(Statement* p
 
   std::list<Statement*>* children = ptc.find(parent)->second;
   for (Statement* child: *children) {
+    assert(child != parent); // erroneous non transitive relationship
+
     std::list<Statement*>* children_T_list = ExtractChildrenTFromParent(child);
     // add this child to the parent
     deliverable_->AddParentTransitiveRelationship(parent, child);

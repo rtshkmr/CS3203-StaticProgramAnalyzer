@@ -55,7 +55,10 @@ std::list<Statement*>* FollowsTExtractor::ExtractFollowsTFromThread(Statement* t
   if (follows_hash.find(top) != follows_hash.end()) {
     // there is a statement following top
     Statement* following_statement = follows_hash.find(top)->second;
+
+    assert(following_statement != top); // erroneous non transitive relationship
     std::list<Statement*>* follows_T_list = ExtractFollowsTFromThread(following_statement);
+
     deliverable_->AddFollowsTransitiveRelationship(top, following_statement);
     deliverable_->AddFollowsTransitiveRelationshipForList(top, follows_T_list);
 
