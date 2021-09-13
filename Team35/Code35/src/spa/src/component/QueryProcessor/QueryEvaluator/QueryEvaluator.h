@@ -13,7 +13,7 @@
 #include "QueryPKB.h"
 #include "EvaluateSuchThatDoubleSynonyms.h"
 #include "EvaluateSuchThatNoSynonym.h"
-#include "EvaluatePatternDoubleSynonym.h"
+#include "EvaluatePatternClause.h"
 
 class QueryEvaluator {
   public:
@@ -29,7 +29,6 @@ class QueryEvaluator {
     QueryEvaluatorTable ProcessSuchThat(Clause* clause, QueryEvaluatorTable table);
     QueryEvaluatorTable EvaluateSuchThatClause(SuchThat st, QueryEvaluatorTable table, RelRef query_relation);
     void ProcessBooleanGroup(std::vector<Clause*> clauseList);
-    QueryEvaluatorTable ProcessPatternClause(Pattern pattern, QueryEvaluatorTable table);
 };
 
 #endif //INC_21S1_CP_SPA_TEAM_35_QUERYEVALUATOR_H

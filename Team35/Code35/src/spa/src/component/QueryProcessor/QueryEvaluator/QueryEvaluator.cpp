@@ -31,7 +31,7 @@ std::vector<std::string> QueryEvaluator::EvaluateQuery() {
         } else {
           // Evaluate pattern clause here
           Pattern* p = dynamic_cast<Pattern*>(currentClause);
-          targetSynonymTable = ProcessPatternClause(*p, targetSynonymTable);
+          targetSynonymTable = ProcessPatternClause(*p, targetSynonymTable, pkb);
         }
       }
 
@@ -152,36 +152,6 @@ void QueryEvaluator::ProcessBooleanGroup(std::vector<Clause*> clauseList) {
 
     if (currTable.GetSize() == 0) {
       booleanResult = false;
-    }
-  }
-}
-
-QueryEvaluatorTable QueryEvaluator::ProcessPatternClause(Pattern pattern, QueryEvaluatorTable table) {
-  std::string assignSynonymName = pattern.assign_synonym;
-  std::string variableValue = pattern.left_hand_side;
-
-  if (pattern.left_is_synonym) {
-    // Case for 2 synonyms
-    if (table.ContainsColumn(variableValue) && table.ContainsColumn(assignSynonymName)) {
-      // Both synonym in table
-      table = EvaluatePatternDoubleSynonym(pattern, table, pkb);
-    } else if (table.ContainsColumn(assignSynonymName)) {
-      // Table only contains assign synonym
-
-    } else if (table.ContainsColumn(variableValue)) {
-      // Table only contains variable synonym
-      // Technically this is not possible
-    } else {
-      // Table contains no synonym
-      // Technically this is not possible
-    }
-  } else {
-    // Case of 1 synonym (assign)
-    // This section to be targeted in issue 92
-    if (table.ContainsColumn(assignSynonymName)) {
-
-    } else {
-      // Technically this should never run
     }
   }
 }
