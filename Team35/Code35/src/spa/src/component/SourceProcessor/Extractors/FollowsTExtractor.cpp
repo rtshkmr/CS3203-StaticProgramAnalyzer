@@ -39,6 +39,12 @@ std::list<Statement*>* FollowsTExtractor::ExtractFollowsTFromThread(Statement* t
     ExtractFollowsTFromThread(first_statement);
     // Statements in the container will not follow the container
     // , so there is no need to collect its result.
+
+    // Extract from else container too
+    if (IfEntity* if_entity = dynamic_cast<IfEntity*>(top)) {
+      Statement* first_else_statement = if_entity->GetElseEntity()->GetStatementList()->front();
+      ExtractFollowsTFromThread(first_else_statement);
+    }
   }
 
   std::unordered_map<Statement*, Statement*> follows_hash = deliverable_->follow_hash_;

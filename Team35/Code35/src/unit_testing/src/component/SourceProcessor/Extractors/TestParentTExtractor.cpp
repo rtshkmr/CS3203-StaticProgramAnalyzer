@@ -5,7 +5,16 @@
 using namespace entity_utils;
 
 TEST_CASE("1.ParentTExtractor.Extract ParentT basic conditions") {
-  SECTION("Single level statement list") {}
+  SECTION("Single level statement list") {
+    /*
+     * procedure proc1 {
+     *  assign
+     *  assign
+     *  read
+     *  print
+     * }
+     */
+  }
   SECTION("Statement list with if") {}
   SECTION("Statement list with while") {}
   SECTION("Multiple procedures") {}
@@ -16,6 +25,6 @@ TEST_CASE("1.ParentTExtractor.Extract ParentT nested containers") {
   SECTION("Nested if x3") {}
   SECTION("Nested while x3") {}
   SECTION("If and while") {}
-  SECTION("Multiple nesting") {}
+  SECTION("Multiple nesting of if and while") {}
 }
 
