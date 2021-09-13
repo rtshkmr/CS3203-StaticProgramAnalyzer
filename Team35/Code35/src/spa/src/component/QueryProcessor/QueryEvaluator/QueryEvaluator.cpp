@@ -112,6 +112,7 @@ void QueryEvaluator::EvaluateSuchThatClause(SuchThat such_that_clause, QueryEval
       ProcessQueryGivenFirstSynonym(pkb, such_that_clause, table);
     } else {
       ProcessQueryGivenSecondSynonym(pkb, such_that_clause, table);
+    }
   }
 }
 

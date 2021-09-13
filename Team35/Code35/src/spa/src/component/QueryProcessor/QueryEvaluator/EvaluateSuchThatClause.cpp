@@ -30,8 +30,6 @@ void BothSynonymInTable(PKB pkb, SuchThat such_that_clause, QueryEvaluatorTable*
   }
 }
 
-void FirstSynonymInTableButSecondNot()
-
 /**
  * Adds a new table column header, then adds or deletes the rows in the table by checking if there is a relationship
  * between the values in the table with all valid stmtRef belonging to the Synonym's DesignEntity.
@@ -150,7 +148,7 @@ bool EvaluateNoSynonym(SuchThat st, PKB pkb) {
   std::string secondParam = st.right_hand_side;
   if (firstParam == "_" && secondParam == "_") {
     // Query the PKB for the existence of this relationship
-    // PKB.hasXxxRelRef()
+    return QueryPkbForRelationshipExistence(pkb, st.rel_ref);
   } else if (firstParam == "_") {
     std::list<std::tuple<DesignEntity, std::string>> result = QueryPKBSuchThat(pkb, st.rel_ref, st.right_hand_side, false);
     return result.size() != 0;    // Return true if there is some value being returned.

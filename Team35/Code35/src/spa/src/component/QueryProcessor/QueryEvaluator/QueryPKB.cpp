@@ -4,6 +4,21 @@
 
 #include "QueryPKB.h"
 
+bool QueryPkbForRelationshipExistence(PKB database, RelRef r) {
+  switch(r) {
+    case RelRef::kFollows:
+      return database.hasFollows();
+    case RelRef::kParent:
+      return database.hasParent();
+    case RelRef::kUsesS:
+      return database.hasUses();
+    case RelRef::kModifiesS:
+      return database.hasModifies();
+    default:
+      return false;
+  }
+}
+
 std::list<std::tuple<DesignEntity, std::string>> QueryPKBSuchThat(PKB database, RelRef r, std::string stmt, bool is_first_param) {
   switch(r) {
     case RelRef::kFollows:
@@ -23,6 +38,7 @@ std::list<std::tuple<DesignEntity, std::string>> QueryPKBSuchThat(PKB database, 
 }
 
 std::vector<AssignEntity> QueryPkbPattern(PKB database, bool is_assign_synonym, std::string value) {
-
+  std::vector<AssignEntity> list_of_assign;
+  return list_of_assign;
   // return is_assign_synonym ? database.GetVarModified(value) : database.GetStmtModifying(value);
 }
