@@ -32,6 +32,7 @@ add_library(spa ${srcs} ${headers}
         src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatSingleSynonym.h src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatSingleSynonym.cpp
         src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatDoubleSynonyms.h src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatDoubleSynonyms.cpp
         src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatNoSynonym.h src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatNoSynonym.cpp
+        src/component/QueryProcessor/QueryEvaluator/EvaluatePatternDoubleSynonym.h src/component/QueryProcessor/QueryEvaluator/EvaluatePatternDoubleSynonym.cpp
         src/component/QueryProcessor/QueryEvaluator/QueryPKB.h src/component/QueryProcessor/QueryEvaluator/QueryPKB.cpp
         src/component/QueryProcessor/QueryEvaluator/QueryEvaluator.h src/component/QueryProcessor/QueryEvaluator/QueryEvaluator.cpp
         src/component/QueryProcessor/QueryProjector.h src/component/QueryProcessor/QueryProjector.cpp

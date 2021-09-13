@@ -16,7 +16,7 @@ QueryEvaluatorTable ProcessQueryGivenFirstSynonym(PKB pkb, SuchThat such_that_cl
   std::vector<std::string> listToVet = table.GetColumn(such_that_clause.left_hand_side);
   for (int i = 0; i < listToVet.size(); i++ ) {
     std::string currentStmtRef = listToVet[i];
-    std::list<std::tuple<DesignEntity, std::string>> output = queryPKBSuchThat(pkb, relation, currentStmtRef, true);
+    std::list<std::tuple<DesignEntity, std::string>> output = QueryPKBSuchThat(pkb, relation, currentStmtRef, true);
 
     bool containsRelationship = false;
 
@@ -51,7 +51,7 @@ QueryEvaluatorTable ProcessQueryGivenSecondSynonym(PKB pkb, SuchThat such_that_c
   std::vector<std::string> listToVet = table.GetColumn(such_that_clause.left_hand_side);
   for (int i = 0; i < listToVet.size(); i++ ) {
     std::string currentStmtRef = listToVet[i];
-    std::list<std::tuple<DesignEntity, std::string>> output = queryPKBSuchThat(pkb, query_relation, currentStmtRef, true);
+    std::list<std::tuple<DesignEntity, std::string>> output = QueryPKBSuchThat(pkb, query_relation, currentStmtRef, true);
 
     bool containsRelationship = false;
 

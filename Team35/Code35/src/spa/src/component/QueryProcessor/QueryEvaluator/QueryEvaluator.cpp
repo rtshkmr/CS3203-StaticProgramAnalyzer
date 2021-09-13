@@ -20,8 +20,9 @@ std::vector<std::string> QueryEvaluator::EvaluateQuery() {
 
   // For each group, evaluate the group with target synonym first if applicable
   for (auto iter = groupList.begin(); iter != groupList.end(); iter++) {
+    std::vector<Clause*> clauseList = iter->GetClauses();
+
     if (iter->ContainsTargetSynonym()) {
-      std::vector<Clause*> clauseList = iter->GetClauses();
       for (auto iter = clauseList.begin(); iter != clauseList.end(); iter++) {
         Clause* currentClause = *iter;
         if (typeid(*currentClause) == typeid(SuchThat)) {
@@ -30,14 +31,13 @@ std::vector<std::string> QueryEvaluator::EvaluateQuery() {
         } else {
           // Evaluate pattern clause here
           Pattern* p = dynamic_cast<Pattern*>(currentClause);
-          // targetSynonymTable = ProcessPatternClause(*p, targetSynonymTable);
+          targetSynonymTable = ProcessPatternClause(*p, targetSynonymTable);
         }
       }
 
     } else {
       // Each boolean group has their own table.
-      std::vector<Clause*> clauseList = iter->GetClauses();
-      ProcessBooleanSuchThat(clauseList);
+      ProcessBooleanGroup(clauseList);
     }
   }
 
@@ -114,7 +114,7 @@ QueryEvaluatorTable QueryEvaluator::EvaluateSuchThatClause(SuchThat such_that_cl
   return table;
 }
 
-void QueryEvaluator::ProcessBooleanSuchThat(std::vector<Clause*> clauseList) {
+void QueryEvaluator::ProcessBooleanGroup(std::vector<Clause*> clauseList) {
   Clause* firstClause = clauseList[0];
   std::string synonymName = "";
   if (typeid(*firstClause) == typeid(SuchThat)) {
@@ -156,6 +156,32 @@ void QueryEvaluator::ProcessBooleanSuchThat(std::vector<Clause*> clauseList) {
   }
 }
 
-//QueryEvaluatorTable QueryEvaluator::ProcessPatternClause(Pattern pattern, QueryEvaluatorTable table) {
-//
-//}
+QueryEvaluatorTable QueryEvaluator::ProcessPatternClause(Pattern pattern, QueryEvaluatorTable table) {
+  std::string assignSynonymName = pattern.assign_synonym;
+  std::string variableValue = pattern.left_hand_side;
+
+  if (pattern.left_is_synonym) {
+    // Case for 2 synonyms
+    if (table.ContainsColumn(variableValue) && table.ContainsColumn(assignSynonymName)) {
+      // Both synonym in table
+      table = EvaluatePatternDoubleSynonym(pattern, table, pkb);
+    } else if (table.ContainsColumn(assignSynonymName)) {
+      // Table only contains assign synonym
+
+    } else if (table.ContainsColumn(variableValue)) {
+      // Table only contains variable synonym
+      // Technically this is not possible
+    } else {
+      // Table contains no synonym
+      // Technically this is not possible
+    }
+  } else {
+    // Case of 1 synonym (assign)
+    // This section to be targeted in issue 92
+    if (table.ContainsColumn(assignSynonymName)) {
+
+    } else {
+      // Technically this should never run
+    }
+  }
+}

@@ -13,6 +13,7 @@
 #include "QueryPKB.h"
 #include "EvaluateSuchThatDoubleSynonyms.h"
 #include "EvaluateSuchThatNoSynonym.h"
+#include "EvaluatePatternDoubleSynonym.h"
 
 class QueryEvaluator {
   public:
@@ -27,8 +28,8 @@ class QueryEvaluator {
     std::unordered_map<DesignEntity, std::list<std::string>> map_of_synonym_values;
     QueryEvaluatorTable ProcessSuchThat(Clause* clause, QueryEvaluatorTable table);
     QueryEvaluatorTable EvaluateSuchThatClause(SuchThat st, QueryEvaluatorTable table, RelRef query_relation);
-    void ProcessBooleanSuchThat(std::vector<Clause*> clauseList);
-    // QueryEvaluatorTable ProcessPatternClause(Pattern pattern, QueryEvaluatorTable table);
+    void ProcessBooleanGroup(std::vector<Clause*> clauseList);
+    QueryEvaluatorTable ProcessPatternClause(Pattern pattern, QueryEvaluatorTable table);
 };
 
 #endif //INC_21S1_CP_SPA_TEAM_35_QUERYEVALUATOR_H
