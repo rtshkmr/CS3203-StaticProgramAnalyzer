@@ -33,6 +33,30 @@ void Deliverable::AddFollowRelationship(Statement* f1, Statement* f2) {
   followed_by_hash_.insert({f2, f1});
 }
 
+void Deliverable::AddFollowsTransitiveRelationship(Statement* before, Statement* after) {
+  if (follows_T_hash_.find(before) != follows_T_hash_.end()) {
+    follows_T_hash_.find(before)->second->push_back(after);
+  } else {
+    auto* list = new std::list<Statement*>();
+    list->push_back(after);
+    follows_T_hash_.insert(std::make_pair(before, list));
+  }
+
+  if (followed_by_T_hash_.find(after) != followed_by_T_hash_.end()) {
+    followed_by_T_hash_.find(after)->second->push_back(before);
+  } else {
+    auto* list = new std::list<Statement*>();
+    list->push_back(before);
+    followed_by_T_hash_.insert(std::make_pair(after, list));
+  }
+}
+
+void Deliverable::AddFollowsTransitiveRelationshipForList(Statement* before, std::list<Statement*>* afters) {
+  for (Statement* after: *afters) {
+    AddFollowsTransitiveRelationship(before, after);
+  }
+}
+
 void Deliverable::AddParentRelationship(Statement* p1, Statement* p2) {
   if (parent_to_child_hash_.count(p1)) {
     parent_to_child_hash_.find(p1)->second->push_back(p2);

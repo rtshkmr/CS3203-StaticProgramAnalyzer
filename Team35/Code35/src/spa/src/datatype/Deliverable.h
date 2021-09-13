@@ -23,6 +23,8 @@ class Deliverable {
   void AddReadEntity(ReadEntity* read_entity);
 
   void AddFollowRelationship(Statement* f1, Statement* f2);
+  void AddFollowsTransitiveRelationship(Statement* before, Statement* after);
+  void AddFollowsTransitiveRelationshipForList(Statement* before, std::list<Statement*>* afters);
   void AddParentRelationship(Statement* p1, Statement* p2);
   void AddParentTransitiveRelationship(Statement* parent, Statement* child);
   void AddParentTransitiveRelationshipForList(Statement* parent, std::list<Statement*>* children);

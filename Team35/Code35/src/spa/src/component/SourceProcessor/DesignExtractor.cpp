@@ -1,3 +1,4 @@
+#include <cassert>
 #include "DesignExtractor.h"
 
 DesignExtractor::DesignExtractor(Deliverable* deliverable) {
@@ -11,26 +12,25 @@ void DesignExtractor::ExtractDesignAbstractions() {
   ExtractUses();
   ExtractModifies();
   ExtractParentTRelationship();
-  ExtractFollowsT(deliverable_->follow_hash_);
-  ExtractFollowedByT(deliverable_->followed_by_hash_);
+  ExtractFollowsTRelationship();
 }
 
 /**
  * Extracts transitive Uses relationship from nested containers and called procedures.
  * For e.g. there can be a while container contained in another while container.
  * A procedure can also call another procedure.
+ *
+ * pseudocode:
+ * for proc in proc list
+ * if proc has not been extracted, use recursive helper function:
+ *  for statement in stmt list
+ *    if if/while/call
+ *      recurse with inner stmt list
+ *      add returned list of var to curr container
+ *    else: base case: no inner stmt list
+ *    return list of var from curr container
  */
 void DesignExtractor::ExtractUses() {
-  /*
-   * for proc in proc list
-   * if proc has not been extracted, use recursive helper function:
-   *  for statement in stmt list
-   *    if if/while/call
-   *      recurse with inner stmt list
-   *      add returned list of var to curr container
-   *    base case no inner stmt list
-   *    return list of var from curr container
-   */
   std::vector<Procedure*> extracted_procedures;
   for (Procedure* proc: deliverable_->proc_list_) {
     if (std::find(extracted_procedures.begin(), extracted_procedures.end(), proc)
@@ -59,20 +59,20 @@ void DesignExtractor::ExtractModifies() {
 }
 
 /**
- * Extracts Parent* recursively on each child.
+ * Extracts Parent* recursively for each procedure.
+ *
+ * pseudocode:
+ * for each proc in proc list
+ *  for each stmt in stmt list
+ *    recurse helper(stmt):
+ *      get children list
+ *      base case: no children list, return empty list
+ *      for each child
+ *        recurse(child) and get childrenT list
+ *        add this child and its childrenT list to parentT
+ *      return all childrenT of this stmt
  */
 void DesignExtractor::ExtractParentTRelationship() {
-  /*
-   * for each proc in proc list
-   *  for each stmt in stmt list
-   *    recurse helper(stmt)
-   *    get children list
-   *    base case: no children list, return empty list
-   *    for each child
-   *      recurse(child) and get childrenT list
-   *      add this child and its childrenT list to parentT
-   *    return all childrenT of this stmt
-   */
   for (Procedure* proc: deliverable_->proc_list_) {
     for (Statement* stmt: *proc->GetStatementList()) {
       ExtractChildrenTFromParent(stmt);
@@ -80,6 +80,13 @@ void DesignExtractor::ExtractParentTRelationship() {
   }
 }
 
+/**
+ * Extracts ChildrenT recursively from a parent Statement. Adds all intermediate ParentT relationship to the deliverable
+ * and returns the ChildrenT list.
+ *
+ * @param parent Statement that may have children.
+ * @return List of Statements that are the childrenT of parent.
+ */
 std::list<Statement*>* DesignExtractor::ExtractChildrenTFromParent(Statement* parent) {
   std::unordered_map<Statement*, std::list<Statement*>*> ptc = deliverable_->parent_to_child_hash_;
 
@@ -98,16 +105,66 @@ std::list<Statement*>* DesignExtractor::ExtractChildrenTFromParent(Statement* pa
     deliverable_->AddParentTransitiveRelationshipForList(parent, children_T_list);
   }
 
+  std::unordered_map<Statement*, std::list<Statement*>*> ptct = deliverable_->parent_to_child_hash_;
+  assert(ptct.find(parent) != ptct.end());  // there must be some ParentT bcos there is a children list
   // return all childrenT
-  return deliverable_->parent_to_child_T_hash_.find(parent)->second;
+  return ptct.find(parent)->second;
 }
 
-void DesignExtractor::ExtractFollowsT(std::unordered_map<Statement*, Statement*> follow_hash) {
-
+/**
+ * Extracts FollowsT from each procedure.
+ *
+ * pseudocode:
+ * for each proc in proc list
+ *  recurse using the first stmt in stmt list:
+ *    if stmt is container
+ *      recurse on the first stmt in its stmt list
+ *      // this starts a new thread of extracting
+ *    // continue
+ *    if stmt found in follows hash
+ *      recurse(following stmt) and get followsT of following stmt
+ *      add the following stmt and followsT to followsT hash of stmt
+ *    else base case: no following statement
+ *      return empty list
+ */
+void DesignExtractor::ExtractFollowsTRelationship() {
+  for (Procedure* proc: deliverable_->proc_list_) {
+    Statement* first_statement = proc->GetStatementList()->front();
+    ExtractFollowsTFromThread(first_statement);
+  }
 }
+/**
+ * Extracts Follows* relationship recursively from the thread of Statements that Follow one another transitively.
+ * Adds any intermediate Follows* relationship to the deliverable.
+ *
+ * @param top The Statement at the top of the Follows* thread.
+ * @return List of Statements that Follows* the top statement.
+ */
+std::list<Statement*>* DesignExtractor::ExtractFollowsTFromThread(Statement* top) {
+  // Check if top statement is a container, i.e. if/while
+  if (Container* container = dynamic_cast<Container*>(top)) {
+    Statement* first_statement = container->GetStatementList()->front();
+    ExtractFollowsTFromThread(first_statement);
+    // Statements in the container will not follow the container
+    // , so there is no need to collect its result.
+  }
 
-void DesignExtractor::ExtractFollowedByT(std::unordered_map<Statement*, Statement*> followed_by_hash) {
+  std::unordered_map<Statement*, Statement*> follows_hash = deliverable_->follow_hash_;
+  if (follows_hash.find(top) != follows_hash.end()) {
+    // there is a statement following top
+    Statement* following_statement = follows_hash.find(top)->second;
+    std::list<Statement*>* follows_T_list = ExtractFollowsTFromThread(following_statement);
+    deliverable_->AddFollowsTransitiveRelationship(top, following_statement);
+    deliverable_->AddFollowsTransitiveRelationshipForList(top, follows_T_list);
 
+    std::unordered_map<Statement*, std::list<Statement*>*> ft = deliverable_->follows_T_hash_;
+    assert(ft.find(top) != ft.end()); // there must be some FollowsT bcos there is Follows
+    // returns all FollowsT of top
+    return ft.find(top)->second;
+  } else {
+    // top is last statement in thread
+    return new std::list<Statement*>();
+  }
 }
 
 /**

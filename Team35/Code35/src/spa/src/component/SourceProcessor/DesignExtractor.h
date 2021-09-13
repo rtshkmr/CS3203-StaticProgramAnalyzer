@@ -14,8 +14,7 @@ class DesignExtractor {
   void ExtractUses();
   void ExtractModifies();
   void ExtractParentTRelationship();
-  void ExtractFollowsT(std::unordered_map<Statement*, Statement*> follow_hash);
-  void ExtractFollowedByT(std::unordered_map<Statement*, Statement*> followed_by_hash);
+  void ExtractFollowsTRelationship();
  private:
   Deliverable* deliverable_;
 
@@ -41,6 +40,7 @@ class DesignExtractor {
                                       std::vector<Procedure*>* extracted_procedures);
 
   std::list<Statement*>* ExtractChildrenTFromParent(Statement* parent);
+  std::list<Statement*>* ExtractFollowsTFromThread(Statement* top);
 };
 
 #endif //AUTOTESTER_DESIGNEXTRACTOR_H
