@@ -24,7 +24,7 @@ class QueryParser {
     void parse_declarations();
     std::tuple<std::string, bool, bool> parse_stmtRef();
     std::pair<Clause*, bool> parse_relRef();
-    Token parse_entRef();
+    Token parse_entRef(bool isPatternCl);
     std::string parse_factor();
     std::pair<std::string, bool> parse_expressionSpec();
     void parse_such_that();

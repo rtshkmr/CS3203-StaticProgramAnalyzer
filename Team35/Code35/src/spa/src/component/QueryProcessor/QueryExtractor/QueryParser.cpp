@@ -126,7 +126,8 @@ std::pair<Clause*, bool> QueryParser::parse_relRef() {
   std::string lhs; bool is_syn; bool is_tgt_syn;
   // UsesS|ModifiesS: ‘Uses|Modifies’ ‘(’ stmtRef ‘,’ entRef ‘)’
   if (rel_type.compare("Uses") == 0 || rel_type.compare("Modifies") == 0) {
-    Token tok = parse_entRef();
+    std::cout << "encountered uses or modifies relRef" << std::endl;
+    Token tok = parse_entRef(false);
     lhs = tok.GetTokenString();
     bool __is_syn = false;
     bool __is_tgt_syn = false;
@@ -174,14 +175,18 @@ void QueryParser::parse_such_that() {
 }
 
 // entRef : synonym | ‘_’ | ‘"’ IDENT ‘"’
-Token QueryParser::parse_entRef() {
+/* Takes in a boolean 1 if parsing of entRef is for pattern, 0 otherwise */
+Token QueryParser::parse_entRef(bool isPatternCl) {
   std::cout << "parsing entRef..." << std::endl;
   std::string token_name;
   TokenTag token_type;
   if (lookahead.GetTokenTag() == TokenTag::kName) {
-    // parse as known synonym of type variable
-    if (!is_valid_synonym(lookahead, DesignEntity::kVariable)) {
+    // parse as known synonym. Synonym must be variable for pattern cl.
+    if (isPatternCl && !is_valid_synonym(lookahead, DesignEntity::kVariable)) {
       throw PQLParseException("Unknown synonym received as entRef in lhs of pattern cl.");
+    }
+    if (!isPatternCl && !is_valid_synonym(lookahead)) {
+      throw PQLParseException("Unknown synonym received as entRef in lhs of cl.");
     }
     token_name = eat(TokenTag::kName).GetTokenString();
     token_type = TokenTag::kName;
@@ -294,7 +299,7 @@ void QueryParser::parse_pattern() {
   eat(TokenTag::kName); // eat 'syn-assign'
   eat(TokenTag::kOpenBracket);
   // parse_lhs
-  Token lhs_token = parse_entRef();
+  Token lhs_token = parse_entRef(true);
   eat(TokenTag::kComma);
   std::string lhs = lhs_token.GetTokenString();
   bool lhs_is_syn = is_valid_synonym(lhs_token, DesignEntity::kVariable);
