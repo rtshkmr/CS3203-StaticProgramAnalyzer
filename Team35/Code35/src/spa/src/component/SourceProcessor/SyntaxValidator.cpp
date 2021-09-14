@@ -71,10 +71,12 @@ bool SyntaxValidator::ValidateIfStatementSyntax(const vector<Token>& tokens) {
   }
   // todo: probably no need to use counting, need to see what the finder fucntion returns if it doesn't exist
   int then_keyword_idx = GetFirstMatchingTokenIdx(tokens, TokenTag::kThenKeyword);
+  int first_open_bracket = GetFirstMatchingTokenIdx(tokens, TokenTag::kOpenBracket);
+  int last_close_bracket = GetLastMatchingTokenIdx(tokens, TokenTag::kCloseBracket);
   bool valid_cond_expression = then_keyword_idx > 4 // min number of tokens required
       && tokens.at(then_keyword_idx - 1).GetTokenTag() == TokenTag::kCloseBracket // cond_expr surrounded by brackets
       && tokens.at(1).GetTokenTag() == TokenTag::kOpenBracket
-      && IsCondExpr(tokens, 2, then_keyword_idx - 2); // guranteed in bound
+      && IsCondExpr(tokens, first_open_bracket + 1, last_close_bracket - 1); // guranteed in bound
   return valid_cond_expression;
 }
 
@@ -82,15 +84,15 @@ bool SyntaxValidator::ValidateElseKeyword(const vector<Token>& tokens) {
   return tokens.capacity() == 2 && tokens.at(1).GetTokenTag() == TokenTag::kOpenBrace;
 }
 bool SyntaxValidator::ValidateWhileKeyword(const vector<Token>& tokens) {
-  bool output = tokens.capacity() == 8
-      && tokens.at(1).GetTokenTag() == TokenTag::kOpenBracket
-      && (tokens.at(2).GetTokenTag() == TokenTag::kName || tokens.at(2).GetTokenTag() == TokenTag::kInteger)
-      && tokens.at(3).GetTokenTag() == TokenTag::kBinaryComparisonOperator
-      && (tokens.at(4).GetTokenTag() == TokenTag::kName || tokens.at(4).GetTokenTag() == TokenTag::kInteger)
-      && tokens.at(5).GetTokenTag() == TokenTag::kCloseBracket
-      && tokens.at(6).GetTokenTag() == TokenTag::kThenKeyword
-      && tokens.at(7).GetTokenTag() == TokenTag::kOpenBrace;
-  return output;
+  bool guarantee = tokens.at(0).GetTokenTag() == TokenTag::kWhileKeyword;
+  assert(guarantee);
+  int first_open_bracket_idx = GetFirstMatchingTokenIdx(tokens, TokenTag::kOpenBracket);
+  int last_close_bracket_idx = GetLastMatchingTokenIdx(tokens, TokenTag::kCloseBracket);
+  bool valid_cond_expression = tokens.size() > 4
+      && first_open_bracket_idx + 1 <= last_close_bracket_idx - 1
+      && first_open_bracket_idx == 1
+      && IsCondExpr(tokens, first_open_bracket_idx + 1, last_close_bracket_idx - 1);
+  return valid_cond_expression;
 }
 
 /**

@@ -70,7 +70,7 @@ static vector<string> invalid_program_lines = {
     R"(   while x >= 1 then { )",
     R"(   while (x = 1) then { )",
     R"(   while (x >= 1) then  )",
-    R"(   while (x >= 1) { )",
+    R"(   while x >= 1 then { )", // repeated test
     R"(   while then { )",
     R"(   while (x) then { )",
     R"(   while () then { )",
@@ -428,6 +428,14 @@ TEST_CASE("1.SyntaxValidator.Validator handles basic statements:") {
       REQUIRE(CheckAgainstSampleLines(9, 9, valid_program_lines, true));
     }
     SECTION("negative cases") {
+//      REQUIRE(CheckAgainstSampleLines(18, 25, invalid_program_lines, false));
+      REQUIRE(CheckAgainstSampleLines(18, 18, invalid_program_lines, false));
+      REQUIRE(CheckAgainstSampleLines(18, 19, invalid_program_lines, false));
+      REQUIRE(CheckAgainstSampleLines(18, 20, invalid_program_lines, false));
+      REQUIRE(CheckAgainstSampleLines(18, 21, invalid_program_lines, false));
+      REQUIRE(CheckAgainstSampleLines(18, 22, invalid_program_lines, false));
+      REQUIRE(CheckAgainstSampleLines(18, 23, invalid_program_lines, false));
+      REQUIRE(CheckAgainstSampleLines(18, 24, invalid_program_lines, false));
       REQUIRE(CheckAgainstSampleLines(18, 25, invalid_program_lines, false));
     }
   }
