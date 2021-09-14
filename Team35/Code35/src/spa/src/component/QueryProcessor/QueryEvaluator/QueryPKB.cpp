@@ -4,20 +4,41 @@
 
 #include "QueryPKB.h"
 
-std::list<std::tuple<DesignEntity, std::string>> queryPKBSuchThat(PKB database, RelRef r, std::string stmt, bool isFirstParam) {
+bool QueryPkbForRelationshipExistence(PKB database, RelRef r) {
   switch(r) {
     case RelRef::kFollows:
-      return isFirstParam ? database.GetFollows(stmt) : database.GetPrevious(stmt);
+      return database.hasFollows();
+    case RelRef::kParent:
+      return database.hasParent();
+    case RelRef::kUsesS:
+      return database.hasUses();
+    case RelRef::kModifiesS:
+      return database.hasModifies();
+    default:
+      return false;
+  }
+}
+
+std::list<std::tuple<DesignEntity, std::string>> QueryPKBSuchThat(PKB database, RelRef r, std::string stmt, bool is_first_param) {
+  switch(r) {
+    case RelRef::kFollows:
+      return is_first_param ? database.GetFollows(stmt) : database.GetPrevious(stmt);
       // CHANGE FOLLOWS TO PREVIOUS
     case RelRef::kParent:
-      return isFirstParam ? database.GetParent(stmt) : database.GetChild(stmt);
+      return is_first_param ? database.GetParent(stmt) : database.GetChild(stmt);
       // CHANGE PARENT TO CHILD
     case RelRef::kUsesS:
-      return isFirstParam ? database.GetUsedBy(stmt) : database.GetUses(stmt);
+      return is_first_param ? database.GetUsedBy(stmt) : database.GetUses(stmt);
     case RelRef::kModifiesS:
-      return isFirstParam ? database.GetModifiedBy(stmt) : database.GetModifies(stmt);
+      return is_first_param ? database.GetModifiedBy(stmt) : database.GetModifies(stmt);
     default:
       std::list<std::tuple<DesignEntity, std::string>> list;
       return list;
   }
+}
+
+std::vector<AssignEntity> QueryPkbPattern(PKB database, bool is_assign_synonym, std::string value) {
+  std::vector<AssignEntity> list_of_assign;
+  return list_of_assign;
+  // return is_assign_synonym ? database.GetVarModified(value) : database.GetStmtModifying(value);
 }
