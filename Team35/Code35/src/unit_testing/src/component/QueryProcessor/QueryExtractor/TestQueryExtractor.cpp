@@ -152,13 +152,13 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that with correct relRef and
 
 // 'pattern'
 TEST_CASE("3.QueryExtractor.Single malformed pattern with typo; should FAIL") {
-  std::string query = "assign a1; Select a1 pAttern a ( _ , \"count + 1\")";
+  std::string query = "assign a1; Select a1 pAttern a ( _ , _)";
   auto query_extractor = QueryExtractor(&query);
   REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(), Catch::Contains("Incorrect query"));
 }
 
 TEST_CASE("3.QueryExtractor.Single well-formed pattern with unknown syn-assign; should FAIL") {
-  std::string query = "assign a1; Select a1 pattern a ( _ , \"count + 1\")";
+  std::string query = "assign a1; Select a1 pattern a ( _ , _)";
   auto query_extractor = QueryExtractor(&query);
   REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
                       Catch::Contains("Expected valid syn-assign for pattern cl, instead got"));
@@ -166,50 +166,143 @@ TEST_CASE("3.QueryExtractor.Single well-formed pattern with unknown syn-assign; 
 
 TEST_CASE("3.QueryExtractor.Single well-formed pattern with correct syn-assign but incorrect lhs; should FAIL") {
   SECTION("lhs is unknown synonym") {
-    std::string query = "assign a1; Select a1 pattern a1 ( p , \"count + 1\")";
+    std::string query = "assign a1; Select a1 pattern a1 ( p , _)";
     auto query_extractor = QueryExtractor(&query);
     REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
                         Catch::Contains("Unknown synonym received as entRef in lhs of pattern cl."));
   }
   SECTION("lhs is known synonym but not of type variable") {
-    std::string query = "assign a1; Select a1 pattern a1 ( a1 , \"count + 1\")";
+    std::string query = "assign a1; Select a1 pattern a1 ( a1 , _)";
     auto query_extractor = QueryExtractor(&query);
     REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
                         Catch::Contains("Unknown synonym received as entRef in lhs of pattern cl."));
+  }
+  SECTION("lhs is a string but not ident") {
+    std::string query = "assign a1; Select a1 pattern a1 (\"69\" , _)";
+    auto query_extractor = QueryExtractor(&query);
+    REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(), Catch::Contains("Unexpected token"));
   }
 }
 
 TEST_CASE("3.QueryExtractor.Single well-formed pattern with correct syn-assign but incorrect rhs; should FAIL") {
   SECTION("malformed rhs of partial match") {
-    std::string query = "assign a1; Select a1 pattern a1 ( _ , _\"count + 1\")";
+    std::string query = "assign a1; Select a1 pattern a1 ( _ , _\"count\")";
     auto query_extractor = QueryExtractor(&query);
     REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
-                        Catch::Contains("Expected valid syn-assign for pattern cl, instead got"));
+                        Catch::Contains("Unexpected token"));
   }
   SECTION("malformed lhs of partial match") {
-    std::string query = "assign a1; Select a1 pattern a1 ( _ , \"count + 1\"_)";
+    std::string query = "assign a1; Select a1 pattern a1 ( _ , \"count\"_)";
     auto query_extractor = QueryExtractor(&query);
     REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
-                        Catch::Contains("Expected valid syn-assign for pattern cl, instead got"));
-  }
-  SECTION("malformed lhs of exact match") {
-    std::string query = "assign a1; Select a1 pattern a1 ( _ , count + 1\")";
-    auto query_extractor = QueryExtractor(&query);
-    REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
-                        Catch::Contains("Expected valid syn-assign for pattern cl, instead got"));
-  }
-  SECTION("malformed rhs of exact match") {
-    std::string query = "assign a1; Select a1 pattern a1 ( _ , \"count + 1)";
-    auto query_extractor = QueryExtractor(&query);
-    REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
-                        Catch::Contains("Expected valid syn-assign for pattern cl, instead got"));
+                        Catch::Contains("Invalid expression-spec for rhs of pattern clause in iteration 1."));
   }
 }
 
-/*
+// for iteration 1: rhs is an expression-spec: ‘_’ ‘"’ factor ‘"’ ‘_’ | ‘_’
 TEST_CASE("3.QueryExtractor.Single well-formed pattern with correct syn-assign and correct args; should PASS") {
-  std::string query = "assign a1; Select a1 pattern a ( _ , \"count + 1\")";
-  auto query_extractor = QueryExtractor(&query);
-  REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
-                      Catch::Contains("Expected valid syn-assign for pattern cl, instead got"));
-}*/
+  SECTION("rhs is underscore") {
+    std::string query = "assign a1; Select a1 pattern a1 ( _ , _)";
+    auto query_extractor = QueryExtractor(&query);
+    query_extractor.ExtractQuery();
+    std::list<Synonym> synonyms = query_extractor.GetSynonymsList();
+    Synonym target = query_extractor.GetTarget();
+    std::list<Group> groups = query_extractor.GetGroupsList();
+
+    std::list<Synonym> expected_synonyms = {Synonym("a1", DesignEntity::kAssign)};
+    Synonym expected_target = Synonym("a1", DesignEntity::kAssign);
+    Clause* cl = new Pattern("_", "_", "a1", false, false);
+    std::vector<Clause*> clauses;
+    clauses.push_back(cl);
+    std::list<Group> expected_groups;
+    Group expected_group = Group(clauses, true);
+    expected_groups.push_back(expected_group);
+
+    // validate target
+    REQUIRE(AreSynonymsEqual(expected_target, target) == 1);
+    // validate synonyms
+    auto it1 = expected_synonyms.begin(); auto it2 = synonyms.begin();
+    while (it1 != expected_synonyms.end() && it2 != synonyms.end()) {
+      REQUIRE(AreSynonymsEqual(*it1, *it2) == 1);
+      it1++; it2++;
+    }
+    // validate groups
+    REQUIRE(expected_groups.size() == groups.size());
+    auto it3 = expected_groups.begin(); auto it4 = groups.begin();
+    while (it3 != expected_groups.end() && it4 != groups.end()) {
+      REQUIRE(AreGroupsEqual(*it3, *it4) == 1);
+      it3++; it4++;
+    }
+    delete cl;
+  }
+
+  SECTION("rhs is factor string of type const") {
+    std::string query = "assign a1; Select a1 pattern a1 ( _ , _\"69\"_)";
+    auto query_extractor = QueryExtractor(&query);
+    query_extractor.ExtractQuery();
+    std::list<Synonym> synonyms = query_extractor.GetSynonymsList();
+    Synonym target = query_extractor.GetTarget();
+    std::list<Group> groups = query_extractor.GetGroupsList();
+
+    std::list<Synonym> expected_synonyms = {Synonym("a1", DesignEntity::kAssign)};
+    Synonym expected_target = Synonym("a1", DesignEntity::kAssign);
+    Clause* cl = new Pattern("_", "69", "a1", false, false);
+    std::vector<Clause*> clauses;
+    clauses.push_back(cl);
+    std::list<Group> expected_groups;
+    Group expected_group = Group(clauses, true);
+    expected_groups.push_back(expected_group);
+
+    // validate target
+    REQUIRE(AreSynonymsEqual(expected_target, target) == 1);
+    // validate synonyms
+    auto it1 = expected_synonyms.begin(); auto it2 = synonyms.begin();
+    while (it1 != expected_synonyms.end() && it2 != synonyms.end()) {
+      REQUIRE(AreSynonymsEqual(*it1, *it2) == 1);
+      it1++; it2++;
+    }
+    // validate groups
+    REQUIRE(expected_groups.size() == groups.size());
+    auto it3 = expected_groups.begin(); auto it4 = groups.begin();
+    while (it3 != expected_groups.end() && it4 != groups.end()) {
+      REQUIRE(AreGroupsEqual(*it3, *it4) == 1);
+      it3++; it4++;
+    }
+    delete cl;
+  }
+
+  SECTION("rhs is a factor string of type variable name") {
+    std::string query = "assign a1; Select a1 pattern a1 ( _ , _\"count\"_)";
+    auto query_extractor = QueryExtractor(&query);
+    query_extractor.ExtractQuery();
+    std::list<Synonym> synonyms = query_extractor.GetSynonymsList();
+    Synonym target = query_extractor.GetTarget();
+    std::list<Group> groups = query_extractor.GetGroupsList();
+
+    std::list<Synonym> expected_synonyms = {Synonym("a1", DesignEntity::kAssign)};
+    Synonym expected_target = Synonym("a1", DesignEntity::kAssign);
+    Clause* cl = new Pattern("_", "count", "a1", false, false);
+    std::vector<Clause*> clauses;
+    clauses.push_back(cl);
+    std::list<Group> expected_groups;
+    Group expected_group = Group(clauses, true);
+    expected_groups.push_back(expected_group);
+
+    // validate target
+    REQUIRE(AreSynonymsEqual(expected_target, target) == 1);
+    // validate synonyms
+    auto it1 = expected_synonyms.begin(); auto it2 = synonyms.begin();
+    while (it1 != expected_synonyms.end() && it2 != synonyms.end()) {
+      REQUIRE(AreSynonymsEqual(*it1, *it2) == 1);
+      it1++; it2++;
+    }
+    // validate groups
+    REQUIRE(expected_groups.size() == groups.size());
+    auto it3 = expected_groups.begin(); auto it4 = groups.begin();
+    while (it3 != expected_groups.end() && it4 != groups.end()) {
+      REQUIRE(AreGroupsEqual(*it3, *it4) == 1);
+      it3++; it4++;
+    }
+    delete cl;
+  }
+}

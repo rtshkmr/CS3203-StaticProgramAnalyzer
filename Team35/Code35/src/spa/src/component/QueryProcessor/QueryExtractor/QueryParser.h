@@ -26,8 +26,6 @@ class QueryParser {
     std::pair<Clause*, bool> parse_relRef();
     Token parse_entRef();
     std::string parse_factor();
-    std::string parse_term();
-    std::string parse_expr();
     std::pair<std::string, bool> parse_expressionSpec();
     void parse_such_that();
     void parse_pattern();

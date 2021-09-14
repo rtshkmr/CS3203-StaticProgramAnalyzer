@@ -158,6 +158,21 @@ struct Pattern : Clause {
     left_is_synonym = lhs_is_syn;
     is_exact = is_exact;
   }
+  std::string getType() const { return typeid(this).name(); }
+  bool isEqual(Clause* toObj) {
+    if (this->getType() == toObj->getType()) {
+      Pattern *obj =  (Pattern *) &toObj;
+      return (
+              this->left_hand_side == obj->left_hand_side &&
+              this->right_hand_side == obj->right_hand_side &&
+              this->assign_synonym == obj->assign_synonym &&
+              this->left_is_synonym == obj->left_is_synonym &&
+              this->is_exact == obj->is_exact
+              );
+    } else {
+      return false;
+    }
+  }
 };
 
 class Group {

@@ -184,18 +184,13 @@ Token QueryParser::parse_entRef() {
   return Token(token_name, token_type);
 }
 
-// factor: var_name | const_value | ‘(’ expr ‘)’
+// iteration 1: factor: var_name | const_value
 std::string QueryParser::parse_factor() {
   std::cout << "parsing factor..." << std::endl;
   std::stringstream ss;
   if (lookahead.GetTokenTag() == TokenTag::kInteger) {
     // parse as constant
     ss << eat(TokenTag::kInteger).GetTokenString();
-  } else if (lookahead.GetTokenTag() == TokenTag::kOpenBracket) {
-    // parse as ‘(’ expr ‘)’
-    ss << eat(TokenTag::kOpenBracket).GetTokenString();
-    ss << parse_expr();
-    ss << eat(TokenTag::kCloseBracket).GetTokenString();
   } else if (lookahead.GetTokenTag() == TokenTag::kName){
     // parse as var_name
     ss << eat(TokenTag::kName).GetTokenString();
@@ -205,79 +200,31 @@ std::string QueryParser::parse_factor() {
   return ss.str();
 }
 
-// term: term ‘*’ factor | term ‘/’ factor | term ‘%’ factor | factor
-std::string QueryParser::parse_term() {
-  std::stringstream ss;
-  std::cout << "parsing term..." << std::endl;
-  // initial check to prevent term from starting with + or -
-  if (lookahead.GetTokenTag() == TokenTag::kTimes || lookahead.GetTokenTag() == TokenTag::kDivide ||
-      lookahead.GetTokenTag() == TokenTag::kModulo) {
-    throw PQLParseException("Term in rhs of pattern clause cannot start with " + lookahead.GetTokenString());
-  }
-  ss << parse_factor();
-  while (lookahead.GetTokenTag() != TokenTag::kStringQuote && lookahead.GetTokenTag() != TokenTag::kPlus &&
-        lookahead.GetTokenTag() != TokenTag::kMinus) {
-    if (lookahead.GetTokenTag() == TokenTag::kTimes) {
-      ss << eat(TokenTag::kTimes).GetTokenString();
-    } else if (lookahead.GetTokenTag() == TokenTag::kDivide) {
-      ss << eat(TokenTag::kDivide).GetTokenString();
-    } else if (lookahead.GetTokenTag() == TokenTag::kModulo) {
-      ss << eat(TokenTag::kModulo).GetTokenString();
-    } else {
-      throw PQLParseException("Expected valid term for pattern cl, instead got " + lookahead.GetTokenString());
-    }
-    ss << parse_factor();
-  }
-  return ss.str();
-}
-
-// expr: expr ‘+’ term | expr ‘-’ term | term
-std::string QueryParser::parse_expr() {
-  std::stringstream ss;
-  std::cout << "parsing expr..." << std::endl;
-  // initial check to prevent expr from starting with + or -
-  if (lookahead.GetTokenTag() == TokenTag::kPlus || lookahead.GetTokenTag() == TokenTag::kMinus) {
-    throw PQLParseException("Expr in rhs of pattern clause cannot start with " + lookahead.GetTokenString());
-  }
-  ss << parse_term();
-  while (lookahead.GetTokenTag() != TokenTag::kStringQuote) {
-    if (lookahead.GetTokenTag() == TokenTag::kPlus) {
-      ss << eat(TokenTag::kPlus).GetTokenString();
-    } else if (lookahead.GetTokenTag() == TokenTag::kMinus) {
-      ss << eat(TokenTag::kMinus).GetTokenString();
-    } else {
-      throw PQLParseException("expected '+' or '-' in expr in pattern cl,"
-                              "instead got " + lookahead.GetTokenString());
-    }
-    ss << parse_term();
-  }
-  return ss.str();
-}
-// expression-spec : ‘"‘ expr’"’ | ‘_’ ‘"’ expr ‘"’ ‘_’ | ‘_’
+// iteration 1: expression-spec: ‘_’ ‘"’ factor ‘"’ ‘_’ | ‘_’
 std::pair<std::string, bool> QueryParser::parse_expressionSpec() {
   std::cout << "parsing expressionSpec..." << std::endl;
   bool is_exact_match = false;
-  std::string rhs_string;
+  std::stringstream rhs_ss;
+
+  // for iteration 1, there are no exact matches that are to be expected.
   if (lookahead.GetTokenTag() == TokenTag::kStringQuote) {
-    // parse as "‘ expr’"
+    throw PQLParseException("Invalid expression-spec for rhs of pattern clause in iteration 1.");
+  }
+  eat(TokenTag::kUnderscore);
+  rhs_ss << "_";
+  if (lookahead.GetTokenTag() == TokenTag::kCloseBracket) {
+    // consider rhs as '_' case due to end of expression-spec.
+  } else if (lookahead.GetTokenTag() == TokenTag::kStringQuote) {
+    // consider as ‘_’ ‘"’ factor ‘"’ ‘_’
     eat(TokenTag::kStringQuote);
-    rhs_string = parse_expr();
-    eat(TokenTag::kStringQuote);
-    is_exact_match = true;
-  } else if (lookahead.GetTokenTag() == TokenTag::kUnderscore) {
-    eat(TokenTag::kUnderscore);
-    if (lookahead.GetTokenTag() != TokenTag::kStringQuote) {
-      return std::make_pair("_", is_exact_match);
-    }
-    // continue parsing as ‘_’ ‘"’ expr ‘"’ ‘_’
-    eat(TokenTag::kStringQuote);
-    rhs_string = parse_expr();
+    rhs_ss << parse_factor();
     eat(TokenTag::kStringQuote);
     eat(TokenTag::kUnderscore);
   } else {
-    throw PQLParseException("Received invalid expression-spec in pattern cl.");
+    throw PQLParseException("Invalid expression-spec for rhs of pattern clause in iteration 1.");
   }
-  return std::make_pair(rhs_string, is_exact_match);
+
+  return std::make_pair(rhs_ss.str(), is_exact_match);
 }
 
 bool QueryParser::is_valid_synonym(Token token) {
@@ -326,7 +273,7 @@ void QueryParser::parse_pattern() {
     throw PQLParseException("Expected valid syn-assign for pattern cl, instead got " + lookahead.GetTokenString());
   }
   std::cout << "Got valid syn assign: " + lookahead.GetTokenString() << std::endl;
-  std::string assn_syn = lookahead.GetTokenString();
+  Token assn_tok = Token(lookahead.GetTokenString(), lookahead.GetTokenTag());
 
   eat(TokenTag::kName); // eat 'syn-assign'
   eat(TokenTag::kOpenBracket);
@@ -341,7 +288,7 @@ void QueryParser::parse_pattern() {
   std::cout << "grouping clauses...";
 
   // TODO: this could introduce a memory leak...
-  Clause* cl = new Pattern(lhs, rhs_info.first, assn_syn, lhs_is_syn, rhs_info.second);
+  Clause* cl = new Pattern(lhs, rhs_info.first, assn_tok.GetTokenString(), lhs_is_syn, rhs_info.second);
   clauses.emplace_back(cl);
 }
 
@@ -412,7 +359,9 @@ void QueryParser::group_clauses() {
       // pattern clause
       std::cout << "received pattern clause for grouping" << std::endl;
       Pattern* pt = dynamic_cast<Pattern*>(clauses[0]);
-      if (pt->left_is_synonym && pt->left_hand_side.compare(target.GetName()) == 0) {
+      // has_target_syn if lhs is a target synonym, or if  syn-assn is a target synonym
+      if (pt->assign_synonym.compare(target.GetName()) == 0 ||
+          pt->left_is_synonym && pt->left_hand_side.compare(target.GetName()) == 0) {
         has_target_syn = true;
       }
     }
@@ -440,8 +389,8 @@ void QueryParser::group_clauses() {
 
     // if 1x pattern cl has common synonym, it goes in the same group.
     Pattern* pt = dynamic_cast<Pattern*>(clauses[1]);
-    if (pt->left_is_synonym && (pt->left_hand_side.compare(cl1[0]->left_hand_side) == 0 ||
-    pt->right_hand_side.compare(cl1[0]->right_hand_side) == 0)) {
+    if (pt->assign_synonym.compare(cl1[0]->left_hand_side) == 0 ||
+        pt->left_is_synonym && (pt->left_hand_side.compare(cl1[0]->left_hand_side) == 0)) {
       g1.AddClauseToVector(pt);
     } else {
       std::vector<Clause*> cl2;
