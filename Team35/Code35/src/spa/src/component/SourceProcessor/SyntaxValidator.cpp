@@ -331,13 +331,17 @@ bool SyntaxValidator::IsExpr(const vector<Token>& statement_tokens, int left_bou
  * @param right_boundary_idx
  * @return
  */
-bool SyntaxValidator::IsRelFactor(const vector<Token>& statement_tokens, int left_boundary_idx, int right_boundary_idx) {
+bool SyntaxValidator::IsRelFactor(const vector<Token>& statement_tokens,
+                                  int left_boundary_idx,
+                                  int right_boundary_idx) {
   TokenTag first_token_tag = statement_tokens.at(left_boundary_idx).GetTokenTag();
   TokenTag last_token_tag = statement_tokens.at(right_boundary_idx).GetTokenTag();
   if (first_token_tag == TokenTag::kOpenBracket && last_token_tag == TokenTag::kCloseBracket) {
     return IsRelFactor(statement_tokens, left_boundary_idx + 1, right_boundary_idx - 1);
   }
-  bool is_factor = IsFactor(statement_tokens, left_boundary_idx, right_boundary_idx);// accepts redundant bracketing of expr e.g. ((x+1))
+  bool is_factor = IsFactor(statement_tokens,
+                            left_boundary_idx,
+                            right_boundary_idx);// accepts redundant bracketing of expr e.g. ((x+1))
   bool is_expr = IsExpr(statement_tokens, left_boundary_idx, right_boundary_idx);  // not sure if redundant OR clause
   return is_factor || is_expr;
 }
@@ -416,5 +420,35 @@ bool SyntaxValidator::IsCondExpr(const vector<Token>& statement_tokens, int left
   return false;
 }
 
+bool SyntaxValidator::IsAssignmentStatement(const vector<Token>& statement_tokens,
+                                            int left_boundary_idx,
+                                            int right_boundary_idx) {
+  return false;
+}
+
+/**
+ * This runs the statement against a blacklist rule:
+ * 1. Statement either ends with these possible tokens:
+ *          ";", ==> read,print,call statement  | assignment statement
+ *          "{" (opening of a new container), if | while | procedure
+ *          "}" only token, closing
+ * 2. If there are brackets, it means it's an if or while statement. In such a case, we'd need an even number of
+ * brackets.
+ *
+ * Other blacklist rules should be applied depending on the type of statement it is actually.
+ *
+ * @param statement_tokens tokens that represent the entire sentence
+ * @return
+ */
+bool SyntaxValidator::StatementPassesCommonBlacklistRules(const vector<Token>& statement_tokens) {
+  Token last_token = statement_tokens.at(statement_tokens.size() - 1);
+  bool valid_last_token
+      = std::regex_match(last_token.GetTokenString(), RegexPatterns::GetValidStatementTerminalToken());
+  // for container statements (if and while statements)
+  int num_open_brackets = CountTokens(statement_tokens, TokenTag::kOpenBracket);
+  int num_close_brackets = CountTokens(statement_tokens, TokenTag::kCloseBracket);
+  bool brackets_are_balanced = num_close_brackets == num_open_brackets;
+  return valid_last_token && brackets_are_balanced;
+}
 
 

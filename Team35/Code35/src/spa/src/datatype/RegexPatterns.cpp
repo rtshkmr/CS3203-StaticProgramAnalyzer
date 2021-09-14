@@ -47,4 +47,18 @@ std::regex RegexPatterns::GetDesignEntityPattern() {
   return std::regex(R"(stmt|read|print|call|while|if|assign|variable|constant|procedure)");
 };
 
+/**
+ * Represents the symbols that a sentence may end up with.
+ * NB: there's a dependency in the parser (since parser helps to split things up, these symbols can be guaranteed to be
+ * the terminal symbols)
+ *          ";", ==> read,print,call statement  | assignment statement
+ *          "{" (opening of a new container), if | while | procedure
+ *          "}" only token, closing
+ * @return
+ */
+std::regex RegexPatterns::GetValidStatementTerminalToken() {
+  return std::regex(R"(;|\{|\})");
+}
+
+
 

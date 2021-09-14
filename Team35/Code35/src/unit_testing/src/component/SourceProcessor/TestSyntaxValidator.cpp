@@ -287,6 +287,42 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
     REQUIRE(SyntaxValidator::IsCondExpr(tokens, 22, 27)); // !(<cond_expr>)
 //    REQUIRE(SyntaxValidator::IsCondExpr(tokens, 2, 20)); // (<cond_expr>) || (<cond_expr>)
   }
+  SECTION("Check StatementPassesCommonBlacklistRules function") {
+
+    SECTION("positive tests") {
+      vector<string> positive_statements;
+      positive_statements.emplace_back("procedure procname {"); // assn
+      positive_statements.emplace_back("a = b + 1;"); // assn
+      positive_statements.emplace_back("call mama;"); // call
+      positive_statements.emplace_back("}");
+      positive_statements.emplace_back("read books;"); // read
+      positive_statements.emplace_back("if(x > 12) then {");
+      positive_statements.emplace_back("while (timeLeft > 0) {");
+
+      for(const auto& statement : positive_statements) {
+        vector<Token> tokenized_statement = Tokenizer::CreateTokens(statement);
+        bool valid = SyntaxValidator::StatementPassesCommonBlacklistRules(tokenized_statement);
+        REQUIRE(valid);
+      }
+    }
+    SECTION("negative tests") {
+      vector<string> negative_statements;
+      negative_statements.emplace_back("a = b + 1");
+      negative_statements.emplace_back(" mama");
+      negative_statements.emplace_back("read books");
+      negative_statements.emplace_back("ifx > 12) then {");
+      negative_statements.emplace_back("if(x > 12 then ");
+      negative_statements.emplace_back("if(x > 12)) then {");
+      negative_statements.emplace_back("while (timeLeft > 0) ");
+      for(const auto& statement : negative_statements) {
+        vector<Token> tokenized_statement = Tokenizer::CreateTokens(statement);
+        bool invalid = !SyntaxValidator::StatementPassesCommonBlacklistRules(tokenized_statement);
+        REQUIRE(invalid);
+      }
+
+    }
+
+  }
 }
 
 TEST_CASE("1.SyntaxValidator.Validator handles basic statements:") {

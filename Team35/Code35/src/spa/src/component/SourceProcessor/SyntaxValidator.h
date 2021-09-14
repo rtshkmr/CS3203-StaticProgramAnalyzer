@@ -41,6 +41,8 @@ class SyntaxValidator {
                                      const std::regex& desired_pattern,
                                      int left_boundary_idx,
                                      int right_boundary_idx);
+  static bool IsAssignmentStatement(const std::vector<Token>& statement_tokens, int left_boundary_idx, int right_boundary_idx);
+  static bool StatementPassesCommonBlacklistRules(const std::vector<Token>& statement_tokens);
 };
 
 #endif //AUTOTESTER_TEAM00_CODE00_SRC_SPA_SRC_COMPONENT_SOURCEPROCESSOR_SYNTAXVALIDATOR_H_
