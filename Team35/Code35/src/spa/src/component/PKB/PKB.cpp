@@ -372,11 +372,11 @@ void PKB::PopulateChildMap(const std::unordered_map<Statement *, Statement *> &c
     }
 }
 
-void PKB::PopulateUseSMap(std::unordered_map<Statement *, std::list<Variable *> *> use_hash) {
-    for (std::pair<Statement *, std::list<Variable *> *> kv : use_hash) {
+void PKB::PopulateUseSMap(std::unordered_map<Statement *, std::list<Variable *> *> uses_hash) {
+    for (std::pair<Statement *, std::list<Variable *> *> kv : uses_hash) {
         auto *kNumber = const_cast<StatementNumber *>(kv.first->GetStatementNumber());
         std::string kString = std::to_string(kNumber->getNum());
-        auto result = std::list<std::tuple<DesignEntity, std::string>>();
+        auto result_ptr = new std::list<std::tuple<DesignEntity, std::string>*>();
 
         std::list<Variable *> *used_variables = kv.second;
 
@@ -385,11 +385,11 @@ void PKB::PopulateUseSMap(std::unordered_map<Statement *, std::list<Variable *> 
         for (Variable *var : *used_variables) {
             VariableName *varName = const_cast<VariableName*>(var->getName());
             varString = varName->getName();
-            std::tuple<DesignEntity, std::string> entity = make_tuple(DesignEntity::kVariable, varString);
-            result.push_back(entity);
+            std::tuple<DesignEntity, std::string>* entity_ptr = new std::tuple(DesignEntity::kVariable, varString);
+            result_ptr->push_back(entity_ptr);
         }
 
-        use_s_map_[kString] = result;
+        use_s_map_[kString] = result_ptr;
     }
 }
 
@@ -399,7 +399,7 @@ void PKB::PopulateUsedBySMap(std::unordered_map<Variable *, std::list<Statement 
         VariableName *varName = const_cast<VariableName*>(kv.first->getName());
         std::string kString = varName->getName();
 
-        auto result = std::list<std::tuple<DesignEntity, std::string>>();
+        auto result_ptr = new std::list<std::tuple<DesignEntity, std::string>*>();
 
         std::list<Statement *> *using_statements = kv.second;
 
@@ -407,20 +407,20 @@ void PKB::PopulateUsedBySMap(std::unordered_map<Variable *, std::list<Statement 
             auto *stmtNum = const_cast<StatementNumber *>(stmt->GetStatementNumber());
             std::string stmtRef = std::to_string(stmtNum->getNum());
 
-            std::tuple<DesignEntity, std::string> entity = make_tuple(type_map_[stmtRef], stmtRef);
-            result.push_back(entity);
+            std::tuple<DesignEntity, std::string>* entity_ptr = new std::tuple(type_map_[stmtRef], stmtRef);
+            result_ptr->push_back(entity_ptr);
         }
-
-        used_by_s_map_[kString] = result;
+        used_by_s_map_[kString] = result_ptr;
     }
 }
 
-void PKB::PopulateUseCMap(std::unordered_map<Container *, std::list<Variable *> *> c_use_hash) {
-    for (std::pair<Container *, std::list<Variable *> *> kv : c_use_hash) {
+void PKB::PopulateUseCMap(std::unordered_map<Container *, std::list<Variable *> *> c_uses_hash) {
+    //    for (std::pair<Container *, std::list<Variable *> *> kv : c_uses_hash) {
+    for (std::pair<Container *, std::list<Variable *> *> kv : c_uses_hash) {
         Statement *c_stmt = (Statement *) kv.first;
         auto *kNumber = const_cast<StatementNumber *>(c_stmt->GetStatementNumber());
         std::string kString = std::to_string(kNumber->getNum());
-        auto result = std::list<std::tuple<DesignEntity, std::string>>();
+        auto result_ptr = new std::list<std::tuple<DesignEntity, std::string>*>();
 
         std::list<Variable *> *used_variables = kv.second;
 
@@ -429,11 +429,11 @@ void PKB::PopulateUseCMap(std::unordered_map<Container *, std::list<Variable *> 
         for (Variable *var : *used_variables) {
             VariableName *varName = const_cast<VariableName*>(var->getName());
             varString = varName->getName();
-            std::tuple<DesignEntity, std::string> entity = make_tuple(DesignEntity::kVariable, varString);
-            result.push_back(entity);
+            std::tuple<DesignEntity, std::string>* entity_ptr = new std::tuple(DesignEntity::kVariable, varString);
+            result_ptr->push_back(entity_ptr);
         }
 
-        use_c_map_[kString] = result;
+        use_c_map_[kString] = result_ptr;
     }
 }
 
@@ -443,7 +443,7 @@ void PKB::PopulateUsedByCMap(std::unordered_map<Variable *, std::list<Container 
         VariableName *varName = const_cast<VariableName*>(kv.first->getName());
         std::string kString = varName->getName();
 
-        auto result = std::list<std::tuple<DesignEntity, std::string>>();
+        auto result_ptr = new std::list<std::tuple<DesignEntity, std::string>*>();
 
         std::list<Container *> *using_statements = kv.second;
 
@@ -452,14 +452,13 @@ void PKB::PopulateUsedByCMap(std::unordered_map<Variable *, std::list<Container 
             auto *stmtNum = const_cast<StatementNumber *>(c_stmt->GetStatementNumber());
             std::string stmtRef = std::to_string(stmtNum->getNum());
 
-            std::tuple<DesignEntity, std::string> entity = make_tuple(type_map_[stmtRef], stmtRef);
-            result.push_back(entity);
+            std::tuple<DesignEntity, std::string>* entity_ptr = new std::tuple(type_map_[stmtRef], stmtRef);
+            result_ptr->push_back(entity_ptr);
         }
 
-        used_by_c_map_[kString] = result;
+        used_by_c_map_[kString] = result_ptr;
     }
 }
-
 
 void PKB::PopulateModifiesSMap(std::unordered_map<Statement *, std::list<Variable *> *> modifies_hash) {
     for (std::pair<Statement *, std::list<Variable *> *> kv : modifies_hash) {
