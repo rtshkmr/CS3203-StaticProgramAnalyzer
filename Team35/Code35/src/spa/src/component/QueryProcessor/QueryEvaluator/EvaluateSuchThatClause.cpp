@@ -47,6 +47,7 @@ void ProcessNewColumn(std::string target_synonym_name, Synonym new_synonym, Quer
 
   std::vector<std::string> targetSynonymList = table->GetColumn(target_synonym_name);
   int numberOfTimesToTraverse = targetSynonymList.size();
+
   for (int i = 0; i < numberOfTimesToTraverse; i++) {    // For each synonym in the table
     std::string currStmtRef = targetSynonymList[i];
     // Get the list of possible stmtRef for the current stmtRef.
@@ -54,14 +55,22 @@ void ProcessNewColumn(std::string target_synonym_name, Synonym new_synonym, Quer
             QueryPKBSuchThat(pkb, relationship, currStmtRef, givenFirstParam);
 
     bool hasValidRelationship = false;
+    int number_of_repeats = 0;
+
     for (auto iter = possibleStmtRef.begin(); iter != possibleStmtRef.end(); iter++) {
       DesignEntity currentStatementType = std::get<0>(*iter);
       std::string currentStatementRef = std::get<1>(*iter);
       if (currentStatementType == new_synonym.GetType()) {
-        hasValidRelationship = true;
         // Add new row for each col in table
-        table->AddRowForAllColumn(new_synonym.GetName(), i, currentStatementRef);
+        table->AddMultipleRowForAllColumn(new_synonym.GetName(), i, currentStatementRef, number_of_repeats);
+
+        hasValidRelationship = true;
+        number_of_repeats++;
       }
+    }
+
+    if (number_of_repeats > 0) {
+      i += number_of_repeats - 1;
     }
 
     // If there are no valid relationships, delete currRow from table.
