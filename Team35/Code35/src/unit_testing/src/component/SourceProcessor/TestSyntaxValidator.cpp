@@ -35,7 +35,7 @@ static vector<string> valid_program_lines = {
     R"(})",
 
     // assignment:
-    R"( y = 1;)",
+    R"( y = 1;)", // idx: 11
     R"(z                                                                                                   = 3;)",
 };
 
@@ -76,19 +76,30 @@ static vector<string> invalid_program_lines = {
     R"(   while () then { )",
 
 //    // assignment:
-//    R"( y = 1;)",
-//    R"(z                                                                                                   = 3;)",
+    R"( y = 1 == 1;)", //  idx:26
+    R"(z                                                                                                   = 3)",
+    R"(z                                                                                                   = 3 > 1)",
 };
 
-static bool CheckAgainstSampleLines(int start, int end, vector<string>& lines, bool expected) {
+/**
+ *  Test helper function to run Validation against sample lines and see if it matches an expected_validation_output
+ * @param start inclusive boundary for the lines to select
+ * @param end
+ * @param lines a common list of sentences in their string format
+ * @param expected_validation_output an expected_validation_output outpuut value to be compared against
+ * @return
+ */
+static bool CheckAgainstSampleLines(int start, int end, vector<string>& lines, bool expected_validation_output) {
+  bool result = true;
   for (int i = start; i <= end; i++) {
     string line = lines.at(i);
     vector<Token> tokens = Tokenizer::CreateTokens(line);
     bool output = SyntaxValidator::ValidateSyntax(tokens);
-    return output == expected;
-
-//    REQUIRE(matches_with_expected);
+    if (output != expected_validation_output) {
+      return false; // break early
+    }
   }
+  return result;
 }
 
 TEST_CASE("1.SyntaxValidator.Test helper functions") {
@@ -384,6 +395,15 @@ TEST_CASE("1.SyntaxValidator.Validator handles basic statements:") {
     }
     SECTION("negative cases") {
       REQUIRE(CheckAgainstSampleLines(2, 8, invalid_program_lines, false));
+    }
+  }
+
+  SECTION("handles assignment statements") {
+    SECTION("positive cases") {
+      REQUIRE(CheckAgainstSampleLines(11, 12, valid_program_lines, true));
+    }
+    SECTION("negative cases") {
+      REQUIRE(CheckAgainstSampleLines(26, 28, invalid_program_lines, false));
     }
   }
   SECTION("handles \"if\" statements") {

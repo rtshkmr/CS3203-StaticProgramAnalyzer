@@ -42,11 +42,11 @@ bool SyntaxValidator::ValidateSyntax(vector<Token> statement_tokens) {
         assert(false);
       }
     }
-  } else if (first_token.GetTokenTag() == TokenTag::kName) { // it's an assignment operator
+  } else if (first_token.GetTokenTag() == TokenTag::kName) { // it's an assignment statement
     return ValidateAssignmentSentenceSyntax(statement_tokens);
   } else if (first_token.GetTokenTag() == TokenTag::kCloseBrace) {
     return ValidateCloseBrace(statement_tokens);
-  } else { // any other case
+  } else { // any other case returns false
     return false;
   }
 }
@@ -115,8 +115,14 @@ bool SyntaxValidator::ValidateAssignmentSentenceSyntax(const vector<Token>& stat
     return false;
   }
   // validate the tokens to the right of the assignment operator as an expression;
-  return false;
+  int assignment_operator_idx = GetFirstMatchingTokenIdx(statement_tokens, RegexPatterns::GetAssignmentOperatorPattern());
+  int right_boundary = statement_tokens.size() - 2; // left of the semicolon
+  if(right_boundary <= assignment_operator_idx) {
+    return false; // boundary invariant broken
+  }
+  return IsExpr(statement_tokens, assignment_operator_idx + 1, right_boundary);
 }
+
 bool SyntaxValidator::ValidateCloseBrace(const vector<Token>& tokens) { // redundant function in case there are edge cases
   return true;
 }
@@ -238,10 +244,26 @@ int SyntaxValidator::GetFirstMatchingTokenIdx(const vector<Token>& tokens,
                                                                       desired_pattern,
                                                                       left_boundary_idx,
                                                                       right_boundary_idx);
-  int delim_idx = std::distance(tokens.begin(), delim_iterator) ; // todo: check delim_idx
+  int delim_idx = std::distance(tokens.begin(), delim_iterator); // todo: check delim_idx
   return delim_idx;
 }
 
+/**
+ * Returns first matching token based on the desired regex pattern within the entire vector of tokens
+ * @param tokens
+ * @param desired_pattern
+ * @return
+ */
+int SyntaxValidator::GetFirstMatchingTokenIdx(const vector<Token>& tokens,
+                                              const std::regex& desired_pattern) {
+  assert(!tokens.empty());
+  auto delim_iterator = SyntaxValidator::GetTokenMatchForwardIterator(tokens,
+                                                                      desired_pattern,
+                                                                      0,
+                                                                      tokens.size() - 1);
+  int delim_idx = std::distance(tokens.begin(), delim_iterator); // todo: check delim_idx
+  return delim_idx;
+}
 /**
  *  A factor is either single variable name token, or an integer. If not, it's an expression surrounded by brackets.
  * @param statement_tokens  the reference statement tokens to inspect
@@ -301,10 +323,6 @@ bool SyntaxValidator::IsTerm(const vector<Token>& statement_tokens, int left_bou
                                           RegexPatterns::GetTermDelimiterPattern(),
                                           left_boundary_idx,
                                           right_boundary_idx);
-  int testing_fwd_idx =  GetFirstMatchingTokenIdx(statement_tokens,
-                                             RegexPatterns::GetTermDelimiterPattern(),
-                                             0,
-                                             statement_tokens.size() - 1);
   bool delim_idx_in_range = left_boundary_idx <= delim_idx && right_boundary_idx >= delim_idx;
   if (delim_idx_in_range) {
     if (delim_idx == left_boundary_idx || delim_idx == right_boundary_idx) {

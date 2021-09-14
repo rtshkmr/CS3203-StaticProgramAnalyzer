@@ -23,6 +23,7 @@ class RegexPatterns {
   static std::regex GetUnaryBooleanOperatorPattern(); // only NOT
   static std::regex GetBinaryBooleanOperatorPattern();
   static std::regex GetValidStatementTerminalToken();
+  static std::regex GetAssignmentOperatorPattern();
 };
 
 #endif //AUTOTESTER_TEAM00_CODE00_SRC_SPA_SRC_DATATYPE_REGEXPATTERNS_H_
