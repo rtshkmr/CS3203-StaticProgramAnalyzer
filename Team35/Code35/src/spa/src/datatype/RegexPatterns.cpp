@@ -60,10 +60,5 @@ std::regex RegexPatterns::GetValidStatementTerminalToken() {
   return std::regex(R"(;|\{|\})");
 }
 
-std::regex RegexPatterns::GetAssignmentOperatorPattern() {
-  return std::regex(R"(=)");
-
-}
-
 
 

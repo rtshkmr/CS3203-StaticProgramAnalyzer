@@ -33,19 +33,42 @@ class SyntaxValidator {
                                            const std::regex& desired_pattern,
                                            int left_idx,
                                            int right_idx);
+  static auto GetTokenMatchForwardIterator(const std::vector<Token>& tokens,
+                                           TokenTag target_token_tag,
+                                           int left_idx,
+                                           int right_idx);
   static auto GetTokenMatchReverseIterator(const std::vector<Token>& tokens,
                                            const std::regex& desired_pattern,
                                            int left_boundary_idx,
                                            int right_boundary_idx);
-  static int GetFirstMatchingTokenIdx(const std::vector<Token>& tokens, const std::regex& desired_pattern);
+  static auto GetTokenMatchReverseIterator(const std::vector<Token>& tokens,
+                                           TokenTag target_token_tag,
+                                           int left_boundary_idx,
+                                           int right_boundary_idx);
+  static int GetFirstMatchingTokenIdx(const std::vector<Token>& tokens,
+                                      TokenTag token_tag,
+                                      int left_boundary_idx,
+                                      int right_boundary_idx);
+
   static int GetFirstMatchingTokenIdx(const std::vector<Token>& tokens,
                                       const std::regex& desired_pattern,
                                       int left_boundary_idx,
                                       int right_boundary_idx);
+  static int GetFirstMatchingTokenIdx(const std::vector<Token>& tokens, const std::regex& desired_pattern);
+  static int GetFirstMatchingTokenIdx(const std::vector<Token>& tokens, TokenTag target_token_tag);
   static int GetLastMatchingTokenIdx(const std::vector<Token>& tokens,
                                      const std::regex& desired_pattern,
                                      int left_boundary_idx,
                                      int right_boundary_idx);
+
+
+  static int GetLastMatchingTokenIdx(const std::vector<Token>& tokens,
+                                     TokenTag target_token_tag,
+                                     int left_boundary_idx,
+                                     int right_boundary_idx);
+  static int GetLastMatchingTokenIdx(const std::vector<Token>& tokens, const std::regex& desired_pattern);
+  static int GetLastMatchingTokenIdx(const std::vector<Token>& tokens, TokenTag target_token_tag);
+
   static bool StatementPassesCommonBlacklistRules(const std::vector<Token>& statement_tokens);
 };
 

@@ -355,7 +355,6 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
                                                                             RegexPatterns::GetBinaryArithmeticOperatorPattern(),
                                                                             0,
                                                                             tokens.size() - 1);
-
     REQUIRE(first_comparator_idx == 3);
     REQUIRE(first_arithmetic_operator == 6);
     REQUIRE(last_arithmetic_operator == 8);

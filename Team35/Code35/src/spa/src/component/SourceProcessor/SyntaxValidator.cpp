@@ -115,9 +115,10 @@ bool SyntaxValidator::ValidateAssignmentSentenceSyntax(const vector<Token>& stat
     return false;
   }
   // validate the tokens to the right of the assignment operator as an expression;
-  int assignment_operator_idx = GetFirstMatchingTokenIdx(statement_tokens, RegexPatterns::GetAssignmentOperatorPattern());
+  int assignment_operator_idx =
+  GetFirstMatchingTokenIdx(statement_tokens, TokenTag::kAssignmentOperator);
   int right_boundary = statement_tokens.size() - 2; // left of the semicolon
-  if(right_boundary <= assignment_operator_idx) {
+  if (right_boundary <= assignment_operator_idx) {
     return false; // boundary invariant broken
   }
   return IsExpr(statement_tokens, assignment_operator_idx + 1, right_boundary);
@@ -178,6 +179,20 @@ auto SyntaxValidator::GetTokenMatchForwardIterator(const vector<Token>& tokens,
                                        });
   return forward_iterator;
 }
+auto SyntaxValidator::GetTokenMatchForwardIterator(const vector<Token>& tokens,
+                                                   TokenTag target_token_tag,
+                                                   int left_idx,
+                                                   int right_idx) {
+  auto forward_iterator = std::find_if(tokens.begin() + left_idx,
+                                       tokens.begin() + right_idx,
+      // todo: check if the end is exclusive range or inclusive, it's half open, the ending is excluded
+                                       [&target_token_tag](Token elem) {
+                                         TokenTag current_tag = elem.GetTokenTag();
+                                         bool matches_target_token = current_tag == target_token_tag;
+                                         return matches_target_token;
+                                       });
+  return forward_iterator;
+}
 // reverse iterator use:
 /**
  * Takes in a range in the form of left and right idx which refers to the actual vector of tokens and within this,
@@ -205,6 +220,24 @@ auto SyntaxValidator::GetTokenMatchReverseIterator(const vector<Token>& tokens,
                                        });
   return reverse_iterator;
 }
+auto SyntaxValidator::GetTokenMatchReverseIterator(const vector<Token>& tokens,
+                                                   TokenTag target_token_tag,
+                                                   int left_boundary_idx,
+                                                   int right_boundary_idx) {
+  // from the given actual indices, get respective reverse iterators for the range
+  auto rBeginning = tokens.crbegin() + ((tokens.size() - 1) - right_boundary_idx);
+  auto rEnding = tokens.crend() - left_boundary_idx;
+  // nb: find_if checks within a half-open range but we want inclusive behaviour:
+  auto reverse_iterator = std::find_if(rBeginning,
+                                       rEnding - 1, // todo: check if will throw out of bounds error;
+                                       [&target_token_tag](Token elem) {
+                                         string current = elem.GetTokenString();
+                                         TokenTag current_tag = elem.GetTokenTag();
+                                         bool matches_target_token = current_tag == target_token_tag;
+                                         return matches_target_token;
+                                       });
+  return reverse_iterator;
+}
 
 /**
  * For a given vector of tokens and a boundary of indices to inspect, returns the index of the last token that matches
@@ -221,6 +254,61 @@ int SyntaxValidator::GetLastMatchingTokenIdx(const vector<Token>& tokens,
                                              int right_boundary_idx) {
   auto delim_iterator = SyntaxValidator::GetTokenMatchReverseIterator(tokens,
                                                                       desired_pattern,
+                                                                      left_boundary_idx,
+                                                                      right_boundary_idx);
+  int delim_idx = std::distance(tokens.begin(), delim_iterator.base()) - 1;
+  return delim_idx;
+}
+
+/**
+ * For a given vector of tokens, returns the index of the last token that matches
+ * the desired regex pattern in the entire vector.
+ * @param tokens
+ * @param desired_pattern
+ * @return
+ */
+int SyntaxValidator::GetLastMatchingTokenIdx(const vector<Token>& tokens,
+                                             const std::regex& desired_pattern) {
+  auto delim_iterator = SyntaxValidator::GetTokenMatchReverseIterator(tokens,
+                                                                      desired_pattern,
+                                                                      0,
+                                                                      tokens.size() - 1);
+  int delim_idx = std::distance(tokens.begin(), delim_iterator.base()) - 1;
+  return delim_idx;
+}
+
+/**
+ * For a given vector of tokens, returns the index of the last token that matches
+ * the desired regex pattern in the entire vector.
+ * @param tokens
+ * @param desired_pattern
+ * @return
+ */
+int SyntaxValidator::GetLastMatchingTokenIdx(const vector<Token>& tokens,
+                                             TokenTag target_token_tag) {
+  auto delim_iterator = SyntaxValidator::GetTokenMatchReverseIterator(tokens,
+                                                                      target_token_tag,
+                                                                      0,
+                                                                      tokens.size() - 1);
+  int delim_idx = std::distance(tokens.begin(), delim_iterator.base()) - 1;
+  return delim_idx;
+}
+
+/**
+ * For a given vector of tokens and a boundary of indices to inspect, returns the index of the last token that matches
+ * the target token tag.
+ * @param tokens
+ * @param target_token_tag
+ * @param left_boundary_idx (inclusive boundary)
+ * @param right_boundary_idx (inclusive boundary)
+ * @return
+ */
+int SyntaxValidator::GetLastMatchingTokenIdx(const vector<Token>& tokens,
+                                             TokenTag target_token_tag,
+                                             int left_boundary_idx,
+                                             int right_boundary_idx) {
+  auto delim_iterator = SyntaxValidator::GetTokenMatchReverseIterator(tokens,
+                                                                      target_token_tag,
                                                                       left_boundary_idx,
                                                                       right_boundary_idx);
   int delim_idx = std::distance(tokens.begin(), delim_iterator.base()) - 1;
@@ -249,6 +337,27 @@ int SyntaxValidator::GetFirstMatchingTokenIdx(const vector<Token>& tokens,
 }
 
 /**
+ * For a given vector of tokens and a boundary of indices to inspect, returns the index of the first token that matches
+ * the desired target token tag.
+ * @param tokens
+ * @param token_tag
+ * @param left_boundary_idx
+ * @param right_boundary_idx
+ * @return
+ */
+int SyntaxValidator::GetFirstMatchingTokenIdx(const vector<Token>& tokens,
+                                              TokenTag token_tag,
+                                              int left_boundary_idx,
+                                              int right_boundary_idx) {
+  auto delim_iterator = SyntaxValidator::GetTokenMatchForwardIterator(tokens,
+                                                                      token_tag,
+                                                                      left_boundary_idx,
+                                                                      right_boundary_idx);
+  int delim_idx = std::distance(tokens.begin(), delim_iterator); // todo: check delim_idx
+  return delim_idx;
+}
+
+/**
  * Returns first matching token based on the desired regex pattern within the entire vector of tokens
  * @param tokens
  * @param desired_pattern
@@ -259,6 +368,22 @@ int SyntaxValidator::GetFirstMatchingTokenIdx(const vector<Token>& tokens,
   assert(!tokens.empty());
   auto delim_iterator = SyntaxValidator::GetTokenMatchForwardIterator(tokens,
                                                                       desired_pattern,
+                                                                      0,
+                                                                      tokens.size() - 1);
+  int delim_idx = std::distance(tokens.begin(), delim_iterator); // todo: check delim_idx
+  return delim_idx;
+}
+/**
+ * Returns first matching token based on the desired regex pattern within the entire vector of tokens
+ * @param tokens
+ * @param target_token_tag
+ * @return
+ */
+int SyntaxValidator::GetFirstMatchingTokenIdx(const vector<Token>& tokens,
+                                              TokenTag target_token_tag) {
+  assert(!tokens.empty());
+  auto delim_iterator = SyntaxValidator::GetTokenMatchForwardIterator(tokens,
+                                                                      target_token_tag,
                                                                       0,
                                                                       tokens.size() - 1);
   int delim_idx = std::distance(tokens.begin(), delim_iterator); // todo: check delim_idx
@@ -507,5 +632,6 @@ bool SyntaxValidator::StatementPassesCommonBlacklistRules(const vector<Token>& s
   bool brackets_are_balanced = num_close_brackets == num_open_brackets;
   return valid_last_token && brackets_are_balanced;
 }
+
 
 
