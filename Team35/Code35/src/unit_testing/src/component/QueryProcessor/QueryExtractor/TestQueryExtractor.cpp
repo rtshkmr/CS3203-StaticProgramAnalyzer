@@ -177,3 +177,38 @@ TEST_CASE("3.QueryExtractor.Single well-formed pattern with correct syn-assign b
                         Catch::Contains("Unknown synonym received as entRef in lhs of pattern cl."));
   }
 }
+
+TEST_CASE("3.QueryExtractor.Single well-formed pattern with correct syn-assign but incorrect rhs; should FAIL") {
+  SECTION("malformed rhs of partial match") {
+    std::string query = "assign a1; Select a1 pattern a1 ( _ , _\"count + 1\")";
+    auto query_extractor = QueryExtractor(&query);
+    REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
+                        Catch::Contains("Expected valid syn-assign for pattern cl, instead got"));
+  }
+  SECTION("malformed lhs of partial match") {
+    std::string query = "assign a1; Select a1 pattern a1 ( _ , \"count + 1\"_)";
+    auto query_extractor = QueryExtractor(&query);
+    REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
+                        Catch::Contains("Expected valid syn-assign for pattern cl, instead got"));
+  }
+  SECTION("malformed lhs of exact match") {
+    std::string query = "assign a1; Select a1 pattern a1 ( _ , count + 1\")";
+    auto query_extractor = QueryExtractor(&query);
+    REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
+                        Catch::Contains("Expected valid syn-assign for pattern cl, instead got"));
+  }
+  SECTION("malformed rhs of exact match") {
+    std::string query = "assign a1; Select a1 pattern a1 ( _ , \"count + 1)";
+    auto query_extractor = QueryExtractor(&query);
+    REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
+                        Catch::Contains("Expected valid syn-assign for pattern cl, instead got"));
+  }
+}
+
+/*
+TEST_CASE("3.QueryExtractor.Single well-formed pattern with correct syn-assign and correct args; should PASS") {
+  std::string query = "assign a1; Select a1 pattern a ( _ , \"count + 1\")";
+  auto query_extractor = QueryExtractor(&query);
+  REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
+                      Catch::Contains("Expected valid syn-assign for pattern cl, instead got"));
+}*/

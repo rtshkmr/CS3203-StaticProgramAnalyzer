@@ -273,6 +273,7 @@ std::pair<std::string, bool> QueryParser::parse_expressionSpec() {
     eat(TokenTag::kStringQuote);
     rhs_string = parse_expr();
     eat(TokenTag::kStringQuote);
+    eat(TokenTag::kUnderscore);
   } else {
     throw PQLParseException("Received invalid expression-spec in pattern cl.");
   }
