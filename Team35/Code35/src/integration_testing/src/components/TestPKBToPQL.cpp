@@ -141,15 +141,6 @@ TEST_CASE("5. Miscellaneous entity and relationship retrievals") {
      * 6.
      */
 
-    /* procedure Week4 {
- * read x;
- * print x;
- * y = 1;
- * z = 3;
- * z = x + y + 3;
- * }
- */
-
     std::vector<std::string> query_list = {
         "variable v; Select v",
         "assign a; Select a",
@@ -186,15 +177,14 @@ TEST_CASE("5. Miscellaneous entity and relationship retrievals") {
         "3, 4",
         "x, y, z",
         "",
-        "x, y, z",
 
         "dummy"
     };
 
     for (int i = 0; i < query_list.size(); i++) {
         std::string* query = &query_list.at(i);
-        std::optional<std::string> answer = QuerySystemController::Evaluate(query, &pkb);
-        REQUIRE(*answer == answer_list[i]);
+        std::string answer = QuerySystemController::Evaluate(query, &pkb);
+        REQUIRE(answer == answer_list[i]);
     }
 }
 
