@@ -212,39 +212,39 @@ inline WhileEntity* GetWhileEntity3() {
 
 // For copying
 //
-//ReadEntity* read_x_ = GetReadX();
-//ReadEntity* read_y_ = GetReadY();
-//ReadEntity* read_z_ = GetReadZ();
-//ReadEntity* read_i_ = GetReadI();
-//ReadEntity* read_n_ = GetReadN();
-//ReadEntity* read_m_ = GetReadM();
-//PrintEntity* print_x_ = GetPrintX();
-//PrintEntity* print_y_ = GetPrintY();
-//PrintEntity* print_z_ = GetPrintZ();
-//PrintEntity* print_i_ = GetPrintI();
-//PrintEntity* print_n_ = GetPrintN();
-//PrintEntity* print_m_ = GetPrintM();
-//AssignEntity* assign_1_ = GetAssign1();
-//AssignEntity* assign_2_ = GetAssign2();
-//AssignEntity* assign_3_ = GetAssign3();
-//AssignEntity* assign_4_ = GetAssign4();
-//AssignEntity* assign_5_ = GetAssign5();
-//AssignEntity* assign_6_ = GetAssign6();
-//AssignEntity* assign_7_ = GetAssign7();
-//AssignEntity* assign_8_ = GetAssign8();
-//AssignEntity* assign_9_ = GetAssign9();
-//AssignEntity* assign_10_ = GetAssign10();
-//IfEntity* if_1_ = GetIf1();
-//IfEntity* if_2_ = GetIf2();
-//IfEntity* if_3_ = GetIf3();
-//IfEntity* if_4_ = GetIf4();
-//ElseEntity* else_1_ = GetElse();
-//ElseEntity* else_2_ = GetElse();
-//ElseEntity* else_3_ = GetElse();
-//ElseEntity* else_4_ = GetElse();
-//WhileEntity* while_1_ = GetWhileEntity3();
-//WhileEntity* while_2_ = GetWhileEntity2();
-//WhileEntity* while_3_ = GetWhileEntity3();
+//ReadEntity* read_x = GetReadX();
+//ReadEntity* read_y = GetReadY();
+//ReadEntity* read_z = GetReadZ();
+//ReadEntity* read_i = GetReadI();
+//ReadEntity* read_n = GetReadN();
+//ReadEntity* read_m = GetReadM();
+//PrintEntity* print_x = GetPrintX();
+//PrintEntity* print_y = GetPrintY();
+//PrintEntity* print_z = GetPrintZ();
+//PrintEntity* print_i = GetPrintI();
+//PrintEntity* print_n = GetPrintN();
+//PrintEntity* print_m = GetPrintM();
+//AssignEntity* assign_1 = GetAssign1();
+//AssignEntity* assign_2 = GetAssign2();
+//AssignEntity* assign_3 = GetAssign3();
+//AssignEntity* assign_4 = GetAssign4();
+//AssignEntity* assign_5 = GetAssign5();
+//AssignEntity* assign_6 = GetAssign6();
+//AssignEntity* assign_7 = GetAssign7();
+//AssignEntity* assign_8 = GetAssign8();
+//AssignEntity* assign_9 = GetAssign9();
+//AssignEntity* assign_10 = GetAssign10();
+//IfEntity* if_1 = GetIf1();
+//IfEntity* if_2 = GetIf2();
+//IfEntity* if_3 = GetIf3();
+//IfEntity* if_4 = GetIf4();
+//ElseEntity* else_1 = GetElse();
+//ElseEntity* else_2 = GetElse();
+//ElseEntity* else_3 = GetElse();
+//ElseEntity* else_4 = GetElse();
+//WhileEntity* while_1 = GetWhileEntity3();
+//WhileEntity* while_2 = GetWhileEntity2();
+//WhileEntity* while_3 = GetWhileEntity3();
 
 }
 
