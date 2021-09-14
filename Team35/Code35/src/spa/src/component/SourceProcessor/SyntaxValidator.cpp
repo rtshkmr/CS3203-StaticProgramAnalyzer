@@ -13,40 +13,45 @@ using std::vector;
 SyntaxValidator::SyntaxValidator() = default;
 
 /**
- * Validates semantic syntax within a single statement by referring to the token tags and adhering to various semantic
+ * Validates syntax within a single statement by referring to the token tags and adhering to various types of statements
  * rules.
  *
- * @param tokens
+ * @param statement_tokens
  * @return
  */
-bool SyntaxValidator::ValidateSemanticSyntax(vector<Token> tokens) {
+bool SyntaxValidator::ValidateSyntax(vector<Token> statement_tokens) {
+  bool passes_generic_blacklist_rules = StatementPassesCommonBlacklistRules(statement_tokens);
+  if(!passes_generic_blacklist_rules) {
+    return false;
+  }
+
   // check starting token to determine what kind of keyword it is and handle subcases in separate private functions:
-  Token first_token = tokens.at(0);
+  Token first_token = statement_tokens.at(0);
   if (Token::IsKeywordToken(first_token)) {
     switch (first_token.GetTokenTag()) {
-      case TokenTag::kProcedureKeyword:return ValidateProcedureSemantics(tokens);
+      case TokenTag::kProcedureKeyword:return ValidateProcedureSyntax(statement_tokens);
       case TokenTag::kReadKeyword: // might need a better name to refer to a group of these keywords:
       case TokenTag::kPrintKeyword:
-      case TokenTag::kCallKeyword:return ValidateMacroFunctionSemantics(tokens);
-      case TokenTag::kIfKeyword:return ValidateIfStatementSemantics(tokens);
-      case TokenTag::kElseKeyword:return ValidateElseKeyword(tokens);
-      case TokenTag::kWhileKeyword:return ValidateWhileKeyword(tokens);
+      case TokenTag::kCallKeyword:return ValidateMacroFunctionSyntax(statement_tokens);
+      case TokenTag::kIfKeyword:return ValidateIfStatementSyntax(statement_tokens);
+      case TokenTag::kElseKeyword:return ValidateElseKeyword(statement_tokens);
+      case TokenTag::kWhileKeyword:return ValidateWhileKeyword(statement_tokens);
         // QQ: will if and then appear in the same line always or can they separate? will put it as true by default first
-      case TokenTag::kThenKeyword:return ValidateThenKeyword(tokens);
+      case TokenTag::kThenKeyword:return ValidateThenKeyword(statement_tokens);
       default: {
         assert(false);
       }
     }
   } else if (first_token.GetTokenTag() == TokenTag::kName) { // it's an assignment operator
-    return ValidateAssignmentSemantics(tokens);
+    return ValidateAssignmentSyntax(statement_tokens);
   } else if (first_token.GetTokenTag() == TokenTag::kCloseBrace) {
-    return ValidateCloseBrace(tokens);
+    return ValidateCloseBrace(statement_tokens);
   } else { // any other case
     return false;
   }
 }
 
-bool SyntaxValidator::ValidateProcedureSemantics(const vector<Token>& tokens) {
+bool SyntaxValidator::ValidateProcedureSyntax(const vector<Token>& tokens) {
   // QQ: is this part (fixed number of tokens for every type of statement a valid guarantee? Feels like it's
   //     very hardcode-y though :(
   return tokens.capacity() == 3
@@ -54,12 +59,12 @@ bool SyntaxValidator::ValidateProcedureSemantics(const vector<Token>& tokens) {
       && tokens.at(2).GetTokenTag() == TokenTag::kOpenBrace;
 }
 // for read, print and call keywords
-bool SyntaxValidator::ValidateMacroFunctionSemantics(const vector<Token>& tokens) {
+bool SyntaxValidator::ValidateMacroFunctionSyntax(const vector<Token>& tokens) {
   return tokens.capacity() == 3
       && tokens.at(1).GetTokenTag() == TokenTag::kName
       && tokens.at(2).GetTokenTag() == TokenTag::kSemicolon;
 }
-bool SyntaxValidator::ValidateIfStatementSemantics(const vector<Token>& tokens) {
+bool SyntaxValidator::ValidateIfStatementSyntax(const vector<Token>& tokens) {
   // todo: 1. this is a very rudimentary implementation.
   //       2. Future implementation needs to support recursive check of conditional expressions, possibly need to do
   //       something like : identify open and close brace to identify scope, then check recursively within each scope.
@@ -95,7 +100,7 @@ bool SyntaxValidator::ValidateWhileKeyword(const vector<Token>& tokens) {
       && tokens.at(7).GetTokenTag() == TokenTag::kOpenBrace;
   return output;
 }
-bool SyntaxValidator::ValidateAssignmentSemantics(const vector<Token>& tokens) {
+bool SyntaxValidator::ValidateAssignmentSyntax(const vector<Token>& tokens) {
   return false;
 }
 bool SyntaxValidator::ValidateCloseBrace(const vector<Token>& tokens) { // redundant function in case there are edge cases

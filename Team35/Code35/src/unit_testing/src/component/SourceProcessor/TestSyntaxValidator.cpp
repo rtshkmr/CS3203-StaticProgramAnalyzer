@@ -84,7 +84,7 @@ static bool CheckAgainstSampleLines(int start, int end, vector<string>& lines, b
   for (int i = start; i <= end; i++) {
     string line = lines.at(i);
     vector<Token> tokens = Tokenizer::CreateTokens(line);
-    bool output = SyntaxValidator::ValidateSemanticSyntax(tokens);
+    bool output = SyntaxValidator::ValidateSyntax(tokens);
     return output == expected;
 
 //    REQUIRE(matches_with_expected);
