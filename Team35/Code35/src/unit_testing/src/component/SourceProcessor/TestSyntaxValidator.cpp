@@ -428,14 +428,6 @@ TEST_CASE("1.SyntaxValidator.Validator handles statement validation:") {
       REQUIRE(CheckAgainstSampleLines(9, 9, valid_program_lines, true));
     }
     SECTION("negative cases") {
-//      REQUIRE(CheckAgainstSampleLines(18, 25, invalid_program_lines, false));
-      REQUIRE(CheckAgainstSampleLines(18, 18, invalid_program_lines, false));
-      REQUIRE(CheckAgainstSampleLines(18, 19, invalid_program_lines, false));
-      REQUIRE(CheckAgainstSampleLines(18, 20, invalid_program_lines, false));
-      REQUIRE(CheckAgainstSampleLines(18, 21, invalid_program_lines, false));
-      REQUIRE(CheckAgainstSampleLines(18, 22, invalid_program_lines, false));
-      REQUIRE(CheckAgainstSampleLines(18, 23, invalid_program_lines, false));
-      REQUIRE(CheckAgainstSampleLines(18, 24, invalid_program_lines, false));
       REQUIRE(CheckAgainstSampleLines(18, 25, invalid_program_lines, false));
     }
   }
