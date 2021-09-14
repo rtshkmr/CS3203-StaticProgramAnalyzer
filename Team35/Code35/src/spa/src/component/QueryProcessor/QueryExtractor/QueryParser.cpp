@@ -182,10 +182,10 @@ void QueryParser::parse_select() {
 
 //  Below is commented out temporarily as queries without such that or pattern clauses are legal according to PQL grammar
 //  Leaving it here for PQL sub-team to review
-//  else {
-//    // std::cout << "Incorrect query. Expected such that or pattern clause but got lookahead: " + lookahead.GetTokenString() << std::endl;
-//    throw PQLParseException("Incorrect query. Expected such that or pattern clause.");
-//  }
+  else {
+    // std::cout << "Incorrect query. Expected such that or pattern clause but got lookahead: " + lookahead.GetTokenString() << std::endl;
+    throw PQLParseException("Incorrect query. Expected such that or pattern clause.");
+  }
 }
 
 void QueryParser::parse_query() {

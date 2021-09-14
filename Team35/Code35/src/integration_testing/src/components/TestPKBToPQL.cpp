@@ -142,10 +142,10 @@ TEST_CASE("5. Miscellaneous entity and relationship retrievals") {
      */
 
     std::vector<std::string> query_list = {
-        "variable v; Select v;",
-        "assign a; Select a;",
-        "read r; Select r;",
-        "procedure p; Select p;",
+        "variable v; Select v",
+        "assign a; Select a",
+        "read r; Select r",
+        "procedure p; Select p",
         "read r; print p; Select r such that Follows(r, p)",
         "assign procedure; Select procedure",
 
