@@ -163,8 +163,8 @@ Token QueryParser::parse_entRef() {
   std::string token_name;
   TokenTag token_type;
   if (lookahead.GetTokenTag() == TokenTag::kName) {
-    // parse as synonym
-    if (!is_valid_synonym(lookahead)) {
+    // parse as known synonym of type variable
+    if (!is_valid_synonym(lookahead, DesignEntity::kVariable)) {
       throw PQLParseException("Unknown synonym received as entRef in lhs of pattern cl.");
     }
     token_name = eat(TokenTag::kName).GetTokenString();

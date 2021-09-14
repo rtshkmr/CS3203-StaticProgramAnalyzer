@@ -150,3 +150,30 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that with correct relRef and
 }
 
 // 'pattern'
+TEST_CASE("3.QueryExtractor.Single malformed pattern with typo; should FAIL") {
+  std::string query = "assign a1; Select a1 pAttern a ( _ , \"count + 1\")";
+  auto query_extractor = QueryExtractor(&query);
+  REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(), Catch::Contains("Incorrect query"));
+}
+
+TEST_CASE("3.QueryExtractor.Single well-formed pattern with unknown syn-assign; should FAIL") {
+  std::string query = "assign a1; Select a1 pattern a ( _ , \"count + 1\")";
+  auto query_extractor = QueryExtractor(&query);
+  REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
+                      Catch::Contains("Expected valid syn-assign for pattern cl, instead got"));
+}
+
+TEST_CASE("3.QueryExtractor.Single well-formed pattern with correct syn-assign but incorrect lhs; should FAIL") {
+  SECTION("lhs is unknown synonym") {
+    std::string query = "assign a1; Select a1 pattern a1 ( p , \"count + 1\")";
+    auto query_extractor = QueryExtractor(&query);
+    REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
+                        Catch::Contains("Unknown synonym received as entRef in lhs of pattern cl."));
+  }
+  SECTION("lhs is known synonym but not of type variable") {
+    std::string query = "assign a1; Select a1 pattern a1 ( a1 , \"count + 1\")";
+    auto query_extractor = QueryExtractor(&query);
+    REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
+                        Catch::Contains("Unknown synonym received as entRef in lhs of pattern cl."));
+  }
+}
