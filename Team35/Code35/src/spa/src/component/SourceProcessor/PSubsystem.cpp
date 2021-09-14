@@ -21,7 +21,7 @@ void PSubsystem::ProcessStatement(std::string statement) {
   }
 
   std::vector<Token> tokens = Tokenizer::CreateTokens(statement);
-  bool valid = syntax_validator_.ValidateSemanticSyntax(tokens);
+  bool valid = syntax_validator_.ValidateSyntax(tokens);
   valid = true; //TODO: remove this after validation check is complete
 
   if (tokens[0].GetTokenTag() == TokenTag::kCloseBrace) {
