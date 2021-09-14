@@ -52,17 +52,17 @@ class PKB {
   std::unordered_map<std::string, std::list<std::tuple<DesignEntity, std::string>>> parent_map_;
   std::unordered_map<std::string, std::tuple<DesignEntity,std::string>> child_map_;
 
-  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> use_s_map_;
-  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> used_by_s_map_;
+  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>*>*> use_s_map_;
+  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>*>*> used_by_s_map_;
 
-  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> use_c_map_;
-  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> used_by_c_map_;
+  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>*>*> use_c_map_;
+  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>*>*> used_by_c_map_;
 
-  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> modifies_s_map_;
-  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> modified_by_s_map_;
+  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>*>*> modifies_s_map_;
+  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>*>*> modified_by_s_map_;
 
-  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> modifies_c_map_;
-  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> modified_by_c_map_;
+  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>*>*> modifies_c_map_;
+  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>*>*> modified_by_c_map_;
 
   void PopulateProcList(const std::list<Procedure *> &proc_list);
   void PopulateVarList(const std::list<Variable *> &var_list);
