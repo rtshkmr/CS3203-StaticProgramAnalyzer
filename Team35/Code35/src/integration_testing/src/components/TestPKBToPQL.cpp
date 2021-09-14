@@ -146,6 +146,7 @@ TEST_CASE("5. Miscellaneous entity and relationship retrievals") {
         "assign a; Select a",
         "read r; Select r",
         "procedure p; Select p",
+        "assign a, b; Select a",
         "read r; print p; Select r such that Follows(r, p)",
         "assign procedure; Select procedure",
         "read r; print p; Select p such that Follows(r, p)",
@@ -155,8 +156,6 @@ TEST_CASE("5. Miscellaneous entity and relationship retrievals") {
 
 //            "variable v; assign a; Select v such that Uses(a, v)", // this does not work while Uses(v, a) works -> params are mixed up
 //            "variable v; assign a; Select v such that Modifies(a, v)", // same as above
-
-//            "assign a, b; Select a", // should be parsed correctly, currently does not
 
 //            "assign a; Select v such that Uses(a, \"x\")", // PQL should be able to handle variables in inverted commas
 //            "assign a; Select v such that Uses(a, _)", // QueryProcessor should be able to handle underscore wildcard
@@ -171,6 +170,7 @@ TEST_CASE("5. Miscellaneous entity and relationship retrievals") {
         "3, 4, 5",
         "1",
         "Week4",
+        "3, 4, 5",
         "1",
         "3, 4, 5",
         "2",

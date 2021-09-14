@@ -24,9 +24,12 @@ Token QueryParser::eat(TokenTag token_type) {
 std::vector<Token> QueryParser::GetSynonyms() {
   // TODO: here, add support for multiple synonyms. e.g. variable v1, v2;
   // TODO: here, add support for constant type, since TokenTag for that will be int.
-  auto token = eat(TokenTag::kName);
   std::vector<Token> tokens;
-  tokens.push_back(token);
+  tokens.push_back(eat(TokenTag::kName));
+  while (lookahead.GetTokenTag() != TokenTag::kSemicolon) {
+    eat(TokenTag::kComma);
+    tokens.push_back(eat(TokenTag::kName));
+  }
   return tokens;
 }
 
