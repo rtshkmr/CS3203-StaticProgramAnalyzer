@@ -4,10 +4,22 @@
 #include "PSubsystem.h"
 #include "Tokenizer.h"
 #include "EntityFactory.h"
+#include "exception/SyntaxException.h"
+#include "exception/IterationOneException.h"
 
 using namespace psub;
 
 void PSubsystem::InitDataStructures() {
+
+  /// INTERNAL STATE RESET
+  valid_state = true;
+  current_procedure_ = nullptr;
+  current_node_ = nullptr;
+  current_node_type_ = -1;
+  parent_stack_ = std::stack<Container*>();
+  follow_stack_ = std::stack<Statement*>();
+  program_counter_ = 0;
+
   deliverable_ = new Deliverable(); //created in heap so that can pass this object to PKB
   syntax_validator_ = SyntaxValidator();
   entity_factory_ =
@@ -15,14 +27,26 @@ void PSubsystem::InitDataStructures() {
                     deliverable_->GetConstantValueList());
 }
 
+/**
+ * Process 1 statement at a time, and append relationship into Deliverables map.
+ * @param statement Statement to be processed
+ * @throws SyntaxException throws when a syntax error was found in this statement or any previous statement
+ * @throws IterationOneException throws when Call statement was called
+ * @throws IterationOneException throws when more than one procedure is processed.
+ */
 void PSubsystem::ProcessStatement(std::string statement) {
   if (!valid_state) {
-    return; //syntax error had occured. No processing required; TODO: probably throw an error
+    throw SyntaxException("Unable to process statement due to an earlier syntax error found, or closed");
   }
 
   std::vector<Token> tokens = Tokenizer::CreateTokens(statement);
   bool valid = syntax_validator_.ValidateSemanticSyntax(tokens);
   valid = true; //TODO: remove this after validation check is complete
+
+  if (!valid) {
+    valid_state = false;
+    throw SyntaxException("Invalid syntax found.");
+  }
 
   if (tokens[0].GetTokenTag() == TokenTag::kCloseBrace) {
     //close brace, no need to create entity;
@@ -53,7 +77,7 @@ void PSubsystem::ProcessStatement(std::string statement) {
 
       if (parent_stack_.empty()) { //back to procedure stmtlist
         current_node_type_ = 0;
-        current_node_ = current_procedure;
+        current_node_ = current_procedure_;
       } else {
         current_nest = parent_stack_.top();
         if (WhileEntity* while_entity = dynamic_cast<WhileEntity*>(current_nest)) {
@@ -68,22 +92,19 @@ void PSubsystem::ProcessStatement(std::string statement) {
     return;
   }
 
-  if (!valid) {
-    valid_state = false;
-    return; //TODO: probably throw an error
-  }
-
   /// TO BE DELETED AFTER ITERATION 1;
   if (tokens[0].GetTokenTag() == TokenTag::kProcedureKeyword && !deliverable_->GetProcList()->empty()) {
-    std::cout << "Encountered multiple procedure \n";
-    //TODO: Perform exception handling here.
     valid_state = false;
-    return;
+    throw IterationOneException("Multiple Procedure found!");
+  } else if (tokens[0].GetTokenTag() == TokenTag::kCallKeyword) {
+    valid_state = false;
+    throw IterationOneException("Call statement found!");
   }
 
-    Entity* entityObj = entity_factory_.CreateEntities(tokens);
+  Entity* entityObj = entity_factory_.CreateEntities(tokens);
 
   if (current_node_type_ == -1) { //when current_node_ is null. Only happens when not reading within a procedure.
+    assert(current_procedure_ == nullptr && current_node_ == nullptr);
     if (Procedure* procedure = dynamic_cast<Procedure*>(entityObj)) {
       PerformNewProcedureSteps(procedure);
       return;
@@ -124,10 +145,17 @@ void PSubsystem::ProcessStatement(std::string statement) {
 }
 
 void PSubsystem::PerformNewProcedureSteps(Procedure* procedure) {
-  current_procedure = procedure;
+  current_procedure_ = procedure;
   current_node_ = procedure;
   current_node_type_ = 0;
-  //TODO: add proc_var_name;
+
+  if (deliverable_->GetProgram() == nullptr) {
+    Program* program = new Program(procedure);
+    deliverable_->SetProgram(program);
+  } else {
+    throw IterationOneException("[2] Encountered multiple procedures"); //TODO: remove after Iteration 1
+    deliverable_->GetProgram()->setProcedure(procedure);
+  }
 }
 
 void PSubsystem::SetStatementObject(Statement* statement) {
@@ -155,15 +183,8 @@ void PSubsystem::SetStatementObject(Statement* statement) {
   if (!parent_stack_.empty()) {
     assert(current_node_type_ == 1 || current_node_type_ == 2 || current_node_type_ == 3);
     statement->SetParentNode(parent_stack_.top());
-    deliverable_->AddParentRelationship(reinterpret_cast<Statement*>(parent_stack_.top()), statement);
+    deliverable_->AddParentRelationship(dynamic_cast<Statement*>(parent_stack_.top()), statement);
   }
-
-  /*
-  //no need modify follow stack for If and While.
-  if (dynamic_cast<IfEntity*>(statement) != nullptr || dynamic_cast<WhileEntity*>(current_node_) != nullptr) {
-    return;
-  }
-  */
 
   if (current_node_->GetStatementList()->size() == 1 || // 1 because this is newly added in Line curr - 13
       (current_node_type_ == 3 && new_else)) {
@@ -230,8 +251,18 @@ void PSubsystem::HandleReadStmt(ReadEntity* read_entity) {
   deliverable_->AddModifiesRelationship(current_node_, read_entity->getVariable());  //container level
 }
 
+void PSubsystem::CheckForIfElseValidity() {
+  for (auto const &i : *deliverable_->GetIfList()) {
+    if (i->GetElseEntity() == nullptr) {
+      throw SyntaxException("Encountered If statement without Else construct");
+    }
+  }
+}
+
 Deliverable* PSubsystem::GetDeliverables() {
-  Program* program = new Program(deliverable_->GetProcList()->front());
-  deliverable_->SetProgram(program);
+  CheckForIfElseValidity(); //TODO: to put it within main handling if possible.
+
+  valid_state = false; //to prevent further processsing.
   return deliverable_;
 }
+
