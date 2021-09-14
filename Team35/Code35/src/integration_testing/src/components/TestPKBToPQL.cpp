@@ -133,12 +133,10 @@ TEST_CASE("5. Miscellaneous entity and relationship retrievals") {
     /*
      * todo:
      * 1. Uses and Modifies have their arguments swapped (Uses(v,a) works when it should be Uses(a,v)
-     * 2. Multiple variables are allowed to be declared in the same line
-     *    (i.e. "assign a, b;" and "assign a; assign b" are equally valid")
-     * 3. The PQL grammar does not allow for ';' at the end of select clauses -> should throw exception and exit gracefully
-     * 4. Follows is not working as expected (refer to the commented test-cases below)
-     * 5. _ and "x" need to be allowed for as wildcards and variable names specifically.
-     * 6.
+     * 2. The PQL grammar does not allow for ';' at the end of select clauses -> should throw exception and exit gracefully
+     * 3. Follows is not working as expected (refer to the commented test-cases below)
+     * 4. _ and "x" need to be allowed for as wildcards and variable names specifically.
+     * 5.
      */
 
     std::vector<std::string> query_list = {
