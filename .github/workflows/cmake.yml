@@ -54,7 +54,7 @@ jobs:
     - name: Run AutoTester 
       run: | 
         cp -r ${{github.workspace}}/Team35/Tests35 ${{env.working-directory}}/build/src/autotester
-        cd ${{env.working-directory}}/build/src/autotester/Test35
+        cd ${{env.working-directory}}/build/src/autotester/Tests35
         chmod +x ./run_autotester_suite.sh
         ./run_autotester_suite.sh
         
