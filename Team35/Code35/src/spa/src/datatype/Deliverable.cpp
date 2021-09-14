@@ -33,6 +33,30 @@ void Deliverable::AddFollowRelationship(Statement* f1, Statement* f2) {
   followed_by_hash_.insert({f2, f1});
 }
 
+void Deliverable::AddFollowsTransitiveRelationship(Statement* before, Statement* after) {
+  if (follows_T_hash_.find(before) != follows_T_hash_.end()) {
+    follows_T_hash_.find(before)->second->push_back(after);
+  } else {
+    auto* list = new std::list<Statement*>();
+    list->push_back(after);
+    follows_T_hash_.insert(std::make_pair(before, list));
+  }
+
+  if (followed_by_T_hash_.find(after) != followed_by_T_hash_.end()) {
+    followed_by_T_hash_.find(after)->second->push_back(before);
+  } else {
+    auto* list = new std::list<Statement*>();
+    list->push_back(before);
+    followed_by_T_hash_.insert(std::make_pair(after, list));
+  }
+}
+
+void Deliverable::AddFollowsTransitiveRelationshipForList(Statement* before, std::list<Statement*>* afters) {
+  for (Statement* after: *afters) {
+    AddFollowsTransitiveRelationship(before, after);
+  }
+}
+
 void Deliverable::AddParentRelationship(Statement* p1, Statement* p2) {
   if (parent_to_child_hash_.count(p1)) {
     parent_to_child_hash_.find(p1)->second->push_back(p2);
@@ -43,6 +67,30 @@ void Deliverable::AddParentRelationship(Statement* p1, Statement* p2) {
   }
 
   child_to_parent_hash_.insert({p2, p1});
+}
+
+void Deliverable::AddParentTransitiveRelationship(Statement* parent, Statement* child) {
+  if (parent_to_child_T_hash_.find(parent) != parent_to_child_T_hash_.end()) {
+    parent_to_child_T_hash_.find(parent)->second->push_back(child);
+  } else {
+    auto* list = new std::list<Statement*>();
+    list->push_back(child);
+    parent_to_child_T_hash_.insert(std::make_pair(parent, list));
+  }
+
+  if (child_to_parent_T_hash_.find(child) != child_to_parent_T_hash_.end()) {
+    child_to_parent_T_hash_.find(child)->second->push_back(parent);
+  } else {
+    auto* list = new std::list<Statement*>();
+    list->push_back(parent);
+    child_to_parent_T_hash_.insert(std::make_pair(child, list));
+  }
+}
+
+void Deliverable::AddParentTransitiveRelationshipForList(Statement* parent, std::list<Statement*>* children) {
+  for (Statement* child: *children) {
+    AddParentTransitiveRelationship(parent, child);
+  }
 }
 
 void Deliverable::AddUsesRelationship(Statement* u1, Variable* u2) {
