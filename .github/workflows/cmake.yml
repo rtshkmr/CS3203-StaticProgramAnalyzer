@@ -53,9 +53,15 @@ jobs:
     
     - name: Run AutoTester 
       run: | 
-        cp -r ${{env.working-directory}}/tests ${{env.working-directory}}/build/src/autotester
-        cd ${{env.working-directory}}/build/src/autotester/tests
-#        ./../autotester Source_simple.txt Source_queries.txt output.xml
+        cp -r ${{github.workspace}}/Team35/Tests35 ${{env.working-directory}}/build/src/autotester
+        cd ${{env.working-directory}}/build/src/autotester/Tests35
+        chmod +x ./run_autotester_suite.sh
+        ./run_autotester_suite.sh
+        
+    - uses: actions/upload-artifact@v2
+      with: 
+        name: output_final
+        path: ${{env.working-directory}}/build/src/autotester/Tests35/output_final.zip
 
     - name: Build All # Take all previous build and build autotester_gui for completeness
       run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target all
