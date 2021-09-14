@@ -1,0 +1,6 @@
+This file keeps a note on what is tested in each test case: 
+
+#1: 
+Original test source and queries given by the course
+
+
