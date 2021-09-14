@@ -123,36 +123,36 @@ std::pair<Clause*, bool> QueryParser::parse_relRef() {
   std::cout << "parsing relref of type " + rel_type << std::endl;
 
   // TODO: add support in the future for modifiesP, usesP case: (entRef ‘,’ entRef)
-  std::string lhs; bool is_syn; bool is_tgt_syn;
+  std::string lhs; bool is_lhs_syn; bool is_lhs_tgt_syn;
   // UsesS|ModifiesS: ‘Uses|Modifies’ ‘(’ stmtRef ‘,’ entRef ‘)’
-  if (rel_type.compare("Uses") == 0 || rel_type.compare("Modifies") == 0) {
-    std::cout << "encountered uses or modifies relRef" << std::endl;
-    Token tok = parse_entRef(false);
-    lhs = tok.GetTokenString();
-    bool __is_syn = false;
-    bool __is_tgt_syn = false;
-    for (Synonym& s : synonyms) {
-      if (s.GetName() == lhs) {
-        __is_syn = true;
-        if (lhs == this->target.GetName()) {
-          __is_tgt_syn = true;
-        }
-        break;
-      }
-    }
-    is_syn = __is_syn;
-    is_tgt_syn = __is_tgt_syn;
-  } else {
-    std::tie(lhs, is_syn, is_tgt_syn) = parse_stmtRef();
-  }
+  std::tie(lhs, is_lhs_syn, is_lhs_tgt_syn) = parse_stmtRef();
 
   if (lhs.compare("_") == 0 && (rel_type.compare("Modifies") == 0 || rel_type.compare("Uses") == 0)) {
     throw PQLValidationException("Semantically invalid to have _ as first argument for " + rel_type);
   }
 
   eat(TokenTag::kComma);
-  std::string rhs; bool is_syn_; bool is_tgt_syn_;
-  std::tie(rhs, is_syn_, is_tgt_syn_) = parse_stmtRef();
+  std::string rhs; bool is_rhs_syn; bool is_rhs_tgt_syn;
+  if (rel_type.compare("Uses") == 0 || rel_type.compare("Modifies") == 0) {
+    std::cout << "encountered uses or modifies relRef" << std::endl;
+    Token tok = parse_entRef(false);
+    rhs = tok.GetTokenString();
+    bool _is_rhs_syn = false;
+    bool _is_rhs_tgt_syn = false;
+    for (Synonym& s : synonyms) {
+      if (s.GetName() == rhs) {
+        _is_rhs_syn = true;
+        if (rhs == this->target.GetName()) {
+          _is_rhs_tgt_syn = true;
+        }
+        break;
+      }
+    }
+    is_rhs_syn = _is_rhs_syn;
+    is_rhs_tgt_syn = _is_rhs_tgt_syn;
+  } else {
+    std::tie(rhs, is_rhs_syn, is_rhs_tgt_syn) = parse_stmtRef();
+  }
 
   eat(TokenTag::kCloseBracket);
 
@@ -162,8 +162,8 @@ std::pair<Clause*, bool> QueryParser::parse_relRef() {
   }
 
   // TODO: this could introduce a memory leak...
-  Clause* cl = new SuchThat(lhs, rhs, GetRelRef(rel_type), is_syn, is_syn_);
-  return std::make_pair(cl, is_tgt_syn || is_tgt_syn_);
+  Clause* cl = new SuchThat(lhs, rhs, GetRelRef(rel_type), is_lhs_syn, is_rhs_syn);
+  return std::make_pair(cl, is_lhs_tgt_syn || is_rhs_tgt_syn);
 }
 
 void QueryParser::parse_such_that() {

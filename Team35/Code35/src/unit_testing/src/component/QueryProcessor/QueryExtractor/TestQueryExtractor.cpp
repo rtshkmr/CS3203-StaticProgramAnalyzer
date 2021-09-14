@@ -183,9 +183,9 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that with correct entRef and
   std::list<Group> groups = query_extractor.GetGroupsList();
 
   std::list<Synonym> expected_synonyms = {Synonym("a", DesignEntity::kAssign),
-                                          Synonym("v", DesignEntity:: kWhile)};
+                                          Synonym("v", DesignEntity:: kVariable)};
   Synonym expected_target = Synonym("a", DesignEntity::kAssign);
-  Clause* cl = new SuchThat("a", "x", RelRef::kFollows, true, false);
+  Clause* cl = new SuchThat("a", "x", RelRef::kUsesS, true, false);
   std::vector<Clause*> clauses;
   clauses.push_back(cl);
   std::list<Group> expected_groups;
