@@ -148,19 +148,20 @@ TEST_CASE("5. Miscellaneous entity and relationship retrievals") {
         "procedure p; Select p",
         "read r; print p; Select r such that Follows(r, p)",
         "assign procedure; Select procedure",
+        "read r; print p; Select p such that Follows(r, p)",
+        "assign a; assign b; Select a such that Follows(a, b)"
 
+//            "variable v; assign a; Select v such that Uses(a, v)", // this does not work while Uses(v, a) works -> params are mixed up
+//            "variable v; assign a; Select v such that Modifies(a, v)", // same as above
 
-//            "read r; print p; Select p such that Follows(r, p)", // should get "2", get "" instead
+//            "assign a, b; Select a", // should be parsed correctly, currently does not
+
+//            "assign a; Select v such that Uses(a, \"x\")", // PQL should be able to handle variables in inverted commas
+//            "assign a; Select v such that Uses(a, _)", // QueryProcessor should be able to handle underscore wildcard
+
+//            The following are not in the scope of iter 1.
 //            "read r; print p; assign a; Select p such that Follows(r, p) such that Follows(p, a)", // should get "2", get "" instead
 //            "read r; print p; assign a; Select p such that Follows(p, r) such that Follows(p, a)", // should get "", get "2 instead
-//            "variable v; assign a; Select v such that Uses(a, v)", // this does not work while Uses(v, a) works -> params are mixed up
-//            "variable v; assign a; Select v such that Uses(v, a)", // this works when it should be Uses(a, v) -> params are mixed up
-//            "variable v; assign a; Select v such that Modifies(a, v)", // same as above
-//            "variable v; assign a; Select v such that Modifies(v, a)", // same as above
-//            "assign a, b; Select a", // should be parsed correctly, currently does not
-//            "assign a; assign b; Select a such that Follows(a, b)" // should get "3, 4", get "3, 4, 5" instead
-//            "assign a; Select v such that Uses(\"x\", a)", // the query is malformed (Uses(a,\"x\") instead), but PQL should be able to handle variables in inverted commas
-//            "assign a; Select v such that Uses(_, a)", // the query is malformed (Uses(a,\"x\") instead), but QueryProcessor should be able to handle underscore wildcard
     };
 
     std::vector<std::string> answer_list = {
@@ -170,6 +171,8 @@ TEST_CASE("5. Miscellaneous entity and relationship retrievals") {
         "Week4",
         "1",
         "3, 4, 5",
+        "2",
+        "3, 4",
 
         "dummy"
     };

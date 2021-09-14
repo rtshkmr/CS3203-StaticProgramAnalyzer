@@ -132,7 +132,7 @@ std::pair<Clause*, bool> QueryParser::parse_relRef() {
 
   eat(TokenTag::kComma);
   std::string rhs; bool is_syn_; bool is_tgt_syn_;
-  std::tie(lhs, is_syn_, is_tgt_syn_) = parse_stmtRef();
+  std::tie(rhs, is_syn_, is_tgt_syn_) = parse_stmtRef();
 
   eat(TokenTag::kCloseBracket);
 
