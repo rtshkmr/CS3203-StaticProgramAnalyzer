@@ -5,7 +5,8 @@
 #include <model/Statement.h>
 
 /**
- * This class provides pre built entities for testing.
+ * This class provides pre built entities for testing. When using these, note that changes might persist across test
+ * cases because of the static nature.
  */
 namespace entity_utils {
 
