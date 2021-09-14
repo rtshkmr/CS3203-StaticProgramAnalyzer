@@ -111,8 +111,8 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
     auto iterator = std::find_if(tokens.begin(), tokens.end(), [target_token](auto elem) {
       return elem == target_token;
     });
-    int num_boolean_operators = SyntaxValidator::CountTokens(tokens, TokenTag::kBooleanOperator);
-    int num_not_operators = SyntaxValidator::CountTokens(tokens, TokenTag::kBooleanOperator, "!");
+    int num_boolean_operators = Token::CountTokens(tokens, TokenTag::kBooleanOperator);
+    int num_not_operators = Token::CountTokens(tokens, TokenTag::kBooleanOperator, "!");
     SECTION("only with token tags") {
       REQUIRE(num_boolean_operators == 7); // hardcoded test
     }
@@ -335,26 +335,26 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
   SECTION("Test index finders (first matching token and last matching token) ") {
     string line = "if (myLifeSavings >= (myBeginningBalance + 3 * myStripperFees)) { &&";
     vector<Token> tokens = Tokenizer::CreateTokens(line);
-    int first_comparator_idx = SyntaxValidator::GetFirstMatchingTokenIdx(tokens,
-                                                                         RegexPatterns::GetBinaryComparisonPattern(),
-                                                                         0,
-                                                                         tokens.size() - 1);
-    int first_arithmetic_operator = SyntaxValidator::GetFirstMatchingTokenIdx(tokens,
-                                                                              RegexPatterns::GetBinaryArithmeticOperatorPattern(),
-                                                                              0,
-                                                                              tokens.size() - 1);
-    int first_boolean_operator = SyntaxValidator::GetFirstMatchingTokenIdx(tokens,
-                                                                           RegexPatterns::GetBinaryBooleanOperatorPattern(),
-                                                                           0,
-                                                                           tokens.size() - 1);
-    int last_boolean_operator = SyntaxValidator::GetLastMatchingTokenIdx(tokens,
-                                                                         RegexPatterns::GetBinaryBooleanOperatorPattern(),
-                                                                         0,
-                                                                         tokens.size() - 1);
-    int last_arithmetic_operator = SyntaxValidator::GetLastMatchingTokenIdx(tokens,
-                                                                            RegexPatterns::GetBinaryArithmeticOperatorPattern(),
-                                                                            0,
-                                                                            tokens.size() - 1);
+    int first_comparator_idx = Token::GetFirstMatchingTokenIdx(tokens,
+                                                               RegexPatterns::GetBinaryComparisonPattern(),
+                                                               0,
+                                                               tokens.size() - 1);
+    int first_arithmetic_operator = Token::GetFirstMatchingTokenIdx(tokens,
+                                                                    RegexPatterns::GetBinaryArithmeticOperatorPattern(),
+                                                                    0,
+                                                                    tokens.size() - 1);
+    int first_boolean_operator = Token::GetFirstMatchingTokenIdx(tokens,
+                                                                 RegexPatterns::GetBinaryBooleanOperatorPattern(),
+                                                                 0,
+                                                                 tokens.size() - 1);
+    int last_boolean_operator = Token::GetLastMatchingTokenIdx(tokens,
+                                                               RegexPatterns::GetBinaryBooleanOperatorPattern(),
+                                                               0,
+                                                               tokens.size() - 1);
+    int last_arithmetic_operator = Token::GetLastMatchingTokenIdx(tokens,
+                                                                  RegexPatterns::GetBinaryArithmeticOperatorPattern(),
+                                                                  0,
+                                                                  tokens.size() - 1);
     REQUIRE(first_comparator_idx == 3);
     REQUIRE(first_arithmetic_operator == 6);
     REQUIRE(last_arithmetic_operator == 8);
