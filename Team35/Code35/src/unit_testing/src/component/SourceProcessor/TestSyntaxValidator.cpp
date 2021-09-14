@@ -299,7 +299,7 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
       positive_statements.emplace_back("if(x > 12) then {");
       positive_statements.emplace_back("while (timeLeft > 0) {");
 
-      for(const auto& statement : positive_statements) {
+      for (const auto& statement : positive_statements) {
         vector<Token> tokenized_statement = Tokenizer::CreateTokens(statement);
         bool valid = SyntaxValidator::StatementPassesCommonBlacklistRules(tokenized_statement);
         REQUIRE(valid);
@@ -314,14 +314,57 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
       negative_statements.emplace_back("if(x > 12 then ");
       negative_statements.emplace_back("if(x > 12)) then {");
       negative_statements.emplace_back("while (timeLeft > 0) ");
-      for(const auto& statement : negative_statements) {
+      for (const auto& statement : negative_statements) {
         vector<Token> tokenized_statement = Tokenizer::CreateTokens(statement);
         bool invalid = !SyntaxValidator::StatementPassesCommonBlacklistRules(tokenized_statement);
         REQUIRE(invalid);
       }
-
     }
+  }
+  SECTION("Test index finders (first matching token and last matching token) ") {
+    string line = "if (myLifeSavings >= (myBeginningBalance + 3 * myStripperFees)) { &&";
+    vector<Token> tokens = Tokenizer::CreateTokens(line);
+    int first_comparator_idx = SyntaxValidator::GetFirstMatchingTokenIdx(tokens,
+                                                                         RegexPatterns::GetBinaryComparisonPattern(),
+                                                                         0,
+                                                                         tokens.size() - 1);
+    int first_arithmetic_operator = SyntaxValidator::GetFirstMatchingTokenIdx(tokens,
+                                                                              RegexPatterns::GetBinaryArithmeticOperatorPattern(),
+                                                                              0,
+                                                                              tokens.size() - 1);
+    int first_boolean_operator = SyntaxValidator::GetFirstMatchingTokenIdx(tokens,
+                                                                           RegexPatterns::GetBinaryBooleanOperatorPattern(),
+                                                                           0,
+                                                                           tokens.size() - 1);
+    int last_boolean_operator = SyntaxValidator::GetLastMatchingTokenIdx(tokens,
+                                                                         RegexPatterns::GetBinaryBooleanOperatorPattern(),
+                                                                         0,
+                                                                         tokens.size() - 1);
+    int last_arithmetic_operator = SyntaxValidator::GetLastMatchingTokenIdx(tokens,
+                                                                            RegexPatterns::GetBinaryArithmeticOperatorPattern(),
+                                                                            0,
+                                                                            tokens.size() - 1);
 
+    REQUIRE(first_comparator_idx == 3);
+    REQUIRE(first_arithmetic_operator == 6);
+    REQUIRE(last_arithmetic_operator == 8);
+    REQUIRE(first_boolean_operator == 13);
+    REQUIRE(last_boolean_operator == 13);
+
+//    [0] = {Token} {token_string_="if", token_tag_=kIfKeyword}
+//    [1] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [2] = {Token} {token_string_="myLifeSavings", token_tag_=kName}
+//    [3] = {Token} {token_string_=">=", token_tag_=kBinaryComparisonOperator}
+//    [4] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [5] = {Token} {token_string_="myBeginningBalance", token_tag_=kName}
+//    [6] = {Token} {token_string_="+", token_tag_=kBinaryArithmeticOperator}
+//    [7] = {Token} {token_string_="3", token_tag_=kInteger}
+//    [8] = {Token} {token_string_="*", token_tag_=kBinaryArithmeticOperator}
+//    [9] = {Token} {token_string_="myStripperFees", token_tag_=kName}
+//    [10] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//    [11] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//    [12] = {Token} {token_string_="{", token_tag_=kOpenBrace}
+//    [13] = {Token} {token_string_="&&", token_tag_=kBooleanOperator}
   }
 }
 

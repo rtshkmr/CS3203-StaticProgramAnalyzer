@@ -21,7 +21,7 @@ SyntaxValidator::SyntaxValidator() = default;
  */
 bool SyntaxValidator::ValidateSyntax(vector<Token> statement_tokens) {
   bool passes_generic_blacklist_rules = StatementPassesCommonBlacklistRules(statement_tokens);
-  if(!passes_generic_blacklist_rules) {
+  if (!passes_generic_blacklist_rules) {
     return false;
   }
 
@@ -43,7 +43,7 @@ bool SyntaxValidator::ValidateSyntax(vector<Token> statement_tokens) {
       }
     }
   } else if (first_token.GetTokenTag() == TokenTag::kName) { // it's an assignment operator
-    return ValidateAssignmentSyntax(statement_tokens);
+    return ValidateAssignmentSentenceSyntax(statement_tokens);
   } else if (first_token.GetTokenTag() == TokenTag::kCloseBrace) {
     return ValidateCloseBrace(statement_tokens);
   } else { // any other case
@@ -100,7 +100,21 @@ bool SyntaxValidator::ValidateWhileKeyword(const vector<Token>& tokens) {
       && tokens.at(7).GetTokenTag() == TokenTag::kOpenBrace;
   return output;
 }
-bool SyntaxValidator::ValidateAssignmentSyntax(const vector<Token>& tokens) {
+
+/**
+ * Validates whether the statement is an assignment statement
+ * @param statement_tokens
+ * @return
+ */
+bool SyntaxValidator::ValidateAssignmentSentenceSyntax(const vector<Token>& statement_tokens) {
+  bool terminates_with_semicolon =
+      statement_tokens.at(statement_tokens.size() - 1).GetTokenTag() == TokenTag::kSemicolon;
+  assert(terminates_with_semicolon == true); // because the generic blacklist would have run by this time
+  bool has_only_one_assignment_operator = CountTokens(statement_tokens, TokenTag::kAssignmentOperator);
+  if (!has_only_one_assignment_operator) {
+    return false;
+  }
+  // validate the tokens to the right of the assignment operator as an expression;
   return false;
 }
 bool SyntaxValidator::ValidateCloseBrace(const vector<Token>& tokens) { // redundant function in case there are edge cases
@@ -150,10 +164,11 @@ auto SyntaxValidator::GetTokenMatchForwardIterator(const vector<Token>& tokens,
                                                    int right_idx) {
   auto forward_iterator = std::find_if(tokens.begin() + left_idx,
                                        tokens.begin()
-                                           + right_idx, // todo: check if the end is exclusive range or inclusive
+                                           + right_idx, // todo: check if the end is exclusive range or inclusive, it's half open, the ending is excluded
                                        [&desired_pattern](Token elem) {
                                          string current = elem.GetTokenString();
-                                         return std::regex_match(current, desired_pattern);
+                                         bool matches_target_pattern = std::regex_match(current, desired_pattern);
+                                         return matches_target_pattern;
                                        });
   return forward_iterator;
 }
@@ -203,6 +218,27 @@ int SyntaxValidator::GetLastMatchingTokenIdx(const vector<Token>& tokens,
                                                                       left_boundary_idx,
                                                                       right_boundary_idx);
   int delim_idx = std::distance(tokens.begin(), delim_iterator.base()) - 1;
+  return delim_idx;
+}
+
+/**
+ * For a given vector of tokens and a boundary of indices to inspect, returns the index of the first token that matches
+ * the desired regex pattern.
+ * @param tokens
+ * @param desired_pattern
+ * @param left_boundary_idx (inclusive boundary)
+ * @param right_boundary_idx (inclusive boundary)
+ * @return
+ */
+int SyntaxValidator::GetFirstMatchingTokenIdx(const vector<Token>& tokens,
+                                              const std::regex& desired_pattern,
+                                              int left_boundary_idx,
+                                              int right_boundary_idx) {
+  auto delim_iterator = SyntaxValidator::GetTokenMatchForwardIterator(tokens,
+                                                                      desired_pattern,
+                                                                      left_boundary_idx,
+                                                                      right_boundary_idx);
+  int delim_idx = std::distance(tokens.begin(), delim_iterator) ; // todo: check delim_idx
   return delim_idx;
 }
 
@@ -265,6 +301,10 @@ bool SyntaxValidator::IsTerm(const vector<Token>& statement_tokens, int left_bou
                                           RegexPatterns::GetTermDelimiterPattern(),
                                           left_boundary_idx,
                                           right_boundary_idx);
+  int testing_fwd_idx =  GetFirstMatchingTokenIdx(statement_tokens,
+                                             RegexPatterns::GetTermDelimiterPattern(),
+                                             0,
+                                             statement_tokens.size() - 1);
   bool delim_idx_in_range = left_boundary_idx <= delim_idx && right_boundary_idx >= delim_idx;
   if (delim_idx_in_range) {
     if (delim_idx == left_boundary_idx || delim_idx == right_boundary_idx) {
@@ -422,12 +462,6 @@ bool SyntaxValidator::IsCondExpr(const vector<Token>& statement_tokens, int left
     bool left_part_is_cond_expr = IsCondExpr(statement_tokens, left_boundary_idx, delim_idx - 1);
     return left_part_is_cond_expr;
   }
-  return false;
-}
-
-bool SyntaxValidator::IsAssignmentStatement(const vector<Token>& statement_tokens,
-                                            int left_boundary_idx,
-                                            int right_boundary_idx) {
   return false;
 }
 
