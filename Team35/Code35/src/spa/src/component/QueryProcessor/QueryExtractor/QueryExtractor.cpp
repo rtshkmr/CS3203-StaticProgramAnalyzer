@@ -6,6 +6,7 @@ void QueryExtractor::ExtractQuery() {
   // tokenize, parse, validation logic. Call helper classes to achieve the aforementioned.
   auto tokenizer = QueryTokenizer();
   tokenizer.SetQueryString(&query);
-  QueryParser parser = QueryParser(groups, synonyms, target, tokenizer);
+  std::vector<Clause*> clauses;
+  QueryParser parser = QueryParser(clauses, groups, synonyms, target, tokenizer);
   parser.parse();
 }
