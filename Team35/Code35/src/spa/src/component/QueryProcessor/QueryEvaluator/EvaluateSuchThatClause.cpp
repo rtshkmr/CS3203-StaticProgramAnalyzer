@@ -5,29 +5,29 @@
 #include "EvaluateSuchThatClause.h"
 
 void BothSynonymInTable(PKB pkb, SuchThat such_that_clause, QueryEvaluatorTable* table) {
-  std::string firstValue = such_that_clause.left_hand_side;
-  std::string secondValue = such_that_clause.right_hand_side;
+    std::string firstValue = such_that_clause.left_hand_side;
+    std::string secondValue = such_that_clause.right_hand_side;
 
-  std::vector<std::string> firstStmtList = table->GetColumn(firstValue);
-  std::vector<std::string> secondStmtList = table->GetColumn(secondValue);
+    std::vector<std::string> firstStmtList = table->GetColumn(firstValue);
+    std::vector<std::string> secondStmtList = table->GetColumn(secondValue);
 
-  for (int i = 0; i < firstStmtList.size(); i++) {
-    std::string firstStmtRef = firstStmtList[i];
-    std::string secondStmtRef = secondStmtList[i];
-    std::list<std::tuple<DesignEntity, std::string>> output =
+    for (int i = 0; i < firstStmtList.size(); i++) {
+        std::string firstStmtRef = firstStmtList[i];
+        std::string secondStmtRef = secondStmtList[i];
+        std::list<std::tuple<DesignEntity, std::string>> output =
             QueryPKBSuchThat(pkb, such_that_clause.rel_ref, firstStmtRef, true);
-    bool relationshipHolds = false;
-    for (auto iter = output.begin(); iter != output.end(); iter++) {
-      if (std::get<1>(*iter) == secondStmtRef) {
-        relationshipHolds = true;
-        break;
-      }
+        bool relationshipHolds = false;
+        for (auto iter = output.begin(); iter != output.end(); iter++) {
+            if (std::get<1>(*iter) == secondStmtRef) {
+                relationshipHolds = true;
+                break;
+            }
+        }
+        if (!relationshipHolds) {
+            table->DeleteRow(i);
+            i--;
+        }
     }
-    if (!relationshipHolds) {
-      table->DeleteRow(i);
-      i--;
-    }
-  }
 }
 
 /**
@@ -43,135 +43,137 @@ void BothSynonymInTable(PKB pkb, SuchThat such_that_clause, QueryEvaluatorTable*
 void ProcessNewColumn(std::string target_synonym_name, Synonym new_synonym, QueryEvaluatorTable* table
                       , RelRef relationship, bool givenFirstParam, PKB pkb) {
 
-  table->AddColumn(new_synonym.GetName()); // Add a new column in the table first
+    table->AddColumn(new_synonym.GetName()); // Add a new column in the table first
 
-  std::vector<std::string> targetSynonymList = table->GetColumn(target_synonym_name);
-  int numberOfTimesToTraverse = targetSynonymList.size();
+    std::vector<std::string> targetSynonymList = table->GetColumn(target_synonym_name);
+    int numberOfTimesToTraverse = targetSynonymList.size();
 
-  for (int i = 0; i < numberOfTimesToTraverse; i++) {    // For each synonym in the table
-    std::string currStmtRef = targetSynonymList[i];
-    // Get the list of possible stmtRef for the current stmtRef.
-    std::list<std::tuple<DesignEntity, std::string>> possibleStmtRef =
+    for (int i = 0; i < numberOfTimesToTraverse; i++) {    // For each synonym in the table
+        std::string currStmtRef = targetSynonymList[i];
+        // Get the list of possible stmtRef for the current stmtRef.
+        std::list<std::tuple<DesignEntity, std::string>> possibleStmtRef =
             QueryPKBSuchThat(pkb, relationship, currStmtRef, givenFirstParam);
 
-    bool hasValidRelationship = false;
-    int number_of_repeats = 0;
+        bool hasValidRelationship = false;
+        int number_of_repeats = 0;
 
-    for (auto iter = possibleStmtRef.begin(); iter != possibleStmtRef.end(); iter++) {
-      DesignEntity currentStatementType = std::get<0>(*iter);
-      std::string currentStatementRef = std::get<1>(*iter);
-      if (currentStatementType == new_synonym.GetType()) {
-        // Add new row for each col in table
-        table->AddMultipleRowForAllColumn(new_synonym.GetName(), i, currentStatementRef, number_of_repeats);
+        for (auto iter = possibleStmtRef.begin(); iter != possibleStmtRef.end(); iter++) {
+            DesignEntity currentStatementType = std::get<0>(*iter);
+            std::string currentStatementRef = std::get<1>(*iter);
+            if (currentStatementType == new_synonym.GetType()) {
+                // Add new row for each col in table
+                table->AddMultipleRowForAllColumn(new_synonym.GetName(), i, currentStatementRef, number_of_repeats);
 
-        hasValidRelationship = true;
-        number_of_repeats++;
-      }
+                hasValidRelationship = true;
+                number_of_repeats++;
+            }
+        }
+
+        if (number_of_repeats > 0) {
+            i += number_of_repeats - 1;
+        }
+
+        // If there are no valid relationships, delete currRow from table.
+        if (!hasValidRelationship) {
+            table->DeleteRow(i);
+            i--;
+            numberOfTimesToTraverse--;
+        }
+
     }
-
-    if (number_of_repeats > 0) {
-      i += number_of_repeats - 1;
-    }
-
-    // If there are no valid relationships, delete currRow from table.
-    if (!hasValidRelationship) {
-      table->DeleteRow(i);
-      i--;
-      numberOfTimesToTraverse--;
-    }
-
-  }
 }
 
 // Only 1 synonym
 void ProcessQueryGivenFirstSynonym(PKB pkb, SuchThat such_that_clause, QueryEvaluatorTable* table) {
-  //e.g Parent(a1, "_") or Parent(a1, 3)
-  std::string secondParameter = such_that_clause.right_hand_side;
-  int deleteCount = 0;
-  RelRef relation = such_that_clause.rel_ref;
+    //e.g Parent(a1, "_") or Parent(a1, 3)
+    std::string secondParameter = such_that_clause.right_hand_side;
+    int deleteCount = 0;
+    RelRef relation = such_that_clause.rel_ref;
 
-  // For each row of the synonym in the table, we check if it contains any, or the given stmt number.
-  std::vector<std::string> listToVet = table->GetColumn(such_that_clause.left_hand_side);
-  for (int i = 0; i < listToVet.size(); i++ ) {
-    std::string currentStmtRef = listToVet[i];
-    std::list<std::tuple<DesignEntity, std::string>> output = QueryPKBSuchThat(pkb, relation, currentStmtRef, true);
+    // For each row of the synonym in the table, we check if it contains any, or the given stmt number.
+    std::vector<std::string> listToVet = table->GetColumn(such_that_clause.left_hand_side);
+    for (int i = 0; i < listToVet.size(); i++ ) {
+        std::string currentStmtRef = listToVet[i];
+        std::list<std::tuple<DesignEntity, std::string>> output = QueryPKBSuchThat(pkb, relation, currentStmtRef, true);
 
-    bool containsRelationship = false;
+        bool containsRelationship = false;
 
-    if (secondParameter == "_") {
-      if (!output.empty()) {
-        containsRelationship = true;
-      }
-    } else {
-      for (auto resultIter = output.begin(); resultIter != output.end(); resultIter++ ) {
-        if (std::get<1>(*resultIter) == secondParameter) {
-          containsRelationship = true;
-          break;
+        if (secondParameter == "_") {
+            if (!output.empty()) {
+                containsRelationship = true;
+            }
+        } else {
+            for (auto resultIter = output.begin(); resultIter != output.end(); resultIter++ ) {
+                if (std::get<1>(*resultIter) == secondParameter) {
+                    containsRelationship = true;
+                    break;
+                }
+            }
         }
-      }
-    }
 
-    if (!containsRelationship) {
-      table->DeleteRow(i - deleteCount);
-      deleteCount++;
+        if (!containsRelationship) {
+            table->DeleteRow(i - deleteCount);
+            deleteCount++;
+        }
     }
-  }
 }
 
 
 void ProcessQueryGivenSecondSynonym(PKB pkb, SuchThat such_that_clause, QueryEvaluatorTable* table) {
-  //e.g Parent("_", a1) or Parent(3, a1)
-  std::string secondParameter = such_that_clause.right_hand_side;
-  RelRef query_relation = such_that_clause.rel_ref;
+    //e.g Parent("_", a1) or Parent(3, a1)
+    std::string firstParameter = such_that_clause.left_hand_side;
+    std::string secondParameter = such_that_clause.right_hand_side;
+    RelRef query_relation = such_that_clause.rel_ref;
+    int deleteCount = 0;
 
-  // For each row of the synonym in the table, we check if it contains any, or the given stmt number.
-  std::vector<std::string> listToVet = table->GetColumn(such_that_clause.left_hand_side);
-  for (int i = 0; i < listToVet.size(); i++ ) {
-    std::string currentStmtRef = listToVet[i];
-    std::list<std::tuple<DesignEntity, std::string>> output = QueryPKBSuchThat(pkb, query_relation, currentStmtRef, true);
+    // For each row of the synonym in the table, we check if it contains any, or the given stmt number.
+    std::vector<std::string> listToVet = table->GetColumn(secondParameter);
+    for (int i = 0; i < listToVet.size(); i++ ) {
+        std::string currentStmtRef = listToVet[i];
+        std::list<std::tuple<DesignEntity, std::string>> output = QueryPKBSuchThat(pkb, query_relation, currentStmtRef, false);
 
-    bool containsRelationship = false;
+        bool containsRelationship = false;
 
-    if (secondParameter == "_") {
-      if (output.size() != 0) {
-        containsRelationship = true;
-      }
-    } else {
-      for (auto resultIter = output.begin(); resultIter != output.end(); resultIter++ ) {
-        if (std::get<1>(*resultIter) == secondParameter) {
-          containsRelationship = true;
-          break;
+        if (firstParameter == "_") {
+            if (output.size() != 0) {
+                containsRelationship = true;
+            }
+        } else {
+            for (auto resultIter = output.begin(); resultIter != output.end(); resultIter++ ) {
+                if (std::get<1>(*resultIter) == firstParameter) {
+                    containsRelationship = true;
+                    break;
+                }
+            }
         }
-      }
-    }
 
-    if (!containsRelationship) {
-      table->DeleteRow(i);
-      i--;
+        if (!containsRelationship) {
+            table->DeleteRow(i - deleteCount);
+            deleteCount++;
+        }
     }
-  }
 }
 
 bool EvaluateNoSynonym(SuchThat st, PKB pkb) {
-  std::string firstParam = st.left_hand_side;
-  std::string secondParam = st.right_hand_side;
-  if (firstParam == "_" && secondParam == "_") {
-    // Query the PKB for the existence of this relationship
-    return QueryPkbForRelationshipExistence(pkb, st.rel_ref);
-  } else if (firstParam == "_") {
-    std::list<std::tuple<DesignEntity, std::string>> result = QueryPKBSuchThat(pkb, st.rel_ref, st.right_hand_side, false);
-    return result.size() != 0;    // Return true if there is some value being returned.
-  } else if (secondParam == "_") {
-    std::list<std::tuple<DesignEntity, std::string>> result = QueryPKBSuchThat(pkb, st.rel_ref, st.left_hand_side, true);
-    return result.size() != 0;    // Return true if there is some value being returned.
-  } else {
-    std::list<std::tuple<DesignEntity, std::string>> result = QueryPKBSuchThat(pkb, st.rel_ref, st.left_hand_side, true);
-    for (auto iter = result.begin(); iter != result.end(); iter++) {
-      // Check if second synonym in list
-      if (std::get<1>(*iter) == st.right_hand_side) {
-        return true;
-      }
+    std::string firstParam = st.left_hand_side;
+    std::string secondParam = st.right_hand_side;
+    if (firstParam == "_" && secondParam == "_") {
+        // Query the PKB for the existence of this relationship
+        return QueryPkbForRelationshipExistence(pkb, st.rel_ref);
+    } else if (firstParam == "_") {
+        std::list<std::tuple<DesignEntity, std::string>> result = QueryPKBSuchThat(pkb, st.rel_ref, st.right_hand_side, false);
+        return result.size() != 0;    // Return true if there is some value being returned.
+    } else if (secondParam == "_") {
+        std::list<std::tuple<DesignEntity, std::string>> result = QueryPKBSuchThat(pkb, st.rel_ref, st.left_hand_side, true);
+        return result.size() != 0;    // Return true if there is some value being returned.
+    } else {
+        std::list<std::tuple<DesignEntity, std::string>> result = QueryPKBSuchThat(pkb, st.rel_ref, st.left_hand_side, true);
+        for (auto iter = result.begin(); iter != result.end(); iter++) {
+            // Check if second synonym in list
+            if (std::get<1>(*iter) == st.right_hand_side) {
+                return true;
+            }
+        }
+        return false;
     }
-    return false;
-  }
 }

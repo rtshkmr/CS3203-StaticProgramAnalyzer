@@ -25,7 +25,7 @@ class StatementNumber {
 
   int getNum();
 
-  bool operator<(const StatementNumber &other) const;
+  bool operator<(const StatementNumber& other) const;
 
   bool operator==(StatementNumber other) const;
 };
@@ -44,7 +44,7 @@ class LineNumber {
 
   int getNum();
 
-  bool operator<(const LineNumber &other) const;
+  bool operator<(const LineNumber& other) const;
 
   bool operator==(LineNumber other) const;
 };
@@ -62,7 +62,7 @@ class ProcedureName {
 
   std::string getName();
 
-  bool operator<(const ProcedureName &other) const;
+  bool operator<(const ProcedureName& other) const;
 
   bool operator==(ProcedureName other) const;
 };
@@ -80,7 +80,7 @@ class VariableName {
 
   std::string getName();
 
-  bool operator<(const VariableName &other) const;
+  bool operator<(const VariableName& other) const;
 
   bool operator==(VariableName other) const;
 };
@@ -100,7 +100,7 @@ class ConstantValue {
 
   int get();
 
-  bool operator<(const ConstantValue &other) const;
+  bool operator<(const ConstantValue& other) const;
 
   bool operator==(ConstantValue other) const;
 };
@@ -155,6 +155,47 @@ class Token {
   bool operator==(Token other);
   static TokenTag TagStringWithToken(std::string const& reference);
   static bool IsKeywordToken(Token token);
+  static auto GetTokenMatchForwardIterator(const std::vector<Token>& tokens,
+                                           const std::regex& desired_pattern,
+                                           int left_idx,
+                                           int right_idx);
+  static auto GetTokenMatchForwardIterator(const std::vector<Token>& tokens,
+                                           TokenTag target_token_tag,
+                                           int left_idx,
+                                           int right_idx);
+  static auto GetTokenMatchReverseIterator(const std::vector<Token>& tokens,
+                                           const std::regex& desired_pattern,
+                                           int left_boundary_idx,
+                                           int right_boundary_idx);
+  static auto GetTokenMatchReverseIterator(const std::vector<Token>& tokens,
+                                           TokenTag target_token_tag,
+                                           int left_boundary_idx,
+                                           int right_boundary_idx);
+  static int GetFirstMatchingTokenIdx(const std::vector<Token>& tokens,
+                                      TokenTag token_tag,
+                                      int left_boundary_idx,
+                                      int right_boundary_idx);
+
+  static int GetFirstMatchingTokenIdx(const std::vector<Token>& tokens,
+                                      const std::regex& desired_pattern,
+                                      int left_boundary_idx,
+                                      int right_boundary_idx);
+  static int GetFirstMatchingTokenIdx(const std::vector<Token>& tokens, const std::regex& desired_pattern);
+  static int GetFirstMatchingTokenIdx(const std::vector<Token>& tokens, TokenTag target_token_tag);
+  static int GetLastMatchingTokenIdx(const std::vector<Token>& tokens,
+                                     const std::regex& desired_pattern,
+                                     int left_boundary_idx,
+                                     int right_boundary_idx);
+
+  static int GetLastMatchingTokenIdx(const std::vector<Token>& tokens,
+                                     TokenTag target_token_tag,
+                                     int left_boundary_idx,
+                                     int right_boundary_idx);
+  static int GetLastMatchingTokenIdx(const std::vector<Token>& tokens, const std::regex& desired_pattern);
+  static int GetLastMatchingTokenIdx(const std::vector<Token>& tokens, TokenTag target_token_tag);
+
+  static int CountTokens(std::vector<Token> tokens, TokenTag target_tag, std::string target_string);
+  static int CountTokens(std::vector<Token> tokens, TokenTag target_tag);
 };
 
 #endif //AUTOTESTER_DATATYPE_H
