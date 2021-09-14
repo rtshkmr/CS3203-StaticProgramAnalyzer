@@ -141,6 +141,15 @@ TEST_CASE("5. Miscellaneous entity and relationship retrievals") {
      * 6.
      */
 
+    /* procedure Week4 {
+ * read x;
+ * print x;
+ * y = 1;
+ * z = 3;
+ * z = x + y + 3;
+ * }
+ */
+
     std::vector<std::string> query_list = {
         "variable v; Select v",
         "assign a; Select a",
@@ -149,7 +158,9 @@ TEST_CASE("5. Miscellaneous entity and relationship retrievals") {
         "read r; print p; Select r such that Follows(r, p)",
         "assign procedure; Select procedure",
         "read r; print p; Select p such that Follows(r, p)",
-        "assign a; assign b; Select a such that Follows(a, b)"
+        "assign a; assign b; Select a such that Follows(a, b)",
+        "variable v; read r; print p; Select v such that Follows(r, p)",
+        "variable v; read r; print p; Select v such that Follows(a, p)",
 
 //            "variable v; assign a; Select v such that Uses(a, v)", // this does not work while Uses(v, a) works -> params are mixed up
 //            "variable v; assign a; Select v such that Modifies(a, v)", // same as above
@@ -173,6 +184,8 @@ TEST_CASE("5. Miscellaneous entity and relationship retrievals") {
         "3, 4, 5",
         "2",
         "3, 4",
+        "x, y, z",
+        "",
 
         "dummy"
     };

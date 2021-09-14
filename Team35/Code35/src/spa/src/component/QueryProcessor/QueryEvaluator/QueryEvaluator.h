@@ -22,7 +22,7 @@ class QueryEvaluator {
     std::list<Group> groupList;
     PKB pkb;
     bool booleanResult;
-    std::unordered_map<DesignEntity, std::list<std::string>> map_of_synonym_values;
+    std::unordered_map<std::string, std::list<std::string>> map_of_synonym_values;
     void PopulateSynonymValues(QueryEvaluatorTable* table);
     void EvaluateAllGroups(QueryEvaluatorTable* table);
     void EvaluateSuchThatClause(SuchThat st, QueryEvaluatorTable* table);

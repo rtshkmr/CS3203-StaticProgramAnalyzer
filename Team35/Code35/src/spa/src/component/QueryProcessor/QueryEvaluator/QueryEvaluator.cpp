@@ -24,8 +24,9 @@ void QueryEvaluator::PopulateSynonymValues(QueryEvaluatorTable* table) {
   // Query all the design entities and add them to an unordered_map.
   for (auto iter = synonymlist.begin(); iter != synonymlist.end(); iter++) {
     DesignEntity synonym_design_entity = iter->GetType();
+    std::string synonym_name = iter->GetName();
     std::list<std::string> list_of_synonym_values = pkb.GetDesignEntity(synonym_design_entity);
-    map_of_synonym_values[synonym_design_entity] = list_of_synonym_values;
+    map_of_synonym_values[synonym_name] = list_of_synonym_values;
     if (iter->GetName() == targetSynonym.GetName()) {
       table->AddTargetSynonym(list_of_synonym_values);
     }
@@ -118,13 +119,13 @@ void QueryEvaluator::EvaluateSuchThatClause(SuchThat such_that_clause, QueryEval
 
 void QueryEvaluator::ProcessBooleanGroup(std::vector<Clause*> clauseList) {
   Clause* firstClause = clauseList[0];
-  std::string synonymName = "";
+  std::string synonym_name = "";
   if (typeid(*firstClause) == typeid(SuchThat)) {
     SuchThat* st = dynamic_cast<SuchThat*>(firstClause);
     if (st->left_is_synonym) {
-      synonymName = st->left_hand_side;
+      synonym_name = st->left_hand_side;
     } else if (st->right_is_synonym) {
-      synonymName = st->right_hand_side;
+      synonym_name = st->right_hand_side;
     } else {
       // If no synonym, no need for a table. Also, should be in a group of size 1.
       bool result = EvaluateNoSynonym(*st, pkb);
@@ -134,13 +135,15 @@ void QueryEvaluator::ProcessBooleanGroup(std::vector<Clause*> clauseList) {
     }
   } else if (typeid(*firstClause) == typeid(Pattern)) {
     Pattern* pattern = dynamic_cast<Pattern*>(firstClause);
-    synonymName = pattern->assign_synonym;
+    synonym_name = pattern->assign_synonym;
   } else {
     // No code should run here for iter 1 since there is only such that and pattern clause.
   }
 
-  if (synonymName != "") {
-    QueryEvaluatorTable currTable(synonymName);
+  if (synonym_name != "") {
+    QueryEvaluatorTable currTable(synonym_name);
+    currTable.AddTargetSynonym(map_of_synonym_values[synonym_name]);
+
     for (auto iter = clauseList.begin(); iter != clauseList.end(); iter++) {
       Clause* currentClause = *iter;
       if (typeid(*currentClause) == typeid(SuchThat)) {
