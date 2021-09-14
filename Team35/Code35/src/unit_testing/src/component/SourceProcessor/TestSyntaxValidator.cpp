@@ -378,7 +378,7 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
   }
 }
 
-TEST_CASE("1.SyntaxValidator.Validator handles basic statements:") {
+TEST_CASE("1.SyntaxValidator.Validator handles statement validation:") {
   SECTION("handles procedure statement") {
     SECTION("positive cases") {
       REQUIRE(CheckAgainstSampleLines(0, 0, valid_program_lines, true));

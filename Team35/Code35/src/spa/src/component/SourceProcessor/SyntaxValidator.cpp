@@ -24,8 +24,6 @@ bool SyntaxValidator::ValidateSyntax(vector<Token> statement_tokens) {
   if (!passes_generic_blacklist_rules) {
     return false;
   }
-
-  // check starting token to determine what kind of keyword it is and handle subcases in separate private functions:
   Token first_token = statement_tokens.at(0);
   if (Token::IsKeywordToken(first_token)) {
     switch (first_token.GetTokenTag()) {
@@ -47,8 +45,16 @@ bool SyntaxValidator::ValidateSyntax(vector<Token> statement_tokens) {
   } else { // any other case returns false
     return false;
   }
+  return false; // fall through
 }
 
+/**
+ * Validates Procedure statements.
+ * Please note that for things like else statements, such a fixed way of handling things depends on the fact that the
+ * Parser insert newlines at the end of every `{`, `}`, `;` symbols
+ * @param tokens
+ * @return
+ */
 bool SyntaxValidator::ValidateProcedureSyntax(const vector<Token>& tokens) {
   // QQ: is this part (fixed number of tokens for every type of statement a valid guarantee? Feels like it's
   //     very hardcode-y though :(
@@ -56,12 +62,26 @@ bool SyntaxValidator::ValidateProcedureSyntax(const vector<Token>& tokens) {
       && tokens.at(1).GetTokenTag() == TokenTag::kName
       && tokens.at(2).GetTokenTag() == TokenTag::kOpenBrace;
 }
-// for read, print and call keywords
+
+/**
+ * Validates read, print and call statements
+ * @param tokens
+ * @return
+ */
 bool SyntaxValidator::ValidateMacroFunctionSyntax(const vector<Token>& tokens) {
   return tokens.capacity() == 3
       && tokens.at(1).GetTokenTag() == TokenTag::kName
       && tokens.at(2).GetTokenTag() == TokenTag::kSemicolon;
 }
+
+
+/**
+ * Validates an If statement. Checks the following conditions:
+ * - If statement must contain a Then keyword
+ * - There's no accidental vector out of boundary access (transposing of vector error)
+ * @param tokens
+ * @return
+ */
 bool SyntaxValidator::ValidateIfStatementSyntax(const vector<Token>& tokens) {
   bool contains_then_keyword = CountTokens(tokens, TokenTag::kThenKeyword) == 1;
   bool guarantee = tokens.at(0).GetTokenTag() == TokenTag::kIfKeyword;
@@ -69,7 +89,7 @@ bool SyntaxValidator::ValidateIfStatementSyntax(const vector<Token>& tokens) {
   if (!contains_then_keyword) {
     return false;
   }
-  // todo: probably no need to use counting, need to see what the finder fucntion returns if it doesn't exist
+  // todo: [cosmetic] probably no need to use counting, need to see what the finder fucntion returns if it doesn't exist
   int then_keyword_idx = GetFirstMatchingTokenIdx(tokens, TokenTag::kThenKeyword);
   int first_open_bracket = GetFirstMatchingTokenIdx(tokens, TokenTag::kOpenBracket);
   int last_close_bracket = GetLastMatchingTokenIdx(tokens, TokenTag::kCloseBracket);
@@ -80,6 +100,13 @@ bool SyntaxValidator::ValidateIfStatementSyntax(const vector<Token>& tokens) {
   return valid_cond_expression;
 }
 
+/**
+ * Validates Else statements in a fixed way.
+ * Please note that for things like else statements, such a fixed way of handling things depends on the fact that the
+ * Parser insert newlines at the end of every `{`, `}`, `;` symbols
+ * @param tokens
+ * @return
+ */
 bool SyntaxValidator::ValidateElseKeyword(const vector<Token>& tokens) {
   return tokens.capacity() == 2 && tokens.at(1).GetTokenTag() == TokenTag::kOpenBrace;
 }
@@ -602,13 +629,13 @@ bool SyntaxValidator::IsCondExpr(const vector<Token>& statement_tokens, int left
 }
 
 /**
- * This runs the statement against a blacklist rule:
- * 1. Statement either ends with these possible tokens:
- *          ";", ==> read,print,call statement  | assignment statement
- *          "{" (opening of a new container), if | while | procedure
- *          "}" only token, closing
+ * This runs the statement against a blacklist rule: \n
+ * 1. Statement either ends with these possible tokens: \n \t\t
+ *          ";", ==> read,print,call statement  | assignment statement \n \t\t
+ *          "{" (opening of a new container), if | while | procedure \n \t\t
+ *          "}" only token, closing \n\n
  * 2. If there are brackets, it means it's an if or while statement. In such a case, we'd need an even number of
- * brackets.
+ * brackets. \n
  *
  * Other blacklist rules should be applied depending on the type of statement it is actually.
  *
