@@ -6,60 +6,39 @@ using namespace entity_utils;
 
 TEST_CASE("1.FollowsTExtractor.Extract FollowsT basic conditions") {
   Deliverable deliverable;
-
-  // if
-  IfEntity* if_1_ = new IfEntity("x==0",
-                                 std::vector<Variable*>{
-                                     var_x_
-                                 },
-                                 std::vector<ConstantValue*>{
-                                     const_0_
-                                 });
-  IfEntity* if_2_ = new IfEntity("y<=3",
-                                 std::vector<Variable*>{
-                                     var_y_
-                                 },
-                                 std::vector<ConstantValue*>{
-                                     const_3_
-                                 });
-  IfEntity* if_3_ = new IfEntity("z>1",
-                                 std::vector<Variable*>{
-                                     var_z_
-                                 },
-                                 std::vector<ConstantValue*>{
-                                     const_1_
-                                 });
-  IfEntity* if_4_ = new IfEntity("i!=2",
-                                 std::vector<Variable*>{
-                                     var_i_
-                                 },
-                                 std::vector<ConstantValue*>{
-                                     const_2_
-                                 });
-  ElseEntity* else_1_ = new ElseEntity();
-  ElseEntity* else_2_ = new ElseEntity();
-  ElseEntity* else_3_ = new ElseEntity();
-  ElseEntity* else_4_ = new ElseEntity();
-
-  // while
-  WhileEntity* while_1_ = new WhileEntity("x==0", std::vector<Variable*>{
-                                              var_x_
-                                          },
-                                          std::vector<ConstantValue*>{
-                                              const_0_
-                                          });
-  WhileEntity* while_2_ = new WhileEntity("y<=3", std::vector<Variable*>{
-                                              var_y_
-                                          },
-                                          std::vector<ConstantValue*>{
-                                              const_3_
-                                          });
-  WhileEntity* while_3_ = new WhileEntity("z>1", std::vector<Variable*>{
-                                              var_z_
-                                          },
-                                          std::vector<ConstantValue*>{
-                                              const_1_
-                                          });
+  ReadEntity* read_x_ = GetReadX();
+  ReadEntity* read_y_ = GetReadY();
+  ReadEntity* read_z_ = GetReadZ();
+  ReadEntity* read_i_ = GetReadI();
+  ReadEntity* read_n_ = GetReadN();
+  ReadEntity* read_m_ = GetReadM();
+  PrintEntity* print_x_ = GetPrintX();
+  PrintEntity* print_y_ = GetPrintY();
+  PrintEntity* print_z_ = GetPrintZ();
+  PrintEntity* print_i_ = GetPrintI();
+  PrintEntity* print_n_ = GetPrintN();
+  PrintEntity* print_m_ = GetPrintM();
+  AssignEntity* assign_1_ = GetAssign1();
+  AssignEntity* assign_2_ = GetAssign2();
+  AssignEntity* assign_3_ = GetAssign3();
+  AssignEntity* assign_4_ = GetAssign4();
+  AssignEntity* assign_5_ = GetAssign5();
+  AssignEntity* assign_6_ = GetAssign6();
+  AssignEntity* assign_7_ = GetAssign7();
+  AssignEntity* assign_8_ = GetAssign8();
+  AssignEntity* assign_9_ = GetAssign9();
+  AssignEntity* assign_10_ = GetAssign10();
+  IfEntity* if_1_ = GetIf1();
+  IfEntity* if_2_ = GetIf2();
+  IfEntity* if_3_ = GetIf3();
+  IfEntity* if_4_ = GetIf4();
+  ElseEntity* else_1_ = GetElse();
+  ElseEntity* else_2_ = GetElse();
+  ElseEntity* else_3_ = GetElse();
+  ElseEntity* else_4_ = GetElse();
+  WhileEntity* while_1_ = GetWhileEntity3();
+  WhileEntity* while_2_ = GetWhileEntity2();
+  WhileEntity* while_3_ = GetWhileEntity3();
 
   SECTION("Single level statement list") {
     /*
@@ -264,61 +243,39 @@ TEST_CASE("1.FollowsTExtractor.Extract FollowsT basic conditions") {
 
 TEST_CASE("1.FollowsTExtractor.Extract FollowsT nested containers") {
   Deliverable deliverable;
-
-  // if
-  IfEntity* if_1_ = new IfEntity("x==0",
-                                 std::vector<Variable*>{
-                                     var_x_
-                                 },
-                                 std::vector<ConstantValue*>{
-                                     const_0_
-                                 });
-  IfEntity* if_2_ = new IfEntity("y<=3",
-                                 std::vector<Variable*>{
-                                     var_y_
-                                 },
-                                 std::vector<ConstantValue*>{
-                                     const_3_
-                                 });
-  IfEntity* if_3_ = new IfEntity("z>1",
-                                 std::vector<Variable*>{
-                                     var_z_
-                                 },
-                                 std::vector<ConstantValue*>{
-                                     const_1_
-                                 });
-  IfEntity* if_4_ = new IfEntity("i!=2",
-                                 std::vector<Variable*>{
-                                     var_i_
-                                 },
-                                 std::vector<ConstantValue*>{
-                                     const_2_
-                                 });
-  ElseEntity* else_1_ = new ElseEntity();
-  ElseEntity* else_2_ = new ElseEntity();
-  ElseEntity* else_3_ = new ElseEntity();
-  ElseEntity* else_4_ = new ElseEntity();
-
-  // while
-  WhileEntity* while_1_ = new WhileEntity("x==0", std::vector<Variable*>{
-                                              var_x_
-                                          },
-                                          std::vector<ConstantValue*>{
-                                              const_0_
-                                          });
-  WhileEntity* while_2_ = new WhileEntity("y<=3", std::vector<Variable*>{
-                                              var_y_
-                                          },
-                                          std::vector<ConstantValue*>{
-                                              const_3_
-                                          });
-  WhileEntity* while_3_ = new WhileEntity("z>1", std::vector<Variable*>{
-                                              var_z_
-                                          },
-                                          std::vector<ConstantValue*>{
-                                              const_1_
-                                          });
-
+  ReadEntity* read_x_ = GetReadX();
+  ReadEntity* read_y_ = GetReadY();
+  ReadEntity* read_z_ = GetReadZ();
+  ReadEntity* read_i_ = GetReadI();
+  ReadEntity* read_n_ = GetReadN();
+  ReadEntity* read_m_ = GetReadM();
+  PrintEntity* print_x_ = GetPrintX();
+  PrintEntity* print_y_ = GetPrintY();
+  PrintEntity* print_z_ = GetPrintZ();
+  PrintEntity* print_i_ = GetPrintI();
+  PrintEntity* print_n_ = GetPrintN();
+  PrintEntity* print_m_ = GetPrintM();
+  AssignEntity* assign_1_ = GetAssign1();
+  AssignEntity* assign_2_ = GetAssign2();
+  AssignEntity* assign_3_ = GetAssign3();
+  AssignEntity* assign_4_ = GetAssign4();
+  AssignEntity* assign_5_ = GetAssign5();
+  AssignEntity* assign_6_ = GetAssign6();
+  AssignEntity* assign_7_ = GetAssign7();
+  AssignEntity* assign_8_ = GetAssign8();
+  AssignEntity* assign_9_ = GetAssign9();
+  AssignEntity* assign_10_ = GetAssign10();
+  IfEntity* if_1_ = GetIf1();
+  IfEntity* if_2_ = GetIf2();
+  IfEntity* if_3_ = GetIf3();
+  IfEntity* if_4_ = GetIf4();
+  ElseEntity* else_1_ = GetElse();
+  ElseEntity* else_2_ = GetElse();
+  ElseEntity* else_3_ = GetElse();
+  ElseEntity* else_4_ = GetElse();
+  WhileEntity* while_1_ = GetWhileEntity3();
+  WhileEntity* while_2_ = GetWhileEntity2();
+  WhileEntity* while_3_ = GetWhileEntity3();
   SECTION("Nested if x3") {
     /*
      * procedure proc1 {
@@ -527,60 +484,39 @@ TEST_CASE("1.FollowsTExtractor.Extract FollowsT nested containers") {
 
 TEST_CASE("1.FollowsTExtractor.Extract FollowsT mixed containers") {
   Deliverable deliverable;
-
-  // if
-  IfEntity* if_1_ = new IfEntity("x==0",
-                                 std::vector<Variable*>{
-                                     var_x_
-                                 },
-                                 std::vector<ConstantValue*>{
-                                     const_0_
-                                 });
-  IfEntity* if_2_ = new IfEntity("y<=3",
-                                 std::vector<Variable*>{
-                                     var_y_
-                                 },
-                                 std::vector<ConstantValue*>{
-                                     const_3_
-                                 });
-  IfEntity* if_3_ = new IfEntity("z>1",
-                                 std::vector<Variable*>{
-                                     var_z_
-                                 },
-                                 std::vector<ConstantValue*>{
-                                     const_1_
-                                 });
-  IfEntity* if_4_ = new IfEntity("i!=2",
-                                 std::vector<Variable*>{
-                                     var_i_
-                                 },
-                                 std::vector<ConstantValue*>{
-                                     const_2_
-                                 });
-  ElseEntity* else_1_ = new ElseEntity();
-  ElseEntity* else_2_ = new ElseEntity();
-  ElseEntity* else_3_ = new ElseEntity();
-  ElseEntity* else_4_ = new ElseEntity();
-
-  // while
-  WhileEntity* while_1_ = new WhileEntity("x==0", std::vector<Variable*>{
-                                              var_x_
-                                          },
-                                          std::vector<ConstantValue*>{
-                                              const_0_
-                                          });
-  WhileEntity* while_2_ = new WhileEntity("y<=3", std::vector<Variable*>{
-                                              var_y_
-                                          },
-                                          std::vector<ConstantValue*>{
-                                              const_3_
-                                          });
-  WhileEntity* while_3_ = new WhileEntity("z>1", std::vector<Variable*>{
-                                              var_z_
-                                          },
-                                          std::vector<ConstantValue*>{
-                                              const_1_
-                                          });
+  ReadEntity* read_x_ = GetReadX();
+  ReadEntity* read_y_ = GetReadY();
+  ReadEntity* read_z_ = GetReadZ();
+  ReadEntity* read_i_ = GetReadI();
+  ReadEntity* read_n_ = GetReadN();
+  ReadEntity* read_m_ = GetReadM();
+  PrintEntity* print_x_ = GetPrintX();
+  PrintEntity* print_y_ = GetPrintY();
+  PrintEntity* print_z_ = GetPrintZ();
+  PrintEntity* print_i_ = GetPrintI();
+  PrintEntity* print_n_ = GetPrintN();
+  PrintEntity* print_m_ = GetPrintM();
+  AssignEntity* assign_1_ = GetAssign1();
+  AssignEntity* assign_2_ = GetAssign2();
+  AssignEntity* assign_3_ = GetAssign3();
+  AssignEntity* assign_4_ = GetAssign4();
+  AssignEntity* assign_5_ = GetAssign5();
+  AssignEntity* assign_6_ = GetAssign6();
+  AssignEntity* assign_7_ = GetAssign7();
+  AssignEntity* assign_8_ = GetAssign8();
+  AssignEntity* assign_9_ = GetAssign9();
+  AssignEntity* assign_10_ = GetAssign10();
+  IfEntity* if_1_ = GetIf1();
+  IfEntity* if_2_ = GetIf2();
+  IfEntity* if_3_ = GetIf3();
+  IfEntity* if_4_ = GetIf4();
+  ElseEntity* else_1_ = GetElse();
+  ElseEntity* else_2_ = GetElse();
+  ElseEntity* else_3_ = GetElse();
+  ElseEntity* else_4_ = GetElse();
+  WhileEntity* while_1_ = GetWhileEntity3();
+  WhileEntity* while_2_ = GetWhileEntity2();
+  WhileEntity* while_3_ = GetWhileEntity3();
 
   SECTION("If and while") {
     /*
