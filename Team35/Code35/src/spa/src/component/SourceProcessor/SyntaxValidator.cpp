@@ -36,8 +36,6 @@ bool SyntaxValidator::ValidateSyntax(vector<Token> statement_tokens) {
       case TokenTag::kIfKeyword:return ValidateIfStatementSyntax(statement_tokens);
       case TokenTag::kElseKeyword:return ValidateElseKeyword(statement_tokens);
       case TokenTag::kWhileKeyword:return ValidateWhileKeyword(statement_tokens);
-        // QQ: will if and then appear in the same line always or can they separate? will put it as true by default first
-      case TokenTag::kThenKeyword:return ValidateThenKeyword(statement_tokens);
       default: {
         assert(false);
       }
@@ -65,27 +63,21 @@ bool SyntaxValidator::ValidateMacroFunctionSyntax(const vector<Token>& tokens) {
       && tokens.at(2).GetTokenTag() == TokenTag::kSemicolon;
 }
 bool SyntaxValidator::ValidateIfStatementSyntax(const vector<Token>& tokens) {
-  // todo: 1. this is a very rudimentary implementation.
-  //       2. Future implementation needs to support recursive check of conditional expressions, possibly need to do
-  //       something like : identify open and close brace to identify scope, then check recursively within each scope.
-  //       Doing that would allow us to handle nested conditional_expressions.
-  //       possible future choice: separate into IsCondExpr and ValidateCondExpr
-
-  // comms: check if entity factory can handle nested cond_expr
-  bool output = tokens.capacity() == 8
+  bool contains_then_keyword = CountTokens(tokens, TokenTag::kThenKeyword) == 1;
+  bool guarantee = tokens.at(0).GetTokenTag() == TokenTag::kIfKeyword;
+  assert(guarantee);
+  if (!contains_then_keyword) {
+    return false;
+  }
+  // todo: probably no need to use counting, need to see what the finder fucntion returns if it doesn't exist
+  int then_keyword_idx = GetFirstMatchingTokenIdx(tokens, TokenTag::kThenKeyword);
+  bool valid_cond_expression = then_keyword_idx > 4 // min number of tokens required
+      && tokens.at(then_keyword_idx - 1).GetTokenTag() == TokenTag::kCloseBracket // cond_expr surrounded by brackets
       && tokens.at(1).GetTokenTag() == TokenTag::kOpenBracket
-      && (tokens.at(2).GetTokenTag() == TokenTag::kName || tokens.at(2).GetTokenTag() == TokenTag::kInteger)
-      && tokens.at(3).GetTokenTag() == TokenTag::kBinaryComparisonOperator
-      && (tokens.at(4).GetTokenTag() == TokenTag::kName || tokens.at(4).GetTokenTag() == TokenTag::kInteger)
-      && tokens.at(5).GetTokenTag() == TokenTag::kCloseBracket
-      && tokens.at(6).GetTokenTag() == TokenTag::kThenKeyword
-      && tokens.at(7).GetTokenTag() == TokenTag::kOpenBrace;
-  return output;
+      && IsCondExpr(tokens, 2, then_keyword_idx - 2); // guranteed in bound
+  return valid_cond_expression;
 }
 
-bool SyntaxValidator::ValidateThenKeyword(const vector<Token>& tokens) {
-  return true;
-}
 bool SyntaxValidator::ValidateElseKeyword(const vector<Token>& tokens) {
   return tokens.capacity() == 2 && tokens.at(1).GetTokenTag() == TokenTag::kOpenBrace;
 }
@@ -115,11 +107,10 @@ bool SyntaxValidator::ValidateAssignmentSentenceSyntax(const vector<Token>& stat
     return false;
   }
   // validate the tokens to the right of the assignment operator as an expression;
-  int assignment_operator_idx =
-  GetFirstMatchingTokenIdx(statement_tokens, TokenTag::kAssignmentOperator);
+  int assignment_operator_idx = GetFirstMatchingTokenIdx(statement_tokens, TokenTag::kAssignmentOperator);
   int right_boundary = statement_tokens.size() - 2; // left of the semicolon
   if (right_boundary <= assignment_operator_idx) {
-    return false; // boundary invariant broken
+    return false; // boundary invariant check
   }
   return IsExpr(statement_tokens, assignment_operator_idx + 1, right_boundary);
 }

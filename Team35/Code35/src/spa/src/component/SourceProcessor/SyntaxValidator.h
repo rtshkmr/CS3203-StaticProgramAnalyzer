@@ -16,7 +16,6 @@ class SyntaxValidator {
   static bool ValidateProcedureSyntax(const std::vector<Token>& tokens);
   static bool ValidateMacroFunctionSyntax(const std::vector<Token>& tokens);
   static bool ValidateIfStatementSyntax(const std::vector<Token>& tokens);
-  static bool ValidateThenKeyword(const std::vector<Token>& tokens);
   static bool ValidateElseKeyword(const std::vector<Token>& tokens);
   static bool ValidateWhileKeyword(const std::vector<Token>& tokens);
   static bool ValidateAssignmentSentenceSyntax(const std::vector<Token>& statement_tokens);
