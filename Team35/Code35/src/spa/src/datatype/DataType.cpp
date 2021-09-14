@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include "DataType.h"
 #include <datatype/RegexPatterns.h>
+#include <cassert>
 
 /**
  * This method checks if the given string as in the correct name syntax.
@@ -192,7 +193,7 @@ bool VariableName::operator==(VariableName other) const {
  */
 ConstantValue::ConstantValue(std::string constant) {
   size_t num_chars = 0;
-  value_ = stoi(constant, &num_chars);
+  value_ = stoi(constant, & num_chars);
   if (num_chars != constant.size()) {
     throw std::invalid_argument("Constant is not valid. Numbers mixed with letters.");
   }
@@ -329,12 +330,263 @@ TokenTag Token::TagStringWithToken(const std::string& reference) {
     return TokenTag::kBinaryComparisonOperator;
   } else if (regex_match(reference, boolean_operator_pat)) {
     return TokenTag::kBooleanOperator;
-  }
-  else if (regex_match(reference, name_pat)) {
+  } else if (regex_match(reference, name_pat)) {
     return TokenTag::kName;
   } else if (regex_match(reference, integer_pat)) {
     return TokenTag::kInteger;
   } else {
     return TokenTag::kInvalid;
   }
+}
+
+/**
+ * Counts the number of tokens in a vector that matches a given target TokenTag
+ * @param tokens tokens to count in
+ * @param target_tag the target tag to meet
+ * @return
+ */
+int Token::CountTokens(std::vector<Token> tokens, TokenTag target_tag) {
+  int count = std::count_if(tokens.begin(), tokens.end(), [&target_tag](Token t) {
+    return t.GetTokenTag() == target_tag;
+  });
+  return count;
+}
+
+/**
+ * Counts the number of tokens in a vector that matches a given target TokenTag and string
+ * @param tokens tokens to count in
+ * @param target_tag the target tag to meet
+ * @param target_string the string target to meet
+ * @return
+ */
+int Token::CountTokens(std::vector<Token> tokens, TokenTag target_tag, std::string target_string) {
+  int count = std::count_if(tokens.begin(), tokens.end(), [&target_tag, &target_string](Token t) {
+    return t.GetTokenTag() == target_tag
+        && t.GetTokenString() == target_string;
+  });
+  return count;
+}
+
+/**
+ *  Returns an iterator for the tokens vector for the token that matches the regex for the desired patterns, this
+ *  is to help identify where to recurse into.
+ * @param tokens
+ * @param desired_pattern
+ * @param left_idx
+ * @param right_idx
+ * @return
+ */
+auto Token::GetTokenMatchForwardIterator(const std::vector<Token>& tokens,
+                                         const std::regex& desired_pattern,
+                                         int left_idx,
+                                         int right_idx) {
+  auto forward_iterator = std::find_if(tokens.begin() + left_idx,
+                                       tokens.begin()
+                                           + right_idx, // todo: check if the end is exclusive range or inclusive, it's half open, the ending is excluded
+                                       [&desired_pattern](Token elem) {
+                                         std::string current = elem.GetTokenString();
+                                         bool matches_target_pattern = std::regex_match(current, desired_pattern);
+                                         return matches_target_pattern;
+                                       });
+  return forward_iterator;
+}
+auto Token::GetTokenMatchForwardIterator(const std::vector<Token>& tokens,
+                                         TokenTag target_token_tag,
+                                         int left_idx,
+                                         int right_idx) {
+  auto forward_iterator = std::find_if(tokens.begin() + left_idx,
+                                       tokens.begin() + right_idx,
+      // todo: check if the end is exclusive range or inclusive, it's half open, the ending is excluded
+                                       [&target_token_tag](Token elem) {
+                                         TokenTag current_tag = elem.GetTokenTag();
+                                         bool matches_target_token = current_tag == target_token_tag;
+                                         return matches_target_token;
+                                       });
+  return forward_iterator;
+}
+
+// reverse iterator use:
+/**
+ * Takes in a range in the form of left and right idx which refers to the actual vector of tokens and within this,
+ * finds the first token FROM THE END OF THE VECTOR that matches a desired pattern.
+ * @param tokens
+ * @param desired_pattern
+ * @param left_boundary_idx
+ * @param right_boundary_idx
+ * @return  the reverse iterator representing this first token
+ */
+auto Token::GetTokenMatchReverseIterator(const std::vector<Token>& tokens,
+                                         const std::regex& desired_pattern,
+                                         int left_boundary_idx,
+                                         int right_boundary_idx) {
+  // from the given actual indices, get respective reverse iterators for the range
+  auto rBeginning = tokens.crbegin() + ((tokens.size() - 1) - right_boundary_idx);
+  auto rEnding = tokens.crend() - left_boundary_idx;
+  // nb: find_if checks within a half-open range but we want inclusive behaviour:
+  auto reverse_iterator = std::find_if(rBeginning,
+                                       rEnding - 1, // todo: check if will throw out of bounds error;
+                                       [&desired_pattern](Token elem) {
+                                         std::string current = elem.GetTokenString();
+                                         bool matches_target_pattern = std::regex_match(current, desired_pattern);
+                                         return matches_target_pattern;
+                                       });
+  return reverse_iterator;
+}
+auto Token::GetTokenMatchReverseIterator(const std::vector<Token>& tokens,
+                                         TokenTag target_token_tag,
+                                         int left_boundary_idx,
+                                         int right_boundary_idx) {
+  // from the given actual indices, get respective reverse iterators for the range
+  auto rBeginning = tokens.crbegin() + ((tokens.size() - 1) - right_boundary_idx);
+  auto rEnding = tokens.crend() - left_boundary_idx;
+  // nb: find_if checks within a half-open range but we want inclusive behaviour:
+  auto reverse_iterator = std::find_if(rBeginning,
+                                       rEnding - 1, // todo: check if will throw out of bounds error;
+                                       [&target_token_tag](Token elem) {
+                                         TokenTag current_tag = elem.GetTokenTag();
+                                         bool matches_target_token = current_tag == target_token_tag;
+                                         return matches_target_token;
+                                       });
+  return reverse_iterator;
+}
+/**
+ * For a given vector of tokens and a boundary of indices to inspect, returns the index of the first token that matches
+ * the desired target token tag.
+ * @param tokens
+ * @param token_tag
+ * @param left_boundary_idx
+ * @param right_boundary_idx
+ * @return
+ */
+int Token::GetFirstMatchingTokenIdx(const std::vector<Token>& tokens,
+                                    TokenTag token_tag,
+                                    int left_boundary_idx,
+                                    int right_boundary_idx) {
+  auto delim_iterator = GetTokenMatchForwardIterator(tokens,
+                                                     token_tag,
+                                                     left_boundary_idx,
+                                                     right_boundary_idx);
+  int delim_idx = std::distance(tokens.begin(), delim_iterator); // todo: check delim_idx
+  return delim_idx;
+}
+/**
+ * For a given vector of tokens and a boundary of indices to inspect, returns the index of the first token that matches
+ * the desired regex pattern.
+ * @param tokens
+ * @param desired_pattern
+ * @param left_boundary_idx (inclusive boundary)
+ * @param right_boundary_idx (inclusive boundary)
+ * @return
+ */
+int Token::GetFirstMatchingTokenIdx(const std::vector<Token>& tokens,
+                                    const std::regex& desired_pattern,
+                                    int left_boundary_idx,
+                                    int right_boundary_idx) {
+  auto delim_iterator = GetTokenMatchForwardIterator(tokens,
+                                                     desired_pattern,
+                                                     left_boundary_idx,
+                                                     right_boundary_idx);
+  int delim_idx = std::distance(tokens.begin(), delim_iterator); // todo: check delim_idx
+  return delim_idx;
+}
+/**
+ * For a given vector of tokens and a boundary of indices to inspect, returns the index of the last token that matches
+ * the desired regex pattern.
+ * @param tokens
+ * @param desired_pattern
+ * @param left_boundary_idx (inclusive boundary)
+ * @param right_boundary_idx (inclusive boundary)
+ * @return
+ */
+int Token::GetLastMatchingTokenIdx(const std::vector<Token>& tokens,
+                                   const std::regex& desired_pattern,
+                                   int left_boundary_idx,
+                                   int right_boundary_idx) {
+  auto delim_iterator = GetTokenMatchReverseIterator(tokens,
+                                                     desired_pattern,
+                                                     left_boundary_idx,
+                                                     right_boundary_idx);
+  int delim_idx = std::distance(tokens.begin(), delim_iterator.base()) - 1;
+  return delim_idx;
+}
+/**
+ * For a given vector of tokens and a boundary of indices to inspect, returns the index of the last token that matches
+ * the target token tag.
+ * @param tokens
+ * @param target_token_tag
+ * @param left_boundary_idx (inclusive boundary)
+ * @param right_boundary_idx (inclusive boundary)
+ * @return
+ */
+int Token::GetLastMatchingTokenIdx(const std::vector<Token>& tokens,
+                                   TokenTag target_token_tag,
+                                   int left_boundary_idx,
+                                   int right_boundary_idx) {
+  auto delim_iterator = GetTokenMatchReverseIterator(tokens,
+                                                     target_token_tag,
+                                                     left_boundary_idx,
+                                                     right_boundary_idx);
+  int delim_idx = std::distance(tokens.begin(), delim_iterator.base()) - 1;
+  return delim_idx;
+}
+/**
+ * Returns first matching token based on the desired regex pattern within the entire vector of tokens
+ * @param tokens
+ * @param desired_pattern
+ * @return
+ */
+int Token::GetFirstMatchingTokenIdx(const std::vector<Token>& tokens, const std::regex& desired_pattern) {
+  assert(!tokens.empty());
+  auto delim_iterator = GetTokenMatchForwardIterator(tokens,
+                                                     desired_pattern,
+                                                     0,
+                                                     tokens.size() - 1);
+  int delim_idx = std::distance(tokens.begin(), delim_iterator); // todo: check delim_idx
+  return delim_idx;
+}
+/**
+ * Returns first matching token based on the desired regex pattern within the entire vector of tokens
+ * @param tokens
+ * @param target_token_tag
+ * @return
+ */
+int Token::GetFirstMatchingTokenIdx(const std::vector<Token>& tokens, TokenTag target_token_tag) {
+  assert(!tokens.empty());
+  auto delim_iterator = GetTokenMatchForwardIterator(tokens,
+                                                     target_token_tag,
+                                                     0,
+                                                     tokens.size() - 1);
+  int delim_idx = std::distance(tokens.begin(), delim_iterator); // todo: check delim_idx
+  return delim_idx;
+}
+/**
+ * For a given vector of tokens, returns the index of the last token that matches
+ * the desired regex pattern in the entire vector.
+ * @param tokens
+ * @param desired_pattern
+ * @return
+ */
+int Token::GetLastMatchingTokenIdx(const std::vector<Token>& tokens, const std::regex& desired_pattern) {
+  auto delim_iterator = GetTokenMatchReverseIterator(tokens,
+                                                     desired_pattern,
+                                                     0,
+                                                     tokens.size() - 1);
+  int delim_idx = std::distance(tokens.begin(), delim_iterator.base()) - 1;
+  return delim_idx;
+}
+
+/**
+ * For a given vector of tokens, returns the index of the last token that matches
+ * the desired regex pattern in the entire vector.
+ * @param tokens
+ * @param desired_pattern
+ * @return
+ */
+int Token::GetLastMatchingTokenIdx(const std::vector<Token>& tokens, TokenTag target_token_tag) {
+  auto delim_iterator = GetTokenMatchReverseIterator(tokens,
+                                                     target_token_tag,
+                                                     0,
+                                                     tokens.size() - 1);
+  int delim_idx = std::distance(tokens.begin(), delim_iterator.base()) - 1;
+  return delim_idx;
 }

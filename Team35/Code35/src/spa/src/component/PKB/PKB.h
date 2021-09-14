@@ -21,6 +21,14 @@ class PKB {
   std::list<std::tuple<DesignEntity, std::string>> GetModifies(std::string stmt);
   std::list<std::tuple<DesignEntity, std::string>> GetModifiedBy(std::string stmt);
 
+  std::list<std::tuple<DesignEntity, std::string>> GetFollowsT(std::string stmt);
+  std::list<std::tuple<DesignEntity, std::string>> GetPreviousT(std::string stmt);
+  std::list<std::tuple<DesignEntity, std::string>> GetParentT(std::string stmt);
+  std::list<std::tuple<DesignEntity, std::string>> GetChildT(std::string stmt);
+
+  std::vector<AssignEntity> GetPatternByAssign(std::string stmtRef);
+  std::vector<AssignEntity> GetPatternByVariable(std::string varName);
+
   bool hasFollows();
   bool hasPrevious();
   bool hasParent();
@@ -52,6 +60,11 @@ class PKB {
   std::unordered_map<std::string, std::list<std::tuple<DesignEntity, std::string>>> parent_map_;
   std::unordered_map<std::string, std::tuple<DesignEntity,std::string>> child_map_;
 
+  std::unordered_map<std::string, std::list<std::tuple<DesignEntity, std::string>>> follows_t_map_;
+  std::unordered_map<std::string, std::list<std::tuple<DesignEntity, std::string>>> previous_t_map_;
+  std::unordered_map<std::string, std::list<std::tuple<DesignEntity, std::string>>> parent_t_map_;
+  std::unordered_map<std::string, std::list<std::tuple<DesignEntity, std::string>>> child_t_map_;
+
   std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>*>*> use_s_map_;
   std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>*>*> used_by_s_map_;
 
@@ -63,6 +76,8 @@ class PKB {
 
   std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>*>*> modifies_c_map_;
   std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>*>*> modified_by_c_map_;
+
+  std::unordered_map<std::string, std::vector<AssignEntity>> assign_expr_map_;
 
   void PopulateProcList(const std::list<Procedure *> &proc_list);
   void PopulateVarList(const std::list<Variable *> &var_list);
@@ -80,6 +95,11 @@ class PKB {
 
   void PopulateParentMap(std::unordered_map<Statement *, std::list<Statement *> *> parent_hash);
   void PopulateChildMap(const std::unordered_map<Statement*, Statement*>& parent_of_hash);
+
+  void PopulateFollowsTMap(std::unordered_map<Statement *, std::list<Statement *> *> follows_T_hash);
+  void PopulatePreviousTMap(std::unordered_map<Statement *, std::list<Statement *> *> followed_by_T_hash);
+  void PopulateParentTMap(std::unordered_map<Statement *, std::list<Statement *> *> parent_to_child_T_hash);
+  void PopulateChildTMap(std::unordered_map<Statement *, std::list<Statement *> *> child_to_parent_T_hash);
 
   void PopulateUseSMap(std::unordered_map<Statement *, std::list<Variable *> *> use_hash);
   void PopulateUsedBySMap(std::unordered_map<Variable *, std::list<Statement *> *> used_by_hash);
