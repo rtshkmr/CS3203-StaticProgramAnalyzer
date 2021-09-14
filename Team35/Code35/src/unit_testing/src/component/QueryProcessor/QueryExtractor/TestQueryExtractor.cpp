@@ -174,40 +174,78 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that with correct relRef and
 }
 
 TEST_CASE("3.QueryExtractor.Single well-formed such that with correct entRef and correct argument; should PASS") {
-  std::string query = "assign a; variable v; Select a such that Uses(a, \"x\")";
+  SECTION("entRef is string IDENT") {
+    std::string query = "assign a; variable v; Select a such that Uses(a, \"x\")";
 
-  auto query_extractor = QueryExtractor(&query);
-  query_extractor.ExtractQuery();
-  std::list<Synonym> synonyms = query_extractor.GetSynonymsList();
-  Synonym target = query_extractor.GetTarget();
-  std::list<Group> groups = query_extractor.GetGroupsList();
+    auto query_extractor = QueryExtractor(&query);
+    query_extractor.ExtractQuery();
+    std::list<Synonym> synonyms = query_extractor.GetSynonymsList();
+    Synonym target = query_extractor.GetTarget();
+    std::list<Group> groups = query_extractor.GetGroupsList();
 
-  std::list<Synonym> expected_synonyms = {Synonym("a", DesignEntity::kAssign),
-                                          Synonym("v", DesignEntity:: kVariable)};
-  Synonym expected_target = Synonym("a", DesignEntity::kAssign);
-  Clause* cl = new SuchThat("a", "x", RelRef::kUsesS, true, false);
-  std::vector<Clause*> clauses;
-  clauses.push_back(cl);
-  std::list<Group> expected_groups;
-  Group expected_group = Group(clauses, true);
-  expected_groups.push_back(expected_group);
+    std::list<Synonym> expected_synonyms = {Synonym("a", DesignEntity::kAssign),
+                                            Synonym("v", DesignEntity:: kVariable)};
+    Synonym expected_target = Synonym("a", DesignEntity::kAssign);
+    Clause* cl = new SuchThat("a", "x", RelRef::kUsesS, true, false);
+    std::vector<Clause*> clauses;
+    clauses.push_back(cl);
+    std::list<Group> expected_groups;
+    Group expected_group = Group(clauses, true);
+    expected_groups.push_back(expected_group);
 
-  // validate target
-  REQUIRE(AreSynonymsEqual(expected_target, target) == 1);
-  // validate synonyms
-  auto it1 = expected_synonyms.begin(); auto it2 = synonyms.begin();
-  while (it1 != expected_synonyms.end() && it2 != synonyms.end()) {
-    REQUIRE(AreSynonymsEqual(*it1, *it2) == 1);
-    it1++; it2++;
+    // validate target
+    REQUIRE(AreSynonymsEqual(expected_target, target) == 1);
+    // validate synonyms
+    auto it1 = expected_synonyms.begin(); auto it2 = synonyms.begin();
+    while (it1 != expected_synonyms.end() && it2 != synonyms.end()) {
+      REQUIRE(AreSynonymsEqual(*it1, *it2) == 1);
+      it1++; it2++;
+    }
+    // validate groups
+    REQUIRE(expected_groups.size() == groups.size());
+    auto it3 = expected_groups.begin(); auto it4 = groups.begin();
+    while (it3 != expected_groups.end() && it4 != groups.end()) {
+      REQUIRE(AreGroupsEqual(*it3, *it4) == 1);
+      it3++; it4++;
+    }
+    delete cl;
   }
-  // validate groups
-  REQUIRE(expected_groups.size() == groups.size());
-  auto it3 = expected_groups.begin(); auto it4 = groups.begin();
-  while (it3 != expected_groups.end() && it4 != groups.end()) {
-    REQUIRE(AreGroupsEqual(*it3, *it4) == 1);
-    it3++; it4++;
+
+  SECTION("entRef is underscore") {
+    std::string query = "assign a; Select a such that Uses(a, _)";
+
+    auto query_extractor = QueryExtractor(&query);
+    query_extractor.ExtractQuery();
+    std::list<Synonym> synonyms = query_extractor.GetSynonymsList();
+    Synonym target = query_extractor.GetTarget();
+    std::list<Group> groups = query_extractor.GetGroupsList();
+
+    std::list<Synonym> expected_synonyms = {Synonym("a", DesignEntity::kAssign)};
+    Synonym expected_target = Synonym("a", DesignEntity::kAssign);
+    Clause* cl = new SuchThat("a", "_", RelRef::kUsesS, true, false);
+    std::vector<Clause*> clauses;
+    clauses.push_back(cl);
+    std::list<Group> expected_groups;
+    Group expected_group = Group(clauses, true);
+    expected_groups.push_back(expected_group);
+
+    // validate target
+    REQUIRE(AreSynonymsEqual(expected_target, target) == 1);
+    // validate synonyms
+    auto it1 = expected_synonyms.begin(); auto it2 = synonyms.begin();
+    while (it1 != expected_synonyms.end() && it2 != synonyms.end()) {
+      REQUIRE(AreSynonymsEqual(*it1, *it2) == 1);
+      it1++; it2++;
+    }
+    // validate groups
+    REQUIRE(expected_groups.size() == groups.size());
+    auto it3 = expected_groups.begin(); auto it4 = groups.begin();
+    while (it3 != expected_groups.end() && it4 != groups.end()) {
+      REQUIRE(AreGroupsEqual(*it3, *it4) == 1);
+      it3++; it4++;
+    }
+    delete cl;
   }
-  delete cl;
 }
 
 // 'pattern'
