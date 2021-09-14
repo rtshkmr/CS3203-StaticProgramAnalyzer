@@ -156,7 +156,7 @@ void QueryEvaluator::ProcessBooleanGroup(std::vector<Clause*> clauseList) {
       }
     }
 
-    if (currTable.GetSize() == 0) {
+    if (currTable.GetRowSize() == 0) {
       booleanResult = false;
     }
   }

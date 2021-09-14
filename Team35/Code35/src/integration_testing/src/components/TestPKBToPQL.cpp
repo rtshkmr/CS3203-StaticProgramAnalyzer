@@ -160,7 +160,7 @@ TEST_CASE("5. Miscellaneous entity and relationship retrievals") {
         "read r; print p; Select p such that Follows(r, p)",
         "assign a; assign b; Select a such that Follows(a, b)",
         "variable v; read r; print p; Select v such that Follows(r, p)",
-        "variable v; read r; print p; Select v such that Follows(a, p)",
+        "variable v; assign a; print p; Select v such that Follows(a, p)",
 
 //            "variable v; assign a; Select v such that Uses(a, v)", // this does not work while Uses(v, a) works -> params are mixed up
 //            "variable v; assign a; Select v such that Modifies(a, v)", // same as above
@@ -186,6 +186,7 @@ TEST_CASE("5. Miscellaneous entity and relationship retrievals") {
         "3, 4",
         "x, y, z",
         "",
+        "x, y, z",
 
         "dummy"
     };
