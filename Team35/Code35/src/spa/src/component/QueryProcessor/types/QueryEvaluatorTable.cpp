@@ -2,7 +2,6 @@
 // Created by Max Ng on 6/9/21.
 //
 
-#include <typeinfo>
 #include "QueryEvaluatorTable.h"
 
 QueryEvaluatorTable::QueryEvaluatorTable(std::string target) {
@@ -18,7 +17,7 @@ bool QueryEvaluatorTable::AddColumn(std::string synonym) {
   } else {
     return false;
   }
-};
+}
 
 // Add target synonym column with values to table
 bool QueryEvaluatorTable::AddTargetSynonym(std::list<std::string> synonym_list) {
@@ -30,7 +29,7 @@ bool QueryEvaluatorTable::AddTargetSynonym(std::list<std::string> synonym_list) 
   um[target_synonym] = synonym_vector;
   return true;
 
-};
+}
 
 // Delete row
 bool QueryEvaluatorTable::DeleteRow(int index) {
@@ -39,14 +38,14 @@ bool QueryEvaluatorTable::DeleteRow(int index) {
   }
   for ( auto iter = um.begin(); iter != um.end(); ++iter ) {
     std::vector<std::string> current_column = iter->second;
-    int size = current_column.size();
+    unsigned long size = current_column.size();
     if (index < size) {
       current_column.erase(current_column.begin() + index);
       iter->second = current_column;
     }
   }
   return true;
-};
+}
 
 // Add row (and new col)
 bool QueryEvaluatorTable::AddRow(std::string synonym, int index, std::string value) {
@@ -56,7 +55,7 @@ bool QueryEvaluatorTable::AddRow(std::string synonym, int index, std::string val
   }
   um[synonym].push_back(value);
   return true;
-};
+}
 
 bool QueryEvaluatorTable::AddRowForAllColumn(std::string synonym, int index, std::string value) {
   for (auto tableIterator = um.begin(); tableIterator != um.end(); tableIterator++) {
@@ -65,6 +64,38 @@ bool QueryEvaluatorTable::AddRowForAllColumn(std::string synonym, int index, std
     } else {
       std::vector<std::string> currList = tableIterator->second;
       currList.insert(currList.begin() + index, currList[index]);
+      tableIterator->second = currList;
+    }
+  }
+  return true;
+}
+
+/**
+ * The first time a row is added (i.e repeat_count = 0), the value is added to the column under 'synonym'.
+ * Each subsequent time a row is added (i.e repeat_count > 0), the value for all other rows are copied, and the value
+ * is added to the column under 'synonym'.
+ *
+ * @param synonym The name of the synonym which acts as the column header.
+ * @param index The position to insert the row in the table. This should be the same across repeated rows.
+ * @param value The value to be inserted into the column.
+ * @param repeat_count The number of times this call has been repeated for the same values in all other columns.
+ * @return false if there is an error with adding values into the table or if the synonym column does not exist.
+ * True otherwise.
+ */
+bool QueryEvaluatorTable::AddMultipleRowForAllColumn(std::string synonym, int index, std::string value, int repeat_count) {
+  if (!ContainsColumn(synonym)) {
+    return false;
+  }
+
+  for (auto tableIterator = um.begin(); tableIterator != um.end(); tableIterator++) {
+    if (tableIterator->first == synonym) {
+      AddRow(synonym, index + repeat_count, value);
+    } else {
+      if (repeat_count > 0) {
+        std::vector<std::string> currList = tableIterator->second;
+        currList.insert(currList.begin() + index + repeat_count, currList[index]);
+        tableIterator->second = currList;
+      }
     }
   }
   return true;
@@ -75,14 +106,14 @@ std::vector<std::string> QueryEvaluatorTable::GetResults() {
   auto search = um.find(target_synonym);
   //assert search != um.end()
   return search->second;
-};
+}
 
 // Return vector of specified synonym
 std::vector<std::string> QueryEvaluatorTable::GetColumn(std::string synonym) {
   auto search = um.find(synonym);
   //assert search != um.end()
   return search->second;
-};
+}
 
 // Empty column
 bool QueryEvaluatorTable::RemoveColumn(std::string synonym) {
@@ -93,7 +124,7 @@ bool QueryEvaluatorTable::RemoveColumn(std::string synonym) {
     search->second.clear();
     return true;
   }
-};
+}
 
 bool QueryEvaluatorTable::ContainsColumn(std::string synonym) {
   auto search = um.find(synonym);
@@ -102,5 +133,10 @@ bool QueryEvaluatorTable::ContainsColumn(std::string synonym) {
 
 int QueryEvaluatorTable::GetSize() {
   return um.size();
-};
+}
 
+int QueryEvaluatorTable::GetRowSize() {
+  auto search = um.find(target_synonym);
+  //assert search != um.end()
+  return search->second.size();
+}

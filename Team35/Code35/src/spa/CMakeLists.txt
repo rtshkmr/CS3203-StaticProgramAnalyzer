@@ -29,9 +29,8 @@ add_library(spa ${srcs} ${headers}
         src/component/QueryProcessor/QueryExtractor/QueryTokenizer.h src/component/QueryProcessor/QueryExtractor/QueryTokenizer.cpp
         src/component/QueryProcessor/QueryExtractor/QueryParser.h src/component/QueryProcessor/QueryExtractor/QueryParser.cpp
         src/component/QueryProcessor/QueryExtractor/QueryExtractor.h src/component/QueryProcessor/QueryExtractor/QueryExtractor.cpp
-        src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatSingleSynonym.h src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatSingleSynonym.cpp
-        src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatDoubleSynonyms.h src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatDoubleSynonyms.cpp
-        src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatNoSynonym.h src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatNoSynonym.cpp
+        src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatClause.h src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatClause.cpp
+        src/component/QueryProcessor/QueryEvaluator/EvaluatePatternClause.h src/component/QueryProcessor/QueryEvaluator/EvaluatePatternClause.cpp
         src/component/QueryProcessor/QueryEvaluator/QueryPKB.h src/component/QueryProcessor/QueryEvaluator/QueryPKB.cpp
         src/component/QueryProcessor/QueryEvaluator/QueryEvaluator.h src/component/QueryProcessor/QueryEvaluator/QueryEvaluator.cpp
         src/component/QueryProcessor/QueryProjector.h src/component/QueryProcessor/QueryProjector.cpp

@@ -5,7 +5,7 @@
 #include "catch.hpp"
 #include "component/QueryProcessor/types/QueryEvaluatorTable.h"
 
-TEST_CASE("Target synonym is statement") {
+TEST_CASE("3.QueryEvaluatorTable.Target synonym is statement") {
   std::string target = "s1";
   QueryEvaluatorTable table(target);
   REQUIRE( table.GetSize() == 0);
@@ -52,7 +52,7 @@ TEST_CASE("Target synonym is statement") {
   }
 }
 
-TEST_CASE("Target synonym is a variable") {
+TEST_CASE("3.QueryEvaluatorTable.Target synonym is a variable") {
   std::string target = "v";
   QueryEvaluatorTable table(target);
   REQUIRE( table.GetSize() == 0);
@@ -95,4 +95,33 @@ TEST_CASE("Target synonym is a variable") {
   SECTION("Empty an invalid column") {
     REQUIRE_FALSE( table.RemoveColumn("null") );
   }
+}
+
+TEST_CASE("3.QueryEvaluatorTable.Add Multiple Rows") {
+  std::string target = "s1";
+  QueryEvaluatorTable table(target);
+
+  std::list<std::string> synonym_list = {"2", "3", "4", "5"};
+  bool outcome = table.AddTargetSynonym(synonym_list);
+  REQUIRE( outcome );
+  table.AddColumn("v1");
+  table.AddRow("v1", 0, "x");
+  bool result = table.AddRow("v1", 2, "x");
+  REQUIRE_FALSE(result);
+  table.AddRow("v1", 1, "y");
+  table.AddRow("v1", 2, "QWERT");
+  table.AddRow("v1", 3, "p2p");
+  table.AddColumn("test");
+  table.AddMultipleRowForAllColumn("test", 0, "a", 0);
+  table.AddMultipleRowForAllColumn("test", 0, "b", 1);
+  table.AddMultipleRowForAllColumn("test", 0, "c", 2);
+  table.AddMultipleRowForAllColumn("test", 0, "d", 3);
+  REQUIRE(table.GetRowSize() == 7);
+  std::vector<std::string> expected = {"2", "2", "2", "2", "3", "4", "5"};
+  REQUIRE(table.GetResults() == expected);
+  table.AddColumn("test2");
+  table.AddRowForAllColumn("test2", 0, "new input");
+  expected = {"2", "2", "2", "2", "2", "3", "4", "5"};
+  REQUIRE(table.GetResults() == expected);
+  REQUIRE(table.GetRowSize() == 8);
 }
