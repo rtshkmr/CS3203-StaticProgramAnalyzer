@@ -77,7 +77,6 @@ void QueryParser::GetTarget() {
 // stmtRef: synonym | ‘_’ | INTEGER
 // returns a tuple of values corresponding to <stmtref string, isSynonym, isTargetSyononym>
 std::tuple<std::string, bool, bool> QueryParser::parse_stmtRef() {
-  std::string stmtRef_string;
   bool is_synonym = false;
   bool is_target_synonym = false;
   std::string curr_lookahead = lookahead.GetTokenString();
@@ -100,10 +99,8 @@ std::tuple<std::string, bool, bool> QueryParser::parse_stmtRef() {
     }
   } else if (lookahead.GetTokenTag() == TokenTag::kInteger) {
     // parse as INTEGER
-    // std::cout << "parsing stmtref with value: " + lookahead.GetTokenString() + " as INTEGER" << std::endl;
   } else if (lookahead.GetTokenTag() == TokenTag::kUnderscore) {
     // parse as underscore
-    // std::cout << "parsing stmtref with value: " + lookahead.GetTokenString() + " as UNDERSCORE" << std::endl;
   } else {
     throw PQLParseException("Incorrect stmtRef supplied in clause.");
   }
@@ -111,10 +108,8 @@ std::tuple<std::string, bool, bool> QueryParser::parse_stmtRef() {
   return std::make_tuple(curr_lookahead, is_synonym, is_target_synonym);
 }
 std::pair<Clause*, bool> QueryParser::parse_relRef() {
-  // std::cout << "parsing relress" << std::endl;
-  // std::cout << lookahead.GetTokenString() << std::endl;
+  std::cout << "parsing relref" << std::endl;
   std::unordered_set<std::string> relRefs = {"Follows", "Follows*", "Parent", "Parent*", "Uses", "Modifies"};
-  // std::cout << "parsing relrefsss" << std::endl;
   std::unordered_set<std::string>::const_iterator got = relRefs.find(lookahead.GetTokenString());
   if (got == relRefs.end()) {
     throw PQLParseException("Invalid relRef in such that clause.");
@@ -122,12 +117,30 @@ std::pair<Clause*, bool> QueryParser::parse_relRef() {
   std::string rel_type = lookahead.GetTokenString();
   eat(TokenTag::kName);
   eat(TokenTag::kOpenBracket);
-  // std::cout << "parsing relref of type " + rel_type << std::endl;
-  // std::cout << "lookahead: " + lookahead.GetTokenString() << std::endl;
+  std::cout << "parsing relref of type " + rel_type << std::endl;
 
   // TODO: add support in the future for modifiesP, usesP case: (entRef ‘,’ entRef)
   std::string lhs; bool is_syn; bool is_tgt_syn;
-  std::tie(lhs, is_syn, is_tgt_syn) = parse_stmtRef();
+  // UsesS|ModifiesS: ‘Uses|Modifies’ ‘(’ stmtRef ‘,’ entRef ‘)’
+  if (rel_type.compare("Uses") == 0 || rel_type.compare("Modifies") == 0) {
+    Token tok = parse_entRef();
+    lhs = tok.GetTokenString();
+    bool __is_syn = false;
+    bool __is_tgt_syn = false;
+    for (Synonym& s : synonyms) {
+      if (s.GetName() == lhs) {
+        __is_syn = true;
+        if (lhs == this->target.GetName()) {
+          __is_tgt_syn = true;
+        }
+        break;
+      }
+    }
+    is_syn = __is_syn;
+    is_tgt_syn = __is_tgt_syn;
+  } else {
+    std::tie(lhs, is_syn, is_tgt_syn) = parse_stmtRef();
+  }
 
   if (lhs.compare("_") == 0 && (rel_type.compare("Modifies") == 0 || rel_type.compare("Uses") == 0)) {
     throw PQLValidationException("Semantically invalid to have _ as first argument for " + rel_type);
