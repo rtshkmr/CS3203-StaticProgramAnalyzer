@@ -78,7 +78,7 @@ Deliverable* SetUpDeliverable_Week4() {
     std::string stmt4_s = "3";
     std::vector<Variable*> stmt4_var_expr;
     std::vector<ConstantValue*> stmt4_cv_expr;
-    stmt3_cv_expr.push_back(cv2);
+    stmt4_cv_expr.push_back(cv2);
 
     AssignEntity* stmt4 = new AssignEntity(var_z, stmt4_s, stmt4_var_expr, stmt4_cv_expr);
     stmt4->SetStatementNumber(new StatementNumber(4));
@@ -101,7 +101,7 @@ Deliverable* SetUpDeliverable_Week4() {
     stmt5_var_expr.push_back(var_x);
     stmt5_var_expr.push_back(var_y);
     std::vector<ConstantValue*> stmt5_cv_expr;
-    stmt3_cv_expr.push_back(cv2);
+    stmt5_cv_expr.push_back(cv3);
 
     AssignEntity* stmt5 = new AssignEntity(var_z, stmt5_s, stmt5_var_expr, stmt5_cv_expr);
     stmt5->SetStatementNumber(new StatementNumber(5));
