@@ -5,6 +5,7 @@
 #include <component/SourceProcessor/SyntaxValidator.h>
 #include <regex>
 #include <datatype/RegexPatterns.h>
+#include <util/TimeUtil.h>
 
 using std::string;
 using std::vector;
@@ -103,6 +104,12 @@ static bool CheckAgainstSampleLines(int start, int end, vector<string>& lines, b
 }
 
 TEST_CASE("1.SyntaxValidator.Test helper functions") {
+  SECTION("Testing time util") {
+    std::string date_time = TimeUtil::GetDateTimeStr();
+    std::string file_name_date_time = TimeUtil::GetDateTimeFileNameStr();
+    int x = 1;
+  }
+
   SECTION("Test count tokens") {
     string input = "> > +++ ??? nothingElseMattersssss trust ! 5eek I find In U  >= || &&  ||  <= ! &&  || <= hello ";
     vector<Token> tokens = Tokenizer::CreateTokens(input);
