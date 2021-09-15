@@ -13,4 +13,4 @@ for i in $(seq 1 $END);
 do echo "[NOTE] Running Test $i"; ./../autotester test_source_$i.txt test_queries_$i.txt output_$i.xml;
 done
 
-zip output_final . -i 'output_*.xml';
+zip output_final output_*.xml;
