@@ -3,6 +3,7 @@
 
 #include <string>
 #include <datatype/Deliverable.h>
+#include "../PKB/PKB.h"
 
 /**
  * This namespace provides a scope for SourceProcessor related declarations. This only includes declarations on the
@@ -19,7 +20,7 @@ namespace sp {
     public:
         SourceProcessor() = default;
 
-        static void ProcessSourceFile(std::string file_name);
+        static void ProcessSourceFile(std::string file_name, PKB* pkb);
     };
 }
 

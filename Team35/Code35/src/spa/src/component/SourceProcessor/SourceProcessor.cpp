@@ -11,13 +11,12 @@ using namespace sp;
  * @param fileName The name of the file to be processed.
  * @return Source process status
  */
-void SourceProcessor::ProcessSourceFile(std::string file_name) {
+void SourceProcessor::ProcessSourceFile(std::string file_name, PKB* pkb) {
   par::Parser parser;
   parser.Parse(file_name);
   Deliverable* deliverable = parser.GetDeliverables();
   DesignExtractor design_extractor = DesignExtractor(deliverable);
   design_extractor.ExtractDesignAbstractions();
-  PKB pkb = PKB();
-  pkb.PopulateDataStructures(*deliverable);
+  pkb->PopulateDataStructures(*deliverable);
 
 }

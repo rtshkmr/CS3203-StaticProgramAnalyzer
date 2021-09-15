@@ -24,7 +24,7 @@ void TestWrapper::parse(std::string file_name) {
     std::cout << "Point 2 in test wrapper" << std::endl;
     sp::SourceProcessor source_processor;
     std::cout << "Point 2 exit" << std::endl;
-    //sp::SourceProcessor::ProcessSourceFile(file_name);
+    sp::SourceProcessor::ProcessSourceFile(file_name, pkb);
 }
 
 // method to evaluating a query
