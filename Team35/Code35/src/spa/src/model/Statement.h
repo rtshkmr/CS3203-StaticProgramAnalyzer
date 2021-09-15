@@ -29,7 +29,7 @@ class IfEntity : public Statement, public Container {
   ConditionalExpression* cond_expr_;
   std::vector<Variable*> expr_variables;
   std::vector<ConstantValue*> expr_constants;
-  ElseEntity* else_entity_; //TODO: check if keeping ELSE as object or merge ELSE object into IF object
+  ElseEntity* else_entity_ = nullptr; //TODO: check if keeping ELSE as object or merge ELSE object into IF object
 
  public:
   IfEntity(std::string condition, std::vector<Variable*> expr_variables, std::vector<ConstantValue*> expr_constants);

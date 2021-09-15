@@ -20,7 +20,7 @@ namespace psub {
  */
 class PSubsystem {
  private:
-  Procedure* current_procedure;
+  Procedure* current_procedure_;
   Deliverable* deliverable_;
   SyntaxValidator syntax_validator_;
   EntityFactory entity_factory_;
@@ -42,6 +42,8 @@ class PSubsystem {
   void HandleCallStmt(CallEntity* call_entity);
   void HandleReadStmt(ReadEntity* read_entity);
   void HandlePrintStmt(PrintEntity* print_entity);
+
+  void CheckForIfElseValidity();
 
  public:
   PSubsystem() = default;
