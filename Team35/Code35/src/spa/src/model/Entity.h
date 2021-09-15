@@ -90,6 +90,8 @@ class Program {
   Program(Procedure* p);
 
   std::list<Procedure*>* getProcedureList();
+
+  void setProcedure(Procedure* p);
 };
 
 #endif //AUTOTESTER_ENTITY_H

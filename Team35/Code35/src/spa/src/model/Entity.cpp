@@ -37,6 +37,10 @@ std::list<Procedure*>* Program::getProcedureList() {
   return &procedure_list_;
 }
 
+void Program::setProcedure(Procedure* p) {
+  procedure_list_.push_back(p);
+}
+
 void Statement::SetStatementNumber(StatementNumber* sn) {
   statement_number_ = sn;
 }
