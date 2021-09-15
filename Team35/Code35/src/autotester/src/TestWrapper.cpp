@@ -33,7 +33,7 @@ TestWrapper::TestWrapper() {
 // method for parsing the SIMPLE source
 void TestWrapper::parse(std::string file_name) {
   sp::SourceProcessor source_processor;
-  sp::SourceProcessor::ProcessSourceFile(file_name, pkb);
+  pkb = sp::SourceProcessor::ProcessSourceFile(file_name);
 }
 
 std::vector<std::string> split(std::string const &input) {
