@@ -51,7 +51,7 @@ void Deliverable::AddFollowsTransitiveRelationship(Statement* before, Statement*
 
   if (followed_by_T_hash_.count(after)) {
     std::list<Statement*>* befores = followed_by_T_hash_.find(after)->second;
-    if (std::find(befores->begin(), befores->end(), after) == befores->end()) {
+    if (std::find(befores->begin(), befores->end(), before) == befores->end()) {
       // add before if it does not exist in befores
       befores->push_back(before);
     }

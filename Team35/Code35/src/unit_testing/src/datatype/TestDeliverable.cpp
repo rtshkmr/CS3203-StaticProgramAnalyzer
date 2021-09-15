@@ -19,6 +19,77 @@ TEST_CASE("1.Deliverable.Add relationships") {
   Container* cont_while_1 = dynamic_cast<Container*>(while_1);
   Container* cont_proc_1 = dynamic_cast<Container*>(proc1);
 
+  SECTION ("AddFollowsRelationship") {
+    deliverable.AddFollowRelationship(if_1, a1);
+    deliverable.AddFollowRelationship(if_1, a1);  // duplicate check
+    REQUIRE(deliverable.follow_hash_.count(if_1));
+    REQUIRE(deliverable.follow_hash_.find(if_1)->second == a1);
+
+    // adding more var to existing entry
+    deliverable.AddFollowRelationship(if_1, a2);
+    REQUIRE(deliverable.follow_hash_.find(if_1)->second == a1);
+    REQUIRE_FALSE(deliverable.followed_by_hash_.count(a2));
+
+    deliverable.AddFollowRelationship(while_1, rx);
+    deliverable.AddFollowRelationship(while_1, rx);  // duplicate check
+    REQUIRE(deliverable.follow_hash_.count(while_1));
+    REQUIRE(deliverable.follow_hash_.find(while_1)->second == rx);
+
+    // adding more var to existing entry
+    deliverable.AddFollowRelationship(while_1, px);
+    REQUIRE(deliverable.follow_hash_.find(while_1)->second == rx);
+    REQUIRE_FALSE(deliverable.followed_by_hash_.count(px));
+
+    // reverse check
+    REQUIRE(deliverable.followed_by_hash_.count(rx));
+    REQUIRE(deliverable.followed_by_hash_.find(rx)->second == while_1);
+    REQUIRE(deliverable.followed_by_hash_.count(a1));
+    REQUIRE(deliverable.followed_by_hash_.find(a1)->second == if_1);
+  }
+
+  SECTION ("AddFollowsTransitiveRelationship and ForList") {
+    deliverable.AddFollowsTransitiveRelationship(rx, if_1);
+    deliverable.AddFollowsTransitiveRelationship(rx, if_1);  // duplicate check
+    std::list<Statement*> stmt_list1 = {if_1};
+    REQUIRE(deliverable.follows_T_hash_.count(rx));
+    REQUIRE(*deliverable.follows_T_hash_.find(rx)->second == stmt_list1);
+
+    // adding more var to existing entry
+    std::list<Statement*> stmt_list2 = {if_1, a1};
+    deliverable.AddFollowsTransitiveRelationship(rx, a1);
+    REQUIRE(*deliverable.follows_T_hash_.find(rx)->second == stmt_list2);
+
+    // adding list
+    std::list<Statement*> add_stmt_list = {a1, if_2, while_1};
+    deliverable.AddFollowsTransitiveRelationshipForList(rx, &add_stmt_list);
+    std::list<Statement*> expected_stmt_list = {if_1, a1, if_2, while_1};
+    REQUIRE(*deliverable.follows_T_hash_.find(rx)->second == expected_stmt_list);
+
+    deliverable.AddFollowsTransitiveRelationship(px, if_1);
+    deliverable.AddFollowsTransitiveRelationship(px, if_1);  // duplicate check
+    REQUIRE(deliverable.follows_T_hash_.count(px));
+    REQUIRE(*deliverable.follows_T_hash_.find(px)->second == stmt_list1);
+
+    // adding more var to existing entry
+    deliverable.AddFollowsTransitiveRelationship(px, a1);
+    REQUIRE(*deliverable.follows_T_hash_.find(px)->second == stmt_list2);
+
+    // adding list
+    std::list<Statement*> add_stmt_list2 = {if_1, if_2, while_1};
+    deliverable.AddFollowsTransitiveRelationshipForList(rx, &add_stmt_list2);
+    std::list<Statement*> expected_stmt_list2 = {if_1, a1, if_2, while_1};
+    REQUIRE(*deliverable.follows_T_hash_.find(rx)->second == expected_stmt_list2);
+
+    // reverse check
+    deliverable.AddFollowsTransitiveRelationship(if_2, a1);
+    std::list<Statement*> expected_stmt_list3 = {rx, px, if_2};
+    REQUIRE(deliverable.followed_by_T_hash_.count(a1));
+    REQUIRE(*deliverable.followed_by_T_hash_.find(a1)->second == expected_stmt_list3);
+    std::list<Statement*> expected_stmt_list4 = {rx, px};
+    REQUIRE(deliverable.followed_by_T_hash_.count(if_1));
+    REQUIRE(*deliverable.followed_by_T_hash_.find(if_1)->second == expected_stmt_list4);
+  }
+
   SECTION ("AddParentRelationship") {
     deliverable.AddParentRelationship(if_1, a1);
     deliverable.AddParentRelationship(if_1, a1);  // duplicate check
@@ -49,35 +120,48 @@ TEST_CASE("1.Deliverable.Add relationships") {
     REQUIRE(deliverable.child_to_parent_hash_.find(a2)->second == if_1);
   }
 
-  SECTION ("AddFollowsRelationship") {
-    deliverable.AddFollowRelationship(if_1, a1);
-    deliverable.AddFollowRelationship(if_1, a1);  // duplicate check
-    REQUIRE(deliverable.follow_hash_.count(if_1));
-    REQUIRE(deliverable.follow_hash_.find(if_1)->second == a1);
+  SECTION ("AddParentTransitiveRelationship and ForList") {
+    deliverable.AddParentTransitiveRelationship(rx, if_1);
+    deliverable.AddParentTransitiveRelationship(rx, if_1);  // duplicate check
+    std::list<Statement*> stmt_list1 = {if_1};
+    REQUIRE(deliverable.parent_to_child_T_hash_.count(rx));
+    REQUIRE(*deliverable.parent_to_child_T_hash_.find(rx)->second == stmt_list1);
 
     // adding more var to existing entry
-    deliverable.AddFollowRelationship(if_1, a2);
-    REQUIRE(deliverable.follow_hash_.find(if_1)->second == a1);
-    REQUIRE_FALSE(deliverable.followed_by_hash_.count(a2));
+    std::list<Statement*> stmt_list2 = {if_1, a1};
+    deliverable.AddParentTransitiveRelationship(rx, a1);
+    REQUIRE(*deliverable.parent_to_child_T_hash_.find(rx)->second == stmt_list2);
 
-    deliverable.AddFollowRelationship(while_1, rx);
-    deliverable.AddFollowRelationship(while_1, rx);  // duplicate check
-    REQUIRE(deliverable.follow_hash_.count(while_1));
-    REQUIRE(deliverable.follow_hash_.find(while_1)->second == rx);
+    // adding list
+    std::list<Statement*> add_stmt_list = {a1, if_2, while_1};
+    deliverable.AddParentTransitiveRelationshipForList(rx, &add_stmt_list);
+    std::list<Statement*> expected_stmt_list = {if_1, a1, if_2, while_1};
+    REQUIRE(*deliverable.parent_to_child_T_hash_.find(rx)->second == expected_stmt_list);
+
+    deliverable.AddParentTransitiveRelationship(px, if_1);
+    deliverable.AddParentTransitiveRelationship(px, if_1);  // duplicate check
+    REQUIRE(deliverable.parent_to_child_T_hash_.count(px));
+    REQUIRE(*deliverable.parent_to_child_T_hash_.find(px)->second == stmt_list1);
 
     // adding more var to existing entry
-    deliverable.AddFollowRelationship(while_1, px);
-    REQUIRE(deliverable.follow_hash_.find(while_1)->second == rx);
-    REQUIRE_FALSE(deliverable.followed_by_hash_.count(px));
+    deliverable.AddParentTransitiveRelationship(px, a1);
+    REQUIRE(*deliverable.parent_to_child_T_hash_.find(px)->second == stmt_list2);
+
+    // adding list
+    std::list<Statement*> add_stmt_list2 = {if_1, if_2, while_1};
+    deliverable.AddParentTransitiveRelationshipForList(rx, &add_stmt_list2);
+    std::list<Statement*> expected_stmt_list2 = {if_1, a1, if_2, while_1};
+    REQUIRE(*deliverable.parent_to_child_T_hash_.find(rx)->second == expected_stmt_list2);
 
     // reverse check
-    REQUIRE(deliverable.followed_by_hash_.count(rx));
-    REQUIRE(deliverable.followed_by_hash_.find(rx)->second == while_1);
-    REQUIRE(deliverable.followed_by_hash_.count(a1));
-    REQUIRE(deliverable.followed_by_hash_.find(a1)->second == if_1);
+    deliverable.AddParentTransitiveRelationship(if_2, a1);
+    std::list<Statement*> expected_stmt_list3 = {rx, px, if_2};
+    REQUIRE(deliverable.child_to_parent_T_hash_.count(a1));
+    REQUIRE(*deliverable.child_to_parent_T_hash_.find(a1)->second == expected_stmt_list3);
+    std::list<Statement*> expected_stmt_list4 = {rx, px};
+    REQUIRE(deliverable.child_to_parent_T_hash_.count(if_1));
+    REQUIRE(*deliverable.child_to_parent_T_hash_.find(if_1)->second == expected_stmt_list4);
   }
-
-
 
   SECTION ("AddUsesRelationship for statements") {
     deliverable.AddUsesRelationship(rx, var_x_);
