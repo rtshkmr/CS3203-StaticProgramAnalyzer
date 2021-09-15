@@ -5,6 +5,7 @@
 #include <component/SourceProcessor/SyntaxValidator.h>
 #include <regex>
 #include <datatype/RegexPatterns.h>
+#include <util/TimeUtil.h>
 
 using std::string;
 using std::vector;
@@ -35,7 +36,7 @@ static vector<string> valid_program_lines = {
     R"(})",
 
     // assignment:
-    R"( y = 1;)",
+    R"( y = 1;)", // idx: 11
     R"(z                                                                                                   = 3;)",
 };
 
@@ -70,28 +71,45 @@ static vector<string> invalid_program_lines = {
     R"(   while x >= 1 then { )",
     R"(   while (x = 1) then { )",
     R"(   while (x >= 1) then  )",
-    R"(   while (x >= 1) { )",
+    R"(   while x >= 1 then { )", // repeated test
     R"(   while then { )",
     R"(   while (x) then { )",
     R"(   while () then { )",
 
 //    // assignment:
-//    R"( y = 1;)",
-//    R"(z                                                                                                   = 3;)",
+    R"( y = 1 == 1;)", //  idx:26
+    R"(z                                                                                                   = 3)",
+    R"(z                                                                                                   = 3 > 1)",
 };
 
-static bool CheckAgainstSampleLines(int start, int end, vector<string>& lines, bool expected) {
+/**
+ *  Test helper function to run Validation against sample lines and see if it matches an expected_validation_output
+ * @param start inclusive boundary for the lines to select
+ * @param end
+ * @param lines a common list of sentences in their string format
+ * @param expected_validation_output an expected_validation_output outpuut value to be compared against
+ * @return
+ */
+static bool CheckAgainstSampleLines(int start, int end, vector<string>& lines, bool expected_validation_output) {
+  bool result = true;
   for (int i = start; i <= end; i++) {
     string line = lines.at(i);
     vector<Token> tokens = Tokenizer::CreateTokens(line);
-    bool output = SyntaxValidator::ValidateSemanticSyntax(tokens);
-    return output == expected;
-
-//    REQUIRE(matches_with_expected);
+    bool output = SyntaxValidator::ValidateSyntax(tokens);
+    if (output != expected_validation_output) {
+      return false; // break early
+    }
   }
+  return result;
 }
 
 TEST_CASE("1.SyntaxValidator.Test helper functions") {
+  SECTION("Testing time util") {
+    std::string date_time = TimeUtil::GetDateTimeStr();
+    std::string file_name_date_time = TimeUtil::GetDateTimeFileNameStr();
+    int x = 1;
+  }
+
   SECTION("Test count tokens") {
     string input = "> > +++ ??? nothingElseMattersssss trust ! 5eek I find In U  >= || &&  ||  <= ! &&  || <= hello ";
     vector<Token> tokens = Tokenizer::CreateTokens(input);
@@ -100,8 +118,8 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
     auto iterator = std::find_if(tokens.begin(), tokens.end(), [target_token](auto elem) {
       return elem == target_token;
     });
-    int num_boolean_operators = SyntaxValidator::CountTokens(tokens, TokenTag::kBooleanOperator);
-    int num_not_operators = SyntaxValidator::CountTokens(tokens, TokenTag::kBooleanOperator, "!");
+    int num_boolean_operators = Token::CountTokens(tokens, TokenTag::kBooleanOperator);
+    int num_not_operators = Token::CountTokens(tokens, TokenTag::kBooleanOperator, "!");
     SECTION("only with token tags") {
       REQUIRE(num_boolean_operators == 7); // hardcoded test
     }
@@ -287,9 +305,87 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
     REQUIRE(SyntaxValidator::IsCondExpr(tokens, 22, 27)); // !(<cond_expr>)
 //    REQUIRE(SyntaxValidator::IsCondExpr(tokens, 2, 20)); // (<cond_expr>) || (<cond_expr>)
   }
+  SECTION("Check StatementPassesCommonBlacklistRules function") {
+
+    SECTION("positive tests") {
+      vector<string> positive_statements;
+      positive_statements.emplace_back("procedure procname {"); // assn
+      positive_statements.emplace_back("a = b + 1;"); // assn
+      positive_statements.emplace_back("call mama;"); // call
+      positive_statements.emplace_back("}");
+      positive_statements.emplace_back("read books;"); // read
+      positive_statements.emplace_back("if(x > 12) then {");
+      positive_statements.emplace_back("while (timeLeft > 0) {");
+
+      for (const auto& statement : positive_statements) {
+        vector<Token> tokenized_statement = Tokenizer::CreateTokens(statement);
+        bool valid = SyntaxValidator::StatementPassesCommonBlacklistRules(tokenized_statement);
+        REQUIRE(valid);
+      }
+    }
+    SECTION("negative tests") {
+      vector<string> negative_statements;
+      negative_statements.emplace_back("a = b + 1");
+      negative_statements.emplace_back(" mama");
+      negative_statements.emplace_back("read books");
+      negative_statements.emplace_back("ifx > 12) then {");
+      negative_statements.emplace_back("if(x > 12 then ");
+      negative_statements.emplace_back("if(x > 12)) then {");
+      negative_statements.emplace_back("while (timeLeft > 0) ");
+      for (const auto& statement : negative_statements) {
+        vector<Token> tokenized_statement = Tokenizer::CreateTokens(statement);
+        bool invalid = !SyntaxValidator::StatementPassesCommonBlacklistRules(tokenized_statement);
+        REQUIRE(invalid);
+      }
+    }
+  }
+  SECTION("Test index finders (first matching token and last matching token) ") {
+    string line = "if (myLifeSavings >= (myBeginningBalance + 3 * myStripperFees)) { &&";
+    vector<Token> tokens = Tokenizer::CreateTokens(line);
+    int first_comparator_idx = Token::GetFirstMatchingTokenIdx(tokens,
+                                                               RegexPatterns::GetBinaryComparisonPattern(),
+                                                               0,
+                                                               tokens.size() - 1);
+    int first_arithmetic_operator = Token::GetFirstMatchingTokenIdx(tokens,
+                                                                    RegexPatterns::GetBinaryArithmeticOperatorPattern(),
+                                                                    0,
+                                                                    tokens.size() - 1);
+    int first_boolean_operator = Token::GetFirstMatchingTokenIdx(tokens,
+                                                                 RegexPatterns::GetBinaryBooleanOperatorPattern(),
+                                                                 0,
+                                                                 tokens.size() - 1);
+    int last_boolean_operator = Token::GetLastMatchingTokenIdx(tokens,
+                                                               RegexPatterns::GetBinaryBooleanOperatorPattern(),
+                                                               0,
+                                                               tokens.size() - 1);
+    int last_arithmetic_operator = Token::GetLastMatchingTokenIdx(tokens,
+                                                                  RegexPatterns::GetBinaryArithmeticOperatorPattern(),
+                                                                  0,
+                                                                  tokens.size() - 1);
+    REQUIRE(first_comparator_idx == 3);
+    REQUIRE(first_arithmetic_operator == 6);
+    REQUIRE(last_arithmetic_operator == 8);
+    REQUIRE(first_boolean_operator == 13);
+    REQUIRE(last_boolean_operator == 13);
+
+//    [0] = {Token} {token_string_="if", token_tag_=kIfKeyword}
+//    [1] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [2] = {Token} {token_string_="myLifeSavings", token_tag_=kName}
+//    [3] = {Token} {token_string_=">=", token_tag_=kBinaryComparisonOperator}
+//    [4] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [5] = {Token} {token_string_="myBeginningBalance", token_tag_=kName}
+//    [6] = {Token} {token_string_="+", token_tag_=kBinaryArithmeticOperator}
+//    [7] = {Token} {token_string_="3", token_tag_=kInteger}
+//    [8] = {Token} {token_string_="*", token_tag_=kBinaryArithmeticOperator}
+//    [9] = {Token} {token_string_="myStripperFees", token_tag_=kName}
+//    [10] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//    [11] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//    [12] = {Token} {token_string_="{", token_tag_=kOpenBrace}
+//    [13] = {Token} {token_string_="&&", token_tag_=kBooleanOperator}
+  }
 }
 
-TEST_CASE("1.SyntaxValidator.Validator handles basic statements:") {
+TEST_CASE("1.SyntaxValidator.Validator handles statement validation:") {
   SECTION("handles procedure statement") {
     SECTION("positive cases") {
       REQUIRE(CheckAgainstSampleLines(0, 0, valid_program_lines, true));
@@ -305,6 +401,15 @@ TEST_CASE("1.SyntaxValidator.Validator handles basic statements:") {
     }
     SECTION("negative cases") {
       REQUIRE(CheckAgainstSampleLines(2, 8, invalid_program_lines, false));
+    }
+  }
+
+  SECTION("handles assignment statements") {
+    SECTION("positive cases") {
+      REQUIRE(CheckAgainstSampleLines(11, 12, valid_program_lines, true));
+    }
+    SECTION("negative cases") {
+      REQUIRE(CheckAgainstSampleLines(26, 28, invalid_program_lines, false));
     }
   }
   SECTION("handles \"if\" statements") {

@@ -13,192 +13,138 @@ using std::vector;
 SyntaxValidator::SyntaxValidator() = default;
 
 /**
- * Validates semantic syntax within a single statement by referring to the token tags and adhering to various semantic
+ * Validates syntax within a single statement by referring to the token tags and adhering to various types of statements
  * rules.
  *
- * @param tokens
+ * @param statement_tokens
  * @return
  */
-bool SyntaxValidator::ValidateSemanticSyntax(vector<Token> tokens) {
-  // check starting token to determine what kind of keyword it is and handle subcases in separate private functions:
-  Token first_token = tokens.at(0);
+bool SyntaxValidator::ValidateSyntax(vector<Token> statement_tokens) {
+  bool passes_generic_blacklist_rules = StatementPassesCommonBlacklistRules(statement_tokens);
+  if (!passes_generic_blacklist_rules) {
+    return false;
+  }
+  Token first_token = statement_tokens.at(0);
   if (Token::IsKeywordToken(first_token)) {
     switch (first_token.GetTokenTag()) {
-      case TokenTag::kProcedureKeyword:return ValidateProcedureSemantics(tokens);
+      case TokenTag::kProcedureKeyword:return ValidateProcedureSyntax(statement_tokens);
       case TokenTag::kReadKeyword: // might need a better name to refer to a group of these keywords:
       case TokenTag::kPrintKeyword:
-      case TokenTag::kCallKeyword:return ValidateMacroFunctionSemantics(tokens);
-      case TokenTag::kIfKeyword:return ValidateIfStatementSemantics(tokens);
-      case TokenTag::kElseKeyword:return ValidateElseKeyword(tokens);
-      case TokenTag::kWhileKeyword:return ValidateWhileKeyword(tokens);
-        // QQ: will if and then appear in the same line always or can they separate? will put it as true by default first
-      case TokenTag::kThenKeyword:return ValidateThenKeyword(tokens);
+      case TokenTag::kCallKeyword:return ValidateMacroFunctionSyntax(statement_tokens);
+      case TokenTag::kIfKeyword:return ValidateIfStatementSyntax(statement_tokens);
+      case TokenTag::kElseKeyword:return ValidateElseKeyword(statement_tokens);
+      case TokenTag::kWhileKeyword:return ValidateWhileKeyword(statement_tokens);
       default: {
         assert(false);
       }
     }
-  } else if (first_token.GetTokenTag() == TokenTag::kName) { // it's an assignment operator
-    return ValidateAssignmentSemantics(tokens);
+  } else if (first_token.GetTokenTag() == TokenTag::kName) { // it's an assignment statement
+    return ValidateAssignmentSentenceSyntax(statement_tokens);
   } else if (first_token.GetTokenTag() == TokenTag::kCloseBrace) {
-    return ValidateCloseBrace(tokens);
-  } else { // any other case
+    return ValidateCloseBrace(statement_tokens);
+  } else { // any other case returns false
     return false;
   }
+  return false; // fall through
 }
 
-bool SyntaxValidator::ValidateProcedureSemantics(const vector<Token>& tokens) {
+/**
+ * Validates Procedure statements.
+ * Please note that for things like else statements, such a fixed way of handling things depends on the fact that the
+ * Parser insert newlines at the end of every `{`, `}`, `;` symbols
+ * @param tokens
+ * @return
+ */
+bool SyntaxValidator::ValidateProcedureSyntax(const vector<Token>& tokens) {
   // QQ: is this part (fixed number of tokens for every type of statement a valid guarantee? Feels like it's
   //     very hardcode-y though :(
   return tokens.capacity() == 3
       && tokens.at(1).GetTokenTag() == TokenTag::kName
       && tokens.at(2).GetTokenTag() == TokenTag::kOpenBrace;
 }
-// for read, print and call keywords
-bool SyntaxValidator::ValidateMacroFunctionSemantics(const vector<Token>& tokens) {
+
+/**
+ * Validates read, print and call statements
+ * @param tokens
+ * @return
+ */
+bool SyntaxValidator::ValidateMacroFunctionSyntax(const vector<Token>& tokens) {
   return tokens.capacity() == 3
       && tokens.at(1).GetTokenTag() == TokenTag::kName
       && tokens.at(2).GetTokenTag() == TokenTag::kSemicolon;
 }
-bool SyntaxValidator::ValidateIfStatementSemantics(const vector<Token>& tokens) {
-  // todo: 1. this is a very rudimentary implementation.
-  //       2. Future implementation needs to support recursive check of conditional expressions, possibly need to do
-  //       something like : identify open and close brace to identify scope, then check recursively within each scope.
-  //       Doing that would allow us to handle nested conditional_expressions.
-  //       possible future choice: separate into IsCondExpr and ValidateCondExpr
 
-  // comms: check if entity factory can handle nested cond_expr
-  bool output = tokens.capacity() == 8
+/**
+ * Validates an If statement. Checks the following conditions:
+ * - If statement must contain a Then keyword
+ * - There's no accidental vector out of boundary access (transposing of vector error)
+ * @param tokens
+ * @return
+ */
+bool SyntaxValidator::ValidateIfStatementSyntax(const vector<Token>& tokens) {
+  bool contains_then_keyword = Token::CountTokens(tokens, TokenTag::kThenKeyword) == 1;
+  bool guarantee = tokens.at(0).GetTokenTag() == TokenTag::kIfKeyword;
+  assert(guarantee);
+  if (!contains_then_keyword) {
+    return false;
+  }
+  // todo: [cosmetic] probably no need to use counting, need to see what the finder fucntion returns if it doesn't exist
+  int then_keyword_idx = Token::GetFirstMatchingTokenIdx(tokens, TokenTag::kThenKeyword);
+  int first_open_bracket = Token::GetFirstMatchingTokenIdx(tokens, TokenTag::kOpenBracket);
+  int last_close_bracket = Token::GetLastMatchingTokenIdx(tokens, TokenTag::kCloseBracket);
+  bool valid_cond_expression = then_keyword_idx > 4 // min number of tokens required
+      && tokens.at(then_keyword_idx - 1).GetTokenTag() == TokenTag::kCloseBracket // cond_expr surrounded by brackets
       && tokens.at(1).GetTokenTag() == TokenTag::kOpenBracket
-      && (tokens.at(2).GetTokenTag() == TokenTag::kName || tokens.at(2).GetTokenTag() == TokenTag::kInteger)
-      && tokens.at(3).GetTokenTag() == TokenTag::kBinaryComparisonOperator
-      && (tokens.at(4).GetTokenTag() == TokenTag::kName || tokens.at(4).GetTokenTag() == TokenTag::kInteger)
-      && tokens.at(5).GetTokenTag() == TokenTag::kCloseBracket
-      && tokens.at(6).GetTokenTag() == TokenTag::kThenKeyword
-      && tokens.at(7).GetTokenTag() == TokenTag::kOpenBrace;
-  return output;
+      && IsCondExpr(tokens, first_open_bracket + 1, last_close_bracket - 1); // guranteed in bound
+  return valid_cond_expression;
 }
 
-bool SyntaxValidator::ValidateThenKeyword(const vector<Token>& tokens) {
-  return true;
-}
+/**
+ * Validates Else statements in a fixed way.
+ * Please note that for things like else statements, such a fixed way of handling things depends on the fact that the
+ * Parser insert newlines at the end of every `{`, `}`, `;` symbols
+ * @param tokens
+ * @return
+ */
 bool SyntaxValidator::ValidateElseKeyword(const vector<Token>& tokens) {
   return tokens.capacity() == 2 && tokens.at(1).GetTokenTag() == TokenTag::kOpenBrace;
 }
 bool SyntaxValidator::ValidateWhileKeyword(const vector<Token>& tokens) {
-  bool output = tokens.capacity() == 8
-      && tokens.at(1).GetTokenTag() == TokenTag::kOpenBracket
-      && (tokens.at(2).GetTokenTag() == TokenTag::kName || tokens.at(2).GetTokenTag() == TokenTag::kInteger)
-      && tokens.at(3).GetTokenTag() == TokenTag::kBinaryComparisonOperator
-      && (tokens.at(4).GetTokenTag() == TokenTag::kName || tokens.at(4).GetTokenTag() == TokenTag::kInteger)
-      && tokens.at(5).GetTokenTag() == TokenTag::kCloseBracket
-      && tokens.at(6).GetTokenTag() == TokenTag::kThenKeyword
-      && tokens.at(7).GetTokenTag() == TokenTag::kOpenBrace;
-  return output;
+  bool guarantee = tokens.at(0).GetTokenTag() == TokenTag::kWhileKeyword;
+  assert(guarantee);
+  int first_open_bracket_idx = Token::GetFirstMatchingTokenIdx(tokens, TokenTag::kOpenBracket);
+  int last_close_bracket_idx = Token::GetLastMatchingTokenIdx(tokens, TokenTag::kCloseBracket);
+  bool valid_cond_expression = tokens.size() > 4
+      && first_open_bracket_idx + 1 <= last_close_bracket_idx - 1
+      && first_open_bracket_idx == 1
+      && IsCondExpr(tokens, first_open_bracket_idx + 1, last_close_bracket_idx - 1);
+  return valid_cond_expression;
 }
-bool SyntaxValidator::ValidateAssignmentSemantics(const vector<Token>& tokens) {
-  return false;
+
+/**
+ * Validates whether the statement is an assignment statement
+ * @param statement_tokens
+ * @return
+ */
+bool SyntaxValidator::ValidateAssignmentSentenceSyntax(const vector<Token>& statement_tokens) {
+  bool terminates_with_semicolon =
+      statement_tokens.at(statement_tokens.size() - 1).GetTokenTag() == TokenTag::kSemicolon;
+  assert(terminates_with_semicolon == true); // because the generic blacklist would have run by this time
+  bool has_only_one_assignment_operator = Token::CountTokens(statement_tokens, TokenTag::kAssignmentOperator);
+  if (!has_only_one_assignment_operator) {
+    return false;
+  }
+  // validate the tokens to the right of the assignment operator as an expression;
+  int assignment_operator_idx = Token::GetFirstMatchingTokenIdx(statement_tokens, TokenTag::kAssignmentOperator);
+  int right_boundary = statement_tokens.size() - 2; // left of the semicolon
+  if (right_boundary <= assignment_operator_idx) {
+    return false; // boundary invariant check
+  }
+  return IsExpr(statement_tokens, assignment_operator_idx + 1, right_boundary);
 }
+
 bool SyntaxValidator::ValidateCloseBrace(const vector<Token>& tokens) { // redundant function in case there are edge cases
   return true;
-}
-/**
- * Counts the number of tokens in a vector that matches a given target TokenTag
- * @param tokens tokens to count in
- * @param target_tag the target tag to meet
- * @return
- */
-int SyntaxValidator::CountTokens(std::vector<Token> tokens, TokenTag target_tag) {
-  int count = std::count_if(tokens.begin(), tokens.end(), [&target_tag](Token t) {
-    return t.GetTokenTag() == target_tag;
-  });
-  return count;
-}
-
-/**
- * Counts the number of tokens in a vector that matches a given target TokenTag and string
- * @param tokens tokens to count in
- * @param target_tag the target tag to meet
- * @param target_string the string target to meet
- * @return
- */
-int SyntaxValidator::CountTokens(std::vector<Token> tokens, TokenTag target_tag, std::string target_string) {
-  int count = std::count_if(tokens.begin(), tokens.end(), [&target_tag, &target_string](Token t) {
-    return t.GetTokenTag() == target_tag
-        && t.GetTokenString() == target_string;
-  });
-  return count;
-}
-
-/**
- *  Returns an iterator for the tokens vector for the token that matches the regex for the desired patterns, this
- *  is to help identify where to recurse into.
- * @param tokens
- * @param desired_pattern
- * @param left_idx
- * @param right_idx
- * @return
- */
-// forward iterator use:
-auto SyntaxValidator::GetTokenMatchForwardIterator(const vector<Token>& tokens,
-                                                   const std::regex& desired_pattern,
-                                                   int left_idx,
-                                                   int right_idx) {
-  auto forward_iterator = std::find_if(tokens.begin() + left_idx,
-                                       tokens.begin()
-                                           + right_idx, // todo: check if the end is exclusive range or inclusive
-                                       [&desired_pattern](Token elem) {
-                                         string current = elem.GetTokenString();
-                                         return std::regex_match(current, desired_pattern);
-                                       });
-  return forward_iterator;
-}
-// reverse iterator use:
-/**
- * Takes in a range in the form of left and right idx which refers to the actual vector of tokens and within this,
- * finds the first token FROM THE END OF THE VECTOR that matches a desired pattern.
- * @param tokens
- * @param desired_pattern
- * @param left_boundary_idx
- * @param right_boundary_idx
- * @return  the reverse iterator representing this first token
- */
-auto SyntaxValidator::GetTokenMatchReverseIterator(const vector<Token>& tokens,
-                                                   const std::regex& desired_pattern,
-                                                   int left_boundary_idx,
-                                                   int right_boundary_idx) {
-  // from the given actual indices, get respective reverse iterators for the range
-  auto rBeginning = tokens.crbegin() + ((tokens.size() - 1) - right_boundary_idx);
-  auto rEnding = tokens.crend() - left_boundary_idx;
-  // nb: find_if checks within a half-open range but we want inclusive behaviour:
-  auto reverse_iterator = std::find_if(rBeginning,
-                                       rEnding - 1, // todo: check if will throw out of bounds error;
-                                       [&desired_pattern](Token elem) {
-                                         string current = elem.GetTokenString();
-                                         bool matches_target_pattern = std::regex_match(current, desired_pattern);
-                                         return matches_target_pattern;
-                                       });
-  return reverse_iterator;
-}
-
-/**
- * For a given vector of tokens and a boundary of indices to inspect, returns the index of the last token that matches
- * the desired regex pattern.
- * @param tokens
- * @param desired_pattern
- * @param left_boundary_idx (inclusive boundary)
- * @param right_boundary_idx (inclusive boundary)
- * @return
- */
-int SyntaxValidator::GetLastMatchingTokenIdx(const vector<Token>& tokens,
-                                             const std::regex& desired_pattern,
-                                             int left_boundary_idx,
-                                             int right_boundary_idx) {
-  auto delim_iterator = SyntaxValidator::GetTokenMatchReverseIterator(tokens,
-                                                                      desired_pattern,
-                                                                      left_boundary_idx,
-                                                                      right_boundary_idx);
-  int delim_idx = std::distance(tokens.begin(), delim_iterator.base()) - 1;
-  return delim_idx;
 }
 
 /**
@@ -256,10 +202,10 @@ bool SyntaxValidator::IsTerm(const vector<Token>& statement_tokens, int left_bou
   }
   // case 2: <term><operator><factor>
   // find delimiter, if found and in range, the left to it is should be a term and right of it should be a factor
-  int delim_idx = GetLastMatchingTokenIdx(statement_tokens,
-                                          RegexPatterns::GetTermDelimiterPattern(),
-                                          left_boundary_idx,
-                                          right_boundary_idx);
+  int delim_idx = Token::GetLastMatchingTokenIdx(statement_tokens,
+                                                 RegexPatterns::GetTermDelimiterPattern(),
+                                                 left_boundary_idx,
+                                                 right_boundary_idx);
   bool delim_idx_in_range = left_boundary_idx <= delim_idx && right_boundary_idx >= delim_idx;
   if (delim_idx_in_range) {
     if (delim_idx == left_boundary_idx || delim_idx == right_boundary_idx) {
@@ -300,10 +246,10 @@ bool SyntaxValidator::IsExpr(const vector<Token>& statement_tokens, int left_bou
     return true;
   }
   // case 2: <expr><delim><term>
-  auto delim_idx = GetLastMatchingTokenIdx(statement_tokens,
-                                           RegexPatterns::GetExprDelimiterPattern(),
-                                           left_boundary_idx,
-                                           right_boundary_idx);
+  auto delim_idx = Token::GetLastMatchingTokenIdx(statement_tokens,
+                                                  RegexPatterns::GetExprDelimiterPattern(),
+                                                  left_boundary_idx,
+                                                  right_boundary_idx);
   bool delim_idx_in_range = left_boundary_idx <= delim_idx && right_boundary_idx >= delim_idx;
   if (delim_idx_in_range) {
     if (delim_idx == left_boundary_idx || delim_idx == right_boundary_idx) {
@@ -331,13 +277,17 @@ bool SyntaxValidator::IsExpr(const vector<Token>& statement_tokens, int left_bou
  * @param right_boundary_idx
  * @return
  */
-bool SyntaxValidator::IsRelFactor(const vector<Token>& statement_tokens, int left_boundary_idx, int right_boundary_idx) {
+bool SyntaxValidator::IsRelFactor(const vector<Token>& statement_tokens,
+                                  int left_boundary_idx,
+                                  int right_boundary_idx) {
   TokenTag first_token_tag = statement_tokens.at(left_boundary_idx).GetTokenTag();
   TokenTag last_token_tag = statement_tokens.at(right_boundary_idx).GetTokenTag();
   if (first_token_tag == TokenTag::kOpenBracket && last_token_tag == TokenTag::kCloseBracket) {
     return IsRelFactor(statement_tokens, left_boundary_idx + 1, right_boundary_idx - 1);
   }
-  bool is_factor = IsFactor(statement_tokens, left_boundary_idx, right_boundary_idx);// accepts redundant bracketing of expr e.g. ((x+1))
+  bool is_factor = IsFactor(statement_tokens,
+                            left_boundary_idx,
+                            right_boundary_idx);// accepts redundant bracketing of expr e.g. ((x+1))
   bool is_expr = IsExpr(statement_tokens, left_boundary_idx, right_boundary_idx);  // not sure if redundant OR clause
   return is_factor || is_expr;
 }
@@ -351,10 +301,10 @@ bool SyntaxValidator::IsRelExpr(const vector<Token>& statement_tokens, int left_
   }
 
   // case 1: <rel_expr> < binary comparison operator> < rel expr>
-  int delim_idx = GetLastMatchingTokenIdx(statement_tokens,
-                                          RegexPatterns::GetBinaryComparisonPattern(),
-                                          left_boundary_idx,
-                                          right_boundary_idx);
+  int delim_idx = Token::GetLastMatchingTokenIdx(statement_tokens,
+                                                 RegexPatterns::GetBinaryComparisonPattern(),
+                                                 left_boundary_idx,
+                                                 right_boundary_idx);
   bool delim_idx_in_range = left_boundary_idx <= delim_idx && right_boundary_idx >= delim_idx;
   if (delim_idx_in_range) {
     // todo: can deprecate this by adding to if predicate
@@ -395,10 +345,10 @@ bool SyntaxValidator::IsCondExpr(const vector<Token>& statement_tokens, int left
     return IsCondExpr(statement_tokens, left_boundary_idx + 1, right_boundary_idx); // keep the Open Bracket
   }
   // case 3: it's (<cond_expr>) <binary bool operator> (<cond_expr>)
-  int delim_idx = GetLastMatchingTokenIdx(statement_tokens,
-                                          RegexPatterns::GetBinaryBooleanOperatorPattern(),
-                                          left_boundary_idx,
-                                          right_boundary_idx);
+  int delim_idx = Token::GetLastMatchingTokenIdx(statement_tokens,
+                                                 RegexPatterns::GetBinaryBooleanOperatorPattern(),
+                                                 left_boundary_idx,
+                                                 right_boundary_idx);
   bool delim_idx_in_range = left_boundary_idx <= delim_idx && right_boundary_idx >= delim_idx;
   if (delim_idx_in_range) {
     // todo: can deprecate this by adding to if predicate
@@ -414,6 +364,31 @@ bool SyntaxValidator::IsCondExpr(const vector<Token>& statement_tokens, int left
     return left_part_is_cond_expr;
   }
   return false;
+}
+
+/**
+ * This runs the statement against a blacklist rule: \n
+ * 1. Statement either ends with these possible tokens: \n \t\t
+ *          ";", ==> read,print,call statement  | assignment statement \n \t\t
+ *          "{" (opening of a new container), if | while | procedure \n \t\t
+ *          "}" only token, closing \n\n
+ * 2. If there are brackets, it means it's an if or while statement. In such a case, we'd need an even number of
+ * brackets. \n
+ *
+ * Other blacklist rules should be applied depending on the type of statement it is actually.
+ *
+ * @param statement_tokens tokens that represent the entire sentence
+ * @return
+ */
+bool SyntaxValidator::StatementPassesCommonBlacklistRules(const vector<Token>& statement_tokens) {
+  Token last_token = statement_tokens.at(statement_tokens.size() - 1);
+  bool valid_last_token
+      = std::regex_match(last_token.GetTokenString(), RegexPatterns::GetValidStatementTerminalToken());
+  // for container statements (if and while statements)
+  int num_open_brackets = Token::CountTokens(statement_tokens, TokenTag::kOpenBracket);
+  int num_close_brackets = Token::CountTokens(statement_tokens, TokenTag::kCloseBracket);
+  bool brackets_are_balanced = num_close_brackets == num_open_brackets;
+  return valid_last_token && brackets_are_balanced;
 }
 
 

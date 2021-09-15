@@ -21,7 +21,7 @@ void PSubsystem::ProcessStatement(std::string statement) {
   }
 
   std::vector<Token> tokens = Tokenizer::CreateTokens(statement);
-  bool valid = syntax_validator_.ValidateSemanticSyntax(tokens);
+  bool valid = syntax_validator_.ValidateSyntax(tokens);
   valid = true; //TODO: remove this after validation check is complete
 
   if (tokens[0].GetTokenTag() == TokenTag::kCloseBrace) {
@@ -155,7 +155,7 @@ void PSubsystem::SetStatementObject(Statement* statement) {
   if (!parent_stack_.empty()) {
     assert(current_node_type_ == 1 || current_node_type_ == 2 || current_node_type_ == 3);
     statement->SetParentNode(parent_stack_.top());
-    deliverable_->AddParentRelationship(reinterpret_cast<Statement*>(parent_stack_.top()), statement);
+    deliverable_->AddParentRelationship(dynamic_cast<Statement*>(parent_stack_.top()), statement);
   }
 
   /*
