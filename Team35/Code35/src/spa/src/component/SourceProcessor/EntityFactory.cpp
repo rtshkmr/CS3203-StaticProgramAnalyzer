@@ -115,16 +115,16 @@ Entity* EntityFactory::CreateAssignEntity(vector<Token> tokens) {
  * endTag.
  *
  * @param tokens Tokens that represent a statement.
- * @param startTag The TokenTag which indicates that the next token is the start of an expression.
- * @param endTag The TokenTag which indicates that the previous token is the end of an expression.
+ * @param start_tag The TokenTag which indicates that the next token is the start of an expression.
+ * @param end_tag The TokenTag which indicates that the previous token is the end of an expression.
  * @return Vector of tokens which represents the expression alone.
  */
-vector<Token> EntityFactory::GetExpressionTokens(vector<Token> tokens, TokenTag startTag, TokenTag endTag) {
+vector<Token> EntityFactory::GetExpressionTokens(vector<Token> tokens, TokenTag start_tag, TokenTag end_tag) {
   int iterator = -1;
   int tokens_size = tokens.size();
   // finding start tag
   for (int i = 0; i < tokens_size; ++i) {
-    if (tokens[i].GetTokenTag() == startTag) {
+    if (tokens[i].GetTokenTag() == start_tag) {
       iterator = i + 1;
       break;
     }
@@ -134,7 +134,7 @@ vector<Token> EntityFactory::GetExpressionTokens(vector<Token> tokens, TokenTag 
   }
   // collecting tokens while finding end tag
   vector<Token> expression_tokens;
-  while (tokens[iterator].GetTokenTag() != endTag && iterator != tokens_size) {
+  while (tokens[iterator].GetTokenTag() != end_tag && iterator != tokens_size) {
     expression_tokens.push_back(tokens[iterator]);
     iterator++;
   }
@@ -156,7 +156,12 @@ vector<Variable*> EntityFactory::GetVariablesFromExpressionTokens(vector<Token> 
   vector<Variable*> variables;
   for (auto &token: tokens) {
     if (token.GetTokenTag() == TokenTag::kName) {
-      variables.push_back(RetrieveVariable(token.GetTokenString()));
+      Variable* curr_var = RetrieveVariable(token.GetTokenString());
+      auto iter = std::find(variables.begin(), variables.end(), curr_var);
+      if (iter == variables.end()) {
+        // add curr_var if it is not found in variables
+        variables.push_back(curr_var);
+      }
     }
   }
   return variables;
@@ -166,7 +171,12 @@ vector<ConstantValue*> EntityFactory::GetConstantsFromExpressionTokens(vector<To
   vector<ConstantValue*> constants;
   for (auto &token: tokens) {
     if (token.GetTokenTag() == TokenTag::kInteger) {
-      constants.push_back(CreateConstantValue(token.GetTokenString()));
+      ConstantValue* curr_const = CreateConstantValue(token.GetTokenString());
+      auto iter = std::find(constants.begin(), constants.end(), curr_const);
+      if (iter == constants.end()) {
+        // add curr_const if it is not found in constants
+        constants.push_back(curr_const);
+      }
     }
   }
   return constants;
