@@ -92,8 +92,6 @@ std::string TimeUtil::FormatDateTimeFileName(const tm* tm) {
   int day = (*tm).tm_mday ;
   int hour = (*tm).tm_hour ;
   int sec = (*tm).tm_sec;
-//  int year = (*tm).tm_year + 1900;
-//  int year = (*tm).tm_year + 1900;
 
   // year
   string_stream << year << file_name_field_delim;
@@ -129,21 +127,6 @@ std::string TimeUtil::GetDateTimeStr() {
   time(& t);
   timeinfo = localtime(& t);
   return FormatDateTime(timeinfo);
-
-//
-//#ifndef WIN32
-//  // todo: check warning here
-//  tm now;
-//  localtime_s(& now, & t);
-//  return FormatDateTime(now);
-//#elif defined(LINUX)
-//  tm now;
-//  localtime_r(& now, & t);
-//  return FormatDateTime(now);
-//#else
-//  tm* now = localtime( &t );
-//  return FormatDateTime( *now );
-//#endif
 }
 std::string TimeUtil::GetDateTimeFileNameStr() {
   time_t t = time(nullptr);
@@ -151,17 +134,4 @@ std::string TimeUtil::GetDateTimeFileNameStr() {
   time(& t);
   timeinfo = localtime(& t);
   return FormatDateTimeFileName(timeinfo);
-//#ifndef WIN32
-//  tm now;
-//  localtime_s(& now, & t);
-//  return FormatDateTimeFileName(now);
-//#elif defined(LINUX)
-//  tm now;
-//  localtime_r(& now, & t);
-//  return FormatDateTimeFileName(now);
-//
-//#else
-//  tm* now = localtime( &t );
-//  return FormatDateTimeFileName( *now );
-//#endif
 }

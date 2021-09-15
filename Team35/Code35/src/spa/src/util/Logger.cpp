@@ -1,6 +1,7 @@
 /**
  * This implements logger functions which will be called by the various macros defined in the header file
- */
+ * Acknowledgement:
+ * - Logger design is an adaptation of the reference code here: https://levelup.gitconnected.com/logging-in-c-60cd1571df15 */
 #include "Logger.h"
 
 Logger spa_logger;
@@ -55,7 +56,7 @@ bool Logger::InitLogger(const LoggerSettings& settings) {
   return true;
 }
 std::string Logger::AddPrefix(const std::string& file, const int line) const {
-  std::string result = "";
+  std::string result;
   if (this->logger_settings_.include_datetime_) {
     result += TimeUtil::GetDateTimeStr();
     if (!this->logger_settings_.include_file_line_) {
