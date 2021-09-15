@@ -8,7 +8,7 @@
 /* Checks that current lookahead has the same expected type. If valid, advances tokenizer to next lookahead.*/
 Token QueryParser::eat(TokenTag token_type) {
   Token token = lookahead;
-  std::cout << "Tokenizer is eating: " + token.GetTokenString() << std::endl;
+//  std::cout << "Tokenizer is eating: " + token.GetTokenString() << std::endl;
   if (token.GetTokenTag() == TokenTag::kInvalid) {
     // TODO: Add a mapping from TokenTag enum to its string representation, so we can print the expected type.
     throw PQLParseException("Unexpected end of input.");

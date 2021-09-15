@@ -58,16 +58,16 @@ Token QueryTokenizer::GetNextToken() {
     return Token("", TokenTag::kInvalid);
   }
   std::string curr_string = query.substr(cursor);
-  std::cout << "curr_string: " + curr_string << std::endl;
+//  std::cout << "curr_string: " + curr_string << std::endl;
   std::smatch match;
   for (auto const& sp : insertion_order) {
     auto spec = *spec_table.find(sp);
     // x.first, x.second
     if (!std::regex_search(curr_string, match, spec.second)) {
-      std::cout << "Regex failed matching for case " + spec.first << std::endl;
+//      std::cout << "Regex failed matching for case " + spec.first << std::endl;
       continue;
     }
-    std::cout << "Regex matched for case " + spec.first << std::endl;
+//    std::cout << "Regex matched for case " + spec.first << std::endl;
     cursor += match[0].str().size();
     if (spec.first.compare("SPACINGS") == 0) {
       return GetNextToken();
