@@ -65,17 +65,17 @@ class PKB {
   std::unordered_map<std::string, std::list<std::tuple<DesignEntity, std::string>>> parent_t_map_;
   std::unordered_map<std::string, std::list<std::tuple<DesignEntity, std::string>>> child_t_map_;
 
-  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> use_s_map_;
-  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> used_by_s_map_;
+  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>*>*> use_s_map_;
+  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>*>*> used_by_s_map_;
 
-  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> use_c_map_;
-  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> used_by_c_map_;
+  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>*>*> use_c_map_;
+  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>*>*> used_by_c_map_;
 
-  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> modifies_s_map_;
-  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> modified_by_s_map_;
+  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>*>*> modifies_s_map_;
+  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>*>*> modified_by_s_map_;
 
-  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> modifies_c_map_;
-  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>>> modified_by_c_map_;
+  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>*>*> modifies_c_map_;
+  std::unordered_map<std::string, std::list<std::tuple<DesignEntity,std::string>*>*> modified_by_c_map_;
 
   std::unordered_map<std::string, std::vector<AssignEntity>> assign_expr_map_;
 

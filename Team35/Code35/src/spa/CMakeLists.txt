@@ -29,14 +29,13 @@ add_library(spa ${srcs} ${headers}
         src/component/QueryProcessor/QueryExtractor/QueryTokenizer.h src/component/QueryProcessor/QueryExtractor/QueryTokenizer.cpp
         src/component/QueryProcessor/QueryExtractor/QueryParser.h src/component/QueryProcessor/QueryExtractor/QueryParser.cpp
         src/component/QueryProcessor/QueryExtractor/QueryExtractor.h src/component/QueryProcessor/QueryExtractor/QueryExtractor.cpp
-        src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatSingleSynonym.h src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatSingleSynonym.cpp
-        src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatDoubleSynonyms.h src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatDoubleSynonyms.cpp
-        src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatNoSynonym.h src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatNoSynonym.cpp
+        src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatClause.h src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatClause.cpp
+        src/component/QueryProcessor/QueryEvaluator/EvaluatePatternClause.h src/component/QueryProcessor/QueryEvaluator/EvaluatePatternClause.cpp
         src/component/QueryProcessor/QueryEvaluator/QueryPKB.h src/component/QueryProcessor/QueryEvaluator/QueryPKB.cpp
         src/component/QueryProcessor/QueryEvaluator/QueryEvaluator.h src/component/QueryProcessor/QueryEvaluator/QueryEvaluator.cpp
         src/component/QueryProcessor/QueryProjector.h src/component/QueryProcessor/QueryProjector.cpp
         src/component/QueryProcessor/QuerySystemController.h src/component/QueryProcessor/QuerySystemController.cpp
-        )
+        src/util/Logger.cpp src/util/Logger.h src/util/util.h src/util/TimeUtil.cpp src/util/TimeUtil.h)
   
 # this makes the headers accessible for other projects which uses spa lib
 target_include_directories(spa PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)

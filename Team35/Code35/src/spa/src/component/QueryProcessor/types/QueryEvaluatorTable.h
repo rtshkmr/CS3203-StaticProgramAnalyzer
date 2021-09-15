@@ -20,6 +20,8 @@ class QueryEvaluatorTable {
 
     bool AddRowForAllColumn(std::string synonym, int index, std::string value);
 
+    bool AddMultipleRowForAllColumn(std::string synonym, int index, std::string value, int count);
+
     // Add target synonym column with values to table
     bool AddTargetSynonym(std::list<std::string> synonymList);
 
@@ -41,6 +43,8 @@ class QueryEvaluatorTable {
     bool ContainsColumn(std::string synonym);
 
     int GetSize();
+
+    int GetRowSize();
   private:
     std::unordered_map<std::string, std::vector<std::string>> um;
     std::string target_synonym;

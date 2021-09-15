@@ -155,7 +155,7 @@ void PSubsystem::SetStatementObject(Statement* statement) {
   if (!parent_stack_.empty()) {
     assert(current_node_type_ == 1 || current_node_type_ == 2 || current_node_type_ == 3);
     statement->SetParentNode(parent_stack_.top());
-    deliverable_->AddParentRelationship(reinterpret_cast<Statement*>(parent_stack_.top()), statement);
+    deliverable_->AddParentRelationship(dynamic_cast<Statement*>(parent_stack_.top()), statement);
   }
 
   /*
