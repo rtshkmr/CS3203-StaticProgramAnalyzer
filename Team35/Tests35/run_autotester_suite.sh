@@ -15,7 +15,7 @@ do echo "[NOTE] Running Test $i";
 	head -1 log_$i.txt;
 	FILENAME=output_$i.xml;
 	QUERIES=$(grep -o '</query>' $FILENAME | wc -l);
-	PASSES=$(grep -o '</passed>' $FILENAME | wc -l); 
+	PASSES=$(grep -o '<passed/>' $FILENAME | wc -l); 
 	FAILS=$(grep -o '</failed>' $FILENAME | wc -l); 
 	echo "[NOTE] #Queries = $QUERIES; #Passes = $PASSES; #Fails = $FAILS" 
 done
