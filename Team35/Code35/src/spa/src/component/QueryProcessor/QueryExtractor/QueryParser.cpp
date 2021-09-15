@@ -244,7 +244,8 @@ std::pair<std::string, bool> QueryParser::parse_expressionSpec() {
   } else {
     throw PQLParseException("Invalid expression-spec for rhs of pattern clause in iteration 1.");
   }
-
+  // ALL GAS NO BRAKES
+  is_exact_match = false;
   return std::make_pair(rhs_ss.str(), is_exact_match);
 }
 

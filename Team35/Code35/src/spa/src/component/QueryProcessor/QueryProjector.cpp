@@ -1,11 +1,6 @@
 #include "QueryProjector.h"
+#include <list>
 
-std::string QueryProjector::FormatQuery(std::vector<std::string> result_list) {
-  std::string output;
-  for (std::string result : result_list) {
-    output += result;
-    output += " ";
-  }
-  output.erase(output.size() - 1);
-  return output;
+std::vector<std::string> QueryProjector::FormatQuery(std::vector<std::string> result_list) {
+  return result_list;
 };

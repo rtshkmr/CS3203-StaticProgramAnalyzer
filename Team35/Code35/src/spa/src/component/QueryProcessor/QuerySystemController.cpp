@@ -7,13 +7,14 @@
 #include "QueryProjector.h"
 #include <component/QueryProcessor/QueryExtractor/QueryExtractor.h>
 
-std::string QuerySystemController::Evaluate(std::string* query, PKB* pkb) {
+std::vector<std::string> QuerySystemController::Evaluate(std::string* query, PKB* pkb) {
   auto query_extractor = QueryExtractor(query);
   try {
     query_extractor.ExtractQuery();
   } catch (const std::runtime_error& error) {
     // cerr << error.what()<< endl;
-    return "";
+    std::vector<std::string> t;
+    return t;
   }
   auto query_evaluator = QueryEvaluator(query_extractor.GetSynonymsList(),
                                         query_extractor.GetTarget(),
@@ -21,9 +22,9 @@ std::string QuerySystemController::Evaluate(std::string* query, PKB* pkb) {
                                         *pkb);
   std::vector<std::string> result_list = query_evaluator.EvaluateQuery();
   if (result_list.size() > 0) {
-    std::string result_string = QueryProjector::FormatQuery(result_list);
-    return result_string;
+    std::vector<std::string> result_list = QueryProjector::FormatQuery(result_list);
+    return result_list;
   }
-  return "";
+  return result_list;
 };
 
