@@ -20,7 +20,7 @@ namespace sp {
     public:
         SourceProcessor() = default;
 
-        static void ProcessSourceFile(std::string file_name, PKB* pkb);
+        static PKB* ProcessSourceFile(std::string file_name);
     };
 }
 
