@@ -29,21 +29,32 @@ void Deliverable::AddReadEntity(ReadEntity* read_entity) {
 }
 
 void Deliverable::AddFollowRelationship(Statement* f1, Statement* f2) {
-  follow_hash_.insert({f1, f2});
-  followed_by_hash_.insert({f2, f1});
+  // Follows is a 1-to-1 relationship so if f1 was not inserted into follow_hash_,
+  // f2 cannot be inserted into followed_by_hash
+  if (follow_hash_.insert({f1, f2}).second) {   // only inserts if the key is unique
+    followed_by_hash_.insert({f2, f1}); // only inserts if the insertion into follow_hash is true
+  };
 }
 
 void Deliverable::AddFollowsTransitiveRelationship(Statement* before, Statement* after) {
-  if (follows_T_hash_.find(before) != follows_T_hash_.end()) {
-    follows_T_hash_.find(before)->second->push_back(after);
+  if (follows_T_hash_.count(before)) {
+    std::list<Statement*>* afters = follows_T_hash_.find(before)->second;
+    if (std::find(afters->begin(), afters->end(), after) == afters->end()) {
+      // add after if it does not exist in afters
+      afters->push_back(after);
+    }
   } else {
     auto* list = new std::list<Statement*>();
     list->push_back(after);
     follows_T_hash_.insert(std::make_pair(before, list));
   }
 
-  if (followed_by_T_hash_.find(after) != followed_by_T_hash_.end()) {
-    followed_by_T_hash_.find(after)->second->push_back(before);
+  if (followed_by_T_hash_.count(after)) {
+    std::list<Statement*>* befores = followed_by_T_hash_.find(after)->second;
+    if (std::find(befores->begin(), befores->end(), before) == befores->end()) {
+      // add before if it does not exist in befores
+      befores->push_back(before);
+    }
   } else {
     auto* list = new std::list<Statement*>();
     list->push_back(before);
@@ -57,29 +68,41 @@ void Deliverable::AddFollowsTransitiveRelationshipForList(Statement* before, std
   }
 }
 
-void Deliverable::AddParentRelationship(Statement* p1, Statement* p2) {
-  if (parent_to_child_hash_.count(p1)) {
-    parent_to_child_hash_.find(p1)->second->push_back(p2);
+void Deliverable::AddParentRelationship(Statement* parent, Statement* child) {
+  if (parent_to_child_hash_.count(parent)) {
+    std::list<Statement*>* children = parent_to_child_hash_.find(parent)->second;
+    if (std::find(children->begin(), children->end(), child) == children->end()) {
+      // add child if it does not exist in children
+      children->push_back(child);
+    }
   } else {
     std::list<Statement*>* lst = new std::list<Statement*>();
-    lst->push_back(p2);
-    parent_to_child_hash_.insert(make_pair(p1, lst));
+    lst->push_back(child);
+    parent_to_child_hash_.insert(make_pair(parent, lst));
   }
 
-  child_to_parent_hash_.insert({p2, p1});
+  child_to_parent_hash_.insert({child, parent}); // only inserts if the key is unique
 }
 
 void Deliverable::AddParentTransitiveRelationship(Statement* parent, Statement* child) {
-  if (parent_to_child_T_hash_.find(parent) != parent_to_child_T_hash_.end()) {
-    parent_to_child_T_hash_.find(parent)->second->push_back(child);
+  if (parent_to_child_T_hash_.count(parent)) {
+    std::list<Statement*>* children = parent_to_child_T_hash_.find(parent)->second;
+    if (std::find(children->begin(), children->end(), child) == children->end()) {
+      // add child if it does not exist in children
+      children->push_back(child);
+    }
   } else {
     auto* list = new std::list<Statement*>();
     list->push_back(child);
     parent_to_child_T_hash_.insert(std::make_pair(parent, list));
   }
 
-  if (child_to_parent_T_hash_.find(child) != child_to_parent_T_hash_.end()) {
-    child_to_parent_T_hash_.find(child)->second->push_back(parent);
+  if (child_to_parent_T_hash_.count(child)) {
+    std::list<Statement*>* parents = child_to_parent_T_hash_.find(child)->second;
+    if (std::find(parents->begin(), parents->end(), parent) == parents->end()) {
+      // add parent if it does not exist in parents
+      parents->push_back(parent);
+    }
   } else {
     auto* list = new std::list<Statement*>();
     list->push_back(parent);
@@ -95,7 +118,11 @@ void Deliverable::AddParentTransitiveRelationshipForList(Statement* parent, std:
 
 void Deliverable::AddUsesRelationship(Statement* u1, Variable* u2) {
   if (use_hash_.count(u1)) {
-    use_hash_.find(u1)->second->push_back(u2);
+    std::list<Variable*>* used_vars = use_hash_.find(u1)->second;
+    if (std::find(used_vars->begin(), used_vars->end(), u2) == used_vars->end()) {
+      // add var u2 if it does not exist in used_vars
+      used_vars->push_back(u2);
+    }
   } else {
     std::list<Variable*>* lst = new std::list<Variable*>();
     lst->push_back(u2);
@@ -103,7 +130,11 @@ void Deliverable::AddUsesRelationship(Statement* u1, Variable* u2) {
   }
 
   if (used_by_hash_.count(u2)) {
-    used_by_hash_.find(u2)->second->push_back(u1);
+    std::list<Statement*>* used_by_stmts = used_by_hash_.find(u2)->second;
+    if (std::find(used_by_stmts->begin(), used_by_stmts->end(), u1) == used_by_stmts->end()) {
+      // add statement u2 if it does not exist in used_by_stmts
+      used_by_stmts->push_back(u1);
+    }
   } else {
     std::list<Statement*>* lst = new std::list<Statement*>();
     lst->push_back(u1);
@@ -115,8 +146,8 @@ void Deliverable::AddUsesRelationship(Container* u1, Variable* u2) {
   if (container_use_hash_.count(u1)) {
     std::list<Variable*>* used_vars = container_use_hash_.find(u1)->second;
     if (std::find(used_vars->begin(), used_vars->end(), u2) == used_vars->end()) {
-      // var does not exist in used_vars
-      container_use_hash_.find(u1)->second->push_back(u2);
+      // add var u2 if it does not exist in used_vars
+      used_vars->push_back(u2);
     }
   } else {
     std::list<Variable*>* lst = new std::list<Variable*>();
@@ -127,8 +158,8 @@ void Deliverable::AddUsesRelationship(Container* u1, Variable* u2) {
   if (container_used_by_hash_.count(u2)) {
     std::list<Container*>* used_by_conts = container_used_by_hash_.find(u2)->second;
     if (std::find(used_by_conts->begin(), used_by_conts->end(), u1) == used_by_conts->end()) {
-      // container does not exist in used_by_conts
-      container_used_by_hash_.find(u2)->second->push_back(u1);
+      // add container u1 if it does not exist in used_by_conts
+      used_by_conts->push_back(u1);
     }
   } else {
     std::list<Container*>* lst = new std::list<Container*>();
@@ -145,7 +176,11 @@ void Deliverable::AddUsesRelationship(Container* container, std::list<Variable*>
 
 void Deliverable::AddModifiesRelationship(Statement* m1, Variable* m2) {
   if (modifies_hash_.count(m1)) {
-    modifies_hash_.find(m1)->second->push_back(m2);
+    std::list<Variable*>* modified_vars = modifies_hash_.find(m1)->second;
+    if (std::find(modified_vars->begin(), modified_vars->end(), m2) == modified_vars->end()) {
+      // add var m2 if it does not exist in modified_vars
+      modified_vars->push_back(m2);
+    }
   } else {
     std::list<Variable*>* lst = new std::list<Variable*>();
     lst->push_back(m2);
@@ -153,7 +188,11 @@ void Deliverable::AddModifiesRelationship(Statement* m1, Variable* m2) {
   }
 
   if (modified_by_hash_.count(m2)) {
-    modified_by_hash_.find(m2)->second->push_back(m1);
+    std::list<Statement*>* modified_by_stmts = modified_by_hash_.find(m2)->second;
+    if (std::find(modified_by_stmts->begin(), modified_by_stmts->end(), m1) == modified_by_stmts->end()) {
+      // add statement m1 if it does not exist in modified_by_stmts
+      modified_by_stmts->push_back(m1);
+    }
   } else {
     std::list<Statement*>* lst = new std::list<Statement*>();
     lst->push_back(m1);
@@ -165,8 +204,8 @@ void Deliverable::AddModifiesRelationship(Container* m1, Variable* m2) {
   if (container_modifies_hash_.count(m1)) {
     std::list<Variable*>* modified_vars = container_modifies_hash_.find(m1)->second;
     if (std::find(modified_vars->begin(), modified_vars->end(), m2) == modified_vars->end()) {
-      // var does not exist in modified_vars
-      container_modifies_hash_.find(m1)->second->push_back(m2);
+      // add var m2 if it does not exist in modified_vars
+      modified_vars->push_back(m2);
     }
   } else {
     std::list<Variable*>* lst = new std::list<Variable*>();
@@ -177,8 +216,8 @@ void Deliverable::AddModifiesRelationship(Container* m1, Variable* m2) {
   if (container_modified_by_hash_.count(m2)) {
     std::list<Container*>* modified_by_conts = container_modified_by_hash_.find(m2)->second;
     if (std::find(modified_by_conts->begin(), modified_by_conts->end(), m1) == modified_by_conts->end()) {
-      // container does not exist in modified_by_conts
-      container_modified_by_hash_.find(m2)->second->push_back(m1);
+      // add container m1 if it does not exist in modified_by_conts
+      modified_by_conts->push_back(m1);
     }
   } else {
     std::list<Container*>* lst = new std::list<Container*>();

@@ -25,7 +25,7 @@ class Deliverable {
   void AddFollowRelationship(Statement* f1, Statement* f2);
   void AddFollowsTransitiveRelationship(Statement* before, Statement* after);
   void AddFollowsTransitiveRelationshipForList(Statement* before, std::list<Statement*>* afters);
-  void AddParentRelationship(Statement* p1, Statement* p2);
+  void AddParentRelationship(Statement* parent, Statement* child);
   void AddParentTransitiveRelationship(Statement* parent, Statement* child);
   void AddParentTransitiveRelationshipForList(Statement* parent, std::list<Statement*>* children);
   void AddUsesRelationship(Statement* u1, Variable* u2);

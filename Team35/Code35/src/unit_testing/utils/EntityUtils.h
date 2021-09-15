@@ -28,6 +28,10 @@ inline ConstantValue* const_3_ = new ConstantValue("3");
  * These functions provide the ability to redefine the statements,
  * so that they do not carry modifications across test cases.
  */
+// Procedures
+inline Procedure* GetProc1() {
+  return new Procedure(new ProcedureName("proc1"));
+}
 
 // read
 inline ReadEntity* GetReadX() {
