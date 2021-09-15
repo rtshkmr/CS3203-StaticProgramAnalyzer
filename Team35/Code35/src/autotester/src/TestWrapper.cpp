@@ -31,8 +31,8 @@ void TestWrapper::parse(std::string file_name) {
 void TestWrapper::evaluate(std::string query, std::list<std::string>& results){
 // call your evaluator to evaluate the query here
   std::cout << "Point 3 in test wrapper" << std::endl;
-  std::vector<std::string> s = QuerySystemController::Evaluate(&query, pkb);
-  for (int i = 0; i < s.size(); i++) {
-    results.push_back(s.at(i));
+  std::optional<std::string> s = QuerySystemController::Evaluate(&query, pkb);
+  if (s) {
+    results.push_back(s.value());;
   }
 }
