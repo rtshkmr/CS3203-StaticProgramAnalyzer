@@ -1,5 +1,6 @@
 #include <sstream>
 #include "TimeUtil.h"
+#include <time.h>
 
 /**
  * Returns a formatted version of the current date time
@@ -96,10 +97,15 @@ std::string TimeUtil::FormatDateTimeFileName(const tm& tm) {
 }
 std::string TimeUtil::GetDateTimeStr() {
   time_t t = time(nullptr);
-#ifndef LINUX
+
+#ifndef WIN32
   // todo: check warning here
   tm now;
   localtime_s(& now, & t);
+  return FormatDateTime(now);
+#elif defined(LINUX)
+  tm now;
+  localtime_r(& now, & t);
   return FormatDateTime(now);
 #else
   tm* now = localtime( &t );
@@ -108,10 +114,15 @@ std::string TimeUtil::GetDateTimeStr() {
 }
 std::string TimeUtil::GetDateTimeFileNameStr() {
   time_t t = time(nullptr);
-#ifndef LINUX
+#ifndef WIN32
   tm now;
   localtime_s(& now, & t);
   return FormatDateTimeFileName(now);
+#elif defined(LINUX)
+  tm now;
+  localtime_r(& now, & t);
+  return FormatDateTimeFileName(now);
+
 #else
   tm* now = localtime( &t );
   return FormatDateTimeFileName( *now );
