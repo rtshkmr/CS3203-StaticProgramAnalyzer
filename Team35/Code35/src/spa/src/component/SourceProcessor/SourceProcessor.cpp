@@ -1,3 +1,4 @@
+#include <util/Logger.h>
 #include <exception/SyntaxException.h>
 #include <exception/IterationOneException.h>
 #include "SourceProcessor.h"
@@ -13,7 +14,10 @@ using namespace sp;
  * @param fileName The name of the file to be processed.
  * @return Source process status
  */
-void SourceProcessor::ProcessSourceFile(std::string file_name) {
+ // todo: [cosmetic] instead of returning void and having a side-effect, return pkb directly
+void SourceProcessor::ProcessSourceFile(std::string file_name, PKB* pkb) {
+  LOG(spa_logger << "=================== SOURCE PROCESSOR ===========================");
+  LOG(spa_logger << "... processing source file");
   par::Parser parser;
   try {
     parser.Parse(file_name);
@@ -29,8 +33,7 @@ void SourceProcessor::ProcessSourceFile(std::string file_name) {
 
   Deliverable* deliverable = parser.GetDeliverables();
   DesignExtractor design_extractor = DesignExtractor(deliverable);
+//  LOG(spa_logger << "...");
   design_extractor.ExtractDesignAbstractions();
-  PKB pkb = PKB();
-  pkb.PopulateDataStructures(*deliverable);
-
+  pkb->PopulateDataStructures(*deliverable);
 }
