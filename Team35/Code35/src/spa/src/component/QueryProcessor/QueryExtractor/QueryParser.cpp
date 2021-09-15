@@ -71,7 +71,7 @@ void QueryParser::GetTarget() {
        break;
      }
    }
-   std::cout << "Exiting from Getarget()..." << std::endl;
+//   std::cout << "Exiting from Getarget()..." << std::endl;
    if (!hasSynonym) {
      throw PQLParseException("Incorrect target synonym for \'Select\' query.");
    }
@@ -111,7 +111,7 @@ std::tuple<std::string, bool, bool> QueryParser::parse_stmtRef() {
   return std::make_tuple(curr_lookahead, is_synonym, is_target_synonym);
 }
 std::pair<Clause*, bool> QueryParser::parse_relRef() {
-  std::cout << "parsing relref" << std::endl;
+//  std::cout << "parsing relref" << std::endl;
   std::unordered_set<std::string> relRefs = {"Follows", "Follows*", "Parent", "Parent*", "Uses", "Modifies"};
   std::unordered_set<std::string>::const_iterator got = relRefs.find(lookahead.GetTokenString());
   if (got == relRefs.end()) {
@@ -120,7 +120,7 @@ std::pair<Clause*, bool> QueryParser::parse_relRef() {
   std::string rel_type = lookahead.GetTokenString();
   eat(TokenTag::kName);
   eat(TokenTag::kOpenBracket);
-  std::cout << "parsing relref of type " + rel_type << std::endl;
+//  std::cout << "parsing relref of type " + rel_type << std::endl;
 
   // TODO: add support in the future for modifiesP, usesP case: (entRef ‘,’ entRef)
   std::string lhs; bool is_lhs_syn; bool is_lhs_tgt_syn;
@@ -134,7 +134,7 @@ std::pair<Clause*, bool> QueryParser::parse_relRef() {
   eat(TokenTag::kComma);
   std::string rhs; bool is_rhs_syn; bool is_rhs_tgt_syn;
   if (rel_type.compare("Uses") == 0 || rel_type.compare("Modifies") == 0) {
-    std::cout << "encountered uses or modifies relRef" << std::endl;
+//    std::cout << "encountered uses or modifies relRef" << std::endl;
     Token tok = parse_entRef(false);
     rhs = tok.GetTokenString();
     bool _is_rhs_syn = false;
@@ -177,7 +177,7 @@ void QueryParser::parse_such_that() {
 // entRef : synonym | ‘_’ | ‘"’ IDENT ‘"’
 /* Takes in a boolean 1 if parsing of entRef is for pattern, 0 otherwise */
 Token QueryParser::parse_entRef(bool isPatternCl) {
-  std::cout << "parsing entRef..." << std::endl;
+//  std::cout << "parsing entRef..." << std::endl;
   std::string token_name;
   TokenTag token_type;
   if (lookahead.GetTokenTag() == TokenTag::kName) {
@@ -207,7 +207,7 @@ Token QueryParser::parse_entRef(bool isPatternCl) {
 
 // iteration 1: factor: var_name | const_value
 std::string QueryParser::parse_factor() {
-  std::cout << "parsing factor..." << std::endl;
+//  std::cout << "parsing factor..." << std::endl;
   std::stringstream ss;
   if (lookahead.GetTokenTag() == TokenTag::kInteger) {
     // parse as constant
@@ -223,7 +223,7 @@ std::string QueryParser::parse_factor() {
 
 // iteration 1: expression-spec: ‘_’ ‘"’ factor ‘"’ ‘_’ | ‘_’
 std::pair<std::string, bool> QueryParser::parse_expressionSpec() {
-  std::cout << "parsing expressionSpec..." << std::endl;
+//  std::cout << "parsing expressionSpec..." << std::endl;
   bool is_exact_match = false;
   std::stringstream rhs_ss;
 
@@ -287,13 +287,13 @@ bool QueryParser::is_valid_synonym(Token token, DesignEntity de) {
 }
 
 void QueryParser::parse_pattern() {
-  std::cout << "parsing pattern clause..." << std::endl;
+//  std::cout << "parsing pattern clause..." << std::endl;
   eat(TokenTag::kName); // eat 'pattern' keyword
   // check if syn-assign valid
   if (!is_valid_synonym(lookahead, DesignEntity::kAssign)) {
     throw PQLParseException("Expected valid syn-assign for pattern cl, instead got " + lookahead.GetTokenString());
   }
-  std::cout << "Got valid syn assign: " + lookahead.GetTokenString() << std::endl;
+//  std::cout << "Got valid syn assign: " + lookahead.GetTokenString() << std::endl;
   Token assn_tok = Token(lookahead.GetTokenString(), lookahead.GetTokenTag());
 
   eat(TokenTag::kName); // eat 'syn-assign'
@@ -303,10 +303,10 @@ void QueryParser::parse_pattern() {
   eat(TokenTag::kComma);
   std::string lhs = lhs_token.GetTokenString();
   bool lhs_is_syn = is_valid_synonym(lhs_token, DesignEntity::kVariable);
-  std::cout << "lhs_is_syn has value "; std::cout << lhs_is_syn << std::endl;
+//  std::cout << "lhs_is_syn has value "; std::cout << lhs_is_syn << std::endl;
   //parse_rhs
   std::pair<std::string, bool> rhs_info = parse_expressionSpec();
-  std::cout << "grouping clauses...";
+//  std::cout << "grouping clauses...";
 
   // TODO: this could introduce a memory leak...
   Clause* cl = new Pattern(lhs, rhs_info.first, assn_tok.GetTokenString(), lhs_is_syn, rhs_info.second);
@@ -318,19 +318,19 @@ void QueryParser::parse_select() {
     throw PQLParseException("Expected \'Select\' keyword, instead got " + lookahead.GetTokenString());
   }
   eat(TokenTag::kName); // 'Select' is tokenized as a name.
-  std::cout << "Entering Getarget()..." << std::endl;
+//  std::cout << "Entering Getarget()..." << std::endl;
   GetTarget();
-  std::cout << "Exited from Getarget()..." << std::endl;
+//  std::cout << "Exited from Getarget()..." << std::endl;
   // if there are more tokens, we are expecting either such that or pattern clauses.
   if (lookahead.GetTokenTag() == TokenTag::kInvalid) {
     return;
   }
-  std::cout << "Expecting such that or pattern clause..." << std::endl;
+//  std::cout << "Expecting such that or pattern clause..." << std::endl;
   if (lookahead.GetTokenTag() == TokenTag::kSuchThat) {
-    std::cout << "parsing such that" << std::endl;
+//    std::cout << "parsing such that" << std::endl;
     parse_such_that();
   } else if (lookahead.GetTokenTag() == TokenTag::kName && lookahead.GetTokenString().compare("pattern") == 0) {
-    std::cout << "parsing pattern" << std::endl;
+//    std::cout << "parsing pattern" << std::endl;
     parse_pattern();
   } else {
     throw PQLParseException("Incorrect query. Expected such that or pattern clause.");
@@ -350,35 +350,35 @@ void QueryParser::parse_query() {
 void QueryParser::group_clauses() {
   // TODO: implement grouping algorithm.
   // current implementation assumes only 1 such that and 1 pattern clause; manually grouping by common synonym.
-  std::cout << "There are ";
+//  std::cout << "There are ";
   std::cout << clauses.size();
 
   if (clauses.size() == 0) {
     return;
   }
-  std::cout << " clauses. Applying grouping algorithm." << std::endl;
+//  std::cout << " clauses. Applying grouping algorithm." << std::endl;
 
   if (clauses.size() == 1) {
     // expecting 1 such that or 1 pattern clause
     bool has_target_syn = false;
     // such that clause
-    std::cout << "printing typeids..." << std::endl;
+//    std::cout << "printing typeids..." << std::endl;
     //std::cout << typeid(*clauses[0]).;
     //std::cout << typeid(SuchThat);
 
     if (typeid(*clauses[0]) == typeid(SuchThat)) {
-      std::cout << "received such that clause for grouping" << std::endl;
+//      std::cout << "received such that clause for grouping" << std::endl;
       SuchThat* st = dynamic_cast<SuchThat*>(clauses[0]);
       if (st->left_is_synonym && st->left_hand_side.compare(target.GetName()) == 0) {
         has_target_syn = true;
       } else if (st->right_is_synonym && st->right_hand_side.compare(target.GetName()) == 0) {
         has_target_syn = true;
       }
-      std::cout << "printing value of has_target_syn for 1x such that... ";
+//      std::cout << "printing value of has_target_syn for 1x such that... ";
       std::cout << has_target_syn << std::endl;
     } else {
       // pattern clause
-      std::cout << "received pattern clause for grouping" << std::endl;
+//      std::cout << "received pattern clause for grouping" << std::endl;
       Pattern* pt = dynamic_cast<Pattern*>(clauses[0]);
       // has_target_syn if lhs is a target synonym, or if  syn-assn is a target synonym
       if (pt->assign_synonym.compare(target.GetName()) == 0 ||
@@ -419,7 +419,7 @@ void QueryParser::group_clauses() {
       groups.push_back(Group(cl2, false));
     }
   } else {
-    std::cout << clauses.size() << std::endl;
+//    std::cout << clauses.size() << std::endl;
     throw PQLValidationException("Got more than 2 clauses.");
   }
 }
@@ -429,6 +429,6 @@ void QueryParser::parse() {
   lookahead = tokenizer.GetNextToken();
   parse_query();
   group_clauses();
-  std::cout << "printing group stats..." << std::endl;
-  std::cout << groups.size() << std::endl;
+//  std::cout << "printing group stats..." << std::endl;
+//  std::cout << groups.size() << std::endl;
 }
