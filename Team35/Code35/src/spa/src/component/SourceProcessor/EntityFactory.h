@@ -29,7 +29,7 @@ class EntityFactory {
 
   Entity* CreateConditionalEntity(std::vector<Token> tokens, TokenTag entity_type);
   Entity* CreateAssignEntity(std::vector<Token> tokens);
-  std::vector<Token> GetExpressionTokens(std::vector<Token> tokens, TokenTag startTag, TokenTag endTag);
+  std::vector<Token> GetExpressionTokens(std::vector<Token> tokens, TokenTag start_tag, TokenTag end_tag);
   static std::string ConvertTokensToString(std::vector<Token> tokens);
   std::vector<Variable*> GetVariablesFromExpressionTokens(std::vector<Token> tokens);
   std::vector<ConstantValue*> GetConstantsFromExpressionTokens(std::vector<Token> tokens);

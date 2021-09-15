@@ -40,6 +40,8 @@ class Statement : public Entity {
 
 /**
  * Container is an abstract class which applies to all classes that can contain statements.
+ * The statement list should only contain the Entity's immediate children statements.
+ * e.g. in the case of If, only the If statement is in this list and not the nested statements.
  */
 class Container {
  private:
@@ -88,6 +90,8 @@ class Program {
   Program(Procedure* p);
 
   std::list<Procedure*>* getProcedureList();
+
+  void setProcedure(Procedure* p);
 };
 
 #endif //AUTOTESTER_ENTITY_H

@@ -82,10 +82,12 @@ bool SyntaxValidator::ValidateMacroFunctionSyntax(const vector<Token>& tokens) {
  * @return
  */
 bool SyntaxValidator::ValidateIfStatementSyntax(const vector<Token>& tokens) {
-  bool contains_then_keyword = Token::CountTokens(tokens, TokenTag::kThenKeyword) == 1;
   bool guarantee = tokens.at(0).GetTokenTag() == TokenTag::kIfKeyword;
   assert(guarantee);
-  if (!contains_then_keyword) {
+
+  bool contains_single_then_keyword = Token::CountTokens(tokens, TokenTag::kThenKeyword) == 1;
+  bool terminal_token_is_open_brace =  tokens.at(tokens.size() - 1).GetTokenTag() == TokenTag::kOpenBrace;
+  if (!contains_single_then_keyword || !terminal_token_is_open_brace) {
     return false;
   }
   // todo: [cosmetic] probably no need to use counting, need to see what the finder fucntion returns if it doesn't exist
@@ -114,11 +116,12 @@ bool SyntaxValidator::ValidateWhileKeyword(const vector<Token>& tokens) {
   assert(guarantee);
   int first_open_bracket_idx = Token::GetFirstMatchingTokenIdx(tokens, TokenTag::kOpenBracket);
   int last_close_bracket_idx = Token::GetLastMatchingTokenIdx(tokens, TokenTag::kCloseBracket);
+  bool terminal_token_is_open_brace = tokens.at(tokens.size() - 1).GetTokenTag()==TokenTag::kOpenBrace;
   bool valid_cond_expression = tokens.size() > 4
       && first_open_bracket_idx + 1 <= last_close_bracket_idx - 1
       && first_open_bracket_idx == 1
       && IsCondExpr(tokens, first_open_bracket_idx + 1, last_close_bracket_idx - 1);
-  return valid_cond_expression;
+  return terminal_token_is_open_brace && valid_cond_expression;
 }
 
 /**
@@ -129,7 +132,10 @@ bool SyntaxValidator::ValidateWhileKeyword(const vector<Token>& tokens) {
 bool SyntaxValidator::ValidateAssignmentSentenceSyntax(const vector<Token>& statement_tokens) {
   bool terminates_with_semicolon =
       statement_tokens.at(statement_tokens.size() - 1).GetTokenTag() == TokenTag::kSemicolon;
-  assert(terminates_with_semicolon == true); // because the generic blacklist would have run by this time
+//  assert(terminates_with_semicolon == true); // because the generic blacklist would have run by this time
+  if (!terminates_with_semicolon) {
+    return false;
+  }
   bool has_only_one_assignment_operator = Token::CountTokens(statement_tokens, TokenTag::kAssignmentOperator);
   if (!has_only_one_assignment_operator) {
     return false;
@@ -144,7 +150,7 @@ bool SyntaxValidator::ValidateAssignmentSentenceSyntax(const vector<Token>& stat
 }
 
 bool SyntaxValidator::ValidateCloseBrace(const vector<Token>& tokens) { // redundant function in case there are edge cases
-  return true;
+  return tokens.size() == 1;
 }
 
 /**

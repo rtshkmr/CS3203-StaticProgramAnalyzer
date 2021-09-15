@@ -438,6 +438,18 @@ TEST_CASE("1.SyntaxValidator.Validator handles statement validation:") {
       REQUIRE(CheckAgainstSampleLines(18, 25, invalid_program_lines, false));
     }
   }
+}
 
+TEST_CASE("1.SyntaxValidator.EdgeCases") {
+  vector<string> invalid_lines;
+  invalid_lines.emplace_back(R"(procedure X meow = 1;)");
+  invalid_lines.emplace_back(R"(if (x==1) then while (p == q) {)"); // mixups
+  invalid_lines.emplace_back(R"(x = 1 if(x>1) then { )");
+  invalid_lines.emplace_back(R"(if(x>1) then{ x = x - 1; })"); // shouldn't be in same line
+  invalid_lines.emplace_back(R"(if(x>1) then{ x = x - 1; } else {x = x + 1;})"); // shouldn't be in same line
+  invalid_lines.emplace_back(R"(while(x>1) { x = x + 1; } then{ x = x - 1; } )"); // shouldn't be in same line
+  invalid_lines.emplace_back(R"(while(x>1) then { x = x + 1; } else {x = x + 1;})"); // shouldn't be in same line
+  invalid_lines.emplace_back(R"(x=x+1 y = y -1 x = x %x;)"); // shouldn't be in same line
+  REQUIRE(CheckAgainstSampleLines(0, 7, invalid_lines, false));
 }
 
