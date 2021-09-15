@@ -1,19 +1,29 @@
 #include <sstream>
 #include "TimeUtil.h"
 #include <time.h>
+#include <chrono>
+#include <ctime>
+#include <cassert>
 
 /**
  * Returns a formatted version of the current date time
  * @param tm  time struct
  * @return  string format of the current day, date, month, year,seconds
  */
-std::string TimeUtil::FormatDateTime(const tm& tm) {
+std::string TimeUtil::FormatDateTime(const tm* tm) {
+//  auto now = std::chrono::system_clock::now();
+//  std::time_t current_time = std::chrono::system_clock::to_time_t(now);
+//  std::ctime(&current_time);
+
+
+
   static std::string date_delim = "/";
   static std::string time_delim = ":";
   std::stringstream string_stream;
 
   // day:
-  switch (tm.tm_wday) {
+  int day = (* tm).tm_wday;
+  switch (day) {
     case 0: string_stream << "Sun ";
       break;
     case 1: string_stream << "Mon ";
@@ -28,33 +38,42 @@ std::string TimeUtil::FormatDateTime(const tm& tm) {
       break;
     case 6: string_stream << "Sat ";
       break;
+    default:assert(false);
+      break;
   }
   // add date:
-  if (tm.tm_mday < 10) {
-    string_stream << "0" << tm.tm_mday << date_delim;
+  int date = (* tm).tm_mday;
+
+  if (date < 10) {
+    string_stream << "0" << date << date_delim;
   } else {
-    string_stream << tm.tm_mday << date_delim;
+    string_stream << date << date_delim;
   }
   // add month:
-  if (tm.tm_mon + 1 < 10) {
-    string_stream << "0" << tm.tm_mon + 1 << date_delim;
+  int month = (* tm).tm_mon + 1;
+  if (month < 10) {
+    string_stream << "0" << month << date_delim;
   } else {
-    string_stream << tm.tm_mon + 1 << date_delim;
+    string_stream << month << date_delim;
   }
+  int year = (* tm).tm_year + 1900;
   // add year:
-  string_stream << tm.tm_year + 1900 << " ";
+  string_stream << year << " ";
   // add timestamp:
-  string_stream << tm.tm_hour << time_delim;
-  if (tm.tm_min < 10) {
-    string_stream << "0" << tm.tm_min << time_delim;
+  int hour = (* tm).tm_hour;
+  string_stream << hour << time_delim;
+  int min = (* tm).tm_min;
+  if (min < 10) {
+    string_stream << "0" << min << time_delim;
   } else {
-    string_stream << tm.tm_min << time_delim;
+    string_stream << min << time_delim;
   }
   // add seconds :
-  if (tm.tm_sec < 10) {
-    string_stream << "0" << tm.tm_sec;
+  int seconds = (* tm).tm_sec;
+  if (seconds < 10) {
+    string_stream << "0" << seconds;
   } else {
-    string_stream << tm.tm_sec;
+    string_stream << seconds;
   }
   return string_stream.str();
 }
@@ -64,67 +83,85 @@ std::string TimeUtil::FormatDateTime(const tm& tm) {
  * @param tm
  * @return
  */
-std::string TimeUtil::FormatDateTimeFileName(const tm& tm) {
+std::string TimeUtil::FormatDateTimeFileName(const tm* tm) {
+
   std::stringstream string_stream;
   static std::string file_name_field_delim = "_";
+  int year = (*tm).tm_year + 1900;
+  int month = (*tm).tm_mon + 1;
+  int day = (*tm).tm_mday ;
+  int hour = (*tm).tm_hour ;
+  int sec = (*tm).tm_sec;
+//  int year = (*tm).tm_year + 1900;
+//  int year = (*tm).tm_year + 1900;
 
   // year
-  string_stream << tm.tm_year + 1900 << file_name_field_delim;
-  if (tm.tm_mon + 1 < 10) {
-    string_stream << "0" << tm.tm_mon + 1 << file_name_field_delim;
+  string_stream << year << file_name_field_delim;
+  if (month < 10) {
+    string_stream << "0" << month << file_name_field_delim;
   } else {
-    string_stream << tm.tm_mon + 1 << file_name_field_delim;
+    string_stream << month << file_name_field_delim;
   }
-  if (tm.tm_mday < 10) {
-    string_stream << "0" << tm.tm_mday << file_name_field_delim;
+  if (day < 10) {
+    string_stream << "0" << day << file_name_field_delim;
   } else {
-    string_stream << tm.tm_mday << file_name_field_delim;
+    string_stream << day << file_name_field_delim;
   }
 
   // time
-  string_stream << tm.tm_hour << file_name_field_delim;
-  if (tm.tm_min < 10) {
-    string_stream << "0" << tm.tm_min << file_name_field_delim;
+  string_stream << hour << file_name_field_delim;
+  if (hour< 10) {
+    string_stream << "0" << hour<< file_name_field_delim;
   } else {
-    string_stream << tm.tm_min << file_name_field_delim;
+    string_stream << hour<< file_name_field_delim;
   }
-  if (tm.tm_sec < 10) {
-    string_stream << "0" << tm.tm_sec;
+  if (sec < 10) {
+    string_stream << "0" << sec;
   } else {
-    string_stream << tm.tm_sec;
+    string_stream << sec;
   }
   return string_stream.str();
 }
+
 std::string TimeUtil::GetDateTimeStr() {
   time_t t = time(nullptr);
+  struct tm* timeinfo;
+  time(& t);
+  timeinfo = localtime(& t);
+  return FormatDateTime(timeinfo);
 
-#ifndef WIN32
-  // todo: check warning here
-  tm now;
-  localtime_s(& now, & t);
-  return FormatDateTime(now);
-#elif defined(LINUX)
-  tm now;
-  localtime_r(& now, & t);
-  return FormatDateTime(now);
-#else
-  tm* now = localtime( &t );
-  return FormatDateTime( *now );
-#endif
+//
+//#ifndef WIN32
+//  // todo: check warning here
+//  tm now;
+//  localtime_s(& now, & t);
+//  return FormatDateTime(now);
+//#elif defined(LINUX)
+//  tm now;
+//  localtime_r(& now, & t);
+//  return FormatDateTime(now);
+//#else
+//  tm* now = localtime( &t );
+//  return FormatDateTime( *now );
+//#endif
 }
 std::string TimeUtil::GetDateTimeFileNameStr() {
   time_t t = time(nullptr);
-#ifndef WIN32
-  tm now;
-  localtime_s(& now, & t);
-  return FormatDateTimeFileName(now);
-#elif defined(LINUX)
-  tm now;
-  localtime_r(& now, & t);
-  return FormatDateTimeFileName(now);
-
-#else
-  tm* now = localtime( &t );
-  return FormatDateTimeFileName( *now );
-#endif
+  struct tm* timeinfo;
+  time(& t);
+  timeinfo = localtime(& t);
+  return FormatDateTimeFileName(timeinfo);
+//#ifndef WIN32
+//  tm now;
+//  localtime_s(& now, & t);
+//  return FormatDateTimeFileName(now);
+//#elif defined(LINUX)
+//  tm now;
+//  localtime_r(& now, & t);
+//  return FormatDateTimeFileName(now);
+//
+//#else
+//  tm* now = localtime( &t );
+//  return FormatDateTimeFileName( *now );
+//#endif
 }

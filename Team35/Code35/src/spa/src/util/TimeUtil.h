@@ -5,8 +5,8 @@
 #include <string>
 class TimeUtil {
  public:
-  static std::string FormatDateTime(const tm& tm);
-  static std::string FormatDateTimeFileName(const tm& time);
+  static std::string FormatDateTime(const tm* tm);
+  static std::string FormatDateTimeFileName(const tm* time);
   static std::string GetDateTimeStr();
   static std::string GetDateTimeFileNameStr();
 };
