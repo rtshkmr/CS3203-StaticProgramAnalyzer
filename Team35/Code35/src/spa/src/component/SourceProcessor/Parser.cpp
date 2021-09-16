@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <util/Logger.h>
 
 #include "Parser.h"
 #include "TNode.h"
@@ -12,6 +13,7 @@ using namespace std;
 using namespace par;
 
 void Parser::Parse(std::string file_name) {
+  LOG (spa_logger << "\n\n\n==========================  [ENTER] PARSE parser ======================\n\n\n");
   psub::PSubsystem p_subsystem;
   p_subsystem.InitDataStructures();
 
@@ -43,6 +45,7 @@ void Parser::Parse(std::string file_name) {
     }
     deliverable_ = *p_subsystem.GetDeliverables();
     source_file.close();
+    LOG (spa_logger << "\n\n\n==========================  [EXIT] PARSE parser ======================\n\n\n");
   }
 
 }

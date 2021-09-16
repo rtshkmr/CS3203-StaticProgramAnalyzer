@@ -39,11 +39,11 @@ TEST_CASE("3.QueryExtractor.Extract single synonym + select declared synonym; sh
   std::list<Synonym> expected_synonyms = {Synonym("a1", DesignEntity::kAssign)};
   Synonym expected_target = Synonym("a1", DesignEntity::kAssign);
   std::list<Group> expected_groups;
-  REQUIRE(AreSynonymsEqual(expected_target, target) == 1);
+  REQUIRE(AreSynonymsEqual(expected_target, target));
   REQUIRE(expected_groups.size() == groups.size());
   auto it1 = expected_synonyms.begin(); auto it2 = synonyms.begin();
   while (it1 != expected_synonyms.end() && it2 != synonyms.end()) {
-    REQUIRE(AreSynonymsEqual(*it1, *it2) == 1);
+    REQUIRE(AreSynonymsEqual(*it1, *it2) );
     it1++; it2++;
   }
 }
@@ -61,11 +61,11 @@ TEST_CASE("3.QueryExtractor.Extract multiple synonym + select declared synonym; 
                                           Synonym("c", DesignEntity::kAssign)};
   Synonym expected_target = Synonym("a", DesignEntity::kAssign);
   std::list<Group> expected_groups;
-  REQUIRE(AreSynonymsEqual(expected_target, target) == 1);
+  REQUIRE(AreSynonymsEqual(expected_target, target));
   REQUIRE(expected_groups.size() == groups.size());
   auto it1 = expected_synonyms.begin(); auto it2 = synonyms.begin();
   while (it1 != expected_synonyms.end() && it2 != synonyms.end()) {
-    REQUIRE(AreSynonymsEqual(*it1, *it2) == 1);
+    REQUIRE(AreSynonymsEqual(*it1, *it2));
     it1++; it2++;
   }
 }
@@ -89,11 +89,11 @@ TEST_CASE("3.QueryExtractor.Extract multiple unique synonym + select declared sy
                                             Synonym("p1", DesignEntity:: kProcedure)};
   Synonym expected_target = Synonym("a1", DesignEntity::kAssign);
   std::list<Group> expected_groups;
-  REQUIRE(AreSynonymsEqual(expected_target, target) == 1);
+  REQUIRE(AreSynonymsEqual(expected_target, target));
   REQUIRE(expected_groups.size() == groups.size());
   auto it1 = expected_synonyms.begin(); auto it2 = synonyms.begin();
   while (it1 != expected_synonyms.end() && it2 != synonyms.end()) {
-    REQUIRE(AreSynonymsEqual(*it1, *it2) == 1);
+    REQUIRE(AreSynonymsEqual(*it1, *it2));
     it1++; it2++;
   }
 }
@@ -156,18 +156,18 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that with correct relRef and
   expected_groups.push_back(expected_group);
 
   // validate target
-  REQUIRE(AreSynonymsEqual(expected_target, target) == 1);
+  REQUIRE(AreSynonymsEqual(expected_target, target) );
   // validate synonyms
   auto it1 = expected_synonyms.begin(); auto it2 = synonyms.begin();
   while (it1 != expected_synonyms.end() && it2 != synonyms.end()) {
-    REQUIRE(AreSynonymsEqual(*it1, *it2) == 1);
+    REQUIRE(AreSynonymsEqual(*it1, *it2));
     it1++; it2++;
   }
   // validate groups
   REQUIRE(expected_groups.size() == groups.size());
   auto it3 = expected_groups.begin(); auto it4 = groups.begin();
   while (it3 != expected_groups.end() && it4 != groups.end()) {
-    REQUIRE(AreGroupsEqual(*it3, *it4) == 1);
+    REQUIRE(AreGroupsEqual(*it3, *it4) );
     it3++; it4++;
   }
   delete cl;
@@ -194,18 +194,18 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that with correct entRef and
     expected_groups.push_back(expected_group);
 
     // validate target
-    REQUIRE(AreSynonymsEqual(expected_target, target) == 1);
+    REQUIRE(AreSynonymsEqual(expected_target, target) );
     // validate synonyms
     auto it1 = expected_synonyms.begin(); auto it2 = synonyms.begin();
     while (it1 != expected_synonyms.end() && it2 != synonyms.end()) {
-      REQUIRE(AreSynonymsEqual(*it1, *it2) == 1);
+      REQUIRE(AreSynonymsEqual(*it1, *it2) );
       it1++; it2++;
     }
     // validate groups
     REQUIRE(expected_groups.size() == groups.size());
     auto it3 = expected_groups.begin(); auto it4 = groups.begin();
     while (it3 != expected_groups.end() && it4 != groups.end()) {
-      REQUIRE(AreGroupsEqual(*it3, *it4) == 1);
+      REQUIRE(AreGroupsEqual(*it3, *it4) );
       it3++; it4++;
     }
     delete cl;
@@ -230,18 +230,18 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that with correct entRef and
     expected_groups.push_back(expected_group);
 
     // validate target
-    REQUIRE(AreSynonymsEqual(expected_target, target) == 1);
+    REQUIRE(AreSynonymsEqual(expected_target, target) );
     // validate synonyms
     auto it1 = expected_synonyms.begin(); auto it2 = synonyms.begin();
     while (it1 != expected_synonyms.end() && it2 != synonyms.end()) {
-      REQUIRE(AreSynonymsEqual(*it1, *it2) == 1);
+      REQUIRE(AreSynonymsEqual(*it1, *it2) );
       it1++; it2++;
     }
     // validate groups
     REQUIRE(expected_groups.size() == groups.size());
     auto it3 = expected_groups.begin(); auto it4 = groups.begin();
     while (it3 != expected_groups.end() && it4 != groups.end()) {
-      REQUIRE(AreGroupsEqual(*it3, *it4) == 1);
+      REQUIRE(AreGroupsEqual(*it3, *it4) );
       it3++; it4++;
     }
     delete cl;
@@ -317,18 +317,18 @@ TEST_CASE("3.QueryExtractor.Single well-formed pattern with correct syn-assign a
     expected_groups.push_back(expected_group);
 
     // validate target
-    REQUIRE(AreSynonymsEqual(expected_target, target) == 1);
+    REQUIRE(AreSynonymsEqual(expected_target, target) );
     // validate synonyms
     auto it1 = expected_synonyms.begin(); auto it2 = synonyms.begin();
     while (it1 != expected_synonyms.end() && it2 != synonyms.end()) {
-      REQUIRE(AreSynonymsEqual(*it1, *it2) == 1);
+      REQUIRE(AreSynonymsEqual(*it1, *it2) );
       it1++; it2++;
     }
     // validate groups
     REQUIRE(expected_groups.size() == groups.size());
     auto it3 = expected_groups.begin(); auto it4 = groups.begin();
     while (it3 != expected_groups.end() && it4 != groups.end()) {
-      REQUIRE(AreGroupsEqual(*it3, *it4) == 1);
+      REQUIRE(AreGroupsEqual(*it3, *it4) );
       it3++; it4++;
     }
     delete cl;
@@ -352,18 +352,18 @@ TEST_CASE("3.QueryExtractor.Single well-formed pattern with correct syn-assign a
     expected_groups.push_back(expected_group);
 
     // validate target
-    REQUIRE(AreSynonymsEqual(expected_target, target) == 1);
+    REQUIRE(AreSynonymsEqual(expected_target, target) );
     // validate synonyms
     auto it1 = expected_synonyms.begin(); auto it2 = synonyms.begin();
     while (it1 != expected_synonyms.end() && it2 != synonyms.end()) {
-      REQUIRE(AreSynonymsEqual(*it1, *it2) == 1);
+      REQUIRE(AreSynonymsEqual(*it1, *it2) );
       it1++; it2++;
     }
     // validate groups
     REQUIRE(expected_groups.size() == groups.size());
     auto it3 = expected_groups.begin(); auto it4 = groups.begin();
     while (it3 != expected_groups.end() && it4 != groups.end()) {
-      REQUIRE(AreGroupsEqual(*it3, *it4) == 1);
+      REQUIRE(AreGroupsEqual(*it3, *it4) );
       it3++; it4++;
     }
     delete cl;
@@ -387,18 +387,18 @@ TEST_CASE("3.QueryExtractor.Single well-formed pattern with correct syn-assign a
     expected_groups.push_back(expected_group);
 
     // validate target
-    REQUIRE(AreSynonymsEqual(expected_target, target) == 1);
+    REQUIRE(AreSynonymsEqual(expected_target, target) );
     // validate synonyms
     auto it1 = expected_synonyms.begin(); auto it2 = synonyms.begin();
     while (it1 != expected_synonyms.end() && it2 != synonyms.end()) {
-      REQUIRE(AreSynonymsEqual(*it1, *it2) == 1);
+      REQUIRE(AreSynonymsEqual(*it1, *it2) );
       it1++; it2++;
     }
     // validate groups
     REQUIRE(expected_groups.size() == groups.size());
     auto it3 = expected_groups.begin(); auto it4 = groups.begin();
     while (it3 != expected_groups.end() && it4 != groups.end()) {
-      REQUIRE(AreGroupsEqual(*it3, *it4) == 1);
+      REQUIRE(AreGroupsEqual(*it3, *it4) );
       it3++; it4++;
     }
     delete cl;

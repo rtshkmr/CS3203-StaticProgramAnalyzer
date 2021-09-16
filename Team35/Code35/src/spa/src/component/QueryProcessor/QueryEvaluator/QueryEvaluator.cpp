@@ -1,3 +1,4 @@
+#include <util/Logger.h>
 #include "QueryEvaluator.h"
 
 QueryEvaluator::QueryEvaluator(std::list<Synonym> syn_list, Synonym target, std::list<Group> groups, PKB pkb)

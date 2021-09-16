@@ -5,7 +5,7 @@
 Item | Version
 -|-
 OS | Cross-Platform (Fedora Build)
-Toolchain | Miscellaneous IDEs + CMake 3.20.5
+Toolchain | CLion + CMake 3.20.5
 C++ Standard | C++17
 
 ### Additional Build Instructions
@@ -18,6 +18,7 @@ Name | Mobile | Email | Development OS/Toolchain
 -:|:-:|:-|-|
 Oliver Cheok | 97986364 | olivercheok20@gmail.com | MacOS/CLion
 Hemanshu Gandhi | 97126133 | hemanshu.gandhi@gmail.com | MacOS/CLion
-Tan Wei Jie | XXXXXXXX | tanweijie123@gmail.com | XXXXXXXX
-Lim Jun Xue | XXXXXXXX | junxue1@gmail.com | XXXXXXXX
-Max Ng Kai Shen | XXXXXXXX | maxngkaishen@gmail.com | XXXXXXXX
+Tan Wei Jie | XXXXXXXX | tanweijie123@gmail.com | Windows/CLion
+Lim Jun Xue | 83661066 | junxue1@gmail.com | Windows/CLion
+Max Ng Kai Shen | XXXXXXXX | maxngkaishen@gmail.com | MacOS/CLion
+Ritesh Kumar | 81867752 | ritesh@emerald.pink | Windows/CLion

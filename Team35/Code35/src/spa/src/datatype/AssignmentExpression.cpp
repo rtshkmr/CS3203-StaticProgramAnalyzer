@@ -38,6 +38,7 @@ int OperatorRank(char &c) {
   if (c == '+' || c == '-') return 1;
   if (c == '*' || c == '/' || c == '%') return 3;
   if (c == '^') return 5;
+  return -INT32_MAX;
 }
 
 std::string ConvertToStringAndClearBuffer(std::vector<char>* chara) {
