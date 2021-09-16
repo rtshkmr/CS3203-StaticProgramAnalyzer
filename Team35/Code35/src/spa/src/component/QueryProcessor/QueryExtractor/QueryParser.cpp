@@ -241,6 +241,7 @@ std::pair<std::string, bool> QueryParser::parse_expressionSpec() {
     rhs_ss << parse_factor();
     eat(TokenTag::kStringQuote);
     eat(TokenTag::kUnderscore);
+    rhs_ss << "_";
   } else {
     throw PQLParseException("Invalid expression-spec for rhs of pattern clause in iteration 1.");
   }
