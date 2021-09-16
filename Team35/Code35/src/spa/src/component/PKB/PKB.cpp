@@ -139,9 +139,13 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetParent(std::string stmt
 std::list<std::tuple<DesignEntity, std::string>> PKB::GetChild(std::string stmt) {
   std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
   auto child_iter = child_map_.find(stmt);
-  std::tuple<DesignEntity, std::string> child = child_iter->second;
-  ret_list.push_back(child);
-  return ret_list;
+  if (child_iter == child_map_.end()) {
+    return ret_list;
+  } else {
+    std::tuple<DesignEntity, std::string> child = child_iter->second;
+    ret_list.push_back(child);
+    return ret_list;
+  }
 }
 
 std::list<std::tuple<DesignEntity, std::string>> PKB::GetFollowsT(std::string stmt) {

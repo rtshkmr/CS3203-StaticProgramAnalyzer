@@ -1,16 +1,12 @@
-procedure
-Bumblebee
-{
-    read
-    x;
+procedure Bumblebee {
+    read     x;
+    print x;
     y = 2 * z;
     z = p - y;
-    if (q != 1) then
-    {
+    if (q != 1) then    {
         z = x + 24;
     }
-else
-    {
+    else {
         while (z > 0) {
             y = x * q - 5;
             z = z - 1;
