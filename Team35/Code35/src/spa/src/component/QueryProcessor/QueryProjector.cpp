@@ -3,7 +3,7 @@
 std::string QueryProjector::FormatQuery(std::vector<std::string> result_list) {
   std::string output;
 
-  sort( result_list.begin(), result_list.end() );
+  std::sort( result_list.begin(), result_list.end() );
   result_list.erase( unique( result_list.begin(), result_list.end() ), result_list.end() );
 
   for (std::string result : result_list) {
