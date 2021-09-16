@@ -237,11 +237,11 @@ std::pair<std::string, bool> QueryParser::parse_expressionSpec() {
     // consider rhs as '_' case due to end of expression-spec.
   } else if (lookahead.GetTokenTag() == TokenTag::kStringQuote) {
     // consider as ‘_’ ‘"’ factor ‘"’ ‘_’
+    rhs_ss.str("");
     eat(TokenTag::kStringQuote);
     rhs_ss << parse_factor();
     eat(TokenTag::kStringQuote);
     eat(TokenTag::kUnderscore);
-    rhs_ss << "_";
   } else {
     throw PQLParseException("Invalid expression-spec for rhs of pattern clause in iteration 1.");
   }
