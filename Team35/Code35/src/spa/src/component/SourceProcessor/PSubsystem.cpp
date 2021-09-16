@@ -154,7 +154,7 @@ void PSubsystem::PerformNewProcedureSteps(Procedure* procedure) {
     deliverable_->SetProgram(program);
   } else {
     throw IterationOneException("[2] Encountered multiple procedures"); //TODO: remove after Iteration 1
-    deliverable_->GetProgram()->setProcedure(procedure);
+    deliverable_->GetProgram()->AddProcedure(procedure);
   }
 }
 
@@ -172,9 +172,9 @@ void PSubsystem::SetStatementObject(Statement* statement) {
   if (current_node_type_ == 3) {
     IfEntity* if_entity = dynamic_cast<IfEntity*>(current_node_);
     assert (if_entity != nullptr);
-    if_entity->getElseStmtList()->push_back(statement);
+    if_entity->GetElseStmtList()->push_back(statement);
 
-    if (if_entity->getElseStmtList()->size() == 1)
+    if (if_entity->GetElseStmtList()->size() == 1)
       new_else = true;
   } else {
     current_node_->AddStatement(statement);
@@ -225,8 +225,8 @@ void PSubsystem::HandleWhileStmt(WhileEntity* while_entity) {
 
 void PSubsystem::HandleAssignStmt(AssignEntity* assign_entity) {
   deliverable_->AddAssignEntity(assign_entity);
-  deliverable_->AddModifiesRelationship(assign_entity, assign_entity->getVariable());
-  deliverable_->AddModifiesRelationship(current_node_, assign_entity->getVariable());  //container level
+  deliverable_->AddModifiesRelationship(assign_entity, assign_entity->GetVariable());
+  deliverable_->AddModifiesRelationship(current_node_, assign_entity->GetVariable());  //container level
 
   for (Variable* v: assign_entity->GetExpressionVariables()) {
     deliverable_->AddUsesRelationship(assign_entity, v);
@@ -241,14 +241,14 @@ void PSubsystem::HandleCallStmt(CallEntity* call_entity) {
 
 void PSubsystem::HandlePrintStmt(PrintEntity* print_entity) {
   deliverable_->AddPrintEntity(print_entity);
-  deliverable_->AddUsesRelationship(print_entity, print_entity->getVariable());
-  deliverable_->AddUsesRelationship(current_node_, print_entity->getVariable());   //container level
+  deliverable_->AddUsesRelationship(print_entity, print_entity->GetVariable());
+  deliverable_->AddUsesRelationship(current_node_, print_entity->GetVariable());   //container level
 }
 
 void PSubsystem::HandleReadStmt(ReadEntity* read_entity) {
   deliverable_->AddReadEntity(read_entity);
-  deliverable_->AddModifiesRelationship(read_entity, read_entity->getVariable());
-  deliverable_->AddModifiesRelationship(current_node_, read_entity->getVariable());  //container level
+  deliverable_->AddModifiesRelationship(read_entity, read_entity->GetVariable());
+  deliverable_->AddModifiesRelationship(current_node_, read_entity->GetVariable());  //container level
 }
 
 void PSubsystem::CheckForIfElseValidity() {

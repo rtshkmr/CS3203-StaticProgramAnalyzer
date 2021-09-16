@@ -175,13 +175,13 @@ TEST_CASE("PKB population and retrieval") {
         SECTION("GetPatternByAssign") {
             std::vector<AssignEntity> pkbEntityVector = pkb.GetPatternByAssign("2");
             REQUIRE(pkbEntityVector.size() == 1);
-            REQUIRE(pkbEntityVector[0].getAssignmentExpr()->GetExpressionString() == "v1=1 2 +v2 +");
+            REQUIRE(pkbEntityVector[0].GetAssignmentExpr()->GetExpressionString() == "v1=1 2 +v2 +");
         }
 
         SECTION("GetPatternByVarName") {
             std::vector<AssignEntity> pkbEntityVector = pkb.GetPatternByVariable("v1");
             REQUIRE(pkbEntityVector.size() == 1);
-            REQUIRE(pkbEntityVector[0].getAssignmentExpr()->GetExpressionString() == "v1=1 2 +v2 +");
+            REQUIRE(pkbEntityVector[0].GetAssignmentExpr()->GetExpressionString() == "v1=1 2 +v2 +");
         }
     }
 }
