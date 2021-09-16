@@ -127,9 +127,10 @@ void EvaluatePatternSingleSynonym(Pattern p, QueryEvaluatorTable* table, PKB pkb
   // Both are synonyms but only assign synonym in table
   std::vector<std::string> assign_stmt_list = table->GetColumn(p.assign_synonym);
   int table_size = assign_stmt_list.size();
+  int assign_reference = 0;
 
   for (int i = 0; i < table_size; i++) {
-    std::string current_assign_stmt = assign_stmt_list[i];
+    std::string current_assign_stmt = assign_stmt_list[assign_reference];
 
     std::vector<AssignEntity> assign_entity_list = QueryPkbPattern(pkb, true, current_assign_stmt);
     // Assert that size of assign_entity_list should be 1.
@@ -141,13 +142,14 @@ void EvaluatePatternSingleSynonym(Pattern p, QueryEvaluatorTable* table, PKB pkb
     std::string name = vn.getName();
 
     // Check if the variable name matches
-    if (name == p.left_hand_side && HasExpressionMatch(p, assign_entity)) {
+    if ((name == p.left_hand_side || p.left_hand_side == "_") && HasExpressionMatch(p, assign_entity)) {
       continue;
     }
 
     table->DeleteRow(i);
     i--;
     table_size--;
+    assign_reference++;
   }
 }
 

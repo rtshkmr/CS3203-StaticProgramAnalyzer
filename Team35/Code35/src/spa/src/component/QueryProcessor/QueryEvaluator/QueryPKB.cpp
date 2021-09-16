@@ -26,9 +26,9 @@ std::list<std::tuple<DesignEntity, std::string>> QueryPKBSuchThat(PKB database, 
     case RelRef::kParent:
       return is_first_param ? database.GetParent(stmt) : database.GetChild(stmt);
     case RelRef::kUsesS:
-      return is_first_param ? database.GetUsedBy(stmt) : database.GetUses(stmt);
+      return is_first_param ? database.GetUses(stmt) : database.GetUsedBy(stmt);
     case RelRef::kModifiesS:
-      return is_first_param ? database.GetModifiedBy(stmt) : database.GetModifies(stmt);
+      return is_first_param ? database.GetModifies(stmt) : database.GetModifiedBy(stmt);
     default:
       std::list<std::tuple<DesignEntity, std::string>> list;
       return list;
@@ -36,7 +36,5 @@ std::list<std::tuple<DesignEntity, std::string>> QueryPKBSuchThat(PKB database, 
 }
 
 std::vector<AssignEntity> QueryPkbPattern(PKB database, bool is_assign_synonym, std::string value) {
-  std::vector<AssignEntity> list_of_assign;
-  return list_of_assign;
-  // return is_assign_synonym ? database.GetVarModified(value) : database.GetStmtModifying(value);
+  return is_assign_synonym ? database.GetPatternByAssign(value) : database.GetPatternByVariable(value);
 }

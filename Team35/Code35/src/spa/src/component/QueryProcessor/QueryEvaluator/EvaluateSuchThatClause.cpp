@@ -47,9 +47,10 @@ void ProcessNewColumn(std::string target_synonym_name, Synonym new_synonym, Quer
 
     std::vector<std::string> targetSynonymList = table->GetColumn(target_synonym_name);
     int numberOfTimesToTraverse = targetSynonymList.size();
+    int target_synonym_reference = 0;
 
     for (int i = 0; i < numberOfTimesToTraverse; i++) {    // For each synonym in the table
-        std::string currStmtRef = targetSynonymList[i];
+        std::string currStmtRef = targetSynonymList[target_synonym_reference];
         // Get the list of possible stmtRef for the current stmtRef.
         std::list<std::tuple<DesignEntity, std::string>> possibleStmtRef =
             QueryPKBSuchThat(pkb, relationship, currStmtRef, givenFirstParam);
@@ -71,6 +72,7 @@ void ProcessNewColumn(std::string target_synonym_name, Synonym new_synonym, Quer
 
         if (number_of_repeats > 0) {
             i += number_of_repeats - 1;
+            numberOfTimesToTraverse += number_of_repeats -1;
         }
 
         // If there are no valid relationships, delete currRow from table.
@@ -79,7 +81,7 @@ void ProcessNewColumn(std::string target_synonym_name, Synonym new_synonym, Quer
             i--;
             numberOfTimesToTraverse--;
         }
-
+        target_synonym_reference++;
     }
 }
 
