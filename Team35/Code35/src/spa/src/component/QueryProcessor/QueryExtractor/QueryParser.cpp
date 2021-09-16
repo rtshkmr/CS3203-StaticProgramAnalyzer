@@ -112,13 +112,18 @@ std::tuple<std::string, bool, bool> QueryParser::parse_stmtRef() {
 }
 std::pair<Clause*, bool> QueryParser::parse_relRef() {
 //  std::cout << "parsing relref" << std::endl;
-  std::unordered_set<std::string> relRefs = {"Follows", "Follows*", "Parent", "Parent*", "Uses", "Modifies"};
+  std::unordered_set<std::string> relRefs = {"Follows", "Parent", "Uses", "Modifies"};
   std::unordered_set<std::string>::const_iterator got = relRefs.find(lookahead.GetTokenString());
   if (got == relRefs.end()) {
     throw PQLParseException("Invalid relRef in such that clause.");
   }
   std::string rel_type = lookahead.GetTokenString();
   eat(TokenTag::kName);
+  // check if next character is *. If so, rel_type is transitive variant.
+  if (lookahead.GetTokenTag() == TokenTag::kTimes) {
+    rel_type += "*";
+    eat(TokenTag::kTimes);
+  }
   eat(TokenTag::kOpenBracket);
 //  std::cout << "parsing relref of type " + rel_type << std::endl;
 
