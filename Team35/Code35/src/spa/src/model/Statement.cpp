@@ -13,7 +13,7 @@ IfEntity::IfEntity(std::string condition, vector<Variable*> expr_variables, vect
   this->expr_constants = std::move(expr_constants);
 }
 
-ConditionalExpression* IfEntity::getCondExpr() {
+ConditionalExpression* IfEntity::GetCondExpr() {
   return cond_expr_;
 }
 
@@ -33,7 +33,7 @@ void IfEntity::SetElseEntity(ElseEntity* else_entity) {
   else_entity_ = else_entity;
 }
 
-std::list<Statement*>* IfEntity::getElseStmtList() {
+std::list<Statement*>* IfEntity::GetElseStmtList() {
   return else_entity_->GetStatementList();
 }
 
@@ -49,7 +49,7 @@ WhileEntity::WhileEntity(std::string condition,
   this->expr_constants = std::move(expr_constants);
 }
 
-ConditionalExpression* WhileEntity::getCondExpr() {
+ConditionalExpression* WhileEntity::GetCondExpr() {
   return cond_expr_;
 }
 
@@ -71,11 +71,11 @@ AssignEntity::AssignEntity(Variable* var,
   this->expr_constants = std::move(expr_constants);
 }
 
-Variable* AssignEntity::getVariable() {
+Variable* AssignEntity::GetVariable() {
   return assigned_to_;
 }
 
-AssignmentExpression* AssignEntity::getAssignmentExpr() {
+AssignmentExpression* AssignEntity::GetAssignmentExpr() {
   return expr_;
 }
 
@@ -91,7 +91,7 @@ CallEntity::CallEntity(Procedure* proc_name) {
   proc_name_ = proc_name;
 }
 
-Procedure* CallEntity::getProcedure() {
+Procedure* CallEntity::GetProcedure() {
   return proc_name_;
 }
 
@@ -99,7 +99,7 @@ PrintEntity::PrintEntity(Variable* var_name) {
   var_name_ = var_name;
 }
 
-Variable* PrintEntity::getVariable() {
+Variable* PrintEntity::GetVariable() {
   return var_name_;
 }
 
@@ -107,6 +107,6 @@ ReadEntity::ReadEntity(Variable* var_name) {
   var_name_ = var_name;
 }
 
-Variable* ReadEntity::getVariable() {
+Variable* ReadEntity::GetVariable() {
   return var_name_;
 }

@@ -32,7 +32,7 @@ TEST_CASE("1.Model.Statement.IfEntity.ElseEntity") {
   else_entity->AddStatement(print_entity);
 
   SECTION ("Check Conditional Elements") {
-    REQUIRE(if1->getCondExpr()->GetExpressionString() == ConditionalExpression(condition).GetExpressionString());
+    REQUIRE(if1->GetCondExpr()->GetExpressionString() == ConditionalExpression(condition).GetExpressionString());
     REQUIRE(if1->GetExpressionVariables() == expr_var);
     REQUIRE(if1->GetExpressionConstants() == expr_constants);
   }
@@ -56,7 +56,7 @@ TEST_CASE("1.Model.Statement.IfEntity.ElseEntity") {
   }
 
   SECTION ("Integrated Else") {
-    REQUIRE(if1->getElseStmtList()->front() == print_entity);
+    REQUIRE(if1->GetElseStmtList()->front() == print_entity);
   }
 
   SECTION ("[IF] Casting to Statement and back") {
@@ -127,7 +127,7 @@ TEST_CASE("1.Model.Statement.WhileEntity") {
   while_entity->AddStatement(assign_entity);
   
   SECTION ("Check Conditional Elements") {
-    REQUIRE(while_entity->getCondExpr()->GetExpressionString() == ConditionalExpression(condition).GetExpressionString());
+    REQUIRE(while_entity->GetCondExpr()->GetExpressionString() == ConditionalExpression(condition).GetExpressionString());
     REQUIRE(while_entity->GetExpressionVariables() == expr_var);
     REQUIRE(while_entity->GetExpressionConstants() == expr_constants);
   }
@@ -181,11 +181,11 @@ TEST_CASE("1.Model.Statement.AssignEntity") {
   AssignEntity* assign_entity = new AssignEntity(var_x, expression, expr_var, expr_constants);
 
   SECTION ("Check Elements") {
-    REQUIRE(assign_entity->getVariable() == var_x);
-    REQUIRE(assign_entity->getAssignmentExpr()->GetExpressionString()
+    REQUIRE(assign_entity->GetVariable() == var_x);
+    REQUIRE(assign_entity->GetAssignmentExpr()->GetExpressionString()
       == AssignmentExpression(expression).GetExpressionString());
 
-    REQUIRE(assign_entity->getAssignmentExpr()->CheckExact(expression));
+    REQUIRE(assign_entity->GetAssignmentExpr()->CheckExact(expression));
 
     REQUIRE(assign_entity->GetExpressionVariables() == expr_var);
     REQUIRE(assign_entity->GetExpressionConstants() == expr_constants);
@@ -223,7 +223,7 @@ TEST_CASE("1.Model.Statement.CallEntity") {
   CallEntity* call_entity = new CallEntity(proc_x);
 
   SECTION ("Check Elements") {
-    REQUIRE(call_entity->getProcedure() == proc_x);
+    REQUIRE(call_entity->GetProcedure() == proc_x);
   }
 
   SECTION ("Casting to Statement and back") {
@@ -258,7 +258,7 @@ TEST_CASE("1.Model.Statement.PrintEntity") {
   PrintEntity* print_entity = new PrintEntity(var_x);
 
   SECTION ("Check Elements") {
-    REQUIRE(print_entity->getVariable() == var_x);
+    REQUIRE(print_entity->GetVariable() == var_x);
   }
 
   SECTION ("Casting to Statement and back") {
@@ -293,7 +293,7 @@ TEST_CASE("1.Model.Statement.ReadEntity") {
   ReadEntity* read_entity = new ReadEntity(var_x);
 
   SECTION ("Check Elements") {
-    REQUIRE(read_entity->getVariable() == var_x);
+    REQUIRE(read_entity->GetVariable() == var_x);
   }
 
   SECTION ("Casting to Statement and back") {

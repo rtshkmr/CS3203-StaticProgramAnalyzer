@@ -346,7 +346,7 @@ void PKB::PopulateAssignList(const std::list<AssignEntity*>& assign_list) {
     std::vector<AssignEntity> varMapVect{entity};
     assign_expr_map_[std::to_string(sNumber->getNum())] = stmtMapVect;
 
-    VariableName varName = *entity.getVariable()->GetName();
+    VariableName varName = *entity.GetVariable()->GetName();
     if (assign_expr_map_.find(varName.getName()) != assign_expr_map_.end()) {
       assign_expr_map_[varName.getName()].push_back(entity);
     } else {

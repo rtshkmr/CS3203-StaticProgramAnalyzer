@@ -34,7 +34,7 @@ class IfEntity : public Statement, public Container {
  public:
   IfEntity(std::string condition, std::vector<Variable*> expr_variables, std::vector<ConstantValue*> expr_constants);
 
-  ConditionalExpression* getCondExpr();
+  ConditionalExpression* GetCondExpr();
 
   std::vector<Variable*> GetExpressionVariables();
 
@@ -44,7 +44,7 @@ class IfEntity : public Statement, public Container {
 
   void SetElseEntity(ElseEntity* else_entity);
 
-  std::list<Statement*>* getElseStmtList();
+  std::list<Statement*>* GetElseStmtList();
 };
 
 /**
@@ -72,7 +72,7 @@ class WhileEntity : public Statement, public Container {
  public:
   WhileEntity(std::string condition, std::vector<Variable*> expr_variables, std::vector<ConstantValue*> expr_constants);
 
-  ConditionalExpression* getCondExpr();
+  ConditionalExpression* GetCondExpr();
 
   std::vector<Variable*> GetExpressionVariables();
 
@@ -98,9 +98,9 @@ class AssignEntity : public Statement {
                std::vector<Variable*> expr_variables,
                std::vector<ConstantValue*> expr_constants);
 
-  Variable* getVariable();
+  Variable* GetVariable();
 
-  AssignmentExpression* getAssignmentExpr();
+  AssignmentExpression* GetAssignmentExpr();
 
   std::vector<Variable*> GetExpressionVariables();
 
@@ -120,7 +120,7 @@ class CallEntity : public Statement {
  public:
   CallEntity(Procedure* proc_name);
 
-  Procedure* getProcedure();
+  Procedure* GetProcedure();
 };
 
 /**
@@ -135,7 +135,7 @@ class PrintEntity : public Statement {
  public:
   PrintEntity(Variable* var_name);
 
-  Variable* getVariable();
+  Variable* GetVariable();
 };
 
 /**
@@ -150,7 +150,7 @@ class ReadEntity : public Statement {
  public:
   ReadEntity(Variable* var_name);
 
-  Variable* getVariable();
+  Variable* GetVariable();
 };
 
 #endif //AUTOTESTER_STATEMENT_H

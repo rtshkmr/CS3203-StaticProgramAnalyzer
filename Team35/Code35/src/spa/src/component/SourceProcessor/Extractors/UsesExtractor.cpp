@@ -93,7 +93,7 @@ void UsesExtractor::ExtractUsesInWhileContainer(WhileEntity* while_entity,
 void UsesExtractor::ExtractUsesInCallContainer(CallEntity* call_entity,
                                                  Container* container,
                                                  std::vector<Procedure*>* extracted_procedures) {
-  Procedure* called_proc = call_entity->getProcedure();
+  Procedure* called_proc = call_entity->GetProcedure();
   std::list<Variable*>* var_list;
   if (std::find(extracted_procedures->begin(), extracted_procedures->end(), called_proc)
   != extracted_procedures->end()) { // procedure found in extracted_procedures

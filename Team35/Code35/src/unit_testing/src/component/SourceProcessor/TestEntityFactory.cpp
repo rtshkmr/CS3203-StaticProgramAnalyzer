@@ -40,14 +40,14 @@ TEST_CASE("1.EntityFactory.CreateEntities") {
     //  ReadEntity expected_read_entity = ReadEntity(new Variable(new VariableName("x")));
     Entity* actual_read_entity = entity_factory.CreateEntities(read_tokens);
     auto* actual_casted_read = dynamic_cast<ReadEntity*>(actual_read_entity);
-    auto* actual_read_var = actual_casted_read->getVariable();
+    auto* actual_read_var = actual_casted_read->GetVariable();
     auto* actual_read_variable_name = const_cast<VariableName*>(actual_read_var->GetName());
 
     CHECK(actual_read_variable_name->getName() == "x");
 
     Entity* duplicate_read = entity_factory.CreateEntities(read_tokens);
     auto* dup_casted_read = dynamic_cast<ReadEntity*>(duplicate_read);
-    auto* dup_read_var = dup_casted_read->getVariable();
+    auto* dup_read_var = dup_casted_read->GetVariable();
     CHECK(actual_read_var == dup_read_var);
   }
 
@@ -60,14 +60,14 @@ TEST_CASE("1.EntityFactory.CreateEntities") {
     //  PrintEntity expected_print_entity = PrintEntity(new Variable(new VariableName("x")));
     Entity* actual_print_entity = entity_factory.CreateEntities(print_tokens);
     auto* actual_casted_print = dynamic_cast<PrintEntity*>(actual_print_entity);
-    auto* actual_print_var = actual_casted_print->getVariable();
+    auto* actual_print_var = actual_casted_print->GetVariable();
     auto* actual_print_variable_name = const_cast<VariableName*>(actual_print_var->GetName());
 
     CHECK(actual_print_variable_name->getName() == "x");
 
     Entity* duplicate_print = entity_factory.CreateEntities(print_tokens);
     auto* dup_casted_print = dynamic_cast<PrintEntity*>(duplicate_print);
-    auto* dup_print_var = dup_casted_print->getVariable();
+    auto* dup_print_var = dup_casted_print->GetVariable();
     CHECK(actual_print_var == dup_print_var);
   }
 
@@ -83,14 +83,14 @@ TEST_CASE("1.EntityFactory.CreateEntities") {
     //          new ProcedureName("anotherProc")));
     Entity* actual_call_entity = entity_factory.CreateEntities(call_tokens);
     auto* actual_casted_call = dynamic_cast<CallEntity*>(actual_call_entity);
-    auto* actual_call_proc = actual_casted_call->getProcedure();
+    auto* actual_call_proc = actual_casted_call->GetProcedure();
     auto* actual_call_proc_name = const_cast<ProcedureName*>(actual_call_proc->GetName());
 
     CHECK(actual_call_proc_name->getName() == "anotherProc");
 
     Entity* duplicate_call = entity_factory.CreateEntities(call_tokens);
     auto* dup_casted_call = dynamic_cast<CallEntity*>(duplicate_call);
-    auto* dup_call_proc = dup_casted_call->getProcedure();
+    auto* dup_call_proc = dup_casted_call->GetProcedure();
     CHECK(actual_call_proc == dup_call_proc);
   }
 
@@ -103,16 +103,16 @@ TEST_CASE("1.EntityFactory.CreateEntities") {
     };
     Entity* actual_assign_entity = entity_factory.CreateEntities(assign_tokens);
     auto* actual_casted_assign = dynamic_cast<AssignEntity*>(actual_assign_entity);
-    auto* actual_ass_var = actual_casted_assign->getVariable();
+    auto* actual_ass_var = actual_casted_assign->GetVariable();
     auto* actual_assign_variable_name = const_cast<VariableName*>(actual_ass_var->GetName());
-    auto actual_assign_expr = actual_casted_assign->getAssignmentExpr()->GetExpressionString();
+    auto actual_assign_expr = actual_casted_assign->GetAssignmentExpr()->GetExpressionString();
 
     CHECK(actual_assign_variable_name->getName() == "y");
     CHECK(actual_assign_expr == "8");
 
     Entity* duplicate_ass = entity_factory.CreateEntities(assign_tokens);
     auto* dup_casted_ass = dynamic_cast<AssignEntity*>(duplicate_ass);
-    auto* dup_ass_var = dup_casted_ass->getVariable();
+    auto* dup_ass_var = dup_casted_ass->GetVariable();
     CHECK(actual_ass_var == dup_ass_var);
   }
 
@@ -128,7 +128,7 @@ TEST_CASE("1.EntityFactory.CreateEntities") {
     };
     Entity* actual_while_entity = entity_factory.CreateEntities(while_tokens);
     auto* actual_casted_while = dynamic_cast<WhileEntity*>(actual_while_entity);
-    auto actual_while_expr = actual_casted_while->getCondExpr()->GetExpressionString();
+    auto actual_while_expr = actual_casted_while->GetCondExpr()->GetExpressionString();
 
     CHECK(actual_while_expr == "x==1");
   }
@@ -145,7 +145,7 @@ TEST_CASE("1.EntityFactory.CreateEntities") {
     };
     Entity* actual_if_entity = entity_factory.CreateEntities(if_tokens);
     auto* actual_casted_if = dynamic_cast<IfEntity*>(actual_if_entity);
-    auto actual_if_expr = actual_casted_if->getCondExpr()->GetExpressionString();
+    auto actual_if_expr = actual_casted_if->GetCondExpr()->GetExpressionString();
 
     CHECK(actual_if_expr == "yyy!=abc");
   }
