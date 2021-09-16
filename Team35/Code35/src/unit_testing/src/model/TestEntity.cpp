@@ -12,11 +12,11 @@ TEST_CASE("1.Model.Entity.Variable") {
   Variable* var_xtester = new Variable(variable_xtester);
 
   SECTION("GetName") {
-    REQUIRE(var_vtester->getName() == variable_vtester);
-    REQUIRE(var_xtester->getName() == variable_xtester);
+    REQUIRE(var_vtester->GetName() == variable_vtester);
+    REQUIRE(var_xtester->GetName() == variable_xtester);
 
-    REQUIRE_FALSE(var_vtester->getName() == variable_xtester);
-    REQUIRE_FALSE(var_xtester->getName() == variable_vtester);
+    REQUIRE_FALSE(var_vtester->GetName() == variable_xtester);
+    REQUIRE_FALSE(var_xtester->GetName() == variable_vtester);
   }
 
   SECTION("Casting to Entity and back") {
@@ -44,11 +44,11 @@ TEST_CASE("1.Model.Entity.Procedure") {
   Procedure* proc_xtester = new Procedure(pname_xtester);
 
   SECTION("GetName") {
-    REQUIRE(proc_vtester->getName() == pname_vtester);
-    REQUIRE(proc_xtester->getName() == pname_xtester);
+    REQUIRE(proc_vtester->GetName() == pname_vtester);
+    REQUIRE(proc_xtester->GetName() == pname_xtester);
 
-    REQUIRE_FALSE(proc_vtester->getName() == pname_xtester);
-    REQUIRE_FALSE(proc_xtester->getName() == pname_vtester);
+    REQUIRE_FALSE(proc_vtester->GetName() == pname_xtester);
+    REQUIRE_FALSE(proc_xtester->GetName() == pname_vtester);
   }
 
   SECTION("Casting to Entity and back") {
@@ -112,9 +112,9 @@ TEST_CASE("1.Model.Entity.Program") {
   program->AddProcedure(proc2);
   program->AddProcedure(proc3);
 
-  REQUIRE(program->getProcedureList()->front() == proc1);
-  program->getProcedureList()->pop_front();
-  REQUIRE(program->getProcedureList()->front() == proc2);
-  program->getProcedureList()->pop_front();
-  REQUIRE(program->getProcedureList()->front() == proc3);
+  REQUIRE(program->GetProcedureList()->front() == proc1);
+  program->GetProcedureList()->pop_front();
+  REQUIRE(program->GetProcedureList()->front() == proc2);
+  program->GetProcedureList()->pop_front();
+  REQUIRE(program->GetProcedureList()->front() == proc3);
 }

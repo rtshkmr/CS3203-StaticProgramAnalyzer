@@ -50,7 +50,7 @@ void EvaluatePatternDoubleSynonym(Pattern p, QueryEvaluatorTable* table, PKB pkb
     // Assert size == 1
     for (int i = 0; i < possible_variable_list.size(); i++) {
       AssignEntity possible_variable = possible_variable_list[i];
-      const VariableName* possible_variable_name = possible_variable.getVariable()->getName();
+      const VariableName* possible_variable_name = possible_variable.getVariable()->GetName();
       if (*possible_variable_name == current_variable_name && HasExpressionMatch(p, possible_variable)) {
         has_relationship = true;
       }
@@ -80,7 +80,7 @@ void EvaluatePatternDoubleSynonymFirstPresent(Pattern p, QueryEvaluatorTable* ta
         continue;
       }
 
-      const VariableName* variable_name = assign_entity.getVariable()->getName();
+      const VariableName* variable_name = assign_entity.getVariable()->GetName();
       VariableName vn = *variable_name;
       std::string name = vn.getName();
       table->AddRowForAllColumn(p.left_hand_side, i, name);
@@ -113,7 +113,7 @@ void EvaluatePatternDoubleSynonymSecondPresent(Pattern p, QueryEvaluatorTable* t
         continue;
       }
 
-      const VariableName* variable_name = assign_entity.getVariable()->getName();
+      const VariableName* variable_name = assign_entity.getVariable()->GetName();
       VariableName vn = *variable_name;
       std::string name = vn.getName();
       table->AddRowForAllColumn(p.left_hand_side, i, name);
@@ -136,7 +136,7 @@ void EvaluatePatternSingleSynonym(Pattern p, QueryEvaluatorTable* table, PKB pkb
     AssignEntity assign_entity = assign_entity_list[0];
 
     // Get the retrieved variable name
-    const VariableName* variable_name = assign_entity.getVariable()->getName();
+    const VariableName* variable_name = assign_entity.getVariable()->GetName();
     VariableName vn = *variable_name;
     std::string name = vn.getName();
 

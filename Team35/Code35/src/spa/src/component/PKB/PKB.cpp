@@ -283,7 +283,7 @@ std::vector<AssignEntity> PKB::GetPatternByVariable(std::string varName) {
 void PKB::PopulateProcList(const std::list<Procedure*>& proc_list) {
   proc_table_ = std::list<std::string>();
   for (auto const& i : proc_list) {
-    auto* pName = const_cast<ProcedureName*>(i->getName());
+    auto* pName = const_cast<ProcedureName*>(i->GetName());
     proc_table_.push_back(pName->getName());
     type_map_[pName->getName()] = DesignEntity::kProcedure;
   }
@@ -292,7 +292,7 @@ void PKB::PopulateProcList(const std::list<Procedure*>& proc_list) {
 void PKB::PopulateVarList(const std::list<Variable*>& var_list) {
   var_table_ = std::list<std::string>();
   for (auto const& i : var_list) {
-    auto* vName = const_cast<VariableName*>(i->getName());
+    auto* vName = const_cast<VariableName*>(i->GetName());
     var_table_.push_back(vName->getName());
     type_map_[vName->getName()] = DesignEntity::kVariable;
   }
@@ -346,7 +346,7 @@ void PKB::PopulateAssignList(const std::list<AssignEntity*>& assign_list) {
     std::vector<AssignEntity> varMapVect{entity};
     assign_expr_map_[std::to_string(sNumber->getNum())] = stmtMapVect;
 
-    VariableName varName = * entity.getVariable()->getName();
+    VariableName varName = *entity.getVariable()->GetName();
     if (assign_expr_map_.find(varName.getName()) != assign_expr_map_.end()) {
       assign_expr_map_[varName.getName()].push_back(entity);
     } else {
@@ -529,7 +529,7 @@ void PKB::PopulateUseSMap(std::unordered_map<Statement*, std::list<Variable*>*> 
     std::string varString;
 
     for (Variable* var : * used_variables) {
-      VariableName* varName = const_cast<VariableName*>(var->getName());
+      VariableName* varName = const_cast<VariableName*>(var->GetName());
       varString = varName->getName();
       std::tuple<DesignEntity, std::string>* entity_ptr = new std::tuple(DesignEntity::kVariable, varString);
       result_ptr->push_back(entity_ptr);
@@ -542,7 +542,7 @@ void PKB::PopulateUseSMap(std::unordered_map<Statement*, std::list<Variable*>*> 
 void PKB::PopulateUsedBySMap(std::unordered_map<Variable*, std::list<Statement*>*> used_by_hash) {
   for (std::pair<Variable*, std::list<Statement*>*> kv : used_by_hash) {
 
-    VariableName* varName = const_cast<VariableName*>(kv.first->getName());
+    VariableName* varName = const_cast<VariableName*>(kv.first->GetName());
     std::string kString = varName->getName();
 
     auto result_ptr = new std::list<std::tuple<DesignEntity, std::string>*>();
@@ -572,7 +572,7 @@ void PKB::PopulateUseCMap(std::unordered_map<Container*, std::list<Variable*>*> 
     std::string varString;
 
     for (Variable* var : * used_variables) {
-      VariableName* varName = const_cast<VariableName*>(var->getName());
+      VariableName* varName = const_cast<VariableName*>(var->GetName());
       varString = varName->getName();
       std::tuple<DesignEntity, std::string>* entity_ptr = new std::tuple(DesignEntity::kVariable, varString);
       result_ptr->push_back(entity_ptr);
@@ -585,7 +585,7 @@ void PKB::PopulateUseCMap(std::unordered_map<Container*, std::list<Variable*>*> 
 void PKB::PopulateUsedByCMap(std::unordered_map<Variable*, std::list<Container*>*> c_used_by_hash) {
   for (std::pair<Variable*, std::list<Container*>*> kv : c_used_by_hash) {
 
-    VariableName* varName = const_cast<VariableName*>(kv.first->getName());
+    VariableName* varName = const_cast<VariableName*>(kv.first->GetName());
     std::string kString = varName->getName();
 
     auto result_ptr = new std::list<std::tuple<DesignEntity, std::string>*>();
@@ -616,7 +616,7 @@ void PKB::PopulateModifiesSMap(std::unordered_map<Statement*, std::list<Variable
     std::string varString;
 
     for (Variable* var : * used_variables) {
-      VariableName* varName = const_cast<VariableName*>(var->getName());
+      VariableName* varName = const_cast<VariableName*>(var->GetName());
       varString = varName->getName();
       std::tuple<DesignEntity, std::string>* entity_ptr = new std::tuple(DesignEntity::kVariable, varString);
       result_ptr->push_back(entity_ptr);
@@ -629,7 +629,7 @@ void PKB::PopulateModifiesSMap(std::unordered_map<Statement*, std::list<Variable
 void PKB::PopulateModifiedBySMap(std::unordered_map<Variable*, std::list<Statement*>*> modified_by_hash) {
   for (std::pair<Variable*, std::list<Statement*>*> kv : modified_by_hash) {
 
-    VariableName* varName = const_cast<VariableName*>(kv.first->getName());
+    VariableName* varName = const_cast<VariableName*>(kv.first->GetName());
     std::string kString = varName->getName();
 
     auto result_ptr = new std::list<std::tuple<DesignEntity, std::string>*>();
@@ -660,7 +660,7 @@ void PKB::PopulateModifiesCMap(std::unordered_map<Container*, std::list<Variable
     std::string varString;
 
     for (Variable* var : * used_variables) {
-      VariableName* varName = const_cast<VariableName*>(var->getName());
+      VariableName* varName = const_cast<VariableName*>(var->GetName());
       varString = varName->getName();
       std::tuple<DesignEntity, std::string>* entity_ptr = new std::tuple(DesignEntity::kVariable, varString);
       result_ptr->push_back(entity_ptr);
@@ -673,7 +673,7 @@ void PKB::PopulateModifiesCMap(std::unordered_map<Container*, std::list<Variable
 void PKB::PopulateModifiedByCMap(std::unordered_map<Variable*, std::list<Container*>*> c_modified_by_hash) {
   for (std::pair<Variable*, std::list<Container*>*> kv : c_modified_by_hash) {
 
-    VariableName* varName = const_cast<VariableName*>(kv.first->getName());
+    VariableName* varName = const_cast<VariableName*>(kv.first->GetName());
     std::string kString = varName->getName();
 
     auto result_ptr = new std::list<std::tuple<DesignEntity, std::string>*>();

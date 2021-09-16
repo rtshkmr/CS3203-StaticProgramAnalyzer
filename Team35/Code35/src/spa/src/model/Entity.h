@@ -66,7 +66,7 @@ class Procedure : public Entity, public Container {
  public:
   Procedure(ProcedureName* procedureName);
 
-  const ProcedureName* getName();
+  const ProcedureName* GetName();
 };
 
 /**
@@ -78,7 +78,7 @@ class Variable : public Entity {
  public:
   Variable(VariableName* variableName);
 
-  const VariableName* getName();
+  const VariableName* GetName();
 };
 
 /**
@@ -91,7 +91,7 @@ class Program {
  public:
   Program(Procedure* p);
 
-  std::list<Procedure*>* getProcedureList();
+  std::list<Procedure*>* GetProcedureList();
 
   void AddProcedure(Procedure* p);
 };
