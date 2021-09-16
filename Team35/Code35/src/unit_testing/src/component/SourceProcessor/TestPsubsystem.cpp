@@ -18,11 +18,11 @@ TEST_CASE("1.PSubsystem.Basic Single Line Creation") {
 
     ProcedureName pname("firstProc");
     REQUIRE(deliverable->GetProcList()->size() == 1);
-    REQUIRE(*(*deliverable->GetProcList()->front()).getName() == pname);
+    REQUIRE(*(*deliverable->GetProcList()->front()).GetName() == pname);
 
     VariableName vname("x");
     REQUIRE(deliverable->GetVariableList()->size() == 1);
-    REQUIRE(*(*deliverable->GetVariableList()->front()).getName() == vname);
+    REQUIRE(*(*deliverable->GetVariableList()->front()).GetName() == vname);
 
     REQUIRE(deliverable->GetConstantValueList()->size() == 1);
     REQUIRE((*deliverable->GetConstantValueList()->front()).get() == 100);
@@ -32,12 +32,12 @@ TEST_CASE("1.PSubsystem.Basic Single Line Creation") {
     AssignEntity* assign_entity = static_cast<AssignEntity*>(*(deliverable->GetStatementList()->begin()));
     AssignEntity* assign_entity2 = deliverable->GetAssignList()->front();
     REQUIRE(assign_entity == assign_entity2);
-    REQUIRE(*assign_entity->getVariable()->getName() == vname);
-    REQUIRE(assign_entity->getAssignmentExpr()->CheckExact("x + 100"));
+    REQUIRE(*assign_entity->GetVariable()->GetName() == vname);
+    REQUIRE(assign_entity->GetAssignmentExpr()->CheckExact("x + 100"));
     REQUIRE(assign_entity->GetExpressionConstants().front()->get() == 100);
 
     //ensure trace down from Program is the same variable
-    REQUIRE(deliverable->GetProgram()->getProcedureList()->front() == deliverable->GetProcList()->front());
+    REQUIRE(deliverable->GetProgram()->GetProcedureList()->front() == deliverable->GetProcList()->front());
   }
 
 }

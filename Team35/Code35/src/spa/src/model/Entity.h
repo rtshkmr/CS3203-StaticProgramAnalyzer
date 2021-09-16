@@ -34,8 +34,10 @@ class Statement : public Entity {
   void SetStatementNumber(StatementNumber* sn);
   void SetParentNode(Container* parent);
   void SetBeforeNode(Statement* before);
-  Container* GetParentNode();
   StatementNumber* GetStatementNumber();
+  LineNumber* GetLineNumber();
+  Container* GetParentNode();
+  Statement* GetBeforeNode();
 };
 
 /**
@@ -64,7 +66,7 @@ class Procedure : public Entity, public Container {
  public:
   Procedure(ProcedureName* procedureName);
 
-  const ProcedureName* getName();
+  const ProcedureName* GetName();
 };
 
 /**
@@ -76,7 +78,7 @@ class Variable : public Entity {
  public:
   Variable(VariableName* variableName);
 
-  const VariableName* getName();
+  const VariableName* GetName();
 };
 
 /**
@@ -89,9 +91,9 @@ class Program {
  public:
   Program(Procedure* p);
 
-  std::list<Procedure*>* getProcedureList();
+  std::list<Procedure*>* GetProcedureList();
 
-  void setProcedure(Procedure* p);
+  void AddProcedure(Procedure* p);
 };
 
 #endif //AUTOTESTER_ENTITY_H
