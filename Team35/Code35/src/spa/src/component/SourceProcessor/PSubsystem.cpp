@@ -1,6 +1,7 @@
 #include <stdexcept>
 #include <cassert>
 #include <iostream>
+#include <util/Logger.h>
 #include "PSubsystem.h"
 #include "Tokenizer.h"
 #include "EntityFactory.h"
@@ -35,6 +36,7 @@ void PSubsystem::InitDataStructures() {
  * @throws IterationOneException throws when more than one procedure is processed.
  */
 void PSubsystem::ProcessStatement(std::string statement) {
+//  LOG (spa_logger << "\n\n\n==========================  [ENTER] ProcessStatement ======================\n\n\n");
   if (!valid_state) {
     throw SyntaxException("Unable to process statement due to an earlier syntax error found, or closed");
   }
@@ -141,7 +143,7 @@ void PSubsystem::ProcessStatement(std::string statement) {
   } else {
     throw std::invalid_argument("[ERROR] current_node_ is not null and Entity is not a Statement type.");
   }
-
+//  LOG (spa_logger << "\n\n\n==========================  [EXIT] ProcessStatement ======================\n\n\n");
 }
 
 void PSubsystem::PerformNewProcedureSteps(Procedure* procedure) {

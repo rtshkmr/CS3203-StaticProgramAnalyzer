@@ -16,7 +16,7 @@ using namespace sp;
  * @return Source process status
  */
 PKB* SourceProcessor::ProcessSourceFile(std::string file_name) {
-  LOG(spa_logger << "=================== SOURCE PROCESSOR ===========================");
+  LOG (spa_logger << "\n\n\n==========================  [ENTER] SOURCE PROC ======================\n\n\n");
   LOG(spa_logger << "... processing source file");
   par::Parser parser;
 
@@ -29,11 +29,12 @@ PKB* SourceProcessor::ProcessSourceFile(std::string file_name) {
   } catch (IterationOneException s) {
     std::cerr << "Syntax Error (due to Iteration 1 requirement)\n";
     std::cerr << s.what() << std::endl;
+
+    LOG (spa_logger << "\n\n\n==========================  [EXIT] SOURCE PROC ======================\n\n\n");
     return new PKB();
   }
 
   Deliverable* deliverable = parser.GetDeliverables();
-
   DesignExtractor design_extractor = DesignExtractor(deliverable);
   design_extractor.ExtractDesignAbstractions();
 
