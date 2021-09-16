@@ -1,5 +1,6 @@
-
-procedure Bumblebee {
+procedure
+Bumblebee
+{
     read
     x;
     y = 2 * z;
@@ -14,8 +15,12 @@ else
             y = x * q - 5;
             z = z - 1;
         }
+        if (q != z) then {
+            x = 1 ;
+        } else {
+            print x;
+        }
         y = x + y * z + p * q;
     }
     i = x + j + z;
 }
-

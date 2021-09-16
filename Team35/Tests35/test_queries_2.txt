@@ -1,0 +1,140 @@
+1 - Double synonym
+stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; proc pr1;
+Select a1 such that Follows(s1, a1)
+3, 4, 9, 13, 14
+5000
+2 - Double synonym
+stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; proc pr1;
+Select a1 such that Parent(r1, p1)
+none
+5000
+3 - Double synonym
+stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; proc pr1;
+Select w1 such that Follows(w1, if1)
+7
+5000
+4 - Double synonym
+stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; proc pr1;
+Select a1 such that Follows(r1, p1)
+3, 4, 6, 8, 9, 11, 13, 14
+5000
+5 - Double synonym
+stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; proc pr1;
+Select a1 such that Parent(if1, a1)
+6, 11
+5000
+6 - Wildcard and single synonym
+stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; proc pr1;
+Select s1 such that Follows(_, s1)
+2, 3, 4, 5, 9, 10, 13, 14
+5000
+7 - Single synonym and wildcard
+stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; proc pr1;
+Select a1 such that Parent(s1, _)
+3, 4, 6, 8, 9, 11, 13, 14
+5000
+8 - Value and single synonym
+stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; proc pr1;
+Select s1 such that Follows(1, s1)
+2
+5000
+9 - Single synonym and value
+stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; proc pr1;
+Select s1 such that Parent(s1, 1)
+none
+5000
+10 - Incorrect query (invalid synonym used)
+stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; proc pr1;
+Select a1 such that Follows(pr1, _)
+none
+5000
+11 - Incorrect query (invalid value)
+stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; proc pr1;
+Select a1 such that Follows(0, _)
+none
+5000
+12 - Incorrect query (invalid value)
+stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; proc pr1;
+Select a1 such that Follows(-1, _)
+none
+5000
+13 - Incorrect query (invalid synonym used)
+stmt s1, s2; assign a1; variable v;
+Select a1 such that Follows(1, v)
+none
+5000
+14 - Incorrect query (invalid value)
+stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; proc pr1;
+Select a1 such that Follows(_, test)
+none
+5000
+15 - Double synonym
+stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; proc pr1;
+Select a1 such that Follows*   (s1, a1)
+3, 4, 9, 13, 14
+5000
+16 - Double synonym
+stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; proc pr1;
+Select a1 such that Parent*  (  r1  ,  p1  )
+none
+5000
+17 - Double synonym
+stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; proc pr1;
+Select    a1   such that      Parent*(if1,a1)
+6, 8, 9, 11, 13
+5000
+18 - Double synonym
+stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; proc pr1;
+Select p1 such that Follows*(r1, a1)
+2
+5000
+19 - Double synonym
+stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; proc pr1;
+Select a1 such that Follows*(w1, a1)
+13
+5000
+20 - Wildcard and single synonym
+stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; proc pr1;
+Select s1 such that Parent*(_, s1)
+6, 7, 8, 9, 10, 11, 12, 13
+5000
+21 - Single synonym and wildcard
+stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; proc pr1;
+Select s1 such that Follows*(s1, _)
+1, 2, 3, 4, 5, 7, 8, 10
+5000
+22 - Value and single synonym
+stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; proc pr1;
+Select s1 such that Follows*(1, s1)
+2, 3, 4, 5, 14
+5000
+23 - Single synonym and value
+stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; proc pr1;
+Select s1 such that Parent*(s1, 1)
+none
+5000
+24 - Incorrect query (invalid synonym used)
+stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; proc pr1;
+Select a1 such that Follows*(pr1, _)
+none
+5000
+25 - Incorrect query (invalid value)
+stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; proc pr1;
+Select a1 such that Follows*(0, _)
+none
+5000
+26 - Incorrect query (invalid value)
+stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; proc pr1;
+Select a1 such that Parent*(-1, _)
+none
+5000
+27 - Incorrect query (invalid synonym used)
+stmt s1, s2; assign a1; variable v;
+Select a1 such that Follows*(1, v)
+none
+5000
+28 - Incorrect query (invalid value)
+stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; proc pr1;
+Select a1 such that Follows*(_, test)
+none
+5000
