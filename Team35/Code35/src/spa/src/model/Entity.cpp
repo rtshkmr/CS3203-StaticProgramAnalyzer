@@ -37,7 +37,7 @@ std::list<Procedure*>* Program::getProcedureList() {
   return &procedure_list_;
 }
 
-void Program::setProcedure(Procedure* p) {
+void Program::AddProcedure(Procedure* p) {
   procedure_list_.push_back(p);
 }
 
@@ -61,6 +61,14 @@ Container* Statement::GetParentNode() {
   return parent_node_;
 }
 
+Statement* Statement::GetBeforeNode() {
+  return before_node_;
+}
+
 StatementNumber* Statement::GetStatementNumber() {
   return statement_number_;
+}
+
+LineNumber* Statement::GetLineNumber() {
+  return line_number_;
 }

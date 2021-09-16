@@ -154,7 +154,7 @@ void PSubsystem::PerformNewProcedureSteps(Procedure* procedure) {
     deliverable_->SetProgram(program);
   } else {
     throw IterationOneException("[2] Encountered multiple procedures"); //TODO: remove after Iteration 1
-    deliverable_->GetProgram()->setProcedure(procedure);
+    deliverable_->GetProgram()->AddProcedure(procedure);
   }
 }
 

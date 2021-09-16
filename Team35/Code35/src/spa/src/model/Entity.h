@@ -34,8 +34,10 @@ class Statement : public Entity {
   void SetStatementNumber(StatementNumber* sn);
   void SetParentNode(Container* parent);
   void SetBeforeNode(Statement* before);
-  Container* GetParentNode();
   StatementNumber* GetStatementNumber();
+  LineNumber* GetLineNumber();
+  Container* GetParentNode();
+  Statement* GetBeforeNode();
 };
 
 /**
@@ -91,7 +93,7 @@ class Program {
 
   std::list<Procedure*>* getProcedureList();
 
-  void setProcedure(Procedure* p);
+  void AddProcedure(Procedure* p);
 };
 
 #endif //AUTOTESTER_ENTITY_H
