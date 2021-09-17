@@ -4,6 +4,7 @@
 #include <utility>
 #include "EntityFactory.h"
 #include "model/Statement.h"
+#include "datatype/DataType.h"
 
 using std::string;
 using std::vector;
@@ -120,27 +121,21 @@ Entity* EntityFactory::CreateAssignEntity(vector<Token> tokens) {
  * @return Vector of tokens which represents the expression alone.
  */
 vector<Token> EntityFactory::GetExpressionTokens(vector<Token> tokens, TokenTag start_tag, TokenTag end_tag) {
-  int iterator = -1;
+  int start_iter = -1;
+  int end_iter = -1;
   int tokens_size = tokens.size();
-  // finding start tag
-  for (int i = 0; i < tokens_size; ++i) {
-    if (tokens[i].GetTokenTag() == start_tag) {
-      iterator = i + 1;
-      break;
-    }
-  }
-  if (iterator < 0) {
-    throw std::invalid_argument("Tokens do not contain start-of-expression token when passed into EF.");
-  }
-  // collecting tokens while finding end tag
+  // finding first start tag
+  start_iter = Token::GetFirstMatchingTokenIdx(tokens, start_tag);
+  // finding last end tag
+  end_iter = Token::GetLastMatchingTokenIdx(tokens, end_tag);
+  assert(start_iter >= 0 && end_iter >= 0 && (start_iter + 1 < end_iter));
+
+  // collecting tokens
   vector<Token> expression_tokens;
-  while (tokens[iterator].GetTokenTag() != end_tag && iterator != tokens_size) {
-    expression_tokens.push_back(tokens[iterator]);
-    iterator++;
+  for (int i = start_iter + 1; i < end_iter; ++i) {
+    expression_tokens.push_back(tokens[i]);
   }
-  if (iterator > tokens_size) {
-    throw std::out_of_range("Tokens do not contain end-of-expression token when passed into EF.");
-  }
+
   return expression_tokens;
 }
 
