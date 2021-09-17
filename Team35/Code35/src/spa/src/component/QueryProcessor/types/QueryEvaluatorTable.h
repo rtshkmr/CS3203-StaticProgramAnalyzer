@@ -10,6 +10,7 @@
 #include <vector>
 #include <utility>
 #include <list>
+#include "Types.h"
 
 class QueryEvaluatorTable {
   public:
@@ -45,6 +46,8 @@ class QueryEvaluatorTable {
     int GetSize();
 
     int GetRowSize();
+
+    std::string GetStatementSynonym(std::unordered_map<std::string, DesignEntity> synonym_design_entity_map);
   private:
     std::unordered_map<std::string, std::vector<std::string>> um;
     std::string target_synonym;
