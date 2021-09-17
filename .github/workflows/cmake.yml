@@ -28,10 +28,10 @@ jobs:
 
     - name: Build SPA
       # Build your program with the given configuration
-      run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target spa
+      run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target spa -- -j 4
       
     - name: Build Unit Test
-      run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target unit_testing
+      run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target unit_testing -- -j 4
 
     - name: Run Unit Test
       #Running Catch2 natively on terminal
@@ -40,7 +40,7 @@ jobs:
         ./unit_testing
 
     - name: Build Integration Test
-      run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target integration_testing
+      run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target integration_testing -- -j 4
 
     - name: Run Integration Test
       run: |
@@ -49,7 +49,7 @@ jobs:
         ./integration_testing
   
     - name: Build AutoTester # GUI is excluded
-      run:  cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target autotester
+      run:  cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target autotester -- -j 4
     
     - name: Run AutoTester 
       run: | 
@@ -61,7 +61,10 @@ jobs:
     - uses: actions/upload-artifact@v2
       with: 
         name: output_final
-        path: ${{env.working-directory}}/build/src/autotester/Tests35/output_final.zip
+        path: |
+          ${{env.working-directory}}/build/src/autotester/Tests35/log_*.txt
+          ${{env.working-directory}}/build/src/autotester/Tests35/output_*.xml
+          ${{env.working-directory}}/build/src/autotester/Tests35/analysis.xsl
 
     - name: Build All # Take all previous build and build autotester_gui for completeness
       run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target all

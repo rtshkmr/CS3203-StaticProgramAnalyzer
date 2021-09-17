@@ -29,6 +29,10 @@ std::list<std::tuple<DesignEntity, std::string>> QueryPKBSuchThat(PKB database, 
       return is_first_param ? database.GetUses(stmt) : database.GetUsedBy(stmt);
     case RelRef::kModifiesS:
       return is_first_param ? database.GetModifies(stmt) : database.GetModifiedBy(stmt);
+    case RelRef::kFollowsT:
+      return is_first_param ? database.GetFollowsT(stmt) : database.GetPreviousT(stmt);
+    case RelRef::kParentT:
+      return is_first_param ? database.GetParentT(stmt) : database.GetChildT(stmt);
     default:
       std::list<std::tuple<DesignEntity, std::string>> list;
       return list;

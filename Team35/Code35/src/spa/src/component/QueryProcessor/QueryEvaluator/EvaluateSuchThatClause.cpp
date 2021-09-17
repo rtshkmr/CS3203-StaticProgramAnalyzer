@@ -47,10 +47,10 @@ void ProcessNewColumn(std::string target_synonym_name, Synonym new_synonym, Quer
 
     std::vector<std::string> targetSynonymList = table->GetColumn(target_synonym_name);
     int numberOfTimesToTraverse = targetSynonymList.size();
-    int target_synonym_reference = 0;
+    int target_synonym_list_reference = 0;
 
     for (int i = 0; i < numberOfTimesToTraverse; i++) {    // For each synonym in the table
-        std::string currStmtRef = targetSynonymList[target_synonym_reference];
+        std::string currStmtRef = targetSynonymList[target_synonym_list_reference];
         // Get the list of possible stmtRef for the current stmtRef.
         std::list<std::tuple<DesignEntity, std::string>> possibleStmtRef =
             QueryPKBSuchThat(pkb, relationship, currStmtRef, givenFirstParam);
@@ -61,7 +61,7 @@ void ProcessNewColumn(std::string target_synonym_name, Synonym new_synonym, Quer
         for (auto iter = possibleStmtRef.begin(); iter != possibleStmtRef.end(); iter++) {
             DesignEntity currentStatementType = std::get<0>(*iter);
             std::string currentStatementRef = std::get<1>(*iter);
-            if (currentStatementType == new_synonym.GetType()) {
+            if (SynonymTypeMatches(currentStatementType, new_synonym.GetType())) {
                 // Add new row for each col in table
                 table->AddMultipleRowForAllColumn(new_synonym.GetName(), i, currentStatementRef, number_of_repeats);
 
@@ -73,6 +73,7 @@ void ProcessNewColumn(std::string target_synonym_name, Synonym new_synonym, Quer
         if (number_of_repeats > 0) {
             i += number_of_repeats - 1;
             numberOfTimesToTraverse += number_of_repeats -1;
+            target_synonym_list_reference += number_of_repeats -1;
         }
 
         // If there are no valid relationships, delete currRow from table.
@@ -81,8 +82,30 @@ void ProcessNewColumn(std::string target_synonym_name, Synonym new_synonym, Quer
             i--;
             numberOfTimesToTraverse--;
         }
-        target_synonym_reference++;
+        target_synonym_list_reference++;
     }
+}
+
+bool SynonymTypeMatches(DesignEntity current_synonym, DesignEntity synonym_type_to_match) {
+  if (synonym_type_to_match == DesignEntity::kStmt) {
+    switch (current_synonym) {
+      case DesignEntity::kStmt:return true;
+      case DesignEntity::kRead:return true;
+      case DesignEntity::kPrint:return true;
+      case DesignEntity::kCall:return true;
+      case DesignEntity::kWhile:return true;
+      case DesignEntity::kIf:return true;
+      case DesignEntity::kAssign:return true;
+      case DesignEntity::kVariable:return false;
+      case DesignEntity::kConstant:return false;
+      case DesignEntity::kProcedure:return false;
+      case DesignEntity::kInvalid:return false;
+      default:return false;
+    }
+  } else {
+    return current_synonym == synonym_type_to_match;
+  }
+
 }
 
 // Only 1 synonym

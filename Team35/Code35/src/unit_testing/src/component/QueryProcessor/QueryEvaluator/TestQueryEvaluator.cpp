@@ -39,7 +39,7 @@ Deliverable* SetUpDeliverable_Week4() {
     proc->AddStatement(stmt1);
     deliverable->AddStatement(stmt1);
     deliverable->AddReadEntity(stmt1);
-    deliverable->AddModifiesRelationship(stmt1, stmt1->getVariable());
+    deliverable->AddModifiesRelationship(stmt1, stmt1->GetVariable());
 
     // print x
     PrintEntity* stmt2 = new PrintEntity(var_x);
@@ -48,7 +48,7 @@ Deliverable* SetUpDeliverable_Week4() {
     proc->AddStatement(stmt2);
     deliverable->AddStatement(stmt2);
     deliverable->AddPrintEntity(stmt2);
-    deliverable->AddUsesRelationship(stmt2, stmt2->getVariable());
+    deliverable->AddUsesRelationship(stmt2, stmt2->GetVariable());
 
     // y = 1
     ConstantValue* cv1 = new ConstantValue("1");
@@ -67,7 +67,7 @@ Deliverable* SetUpDeliverable_Week4() {
     proc->AddStatement(stmt3);
     deliverable->AddStatement(stmt3);
     deliverable->AddAssignEntity(stmt3);
-    deliverable->AddModifiesRelationship(stmt3, stmt3->getVariable());
+    deliverable->AddModifiesRelationship(stmt3, stmt3->GetVariable());
 
     for (Variable* v: stmt3->GetExpressionVariables()) {
         deliverable->AddUsesRelationship(stmt3, v);
@@ -90,7 +90,7 @@ Deliverable* SetUpDeliverable_Week4() {
     proc->AddStatement(stmt4);
     deliverable->AddStatement(stmt4);
     deliverable->AddAssignEntity(stmt4);
-    deliverable->AddModifiesRelationship(stmt4, stmt4->getVariable());
+    deliverable->AddModifiesRelationship(stmt4, stmt4->GetVariable());
 
     for (Variable* v: stmt4->GetExpressionVariables()) {
         deliverable->AddUsesRelationship(stmt4, v);
@@ -113,7 +113,7 @@ Deliverable* SetUpDeliverable_Week4() {
     proc->AddStatement(stmt5);
     deliverable->AddStatement(stmt5);
     deliverable->AddAssignEntity(stmt5);
-    deliverable->AddModifiesRelationship(stmt5, stmt5->getVariable());
+    deliverable->AddModifiesRelationship(stmt5, stmt5->GetVariable());
 
     for (Variable* v: stmt5->GetExpressionVariables()) {
         deliverable->AddUsesRelationship(stmt5, v);

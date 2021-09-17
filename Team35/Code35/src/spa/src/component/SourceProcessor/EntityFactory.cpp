@@ -210,7 +210,7 @@ Procedure* EntityFactory::RetrieveProcedure(std::string proc_name) {
 
   ProcedureName temp_proc_name = ProcedureName(proc_name);
   for (auto const &proc : *proc_list_) {
-    if (*proc->getName() == temp_proc_name) { // uses the overloaded ==
+    if (*proc->GetName() == temp_proc_name) { // uses the overloaded ==
       return proc;
     }
   }
@@ -226,7 +226,7 @@ Variable* EntityFactory::RetrieveVariable(std::string var_name) {
 
   VariableName temp_var_name = VariableName(var_name);
   for (auto const &var : *var_list_) {
-    if (*var->getName() == temp_var_name) { // uses the overloaded ==
+    if (*var->GetName() == temp_var_name) { // uses the overloaded ==
       return var;
     }
   }
