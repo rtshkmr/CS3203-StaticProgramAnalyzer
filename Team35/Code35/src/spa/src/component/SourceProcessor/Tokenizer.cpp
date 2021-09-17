@@ -163,20 +163,13 @@ bool Tokenizer::IsWhiteSpace(string& test_string) {
 
 /**
  * Based on the other tokens in the same sentence, determines if a token is an actual keyword.
- * This is a whitelist routine instead of blacklist. The conditions are as follows:
- * 1. Procedure tokens: the token string is the first token_string and there are only two more after <procName><{>
- * 2. Macro functions (e.g. call, read, print) can only be tagged as such if they are the first token in the statement and there are 3 tokens in total for that statement.
- * 3. If token: first token, there's a open bracket after, there's a then token in the same sentence, last token must be {
- * 4.
- *
- *
- *
- * note that the ideal way would have been to judge in the same routine instead of create a separate routine for retagging,
- * but this is intended to be a quick fix. TODO: iter 2, improve data flow.
+ * This is a whitelist routine instead of blacklist.
+ * Note that the ideal way would have been to judge in the same routine instead of create a separate routine for retagging,
+ * but this is intended to be a quick fix. TODO [COSMETIC]: iter 2, improve data flow
  * @param token_string
  * @param token_idx the idx of the token string with respect to the statement
  * @param token_strings
- * @return
+ * @return true if actual keyword and false if it should actually be tagged as a kName
  */
 bool Tokenizer::IsActualKeyword(const std::string& token_string, int token_idx, const vector<string>& token_strings) {
   if (token_string == "procedure") {
