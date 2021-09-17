@@ -87,31 +87,19 @@ void ProcessNewColumn(std::string target_synonym_name, Synonym new_synonym, Quer
 
 bool SynonymTypeMatches(DesignEntity current_synonym, DesignEntity synonym_type_to_match) {
   if (synonym_type_to_match == DesignEntity::kStmt) {
-    switch(current_synonym) {
-      case DesignEntity::kStmt:
-        return true;
-        case DesignEntity::kRead:
-          return true;
-          case DesignEntity::kPrint:
-            return true;
-            case DesignEntity::kCall:
-              return true;
-              case DesignEntity::kWhile:
-                return true;
-                case DesignEntity::kIf:
-                  return true;
-                  case DesignEntity::kAssign:
-                    return true;
-                    case DesignEntity::kVariable:
-                      return false;
-                      case DesignEntity::kConstant:
-                        return false;
-                        case DesignEntity::kProcedure:
-                          return false;
-                          case DesignEntity::kInvalid:
-                            return false;
-                            default:
-                              return false;
+    switch (current_synonym) {
+      case DesignEntity::kStmt:return true;
+      case DesignEntity::kRead:return true;
+      case DesignEntity::kPrint:return true;
+      case DesignEntity::kCall:return true;
+      case DesignEntity::kWhile:return true;
+      case DesignEntity::kIf:return true;
+      case DesignEntity::kAssign:return true;
+      case DesignEntity::kVariable:return false;
+      case DesignEntity::kConstant:return false;
+      case DesignEntity::kProcedure:return false;
+      case DesignEntity::kInvalid:return false;
+      default:return false;
     }
   } else {
     return current_synonym == synonym_type_to_match;
