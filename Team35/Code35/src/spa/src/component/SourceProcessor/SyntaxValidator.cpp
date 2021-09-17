@@ -56,8 +56,6 @@ bool SyntaxValidator::ValidateSyntax(vector<Token> statement_tokens) {
  * @return
  */
 bool SyntaxValidator::ValidateProcedureSyntax(const vector<Token>& tokens) {
-  // QQ: is this part (fixed number of tokens for every type of statement a valid guarantee? Feels like it's
-  //     very hardcode-y though :(
   return tokens.capacity() == 3
       && tokens.at(1).GetTokenTag() == TokenTag::kName
       && tokens.at(2).GetTokenTag() == TokenTag::kOpenBrace;
@@ -86,7 +84,7 @@ bool SyntaxValidator::ValidateIfStatementSyntax(const vector<Token>& tokens) {
   assert(guarantee);
 
   bool contains_single_then_keyword = Token::CountTokens(tokens, TokenTag::kThenKeyword) == 1;
-  bool terminal_token_is_open_brace =  tokens.at(tokens.size() - 1).GetTokenTag() == TokenTag::kOpenBrace;
+  bool terminal_token_is_open_brace = tokens.at(tokens.size() - 1).GetTokenTag() == TokenTag::kOpenBrace;
   if (!contains_single_then_keyword || !terminal_token_is_open_brace) {
     return false;
   }
@@ -116,7 +114,7 @@ bool SyntaxValidator::ValidateWhileKeyword(const vector<Token>& tokens) {
   assert(guarantee);
   int first_open_bracket_idx = Token::GetFirstMatchingTokenIdx(tokens, TokenTag::kOpenBracket);
   int last_close_bracket_idx = Token::GetLastMatchingTokenIdx(tokens, TokenTag::kCloseBracket);
-  bool terminal_token_is_open_brace = tokens.at(tokens.size() - 1).GetTokenTag()==TokenTag::kOpenBrace;
+  bool terminal_token_is_open_brace = tokens.at(tokens.size() - 1).GetTokenTag() == TokenTag::kOpenBrace;
   bool valid_cond_expression = tokens.size() > 4
       && first_open_bracket_idx + 1 <= last_close_bracket_idx - 1
       && first_open_bracket_idx == 1
@@ -394,7 +392,27 @@ bool SyntaxValidator::StatementPassesCommonBlacklistRules(const vector<Token>& s
   int num_open_brackets = Token::CountTokens(statement_tokens, TokenTag::kOpenBracket);
   int num_close_brackets = Token::CountTokens(statement_tokens, TokenTag::kCloseBracket);
   bool brackets_are_balanced = num_close_brackets == num_open_brackets;
-  return valid_last_token && brackets_are_balanced;
+  bool name_tokens_are_delimited = VerifyNameTokensAreDelimited(statement_tokens);
+  return valid_last_token && brackets_are_balanced && name_tokens_are_delimited;
+}
+// verify that if there's more than one name token, they aren't side by side without any delmiter b/w them
+bool SyntaxValidator::VerifyNameTokensAreDelimited(const vector<Token>& statement_tokens) {
+  int num_k_names = Token::CountTokens(statement_tokens, TokenTag::kName);
+  int prev_kname_idx = -2;
+  int curr_kname_idx = -1;
+  for (int i = 0; i < num_k_names && curr_kname_idx + 1 <= statement_tokens.size() - 1; i++) {
+    curr_kname_idx = Token::GetFirstMatchingTokenIdx(statement_tokens,
+                                                     TokenTag::kName,
+                                                     curr_kname_idx + 1,
+                                                     statement_tokens.size() - 1);
+    // false if out of bounds or it's side by side
+    if ((prev_kname_idx >= 0 && curr_kname_idx <= prev_kname_idx + 1) // i.e. not first iteration of for loop
+        || curr_kname_idx > statement_tokens.size() - 1) {
+      return false;
+    }
+    prev_kname_idx = curr_kname_idx;
+  }
+  return true;
 }
 
 
