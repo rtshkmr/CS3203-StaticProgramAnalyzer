@@ -140,3 +140,27 @@ int QueryEvaluatorTable::GetRowSize() {
   //assert search != um.end()
   return search->second.size();
 }
+
+std::string QueryEvaluatorTable::GetStatementSynonym(std::unordered_map<std::string, DesignEntity> synonym_design_entity_map) {
+  bool is_statement = false;
+  for (auto tableIterator = um.begin(); tableIterator != um.end(); tableIterator++) {
+    DesignEntity current_design_entity = synonym_design_entity_map[tableIterator->first];
+    switch(current_design_entity) {
+      case DesignEntity::kStmt:
+      case DesignEntity::kAssign:
+      case DesignEntity::kCall:
+      case DesignEntity::kPrint:
+      case DesignEntity::kRead:
+      case DesignEntity::kIf:
+      case DesignEntity::kWhile:
+        is_statement = true;
+        break;
+      default:
+        break;
+    }
+    if (is_statement) {
+      return tableIterator->first;
+    }
+  }
+  return "";
+}

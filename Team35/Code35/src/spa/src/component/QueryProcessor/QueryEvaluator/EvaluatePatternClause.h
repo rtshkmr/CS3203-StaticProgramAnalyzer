@@ -12,10 +12,12 @@
 #include "QueryPKB.h"
 #include "model/Statement.h"
 
-void ProcessPatternClause(Pattern pattern, QueryEvaluatorTable* table, PKB pkb);
+void ProcessPatternClause(Pattern pattern, QueryEvaluatorTable* table, PKB pkb,
+                          std::unordered_map<std::string, DesignEntity> synonym_design_entity_map);
 void EvaluatePatternDoubleSynonym(Pattern p, QueryEvaluatorTable* table, PKB pkb);
 void EvaluatePatternDoubleSynonymFirstPresent(Pattern p, QueryEvaluatorTable* table, PKB pkb);
-void EvaluatePatternDoubleSynonymSecondPresent(Pattern p, QueryEvaluatorTable* table, PKB pkb);
+void EvaluatePatternDoubleSynonymSecondPresent(Pattern p, QueryEvaluatorTable* table, PKB pkb,
+                                               std::unordered_map<std::string, DesignEntity> synonym_design_entity_map);
 void EvaluatePatternSingleSynonym(Pattern p, QueryEvaluatorTable* table, PKB pkb);
 bool HasExpressionMatch(Pattern p, AssignEntity assign_entity);
 

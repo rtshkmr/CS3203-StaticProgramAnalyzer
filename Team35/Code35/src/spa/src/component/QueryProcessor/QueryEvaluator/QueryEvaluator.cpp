@@ -1,9 +1,9 @@
 #include <util/Logger.h>
 #include "QueryEvaluator.h"
 
-QueryEvaluator::QueryEvaluator(std::list<Synonym> syn_list, Synonym target, std::list<Group> groups, PKB pkb)
+QueryEvaluator::QueryEvaluator(std::list<Synonym> syn_list, Synonym target, std::list<Group*> groups, PKB pkb)
 : synonymlist{syn_list}, targetSynonym{target}, groupList{groups}, pkb{pkb}, booleanResult{true},
-map_of_synonym_values{} {}
+map_of_synonym_values{}, synonym_design_entity_map() {}
 
 std::vector<std::string> QueryEvaluator::EvaluateQuery() {
 
@@ -26,6 +26,7 @@ void QueryEvaluator::PopulateSynonymValues(QueryEvaluatorTable* table) {
     for (auto iter = synonymlist.begin(); iter != synonymlist.end(); iter++) {
         DesignEntity synonym_design_entity = iter->GetType();
         std::string synonym_name = iter->GetName();
+        synonym_design_entity_map[synonym_name] = synonym_design_entity;
         std::list<std::string> list_of_synonym_values = pkb.GetDesignEntity(synonym_design_entity);
         map_of_synonym_values[synonym_name] = list_of_synonym_values;
         if (iter->GetName() == targetSynonym.GetName()) {
@@ -37,10 +38,10 @@ void QueryEvaluator::PopulateSynonymValues(QueryEvaluatorTable* table) {
 void QueryEvaluator::EvaluateAllGroups(QueryEvaluatorTable* table) {
     // For each group, evaluate the group with target synonym first if applicable
     for (auto iter = groupList.begin(); iter != groupList.end(); iter++) {
-        std::vector<Clause*> clauseList = iter->GetClauses();
+        std::vector<Clause*> clauseList = (*iter)->GetClauses();
 
         // This Group contains the target synonym
-        if (iter->ContainsTargetSynonym()) {
+        if ((*iter)->ContainsTargetSynonym()) {
             ProcessNonBooleanGroup(clauseList, table);
 
             // This Group contains no target synonym and is treated as a boolean type group
@@ -63,7 +64,7 @@ void QueryEvaluator::ProcessNonBooleanGroup(std::vector<Clause*> clauseList, Que
         } else {
             // Evaluate pattern clause here
             Pattern* p = dynamic_cast<Pattern*>(currentClause);
-            ProcessPatternClause(*p, table, pkb);
+            ProcessPatternClause(*p, table, pkb, synonym_design_entity_map);
         }
     }
 }

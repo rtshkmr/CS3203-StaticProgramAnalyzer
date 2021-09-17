@@ -149,7 +149,7 @@ struct SuchThat : Clause {
 struct Pattern : Clause {
   std::string assign_synonym;
   bool left_is_synonym;
-  bool is_exact;
+  bool is_exact = false;
   Pattern() {};
   Pattern(std::string lhs, std::string rhs, std::string assn_syn, bool lhs_is_syn, bool is_exact) {
     left_hand_side = lhs;
