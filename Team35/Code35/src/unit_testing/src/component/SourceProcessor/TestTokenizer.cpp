@@ -20,7 +20,8 @@ vector<string> lines = {
 //    R"(x=1;)", // cond_expr encapsulated by brackets : this fails to separate the =1;
 //    R"(if(x >= 1) {read x; call helloProc;} else {x= 1; })",
 //    R"(if(x >= 1) {read x; call helloProc;} else {x =1; })", // cond_expr encapsulated by brackets
-    R"(if((x>=1)&&((y>69)||(z<0)) && (!!TheMatrixIsReal)){)", // nested cond expr without any spacing b/w any impt characters
+//    R"(if((x>=1)&&((y>69)||(z<0)) && (!!TheMatrixIsReal)){)", // nested cond expr without any spacing b/w any impt characters
+    R"(procedure=1)", // nested cond expr without any spacing b/w any impt characters
 //    R"(if(x >= 1) then {read x; call helloProc;} else {x=1;})", // todo: the {x=1;} is not supported by tokenizer (i.e. more than 2 special delimiters. if necessary, need to make the splitting functions do a recursive call)
 };
 
@@ -197,4 +198,36 @@ TEST_CASE("1.Tokenizer.Successfully handles the tagging strings with a TokenTag"
     REQUIRE(matches);
   }
 
+}
+
+TEST_CASE("1.Tokenizer.Sentence-specific tokenizing that allows keywords to be used as varnames") {
+  /*
+   *
+   * Whitelist approach (when to gurantee the token is a special token)
+   *
+   * Procedure:
+   *  - proc statement conditions:
+   *     * it is the first token in statement,
+   *     * 2 more token_strings in that statement (validation logic, shouldn't be in tokenizer)
+   *
+   *     - what about procedure=?
+   *
+   *
+   *
+   * Blacklist approach:
+   * These are the keywords that can potentially be kNames also:
+   * - procedure
+   *    * only a kname if:
+   *       - proc statement: token before is kProcedure and token after is kOpenBrace
+   *       - assignment statement: token after is
+   * - if
+   * - then
+   * - else
+   * - read
+   * - print
+   * - call
+   * - while
+   *
+   *
+   * */
 }

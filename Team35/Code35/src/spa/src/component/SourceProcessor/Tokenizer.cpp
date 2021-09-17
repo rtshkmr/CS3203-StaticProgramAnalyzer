@@ -5,28 +5,37 @@
 
 using namespace std;
 
-/**
- * Creates a vector of Token objects for a given string that represents a SIMPLE statement. Syntax validation
- * is done for every token but semantic (order of tokens and such rules) are not validated.
- * @param statement_string A SIMPLE statement in its string form
- * @return A vector of Token objects that represent that SIMPLE statement
- */
 vector<Token> Tokenizer::CreateTokens(const string& statement_string) {
   vector<Token> tokens;
-  vector<string> split_strings = SplitString(" ", statement_string, false);
-  for (auto& string_token : split_strings) {
-    if (!IsWhiteSpace(string_token)) {
-      // example: "abc=1;"
-      vector<string> split_sub_tokens_strings = SplitSubTokenStrings(string_token);
-      for (auto& sub_token_string: split_sub_tokens_strings) {
-        if (!IsWhiteSpace(sub_token_string)) {
-          tokens.push_back(*(CreateToken(sub_token_string)));
-        }
-      }
-    }
+  vector<string> token_strings = SplitSentenceIntoStringTokens(statement_string);
+  for (auto& token_string : token_strings) {
+    Token* new_token = CreateToken(token_string);
+    tokens.push_back(* new_token);
   }
   return tokens;
 }
+
+/**
+ * Given a single string representing a statement, splits into discernible tokens
+ * @param statement_string
+ * @return
+ */
+vector<string> Tokenizer::SplitSentenceIntoStringTokens(const string& statement_string) {
+  vector<string> final_token_strings;
+  vector<string> split_strings_by_space = SplitString(" ", statement_string, false);
+  for (auto & string_token : split_strings_by_space) {
+    if (!IsWhiteSpace(string_token)) {
+      vector<string> split_sub_tokens_strings = SplitSubTokenStrings(string_token);
+      for (auto& sub_token_string: split_sub_tokens_strings) {
+        if (!IsWhiteSpace(sub_token_string))
+          final_token_strings.push_back(sub_token_string);
+      }
+    }
+  }
+  return final_token_strings;
+}
+
+
 
 /**
  *  Creates a new Token object for a given string that represents a possible token

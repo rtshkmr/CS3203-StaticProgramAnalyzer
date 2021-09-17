@@ -21,6 +21,7 @@ class Tokenizer {
   static std::vector<std::string> SplitSubTokenStrings(std::string &string_token);
   static bool IsSpecialDelimiter(std::string &test_string);
   static bool IsWhiteSpace(std::string &test_string);
+  static std::vector<std::string> SplitSentenceIntoStringTokens(const std::string& statement_string);
 };
 
 #endif //AUTOTESTER_TEAM00_CODE00_SRC_SPA_SRC_COMPONENT_SOURCEPROCESSOR_TOKENIZER_H_
