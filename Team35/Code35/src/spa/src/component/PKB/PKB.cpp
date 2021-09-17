@@ -29,7 +29,6 @@ std::list<std::string> PKB::GetDesignEntity(DesignEntity de) {
             break;
         case DesignEntity::kInvalid:return {};
         default:return {};
-            throw std::invalid_argument("fallthrough, shouldn't be here. wtf.");
             break;
     }
 }
@@ -144,8 +143,7 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetPrevious(std::string st
 std::list<std::tuple<DesignEntity, std::string>> PKB::GetParent(std::string stmt) {
     std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
     auto parent_iter = parent_t_map_.find(stmt);
-    if (parent_iter == parent_t_map_.end()) { ;
-    } else {
+    if (parent_iter != parent_t_map_.end()) {
         std::list<std::tuple<DesignEntity, std::string>*>* children = parent_iter->second;
         for (auto s : *children) {
             ret_list.push_back(*s);
@@ -157,16 +155,17 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetParent(std::string stmt
 std::list<std::tuple<DesignEntity, std::string>> PKB::GetChild(std::string stmt) {
     std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
     auto child_iter = child_map_.find(stmt);
-    std::tuple<DesignEntity, std::string> child = child_iter->second;
-    ret_list.push_back(child);
+    if (child_iter != child_map_.end()) {
+        std::tuple<DesignEntity, std::string> child = child_iter->second;
+        ret_list.push_back(child);
+    }
     return ret_list;
 }
 
 std::list<std::tuple<DesignEntity, std::string>> PKB::GetFollowsT(std::string stmt) {
     std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
     auto follows_iter = follows_t_map_.find(stmt);
-    if (follows_iter == follows_t_map_.end()) { ;
-    } else {
+    if (follows_iter != follows_t_map_.end()) {
         std::list<std::tuple<DesignEntity, std::string>*>* before = follows_iter->second;
         for (auto s : *before) {
             ret_list.push_back(*s);
@@ -178,8 +177,7 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetFollowsT(std::string st
 std::list<std::tuple<DesignEntity, std::string>> PKB::GetPreviousT(std::string stmt) {
     std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
     auto previous_iter = previous_t_map_.find(stmt);
-    if (previous_iter == previous_t_map_.end()) { ;
-    } else {
+    if (previous_iter != previous_t_map_.end()) {
         std::list<std::tuple<DesignEntity, std::string>*>* after = previous_iter->second;
         for (auto s : *after) {
             ret_list.push_back(*s);
@@ -191,8 +189,7 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetPreviousT(std::string s
 std::list<std::tuple<DesignEntity, std::string>> PKB::GetParentT(std::string stmt) {
     std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
     auto parent_iter = parent_t_map_.find(stmt);
-    if (parent_iter == parent_t_map_.end()) { ;
-    } else {
+    if (parent_iter != parent_t_map_.end()) {
         std::list<std::tuple<DesignEntity, std::string>*>* children = parent_iter->second;
         for (auto s : *children) {
             ret_list.push_back(*s);
@@ -204,8 +201,7 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetParentT(std::string stm
 std::list<std::tuple<DesignEntity, std::string>> PKB::GetChildT(std::string stmt) {
     std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
     auto child_iter = child_t_map_.find(stmt);
-    if (child_iter == child_t_map_.end()) { ;
-    } else {
+    if (child_iter != child_t_map_.end()) {
         std::list<std::tuple<DesignEntity, std::string>*>* parents = child_iter->second;
         for (auto s : *parents) {
             ret_list.push_back(*s);
@@ -217,16 +213,14 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetChildT(std::string stmt
 std::list<std::tuple<DesignEntity, std::string>> PKB::GetUses(std::string stmt) {
     std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
     auto use_s_iter = use_s_map_.find(stmt);
-    if (use_s_iter == use_s_map_.end()) { ;
-    } else {
+    if (use_s_iter != use_s_map_.end()) {
         std::list<std::tuple<DesignEntity, std::string>*>* use_s = use_s_iter->second;
         for (auto v : *use_s) {
             ret_list.push_back(*v);
         }
     }
     auto use_c_iter = use_c_map_.find(stmt);
-    if (use_c_iter == use_c_map_.end()) { ;
-    } else {
+    if (use_c_iter != use_c_map_.end()) {
         std::list<std::tuple<DesignEntity, std::string>*>* use_c = use_c_iter->second;
         for (auto v : *use_c) {
             ret_list.push_back(*v);
@@ -238,16 +232,14 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetUses(std::string stmt) 
 std::list<std::tuple<DesignEntity, std::string>> PKB::GetUsedBy(std::string var) {
     std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
     auto used_by_s_iter = used_by_s_map_.find(var);
-    if (used_by_s_iter == used_by_s_map_.end()) { ;
-    } else {
+    if (used_by_s_iter != used_by_s_map_.end()) {
         std::list<std::tuple<DesignEntity, std::string>*>* used_by_s = used_by_s_iter->second;
         for (auto s : *used_by_s) {
             ret_list.push_back(*s);
         }
     }
     auto used_by_c_iter = used_by_c_map_.find(var);
-    if (used_by_c_iter == used_by_c_map_.end()) { ;
-    } else {
+    if (used_by_c_iter != used_by_c_map_.end()) {
         std::list<std::tuple<DesignEntity, std::string>*>* used_by_c = used_by_c_iter->second;
         for (auto c : *used_by_c) {
             ret_list.push_back(*c);
@@ -259,16 +251,14 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetUsedBy(std::string var)
 std::list<std::tuple<DesignEntity, std::string>> PKB::GetModifies(std::string stmt) {
     std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
     auto modifies_s_iter = modifies_s_map_.find(stmt);
-    if (modifies_s_iter == modifies_s_map_.end()) { ;
-    } else {
+    if (modifies_s_iter != modifies_s_map_.end()) {
         std::list<std::tuple<DesignEntity, std::string>*>* modifies_s = modifies_s_iter->second;
         for (auto v : *modifies_s) {
             ret_list.push_back(*v);
         }
     }
     auto modifies_c_iter = modifies_c_map_.find(stmt);
-    if (modifies_c_iter == modifies_c_map_.end()) { ;
-    } else {
+    if (modifies_c_iter != modifies_c_map_.end()) {
         std::list<std::tuple<DesignEntity, std::string>*>* modifies_c = modifies_c_iter->second;
         for (auto v : *modifies_c) {
             ret_list.push_back(*v);
@@ -280,16 +270,14 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetModifies(std::string st
 std::list<std::tuple<DesignEntity, std::string>> PKB::GetModifiedBy(std::string var) {
     std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
     auto modified_by_s_iter = modified_by_s_map_.find(var);
-    if (modified_by_s_iter == modified_by_s_map_.end()) { ;
-    } else {
+    if (modified_by_s_iter != modified_by_s_map_.end()) {
         std::list<std::tuple<DesignEntity, std::string>*>* modified_by_s = modified_by_s_iter->second;
         for (auto s : *modified_by_s) {
             ret_list.push_back(*s);
         }
     }
     auto modified_by_c_iter = modified_by_c_map_.find(var);
-    if (modified_by_c_iter == modified_by_c_map_.end()) { ;
-    } else {
+    if (modified_by_c_iter != modified_by_c_map_.end()) {
         std::list<std::tuple<DesignEntity, std::string>*>* modified_by_c = modified_by_c_iter->second;
         for (auto c : *modified_by_c) {
             ret_list.push_back(*c);
