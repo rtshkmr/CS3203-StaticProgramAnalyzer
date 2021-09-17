@@ -57,6 +57,7 @@ bool Logger::InitLogger(const LoggerSettings& settings) {
 }
 std::string Logger::AddPrefix(const std::string& file, const int line) const {
   std::string result;
+  result += "\n";
   if (this->logger_settings_.include_datetime_) {
     result += TimeUtil::GetDateTimeStr();
     if (!this->logger_settings_.include_file_line_) {
@@ -68,5 +69,6 @@ std::string Logger::AddPrefix(const std::string& file, const int line) const {
   if (this->logger_settings_.include_file_line_) {
     result += file + "(" + tostring(line) + "): ";
   }
+  result += "\n";
   return result;
 }

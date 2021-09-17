@@ -165,3 +165,115 @@ TEST_CASE("1.EntityFactory.CreateEntities") {
     CHECK_THROWS_AS(entity_factory.CreateEntities(wrong_keyword_tokens), std::invalid_argument);
   }
 }
+
+TEST_CASE("1.EntityFactory.GetExpressionTokens") {
+  SECTION("Assignment and semicolon") {
+    vector<Token> tokens = {
+        Token("x", TokenTag::kName),
+        Token("=", TokenTag::kAssignmentOperator),
+        Token("d", TokenTag::kName),
+        Token("2", TokenTag::kName),
+        Token("4", TokenTag::kName),
+        Token("5", TokenTag::kName),
+        Token(";", TokenTag::kSemicolon),
+    };
+    vector<Token> expected_tokens = {
+        Token("d", TokenTag::kName),
+        Token("2", TokenTag::kName),
+        Token("4", TokenTag::kName),
+        Token("5", TokenTag::kName),
+    };
+    vector<Token>
+        actual_tokens = EntityFactory::GetExpressionTokens(tokens, TokenTag::kAssignmentOperator, TokenTag::kSemicolon);
+    bool equal = true;
+    for (int i = 0; i < actual_tokens.size(); ++i) {
+      equal = equal && (actual_tokens[i].GetTokenString() == expected_tokens[i].GetTokenString());
+    }
+    REQUIRE(equal);
+    REQUIRE(actual_tokens.size() == expected_tokens.size());
+  }
+
+  SECTION("Brackets") {
+    vector<Token> tokens = {
+        Token("(", TokenTag::kOpenBracket),
+        Token("x", TokenTag::kName),
+        Token("d", TokenTag::kName),
+        Token("2", TokenTag::kName),
+        Token("4", TokenTag::kName),
+        Token("5", TokenTag::kName),
+        Token(")", TokenTag::kCloseBracket),
+    };
+    vector<Token> expected_tokens = {
+        Token("x", TokenTag::kName),
+        Token("d", TokenTag::kName),
+        Token("2", TokenTag::kName),
+        Token("4", TokenTag::kName),
+        Token("5", TokenTag::kName),
+    };
+    vector<Token>
+        actual_tokens = EntityFactory::GetExpressionTokens(tokens, TokenTag::kOpenBracket, TokenTag::kCloseBracket);
+    bool equal = true;
+    for (int i = 0; i < actual_tokens.size(); ++i) {
+      equal = equal && (actual_tokens[i].GetTokenString() == expected_tokens[i].GetTokenString());
+    }
+    REQUIRE(equal);
+    REQUIRE(actual_tokens.size() == expected_tokens.size());
+  }
+
+  SECTION("Multiple start and end tags") {
+    vector<Token> tokens = {
+        Token("x", TokenTag::kName),
+        Token("(", TokenTag::kOpenBracket),
+        Token("(", TokenTag::kOpenBracket),
+        Token("x", TokenTag::kName),
+        Token("d", TokenTag::kName),
+        Token(")", TokenTag::kCloseBracket),
+        Token("2", TokenTag::kName),
+        Token("(", TokenTag::kOpenBracket),
+        Token("4", TokenTag::kName),
+        Token("5", TokenTag::kName),
+        Token(")", TokenTag::kCloseBracket),
+        Token(")", TokenTag::kCloseBracket),
+        Token("4", TokenTag::kName),
+    };
+    vector<Token> expected_tokens = {
+        Token("(", TokenTag::kOpenBracket),
+        Token("x", TokenTag::kName),
+        Token("d", TokenTag::kName),
+        Token(")", TokenTag::kCloseBracket),
+        Token("2", TokenTag::kName),
+        Token("(", TokenTag::kOpenBracket),
+        Token("4", TokenTag::kName),
+        Token("5", TokenTag::kName),
+        Token(")", TokenTag::kCloseBracket),
+    };
+    vector<Token>
+        actual_tokens = EntityFactory::GetExpressionTokens(tokens, TokenTag::kOpenBracket, TokenTag::kCloseBracket);
+    bool equal = true;
+    for (int i = 0; i < actual_tokens.size(); ++i) {
+      equal = equal && (actual_tokens[i].GetTokenString() == expected_tokens[i].GetTokenString());
+    }
+    REQUIRE(equal);
+    REQUIRE(actual_tokens.size() == expected_tokens.size());
+  }
+
+  SECTION("Nothing between start and end tags") {
+    vector<Token> tokens = {
+        Token("{", TokenTag::kOpenBrace),
+        Token("}", TokenTag::kCloseBrace),
+        Token("x", TokenTag::kName),
+    };
+    REQUIRE_THROWS_AS(EntityFactory::GetExpressionTokens(tokens, TokenTag::kOpenBrace, TokenTag::kCloseBrace),
+                      std::invalid_argument);
+  }
+
+  SECTION("Nothing between start and end tags") {
+    vector<Token> tokens = {
+        Token("{", TokenTag::kOpenBrace),
+        Token("}", TokenTag::kCloseBrace),
+        Token("x", TokenTag::kName),
+        };
+    REQUIRE_THROWS_AS(EntityFactory::GetExpressionTokens(tokens, TokenTag::kSemicolon, TokenTag::kCloseBrace),
+                      std::invalid_argument);
+  }
+}

@@ -16,7 +16,7 @@ using namespace sp;
  * @return Source process status
  */
 PKB* SourceProcessor::ProcessSourceFile(std::string file_name) {
-  LOG (spa_logger << "\n\n\n==========================  [ENTER] SOURCE PROC ======================\n\n\n");
+  LOG (spa_logger << "==========================  [ENTER] SOURCE PROC ======================");
   LOG(spa_logger << "... processing source file");
   par::Parser parser;
 
