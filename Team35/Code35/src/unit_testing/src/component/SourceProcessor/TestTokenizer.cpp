@@ -21,8 +21,19 @@ vector<string> lines = {
 //    R"(if(x >= 1) {read x; call helloProc;} else {x= 1; })",
 //    R"(if(x >= 1) {read x; call helloProc;} else {x =1; })", // cond_expr encapsulated by brackets
 //    R"(if((x>=1)&&((y>69)||(z<0)) && (!!TheMatrixIsReal)){)", // nested cond expr without any spacing b/w any impt characters
-    R"(procedure=1)", // nested cond expr without any spacing b/w any impt characters
-//    R"(if(x >= 1) then {read x; call helloProc;} else {x=1;})", // todo: the {x=1;} is not supported by tokenizer (i.e. more than 2 special delimiters. if necessary, need to make the splitting functions do a recursive call)
+    R"(if(x >= 1) then {read x; call helloProc;} else {x=1;})",
+    R"(procedure=1)",
+    R"(procedure procedure {)",
+    R"(procedure if {)",
+    R"(procedure then {)",
+    R"(procedure while {)",
+    R"(if = 10;)",
+    R"(else = 12;)",
+    R"(while = 12 + if;)",
+    R"(while = 12 + then;)",
+    R"(if = if + then;)",
+    R"(if = if + then;)",
+    R"(x = while + then * procedure;)",
 };
 
 TEST_CASE("1.Tokenizer.Tokenizer displays current tokenization status") {
@@ -101,7 +112,7 @@ TEST_CASE("1.Tokenizer.RegexPatterns pattern tests for token_strings") {
   regex fixed_char_pat = RegexPatterns::GetFixedCharPattern(); // for braces, semicolon...
   regex binary_arithmetic_operator_pat = RegexPatterns::GetBinaryArithmeticOperatorPattern(); // for math
   regex binary_comparison_operator_pat = RegexPatterns::GetBinaryComparisonPattern(); // for comparator chars
-  regex name_pat = RegexPatterns::GetNamePattern(); // names, integers... todo: check alphanum
+  regex name_pat = RegexPatterns::GetNamePattern(); // names, integers...
   regex integer_pat = RegexPatterns::GetIntegerPattern();
 
   bool handle_valid_names_integers = regex_match("procedure", fixed_keyword_pat)
@@ -201,6 +212,23 @@ TEST_CASE("1.Tokenizer.Successfully handles the tagging strings with a TokenTag"
 }
 
 TEST_CASE("1.Tokenizer.Sentence-specific tokenizing that allows keywords to be used as varnames") {
+
+  vector<string> valid_lines = {
+
+      R"(procedure=1;)",
+      R"(procedure procedure {)",
+      R"(procedure if {)",
+      R"(procedure then {)",
+      R"(procedure while {)",
+      R"(if = 10;)",
+      R"(else = 12;)",
+      R"(while = 12 + if;)",
+      R"(while = 12 + then;)",
+      R"(if = if + then;)",
+      R"(if = if + then;)",
+      R"(x = while + then * procedure;)",
+  };
+
   /*
    *
    * Whitelist approach (when to gurantee the token is a special token)

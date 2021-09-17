@@ -154,7 +154,7 @@ class Token {
   [[nodiscard]] TokenTag GetTokenTag() const;
   bool operator==(Token other);
   static TokenTag TagStringWithToken(std::string const& reference);
-  static bool IsKeywordToken(Token token);
+  static bool IsKeywordToken(const Token& token);
   static auto GetTokenMatchForwardIterator(const std::vector<Token>& tokens,
                                            const std::regex& desired_pattern,
                                            int left_idx,

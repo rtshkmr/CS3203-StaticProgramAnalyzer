@@ -246,15 +246,15 @@ Token::Token(std::string token_string, TokenTag token_tag) :
 }
 
 /**
- * Equality operator checks the string kept in the token todo: add the tag also
+ * Equality operator checks the string kept in the token
  * @param other
  * @return
  */
 bool Token::operator==(Token other) {
-  return this->GetTokenString() == other.GetTokenString();
+  return this->GetTokenString() == other.GetTokenString() && this->GetTokenTag()==other.GetTokenTag();
 }
 
-bool Token::IsKeywordToken(Token token) {
+bool Token::IsKeywordToken(const Token& token) {
   TokenTag tag = token.GetTokenTag();
   return tag == TokenTag::kProcedureKeyword
       || tag == TokenTag::kReadKeyword
@@ -262,7 +262,6 @@ bool Token::IsKeywordToken(Token token) {
       || tag == TokenTag::kCallKeyword
       || tag == TokenTag::kWhileKeyword
       || tag == TokenTag::kIfKeyword
-      || tag == TokenTag::kWhileKeyword
       || tag == TokenTag::kElseKeyword
       || tag == TokenTag::kThenKeyword;
 }
@@ -382,7 +381,7 @@ auto Token::GetTokenMatchForwardIterator(const std::vector<Token>& tokens,
                                          int right_idx) {
   auto forward_iterator = std::find_if(tokens.begin() + left_idx,
                                        tokens.begin()
-                                           + right_idx, // todo: check if the end is exclusive range or inclusive, it's half open, the ending is excluded
+                                           + right_idx,
                                        [&desired_pattern](Token elem) {
                                          std::string current = elem.GetTokenString();
                                          bool matches_target_pattern = std::regex_match(current, desired_pattern);
@@ -396,7 +395,6 @@ auto Token::GetTokenMatchForwardIterator(const std::vector<Token>& tokens,
                                          int right_idx) {
   auto forward_iterator = std::find_if(tokens.begin() + left_idx,
                                        tokens.begin() + right_idx,
-      // todo: check if the end is exclusive range or inclusive, it's half open, the ending is excluded
                                        [&target_token_tag](Token elem) {
                                          TokenTag current_tag = elem.GetTokenTag();
                                          bool matches_target_token = current_tag == target_token_tag;
@@ -424,7 +422,7 @@ auto Token::GetTokenMatchReverseIterator(const std::vector<Token>& tokens,
   auto rEnding = tokens.crend() - left_boundary_idx;
   // nb: find_if checks within a half-open range but we want inclusive behaviour:
   auto reverse_iterator = std::find_if(rBeginning,
-                                       rEnding - 1, // todo: check if will throw out of bounds error;
+                                       rEnding - 1,
                                        [&desired_pattern](Token elem) {
                                          std::string current = elem.GetTokenString();
                                          bool matches_target_pattern = std::regex_match(current, desired_pattern);
@@ -441,7 +439,7 @@ auto Token::GetTokenMatchReverseIterator(const std::vector<Token>& tokens,
   auto rEnding = tokens.crend() - left_boundary_idx;
   // nb: find_if checks within a half-open range but we want inclusive behaviour:
   auto reverse_iterator = std::find_if(rBeginning,
-                                       rEnding - 1, // todo: check if will throw out of bounds error;
+                                       rEnding - 1,
                                        [&target_token_tag](Token elem) {
                                          TokenTag current_tag = elem.GetTokenTag();
                                          bool matches_target_token = current_tag == target_token_tag;
@@ -466,7 +464,7 @@ int Token::GetFirstMatchingTokenIdx(const std::vector<Token>& tokens,
                                                      token_tag,
                                                      left_boundary_idx,
                                                      right_boundary_idx);
-  int delim_idx = std::distance(tokens.begin(), delim_iterator); // todo: check delim_idx
+  int delim_idx = std::distance(tokens.begin(), delim_iterator);
   return delim_idx;
 }
 /**
@@ -486,7 +484,7 @@ int Token::GetFirstMatchingTokenIdx(const std::vector<Token>& tokens,
                                                      desired_pattern,
                                                      left_boundary_idx,
                                                      right_boundary_idx);
-  int delim_idx = std::distance(tokens.begin(), delim_iterator); // todo: check delim_idx
+  int delim_idx = std::distance(tokens.begin(), delim_iterator);
   return delim_idx;
 }
 /**
@@ -541,7 +539,7 @@ int Token::GetFirstMatchingTokenIdx(const std::vector<Token>& tokens, const std:
                                                      desired_pattern,
                                                      0,
                                                      tokens.size() - 1);
-  int delim_idx = std::distance(tokens.begin(), delim_iterator); // todo: check delim_idx
+  int delim_idx = std::distance(tokens.begin(), delim_iterator);
   return delim_idx;
 }
 /**
@@ -556,7 +554,7 @@ int Token::GetFirstMatchingTokenIdx(const std::vector<Token>& tokens, TokenTag t
                                                      target_token_tag,
                                                      0,
                                                      tokens.size() - 1);
-  int delim_idx = std::distance(tokens.begin(), delim_iterator); // todo: check delim_idx
+  int delim_idx = std::distance(tokens.begin(), delim_iterator);
   return delim_idx;
 }
 /**
