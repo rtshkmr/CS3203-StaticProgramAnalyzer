@@ -19,5 +19,3 @@ do echo "[NOTE] Running Test $i";
 	FAILS=$(grep -o '</failed>' $FILENAME | wc -l); 
 	echo "[NOTE] #Queries = $QUERIES; #Passes = $PASSES; #Fails = $FAILS" 
 done
-
-zip output_final output_*.xml log_*.txt analysis.xsl;

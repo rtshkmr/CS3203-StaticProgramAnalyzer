@@ -1,5 +1,0 @@
-1 - Simple statement
-assign a1;
-Select a1 such that pattern a1("y", _)
-2, 8, 10
-5000

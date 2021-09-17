@@ -8,6 +8,8 @@
 #include <vector>
 
 class SyntaxValidator {
+ private:
+  static bool VerifyNameTokensAreDelimited(const std::vector<Token>& statement_tokens);
 
  public:
   SyntaxValidator();
