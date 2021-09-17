@@ -183,7 +183,7 @@ TEST_CASE("3.QueryProcessor.Query select only") {
         std::list<Synonym> synonymList = {Synonym("s2", DesignEntity::kStmt),
                                           Synonym("a1", DesignEntity::kAssign),
                                           Synonym("call", DesignEntity::kCall)};
-        std::list<Group> groupList;
+        std::list<Group*> groupList;
 
         SECTION( "Basic statement select query" ) {
             Synonym targetSynonym = Synonym("s2", DesignEntity::kStmt);
@@ -230,7 +230,7 @@ TEST_CASE("3.QueryProcessor.Query select only") {
             st.left_hand_side = "s2";
             std::vector<Clause*> clauseList = {&st};
             Group firstGroup (clauseList, true);
-            std::list<Group> groupList = {firstGroup};
+            std::list<Group*> groupList = {&firstGroup};
 
             Synonym targetSynonym = Synonym("s2", DesignEntity::kStmt);
             QueryEvaluator evaluator(synonymList, targetSynonym, groupList, pkb);
@@ -248,7 +248,7 @@ TEST_CASE("3.QueryProcessor.Query select only") {
 
             std::vector<Clause*> clauseList = {&st};
             Group firstGroup (clauseList, true);
-            std::list<Group> groupList = {firstGroup};
+            std::list<Group*> groupList = {&firstGroup};
 
             Synonym targetSynonym = Synonym("s2", DesignEntity::kStmt);
             QueryEvaluator evaluator(synonymList, targetSynonym, groupList, pkb);
@@ -266,7 +266,7 @@ TEST_CASE("3.QueryProcessor.Query select only") {
 
             std::vector<Clause*> clauseList = {&st};
             Group firstGroup (clauseList, false);
-            std::list<Group> groupList = {firstGroup};
+            std::list<Group*> groupList = {&firstGroup};
 
             Synonym targetSynonym = Synonym("s2", DesignEntity::kStmt);
             QueryEvaluator evaluator(synonymList, targetSynonym, groupList, pkb);
@@ -284,7 +284,7 @@ TEST_CASE("3.QueryProcessor.Query select only") {
 
             std::vector<Clause*> clauseList = {&st};
             Group firstGroup (clauseList, false);
-            std::list<Group> groupList = {firstGroup};
+            std::list<Group*> groupList = {&firstGroup};
 
             Synonym targetSynonym = Synonym("s2", DesignEntity::kStmt);
             QueryEvaluator evaluator(synonymList, targetSynonym, groupList, pkb);
@@ -302,7 +302,7 @@ TEST_CASE("3.QueryProcessor.Query select only") {
 
             std::vector<Clause*> clauseList = {&st};
             Group firstGroup (clauseList, false);
-            std::list<Group> groupList = {firstGroup};
+            std::list<Group*> groupList = {&firstGroup};
 
             Synonym targetSynonym = Synonym("s2", DesignEntity::kStmt);
             QueryEvaluator evaluator(synonymList, targetSynonym, groupList, pkb);
@@ -320,7 +320,7 @@ TEST_CASE("3.QueryProcessor.Query select only") {
 
             std::vector<Clause*> clauseList = {&st};
             Group firstGroup (clauseList, false);
-            std::list<Group> groupList = {firstGroup};
+            std::list<Group*> groupList = {&firstGroup};
 
             Synonym targetSynonym = Synonym("s2", DesignEntity::kStmt);
             QueryEvaluator evaluator(synonymList, targetSynonym, groupList, pkb);
@@ -357,7 +357,7 @@ TEST_CASE( "3.QueryEvaluator.Evaluate single Follow and Parent(?) clauses" ) {
 
         SECTION("Select first synonym") {
             Group firstGroup (clauseList, true);
-            std::list<Group> groupList = {firstGroup};
+            std::list<Group*> groupList = {&firstGroup};
             Synonym targetSynonym = Synonym("p1", DesignEntity::kPrint);
             QueryEvaluator evaluator(synonymList, targetSynonym, groupList, pkb);
 
@@ -368,7 +368,7 @@ TEST_CASE( "3.QueryEvaluator.Evaluate single Follow and Parent(?) clauses" ) {
 
         SECTION("Select second synonym") {
             Group firstGroup (clauseList, true);
-            std::list<Group> groupList = {firstGroup};
+            std::list<Group*> groupList = {&firstGroup};
             Synonym targetSynonym = Synonym("a1", DesignEntity::kAssign);
             QueryEvaluator evaluator(synonymList, targetSynonym, groupList, pkb);
 
@@ -379,7 +379,7 @@ TEST_CASE( "3.QueryEvaluator.Evaluate single Follow and Parent(?) clauses" ) {
 
         SECTION("Select neither synonym, with correct boolean result") {
             Group firstGroup (clauseList, false);
-            std::list<Group> groupList = {firstGroup};
+            std::list<Group*> groupList = {&firstGroup};
             Synonym targetSynonym = Synonym("a2", DesignEntity::kAssign);
             QueryEvaluator evaluator(synonymList, targetSynonym, groupList, pkb);
 
@@ -400,7 +400,7 @@ TEST_CASE( "3.QueryEvaluator.Evaluate single Follow and Parent(?) clauses" ) {
 
         SECTION("Select first synonym") {
             Group firstGroup (clauseList, true);
-            std::list<Group> groupList = {firstGroup};
+            std::list<Group*> groupList = {&firstGroup};
             Synonym targetSynonym = Synonym("p1", DesignEntity::kPrint);
             QueryEvaluator evaluator(synonymList, targetSynonym, groupList, pkb);
 
@@ -411,7 +411,7 @@ TEST_CASE( "3.QueryEvaluator.Evaluate single Follow and Parent(?) clauses" ) {
 
         SECTION("Select second synonym") {
             Group firstGroup (clauseList, true);
-            std::list<Group> groupList = {firstGroup};
+            std::list<Group*> groupList = {&firstGroup};
             Synonym targetSynonym = Synonym("r1", DesignEntity::kRead);
             QueryEvaluator evaluator(synonymList, targetSynonym, groupList, pkb);
 
@@ -422,7 +422,7 @@ TEST_CASE( "3.QueryEvaluator.Evaluate single Follow and Parent(?) clauses" ) {
 
         SECTION("Select neither synonym, with incorrect boolean result") {
             Group firstGroup (clauseList, false);
-            std::list<Group> groupList = {firstGroup};
+            std::list<Group*> groupList = {&firstGroup};
             Synonym targetSynonym = Synonym("a2", DesignEntity::kAssign);
             QueryEvaluator evaluator(synonymList, targetSynonym, groupList, pkb);
 
@@ -443,7 +443,7 @@ TEST_CASE( "3.QueryEvaluator.Evaluate single Follow and Parent(?) clauses" ) {
 
         SECTION("Select first synonym") {
             Group firstGroup (clauseList, true);
-            std::list<Group> groupList = {firstGroup};
+            std::list<Group*> groupList = {&firstGroup};
             Synonym targetSynonym = Synonym("a1", DesignEntity::kAssign);
             QueryEvaluator evaluator(synonymList, targetSynonym, groupList, pkb);
 
@@ -454,7 +454,7 @@ TEST_CASE( "3.QueryEvaluator.Evaluate single Follow and Parent(?) clauses" ) {
 
         SECTION("Select synonym not in clause") {
             Group firstGroup (clauseList, false);
-            std::list<Group> groupList = {firstGroup};
+            std::list<Group*> groupList = {&firstGroup};
             Synonym targetSynonym = Synonym("r1", DesignEntity::kAssign);
             QueryEvaluator evaluator(synonymList, targetSynonym, groupList, pkb);
 
@@ -475,7 +475,7 @@ TEST_CASE( "3.QueryEvaluator.Evaluate single Follow and Parent(?) clauses" ) {
 
         SECTION("Select first synonym") {
             Group firstGroup (clauseList, true);
-            std::list<Group> groupList = {firstGroup};
+            std::list<Group*> groupList = {&firstGroup};
             Synonym targetSynonym = Synonym("a1", DesignEntity::kAssign);
             QueryEvaluator evaluator(synonymList, targetSynonym, groupList, pkb);
 
@@ -486,7 +486,7 @@ TEST_CASE( "3.QueryEvaluator.Evaluate single Follow and Parent(?) clauses" ) {
 
         SECTION("Select synonym not in clause") {
             Group firstGroup (clauseList, false);
-            std::list<Group> groupList = {firstGroup};
+            std::list<Group*> groupList = {&firstGroup};
             Synonym targetSynonym = Synonym("r1", DesignEntity::kAssign);
             QueryEvaluator evaluator(synonymList, targetSynonym, groupList, pkb);
 
@@ -507,7 +507,7 @@ TEST_CASE( "3.QueryEvaluator.Evaluate single Follow and Parent(?) clauses" ) {
 
         SECTION("Select second synonym") {
             Group firstGroup (clauseList, true);
-            std::list<Group> groupList = {firstGroup};
+            std::list<Group*> groupList = {&firstGroup};
             Synonym targetSynonym = Synonym("a1", DesignEntity::kAssign);
             QueryEvaluator evaluator(synonymList, targetSynonym, groupList, pkb);
 
@@ -518,7 +518,7 @@ TEST_CASE( "3.QueryEvaluator.Evaluate single Follow and Parent(?) clauses" ) {
 
         SECTION("Select synonym not in clause") {
             Group firstGroup (clauseList, false);
-            std::list<Group> groupList = {firstGroup};
+            std::list<Group*> groupList = {&firstGroup};
             Synonym targetSynonym = Synonym("a2", DesignEntity::kAssign);
             QueryEvaluator evaluator(synonymList, targetSynonym, groupList, pkb);
 
@@ -539,7 +539,7 @@ TEST_CASE( "3.QueryEvaluator.Evaluate single Follow and Parent(?) clauses" ) {
 
         SECTION("Select second synonym") {
             Group firstGroup (clauseList, true);
-            std::list<Group> groupList = {firstGroup};
+            std::list<Group*> groupList = {&firstGroup};
             Synonym targetSynonym = Synonym("a1", DesignEntity::kAssign);
             QueryEvaluator evaluator(synonymList, targetSynonym, groupList, pkb);
 
@@ -550,7 +550,7 @@ TEST_CASE( "3.QueryEvaluator.Evaluate single Follow and Parent(?) clauses" ) {
 
         SECTION("Select synonym not in clause") {
             Group firstGroup (clauseList, false);
-            std::list<Group> groupList = {firstGroup};
+            std::list<Group*> groupList = {&firstGroup};
             Synonym targetSynonym = Synonym("a2", DesignEntity::kAssign);
             QueryEvaluator evaluator(synonymList, targetSynonym, groupList, pkb);
 
@@ -570,7 +570,7 @@ TEST_CASE( "3.QueryEvaluator.Evaluate single Follow and Parent(?) clauses" ) {
         std::vector<Clause*> clauseList = {&st};
 
         Group firstGroup (clauseList, false);
-        std::list<Group> groupList = {firstGroup};
+        std::list<Group*> groupList = {&firstGroup};
         Synonym targetSynonym = Synonym("a1", DesignEntity::kAssign);
         QueryEvaluator evaluator(synonymList, targetSynonym, groupList, pkb);
 
@@ -589,7 +589,7 @@ TEST_CASE( "3.QueryEvaluator.Evaluate single Follow and Parent(?) clauses" ) {
         std::vector<Clause*> clauseList = {&st};
 
         Group firstGroup (clauseList, false);
-        std::list<Group> groupList = {firstGroup};
+        std::list<Group*> groupList = {&firstGroup};
         Synonym targetSynonym = Synonym("p1", DesignEntity::kPrint);
         QueryEvaluator evaluator(synonymList, targetSynonym, groupList, pkb);
 
@@ -608,7 +608,7 @@ TEST_CASE( "3.QueryEvaluator.Evaluate single Follow and Parent(?) clauses" ) {
         std::vector<Clause*> clauseList = {&st};
 
         Group firstGroup (clauseList, false);
-        std::list<Group> groupList = {firstGroup};
+        std::list<Group*> groupList = {&firstGroup};
         Synonym targetSynonym = Synonym("a1", DesignEntity::kAssign);
         QueryEvaluator evaluator(synonymList, targetSynonym, groupList, pkb);
 
@@ -627,7 +627,7 @@ TEST_CASE( "3.QueryEvaluator.Evaluate single Follow and Parent(?) clauses" ) {
         std::vector<Clause*> clauseList = {&st};
 
         Group firstGroup (clauseList, false);
-        std::list<Group> groupList = {firstGroup};
+        std::list<Group*> groupList = {&firstGroup};
         Synonym targetSynonym = Synonym("a1", DesignEntity::kAssign);
         QueryEvaluator evaluator(synonymList, targetSynonym, groupList, pkb);
 
@@ -646,7 +646,7 @@ TEST_CASE( "3.QueryEvaluator.Evaluate single Follow and Parent(?) clauses" ) {
         std::vector<Clause*> clauseList = {&st};
 
         Group firstGroup (clauseList, false);
-        std::list<Group> groupList = {firstGroup};
+        std::list<Group*> groupList = {&firstGroup};
         Synonym targetSynonym = Synonym("a1", DesignEntity::kAssign);
         QueryEvaluator evaluator(synonymList, targetSynonym, groupList, pkb);
 
@@ -689,7 +689,7 @@ TEST_CASE( "3.QueryEvaluator.Evaluate single Follow and Parent(?) clauses" ) {
 //
 //    SECTION("Select first synonym") {
 //      Group firstGroup (clauseList, true);
-//      std::list<Group> groupList = {firstGroup};
+//      std::list<Group*> groupList = {&firstGroup};
 //      Synonym targetSynonym = Synonym("r1", DesignEntity::kRead);
 //      QueryEvaluator evaluator(synonymList, targetSynonym, groupList, pkb);
 //
@@ -700,7 +700,7 @@ TEST_CASE( "3.QueryEvaluator.Evaluate single Follow and Parent(?) clauses" ) {
 //
 //    SECTION("Select second synonym") {
 //      Group firstGroup (clauseList, true);
-//      std::list<Group> groupList = {firstGroup};
+//      std::list<Group*> groupList = {&firstGroup};
 //      Synonym targetSynonym = Synonym("v1", DesignEntity::kVariable);
 //      QueryEvaluator evaluator(synonymList, targetSynonym, groupList, pkb);
 //
@@ -711,7 +711,7 @@ TEST_CASE( "3.QueryEvaluator.Evaluate single Follow and Parent(?) clauses" ) {
 //
 //    SECTION("Select neither synonym, with correct boolean result") {
 //      Group firstGroup (clauseList, false);
-//      std::list<Group> groupList = {firstGroup};
+//      std::list<Group*> groupList = {&firstGroup};
 //      Synonym targetSynonym = Synonym("v2", DesignEntity::kAssign);
 //      QueryEvaluator evaluator(synonymList, targetSynonym, groupList, pkb);
 //

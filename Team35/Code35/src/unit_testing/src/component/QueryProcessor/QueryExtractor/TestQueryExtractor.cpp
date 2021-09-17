@@ -10,12 +10,12 @@ bool AreSynonymsEqual(Synonym s1, Synonym s2) {
   return s1.GetType() == s2.GetType() && s1.GetName() == s2.GetName();
 }
 
-bool AreGroupsEqual(Group g1, Group g2) {
-  if (g1.ContainsTargetSynonym() != g2.ContainsTargetSynonym()) {
+bool AreGroupsEqual(Group* g1, Group* g2) {
+  if (g1->ContainsTargetSynonym() != g2->ContainsTargetSynonym()) {
     return false;
   }
   // validate clauses
-  auto c1 = g1.GetClauses(); auto c2 = g2.GetClauses();
+  auto c1 = g1->GetClauses(); auto c2 = g2->GetClauses();
   auto it1 = c1.begin(); auto it2 = c2.begin();
   while (it1 != c1.end() && it2 != c2.end()) {
     auto _c1 = *it1; auto _c2 = *it2;
@@ -34,11 +34,11 @@ TEST_CASE("3.QueryExtractor.Extract single synonym + select declared synonym; sh
   query_extractor.ExtractQuery();
   std::list<Synonym> synonyms = query_extractor.GetSynonymsList();
   Synonym target = query_extractor.GetTarget();
-  std::list<Group> groups = query_extractor.GetGroupsList();
+  std::list<Group*> groups = query_extractor.GetGroupsList();
 
   std::list<Synonym> expected_synonyms = {Synonym("a1", DesignEntity::kAssign)};
   Synonym expected_target = Synonym("a1", DesignEntity::kAssign);
-  std::list<Group> expected_groups;
+  std::list<Group*> expected_groups;
   REQUIRE(AreSynonymsEqual(expected_target, target));
   REQUIRE(expected_groups.size() == groups.size());
   auto it1 = expected_synonyms.begin(); auto it2 = synonyms.begin();
@@ -54,13 +54,13 @@ TEST_CASE("3.QueryExtractor.Extract multiple synonym + select declared synonym; 
   query_extractor.ExtractQuery();
   std::list<Synonym> synonyms = query_extractor.GetSynonymsList();
   Synonym target = query_extractor.GetTarget();
-  std::list<Group> groups = query_extractor.GetGroupsList();
+  std::list<Group*> groups = query_extractor.GetGroupsList();
 
   std::list<Synonym> expected_synonyms = {Synonym("a", DesignEntity::kAssign),
                                           Synonym("b", DesignEntity::kAssign),
                                           Synonym("c", DesignEntity::kAssign)};
   Synonym expected_target = Synonym("a", DesignEntity::kAssign);
-  std::list<Group> expected_groups;
+  std::list<Group*> expected_groups;
   REQUIRE(AreSynonymsEqual(expected_target, target));
   REQUIRE(expected_groups.size() == groups.size());
   auto it1 = expected_synonyms.begin(); auto it2 = synonyms.begin();
@@ -83,12 +83,12 @@ TEST_CASE("3.QueryExtractor.Extract multiple unique synonym + select declared sy
   query_extractor.ExtractQuery();
   std::list<Synonym> synonyms = query_extractor.GetSynonymsList();
   Synonym target = query_extractor.GetTarget();
-  std::list<Group> groups = query_extractor.GetGroupsList();
+  std::list<Group*> groups = query_extractor.GetGroupsList();
 
   std::list<Synonym> expected_synonyms = {Synonym("a1", DesignEntity::kAssign),
                                             Synonym("p1", DesignEntity:: kProcedure)};
   Synonym expected_target = Synonym("a1", DesignEntity::kAssign);
-  std::list<Group> expected_groups;
+  std::list<Group*> expected_groups;
   REQUIRE(AreSynonymsEqual(expected_target, target));
   REQUIRE(expected_groups.size() == groups.size());
   auto it1 = expected_synonyms.begin(); auto it2 = synonyms.begin();
@@ -143,7 +143,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that with correct relRef and
   query_extractor.ExtractQuery();
   std::list<Synonym> synonyms = query_extractor.GetSynonymsList();
   Synonym target = query_extractor.GetTarget();
-  std::list<Group> groups = query_extractor.GetGroupsList();
+  std::list<Group*> groups = query_extractor.GetGroupsList();
 
   std::list<Synonym> expected_synonyms = {Synonym("a", DesignEntity::kAssign),
                                           Synonym("w", DesignEntity:: kWhile)};
@@ -151,9 +151,9 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that with correct relRef and
   Clause* cl = new SuchThat("w", "a", RelRef::kFollows, true, true);
   std::vector<Clause*> clauses;
   clauses.push_back(cl);
-  std::list<Group> expected_groups;
+  std::list<Group*> expected_groups;
   Group expected_group = Group(clauses, true);
-  expected_groups.push_back(expected_group);
+  expected_groups.push_back(&expected_group);
 
   // validate target
   REQUIRE(AreSynonymsEqual(expected_target, target) );
@@ -181,7 +181,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that with correct entRef and
     query_extractor.ExtractQuery();
     std::list<Synonym> synonyms = query_extractor.GetSynonymsList();
     Synonym target = query_extractor.GetTarget();
-    std::list<Group> groups = query_extractor.GetGroupsList();
+    std::list<Group*> groups = query_extractor.GetGroupsList();
 
     std::list<Synonym> expected_synonyms = {Synonym("a", DesignEntity::kAssign),
                                             Synonym("v", DesignEntity:: kVariable)};
@@ -189,9 +189,9 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that with correct entRef and
     Clause* cl = new SuchThat("a", "x", RelRef::kUsesS, true, false);
     std::vector<Clause*> clauses;
     clauses.push_back(cl);
-    std::list<Group> expected_groups;
+    std::list<Group*> expected_groups;
     Group expected_group = Group(clauses, true);
-    expected_groups.push_back(expected_group);
+    expected_groups.push_back(&expected_group);
 
     // validate target
     REQUIRE(AreSynonymsEqual(expected_target, target) );
@@ -218,16 +218,16 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that with correct entRef and
     query_extractor.ExtractQuery();
     std::list<Synonym> synonyms = query_extractor.GetSynonymsList();
     Synonym target = query_extractor.GetTarget();
-    std::list<Group> groups = query_extractor.GetGroupsList();
+    std::list<Group*> groups = query_extractor.GetGroupsList();
 
     std::list<Synonym> expected_synonyms = {Synonym("a", DesignEntity::kAssign)};
     Synonym expected_target = Synonym("a", DesignEntity::kAssign);
     Clause* cl = new SuchThat("a", "_", RelRef::kUsesS, true, false);
     std::vector<Clause*> clauses;
     clauses.push_back(cl);
-    std::list<Group> expected_groups;
+    std::list<Group*> expected_groups;
     Group expected_group = Group(clauses, true);
-    expected_groups.push_back(expected_group);
+    expected_groups.push_back(&expected_group);
 
     // validate target
     REQUIRE(AreSynonymsEqual(expected_target, target) );
@@ -305,16 +305,16 @@ TEST_CASE("3.QueryExtractor.Single well-formed pattern with correct syn-assign a
     query_extractor.ExtractQuery();
     std::list<Synonym> synonyms = query_extractor.GetSynonymsList();
     Synonym target = query_extractor.GetTarget();
-    std::list<Group> groups = query_extractor.GetGroupsList();
+    std::list<Group*> groups = query_extractor.GetGroupsList();
 
     std::list<Synonym> expected_synonyms = {Synonym("a1", DesignEntity::kAssign)};
     Synonym expected_target = Synonym("a1", DesignEntity::kAssign);
     Clause* cl = new Pattern("_", "_", "a1", false, false);
     std::vector<Clause*> clauses;
     clauses.push_back(cl);
-    std::list<Group> expected_groups;
+    std::list<Group*> expected_groups;
     Group expected_group = Group(clauses, true);
-    expected_groups.push_back(expected_group);
+    expected_groups.push_back(&expected_group);
 
     // validate target
     REQUIRE(AreSynonymsEqual(expected_target, target) );
@@ -340,16 +340,16 @@ TEST_CASE("3.QueryExtractor.Single well-formed pattern with correct syn-assign a
     query_extractor.ExtractQuery();
     std::list<Synonym> synonyms = query_extractor.GetSynonymsList();
     Synonym target = query_extractor.GetTarget();
-    std::list<Group> groups = query_extractor.GetGroupsList();
+    std::list<Group*> groups = query_extractor.GetGroupsList();
 
     std::list<Synonym> expected_synonyms = {Synonym("a1", DesignEntity::kAssign)};
     Synonym expected_target = Synonym("a1", DesignEntity::kAssign);
     Clause* cl = new Pattern("_", "69", "a1", false, false);
     std::vector<Clause*> clauses;
     clauses.push_back(cl);
-    std::list<Group> expected_groups;
+    std::list<Group*> expected_groups;
     Group expected_group = Group(clauses, true);
-    expected_groups.push_back(expected_group);
+    expected_groups.push_back(&expected_group);
 
     // validate target
     REQUIRE(AreSynonymsEqual(expected_target, target) );
@@ -375,16 +375,16 @@ TEST_CASE("3.QueryExtractor.Single well-formed pattern with correct syn-assign a
     query_extractor.ExtractQuery();
     std::list<Synonym> synonyms = query_extractor.GetSynonymsList();
     Synonym target = query_extractor.GetTarget();
-    std::list<Group> groups = query_extractor.GetGroupsList();
+    std::list<Group*> groups = query_extractor.GetGroupsList();
 
     std::list<Synonym> expected_synonyms = {Synonym("a1", DesignEntity::kAssign)};
     Synonym expected_target = Synonym("a1", DesignEntity::kAssign);
     Clause* cl = new Pattern("_", "count", "a1", false, false);
     std::vector<Clause*> clauses;
     clauses.push_back(cl);
-    std::list<Group> expected_groups;
+    std::list<Group*> expected_groups;
     Group expected_group = Group(clauses, true);
-    expected_groups.push_back(expected_group);
+    expected_groups.push_back(&expected_group);
 
     // validate target
     REQUIRE(AreSynonymsEqual(expected_target, target) );

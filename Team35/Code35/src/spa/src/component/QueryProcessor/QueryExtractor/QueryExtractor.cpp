@@ -9,4 +9,5 @@ void QueryExtractor::ExtractQuery() {
   std::vector<Clause*> clauses;
   QueryParser parser = QueryParser(clauses, groups, synonyms, target, tokenizer);
   parser.parse();
+
 }

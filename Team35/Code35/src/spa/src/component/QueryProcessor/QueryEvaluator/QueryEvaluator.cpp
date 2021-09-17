@@ -1,7 +1,7 @@
 #include <util/Logger.h>
 #include "QueryEvaluator.h"
 
-QueryEvaluator::QueryEvaluator(std::list<Synonym> syn_list, Synonym target, std::list<Group> groups, PKB pkb)
+QueryEvaluator::QueryEvaluator(std::list<Synonym> syn_list, Synonym target, std::list<Group*> groups, PKB pkb)
 : synonymlist{syn_list}, targetSynonym{target}, groupList{groups}, pkb{pkb}, booleanResult{true},
 map_of_synonym_values{} {}
 
@@ -37,10 +37,10 @@ void QueryEvaluator::PopulateSynonymValues(QueryEvaluatorTable* table) {
 void QueryEvaluator::EvaluateAllGroups(QueryEvaluatorTable* table) {
     // For each group, evaluate the group with target synonym first if applicable
     for (auto iter = groupList.begin(); iter != groupList.end(); iter++) {
-        std::vector<Clause*> clauseList = iter->GetClauses();
+        std::vector<Clause*> clauseList = (*iter)->GetClauses();
 
         // This Group contains the target synonym
-        if (iter->ContainsTargetSynonym()) {
+        if ((*iter)->ContainsTargetSynonym()) {
             ProcessNonBooleanGroup(clauseList, table);
 
             // This Group contains no target synonym and is treated as a boolean type group

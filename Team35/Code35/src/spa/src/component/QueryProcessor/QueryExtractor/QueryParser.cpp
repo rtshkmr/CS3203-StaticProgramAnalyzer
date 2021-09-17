@@ -312,6 +312,7 @@ void QueryParser::parse_pattern() {
 //  std::cout << "lhs_is_syn has value "; std::cout << lhs_is_syn << std::endl;
   //parse_rhs
   std::pair<std::string, bool> rhs_info = parse_expressionSpec();
+  eat(TokenTag::kCloseBracket);
 //  std::cout << "grouping clauses...";
 
   // TODO: this could introduce a memory leak...
@@ -335,11 +336,13 @@ void QueryParser::parse_select() {
   if (lookahead.GetTokenTag() == TokenTag::kSuchThat) {
 //    std::cout << "parsing such that" << std::endl;
     parse_such_that();
-  } else if (lookahead.GetTokenTag() == TokenTag::kName && lookahead.GetTokenString().compare("pattern") == 0) {
+  }
+  if (lookahead.GetTokenTag() == TokenTag::kName && lookahead.GetTokenString().compare("pattern") == 0) {
 //    std::cout << "parsing pattern" << std::endl;
     parse_pattern();
-  } else {
-    throw PQLParseException("Incorrect query. Expected such that or pattern clause.");
+  }
+  if (lookahead.GetTokenTag() != TokenTag::kInvalid) {
+    throw PQLParseException("Incorrect query. Expected at most 1 such that and 1 pattern for iteration 1.");
   }
 }
 
@@ -395,13 +398,13 @@ void QueryParser::group_clauses() {
     // add clause into its own group
     std::vector<Clause*> cl1;
     cl1.push_back(clauses[0]);
-    Group g1 = Group(cl1, has_target_syn);
+    Group* g1 = new Group(cl1, has_target_syn);
     groups.push_back(g1);
 
   } else if (clauses.size() == 2) {
     // expecting 1 such that followed by 1 pattern clause
     bool has_target_syn = false;
-    if (typeid(clauses[0]) == typeid(SuchThat)) {
+    if (typeid(*clauses[0]) == typeid(SuchThat)) {
       SuchThat* st = dynamic_cast<SuchThat*>(clauses[0]);
       if (st->left_is_synonym && st->left_hand_side.compare(target.GetName()) == 0) {
         has_target_syn = true;
@@ -411,18 +414,22 @@ void QueryParser::group_clauses() {
     }
     std::vector<Clause*> cl1;
     cl1.push_back(clauses[0]);
-    Group g1 = Group(cl1, has_target_syn);
+    Group* g1 = new Group(cl1, has_target_syn);
     groups.push_back(g1);
 
     // if 1x pattern cl has common synonym, it goes in the same group.
     Pattern* pt = dynamic_cast<Pattern*>(clauses[1]);
-    if (pt->assign_synonym.compare(cl1[0]->left_hand_side) == 0 ||
-        pt->left_is_synonym && (pt->left_hand_side.compare(cl1[0]->left_hand_side) == 0)) {
-      g1.AddClauseToVector(pt);
+    bool has_common_assign_syn = pt->assign_synonym.compare(cl1[0]->left_hand_side) == 0;
+    bool has_common_args = pt->left_is_synonym && (
+            pt->left_hand_side.compare(cl1[0]->left_hand_side) == 0 ||
+            pt->left_hand_side.compare(cl1[0]->right_hand_side) == 0);
+    if (has_common_assign_syn || has_common_args) {
+      g1->AddClauseToVector(pt);
     } else {
       std::vector<Clause*> cl2;
       cl2.push_back(pt);
-      groups.push_back(Group(cl2, false));
+      Group* g2 = new Group(cl2, false);
+      groups.push_back(g2);
     }
   } else {
 //    std::cout << clauses.size() << std::endl;
