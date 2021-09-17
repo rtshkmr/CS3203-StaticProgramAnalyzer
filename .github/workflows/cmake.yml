@@ -64,6 +64,7 @@ jobs:
         path: |
           ${{env.working-directory}}/build/src/autotester/Tests35/log_*.txt
           ${{env.working-directory}}/build/src/autotester/Tests35/output_*.xml
+          ${{env.working-directory}}/build/src/autotester/Tests35/Team35_SPA_*.log
           ${{env.working-directory}}/build/src/autotester/Tests35/analysis.xsl
 
     - name: Build All # Take all previous build and build autotester_gui for completeness
