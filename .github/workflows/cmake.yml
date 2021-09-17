@@ -61,7 +61,10 @@ jobs:
     - uses: actions/upload-artifact@v2
       with: 
         name: output_final
-        path: ${{env.working-directory}}/build/src/autotester/Tests35/output_final.zip
+        path: |
+          ${{env.working-directory}}/build/src/autotester/Tests35/log_*.txt
+          ${{env.working-directory}}/build/src/autotester/Tests35/output_*.xml
+          ${{env.working-directory}}/build/src/autotester/Tests35/analysis.xsl
 
     - name: Build All # Take all previous build and build autotester_gui for completeness
       run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target all
