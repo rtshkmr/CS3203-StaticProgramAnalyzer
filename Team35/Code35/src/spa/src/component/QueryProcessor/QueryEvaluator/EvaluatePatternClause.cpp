@@ -108,7 +108,7 @@ void EvaluatePatternDoubleSynonymSecondPresent(Pattern p, QueryEvaluatorTable* t
 
     for (int i = 0; i < assign_entity_list.size(); i++) {
       AssignEntity assign_entity = assign_entity_list[i];
-      const VariableName* variable_name = assign_entity.getVariable()->getName();
+      const VariableName* variable_name = assign_entity.GetVariable()->GetName();
       VariableName vn = *variable_name;
       std::string name = vn.getName();
       std::string statement_number = std::to_string(assign_entity.GetStatementNumber()->getNum());
