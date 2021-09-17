@@ -236,7 +236,7 @@ bool ConstantValue::operator==(ConstantValue other) const {
 TokenTag Token::GetTokenTag() const {
   return this->token_tag_;
 }
-std::string Token::GetTokenString() {
+std::string Token::GetTokenString() const {
   return this->token_string_;
 }
 
@@ -250,8 +250,9 @@ Token::Token(std::string token_string, TokenTag token_tag) :
  * @param other
  * @return
  */
-bool Token::operator==(Token other) {
-  return this->GetTokenString() == other.GetTokenString() && this->GetTokenTag()==other.GetTokenTag();
+bool Token::operator==(const Token& other) const {
+  return this->GetTokenString() == other.GetTokenString()
+      && this->GetTokenTag() == other.GetTokenTag();
 }
 
 bool Token::IsKeywordToken(const Token& token) {

@@ -149,10 +149,10 @@ class Token {
   TokenTag token_tag_;
 
  public:
-  std::string GetTokenString();
+  std::string GetTokenString() const;
   Token(std::string token_string, TokenTag token_tag);
   [[nodiscard]] TokenTag GetTokenTag() const;
-  bool operator==(Token other);
+  bool operator==(const Token& other) const;
   static TokenTag TagStringWithToken(std::string const& reference);
   static bool IsKeywordToken(const Token& token);
   static auto GetTokenMatchForwardIterator(const std::vector<Token>& tokens,

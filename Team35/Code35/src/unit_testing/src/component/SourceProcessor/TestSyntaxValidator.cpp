@@ -273,9 +273,9 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
     REQUIRE_FALSE(SyntaxValidator::IsRelExpr(tokens, 8, 20)); // Rel expression is not cond expr
   }
   SECTION("Is CondExpr tests") {
-    string line = "if((x>=1)&&((y>69)||(z<0)) || !(3 > 1)){";
+    string line = "if((x>=1)&&((y>69)||(z<0)) || !(3 > 1)) !!TheMatrixIsReal !!(x > 1){";
     vector<Token> tokens = Tokenizer::CreateTokens(line);
-//    [0] = {Token} {token_string_="if", token_tag_=kIfKeyword}
+//    [0] = {Token} {token_string_="if", token_tag_=kName}
 //    [1] = {Token} {token_string_="(", token_tag_=kOpenBracket}
 //    [2] = {Token} {token_string_="(", token_tag_=kOpenBracket}
 //    [3] = {Token} {token_string_="x", token_tag_=kName}
@@ -304,10 +304,22 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
 //    [26] = {Token} {token_string_="1", token_tag_=kInteger}
 //    [27] = {Token} {token_string_=")", token_tag_=kCloseBracket}
 //    [28] = {Token} {token_string_=")", token_tag_=kCloseBracket}
-//    [29] = {Token} {token_string_="{", token_tag_=kOpenBrace}
+//    [29] = {Token} {token_string_="!", token_tag_=kBooleanOperator}
+//    [30] = {Token} {token_string_="!", token_tag_=kBooleanOperator}
+//    [31] = {Token} {token_string_="TheMatrixIsReal", token_tag_=kName}
+//    [32] = {Token} {token_string_="!", token_tag_=kBooleanOperator}
+//    [33] = {Token} {token_string_="!", token_tag_=kBooleanOperator}
+//    [34] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [35] = {Token} {token_string_="x", token_tag_=kName}
+//    [36] = {Token} {token_string_=">", token_tag_=kBinaryComparisonOperator}
+//    [37] = {Token} {token_string_="1", token_tag_=kInteger}
+//    [38] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//    [39] = {Token} {token_string_="{", token_tag_=kOpenBrace}
     REQUIRE(SyntaxValidator::IsCondExpr(tokens, 9, 13)); // is just a rel_expr
     REQUIRE(SyntaxValidator::IsCondExpr(tokens, 9, 19)); // (<cond_expr>) || (<cond_expr>)
     REQUIRE(SyntaxValidator::IsCondExpr(tokens, 22, 27)); // !(<cond_expr>)
+    REQUIRE_FALSE(SyntaxValidator::IsCondExpr(tokens, 29, 31)); // !!xxx
+    REQUIRE_FALSE(SyntaxValidator::IsCondExpr(tokens, 32, 38)); // !!xxx
 //    REQUIRE(SyntaxValidator::IsCondExpr(tokens, 2, 20)); // (<cond_expr>) || (<cond_expr>)
   }
   SECTION("Check StatementPassesCommonBlacklistRules function") {
