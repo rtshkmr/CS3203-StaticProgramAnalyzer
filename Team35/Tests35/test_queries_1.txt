@@ -94,7 +94,7 @@ Select v1 such that Uses(a1, v1)
 x, y, i, z
 5000
 21 - Combination of cases (No boolean)
-statement s1; assign a1; variable v1;
+stmt s1; assign a1; variable v1;
 Select s1 such that Uses(s1, v1) pattern a1(v1, _"z"_)
 5, 8, 9
 5000
