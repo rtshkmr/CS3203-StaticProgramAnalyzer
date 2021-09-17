@@ -18,13 +18,11 @@ volatile bool AbstractWrapper::GlobalStop = false;
 TestWrapper::TestWrapper() {
   LoggerSettings logger_settings;
   logger_settings.can_overwrite_file_ = true;
-  logger_settings.filename_ = "killMeNow";
-  logger_settings.can_overwrite_file_ = true;
   logger_settings.out_to_stdout_ = true;
   logger_settings.out_to_file_ = true;
   LoggerInit(logger_settings);
   LOG
-  (spa_logger << "\n\n\n========================== [BEFORE] STARTING RUN ======================\n");
+  (spa_logger << "========================== [BEFORE] STARTING RUN ======================\n");
   // create any objects here as instance variables of this class
   // as well as any initialization required for your spa program
   pkb = new PKB();
@@ -39,7 +37,7 @@ void TestWrapper::parse(std::string file_name) {
   sp::SourceProcessor source_processor;
   pkb = sp::SourceProcessor::ProcessSourceFile(file_name);
   LOG
-  (spa_logger << "\n\n\n ========================== [DONE] FRONT END COMPLETED WITHOUT ERROR  ======================\n\n\n");
+  (spa_logger << " ========================== [DONE] FRONT END COMPLETED WITHOUT ERROR  ======================");
 }
 
 std::vector<std::string> split(std::string const& input) {
@@ -55,7 +53,7 @@ std::vector<std::string> split(std::string const& input) {
 // method to evaluating a query
 void TestWrapper::evaluate(std::string query, std::list<std::string>& results) {
   LOG
-  (spa_logger << "\n\n\n==========================  [BEFORE] EVALUATING  QUERY ======================\n\n\n");
+  (spa_logger << "==========================  [BEFORE] EVALUATING  QUERY ======================");
 // call your evaluator to evaluate the query here
   std::optional<std::string> s = QuerySystemController::Evaluate(& query, pkb);
   LOG
@@ -67,7 +65,7 @@ void TestWrapper::evaluate(std::string query, std::list<std::string>& results) {
       results.push_back(s);
     }
   }
-  LOG (spa_logger << "\n\n\n========================== EVALUATED QUERY ======================\n\n\n");
+  LOG (spa_logger << "========================== EVALUATED QUERY ======================");
   LoggerTerminate();
 }
 
