@@ -1,133 +1,133 @@
 <?xml-stylesheet type="text/xsl" href="analysis.xsl"?>
 <test_results>
 <info>
-<name>autotester</name><parsing_time_taken>65.000000</parsing_time_taken>
+<name>autotester</name><parsing_time_taken>44.000000</parsing_time_taken>
 </info>
 <queries>
 <query>
 <id ReturnTuple="1" Follows="1" SuchThat="1" CondNum="3" RelNum="1" comment="Double synonym">1</id><querystr><![CDATA[stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; procedure pr1; Select a1 such that Follows(s1, a1)]]></querystr>
 <stuans>3,4,9,13,14</stuans>
 <correct>3,4,9,13,14</correct>
-<time_taken>43.000000</time_taken>
+<time_taken>49.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Double synonym">2</id><querystr><![CDATA[stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; procedure pr1; Select a1 such that Parent(r1, p1)]]></querystr>
 <stuans></stuans>
 <correct></correct>
-<time_taken>59.000000</time_taken>
+<time_taken>50.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Follows="1" SuchThat="1" CondNum="3" RelNum="1" comment="Double synonym">3</id><querystr><![CDATA[stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; procedure pr1; Select w1 such that Follows(w1, if1)]]></querystr>
 <stuans>7</stuans>
 <correct>7</correct>
-<time_taken>33.000000</time_taken>
+<time_taken>36.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Follows="1" SuchThat="1" CondNum="3" RelNum="1" comment="Double synonym">4</id><querystr><![CDATA[stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; procedure pr1; Select a1 such that Follows(r1, p1)]]></querystr>
 <stuans>3,4,6,8,9,11,13,14</stuans>
 <correct>3,4,6,8,9,11,13,14</correct>
-<time_taken>37.000000</time_taken>
+<time_taken>35.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Double synonym">5</id><querystr><![CDATA[stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; procedure pr1; Select a1 such that Parent(if1, a1)]]></querystr>
 <stuans>6,11,13</stuans>
 <correct>6,11,13</correct>
-<time_taken>45.000000</time_taken>
+<time_taken>36.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Follows="1" UnnamedVar="1" SuchThat="1" CondNum="4" RelNum="1" comment="Wildcard and single synonym">6</id><querystr><![CDATA[stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; procedure pr1; Select s1 such that Follows(_, s1)]]></querystr>
 <stuans>2,3,4,5,9,10,13,14</stuans>
 <correct>2,3,4,5,9,10,13,14</correct>
-<time_taken>49.000000</time_taken>
+<time_taken>38.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Parent="1" UnnamedVar="1" SuchThat="1" CondNum="4" RelNum="1" comment="Single synonym and wildcard">7</id><querystr><![CDATA[stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; procedure pr1; Select a1 such that Parent(s1, _)]]></querystr>
 <stuans>3,4,6,8,9,11,13,14</stuans>
 <correct>3,4,6,8,9,11,13,14</correct>
-<time_taken>39.000000</time_taken>
+<time_taken>38.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Follows="1" SuchThat="1" CondNum="3" RelNum="1" comment="Value and single synonym">8</id><querystr><![CDATA[stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; procedure pr1; Select s1 such that Follows(1, s1)]]></querystr>
 <stuans>2</stuans>
 <correct>2</correct>
-<time_taken>33.000000</time_taken>
+<time_taken>38.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Parent="1" SuchThat="1" CondNum="3" RelNum="1" comment="Single synonym and value">9</id><querystr><![CDATA[stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; procedure pr1; Select s1 such that Parent(s1, 1)]]></querystr>
 <stuans></stuans>
 <correct></correct>
-<time_taken>38.000000</time_taken>
+<time_taken>32.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Follows="1" UnnamedVar="1" SuchThat="1" CondNum="4" RelNum="1" comment="Incorrect query (invalid synonym used)">10</id><querystr><![CDATA[stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; procedure pr1; Select a1 such that Follows(pr1, _)]]></querystr>
 <stuans></stuans>
 <correct></correct>
-<time_taken>29.000000</time_taken>
+<time_taken>26.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Follows="1" UnnamedVar="1" SuchThat="1" CondNum="4" RelNum="1" comment="Incorrect query (invalid value)">11</id><querystr><![CDATA[stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; procedure pr1; Select a1 such that Follows(0, _)]]></querystr>
 <stuans></stuans>
 <correct></correct>
-<time_taken>28.000000</time_taken>
+<time_taken>33.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Follows="1" UnnamedVar="1" SuchThat="1" CondNum="4" RelNum="1" comment="Incorrect query (invalid value)">12</id><querystr><![CDATA[stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; procedure pr1; Select a1 such that Follows(-1, _)]]></querystr>
 <stuans></stuans>
 <correct></correct>
-<time_taken>25.000000</time_taken>
+<time_taken>24.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Follows="1" SuchThat="1" CondNum="3" RelNum="1" comment="Incorrect query (invalid synonym used)">13</id><querystr><![CDATA[stmt s1, s2; assign a1; variable v; Select a1 such that Follows(1, v)]]></querystr>
 <stuans></stuans>
 <correct></correct>
-<time_taken>28.000000</time_taken>
+<time_taken>25.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Follows="1" UnnamedVar="1" SuchThat="1" CondNum="4" RelNum="1" comment="Incorrect query (invalid value)">14</id><querystr><![CDATA[stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; procedure pr1; Select a1 such that Follows(_, test)]]></querystr>
 <stuans></stuans>
 <correct></correct>
-<time_taken>28.000000</time_taken>
+<time_taken>27.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Followsstar="1" SuchThat="1" CondNum="3" RelNum="1" comment="Double synonym">15</id><querystr><![CDATA[stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; procedure pr1; Select a1 such that Follows*   (s1, a1)]]></querystr>
 <stuans>3,4,9,13,14</stuans>
 <correct>3,4,9,13,14</correct>
-<time_taken>37.000000</time_taken>
+<time_taken>43.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Parentstar="1" SuchThat="1" CondNum="3" RelNum="1" comment="Double synonym">16</id><querystr><![CDATA[stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; procedure pr1; Select a1 such that Parent*  (  r1  ,  p1  )]]></querystr>
 <stuans></stuans>
 <correct></correct>
-<time_taken>33.000000</time_taken>
+<time_taken>31.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Parentstar="1" SuchThat="1" CondNum="3" RelNum="1" comment="Double synonym">17</id><querystr><![CDATA[stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; procedure pr1; Select    a1   such that      Parent*(if1,a1)]]></querystr>
 <stuans>6,8,9,11,13</stuans>
 <correct>6,8,9,11,13</correct>
-<time_taken>38.000000</time_taken>
+<time_taken>30.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Followsstar="1" SuchThat="1" CondNum="3" RelNum="1" comment="Double synonym">18</id><querystr><![CDATA[stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; procedure pr1; Select p1 such that Follows*(r1, a1)]]></querystr>
 <stuans>2,12</stuans>
 <correct>2</correct>
-<time_taken>30.000000</time_taken>
+<time_taken>28.000000</time_taken>
 <failed>
 <missing></missing>
 <additional>12</additional>
@@ -143,63 +143,63 @@
 <id ReturnTuple="1" Followsstar="1" SuchThat="1" CondNum="3" RelNum="1" comment="Double synonym">19</id><querystr><![CDATA[stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; procedure pr1; Select a1 such that Follows*(w1, a1)]]></querystr>
 <stuans>13</stuans>
 <correct>13</correct>
-<time_taken>31.000000</time_taken>
+<time_taken>33.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Parentstar="1" UnnamedVar="1" SuchThat="1" CondNum="4" RelNum="1" comment="Wildcard and single synonym">20</id><querystr><![CDATA[stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; procedure pr1; Select s1 such that Parent*(_, s1)]]></querystr>
 <stuans>6,7,8,9,10,11,12,13</stuans>
 <correct>6,7,8,9,10,11,12,13</correct>
-<time_taken>33.000000</time_taken>
+<time_taken>38.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Followsstar="1" UnnamedVar="1" SuchThat="1" CondNum="4" RelNum="1" comment="Single synonym and wildcard">21</id><querystr><![CDATA[stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; procedure pr1; Select s1 such that Follows*(s1, _)]]></querystr>
 <stuans>1,2,3,4,5,7,8,10</stuans>
 <correct>1,2,3,4,5,7,8,10</correct>
-<time_taken>37.000000</time_taken>
+<time_taken>34.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Followsstar="1" SuchThat="1" CondNum="3" RelNum="1" comment="Value and single synonym">22</id><querystr><![CDATA[stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; procedure pr1; Select s1 such that Follows*(1, s1)]]></querystr>
 <stuans>2,3,4,5,14</stuans>
 <correct>2,3,4,5,14</correct>
-<time_taken>37.000000</time_taken>
+<time_taken>33.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Parentstar="1" SuchThat="1" CondNum="3" RelNum="1" comment="Single synonym and value">23</id><querystr><![CDATA[stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; procedure pr1; Select s1 such that Parent*(s1, 1)]]></querystr>
 <stuans></stuans>
 <correct></correct>
-<time_taken>36.000000</time_taken>
+<time_taken>31.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Followsstar="1" UnnamedVar="1" SuchThat="1" CondNum="4" RelNum="1" comment="Incorrect query (invalid synonym used)">24</id><querystr><![CDATA[stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; procedure pr1; Select a1 such that Follows*(pr1, _)]]></querystr>
 <stuans></stuans>
 <correct></correct>
-<time_taken>27.000000</time_taken>
+<time_taken>29.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Followsstar="1" UnnamedVar="1" SuchThat="1" CondNum="4" RelNum="1" comment="Incorrect query (invalid value)">25</id><querystr><![CDATA[stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; procedure pr1; Select a1 such that Follows*(0, _)]]></querystr>
 <stuans></stuans>
 <correct></correct>
-<time_taken>25.000000</time_taken>
+<time_taken>31.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Parentstar="1" UnnamedVar="1" SuchThat="1" CondNum="4" RelNum="1" comment="Incorrect query (invalid value)">26</id><querystr><![CDATA[stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; procedure pr1; Select a1 such that Parent*(-1, _)]]></querystr>
 <stuans></stuans>
 <correct></correct>
-<time_taken>22.000000</time_taken>
+<time_taken>25.000000</time_taken>
 <passed/>
 </query>
 <query>
 <id ReturnTuple="1" Followsstar="1" SuchThat="1" CondNum="3" RelNum="1" comment="Incorrect query (invalid synonym used)">27</id><querystr><![CDATA[stmt s1, s2; assign a1; variable v; Select a1 such that Follows*(1, v)]]></querystr>
 <stuans></stuans>
 <correct></correct>
-<time_taken>20.000000</time_taken>
+<time_taken>23.000000</time_taken>
 <passed/>
 </query>
 <query>

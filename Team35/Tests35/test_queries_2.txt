@@ -86,7 +86,7 @@ Select    a1   such that      Parent*(if1,a1)
 18 - Double synonym
 stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; procedure pr1;
 Select p1 such that Follows*(r1, a1)
-2
+2, 12
 5000
 19 - Double synonym
 stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; procedure pr1;
