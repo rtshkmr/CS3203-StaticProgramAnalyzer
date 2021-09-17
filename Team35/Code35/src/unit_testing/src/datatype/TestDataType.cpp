@@ -198,4 +198,14 @@ TEST_CASE("1.DataType.ConstantValue") {
   }
 }
 
-//TODO: Test Cases for Token and TokenTags
+TEST_CASE("1.Datatype.TokenTag") {
+  SECTION("Operators") {
+    Token token1 = Token("hello", TokenTag::kName);
+    Token token1_duplicate = Token("hello", TokenTag::kName);
+    Token token2 = Token("procedure", TokenTag::kProcedureKeyword);
+    Token token2_different_tags = Token("procedure", TokenTag::kName);
+    REQUIRE(token1==token1_duplicate);
+    REQUIRE_FALSE(token2==token2_different_tags);
+  }
+}
+

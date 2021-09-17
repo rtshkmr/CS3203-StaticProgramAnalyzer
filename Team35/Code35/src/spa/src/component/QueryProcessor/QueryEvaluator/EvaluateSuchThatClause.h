@@ -18,6 +18,7 @@ void ProcessQueryGivenSecondSynonym(PKB pkb, SuchThat such_that_clause, QueryEva
 void BothSynonymInTable(PKB pkb, SuchThat such_that_clause, QueryEvaluatorTable* table);
 void ProcessNewColumn(std::string target_synonym_name, Synonym new_synonym, QueryEvaluatorTable* table,
                       RelRef relationship, bool givenFirstParam, PKB pkb);
+bool SynonymTypeMatches(DesignEntity current_synonym, DesignEntity synonym_type_to_match);
 bool EvaluateNoSynonym(SuchThat st, PKB pkb);
 
 #endif //AUTOTESTER_EVALUATESUCHTHATCLAUSE_H

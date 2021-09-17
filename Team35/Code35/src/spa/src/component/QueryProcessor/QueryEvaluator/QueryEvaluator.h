@@ -14,15 +14,16 @@
 
 class QueryEvaluator {
   public:
-    QueryEvaluator(std::list<Synonym> syn_list, Synonym target, std::list<Group> groups, PKB pkb);
+    QueryEvaluator(std::list<Synonym> syn_list, Synonym target, std::list<Group*> groups, PKB pkb);
     std::vector<std::string> EvaluateQuery();
   private:
     std::list<Synonym> synonymlist;
     Synonym targetSynonym;
-    std::list<Group> groupList;
+    std::list<Group*> groupList;
     PKB pkb;
     bool booleanResult;
     std::unordered_map<std::string, std::list<std::string>> map_of_synonym_values;
+    std::unordered_map<std::string, DesignEntity> synonym_design_entity_map;
     void PopulateSynonymValues(QueryEvaluatorTable* table);
     void EvaluateAllGroups(QueryEvaluatorTable* table);
     void EvaluateSuchThatClause(SuchThat st, QueryEvaluatorTable* table);

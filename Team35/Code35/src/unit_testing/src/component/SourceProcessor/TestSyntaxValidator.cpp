@@ -129,8 +129,7 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
   }
 
   SECTION("Is Factor function check") {
-    string line = "0 1 2 3 4 5 varName";
-    // todo: add test for IsExpr based factor
+    string line = "0 1 2 3 4 5 varName (x + 1)";
     vector<Token> tokens = Tokenizer::CreateTokens(line);
 //    [0] = {Token} {token_string_="0", token_tag_=kInteger}
 //    [1] = {Token} {token_string_="1", token_tag_=kInteger}
@@ -139,9 +138,15 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
 //    [4] = {Token} {token_string_="4", token_tag_=kInteger}
 //    [5] = {Token} {token_string_="5", token_tag_=kInteger}
 //    [6] = {Token} {token_string_="varName", token_tag_=kName}
+//    [7] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [8] = {Token} {token_string_="x", token_tag_=kName}
+//    [9] = {Token} {token_string_="+", token_tag_=kBinaryArithmeticOperator}
+//    [10] = {Token} {token_string_="1", token_tag_=kInteger}
+//    [11] = {Token} {token_string_=")", token_tag_=kCloseBracket}
     REQUIRE_FALSE(SyntaxValidator::IsFactor(tokens, 0, 3)); // because only accepts if it's a single int
     REQUIRE(SyntaxValidator::IsFactor(tokens, 0, 0)); // because only accepts if it's a single int
     REQUIRE(SyntaxValidator::IsFactor(tokens, 6, 6)); // because only accepts if it's a single varName
+    REQUIRE(SyntaxValidator::IsFactor(tokens, 7, 11)); // an expression is also a factor
   }
   SECTION("Is Term function check") {
     string line = "VarNameIsASingleFactor "
@@ -268,9 +273,9 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
     REQUIRE_FALSE(SyntaxValidator::IsRelExpr(tokens, 8, 20)); // Rel expression is not cond expr
   }
   SECTION("Is CondExpr tests") {
-    string line = "if((x>=1)&&((y>69)||(z<0)) || !(3 > 1)){";
+    string line = "if((x>=1)&&((y>69)||(z<0)) || !(3 > 1)) !!TheMatrixIsReal !!(x > 1){";
     vector<Token> tokens = Tokenizer::CreateTokens(line);
-//    [0] = {Token} {token_string_="if", token_tag_=kIfKeyword}
+//    [0] = {Token} {token_string_="if", token_tag_=kName}
 //    [1] = {Token} {token_string_="(", token_tag_=kOpenBracket}
 //    [2] = {Token} {token_string_="(", token_tag_=kOpenBracket}
 //    [3] = {Token} {token_string_="x", token_tag_=kName}
@@ -299,10 +304,22 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
 //    [26] = {Token} {token_string_="1", token_tag_=kInteger}
 //    [27] = {Token} {token_string_=")", token_tag_=kCloseBracket}
 //    [28] = {Token} {token_string_=")", token_tag_=kCloseBracket}
-//    [29] = {Token} {token_string_="{", token_tag_=kOpenBrace}
+//    [29] = {Token} {token_string_="!", token_tag_=kBooleanOperator}
+//    [30] = {Token} {token_string_="!", token_tag_=kBooleanOperator}
+//    [31] = {Token} {token_string_="TheMatrixIsReal", token_tag_=kName}
+//    [32] = {Token} {token_string_="!", token_tag_=kBooleanOperator}
+//    [33] = {Token} {token_string_="!", token_tag_=kBooleanOperator}
+//    [34] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [35] = {Token} {token_string_="x", token_tag_=kName}
+//    [36] = {Token} {token_string_=">", token_tag_=kBinaryComparisonOperator}
+//    [37] = {Token} {token_string_="1", token_tag_=kInteger}
+//    [38] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//    [39] = {Token} {token_string_="{", token_tag_=kOpenBrace}
     REQUIRE(SyntaxValidator::IsCondExpr(tokens, 9, 13)); // is just a rel_expr
     REQUIRE(SyntaxValidator::IsCondExpr(tokens, 9, 19)); // (<cond_expr>) || (<cond_expr>)
     REQUIRE(SyntaxValidator::IsCondExpr(tokens, 22, 27)); // !(<cond_expr>)
+    REQUIRE_FALSE(SyntaxValidator::IsCondExpr(tokens, 29, 31)); // !!xxx
+    REQUIRE_FALSE(SyntaxValidator::IsCondExpr(tokens, 32, 38)); // !!xxx
 //    REQUIRE(SyntaxValidator::IsCondExpr(tokens, 2, 20)); // (<cond_expr>) || (<cond_expr>)
   }
   SECTION("Check StatementPassesCommonBlacklistRules function") {
@@ -451,5 +468,26 @@ TEST_CASE("1.SyntaxValidator.EdgeCases") {
   invalid_lines.emplace_back(R"(while(x>1) then { x = x + 1; } else {x = x + 1;})"); // shouldn't be in same line
   invalid_lines.emplace_back(R"(x=x+1 y = y -1 x = x %x;)"); // shouldn't be in same line
   REQUIRE(CheckAgainstSampleLines(0, 7, invalid_lines, false));
+}
+
+TEST_CASE("1.SyntaxValidator.KeywordsUsedAsNames") {
+  vector<string> valid_lines = {
+      R"(procedure=1;)",
+      R"(procedure procedure {)",
+      R"(procedure if {)",
+      R"(procedure then {)",
+      R"(procedure while {)",
+      R"(if = 10;)",
+      R"(else = 12;)",
+      R"(while = 12 + if;)",
+      R"(while = 12 + then;)",
+      R"(if = if + then;)",
+      R"(if = if + then;)",
+      R"(x = while + then * procedure;)",
+  };
+
+  SECTION("Positive tests") {
+    REQUIRE(CheckAgainstSampleLines(0, valid_lines.size() - 1, valid_lines, true));
+  }
 }
 

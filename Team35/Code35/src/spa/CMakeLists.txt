@@ -10,8 +10,7 @@ add_library(spa ${srcs} ${headers}
         src/component/SourceProcessor/Tokenizer.cpp src/component/SourceProcessor/Tokenizer.h
         src/component/SourceProcessor/SyntaxValidator.cpp src/component/SourceProcessor/SyntaxValidator.h
         src/component/SourceProcessor/EntityFactory.cpp src/component/SourceProcessor/EntityFactory.h
-        src/datatype/Identifier.cpp
-        src/datatype/Identifier.h src/datatype/Deliverable.cpp
+        src/datatype/Deliverable.cpp
         src/datatype/Deliverable.h
         src/datatype/RegexPatterns.h src/datatype/RegexPatterns.cpp
         src/component/SourceProcessor/SourceProcessor.cpp
