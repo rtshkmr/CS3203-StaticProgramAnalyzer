@@ -66,16 +66,6 @@ void PSubsystem::ProcessStatement(std::string statement) {
       parent_stack_.pop();
       current_node_ = dynamic_cast<Statement*>(current_nest)->GetParentNode();
 
-      /* [INVALID LOGIC]
-      //why? Else is wrap within If. So it is 2 steps in AST, so need to parent 2x.
-      // however, no need to pop 2x because the "parent" is the same.
-      if (current_node_type_ == 3) {
-        assert(dynamic_cast<IfEntity*>(current_node_) != nullptr);
-        current_node_ = dynamic_cast<Statement*>(current_node_)->GetParentNode();
-      }
-      */
-
-
       if (parent_stack_.empty()) { //back to procedure stmtlist
         current_node_type_ = 0;
         current_node_ = current_procedure_;
