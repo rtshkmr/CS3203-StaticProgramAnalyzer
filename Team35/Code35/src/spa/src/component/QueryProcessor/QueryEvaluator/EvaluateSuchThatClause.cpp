@@ -73,7 +73,6 @@ void ProcessNewColumn(std::string target_synonym_name, Synonym new_synonym, Quer
         if (number_of_repeats > 0) {
             i += number_of_repeats - 1;
             numberOfTimesToTraverse += number_of_repeats -1;
-            target_synonym_list_reference += number_of_repeats -1;
         }
 
         // If there are no valid relationships, delete currRow from table.
