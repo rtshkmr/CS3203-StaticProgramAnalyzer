@@ -18,4 +18,5 @@ do echo "[NOTE] Running Test $i";
 	PASSES=$(grep -o '<passed/>' $FILENAME | wc -l); 
 	FAILS=$(grep -o '</failed>' $FILENAME | wc -l); 
 	echo "[NOTE] #Queries = $QUERIES; #Passes = $PASSES; #Fails = $FAILS" 
+	mv Team35_SPA.log Team35_SPA_$i.log # to rename Logger file for each run.
 done
