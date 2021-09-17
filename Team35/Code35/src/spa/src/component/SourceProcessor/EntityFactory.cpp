@@ -129,7 +129,7 @@ vector<Token> EntityFactory::GetExpressionTokens(vector<Token> tokens, TokenTag 
   start_iter = Token::GetFirstMatchingTokenIdx(tokens, start_tag);
   // finding last end tag
   end_iter = Token::GetLastMatchingTokenIdx(tokens, end_tag);
-  if (start_iter < 0 && end_iter < 0) {
+  if (start_iter < 0 || end_iter < 0) {
     throw std::invalid_argument("EF: Start or end tag not found.\n");
   }
   if (start_iter + 1 >= end_iter) {
