@@ -141,6 +141,7 @@ void EvaluatePatternSingleSynonym(Pattern p, QueryEvaluatorTable* table, PKB pkb
     VariableName vn = *variable_name;
     std::string name = vn.getName();
 
+    assign_reference++;
     // Check if the variable name matches
     if ((name == p.left_hand_side || p.left_hand_side == "_") && HasExpressionMatch(p, assign_entity)) {
       continue;
@@ -149,7 +150,6 @@ void EvaluatePatternSingleSynonym(Pattern p, QueryEvaluatorTable* table, PKB pkb
     table->DeleteRow(i);
     i--;
     table_size--;
-    assign_reference++;
   }
 }
 
