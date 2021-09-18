@@ -141,42 +141,42 @@ none
 30 - Variable is synonym with partial match
 assign a1; variable v1;
 Select a1 pattern a1 (v1, _"p"_)
-2, 11
+11, 16
 5000
 31 - Variable is synonym with wildcard
 assign a1; variable v1;
 Select v1 pattern a1 (v1, _)
-y, z, i
+y, z, x, i
 5000
 32 - Variable is value with partial match
 assign a1; variable v1;
 Select a1 pattern a1 ("y", _"q"_)
-6, 11
+6, 11, 16
 5000
 33 - Variable is value with wildcard
 assign a1; variable v1;
 Select a1 pattern a1 ("y", _)
-2, 6, 11
+2, 6, 11, 16
 5000
 34 - Variable is wildcard with partial match
 assign a1; variable v1;
 Select a1 pattern a1 (  _  ,   _"z"_   )
-2, 8, 11, 12
+2, 3, 8, 11, 16, 17
 5000
 35 - Variable is wildcard with wildcard
 assign a1; variable v1;
 Select a1 pattern a1 (_, _)
-2, 3, 6, 8, 11, 12
+2, 3, 6, 8, 11, 13, 16, 17
 5000
 36 - Query is boolean type with value and partial match
 assign a1, a2; variable v1;
 Select a2 pattern a1 ("y", _"q"_)
-2, 3, 6, 8, 11, 12
+2, 3, 6, 8, 11, 13, 16, 17
 5000
 37 - Query is boolean type with wildcard and partial match
 assign a1, a2; variable v1;
 Select a2 pattern a1 (_, _"q"_)
-2, 3, 6, 8, 11, 12
+2, 3, 6, 8, 11, 13, 16, 17
 5000
 38 - Variable is invalid with partial match
 assign a1; variable v1;
