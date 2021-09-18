@@ -1,12 +1,5 @@
-<<<<<<< Updated upstream
-45 - Only such that is boolean
-stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; variable v1;
-Select v1  pattern a1 (v1,_)
-y, z, x, i
-=======
-2 - Gets all variables
-variable v;
-Select v;
-psubsystem, fileName, chara, byte, lastByte, ProcessStmtNow, cont1nueREad1ng, SyntaxErr0rFound, InvalidFileName, pr0cessSuccessfuI
->>>>>>> Stashed changes
+19 - Double synonym (valid)
+stmt s1; variable v1;
+Select s1 such that Uses(s1, v1)
+2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14
 5000

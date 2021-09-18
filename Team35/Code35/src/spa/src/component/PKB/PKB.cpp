@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <iostream>
 #include <cassert>
+#include <typeinfo>
+
 
 #include "PKB.h"
 
@@ -583,8 +585,10 @@ void PKB::PopulateUsedBySMap(std::unordered_map<Variable*, std::list<Statement*>
 
 void PKB::PopulateUseCMap(std::unordered_map<Container*, std::list<Variable*>*> c_use_hash) {
     for (std::pair<Container*, std::list<Variable*>*> kv : c_use_hash) {
-        Statement* c_stmt = (Statement*) kv.first;
+//        std::string type = typeid(kv.first).name();
+        Statement* c_stmt = dynamic_cast<Statement*>(kv.first);
         auto* kNumber = const_cast<StatementNumber*>(c_stmt->GetStatementNumber());
+
         std::string kString = std::to_string(kNumber->getNum());
         auto result_ptr = new std::list<std::tuple<DesignEntity, std::string>*>();
 
@@ -614,7 +618,7 @@ void PKB::PopulateUsedByCMap(std::unordered_map<Variable*, std::list<Container*>
         std::list<Container*>* using_statements = kv.second;
 
         for (Container* stmt : *using_statements) {
-            Statement* c_stmt = (Statement*) stmt;
+            Statement* c_stmt = dynamic_cast<Statement*>(stmt);
             auto* stmtNum = const_cast<StatementNumber*>(c_stmt->GetStatementNumber());
             std::string stmtRef = std::to_string(stmtNum->getNum());
 
@@ -671,7 +675,7 @@ void PKB::PopulateModifiedBySMap(std::unordered_map<Variable*, std::list<Stateme
 void PKB::PopulateModifiesCMap(std::unordered_map<Container*, std::list<Variable*>*> c_modifies_hash) {
 //    for (std::pair<Container *, std::list<Variable *> *> kv : c_modifies_hash) {
     for (std::pair<Container*, std::list<Variable*>*> kv : c_modifies_hash) {
-        Statement* c_stmt = (Statement*) kv.first;
+        Statement* c_stmt = dynamic_cast<Statement*>(kv.first);
         auto* kNumber = const_cast<StatementNumber*>(c_stmt->GetStatementNumber());
         std::string kString = std::to_string(kNumber->getNum());
         auto result_ptr = new std::list<std::tuple<DesignEntity, std::string>*>();
@@ -702,7 +706,7 @@ void PKB::PopulateModifiedByCMap(std::unordered_map<Variable*, std::list<Contain
         std::list<Container*>* using_statements = kv.second;
 
         for (Container* stmt : *using_statements) {
-            Statement* c_stmt = (Statement*) stmt;
+            Statement* c_stmt = dynamic_cast<Statement*>(stmt);
             auto* stmtNum = const_cast<StatementNumber*>(c_stmt->GetStatementNumber());
             std::string stmtRef = std::to_string(stmtNum->getNum());
 
