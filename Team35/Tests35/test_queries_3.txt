@@ -243,8 +243,8 @@ stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; variable v1, v2;
 Select p1 such that Uses (if1, "q") pattern a1 (_, _)
 14, 21, 22
 5000
-50 - Double boolean with Uses
-assign pattern; if Uses; print print;
+50 - Double boolean with Modifies
+assign pattern; if Modifies; print print;
 Select print such that Uses (Uses, "z") pattern pattern(_, _)
 14, 21, 22
 5000
