@@ -5,22 +5,22 @@ Select c
 5000
 2 - Gets all variables
 variable v;
-Select v;
+Select v
 psubsystem, fileName, chara, byte, lastByte, ProcessStmtNow, cont1nueREad1ng, SyntaxErr0rFound, InvalidFileName, pr0cessSuccessfuI
 5000
 3 - Get all if statement
 if ifs;
-Select ifs;
+Select ifs
 3, 8, 11, 19
 5000
 4 - Get all assign statement
 assign a1;
-Select a1;
+Select a1
 1, 4, 5, 9, 10, 12, 14, 16, 23
 5000
 5 - Get all read statement
 read r1;
-Select r1;
+Select r1
 2, 7
 5000
 6 - Get the stmtList of if-statement 8
@@ -79,13 +79,13 @@ Select rr such that Uses(_, "lastByte")
 none
 5000
 17 - Find all stmt that prints a SyntaxErr0rFound
-stmt s1;
-Select s1 such that Uses(s1, "SyntaxErr0rFound")
+stmt Uses;
+Select Uses such that Uses(Uses, "SyntaxErr0rFound")
 17, 21
 5000
 18 - Find all stmt state reset / initializer
-assign a;
-Select a pattern a(_, "0")
+assign pattern;
+Select pattern pattern pattern(_, "0")
 1, 4, 5, 14, 23
 5000
 19 - Find the stmt which uses byte variable
@@ -122,4 +122,29 @@ Select a such that Uses(a, v) pattern a(v, _"1"_)
 assign a;
 Select a such that Parent*(_,a) pattern a(_, "0")
 4, 5, 14
+5000
+26 - Find a back-to-back if statement with BOOLEAN pattern
+if ifs, ifss; assign a;
+Select ifss such that Follows(ifs, ifss) pattern a(_, _)
+19
+5000
+27 - Find a assignment stmt with chara variable, not first in stmtLst
+assign a1,a2,a3,a4,a5;
+Select a4 such that Follows(_, a4) pattern a4("chara", _)
+14
+5000
+28 - Find the stmt which assignment: lastByte = byte with BOOLEAN such that
+assign procedure;
+Select procedure such that Modifies(_, "lastByte") pattern procedure("lastByte", "byte")
+10
+5000
+29 - Find the psubsystem assignment that is not the first stmt
+assign assign;
+Select assign such that Follow(_, assign) pattern ("psubsystem", _)
+23
+5000
+30 - Find the stmt that prints pr0cessSuccessfuI with BOOLEAN pattern
+assign qwerty1; print printer;
+Select printer such that Uses(printer, "pr0cessSuccessfuI") pattern qwerty1(_, _"1"_)
+20
 5000
