@@ -125,11 +125,6 @@ void EvaluatePatternDoubleSynonymSecondPresent(Pattern p, QueryEvaluatorTable* t
         continue;
       }
 
-      // If the table has a statement, and the number don't match
-      if (!stmt_synonym.empty() && table->GetColumn(stmt_synonym)[table_index] != statement_number) {
-        continue;
-      }
-
       has_variable = true;
       table->AddMultipleRowForAllColumn(p.assign_synonym, table_index, statement_number, repeat_count);
       repeat_count++;
