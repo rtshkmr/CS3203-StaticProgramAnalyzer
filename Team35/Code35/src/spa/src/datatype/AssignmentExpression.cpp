@@ -115,7 +115,7 @@ std::vector<std::string> ConvertEquationIntoTokens(std::string eqn) {
       } else {
         operator_stack.push(c);
       }
-    } else if (!(c == ' ' || c == '0')) {
+    } else if (!(c == ' ')) {
       chara.push_back(c);
     } else if (c == '0') {
       if (!chara.empty()) {
