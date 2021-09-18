@@ -1,37 +1,38 @@
-procedure Bumblebee3 {
-    read
-    x;    //1
-    y = 2 * z;//2
-    z = z - 1;//3
+procedure Parser {
+    psubsystem = 1;
+    read fileName;
 
-    while (z > 0) {//4
-        while ((nice + 1) > 12) {//5
-            y = x * q - 5;//6
-            while (x < 69) {//7
-                z = z - 1;//8
-                while (sleepTime > 0) {//9
-                    while ((bananas * cherries) == 0) {//10
+    if (fileName != 0) then {
+       chara = 0;
+       byte = 0;
 
-                        y = x + y * z + p * q;//11
-                    }
-                    if (q != z) then {//12
-                        x = 1 ;//13
-                    } else {
-                        print x;//14
-                        read x;//15
-                    }
-                    y = x + y * z + p * q;//16
-                }
-            }
-            i = x + j + z;//17
-        }
-        if (x != z) then {//18
-            read x;//19
-        } else {
-            read x;//20
-            print x;//21
-        }
+       while (fileName > 1) {
+           read byte;
+           if (byte != 99) then {
+               chara = chara + byte;
+               lastByte = byte;
+               if (byte == 88) then {
+                   psubsystem = psubsystem + 1;
+                   print ProcessStmtNow;
+                   chara = 0;
+               } else {
+                   print cont1nueREad1ng;
+               }
+               fileName = fileName - 1;
+           } else {
+               print SyntaxErr0rFound;
+           }
+       }
+    } else {
+        print InvalidFileName;
     }
-    print p;//22
-    read p;//23
+
+    if (fileName == 1) then {
+        print pr0cessSuccessfuI;
+    } else {
+        print SyntaxErr0rFound;
+    }
+
+    print psubsystem;
+    psubsystem = 0;
 }
