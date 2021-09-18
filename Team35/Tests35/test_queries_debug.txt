@@ -1,5 +1,5 @@
-12 - Single synonym and wildcard [need to verify tc]
-stmt s1, s2; assign a1; print p1; read r1; while w1; if if1;
-Select s1 such that Follows*(_, s1)
-2, 3, 4, 7, 9, 12, 15, 16, 17, 18, 21, 22, 23
+19 - Double synonym (valid)
+stmt s1; variable v1;
+Select s1 such that Uses(s1, v1)
+2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14
 5000
