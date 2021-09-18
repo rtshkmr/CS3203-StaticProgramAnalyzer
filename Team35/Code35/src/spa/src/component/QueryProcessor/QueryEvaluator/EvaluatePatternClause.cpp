@@ -41,9 +41,9 @@ void EvaluatePatternDoubleSynonym(Pattern p, QueryEvaluatorTable* table, PKB pkb
   std::vector<std::string> variable_list = table->GetColumn(p.left_hand_side);
   int number_of_iterations = assign_stmt_list.size();
 
-  for (int i = 0; i < number_of_iterations; i++) {
-    std::string current_assign_stmt = assign_stmt_list[i];
-    std::string current_variable_value = variable_list[i];
+  for (int current_table_index = 0; current_table_index < number_of_iterations; current_table_index++) {
+    std::string current_assign_stmt = assign_stmt_list[current_table_index];
+    std::string current_variable_value = variable_list[current_table_index];
     VariableName current_variable_name = VariableName(current_variable_value);
     bool has_relationship = false;
 
@@ -58,8 +58,8 @@ void EvaluatePatternDoubleSynonym(Pattern p, QueryEvaluatorTable* table, PKB pkb
     }
 
     if (!has_relationship) {
-      table->DeleteRow(i);
-      i--;
+      table->DeleteRow(current_table_index);
+      current_table_index--;
       number_of_iterations--;
     }
   }
