@@ -5,7 +5,7 @@ TEST_CASE("1.DataType.AssignmentExpression") {
   SECTION("Check Postfix Expression") {
 
     /// 0 NO OPERATOR TEST
-    REQUIRE(AssignmentExpression("02").GetExpressionString() == "2");
+    REQUIRE(AssignmentExpression("02").GetExpressionString() == "02"); // this case should not happen as syntax will flag leading 0 as error
     REQUIRE(AssignmentExpression("102").GetExpressionString() == "102");
     REQUIRE(AssignmentExpression("Weeeeew").GetExpressionString() == "Weeeeew");
     REQUIRE(AssignmentExpression("AssignmentExpression").GetExpressionString() == "AssignmentExpression");
