@@ -55,212 +55,200 @@ Select s1 such that Follows*(1, s1)
 5000
 12 - Single synonym and wildcard
 stmt s1, s2; assign a1; print p1; read r1; while w1; if if1;
-Select s1 such that Follows*(s1, _)
-2,3,4,7,9,12,15,16,17,18,22,23
+Select s1 such that Follows*(_, s1)
+2,3,4,7,9,12,15,16,17,18,21,22,23
 5000
 13 - Double synonym
 stmt s1, s2; assign a1; print p1; read r1; while w1; if if1;
 Select a1 such that Parent*  (  r1  ,  p1  )
-
+none
 5000
 14 - Double synonym
 stmt s1, s2; assign a1; print p1; read r1; while w1; if if1;
 Select    a1   such that      Parent*(if1,a1)
-
+13, 14, 15
 5000
 15 - Wildcard and single synonym
 stmt s1, s2; assign a1; print p1; read r1; while w1; if if1;
 Select s1 such that Parent*(_, s1)
-
+5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21
 5000
 16 - Single synonym and value
 stmt s1, s2; assign a1; print p1; read r1; while w1; if if1;
 Select s1 such that Parent*(s1, 1)
-
+none
 5000
 17 - Double synonym (valid)
 stmt s1; variable v1;
 Select s1 such that Uses(s1, v1)
-
+2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 17, 18, 21, 22
 5000
 18 - One synonym, one wildcard (valid)
 assign a1;
 Select a1 such that Uses(a1, _)
-
+2, 3, 6, 8, 11, 16, 17
 5000
-19 - One synonym, one exact match (valid)
-print p1;
-Select p1 such that Uses(p1, "x")
-
-5000
-20 - Double synonym (valid)
+19 - Double synonym (meaning is invalid because read doesn't use)
 read r1; variable v1;
 Select r1 such that Uses(r1, v1)
-
+none
 5000
-21 - Double synonym (valid)
+20 - Double synonym (valid)
 while w1; variable v1;
 Select w1 such that Uses(w1, v1)
-
+4, 5, 7, 9, 10
 5000
 22 - Double synonym (valid)
 if if1; variable v1;
 Select if1 such that Uses(if1, v1)
-
+12, 18
 5000
 23 - Zero (valid)
 variable v1;
 Select v1 such that Uses(0, v1)
-
+none
 5000
 24 - Double synonym (valid)
 stmt s1; variable v1;
 Select s1 such that Modifies(s1, v1)
-
+1, 2, 3, 6, 8, 11, 13, 15, 16, 17, 20, 23
 5000
 25 - One synonym, one wildcard (valid)
 assign a1;
 Select a1 such that Modifies(a1, _)
-
+2, 3, 6, 8, 11, 13, 16, 17
 5000
-26 - One synonym, one exact match (valid)
-print p1;
-Select p1 such that Modifies(p1, "x")
-
-5000
-27 - Double synonym (valid)
+26 - Double synonym (valid)
 read r1; variable v1;
 Select r1 such that Modifies(r1, v1)
-
+1, 15, 19, 20, 23
 5000
-28 - Double synonym (valid)
+27 - Double synonym (valid)
 while w1; variable v1;
 Select w1 such that Modifies(w1, v1)
-
+4, 5, 7, 9, 10
 5000
-29 - Double synonym (valid)
+28 - Double synonym (valid)
 if if1; variable v1;
 Select if1 such that Modifies(if1, v1)
-
+12, 18
 5000
-30 - Zero (valid)
+29 - Zero (valid)
 variable v1;
 Select v1 such that Modifies(0, v1)
-
+none
 5000
-
-
-1 - Variable is synonym with partial match
+30 - Variable is synonym with partial match
 assign a1; variable v1;
 Select a1 pattern a1 (v1, _"p"_)
 2, 11
 5000
-2 - Variable is synonym with wildcard
+31 - Variable is synonym with wildcard
 assign a1; variable v1;
 Select v1 pattern a1 (v1, _)
 y, z, i
 5000
-3 - Variable is value with partial match
+32 - Variable is value with partial match
 assign a1; variable v1;
 Select a1 pattern a1 ("y", _"q"_)
 6, 11
 5000
-4 - Variable is value with wildcard
+33 - Variable is value with wildcard
 assign a1; variable v1;
 Select a1 pattern a1 ("y", _)
 2, 6, 11
 5000
-5 - Variable is wildcard with partial match
+34 - Variable is wildcard with partial match
 assign a1; variable v1;
 Select a1 pattern a1 (  _  ,   _"z"_   )
 2, 8, 11, 12
 5000
-6 - Variable is wildcard with wildcard
+35 - Variable is wildcard with wildcard
 assign a1; variable v1;
 Select a1 pattern a1 (_, _)
 2, 3, 6, 8, 11, 12
 5000
-7 - Query is boolean type with value and partial match
+36 - Query is boolean type with value and partial match
 assign a1, a2; variable v1;
 Select a2 pattern a1 ("y", _"q"_)
 2, 3, 6, 8, 11, 12
 5000
-8 - Query is boolean type with wildcard and partial match
+37 - Query is boolean type with wildcard and partial match
 assign a1, a2; variable v1;
 Select a2 pattern a1 (_, _"q"_)
 2, 3, 6, 8, 11, 12
 5000
-9 - Variable is invalid with partial match
+38 - Variable is invalid with partial match
 assign a1; variable v1;
 Select a1 pattern a1 ("2", _"q"_)
 none
 5000
-10 - Variable is invalid with wildcard
+39 - Variable is invalid with wildcard
 assign a1; variable v1;
 Select a1 pattern a1 ("", _"q"_)
 none
 5000
-11 - Query is invalid
+40 - Query is invalid
 stmt s1; variable v1;
 Select a1 pattern s1 ("y", _"q"_)
 none
 5000
-1 - No boolean with Follows
+41 - No boolean with Follows
 stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; variable v1, v2;
 Select a1 such that Follows (a1, w1) pattern a1 (_, _"z"_)
 3, 8
 5000
-2 - No boolean with ParentT
+42 - No boolean with ParentT
 stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; variable v1, v2;
 Select w1 such that Parent* (w1, a1) pattern a1 (_, _"z"_)
 4, 5, 7, 9, 10
 5000
-3 - No boolean with Uses
+43 - No boolean with Uses
 stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; variable v1, v2;
 Select v1 such that Uses (s1, v1) pattern a1 (v1, _"z"_)
 z, y
 5000
-4 - Single such that boolean with Parent
+44 - Single such that boolean with Parent
 stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; variable v1, v2;
 Select v1 such that Parent (5, 17) pattern a1 (v1, _"z"_)
 y, z, i
 5000
-5 - Single such that boolean with FollowsT
+45 - Single such that boolean with FollowsT
 stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; variable v1, v2;
 Select v1 such that Follows* (5, 18) pattern a1 (v1, _"z"_)
 y, z, i
 5000
-6 - Single such that boolean with Modifies
+46 - Single such that boolean with Modifies
 stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; variable v1, v2;
 Select a1 such that Modifies (w1, "x") pattern a1 ("y", _"5"_)
 6
 5000
-7 - Single pattern boolean with Follows
+47 - Single pattern boolean with Follows
 stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; variable v1, v2;
 Select s1 pattern a1 (v2, _"z"_) such that Follows (s1, if1)
 5, 10
 5000
-8 - Single pattern boolean with FollowsT
+48 - Single pattern boolean with FollowsT
 stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; variable v1, v2;
 Select w1 pattern a1 (v1, _) such that Follows* (w1, s1)
 4, 5, 7, 10
 5000
-9 - Single pattern boolean with Modifies
+49 - Single pattern boolean with Modifies
 stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; variable v1, v2;
 Select v2 pattern a1 (_, v1) such that Modifies(w1, v2)
 x, y, i, z
 5000
-10 - Double boolean with Follows
+50 - Double boolean with Follows
 stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; variable v1, v2;
 Select v1 such that Follows (_, 1) pattern a1 (v2, _"z"_)
 x, y, z, nice, q, sleepTime, bananas, cherries, p, i, j
 5000
-11 - Double boolean with FollowsT
+51 - Double boolean with FollowsT
 stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; variable v1, v2;
 Select s1 such that Follows* (1, 23) pattern a1 ("i", _"j"_)
 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23
 5000
-12 - Double boolean with Uses
+52 - Double boolean with Uses
 stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; variable v1, v2;
 Select p1 such that Uses (if1, "q") pattern a1 (_, _)
 14, 21, 22

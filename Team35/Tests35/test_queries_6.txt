@@ -123,28 +123,3 @@ assign a;
 Select a such that Parent*(_,a) pattern a(_, "0")
 4, 5, 14
 5000
-26 - Gets all print variable name that are declared before
-print p; variable v; assign a;
-Select v pattern a(v, _) such that Uses(p, v)
-psubsystem
-5000
-27 - Find all parent statement number which assigns to psubsystem
-assign a; stmt ss;
-Select ss pattern a("psubsystem", _) such that Parent*(ss, a)
-3, 6, 8, 11
-5000
-28 - Find the statements that modifies fileName with fileName = 1;
-stmt s; assign a123;
-Select s pattern a123("fileName", "1") such that Modifies(s, "fileName")
-none
-5000
-29 - Gets all counter-type stmt
-assign a; variable v;
-Select a pattern a(v, _"1"_) such that Uses(a, v)
-12, 16
-5000
-30 - Find all stmt state reset / initializer which are nested in a container
-assign a;
-Select a pattern a(_, "0") such that Parent*(_,a)
-4, 5, 14
-5000
