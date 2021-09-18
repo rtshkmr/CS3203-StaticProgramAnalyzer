@@ -68,9 +68,13 @@ void EvaluatePatternDoubleSynonym(Pattern p, QueryEvaluatorTable* table, PKB pkb
 void EvaluatePatternDoubleSynonymFirstPresent(Pattern p, QueryEvaluatorTable* table, PKB pkb) {
   // Both are synonyms but only assign synonym in table
   std::vector<std::string> assign_stmt_list = table->GetColumn(p.assign_synonym);
+  int assign_statement_pointer = 0;
+  int table_size = assign_stmt_list.size();
+  table->AddColumn(p.left_hand_side);
 
-  for (int i = 0; i < assign_stmt_list.size(); i++) {
-    std::string current_assign_stmt = assign_stmt_list[i];
+  for (int table_index = 0; table_index < table_size; table_index++) {
+    std::string current_assign_stmt = assign_stmt_list[assign_statement_pointer];
+    int repeat_count = 0;
 
     std::vector<AssignEntity> assign_entity_list = QueryPkbPattern(pkb, true, current_assign_stmt);
 
@@ -78,15 +82,19 @@ void EvaluatePatternDoubleSynonymFirstPresent(Pattern p, QueryEvaluatorTable* ta
       AssignEntity assign_entity = assign_entity_list[i];
 
       if (!HasExpressionMatch(p, assign_entity)) {
+        table->DeleteRow(table_index);
+        table_index--;
+        table_size--;
         continue;
       }
 
       const VariableName* variable_name = assign_entity.GetVariable()->GetName();
       VariableName vn = *variable_name;
       std::string name = vn.getName();
-      table->AddRowForAllColumn(p.left_hand_side, i, name);
+      table->AddMultipleRowForAllColumn(p.left_hand_side, i, name, repeat_count);
+      repeat_count++;
     }
-
+    assign_statement_pointer++;
   }
 }
 
