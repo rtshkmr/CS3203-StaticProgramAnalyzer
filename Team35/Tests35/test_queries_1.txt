@@ -101,7 +101,7 @@ x, y, i, z
 21 - Combination of cases (No boolean)
 stmt s1; assign a1; variable v1;
 Select s1 such that Uses(s1, v1) pattern a1(v1, _"z"_)
-1, 5, 8, 9
+1, 4, 5, 8, 9
 5000
 22 - Combination of cases (one non-boolean, one boolean)
 stmt s1; assign a1; variable v1, v2;
