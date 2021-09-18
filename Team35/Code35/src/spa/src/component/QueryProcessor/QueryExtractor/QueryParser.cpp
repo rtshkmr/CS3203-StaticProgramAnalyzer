@@ -429,7 +429,8 @@ void QueryParser::group_clauses() {
       std::vector<Clause*> cl2;
       cl2.push_back(pt);
       bool pattern_cl_has_tgt_syn = false;
-      if (pt->left_is_synonym && pt->left_hand_side.compare(target.GetName()) == 0) {
+      if (pt->assign_synonym.compare(target.GetName()) == 0 ||
+      pt->left_is_synonym && pt->left_hand_side.compare(target.GetName()) == 0) {
         pattern_cl_has_tgt_syn = true;
       }
       Group* g2 = new Group(cl2, pattern_cl_has_tgt_syn);
