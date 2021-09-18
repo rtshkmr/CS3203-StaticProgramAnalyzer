@@ -40,6 +40,7 @@ void EvaluatePatternDoubleSynonym(Pattern p, QueryEvaluatorTable* table, PKB pkb
   std::vector<std::string> assign_stmt_list = table->GetColumn(p.assign_synonym);
   std::vector<std::string> variable_list = table->GetColumn(p.left_hand_side);
   int number_of_iterations = assign_stmt_list.size();
+  int table_index = 0;
 
   for (int current_table_index = 0; current_table_index < number_of_iterations; current_table_index++) {
     std::string current_assign_stmt = assign_stmt_list[current_table_index];
@@ -58,10 +59,11 @@ void EvaluatePatternDoubleSynonym(Pattern p, QueryEvaluatorTable* table, PKB pkb
     }
 
     if (!has_relationship) {
-      table->DeleteRow(current_table_index);
-      current_table_index--;
+      table->DeleteRow(table_index);
       number_of_iterations--;
+      table_index--;
     }
+    table_index++;
   }
 }
 
