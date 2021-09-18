@@ -131,6 +131,9 @@ void EvaluatePatternDoubleSynonymSecondPresent(Pattern p, QueryEvaluatorTable* t
       table->DeleteRow(table_index);
       table_index--;
       table_size--;
+    } else {
+      table_index += repeat_count -1;
+      table_size += repeat_count -1;
     }
     variable_list_reference++;
   }
