@@ -145,22 +145,24 @@ void QueryEvaluator::ProcessBooleanGroup(std::vector<Clause*> clauseList) {
     }
 
     if (synonym_name != "") {
-        QueryEvaluatorTable currTable(synonym_name);
-        currTable.AddTargetSynonym(map_of_synonym_values[synonym_name]);
+        QueryEvaluatorTable current_table(synonym_name);
+        current_table.AddTargetSynonym(map_of_synonym_values[synonym_name]);
 
         for (auto iter = clauseList.begin(); iter != clauseList.end(); iter++) {
             Clause* currentClause = *iter;
             if (typeid(*currentClause) == typeid(SuchThat)) {
                 // Evaluate such that clause here
                 SuchThat* currentSuchThat = dynamic_cast<SuchThat*>(currentClause);
-                EvaluateSuchThatClause(*currentSuchThat, &currTable);
+                EvaluateSuchThatClause(*currentSuchThat, &current_table);
             } else {
                 // Evaluate pattern clause here
                 // Technically not possible here
+                Pattern* p = dynamic_cast<Pattern*>(currentClause);
+                ProcessPatternClause(*p, &current_table, pkb, synonym_design_entity_map);
             }
         }
 
-        if (currTable.GetRowSize() == 0) {
+        if (current_table.GetRowSize() == 0) {
             booleanResult = false;
         }
     }

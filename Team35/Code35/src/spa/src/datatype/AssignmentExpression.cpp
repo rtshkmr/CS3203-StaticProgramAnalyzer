@@ -85,6 +85,7 @@ std::vector<std::string> ConvertEquationIntoTokens(std::string eqn) {
             operator_stack.pop();
             std::string s2;
             s2.push_back(op);
+            s2.push_back(' '); // add a space for every operator push.
 
             op_rank = OperatorRank(op);
             if (op_rank != -1) {
@@ -100,6 +101,7 @@ std::vector<std::string> ConvertEquationIntoTokens(std::string eqn) {
             operator_stack.pop();
             std::string s2;
             s2.push_back(op);
+            s2.push_back(' ');
             tokens.push_back(s2);
 
             if (!operator_stack.empty())
@@ -113,7 +115,7 @@ std::vector<std::string> ConvertEquationIntoTokens(std::string eqn) {
       } else {
         operator_stack.push(c);
       }
-    } else if (!(c == ' ' || c == '0')) {
+    } else if (!(c == ' ')) {
       chara.push_back(c);
     } else if (c == '0') {
       if (!chara.empty()) {
@@ -132,6 +134,7 @@ std::vector<std::string> ConvertEquationIntoTokens(std::string eqn) {
     operator_stack.pop();
     std::string s2;
     s2.push_back(op);
+    s2.push_back(' '); // add a space for every operator push.
     tokens.push_back(s2);
   }
 

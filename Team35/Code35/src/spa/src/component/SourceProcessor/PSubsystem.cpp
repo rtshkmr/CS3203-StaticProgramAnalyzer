@@ -177,7 +177,7 @@ void PSubsystem::SetStatementObject(Statement* statement) {
     deliverable_->AddParentRelationship(dynamic_cast<Statement*>(parent_stack_.top()), statement);
   }
 
-  if (current_node_->GetStatementList()->size() == 1 || // 1 because this is newly added in Line curr - 13
+  if (current_node_type_ != 3 && current_node_->GetStatementList()->size() == 1 || // 1 because this is newly added in Line curr - 13
       (current_node_type_ == 3 && new_else)) {
     //just entered a stack, follow nothing.
     follow_stack_.push(statement);
@@ -195,6 +195,10 @@ void PSubsystem::HandleIfStmt(IfEntity* if_entity) {
   parent_stack_.push(if_entity);
   current_node_type_ = 2;
   current_node_ = if_entity;
+
+  for (Variable* v: if_entity->GetExpressionVariables()) {
+    deliverable_->AddUsesRelationship(current_node_, v);   //container level which is this if-entity
+  }
 }
 
 void PSubsystem::HandleElseStmt(ElseEntity* else_entity) {
@@ -212,6 +216,10 @@ void PSubsystem::HandleWhileStmt(WhileEntity* while_entity) {
   parent_stack_.push(while_entity);
   current_node_type_ = 1;
   current_node_ = while_entity;
+
+  for (Variable* v: while_entity->GetExpressionVariables()) {
+    deliverable_->AddUsesRelationship(current_node_, v);   //container level which is this while-entity
+  }
 }
 
 void PSubsystem::HandleAssignStmt(AssignEntity* assign_entity) {

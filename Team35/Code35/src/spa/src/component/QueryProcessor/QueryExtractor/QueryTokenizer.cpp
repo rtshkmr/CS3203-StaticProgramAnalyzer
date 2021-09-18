@@ -16,7 +16,7 @@ static std::map<std::string, std::regex> spec_table {
   {"*", std::regex("^[*]")},
   {"/", std::regex("^[/]")},
   {"STRING_QUOTE", std::regex("^\"")},
-  {"INTEGER", std::regex(R"(^[0-9]+)")},
+  {"INTEGER", RegexPatterns::GetIntegerPatternNonTerminating()},
   {"SUCH_THAT", std::regex("^such that")},
   {"IDENT", RegexPatterns::GetNamePattern()}, // IDENT is TokenTag:kName
   {";", std::regex("^;")},

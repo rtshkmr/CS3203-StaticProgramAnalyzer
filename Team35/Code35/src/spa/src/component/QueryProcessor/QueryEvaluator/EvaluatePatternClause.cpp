@@ -40,10 +40,11 @@ void EvaluatePatternDoubleSynonym(Pattern p, QueryEvaluatorTable* table, PKB pkb
   std::vector<std::string> assign_stmt_list = table->GetColumn(p.assign_synonym);
   std::vector<std::string> variable_list = table->GetColumn(p.left_hand_side);
   int number_of_iterations = assign_stmt_list.size();
+  int table_index = 0;
 
-  for (int i = 0; i < number_of_iterations; i++) {
-    std::string current_assign_stmt = assign_stmt_list[i];
-    std::string current_variable_value = variable_list[i];
+  for (int current_table_index = 0; current_table_index < number_of_iterations; current_table_index++) {
+    std::string current_assign_stmt = assign_stmt_list[current_table_index];
+    std::string current_variable_value = variable_list[current_table_index];
     VariableName current_variable_name = VariableName(current_variable_value);
     bool has_relationship = false;
 
@@ -58,19 +59,24 @@ void EvaluatePatternDoubleSynonym(Pattern p, QueryEvaluatorTable* table, PKB pkb
     }
 
     if (!has_relationship) {
-      table->DeleteRow(i);
-      i--;
+      table->DeleteRow(table_index);
       number_of_iterations--;
+      table_index--;
     }
+    table_index++;
   }
 }
 
 void EvaluatePatternDoubleSynonymFirstPresent(Pattern p, QueryEvaluatorTable* table, PKB pkb) {
   // Both are synonyms but only assign synonym in table
   std::vector<std::string> assign_stmt_list = table->GetColumn(p.assign_synonym);
+  int assign_statement_pointer = 0;
+  int table_size = assign_stmt_list.size();
+  table->AddColumn(p.left_hand_side);
 
-  for (int i = 0; i < assign_stmt_list.size(); i++) {
-    std::string current_assign_stmt = assign_stmt_list[i];
+  for (int table_index = 0; table_index < table_size; table_index++) {
+    std::string current_assign_stmt = assign_stmt_list[assign_statement_pointer];
+    int repeat_count = 0;
 
     std::vector<AssignEntity> assign_entity_list = QueryPkbPattern(pkb, true, current_assign_stmt);
 
@@ -78,15 +84,19 @@ void EvaluatePatternDoubleSynonymFirstPresent(Pattern p, QueryEvaluatorTable* ta
       AssignEntity assign_entity = assign_entity_list[i];
 
       if (!HasExpressionMatch(p, assign_entity)) {
+        table->DeleteRow(table_index);
+        table_index--;
+        table_size--;
         continue;
       }
 
       const VariableName* variable_name = assign_entity.GetVariable()->GetName();
       VariableName vn = *variable_name;
       std::string name = vn.getName();
-      table->AddRowForAllColumn(p.left_hand_side, i, name);
+      table->AddMultipleRowForAllColumn(p.left_hand_side, i, name, repeat_count);
+      repeat_count++;
     }
-
+    assign_statement_pointer++;
   }
 }
 
@@ -117,11 +127,6 @@ void EvaluatePatternDoubleSynonymSecondPresent(Pattern p, QueryEvaluatorTable* t
         continue;
       }
 
-      // If the table has a statement, and the number don't match
-      if (!stmt_synonym.empty() && table->GetColumn(stmt_synonym)[table_index] != statement_number) {
-        continue;
-      }
-
       has_variable = true;
       table->AddMultipleRowForAllColumn(p.assign_synonym, table_index, statement_number, repeat_count);
       repeat_count++;
@@ -131,6 +136,9 @@ void EvaluatePatternDoubleSynonymSecondPresent(Pattern p, QueryEvaluatorTable* t
       table->DeleteRow(table_index);
       table_index--;
       table_size--;
+    } else {
+      table_index += repeat_count -1;
+      table_size += repeat_count -1;
     }
     variable_list_reference++;
   }

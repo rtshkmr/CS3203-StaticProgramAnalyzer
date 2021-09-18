@@ -1,0 +1,5 @@
+24 - Gets all counter-type stmt
+assign a; variable v;
+Select a such that Uses(a, v) pattern a(v, _"1"_)
+12, 16
+5000
