@@ -104,7 +104,6 @@ std::vector<std::string> ConvertEquationIntoTokens(std::string eqn) {
             s2.push_back(' ');
             tokens.push_back(s2);
 
-
             if (!operator_stack.empty())
               stack_rank = OperatorRank(operator_stack.top()) + 1;
             else break;
@@ -135,8 +134,8 @@ std::vector<std::string> ConvertEquationIntoTokens(std::string eqn) {
     operator_stack.pop();
     std::string s2;
     s2.push_back(op);
-    tokens.push_back(s2);
     s2.push_back(' '); // add a space for every operator push.
+    tokens.push_back(s2);
   }
 
   return tokens;
