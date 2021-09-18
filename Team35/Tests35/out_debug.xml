@@ -1,0 +1,24 @@
+<?xml-stylesheet type="text/xsl" href="analysis.xsl"?>
+<test_results>
+<info>
+<name>autotester</name><parsing_time_taken>82.000000</parsing_time_taken>
+</info>
+<queries>
+<query>
+<id ReturnTuple="1" UnnamedVar="1" Pattern="1" CondNum="3" RelNum="0" comment="Only such that is boolean">45</id><querystr><![CDATA[stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; variable v1; Select v1  pattern a1 (v1,_)]]></querystr>
+<stuans>x,z,y,p,q,j,i</stuans>
+<correct>y,z,x,i</correct>
+<time_taken>126.000000</time_taken>
+<failed>
+<missing></missing>
+<additional>j,p,q</additional>
+<summary>
+<expected>4</expected>
+<matched>4</matched>
+<missing>0</missing>
+<additional>3</additional>
+</summary>
+</failed>
+</query>
+</queries>
+</test_results>
