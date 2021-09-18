@@ -177,7 +177,7 @@ void PSubsystem::SetStatementObject(Statement* statement) {
     deliverable_->AddParentRelationship(dynamic_cast<Statement*>(parent_stack_.top()), statement);
   }
 
-  if (current_node_->GetStatementList()->size() == 1 || // 1 because this is newly added in Line curr - 13
+  if (current_node_type_ != 3 && current_node_->GetStatementList()->size() == 1 || // 1 because this is newly added in Line curr - 13
       (current_node_type_ == 3 && new_else)) {
     //just entered a stack, follow nothing.
     follow_stack_.push(statement);
