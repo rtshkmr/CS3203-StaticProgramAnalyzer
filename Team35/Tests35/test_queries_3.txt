@@ -245,6 +245,6 @@ Select p1 such that Uses (if1, "q") pattern a1 (_, _)
 5000
 50 - Double boolean with Modifies
 assign pattern; if Modifies; print print;
-Select print such that Uses (Uses, "z") pattern pattern(_, _)
+Select print such that Modifies (Modifies, "x") pattern pattern(_, _)
 14, 21, 22
 5000
