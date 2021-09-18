@@ -1,22 +1,37 @@
-procedure Bumblebee {
-    read     x;
-    print x;
+procedure Bumblebee3 {
+    read
+    x;
     y = 2 * z;
-    z = p - y;
-    if (q != 1) then    {
-        z = x + 24;
-    }
-    else {
-        while (z > 0) {
+    z = z - 1;
+
+    while (z > 0) {
+        while ((nice + 1) > 12) {
             y = x * q - 5;
-            z = z - 1;
+            while (x < 69) {
+                z = z - 1;
+                while (sleepTime > 0) {
+                    while ((bananas * cherries) == 0) {
+
+                        y = x + y * z + p * q;
+                    }
+                    if (q != z) then {
+                        x = 1 ;
+                    } else {
+                        print x;
+                        read x;
+                    }
+                    y = x + y * z + p * q;
+                }
+            }
+            i = x + j + z;
         }
-        if (q != z) then {
-            x = 1 ;
+        if (x != z) then {
+            read x;
         } else {
+            read x;
             print x;
         }
-        y = x + y * z + p * q;
     }
-    i = x + j + z;
+    print p;
+    read p;
 }

@@ -1,0 +1,38 @@
+procedure Parser {
+    psubsystem = 0;
+    read fileName;
+
+    if (fileName != 0) then {
+       chara = 0;
+       byte = 0;
+
+       while (fileName > 1) {
+           read byte;
+           if (byte != 99) then {
+               chara = chara + byte;
+               lastByte = byte;
+               if (byte == 88) then {
+                   psubsystem = psubsystem + 1;
+                   print ProcessStmtNow;
+                   chara = 0;
+               } else {
+                   print cont1nueREad1ng;
+               }
+               fileName = fileName - 1;
+           } else {
+               print SyntaxErr0rFound;
+           }
+       }
+    } else {
+        print InvalidFileName;
+    }
+
+    if (fileName == 1) then {
+        print pr0cessSuccessfuI;
+    } else {
+        print SyntaxErr0rFound;
+    }
+
+    print psubsystem;
+    psubsystem = 0;
+}
