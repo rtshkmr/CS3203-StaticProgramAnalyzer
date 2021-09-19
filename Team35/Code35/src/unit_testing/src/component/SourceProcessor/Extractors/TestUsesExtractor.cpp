@@ -35,6 +35,7 @@ TEST_CASE("1.UsesExtractor.Extract Uses basic conditions") {
     uses_extractor.Extract(&deliverable);
 
     CHECK(deliverable.container_use_hash_.count(proc1) == 0);
+// [TODO: iter2]
 //    std::list<Variable*> actual_var_list = *deliverable.container_use_hash_.find(proc1)->second;
 //    std::list<Variable*> expected_var_list = {var_x_};
 //

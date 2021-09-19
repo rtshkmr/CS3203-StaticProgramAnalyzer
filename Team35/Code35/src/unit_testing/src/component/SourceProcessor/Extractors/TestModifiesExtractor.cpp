@@ -36,6 +36,7 @@ TEST_CASE("1.ModifiesExtractor.Extract Modifies basic conditions") {
     modifies_extractor.Extract(&deliverable);
 
     CHECK(deliverable.container_modifies_hash_.count(proc1) == 0);
+// [TODO iter 2]
 //    std::list<Variable*> actual_var_list = *deliverable.container_modifies_hash_.find(proc1)->second;
 //    std::list<Variable*> expected_var_list = {var_x_};
 //
