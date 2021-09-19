@@ -380,7 +380,7 @@ void QueryParser::ParseSelect() {
 }
 
 /**
- * Parses the actual query portion of the pql query (after declarations).
+ * Parses the pql query.
  */
 void QueryParser::ParseQuery() {
   // parse synonym declarations first, if they exist.
