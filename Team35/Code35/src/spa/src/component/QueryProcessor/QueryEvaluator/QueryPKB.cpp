@@ -1,7 +1,3 @@
-//
-// Created by Max Ng on 11/9/21.
-//
-
 #include "QueryPKB.h"
 
 bool QueryPkbForRelationshipExistence(PKB database, RelRef r) {

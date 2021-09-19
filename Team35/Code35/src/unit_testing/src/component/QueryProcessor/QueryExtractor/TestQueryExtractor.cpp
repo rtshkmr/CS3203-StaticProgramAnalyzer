@@ -1,7 +1,3 @@
-//
-// Created by Hemanshu Gandhi on 8/9/21.
-//
-
 #include "catch.hpp"
 #include "component/QueryProcessor/QueryExtractor/QueryExtractor.h"
 #include "component/QueryProcessor/types/Types.h"

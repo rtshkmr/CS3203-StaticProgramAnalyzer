@@ -1,7 +1,3 @@
-//
-// Created by Max Ng on 13/9/21.
-//
-
 #include "EvaluatePatternClause.h"
 
 /**

@@ -1,7 +1,3 @@
-//
-// Created by Hemanshu Gandhi on 8/9/21.
-//
-
 #ifndef AUTOTESTER_EXCEPTIONS_H
 #define AUTOTESTER_EXCEPTIONS_H
 

@@ -1,7 +1,3 @@
-//
-// Created by Max Ng on 11/9/21.
-//
-
 #ifndef AUTOTESTER_QUERYPKB_H
 #define AUTOTESTER_QUERYPKB_H
 

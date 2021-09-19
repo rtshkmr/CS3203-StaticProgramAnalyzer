@@ -1,7 +1,3 @@
-//
-// Created by Max Ng on 11/9/21.
-//
-
 #include "catch.hpp"
 #include "component/QueryProcessor/QueryEvaluator/QueryEvaluator.h"
 #include "component/QueryProcessor/types/Types.h"

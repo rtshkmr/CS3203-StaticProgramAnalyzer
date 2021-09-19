@@ -1,7 +1,3 @@
-//
-// Created by Max Ng on 14/9/21.
-//
-
 #include "EvaluateSuchThatClause.h"
 
 void EvaluateSuchThatClause(const SuchThat& such_that_clause, QueryEvaluatorTable* table, const PKB& pkb,

@@ -1,7 +1,3 @@
-//
-// Created by Max Ng on 8/9/21.
-//
-
 #include "catch.hpp"
 #include "component/QueryProcessor/QueryProjector.h"
 

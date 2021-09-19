@@ -1,7 +1,3 @@
-//
-// Created by Hemanshu Gandhi on 11/9/21.
-//
-
 #include "QuerySystemController.h"
 #include "component/QueryProcessor/QueryEvaluator/QueryEvaluator.h"
 #include "QueryProjector.h"

@@ -1,7 +1,3 @@
-//
-// Created by Max Ng on 6/9/21.
-//
-
 #include "QueryEvaluatorTable.h"
 
 QueryEvaluatorTable::QueryEvaluatorTable(std::string target) {

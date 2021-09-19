@@ -1,7 +1,3 @@
-//
-// Created by Hemanshu Gandhi on 11/9/21.
-//
-
 #ifndef AUTOTESTER_QUERYSYSTEMCONTROLLER_H
 #define AUTOTESTER_QUERYSYSTEMCONTROLLER_H
 
