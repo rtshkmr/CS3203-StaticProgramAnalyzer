@@ -140,11 +140,91 @@ Select procedure such that Modifies(else, "lastByte") pattern procedure("lastByt
 5000
 29 - Find the if assignment that is not the first stmt
 assign assign;
-Select assign such that Follow(_, assign) pattern assign("if", _)
-25
+Select assign such that Follows(_, assign) pattern assign("if", _)
+23
 5000
 30 - Find the stmt that prints pr0cessSuccessfuI with BOOLEAN pattern
 assign qwerty1; print printer;
 Select printer such that Uses(printer, "pr0cessSuccessfuI") pattern qwerty1(_, _"1"_)
 20
+5000
+31 - Repeated declaration of the same assign statement (called assign) NEGATIVE TC
+assign assign, assign;
+Select assign
+none
+5000
+32 - Repeated declaration of the same assign statement (not called assign) NEGATIVE TC
+assign a, a;
+Select a
+none
+5000
+33 - Repeated declaration of the same if statement (called if) NEGATIVE TC
+if if, if;
+Select if
+none
+5000
+34 - Repeated declaration of the same if statement (not called if) NEGATIVE TC
+if ifs, ifs;
+Select ifs
+none
+5000
+35 - Repeated declaration of the same read statement (called read) NEGATIVE TC
+read read, read;
+Select read
+none
+5000
+36 - Repeated declaration of the same read statement (not called read) NEGATIVE TC
+read r, r;
+Select r
+none
+5000
+37 - Repeated declaration of the same print statement (called print)NEGATIVE TC
+print print, print;
+Select print
+none
+5000
+38 - Repeated declaration of the same print statement (not called print) NEGATIVE TC
+print p, p;
+Select p
+none
+5000
+39 - Repeated declaration of the same while statement (called while) NEGATIVE TC
+while while, while;
+Select while
+none
+5000
+40 - Repeated declaration of the same while statement (not called while) NEGATIVE TC
+while w, w;
+Select w
+none
+5000
+41 - Repeated declaration of the same statement (called stmt)NEGATIVE TC
+stmt stmt, stmt;
+Select stmt
+none
+5000
+42 - Repeated declaration of the same statement (not called stmt) NEGATIVE TC
+stmt s, s;
+Select s
+none
+5000
+43 - Repeated declaration of the same variable (called variable) NEGATIVE TC
+variable variable, variable;
+Select variable
+none
+5000
+44 - Repeated declaration of the same variable (not called stmt) NEGATIVE TC
+variable v, v;
+Select v
+none
+5000
+45 - Same synonym assigned to multiple types (assign and variable) NEGATIVE TC
+assign a; variable a;
+Select a;
+none
+5000
+46 - Same synonym assigned to multiple types (while and variable) NEGATIVE TC
+assign a; variable a;
+Select a;
+none
 5000

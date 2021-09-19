@@ -1,5 +1,5 @@
 29 - Find the if assignment that is not the first stmt
 assign assign;
-Select assign such that Follow(_, assign) pattern assign("if", _)
-25
+Select assign such that Follows(_, assign) pattern assign("if", _)
+23
 5000
