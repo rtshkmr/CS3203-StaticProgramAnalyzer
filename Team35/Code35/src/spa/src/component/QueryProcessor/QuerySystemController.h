@@ -9,7 +9,7 @@
 
 class QuerySystemController {
   public:
-    static std::string Evaluate(std::string *query, PKB* pkb);
+    static std::list<std::string> Evaluate(std::string *query, PKB* pkb);
 };
 
 #endif //AUTOTESTER_QUERYSYSTEMCONTROLLER_H

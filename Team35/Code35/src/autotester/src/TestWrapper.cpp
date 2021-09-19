@@ -58,14 +58,19 @@ std::vector<std::string> split(std::string const& input) {
 void TestWrapper::evaluate(std::string query, std::list<std::string>& results) {
   L("[BEFORE] EVALUATING  QUERY ");
 // call your evaluator to evaluate the query here
-  std::optional<std::string> s = QuerySystemController::Evaluate(& query, pkb);
+  std::optional<std::list<std::string>> populated_result_list = QuerySystemController::Evaluate(& query, pkb);
   L("... Query System controller has evaluated the query");
-  if (s) {
-    std::vector<std::string> res_vec = split(s.value());
-
-    for (std::string s : res_vec) {
-      results.push_back(s);
+  if (populated_result_list) {
+    for(const auto& elem : populated_result_list.value()){
+      results.push_back(elem);
     }
+
+//    std::vector<std::string> res_vec = split(populated_result_list.value());
+//
+//
+//    for (std::string s : res_vec) {
+//      results.push_back(s);
+//    }
   }
   L("EVALUATED QUERY");
 }

@@ -1,15 +1,19 @@
+#include <list>
 #include "QueryProjector.h"
 
-std::string QueryProjector::FormatQuery(std::vector<std::string> result_list) {
-  std::string output;
+std::list<std::string> QueryProjector::FormatQuery(std::vector<std::string> results) {
+  results.erase(std::unique(results.begin(), results.end() ), results.end() );
+  std::list<std::string> result_list(results.begin(), results.end());
+  return result_list;
 
 
-  result_list.erase( std::unique( result_list.begin(), result_list.end() ), result_list.end() );
-
-  for (std::string result : result_list) {
-    output += result;
-    output += " ";
-  }
-  output.erase(output.size() - 1);
-  return output;
+//  std::string output;
+//
+//
+//  for (std::string result : results) {
+//    output += result;
+//    output += " ";
+//  }
+//  output.erase(output.size() - 1);
+//  return output;
 };
