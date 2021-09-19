@@ -2,6 +2,8 @@
 #define AUTOTESTER_QUERYVALIDATOR_H
 
 #include <component/QueryProcessor/types/Types.h>
+#include <string>
+#include <list>
 
 /**
  * Contains helper functions to perform syntactic/semantic analysis of queries.

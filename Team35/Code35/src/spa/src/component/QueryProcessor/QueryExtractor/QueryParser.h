@@ -41,7 +41,6 @@ class QueryParser {
 
     bool IsValidSynonym(Token token);
     bool IsValidSynonym(Token token, DesignEntity de);
-    void GroupClauses();
   public:
     QueryParser(std::vector<Clause*>& clauses, std::list<Group*>& groups, std::list<Synonym>& synonyms,
                 Synonym& target, QueryTokenizer tokenizer) :

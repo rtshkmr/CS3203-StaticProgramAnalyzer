@@ -1,4 +1,5 @@
 #include "QueryExtractor.h"
+#include "QueryOptimizer.h"
 #include "QueryParser.h"
 #include "QueryTokenizer.h"
 
@@ -11,4 +12,5 @@ void QueryExtractor::ExtractQuery() {
   std::vector<Clause*> clauses;
   QueryParser parser = QueryParser(clauses, groups, synonyms, target, tokenizer);
   parser.Parse();
+  QueryOptimizer::GroupClauses(&clauses, &groups, &target);
 }
