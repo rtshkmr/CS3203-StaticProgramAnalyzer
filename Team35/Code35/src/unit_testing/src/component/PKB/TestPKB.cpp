@@ -121,20 +121,20 @@ TEST_CASE("2.PKB.PKB population and retrieval") {
         }
 
         SECTION("UsedBy") {
-            std::list<std::tuple<DesignEntity, std::string>> uses_list{std::make_tuple(DesignEntity::kAssign, "2")};
-            REQUIRE(uses_list == pkb.GetUsedBy("v2"));
+            std::list<std::tuple<DesignEntity, std::string>> used_by_list{std::make_tuple(DesignEntity::kAssign, "2")};
+            REQUIRE(used_by_list == pkb.GetUsedBy("v2"));
         }
 
         SECTION("Modifies") {
-            std::list<std::tuple<DesignEntity, std::string>> uses_list{std::make_tuple(DesignEntity::kVariable, "v1")};
-            REQUIRE(uses_list == pkb.GetModifies("1"));
+            std::list<std::tuple<DesignEntity, std::string>> modifies_list{std::make_tuple(DesignEntity::kVariable, "v1")};
+            REQUIRE(modifies_list == pkb.GetModifies("1"));
         }
 
         SECTION("ModifiedBy") {
-            std::list<std::tuple<DesignEntity, std::string>> uses_list{};
-            uses_list.push_back(std::make_tuple(DesignEntity::kRead, "1"));
-            uses_list.push_back(std::make_tuple(DesignEntity::kAssign, "2"));
-            REQUIRE(uses_list == pkb.GetModifiedBy("v1"));
+            std::list<std::tuple<DesignEntity, std::string>> modified_by_list{};
+            modified_by_list.push_back(std::make_tuple(DesignEntity::kRead, "1"));
+            modified_by_list.push_back(std::make_tuple(DesignEntity::kAssign, "2"));
+            REQUIRE(modified_by_list == pkb.GetModifiedBy("v1"));
         }
     }
 
@@ -175,16 +175,16 @@ TEST_CASE("2.PKB.PKB population and retrieval") {
 
     // Check if PKB can store and retrieve assign expressions given either variable name or statement number
     SECTION("Assignment Expressions") {
-        SECTION("GetPatternByAssign") {
-            std::vector<AssignEntity> pkbEntityVector = pkb.GetPatternByAssign("2");
-            REQUIRE(pkbEntityVector.size() == 1);
-            REQUIRE(pkbEntityVector[0].GetAssignmentExpr()->GetExpressionString() == "v1=1 2 + v2 +");
+        SECTION("Get pattern by assignment statement number") {
+            std::vector<AssignEntity> assign_vector = pkb.GetPatternByAssign("2");
+            REQUIRE(assign_vector.size() == 1);
+            REQUIRE(assign_vector[0].GetAssignmentExpr()->GetExpressionString() == "v1=1 2 + v2 +");
         }
 
-        SECTION("GetPatternByVarName") {
-            std::vector<AssignEntity> pkbEntityVector = pkb.GetPatternByVariable("v1");
-            REQUIRE(pkbEntityVector.size() == 1);
-            REQUIRE(pkbEntityVector[0].GetAssignmentExpr()->GetExpressionString() == "v1=1 2 + v2 +");
+        SECTION("Get pattern by variable namebu") {
+            std::vector<AssignEntity> assign_vector = pkb.GetPatternByVariable("v1");
+            REQUIRE(assign_vector.size() == 1);
+            REQUIRE(assign_vector[0].GetAssignmentExpr()->GetExpressionString() == "v1=1 2 + v2 +");
         }
     }
 }
