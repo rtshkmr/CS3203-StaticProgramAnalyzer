@@ -7,85 +7,146 @@ constexpr auto L = [](auto msg){
     LOG(spa_logger << Logger::Prettify(msg));
 };
 
-
+/**
+ * Returns a list of strings representing elements of the specified DesignEntity type
+ * @param de is an enum of the types of DesignEntity (e.g. read, print, assign, etc.)
+ * @return list of strings in which each string is the identifier of an element
+ */
 std::list<std::string> PKB::GetDesignEntity(DesignEntity de) {
     std::list<std::string> result = std::list<std::string>();
     switch (de) {
         case DesignEntity::kStmt:return stmt_table_;
-            break;
         case DesignEntity::kRead:return read_table_;
-            break;
         case DesignEntity::kPrint:return print_table_;
-            break;
         case DesignEntity::kCall:return call_table_;
-            break;
         case DesignEntity::kWhile:return while_table_;
-            break;
         case DesignEntity::kIf:return if_table_;
-            break;
         case DesignEntity::kAssign:return assign_table_;
-            break;
         case DesignEntity::kVariable:return var_table_;
-            break;
         case DesignEntity::kConstant:return const_table_;
-            break;
         case DesignEntity::kProcedure:return proc_table_;
-            break;
         case DesignEntity::kInvalid:return {};
         default:return {};
-            break;
     }
 }
 
+/**
+ * Returns boolean of whether there exists any follows relationship
+ * @param
+ * @return True if there is at least one follows relationship, otherwise False
+ */
 bool PKB::hasFollows() {
     return !follows_map_.empty();
 };
 
+/**
+ * Returns boolean of whether there exists any Previous relationship
+ * @param
+ * @return True if there is at least one previous relationship, otherwise False
+ */
 bool PKB::hasPrevious() {
     return !previous_map_.empty();
 }
 
+/**
+ * Returns boolean of whether there exists any parent relationship
+ * @param
+ * @return True if there is at least one parent relationship, otherwise False
+ */
 bool PKB::hasParent() {
     return !parent_map_.empty();
 }
 
+/**
+ * Returns boolean of whether there exists any child relationship
+ * @param
+ * @return True if there is at least one child relationship, otherwise False
+ */
 bool PKB::hasChild() {
     return !child_map_.empty();
 }
 
+/**
+ * Returns boolean of whether there exists any follows* relationship
+ * @param
+ * @return True if there is at least one follows* relationship, otherwise False
+ */
 bool PKB::hasFollowsT() {
     return !follows_t_map_.empty();
 };
 
+/**
+ * Returns boolean of whether there exists any previous* relationship
+ * @param
+ * @return True if there is at least one previous* relationship, otherwise False
+ */
 bool PKB::hasPreviousT() {
     return !previous_t_map_.empty();
 }
 
+/**
+ * Returns boolean of whether there exists any parent* relationship
+ * @param
+ * @return True if there is at least one parent* relationship, otherwise False
+ */
 bool PKB::hasParentT() {
     return !parent_t_map_.empty();
 }
 
+/**
+ * Returns boolean of whether there exists any child* relationship
+ * @param
+ * @return True if there is at least one child* relationship, otherwise False
+ */
 bool PKB::hasChildT() {
     return !child_t_map_.empty();
 }
 
+/**
+ * Returns boolean of whether there exists any uses relationship
+ * @param
+ * @return True if there is at least one uses relationship, otherwise False
+ */
 bool PKB::hasUses() {
+    // Must check if both container and statement maps are empty
     return !use_s_map_.empty() || !use_c_map_.empty();
 }
 
+/**
+ * Returns boolean of whether there exists any used by relationship
+ * @param
+ * @return True if there is at least one used by relationship, otherwise False
+ */
 bool PKB::hasUsedBy() {
+    // Must check if both container and statement maps are empty
     return !used_by_s_map_.empty() || !used_by_c_map_.empty();
-
 }
 
+/**
+ * Returns boolean of whether there exists any modifies relationship
+ * @param
+ * @return True if there is at least one modifies relationship, otherwise False
+ */
 bool PKB::hasModifies() {
+    // Must check if both container and statement maps are empty
     return !modifies_s_map_.empty() || !modifies_c_map_.empty();
 }
 
+/**
+ * Returns boolean of whether there exists any modified by relationship
+ * @param
+ * @return True if there is at least one modified by relationship, otherwise False
+ */
 bool PKB::hasModifiedBy() {
+    // Must check if both container and statement maps are empty
     return !modified_by_s_map_.empty() || !modified_by_c_map_.empty();
 }
 
+/**
+ * Populates the respective entity lists and relationship hashmaps
+ * @param d is a Deliverable object initialised in PSubsystem
+ * @return
+ */
 void PKB::PopulateDataStructures(Deliverable d) {
     L("... PKB will be populated by Deliverable object from SourceProcessor\n");
 
@@ -123,6 +184,11 @@ void PKB::PopulateDataStructures(Deliverable d) {
     L("[DONE] PKB POPULATED WITHOUT ERROR\n");
 }
 
+/**
+ * Returns a list of tuples representing elements that fulfill the follows relationship with the specified statement
+ * @param stmt is a string representing the statement number (e.g. "1", "2", "3", ...)
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and statement number (string)
+ */
 std::list<std::tuple<DesignEntity, std::string>> PKB::GetFollows(std::string stmt) {
     std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
     auto follows_iter = follows_map_.find(stmt);
@@ -135,6 +201,11 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetFollows(std::string stm
     }
 }
 
+/**
+ * Returns a list of tuples representing elements that fulfill the previous relationship with the specified statement
+ * @param stmt is a string representing the statement number (e.g. "1", "2", "3", ...)
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and statement number (string)
+ */
 std::list<std::tuple<DesignEntity, std::string>> PKB::GetPrevious(std::string stmt) {
     std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
     auto previous_iter = previous_map_.find(stmt);
@@ -147,6 +218,11 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetPrevious(std::string st
     }
 }
 
+/**
+ * Returns a list of tuples representing elements that fulfill the parent relationship with the specified statement
+ * @param stmt is a string representing the statement number (e.g. "1", "2", "3", ...)
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and statement number (string)
+ */
 std::list<std::tuple<DesignEntity, std::string>> PKB::GetParent(std::string stmt) {
     std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
     auto parent_iter = parent_t_map_.find(stmt);
@@ -159,6 +235,11 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetParent(std::string stmt
     return ret_list;
 }
 
+/**
+ * Returns a list of tuples representing elements that fulfill the child relationship with the specified statement
+ * @param stmt is a string representing the statement number (e.g. "1", "2", "3", ...)
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and statement number (string)
+ */
 std::list<std::tuple<DesignEntity, std::string>> PKB::GetChild(std::string stmt) {
   std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
   auto child_iter = child_map_.find(stmt);
@@ -171,6 +252,11 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetChild(std::string stmt)
   }
 }
 
+/**
+ * Returns a list of tuples representing elements that fulfill the follows* relationship with the specified statement
+ * @param stmt is a string representing the statement number (e.g. "1", "2", "3", ...)
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and statement number (string)
+ */
 std::list<std::tuple<DesignEntity, std::string>> PKB::GetFollowsT(std::string stmt) {
     std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
     auto follows_iter = follows_t_map_.find(stmt);
@@ -183,6 +269,11 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetFollowsT(std::string st
     return ret_list;
 }
 
+/**
+ * Returns a list of tuples representing elements that fulfill the previous* relationship with the specified statement
+ * @param stmt is a string representing the statement number (e.g. "1", "2", "3", ...)
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and statement number (string)
+ */
 std::list<std::tuple<DesignEntity, std::string>> PKB::GetPreviousT(std::string stmt) {
     std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
     auto previous_iter = previous_t_map_.find(stmt);
@@ -195,6 +286,11 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetPreviousT(std::string s
     return ret_list;
 }
 
+/**
+ * Returns a list of tuples representing elements that fulfill the parent* relationship with the specified statement
+ * @param stmt is a string representing the statement number (e.g. "1", "2", "3", ...)
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and statement number (string)
+ */
 std::list<std::tuple<DesignEntity, std::string>> PKB::GetParentT(std::string stmt) {
     std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
     auto parent_iter = parent_t_map_.find(stmt);
@@ -207,6 +303,11 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetParentT(std::string stm
     return ret_list;
 }
 
+/**
+ * Returns a list of tuples representing elements that fulfill the child* relationship with the specified statement
+ * @param stmt is a string representing the statement number (e.g. "1", "2", "3", ...)
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and statement number (string)
+ */
 std::list<std::tuple<DesignEntity, std::string>> PKB::GetChildT(std::string stmt) {
     std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
     auto child_iter = child_t_map_.find(stmt);
@@ -219,8 +320,14 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetChildT(std::string stmt
     return ret_list;
 }
 
+/**
+ * Returns a list of tuples representing elements that fulfill the uses relationship with the specified statement
+ * @param stmt is a string representing the statement number (e.g. "1", "2", "3", ...)
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and variable name (string)
+ */
 std::list<std::tuple<DesignEntity, std::string>> PKB::GetUses(std::string stmt) {
     std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
+    // For statement map
     auto use_s_iter = use_s_map_.find(stmt);
     if (use_s_iter != use_s_map_.end()) {
         std::list<std::tuple<DesignEntity, std::string>*>* use_s = use_s_iter->second;
@@ -228,6 +335,7 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetUses(std::string stmt) 
             ret_list.push_back(*v);
         }
     }
+    // For container map
     auto use_c_iter = use_c_map_.find(stmt);
     if (use_c_iter != use_c_map_.end()) {
         std::list<std::tuple<DesignEntity, std::string>*>* use_c = use_c_iter->second;
@@ -238,8 +346,14 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetUses(std::string stmt) 
     return ret_list;
 }
 
+/**
+ * Returns a list of tuples representing elements that fulfill the used by relationship with the specified statement
+ * @param var is a string representing the variable name (e.g. "i", "byte", "u", ...)
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and statement number (string)
+ */
 std::list<std::tuple<DesignEntity, std::string>> PKB::GetUsedBy(std::string var) {
     std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
+    // For statement map
     auto used_by_s_iter = used_by_s_map_.find(var);
     if (used_by_s_iter != used_by_s_map_.end()) {
         std::list<std::tuple<DesignEntity, std::string>*>* used_by_s = used_by_s_iter->second;
@@ -247,6 +361,7 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetUsedBy(std::string var)
             ret_list.push_back(*s);
         }
     }
+    // For container map
     auto used_by_c_iter = used_by_c_map_.find(var);
     if (used_by_c_iter != used_by_c_map_.end()) {
         std::list<std::tuple<DesignEntity, std::string>*>* used_by_c = used_by_c_iter->second;
@@ -257,8 +372,14 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetUsedBy(std::string var)
     return ret_list;
 }
 
+/**
+ * Returns a list of tuples representing elements that fulfill the modifies relationship with the specified statement
+ * @param stmt is a string representing the statement number (e.g. "1", "2", "3", ...)
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and variable name (string)
+ */
 std::list<std::tuple<DesignEntity, std::string>> PKB::GetModifies(std::string stmt) {
     std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
+    // For statement map
     auto modifies_s_iter = modifies_s_map_.find(stmt);
     if (modifies_s_iter != modifies_s_map_.end()) {
         std::list<std::tuple<DesignEntity, std::string>*>* modifies_s = modifies_s_iter->second;
@@ -266,6 +387,7 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetModifies(std::string st
             ret_list.push_back(*v);
         }
     }
+    // For container map
     auto modifies_c_iter = modifies_c_map_.find(stmt);
     if (modifies_c_iter != modifies_c_map_.end()) {
         std::list<std::tuple<DesignEntity, std::string>*>* modifies_c = modifies_c_iter->second;
@@ -276,8 +398,14 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetModifies(std::string st
     return ret_list;
 }
 
+/**
+ * Returns a list of tuples representing elements that fulfill the modified by relationship with the specified statement
+ * @param var is a string representing the variable name (e.g. "i", "byte", "u", ...)
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and statement number (string)
+ */
 std::list<std::tuple<DesignEntity, std::string>> PKB::GetModifiedBy(std::string var) {
     std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
+    // For statement map
     auto modified_by_s_iter = modified_by_s_map_.find(var);
     if (modified_by_s_iter != modified_by_s_map_.end()) {
         std::list<std::tuple<DesignEntity, std::string>*>* modified_by_s = modified_by_s_iter->second;
@@ -285,6 +413,7 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetModifiedBy(std::string 
             ret_list.push_back(*s);
         }
     }
+    // For container map
     auto modified_by_c_iter = modified_by_c_map_.find(var);
     if (modified_by_c_iter != modified_by_c_map_.end()) {
         std::list<std::tuple<DesignEntity, std::string>*>* modified_by_c = modified_by_c_iter->second;
@@ -295,14 +424,29 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetModifiedBy(std::string 
     return ret_list;
 }
 
+/**
+ * From an assign statement, get its AssignEntity object
+ * @param stmtRef is a string representing the statement number (e.g. "1", "2", "3", ...)
+ * @return vector containing one AssignEntity object
+ */
 std::vector<AssignEntity> PKB::GetPatternByAssign(std::string stmtRef) {
     return assign_expr_map_[stmtRef];
 }
 
+/**
+ * From a variable name, get all AssignEntity object with the variable on the LHS
+ * @param varName is a string representing the variable name (e.g. "give", "me", "A", ...)
+ * @return vector containing the AssignEntity objects associated with varName
+ */
 std::vector<AssignEntity> PKB::GetPatternByVariable(std::string varName) {
     return assign_expr_map_[varName];
 }
 
+/**
+ * Populates the PKB proc_table_ and adds type info to type_map_
+ * @param proc_list is a list of Procedure pointers
+ * @return
+ */
 void PKB::PopulateProcList(const std::list<Procedure*>& proc_list) {
     proc_table_ = std::list<std::string>();
     for (auto const& i : proc_list) {
@@ -312,6 +456,11 @@ void PKB::PopulateProcList(const std::list<Procedure*>& proc_list) {
     }
 }
 
+/**
+ * Populates the PKB var_table_ and adds type info to type_map_
+ * @param var_list is a list of Variable pointers
+ * @return
+ */
 void PKB::PopulateVarList(const std::list<Variable*>& var_list) {
     var_table_ = std::list<std::string>();
     for (auto const& i : var_list) {
@@ -321,6 +470,11 @@ void PKB::PopulateVarList(const std::list<Variable*>& var_list) {
     }
 }
 
+/**
+ * Populates the PKB const_table_ and adds type info to type_map_
+ * @param const_list is a list of ConstantValue pointers
+ * @return
+ */
 void PKB::PopulateConstList(const std::list<ConstantValue*>& const_list) {
     const_table_ = std::list<std::string>();
     for (auto const& i : const_list) {
@@ -330,6 +484,11 @@ void PKB::PopulateConstList(const std::list<ConstantValue*>& const_list) {
     }
 }
 
+/**
+ * Populates the PKB stmt_table_
+ * @param stmt_list is a list of Statement pointers
+ * @return
+ */
 void PKB::PopulateStmtList(const std::list<Statement*>& stmt_list) {
     stmt_table_ = std::list<std::string>();
     for (auto const& i : stmt_list) {
@@ -338,6 +497,11 @@ void PKB::PopulateStmtList(const std::list<Statement*>& stmt_list) {
     }
 }
 
+/**
+ * Populates the PKB if_table_ and adds type info to type_map_
+ * @param if_list is a list of IfEntity pointers
+ * @return
+ */
 void PKB::PopulateIfList(const std::list<IfEntity*>& if_list) {
     if_table_ = std::list<std::string>();
     for (auto const& i : if_list) {
@@ -347,6 +511,11 @@ void PKB::PopulateIfList(const std::list<IfEntity*>& if_list) {
     }
 }
 
+/**
+ * Populates the PKB while_table_ and adds type info to type_map_
+ * @param while_list is a list of WhileEntity pointers
+ * @return
+ */
 void PKB::PopulateWhileList(const std::list<WhileEntity*>& while_list) {
     while_table_ = std::list<std::string>();
     for (auto const& i : while_list) {
@@ -356,6 +525,11 @@ void PKB::PopulateWhileList(const std::list<WhileEntity*>& while_list) {
     }
 }
 
+/**
+ * Populates the PKB assign_table_, adds type info to type_map_, and populates assign_expr_map_
+ * @param assign_list is a list of AssignEntity pointers
+ * @return
+ */
 void PKB::PopulateAssignList(const std::list<AssignEntity*>& assign_list) {
     assign_table_ = std::list<std::string>();
     for (auto const& i : assign_list) {
@@ -363,6 +537,8 @@ void PKB::PopulateAssignList(const std::list<AssignEntity*>& assign_list) {
         assign_table_.push_back(std::to_string(sNumber->GetNum()));
 
         type_map_[std::to_string(sNumber->GetNum())] = DesignEntity::kAssign;
+
+        // Populate assign_expr_map_ with AssignEntity
 
         AssignEntity entity = *const_cast<AssignEntity*>(i);
         std::vector<AssignEntity> stmtMapVect{entity};
@@ -378,6 +554,11 @@ void PKB::PopulateAssignList(const std::list<AssignEntity*>& assign_list) {
     }
 }
 
+/**
+ * Populates the PKB call_table_ and adds type info to type_map_
+ * @param call_list is a list of CallEntity pointers
+ * @return
+ */
 void PKB::PopulateCallList(const std::list<CallEntity*>& call_list) {
     call_table_ = std::list<std::string>();
     for (auto const& i : call_list) {
@@ -387,6 +568,11 @@ void PKB::PopulateCallList(const std::list<CallEntity*>& call_list) {
     }
 }
 
+/**
+ * Populates the PKB print_table_ and adds type info to type_map_
+ * @param print_list is a list of PrintEntity pointers
+ * @return
+ */
 void PKB::PopulatePrintList(const std::list<PrintEntity*>& print_list) {
     print_table_ = std::list<std::string>();
     for (auto const& i : print_list) {
@@ -396,6 +582,11 @@ void PKB::PopulatePrintList(const std::list<PrintEntity*>& print_list) {
     }
 }
 
+/**
+ * Populates the PKB read_table_ and adds type info to type_map_
+ * @param read_list is a list of ReadEntity pointers
+ * @return
+ */
 void PKB::PopulateReadList(const std::list<ReadEntity*>& read_list) {
     read_table_ = std::list<std::string>();
     for (auto const& i : read_list) {
@@ -405,6 +596,11 @@ void PKB::PopulateReadList(const std::list<ReadEntity*>& read_list) {
     }
 }
 
+/**
+ * Populates the PKB follows_map_
+ * @param follow_hash is a hashmap representing follows relationships between statements
+ * @return
+ */
 void PKB::PopulateFollowsMap(const std::unordered_map<Statement*, Statement*>& follow_hash) {
     for (std::pair<Statement*, Statement*> kv : follow_hash) {
         auto* kNumber = const_cast<StatementNumber*>(kv.first->GetStatementNumber());
@@ -417,6 +613,11 @@ void PKB::PopulateFollowsMap(const std::unordered_map<Statement*, Statement*>& f
     }
 }
 
+/**
+ * Populates the PKB previous_map_
+ * @param followed_by_hash is a hashmap representing followed by relationships between statements
+ * @return
+ */
 void PKB::PopulatePreviousMap(const std::unordered_map<Statement*, Statement*>& followed_by_hash) {
     for (std::pair<Statement*, Statement*> kv : followed_by_hash) {
         auto* kNumber = const_cast<StatementNumber*>(kv.first->GetStatementNumber());
@@ -429,6 +630,11 @@ void PKB::PopulatePreviousMap(const std::unordered_map<Statement*, Statement*>& 
     }
 }
 
+/**
+ * Populates the PKB parent_map_
+ * @param parent_to_child_hash is a hashmap representing parent relationships between statements
+ * @return
+ */
 void PKB::PopulateParentMap(std::unordered_map<Statement*, std::list<Statement*>*> parent_to_child_hash) {
     for (std::pair<Statement*, std::list<Statement*>*> kv : parent_to_child_hash) {
         auto* kNumber = const_cast<StatementNumber*>(kv.first->GetStatementNumber());
@@ -450,6 +656,11 @@ void PKB::PopulateParentMap(std::unordered_map<Statement*, std::list<Statement*>
     }
 }
 
+/**
+ * Populates the PKB child_map_
+ * @param child_to_parent_hash_ is a hashmap representing child relationships between statements
+ * @return
+ */
 void PKB::PopulateChildMap(const std::unordered_map<Statement*, Statement*>& child_to_parent_hash_) {
     for (std::pair<Statement*, Statement*> kv : child_to_parent_hash_) {
         auto* kNumber = const_cast<StatementNumber*>(kv.first->GetStatementNumber());
@@ -462,6 +673,11 @@ void PKB::PopulateChildMap(const std::unordered_map<Statement*, Statement*>& chi
     }
 }
 
+/**
+ * Populates the PKB follows_t_map_
+ * @param follow_T_hash is a hashmap representing follows* relationships between statements
+ * @return
+ */
 void PKB::PopulateFollowsTMap(std::unordered_map<Statement*, std::list<Statement*>*> follows_T_hash) {
     for (std::pair<Statement*, std::list<Statement*>*> kv : follows_T_hash) {
         auto* kNumber = const_cast<StatementNumber*>(kv.first->GetStatementNumber());
@@ -483,6 +699,11 @@ void PKB::PopulateFollowsTMap(std::unordered_map<Statement*, std::list<Statement
     }
 }
 
+/**
+ * Populates the PKB previous_t_map_
+ * @param previous_T_hash is a hashmap representing previous* relationships between statements
+ * @return
+ */
 void PKB::PopulatePreviousTMap(std::unordered_map<Statement*, std::list<Statement*>*> previous_T_hash) {
     for (std::pair<Statement*, std::list<Statement*>*> kv : previous_T_hash) {
         auto* kNumber = const_cast<StatementNumber*>(kv.first->GetStatementNumber());
@@ -504,6 +725,11 @@ void PKB::PopulatePreviousTMap(std::unordered_map<Statement*, std::list<Statemen
     }
 }
 
+/**
+ * Populates the PKB parent_t_map_
+ * @param parent_to_child_T_hash is a hashmap representing parent* relationships between statements
+ * @return
+ */
 void PKB::PopulateParentTMap(std::unordered_map<Statement*, std::list<Statement*>*> parent_to_child_T_hash) {
     for (std::pair<Statement*, std::list<Statement*>*> kv : parent_to_child_T_hash) {
         auto* kNumber = const_cast<StatementNumber*>(kv.first->GetStatementNumber());
@@ -525,6 +751,11 @@ void PKB::PopulateParentTMap(std::unordered_map<Statement*, std::list<Statement*
     }
 }
 
+/**
+ * Populates the PKB child_t_map_
+ * @param child_to_parent_T_hash is a hashmap representing child* relationships between statements
+ * @return
+ */
 void PKB::PopulateChildTMap(std::unordered_map<Statement*, std::list<Statement*>*> child_to_parent_T_hash) {
     for (std::pair<Statement*, std::list<Statement*>*> kv : child_to_parent_T_hash) {
         auto* kNumber = const_cast<StatementNumber*>(kv.first->GetStatementNumber());
@@ -546,6 +777,11 @@ void PKB::PopulateChildTMap(std::unordered_map<Statement*, std::list<Statement*>
     }
 }
 
+/**
+ * Populates the PKB use_s_map_
+ * @param use_hash is a hashmap representing use relationships between non-container statements and variables
+ * @return
+ */
 void PKB::PopulateUseSMap(std::unordered_map<Statement*, std::list<Variable*>*> use_hash) {
     for (std::pair<Statement*, std::list<Variable*>*> kv : use_hash) {
         auto* kNumber = const_cast<StatementNumber*>(kv.first->GetStatementNumber());
@@ -567,6 +803,11 @@ void PKB::PopulateUseSMap(std::unordered_map<Statement*, std::list<Variable*>*> 
     }
 }
 
+/**
+ * Populates the PKB used_by_s_map_
+ * @param used_by_hash is a hashmap representing used by relationships between variables and non-container statements
+ * @return
+ */
 void PKB::PopulateUsedBySMap(std::unordered_map<Variable*, std::list<Statement*>*> used_by_hash) {
     for (std::pair<Variable*, std::list<Statement*>*> kv : used_by_hash) {
 
@@ -588,6 +829,11 @@ void PKB::PopulateUsedBySMap(std::unordered_map<Variable*, std::list<Statement*>
     }
 }
 
+/**
+ * Populates the PKB use_c_map_
+ * @param c_use_hash is a hashmap representing use relationships between container statements and variables
+ * @return
+ */
 void PKB::PopulateUseCMap(std::unordered_map<Container*, std::list<Variable*>*> c_use_hash) {
     for (std::pair<Container*, std::list<Variable*>*> kv : c_use_hash) {
         Statement* c_stmt = dynamic_cast<Statement*>(kv.first);
@@ -611,6 +857,11 @@ void PKB::PopulateUseCMap(std::unordered_map<Container*, std::list<Variable*>*> 
     }
 }
 
+/**
+ * Populates the PKB used_by_c_map_
+ * @param c_used_by_hash is a hashmap representing used by relationships between variables and container statements
+ * @return
+ */
 void PKB::PopulateUsedByCMap(std::unordered_map<Variable*, std::list<Container*>*> c_used_by_hash) {
     for (std::pair<Variable*, std::list<Container*>*> kv : c_used_by_hash) {
 
@@ -634,6 +885,11 @@ void PKB::PopulateUsedByCMap(std::unordered_map<Variable*, std::list<Container*>
     }
 }
 
+/**
+ * Populates the PKB modifies_s_map_
+ * @param modifies_hash is a hashmap representing modifies relationships between non-container statements and variables
+ * @return
+ */
 void PKB::PopulateModifiesSMap(std::unordered_map<Statement*, std::list<Variable*>*> modifies_hash) {
     for (std::pair<Statement*, std::list<Variable*>*> kv : modifies_hash) {
         auto* kNumber = const_cast<StatementNumber*>(kv.first->GetStatementNumber());
@@ -655,6 +911,11 @@ void PKB::PopulateModifiesSMap(std::unordered_map<Statement*, std::list<Variable
     }
 }
 
+/**
+ * Populates the PKB modified_by_s_map_
+ * @param modified_by_hash is a hashmap representing modified by relationships between variables and non-container statements
+ * @return
+ */
 void PKB::PopulateModifiedBySMap(std::unordered_map<Variable*, std::list<Statement*>*> modified_by_hash) {
     for (std::pair<Variable*, std::list<Statement*>*> kv : modified_by_hash) {
 
@@ -676,6 +937,11 @@ void PKB::PopulateModifiedBySMap(std::unordered_map<Variable*, std::list<Stateme
     }
 }
 
+/**
+ * Populates the PKB modifies_c_map_
+ * @param c_modifies_hash is a hashmap representing modifies relationships between container statements and variables
+ * @return
+ */
 void PKB::PopulateModifiesCMap(std::unordered_map<Container*, std::list<Variable*>*> c_modifies_hash) {
 //    for (std::pair<Container *, std::list<Variable *> *> kv : c_modifies_hash) {
     for (std::pair<Container*, std::list<Variable*>*> kv : c_modifies_hash) {
@@ -699,6 +965,11 @@ void PKB::PopulateModifiesCMap(std::unordered_map<Container*, std::list<Variable
     }
 }
 
+/**
+ * Populates the PKB modified_by_c_map_
+ * @param c_modified_by_hash is a hashmap representing modified by relationships between variables and container statements
+ * @return
+ */
 void PKB::PopulateModifiedByCMap(std::unordered_map<Variable*, std::list<Container*>*> c_modified_by_hash) {
     for (std::pair<Variable*, std::list<Container*>*> kv : c_modified_by_hash) {
 
