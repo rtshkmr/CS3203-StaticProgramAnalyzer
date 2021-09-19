@@ -24,25 +24,25 @@ static DesignEntity GetDesignEntity(std::string reference) {
   if (reference == "stmt") {
     return DesignEntity::kStmt;
   } else if (reference == "read") {
-      return DesignEntity::kRead;
+    return DesignEntity::kRead;
   } else if (reference == "print") {
-      return DesignEntity::kPrint;
+    return DesignEntity::kPrint;
   } else if (reference == "call") {
-      return DesignEntity::kCall;
+    return DesignEntity::kCall;
   } else if (reference == "while") {
-      return DesignEntity::kWhile;
+    return DesignEntity::kWhile;
   } else if (reference == "if") {
-      return DesignEntity::kIf;
+    return DesignEntity::kIf;
   } else if (reference == "assign") {
-      return DesignEntity::kAssign;
+    return DesignEntity::kAssign;
   } else if (reference == "variable") {
-      return DesignEntity::kVariable;
+    return DesignEntity::kVariable;
   } else if (reference == "constant") {
-      return DesignEntity::kConstant;
+    return DesignEntity::kConstant;
   } else if (reference == "procedure") {
-      return DesignEntity::kProcedure;
+    return DesignEntity::kProcedure;
   }
-  // TODO: Throw an error if this line is reached.
+
   return DesignEntity::kInvalid;
 }
 
@@ -99,14 +99,14 @@ static RelRef GetRelRef(std::string reference) {
 }
 
 class Synonym {
-  private:
-    std::string name;
-    DesignEntity type;
-  public:
-    Synonym() {};
-    Synonym(std::string name, DesignEntity type): name(name), type(type) {};
-    std::string GetName() { return name; };
-    DesignEntity GetType() { return type; };
+ private:
+  std::string name;
+  DesignEntity type;
+ public:
+  Synonym() {};
+  Synonym(std::string name, DesignEntity type) : name(name), type(type) {};
+  std::string GetName() { return name; };
+  DesignEntity GetType() { return type; };
 };
 
 struct Clause {
@@ -132,13 +132,13 @@ struct SuchThat : Clause {
   std::string getType() const { return typeid(this).name(); }
   bool isEqual(Clause* toObj) {
     if (this->getType() == toObj->getType()) {
-      SuchThat *obj =  (SuchThat *) &toObj;
+      SuchThat* obj = (SuchThat*) & toObj;
       return (
-        this->left_hand_side == obj->left_hand_side &&
-        this->right_hand_side == obj->right_hand_side &&
-        this->rel_ref == obj->rel_ref &&
-        this->left_is_synonym == obj->left_is_synonym &&
-        this->right_is_synonym == obj->right_is_synonym
+          this->left_hand_side == obj->left_hand_side &&
+              this->right_hand_side == obj->right_hand_side &&
+              this->rel_ref == obj->rel_ref &&
+              this->left_is_synonym == obj->left_is_synonym &&
+              this->right_is_synonym == obj->right_is_synonym
       );
     } else {
       return false;
@@ -161,14 +161,14 @@ struct Pattern : Clause {
   std::string getType() const { return typeid(this).name(); }
   bool isEqual(Clause* toObj) {
     if (this->getType() == toObj->getType()) {
-      Pattern *obj =  (Pattern *) &toObj;
+      Pattern* obj = (Pattern*) & toObj;
       return (
-              this->left_hand_side == obj->left_hand_side &&
+          this->left_hand_side == obj->left_hand_side &&
               this->right_hand_side == obj->right_hand_side &&
               this->assign_synonym == obj->assign_synonym &&
               this->left_is_synonym == obj->left_is_synonym &&
               this->is_exact == obj->is_exact
-              );
+      );
     } else {
       return false;
     }
@@ -176,15 +176,15 @@ struct Pattern : Clause {
 };
 
 class Group {
-  private:
-    std::vector<Clause*> clauses;
-    bool has_target_synonym;
-  public:
-    Group(std::vector<Clause*> clauses, bool has_target_synonym) :
-            has_target_synonym(has_target_synonym), clauses(clauses) {};
-    bool AddClauseToVector(Clause* clause);
-    std::vector<Clause*> GetClauses();
-    bool ContainsTargetSynonym();
+ private:
+  std::vector<Clause*> clauses;
+  bool has_target_synonym;
+ public:
+  Group(std::vector<Clause*> clauses, bool has_target_synonym) :
+      has_target_synonym(has_target_synonym), clauses(clauses) {};
+  bool AddClauseToVector(Clause* clause);
+  std::vector<Clause*> GetClauses();
+  bool ContainsTargetSynonym();
 };
 
 #endif //AUTOTESTER_TYPES_H

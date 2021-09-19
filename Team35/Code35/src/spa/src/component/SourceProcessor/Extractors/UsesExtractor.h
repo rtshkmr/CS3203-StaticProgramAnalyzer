@@ -20,6 +20,8 @@ class UsesExtractor {
   void ExtractUsesInCallContainer(CallEntity* call_entity,
                                   Container* container,
                                   std::vector<Procedure*>* extracted_procedures);
+  void EraseElseAndProcFromUses();
+  void EraseReverseRelationship(Container* container, std::list<Variable*>* var_list);
 };
 
 #endif //AUTOTESTER_SRC_SPA_SRC_COMPONENT_SOURCEPROCESSOR_EXTRACTORS_USESEXTRACTOR_H_

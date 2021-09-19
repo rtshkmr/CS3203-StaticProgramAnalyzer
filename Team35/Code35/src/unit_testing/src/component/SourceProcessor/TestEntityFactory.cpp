@@ -10,7 +10,7 @@ TEST_CASE("1.EntityFactory.CreateEntities") {
   std::list<Procedure*> proc_list;
   std::list<Variable*> var_list;
   std::list<ConstantValue*> const_list;
-  EntityFactory entity_factory = EntityFactory(&proc_list, &var_list, &const_list);
+  EntityFactory entity_factory = EntityFactory(& proc_list, & var_list, & const_list);
 
   SECTION("procedure test") {
     vector<Token> procedure_tokens = {
@@ -272,7 +272,7 @@ TEST_CASE("1.EntityFactory.GetExpressionTokens") {
         Token("{", TokenTag::kOpenBrace),
         Token("}", TokenTag::kCloseBrace),
         Token("x", TokenTag::kName),
-        };
+    };
     REQUIRE_THROWS_AS(EntityFactory::GetExpressionTokens(tokens, TokenTag::kSemicolon, TokenTag::kCloseBrace),
                       std::invalid_argument);
   }

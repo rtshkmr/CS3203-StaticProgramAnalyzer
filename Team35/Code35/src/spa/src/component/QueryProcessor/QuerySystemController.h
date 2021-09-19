@@ -1,7 +1,3 @@
-//
-// Created by Hemanshu Gandhi on 11/9/21.
-//
-
 #ifndef AUTOTESTER_QUERYSYSTEMCONTROLLER_H
 #define AUTOTESTER_QUERYSYSTEMCONTROLLER_H
 
@@ -12,8 +8,8 @@
 #include <component/PKB/PKB.h>
 
 class QuerySystemController {
-  public:
-    static std::string Evaluate(std::string *query, PKB* pkb);
+ public:
+  static std::list<std::string> Evaluate(std::string* query, PKB* pkb);
 };
 
 #endif //AUTOTESTER_QUERYSYSTEMCONTROLLER_H

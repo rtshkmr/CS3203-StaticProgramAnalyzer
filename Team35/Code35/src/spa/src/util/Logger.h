@@ -15,7 +15,7 @@ class Logger;
 extern Logger spa_logger;
 #define LoggerInit(logger_settings) spa_logger.InitLogger(logger_settings);
 #define LoggerTerminate() spa_logger.TerminateLogger();
-#define LOG (spa_logger << spa_logger.AddPrefix(__FILE__, __LINE__));
+#define LOG (spa_logger << spa_logger.AddPrefix(__FILE__, __LINE__,__func__));
 
 class LoggerSettings {
  public:
@@ -29,8 +29,6 @@ class LoggerSettings {
   // default constructor:
   LoggerSettings();
 };
-
-
 
 class Logger {
  private:
@@ -47,7 +45,8 @@ class Logger {
   template<typename T>
   Logger& operator<<(T t);
   Logger& operator<<(std::ostream& (* fun)(std::ostream&));
-  [[nodiscard]] std::string AddPrefix(const std::string& file, int line) const;
+  [[nodiscard]] std::string AddPrefix(const std::string& file, const int line, const std::string& function) const;
+  static std::string Prettify(const std::string& original_mesage);
 };
 
 /**
@@ -59,23 +58,21 @@ class Logger {
  */
 template<typename T>
 inline Logger& Logger::operator<<(T t) {
-  if ( this->is_init_ )
-  {
-    if ( this->logger_settings_.out_to_file_ ) this->ofstream_ << t;
-    if ( this->logger_settings_.out_to_stdout_ ) std::cout << t;
+  if (this->is_init_) {
+    if (this->logger_settings_.out_to_file_) this->ofstream_ << t;
+    if (this->logger_settings_.out_to_stdout_) std::cout << t;
   }
-  return *this;
+  return * this;
 }
 
 /**
  *  This  is an overloaded operator to support adding of std::endl.
  */
 inline Logger& Logger::operator<<(std::ostream& (* fun)(std::ostream&)) {
-  if ( this->is_init_ )
-  {
-    if ( this->logger_settings_.out_to_file_ ) this->ofstream_ << std::endl;
-    if ( this->logger_settings_.out_to_stdout_ ) std::cout << std::endl;
+  if (this->is_init_) {
+    if (this->logger_settings_.out_to_file_) this->ofstream_ << std::endl;
+    if (this->logger_settings_.out_to_stdout_) std::cout << std::endl;
   }
-  return *this;
+  return * this;
 }
 #endif //AUTOTESTER_TEAM35_CODE35_SRC_SPA_SRC_UTIL_LOGGER_H_

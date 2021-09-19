@@ -28,12 +28,19 @@ void Deliverable::AddReadEntity(ReadEntity* read_entity) {
   read_list_.push_back(read_entity);
 }
 
+/**
+ * Adds Follows relationship into the hashmap of deliverable. Follows is a 1-to-1 bidirectional relationship
+ * so f2 cannot be inserted into followed_by_hash if f1 was not inserted into follow_hash_.
+ *
+ * @param f1 Previous Statement.
+ * @param f2 Following Statement.
+ */
 void Deliverable::AddFollowRelationship(Statement* f1, Statement* f2) {
   // Follows is a 1-to-1 relationship so if f1 was not inserted into follow_hash_,
   // f2 cannot be inserted into followed_by_hash
   if (follow_hash_.insert({f1, f2}).second) {   // only inserts if the key is unique
     followed_by_hash_.insert({f2, f1}); // only inserts if the insertion into follow_hash is true
-  };
+  }
 }
 
 void Deliverable::AddFollowsTransitiveRelationship(Statement* before, Statement* after) {
@@ -63,7 +70,7 @@ void Deliverable::AddFollowsTransitiveRelationship(Statement* before, Statement*
 }
 
 void Deliverable::AddFollowsTransitiveRelationshipForList(Statement* before, std::list<Statement*>* afters) {
-  for (Statement* after: *afters) {
+  for (Statement* after: * afters) {
     AddFollowsTransitiveRelationship(before, after);
   }
 }
@@ -111,7 +118,7 @@ void Deliverable::AddParentTransitiveRelationship(Statement* parent, Statement* 
 }
 
 void Deliverable::AddParentTransitiveRelationshipForList(Statement* parent, std::list<Statement*>* children) {
-  for (Statement* child: *children) {
+  for (Statement* child: * children) {
     AddParentTransitiveRelationship(parent, child);
   }
 }
@@ -169,7 +176,7 @@ void Deliverable::AddUsesRelationship(Container* u1, Variable* u2) {
 }
 
 void Deliverable::AddUsesRelationship(Container* container, std::list<Variable*>* var_list) {
-  for (Variable* var: *var_list) {
+  for (Variable* var: * var_list) {
     AddUsesRelationship(container, var);
   }
 }
@@ -227,7 +234,7 @@ void Deliverable::AddModifiesRelationship(Container* m1, Variable* m2) {
 }
 
 void Deliverable::AddModifiesRelationship(Container* container, std::list<Variable*>* var_list) {
-  for (Variable* var: *var_list) {
+  for (Variable* var: * var_list) {
     AddModifiesRelationship(container, var);
   }
 }
@@ -241,40 +248,40 @@ Program* Deliverable::GetProgram() {
 }
 
 std::list<Procedure*>* Deliverable::GetProcList() {
-  return &proc_list_;
+  return & proc_list_;
 }
 
 std::list<Variable*>* Deliverable::GetVariableList() {
-  return &var_list_;
+  return & var_list_;
 }
 std::list<ConstantValue*>* Deliverable::GetConstantValueList() {
-  return &const_list_;
+  return & const_list_;
 }
 
 std::list<Statement*>* Deliverable::GetStatementList() {
-  return &stmt_list_;
+  return & stmt_list_;
 }
 
 std::list<IfEntity*>* Deliverable::GetIfList() {
-  return &if_list_;
+  return & if_list_;
 }
 
 std::list<WhileEntity*>* Deliverable::GetWhileList() {
-  return &while_list_;
+  return & while_list_;
 }
 
 std::list<AssignEntity*>* Deliverable::GetAssignList() {
-  return &assign_list_;
+  return & assign_list_;
 }
 
 std::list<CallEntity*>* Deliverable::GetCallList() {
-  return &call_list_;
+  return & call_list_;
 }
 
 std::list<PrintEntity*>* Deliverable::GetPrintList() {
-  return &print_list_;
+  return & print_list_;
 }
 
 std::list<ReadEntity*>* Deliverable::GetReadList() {
-  return &read_list_;
+  return & read_list_;
 }

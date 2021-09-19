@@ -1,8 +1,5 @@
-#include <stdio.h>
-#include <iostream>
 #include <string>
 #include <vector>
-#include <fstream>
 #include <util/Logger.h>
 
 #include "Parser.h"
@@ -11,9 +8,13 @@
 
 using namespace std;
 using namespace par;
+constexpr auto L = [](auto msg) {
+  LOG
+  (spa_logger << Logger::Prettify(msg));
+};
 
-void Parser::Parse(std::string file_name) {
-  LOG (spa_logger << "\n\n\n==========================  [ENTER] PARSE parser ======================\n\n\n");
+void Parser::Parse(const std::string& file_name) {
+  L("[ENTER] PARSE parser");
   psub::PSubsystem p_subsystem;
   p_subsystem.InitDataStructures();
 
@@ -27,6 +28,10 @@ void Parser::Parse(std::string file_name) {
     while (source_file.get(byte)) {
       if (byte == '\n') {
         continue;
+      }
+
+      if (byte == '\t' || byte == '\a' || byte == '\n' || byte == '\v' || byte == '\r' || byte == '\f') {
+        byte = ' ';
       }
 
       if (byte == ' ') {
@@ -43,13 +48,13 @@ void Parser::Parse(std::string file_name) {
         chara.clear();
       }
     }
-    deliverable_ = *p_subsystem.GetDeliverables();
+    deliverable_ = * p_subsystem.GetDeliverables();
     source_file.close();
-    LOG (spa_logger << "\n\n\n==========================  [EXIT] PARSE parser ======================\n\n\n");
+    L("[EXIT] PARSE parser");
   }
 
 }
 
 Deliverable* Parser::GetDeliverables() {
-  return &this->deliverable_;
+  return & this->deliverable_;
 }

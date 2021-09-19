@@ -80,7 +80,7 @@ TEST_CASE("1.Model.Entity.Procedure") {
     REQUIRE(proc_vtester == cast_proc_vtester);
     REQUIRE(proc_xtester == cast_proc_xtester);
   }
-  
+
   SECTION("Cast to Container and AddStmt") {
     Container* container_proc_vtester = dynamic_cast<Container*>(proc_vtester);
 

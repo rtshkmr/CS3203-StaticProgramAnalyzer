@@ -5,7 +5,8 @@ TEST_CASE("1.DataType.AssignmentExpression") {
   SECTION("Check Postfix Expression") {
 
     /// 0 NO OPERATOR TEST
-    REQUIRE(AssignmentExpression("02").GetExpressionString() == "02"); // this case should not happen as syntax will flag leading 0 as error
+    REQUIRE(AssignmentExpression("02").GetExpressionString()
+                == "02"); // this case should not happen as syntax will flag leading 0 as error
     REQUIRE(AssignmentExpression("102").GetExpressionString() == "102");
     REQUIRE(AssignmentExpression("Weeeeew").GetExpressionString() == "Weeeeew");
     REQUIRE(AssignmentExpression("AssignmentExpression").GetExpressionString() == "AssignmentExpression");
@@ -44,18 +45,24 @@ TEST_CASE("1.DataType.AssignmentExpression") {
 
     /// 5 NAMES WITH DIFFERENT LENGTH
     REQUIRE(AssignmentExpression("You + Me + Who").GetExpressionString() == "You Me + Who +");
-    REQUIRE(AssignmentExpression("What * The + (Weird + Equation * This - Is) - Aint % it").GetExpressionString() == "What The * Weird Equation This * + Is - + Aint it % -");
-    REQUIRE(AssignmentExpression("never + g0nna * Give - u ^ up").GetExpressionString() == "never g0nna Give * + u up ^ -");
-    REQUIRE(AssignmentExpression("never / g0nna * let - u - down").GetExpressionString() == "never g0nna / let * u - down -");
-    REQUIRE(AssignmentExpression("(never + g0nNa) / (run * ar0und + n + dese3t) * u").GetExpressionString() == "never g0nNa + run ar0und * n + dese3t + / u *");
+    REQUIRE(AssignmentExpression("What * The + (Weird + Equation * This - Is) - Aint % it").GetExpressionString()
+                == "What The * Weird Equation This * + Is - + Aint it % -");
+    REQUIRE(
+        AssignmentExpression("never + g0nna * Give - u ^ up").GetExpressionString() == "never g0nna Give * + u up ^ -");
+    REQUIRE(AssignmentExpression("never / g0nna * let - u - down").GetExpressionString()
+                == "never g0nna / let * u - down -");
+    REQUIRE(AssignmentExpression("(never + g0nNa) / (run * ar0und + n + dese3t) * u").GetExpressionString()
+                == "never g0nNa + run ar0und * n + dese3t + / u *");
 
     /// 6 NESTED BRACKETS
-    REQUIRE(AssignmentExpression("(((Young) + (Man) * (u) + dont / have * to + feel) + down)").GetExpressionString() == "Young Man u * + dont have / to * + feel + down +");
+    REQUIRE(AssignmentExpression("(((Young) + (Man) * (u) + dont / have * to + feel) + down)").GetExpressionString()
+                == "Young Man u * + dont have / to * + feel + down +");
     REQUIRE(AssignmentExpression("(I) + (Said) * ((1) + was)").GetExpressionString() == "I Said 1 was + * +");
 
     /// 7 VARIABLE + NUMBERS
     REQUIRE(AssignmentExpression("Y * M ^ 3 + A").GetExpressionString() == "Y M 3 ^ * A +");
-    REQUIRE(AssignmentExpression("It2+(fun/2)*sTay+at^the/Y+M-C*A").GetExpressionString() == "It2 fun 2 / sTay * + at the ^ Y / + M + C A * -");
+    REQUIRE(AssignmentExpression("It2+(fun/2)*sTay+at^the/Y+M-C*A").GetExpressionString()
+                == "It2 fun 2 / sTay * + at the ^ Y / + M + C A * -");
   }
 
   SECTION("Check Equation Exact") {

@@ -10,7 +10,7 @@ void Container::AddStatement(Statement* stmt) {
 }
 
 std::list<Statement*>* Container::GetStatementList() {
-  return &statement_list_;
+  return & statement_list_;
 }
 
 Procedure::Procedure(ProcedureName* pName) {
@@ -34,7 +34,7 @@ Program::Program(Procedure* p) {
 }
 
 std::list<Procedure*>* Program::GetProcedureList() {
-  return &procedure_list_;
+  return & procedure_list_;
 }
 
 void Program::AddProcedure(Procedure* p) {

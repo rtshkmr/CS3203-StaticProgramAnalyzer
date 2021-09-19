@@ -24,7 +24,7 @@ vector<Token> Tokenizer::CreateTokens(const string& statement_string) {
 vector<string> Tokenizer::SplitSentenceIntoStringTokens(const string& statement_string) {
   vector<string> final_token_strings;
   vector<string> split_strings_by_space = SplitString(" ", statement_string, false);
-  for (auto& string_token : split_strings_by_space) {
+  for (auto& string_token: split_strings_by_space) {
     if (!IsWhiteSpace(string_token)) {
       vector<string> split_sub_tokens_strings = SplitSubTokenStrings(string_token);
       for (auto& sub_token_string: split_sub_tokens_strings) {
@@ -41,9 +41,10 @@ vector<string> Tokenizer::SplitSentenceIntoStringTokens(const string& statement_
  * @param token_string is a non-whitespace character/string that will be tokenized
  * @return  pointer to a newly created Token object for a given token_string
  */
-Token* Tokenizer::CreateToken(const string& token_string, int token_idx, const vector<string>& statement_token_strings) {
+Token* Tokenizer::CreateToken(const string& token_string,
+                              int token_idx,
+                              const vector<string>& statement_token_strings) {
   TokenTag token_tag = Token::TagStringWithToken(token_string);
-  // if it's a keyword tag, do a look around and retag to kName if needed:
   string copied_str = token_string;
   auto* new_token = new Token(std::move(copied_str), token_tag);
   if (Token::IsKeywordToken(* new_token)
@@ -62,26 +63,25 @@ Token* Tokenizer::CreateToken(const string& token_string, int token_idx, const v
  */
 vector<string> Tokenizer::SplitString(const string& delimiter, const string& input, bool retain_delimiter) {
   vector<string> split_strings;
-  auto start = 0U;
-  auto end = input.find(delimiter); // first occurance of delimiter
-  while (end != string::npos) {
-    string split_string = input.substr(start, end - start);
+  auto left = 0U;
+  auto right = input.find(delimiter);
+  while (right != string::npos) {
+    string split_string = input.substr(left, right - left);
     if (!IsWhiteSpace(split_string)) {
       split_strings.push_back(split_string);
     }
     if (retain_delimiter) {
       split_strings.push_back(delimiter);
     }
-    start = end + delimiter.length();
-    end = input.find(delimiter, start);
+    left = right + delimiter.length();
+    right = input.find(delimiter, left);
   }
-  // if there are no delimiters in the input, return:
-  if (start >= input.size()) { // i.e. scanned the whole string
+  if (left >= input.size()) { // i.e. scanned the whole string, there are no delimiters in input
     return split_strings;
   } else {
-    string substr = input.substr(start, end);
+    string substr = input.substr(left, right);
     split_strings.push_back(substr);
-    // check if the delimiter appears at the end of the input string:
+    // check if the delimiter appears at the right of the input string:
     string s;
     bool last_char_is_delimiter = (s + input[input.size() - 1]) == delimiter;
     if (retain_delimiter && last_char_is_delimiter) {
@@ -114,7 +114,7 @@ vector<string> Tokenizer::SplitSubTokenStrings(string& string_token) {
         "!",
         "+", "-", "*", "%", "/",
     };
-    for (auto& delimiter : special_delimiters) {
+    for (auto& delimiter: special_delimiters) {
       int delim_idx = string_token.find(delimiter);
       if (delim_idx != string::npos) { // found first valid delim:
         if (delim_idx > 0) { // left substring exists, no left substring if delim_idx == 0
@@ -124,9 +124,8 @@ vector<string> Tokenizer::SplitSubTokenStrings(string& string_token) {
         }
         result.push_back(delimiter);
         if (delim_idx < string_token.size() - 1) { // right substring exists:
-          string
-              right_substring = string_token.substr(delim_idx + delimiter.size(),
-                                                    string_token.size() - 1 - delim_idx);
+          string right_substring = string_token.substr(delim_idx + delimiter.size(),
+                                                       string_token.size() - 1 - delim_idx);
           vector<string> right_token_strings = SplitSubTokenStrings(right_substring);
           result.insert(result.end(), right_token_strings.begin(), right_token_strings.end());
         }
@@ -144,16 +143,13 @@ vector<string> Tokenizer::SplitSubTokenStrings(string& string_token) {
 
 /**
  * Checks whether test_string exactly matches a list of possible whitespace characters
- *
- * todo: deprecate this in the future, this exists in case any control chars or other whitespace chars slip through
- *       then we'd only need to mod this function
  * @param test_string
  * @return
  */
 bool Tokenizer::IsWhiteSpace(string& test_string) {
   if (test_string.empty()) return true;
   string targets[]{" "};
-  for (auto& target : targets) {
+  for (auto& target: targets) {
     if (target == test_string) {
       return true;
     }
@@ -172,9 +168,8 @@ bool Tokenizer::IsWhiteSpace(string& test_string) {
  * @return true if actual keyword and false if it should actually be tagged as a kName
  */
 bool Tokenizer::IsActualKeyword(const std::string& token_string, int token_idx, const vector<string>& token_strings) {
-  if (token_string == "procedure") {
-    return token_idx == 0 && token_strings.size() == 3;
-  } else if (token_string == "read"
+  if (token_string == "procedure"
+      || token_string == "read"
       || token_string == "print"
       || token_string == "call") {
     return token_idx == 0 && token_strings.size() == 3;

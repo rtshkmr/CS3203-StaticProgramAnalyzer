@@ -8,23 +8,23 @@
 // note: order of regex evaluation matters! always retrieve key-values based on defined insertion_order.
 std::vector<std::string> insertion_order = {"+", "-", "%", "*", "/", "STRING_QUOTE", "INTEGER", "SUCH_THAT",
                                             "IDENT", ";", "SPACINGS", "(", ")", ",", "_"};
-static std::map<std::string, std::regex> spec_table {
-  // TODO: for performance optimization, group (+, -) and (%, *, /) together if separate regex is not required.
-  {"+", std::regex("^[+]")},
-  {"-", std::regex("^[-]")},
-  {"%", std::regex("^[%]")},
-  {"*", std::regex("^[*]")},
-  {"/", std::regex("^[/]")},
-  {"STRING_QUOTE", std::regex("^\"")},
-  {"INTEGER", RegexPatterns::GetIntegerPatternNonTerminating()},
-  {"SUCH_THAT", std::regex("^such that")},
-  {"IDENT", RegexPatterns::GetNamePattern()}, // IDENT is TokenTag:kName
-  {";", std::regex("^;")},
-  {"SPACINGS", std::regex(R"(^[\n\r\s\t]+)")},
-  {"(", std::regex("^[(]")},
-  {")", std::regex("^[)]")},
-  {",", std::regex("^,")},
-  {"_", std::regex("^_")},
+static std::map<std::string, std::regex> spec_table{
+    // TODO: for performance optimization, group (+, -) and (%, *, /) together if separate regex is not required.
+    {"+", std::regex("^[+]")},
+    {"-", std::regex("^[-]")},
+    {"%", std::regex("^[%]")},
+    {"*", std::regex("^[*]")},
+    {"/", std::regex("^[/]")},
+    {"STRING_QUOTE", std::regex("^\"")},
+    {"INTEGER", RegexPatterns::GetIntegerPatternNonTerminating()},
+    {"SUCH_THAT", std::regex("^such that")},
+    {"IDENT", RegexPatterns::GetNamePattern()}, // IDENT is TokenTag:kName
+    {";", std::regex("^;")},
+    {"SPACINGS", std::regex(R"(^[\n\r\s\t]+)")},
+    {"(", std::regex("^[(]")},
+    {")", std::regex("^[)]")},
+    {",", std::regex("^,")},
+    {"_", std::regex("^_")},
 };
 
 /* Gets correct TokenTag specific to PQL applications. Allowed alphabet of TokenTags corresponds to specTable.
@@ -58,16 +58,12 @@ Token QueryTokenizer::GetNextToken() {
     return Token("", TokenTag::kInvalid);
   }
   std::string curr_string = query.substr(cursor);
-//  std::cout << "curr_string: " + curr_string << std::endl;
   std::smatch match;
-  for (auto const& sp : insertion_order) {
-    auto spec = *spec_table.find(sp);
-    // x.first, x.second
+  for (auto const& sp: insertion_order) {
+    auto spec = * spec_table.find(sp);
     if (!std::regex_search(curr_string, match, spec.second)) {
-//      std::cout << "Regex failed matching for case " + spec.first << std::endl;
       continue;
     }
-//    std::cout << "Regex matched for case " + spec.first << std::endl;
     cursor += match[0].str().size();
     if (spec.first.compare("SPACINGS") == 0) {
       return GetNextToken();

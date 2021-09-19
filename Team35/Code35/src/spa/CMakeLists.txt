@@ -28,6 +28,8 @@ add_library(spa ${srcs} ${headers}
         src/component/QueryProcessor/QueryExtractor/QueryTokenizer.h src/component/QueryProcessor/QueryExtractor/QueryTokenizer.cpp
         src/component/QueryProcessor/QueryExtractor/QueryParser.h src/component/QueryProcessor/QueryExtractor/QueryParser.cpp
         src/component/QueryProcessor/QueryExtractor/QueryExtractor.h src/component/QueryProcessor/QueryExtractor/QueryExtractor.cpp
+        src/component/QueryProcessor/QueryExtractor/QueryOptimizer.h src/component/QueryProcessor/QueryExtractor/QueryOptimizer.cpp
+        src/component/QueryProcessor/QueryExtractor/QueryValidator.h src/component/QueryProcessor/QueryExtractor/QueryValidator.cpp
         src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatClause.h src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatClause.cpp
         src/component/QueryProcessor/QueryEvaluator/EvaluatePatternClause.h src/component/QueryProcessor/QueryEvaluator/EvaluatePatternClause.cpp
         src/component/QueryProcessor/QueryEvaluator/QueryPKB.h src/component/QueryProcessor/QueryEvaluator/QueryPKB.cpp
@@ -35,12 +37,12 @@ add_library(spa ${srcs} ${headers}
         src/component/QueryProcessor/QueryProjector.h src/component/QueryProcessor/QueryProjector.cpp
         src/component/QueryProcessor/QuerySystemController.h src/component/QueryProcessor/QuerySystemController.cpp
         src/component/SourceProcessor/Extractors/UsesExtractor.cpp src/component/SourceProcessor/Extractors/UsesExtractor.h
-        src/component/SourceProcessor/Extractors/ModifiesExtractor.cpp src/component/SourceProcessor/Extractors/ModifiesExtractor.h 
+        src/component/SourceProcessor/Extractors/ModifiesExtractor.cpp src/component/SourceProcessor/Extractors/ModifiesExtractor.h
         src/component/SourceProcessor/Extractors/ParentTExtractor.cpp src/component/SourceProcessor/Extractors/ParentTExtractor.h
         src/component/SourceProcessor/Extractors/FollowsTExtractor.cpp src/component/SourceProcessor/Extractors/FollowsTExtractor.h
         src/util/Logger.cpp src/util/Logger.h src/util/util.h src/util/TimeUtil.cpp src/util/TimeUtil.h)
 
-  
+
 # this makes the headers accessible for other projects which uses spa lib
 target_include_directories(spa PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 

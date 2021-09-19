@@ -1,10 +1,7 @@
 #include <stdexcept>
 #include <cassert>
-#include <iostream>
-#include <util/Logger.h>
 #include "PSubsystem.h"
 #include "Tokenizer.h"
-#include "EntityFactory.h"
 #include "exception/SyntaxException.h"
 #include "exception/IterationOneException.h"
 
@@ -111,7 +108,7 @@ void PSubsystem::ProcessStatement(std::string statement) {
 
     //evaluate what type of stmt it is:
     //if, else, while, assign, call, print, read
-    //TODO: convert multiple-if to get type from EntityFactory
+    //TODO: convert multiple-if to Get type from EntityFactory
     if (IfEntity* if_entity = dynamic_cast<IfEntity*>(stmt)) {
       HandleIfStmt(if_entity);
     } else if (ElseEntity* else_entity = dynamic_cast<ElseEntity*>(stmt)) {
@@ -177,8 +174,9 @@ void PSubsystem::SetStatementObject(Statement* statement) {
     deliverable_->AddParentRelationship(dynamic_cast<Statement*>(parent_stack_.top()), statement);
   }
 
-  if (current_node_type_ != 3 && current_node_->GetStatementList()->size() == 1 || // 1 because this is newly added in Line curr - 13
-      (current_node_type_ == 3 && new_else)) {
+  if (current_node_type_ != 3 && current_node_->GetStatementList()->size() == 1
+      || // 1 because this is newly added in Line curr - 13
+          (current_node_type_ == 3 && new_else)) {
     //just entered a stack, follow nothing.
     follow_stack_.push(statement);
   } else {
@@ -251,7 +249,7 @@ void PSubsystem::HandleReadStmt(ReadEntity* read_entity) {
 }
 
 void PSubsystem::CheckForIfElseValidity() {
-  for (auto const &i : *deliverable_->GetIfList()) {
+  for (auto const& i: * deliverable_->GetIfList()) {
     if (i->GetElseEntity() == nullptr) {
       throw SyntaxException("Encountered If statement without Else construct");
     }

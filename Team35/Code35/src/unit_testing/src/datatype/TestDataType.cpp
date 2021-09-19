@@ -1,3 +1,4 @@
+#include <exception/SyntaxException.h>
 #include "catch.hpp"
 #include "datatype/DataType.h"
 
@@ -25,8 +26,8 @@ TEST_CASE("1.DataType.StatementNumber") {
     StatementNumber sn = StatementNumber(39);
     StatementNumber sn2(10);
 
-    REQUIRE(sn.getNum() == 39);
-    REQUIRE(sn2.getNum() == 10);
+    REQUIRE(sn.GetNum() == 39);
+    REQUIRE(sn2.GetNum() == 10);
     REQUIRE_THROWS_AS(StatementNumber(0), std::invalid_argument);
     REQUIRE_THROWS_AS(StatementNumber(-28), std::invalid_argument);
   }
@@ -167,16 +168,16 @@ TEST_CASE("1.DataType.ConstantValue") {
     ConstantValue cv4 = ConstantValue("00000000000");
     ConstantValue cv5 = ConstantValue("-12345678");
 
-    REQUIRE(cv.get() == 39);
-    REQUIRE(cv2.get() == 10000);
-    REQUIRE(cv3.get() == 0);
-    REQUIRE(cv4.get() == 0);
-    REQUIRE(cv5.get() == -12345678);
+    REQUIRE(cv.Get() == 39);
+    REQUIRE(cv2.Get() == 10000);
+    REQUIRE(cv3.Get() == 0);
+    REQUIRE(cv4.Get() == 0);
+    REQUIRE(cv5.Get() == -12345678);
 
-    REQUIRE_THROWS_AS(ConstantValue("999999999999999999999999999999999999999"), std::out_of_range);
-    REQUIRE_THROWS_AS(ConstantValue("9hello"), std::invalid_argument);
-    REQUIRE_THROWS_AS(ConstantValue("he11o"), std::invalid_argument);
-    REQUIRE_THROWS_AS(ConstantValue("hell0"), std::invalid_argument);
+    REQUIRE_THROWS_AS(ConstantValue("999999999999999999999999999999999999999"), SyntaxException);
+    REQUIRE_THROWS_AS(ConstantValue("9hello"), SyntaxException);
+    REQUIRE_THROWS_AS(ConstantValue("he11o"), SyntaxException);
+    REQUIRE_THROWS_AS(ConstantValue("hell0"), SyntaxException);
   }
 
   SECTION("Operators") {
@@ -204,8 +205,8 @@ TEST_CASE("1.Datatype.TokenTag") {
     Token token1_duplicate = Token("hello", TokenTag::kName);
     Token token2 = Token("procedure", TokenTag::kProcedureKeyword);
     Token token2_different_tags = Token("procedure", TokenTag::kName);
-    REQUIRE(token1==token1_duplicate);
-    REQUIRE_FALSE(token2==token2_different_tags);
+    REQUIRE(token1 == token1_duplicate);
+    REQUIRE_FALSE(token2 == token2_different_tags);
   }
 }
 

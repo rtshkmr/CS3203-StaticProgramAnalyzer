@@ -2,6 +2,7 @@
 #define AUTOTESTER_SRC_SPA_SRC_COMPONENT_SOURCEPROCESSOR_EXTRACTORS_FOLLOWSTEXTRACTOR_H_
 
 #include <datatype/Deliverable.h>
+
 class FollowsTExtractor {
  public:
   FollowsTExtractor() = default;

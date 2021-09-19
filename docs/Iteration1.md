@@ -402,7 +402,7 @@ To help you discover your APIs for PKB and Query Evaluator, start by answering t
 
 Using subsections, describe how SPA components work with design abstractions (possibly via APIs), following examples in course materials using English.
 
-Feel free to shorten/abbreviate repeated steps. For each interaction, continue description until you feel you are ready to switch to document a given API. Include as many steps as you think it is enough for you to get useful feedback.
+Feel free to shorten/abbreviate repeated steps. For each interaction, continue description until you feel you are ready to switch to document a given API. Include as many steps as you think it is enough for you to Get useful feedback.
 
 Base your answers on the following SIMPLE source program and queries.
 

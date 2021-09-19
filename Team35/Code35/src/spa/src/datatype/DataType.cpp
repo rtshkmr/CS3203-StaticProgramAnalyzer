@@ -7,13 +7,14 @@
 #include "DataType.h"
 #include <datatype/RegexPatterns.h>
 #include <cassert>
+#include <exception/SyntaxException.h>
 
 /**
  * This method checks if the given string as in the correct name syntax.
  * @param name The name to be checked.
  * @return true if it is in the correct name syntax; false otherwise.
  */
-bool ValidateName(std::string name) {
+bool ValidateName(const std::string& name) {
   std::regex name_regex("^[A-Za-z][A-Za-z0-9]*$");
   return std::regex_search(name, name_regex);
 }
@@ -34,7 +35,7 @@ StatementNumber::StatementNumber(int sn) {
  * Gets the statement number.
  * @return [Not Null] The statement number
  */
-int StatementNumber::getNum() {
+int StatementNumber::GetNum() const {
   return num_;
 }
 
@@ -180,7 +181,7 @@ bool VariableName::operator<(const VariableName& other) const {
  * @param other The VariableName object to compare to
  * @return true if this.name_ is equal to other.name_
  */
-bool VariableName::operator==(VariableName other) const {
+bool VariableName::operator==(const VariableName& other) const {
   return this->name_ == other.name_;
 }
 
@@ -188,14 +189,17 @@ bool VariableName::operator==(VariableName other) const {
  * This ConstantValue constructor check if the constant received is valid (valid = integer up to +- 2,147,483,647),
  *   and stores as a ConstantValue object.
  * @param constant [NOT NULL] The constant (in string) as extracted from SIMPLE program
- * @throws invalid_argument when a non-integer in passed in
- * @throws out_of_range when integers that had exceeded the range.
+ * @throws SyntaxException when a non-integer in passed in or when integers that had exceeded the range.
  */
-ConstantValue::ConstantValue(std::string constant) {
+ConstantValue::ConstantValue(const std::string& constant) {
   size_t num_chars = 0;
-  value_ = stoi(constant, & num_chars);
+  try {
+    value_ = stoi(constant, & num_chars);
+  } catch (std::exception ia) {
+    throw SyntaxException("Argument is not smaller that max int.");
+  }
   if (num_chars != constant.size()) {
-    throw std::invalid_argument("Constant is not valid. Numbers mixed with letters.");
+    throw SyntaxException("Constant is not valid. Numbers mixed with letters.");
   }
 }
 
@@ -203,7 +207,7 @@ ConstantValue::ConstantValue(std::string constant) {
  * Gets the constant value.
  * @return [Not Null] The constant value
  */
-int ConstantValue::get() {
+int ConstantValue::Get() {
   return value_;
 }
 
@@ -268,8 +272,8 @@ bool Token::IsKeywordToken(const Token& token) {
 }
 
 /**
- * Tags a @param reference string with a TokenTag by comparing with a various regex that represent a fixed set of
- * concrete syntax grammar rules. As a side-effect, any @param reference string that doesn't match the given regex
+ * Tags a reference string with a TokenTag by comparing with a various regex that represent a fixed set of
+ * concrete syntax grammar rules. As a side-effect, any reference string that doesn't match the given regex
  * patterns would violate the Concrete Grammar Syntax for SIMPLE and therefore would be tagged with a kInvalid tag for
  * further error handling
  *
@@ -383,7 +387,7 @@ auto Token::GetTokenMatchForwardIterator(const std::vector<Token>& tokens,
   auto forward_iterator = std::find_if(tokens.begin() + left_idx,
                                        tokens.begin()
                                            + right_idx,
-                                       [&desired_pattern](Token elem) {
+                                       [&desired_pattern](const Token& elem) {
                                          std::string current = elem.GetTokenString();
                                          bool matches_target_pattern = std::regex_match(current, desired_pattern);
                                          return matches_target_pattern;
@@ -396,7 +400,7 @@ auto Token::GetTokenMatchForwardIterator(const std::vector<Token>& tokens,
                                          int right_idx) {
   auto forward_iterator = std::find_if(tokens.begin() + left_idx,
                                        tokens.begin() + right_idx,
-                                       [&target_token_tag](Token elem) {
+                                       [&target_token_tag](const Token& elem) {
                                          TokenTag current_tag = elem.GetTokenTag();
                                          bool matches_target_token = current_tag == target_token_tag;
                                          return matches_target_token;
@@ -418,13 +422,13 @@ auto Token::GetTokenMatchReverseIterator(const std::vector<Token>& tokens,
                                          const std::regex& desired_pattern,
                                          int left_boundary_idx,
                                          int right_boundary_idx) {
-  // from the given actual indices, get respective reverse iterators for the range
+  // from the given actual indices, Get respective reverse iterators for the range
   auto rBeginning = tokens.crbegin() + ((tokens.size() - 1) - right_boundary_idx);
   auto rEnding = tokens.crend() - left_boundary_idx;
   // nb: find_if checks within a half-open range but we want inclusive behaviour:
   auto reverse_iterator = std::find_if(rBeginning,
                                        rEnding - 1,
-                                       [&desired_pattern](Token elem) {
+                                       [&desired_pattern](const Token& elem) {
                                          std::string current = elem.GetTokenString();
                                          bool matches_target_pattern = std::regex_match(current, desired_pattern);
                                          return matches_target_pattern;
@@ -435,13 +439,13 @@ auto Token::GetTokenMatchReverseIterator(const std::vector<Token>& tokens,
                                          TokenTag target_token_tag,
                                          int left_boundary_idx,
                                          int right_boundary_idx) {
-  // from the given actual indices, get respective reverse iterators for the range
+  // from the given actual indices, Get respective reverse iterators for the range
   auto rBeginning = tokens.crbegin() + ((tokens.size() - 1) - right_boundary_idx);
   auto rEnding = tokens.crend() - left_boundary_idx;
   // nb: find_if checks within a half-open range but we want inclusive behaviour:
   auto reverse_iterator = std::find_if(rBeginning,
                                        rEnding - 1,
-                                       [&target_token_tag](Token elem) {
+                                       [&target_token_tag](const Token& elem) {
                                          TokenTag current_tag = elem.GetTokenTag();
                                          bool matches_target_token = current_tag == target_token_tag;
                                          return matches_target_token;

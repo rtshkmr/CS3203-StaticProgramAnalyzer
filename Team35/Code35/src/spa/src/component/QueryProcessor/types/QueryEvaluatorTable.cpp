@@ -1,7 +1,3 @@
-//
-// Created by Max Ng on 6/9/21.
-//
-
 #include "QueryEvaluatorTable.h"
 
 QueryEvaluatorTable::QueryEvaluatorTable(std::string target) {
@@ -23,7 +19,7 @@ bool QueryEvaluatorTable::AddColumn(std::string synonym) {
 bool QueryEvaluatorTable::AddTargetSynonym(std::list<std::string> synonym_list) {
   std::vector<std::string> synonym_vector;
   // TODO: Change internal pql API input to be a vector instead of a list to avoid this.
-  for (std::string const &value : synonym_list) {
+  for (std::string const& value: synonym_list) {
     synonym_vector.push_back(value);
   }
   um[target_synonym] = synonym_vector;
@@ -36,7 +32,7 @@ bool QueryEvaluatorTable::DeleteRow(int index) {
   if (um[target_synonym].size() - 1 < index) {
     return false;
   }
-  for ( auto iter = um.begin(); iter != um.end(); ++iter ) {
+  for (auto iter = um.begin(); iter != um.end(); ++iter) {
     std::vector<std::string> current_column = iter->second;
     unsigned long size = current_column.size();
     if (index < size) {
@@ -82,7 +78,10 @@ bool QueryEvaluatorTable::AddRowForAllColumn(std::string synonym, int index, std
  * @return false if there is an error with adding values into the table or if the synonym column does not exist.
  * True otherwise.
  */
-bool QueryEvaluatorTable::AddMultipleRowForAllColumn(std::string synonym, int index, std::string value, int repeat_count) {
+bool QueryEvaluatorTable::AddMultipleRowForAllColumn(std::string synonym,
+                                                     int index,
+                                                     std::string value,
+                                                     int repeat_count) {
   if (!ContainsColumn(synonym)) {
     return false;
   }
@@ -141,22 +140,21 @@ int QueryEvaluatorTable::GetRowSize() {
   return search->second.size();
 }
 
-std::string QueryEvaluatorTable::GetStatementSynonym(std::unordered_map<std::string, DesignEntity> synonym_design_entity_map) {
+std::string QueryEvaluatorTable::GetStatementSynonym(std::unordered_map<std::string,
+                                                                        DesignEntity> synonym_design_entity_map) {
   bool is_statement = false;
   for (auto tableIterator = um.begin(); tableIterator != um.end(); tableIterator++) {
     DesignEntity current_design_entity = synonym_design_entity_map[tableIterator->first];
-    switch(current_design_entity) {
+    switch (current_design_entity) {
       case DesignEntity::kStmt:
       case DesignEntity::kAssign:
       case DesignEntity::kCall:
       case DesignEntity::kPrint:
       case DesignEntity::kRead:
       case DesignEntity::kIf:
-      case DesignEntity::kWhile:
-        is_statement = true;
+      case DesignEntity::kWhile:is_statement = true;
         break;
-      default:
-        break;
+      default:break;
     }
     if (is_statement) {
       return tableIterator->first;

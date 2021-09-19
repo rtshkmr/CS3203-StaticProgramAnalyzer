@@ -29,6 +29,10 @@ class SyntaxValidator {
   static bool IsRelExpr(const std::vector<Token>& statement_tokens, int left_boundary_idx, int right_boundary_idx);
   static bool IsCondExpr(const std::vector<Token>& statement_tokens, int left_boundary_idx, int right_boundary_idx);
   static bool StatementPassesCommonBlacklistRules(const std::vector<Token>& statement_tokens);
+  static int FindSplitPoint(const std::vector<Token>& statement_tokens,
+                            int left_boundary_idx,
+                            int right_boundary_idx,
+                            const std::regex& desired_pattern);
 };
 
 #endif //AUTOTESTER_TEAM00_CODE00_SRC_SPA_SRC_COMPONENT_SOURCEPROCESSOR_SYNTAXVALIDATOR_H_
