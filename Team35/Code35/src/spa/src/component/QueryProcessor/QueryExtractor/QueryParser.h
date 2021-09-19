@@ -8,6 +8,10 @@
 #include "QueryTokenizer.h"
 #include <component/QueryProcessor/types/Types.h>
 
+/**
+ * QueryParser parses the query input from start to end into tokens, by calling QueryTokenizer.
+ * Parsing is based on recursive-descent parsing that reflects the grammar rules of PQL.
+ */
 class QueryParser {
   private:
     std::unordered_set<std::string> synonyms_name_set;
@@ -18,11 +22,9 @@ class QueryParser {
 
     Token lookahead = Token("", TokenTag::kInvalid);
     QueryTokenizer tokenizer;
+    Token Eat(TokenTag tokenType);
 
-    Token eat(TokenTag tokenType);
-    // helpers for recursive descent parsing
     void ParseQuery();
-    void GroupClauses();
     void ParseDeclarations();
     std::tuple<std::string, bool, bool> ParseStmtRef();
     std::pair<Clause*, bool> ParseRelRef();
@@ -31,12 +33,15 @@ class QueryParser {
     std::pair<std::string, bool> ParseExpressionSpec();
     void ParseSuchThat();
     void ParsePattern();
-    bool IsValidSynonym(Token token);
-    bool IsValidSynonym(Token token, DesignEntity de);
     void ParseSelect();
+
     void GetTarget();
     void GetDeclaration();
     std::vector<Token> GetSynonyms();
+
+    bool IsValidSynonym(Token token);
+    bool IsValidSynonym(Token token, DesignEntity de);
+    void GroupClauses();
   public:
     QueryParser(std::vector<Clause*>& clauses, std::list<Group*>& groups, std::list<Synonym>& synonyms,
                 Synonym& target, QueryTokenizer tokenizer) :
