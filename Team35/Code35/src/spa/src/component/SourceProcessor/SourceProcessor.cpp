@@ -36,6 +36,10 @@ PKB* SourceProcessor::ProcessSourceFile(std::string file_name) {
     std::cerr << s.what() << std::endl;
     L("[EXIT] SOURCE PROC");
     Terminate(std::string("Unfortunately, the Source input had something that isn't supported for SPA Iteration 1"));
+  } catch (std::exception e) {
+    std::cerr << "Exception error\n";
+    std::cerr << e.what() << std::endl;
+    Terminate(std::string("Unfortunately, there was some exception thrown."));
   }
 
   Deliverable* deliverable = parser.GetDeliverables();
