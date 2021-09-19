@@ -198,7 +198,8 @@ bool SyntaxValidator::IsTerm(const vector<Token>& statement_tokens, int left_bou
   TokenTag first_token_tag = statement_tokens.at(left_boundary_idx).GetTokenTag();
   TokenTag last_token_tag = statement_tokens.at(right_boundary_idx).GetTokenTag();
   if (first_token_tag == TokenTag::kOpenBracket && last_token_tag == TokenTag::kCloseBracket) {
-    return IsTerm(statement_tokens, left_boundary_idx + 1, right_boundary_idx - 1);
+//    return IsTerm(statement_tokens, left_boundary_idx + 1, right_boundary_idx - 1);
+    return IsFactor(statement_tokens, left_boundary_idx, right_boundary_idx);
   }
   /// case 1: whole range makes up a factor:
   if (IsFactor(statement_tokens, left_boundary_idx, right_boundary_idx)) {
@@ -241,6 +242,16 @@ bool SyntaxValidator::IsExpr(const vector<Token>& statement_tokens, int left_bou
 
   const Token& first_token = statement_tokens.at(left_boundary_idx);
   const Token& last_token = statement_tokens.at(right_boundary_idx);
+  // check that first and last tokens are not operators
+  bool first_token_is_expr_delim =
+      std::regex_match(first_token.GetTokenString(), RegexPatterns::GetExprDelimiterPattern());
+  bool last_token_is_expr_delim =
+      std::regex_match(last_token.GetTokenString(), RegexPatterns::GetExprDelimiterPattern());
+  if (first_token_is_expr_delim || last_token_is_expr_delim) {
+    return false;
+  }
+
+
 
   // if it's a set of extra brackets:
   if (first_token.GetTokenTag() == TokenTag::kOpenBracket && last_token.GetTokenTag() == TokenTag::kCloseBracket) {
@@ -253,8 +264,13 @@ bool SyntaxValidator::IsExpr(const vector<Token>& statement_tokens, int left_bou
     return true;
   }
 
+
+  // no extra brackets and is not a term, check for
+
+
+
   std::stack<Token> bracket_stack;
-  int middle_ptr =  -1;
+  int middle_ptr = -1;
   /// case 2: <expr><delim><term>
   // sweep from right and check with stack
   for (int right_ptr = right_boundary_idx; right_ptr >= left_boundary_idx; right_ptr--) {
@@ -263,7 +279,11 @@ bool SyntaxValidator::IsExpr(const vector<Token>& statement_tokens, int left_bou
     if (current_tag == TokenTag::kCloseBracket) {
       bracket_stack.push(current_token);
     } else if (current_tag == TokenTag::kOpenBracket) {
-      bracket_stack.pop();
+      if (bracket_stack.empty()) {
+        return false;
+      } else {
+        bracket_stack.pop();
+      }
     } else if (current_token.GetTokenString() == "+"
         || current_token.GetTokenString() == "-") {
       bool can_recurse = bracket_stack.empty();
@@ -280,8 +300,10 @@ bool SyntaxValidator::IsExpr(const vector<Token>& statement_tokens, int left_bou
    * Reason being that if there were no desired delims (+ or -) it would be a term
    * and if it wasn't a term then there would have been extra brackets
    */
-  bool assertion_passed = middle_ptr > left_boundary_idx;
-  assert(middle_ptr > left_boundary_idx);
+  if (middle_ptr <= left_boundary_idx) {
+    return false;
+    throw std::invalid_argument("help me");
+  }
   bool left_is_expr = IsExpr(statement_tokens, left_boundary_idx, middle_ptr - 1);
   bool right_is_term = IsTerm(statement_tokens, middle_ptr + 1, right_boundary_idx);
   return left_is_expr && right_is_term;
@@ -356,6 +378,7 @@ bool SyntaxValidator::IsRelFactor(const vector<Token>& statement_tokens,
                                   int right_boundary_idx) {
   TokenTag first_token_tag = statement_tokens.at(left_boundary_idx).GetTokenTag();
   TokenTag last_token_tag = statement_tokens.at(right_boundary_idx).GetTokenTag();
+  // todo: try do let IsExpr handle the strpping and don't do any stripping here, just recurse into IsExpr regardless
   if (first_token_tag == TokenTag::kOpenBracket && last_token_tag == TokenTag::kCloseBracket) {
     return IsRelFactor(statement_tokens, left_boundary_idx + 1, right_boundary_idx - 1);
   }
@@ -365,74 +388,219 @@ bool SyntaxValidator::IsRelFactor(const vector<Token>& statement_tokens,
   bool is_expr = IsExpr(statement_tokens, left_boundary_idx, right_boundary_idx);  // not sure if redundant OR clause
   return is_factor || is_expr;
 }
-
 bool SyntaxValidator::IsRelExpr(const vector<Token>& statement_tokens, int left_boundary_idx, int right_boundary_idx) {
-  TokenTag first_token_tag = statement_tokens.at(left_boundary_idx).GetTokenTag();
-  TokenTag last_token_tag = statement_tokens.at(right_boundary_idx).GetTokenTag();
-  /// case 0: redundant brackets
-  if (first_token_tag == TokenTag::kOpenBracket && last_token_tag == TokenTag::kCloseBracket) {
-    return IsRelExpr(statement_tokens, left_boundary_idx + 1, right_boundary_idx - 1);
+  const Token& first_token = statement_tokens.at(left_boundary_idx);
+  const Token& last_token = statement_tokens.at(right_boundary_idx);
+  // check that first and last tokens are not operators
+  // !(....) ==> still okay
+  // &&(...) ==> fail
+  bool first_token_is_binary_comp_delim =
+      std::regex_match(first_token.GetTokenString(), RegexPatterns::GetBinaryComparisonPattern());
+  bool last_token_is_binary_comp_delim =
+      std::regex_match(last_token.GetTokenString(), RegexPatterns::GetBinaryComparisonPattern());
+  // because ! at the end is undesirable
+  if (first_token_is_binary_comp_delim || last_token_is_binary_comp_delim) {
+    return false;
   }
 
-  /// case 1: <rel_expr> < binary comparison operator> < rel expr>
-  int delim_idx = Token::GetLastMatchingTokenIdx(statement_tokens,
-                                                 RegexPatterns::GetBinaryComparisonPattern(),
-                                                 left_boundary_idx,
-                                                 right_boundary_idx);
-  bool delim_idx_in_range = left_boundary_idx <= delim_idx && right_boundary_idx >= delim_idx;
-  if (delim_idx_in_range) {
-    // todo: can deprecate this by adding to if predicate
-    if (delim_idx == left_boundary_idx || delim_idx == right_boundary_idx) {
-      // if first or last token is a delim (prevents out of range access in recursive calls)
-      return false;
+  int bracket_stack_indicator = 0;
+  int middle_ptr = left_boundary_idx; // set invalid first
+  for (; middle_ptr <= right_boundary_idx; middle_ptr++) {
+    const Token& current_token = statement_tokens.at(middle_ptr);
+    string current_token_string = current_token.GetTokenString();
+    TokenTag current_tag = current_token.GetTokenTag();
+    // case 1: it's openbracket
+    if (current_tag == TokenTag::kOpenBracket) {
+      bracket_stack_indicator++;
+    } else if (current_tag == TokenTag::kCloseBracket) {
+      if (bracket_stack_indicator == 0) {
+        return false;
+      } else {
+        bracket_stack_indicator--;
+      }
+    } else if (std::regex_match(current_token_string,
+                                RegexPatterns::GetBinaryComparisonPattern())) { // encountered delim
+      if (bracket_stack_indicator == 0) {
+        break;
+      }
     }
-    bool right_part_is_rel_factor = IsRelFactor(statement_tokens, delim_idx + 1, right_boundary_idx);
-    if (!right_part_is_rel_factor) {
-      return false;
-    }
-    bool left_part_is_rel_factor = IsRelFactor(statement_tokens, left_boundary_idx, delim_idx - 1);
-    return left_part_is_rel_factor;
   }
-  return false;
+
+  if (middle_ptr >= right_boundary_idx) { // iterate thru, nothing hits
+    return false; // cfm got operator
+  } else {
+    bool left_is_rel_factor = IsRelFactor(statement_tokens, left_boundary_idx, middle_ptr - 1);
+    bool right_is_rel_factor = IsRelFactor(statement_tokens, middle_ptr + 1, right_boundary_idx);
+    return left_is_rel_factor && right_is_rel_factor;
+  }
+
 }
+//bool SyntaxValidator::IsRelExpr(const vector<Token>& statement_tokens, int left_boundary_idx, int right_boundary_idx) {
+//  TokenTag first_token_tag = statement_tokens.at(left_boundary_idx).GetTokenTag();
+//  TokenTag last_token_tag = statement_tokens.at(right_boundary_idx).GetTokenTag();
+//  /// case 0: redundant brackets
+//  if (first_token_tag == TokenTag::kOpenBracket && last_token_tag == TokenTag::kCloseBracket) {
+//    return IsRelExpr(statement_tokens, left_boundary_idx + 1, right_boundary_idx - 1);
+//  }
+//
+//  /// case 1: <rel_expr> < binary comparison operator> < rel expr>
+//  int delim_idx = Token::GetLastMatchingTokenIdx(statement_tokens,
+//                                                 RegexPatterns::GetBinaryComparisonPattern(),
+//                                                 left_boundary_idx,
+//                                                 right_boundary_idx);
+//  bool delim_idx_in_range = left_boundary_idx <= delim_idx && right_boundary_idx >= delim_idx;
+//  if (delim_idx_in_range) {
+//    // todo: can deprecate this by adding to if predicate
+//    if (delim_idx == left_boundary_idx || delim_idx == right_boundary_idx) {
+//      // if first or last token is a delim (prevents out of range access in recursive calls)
+//      return false;
+//    }
+//    bool right_part_is_rel_factor = IsRelFactor(statement_tokens, delim_idx + 1, right_boundary_idx);
+//    if (!right_part_is_rel_factor) {
+//      return false;
+//    }
+//    bool left_part_is_rel_factor = IsRelFactor(statement_tokens, left_boundary_idx, delim_idx - 1);
+//    return left_part_is_rel_factor;
+//  }
+//  return false;
+//}
 bool SyntaxValidator::IsCondExpr(const vector<Token>& statement_tokens, int left_boundary_idx, int right_boundary_idx) {
   // [TODO iter 2]: not sure how to handle redundant bracket for cond expr because will wrongly remove outer brackets for
   //               (cond_expr) <bool> (cond_expr) because removing the outer ones
   //               will give unequal bracketing
 
-  /// case 1 it's a relative expr:
-  if (IsRelExpr(statement_tokens, left_boundary_idx, right_boundary_idx)) {
-    return true;
-  }
   const Token& first_token = statement_tokens.at(left_boundary_idx);
-  const Token& second_token = statement_tokens.at(left_boundary_idx + 1);
-  // case 2: unary "not" operator, note that needs to be surrounded with an open bracket:
-  bool first_token_is_unary_operator = std::regex_match(first_token.GetTokenString(),
-                                                        RegexPatterns::GetUnaryBooleanOperatorPattern());
-  if (first_token_is_unary_operator && second_token.GetTokenTag() == TokenTag::kOpenBracket) {
-    return IsCondExpr(statement_tokens, left_boundary_idx + 1, right_boundary_idx); // keep the Open Bracket
+  const Token& last_token = statement_tokens.at(right_boundary_idx);
+  // check that first and last tokens are not operators
+  // !(....) ==> still okay
+  // &&(...) ==> fail
+  bool first_token_is_binary_bool_delim =
+      std::regex_match(first_token.GetTokenString(), RegexPatterns::GetBinaryBooleanOperatorPattern());
+  bool last_token_is_bool_delim =
+      std::regex_match(last_token.GetTokenString(), RegexPatterns::GetBooleanOperatorPattern());
+  // because ! at the end is undesirable
+  if (first_token_is_binary_bool_delim || last_token_is_bool_delim) {
+    return false;
   }
-  /// case 3: it's (<cond_expr>) <binary bool operator> (<cond_expr>)
-  int delim_idx = Token::GetLastMatchingTokenIdx(statement_tokens,
-                                                 RegexPatterns::GetBinaryBooleanOperatorPattern(),
-                                                 left_boundary_idx,
-                                                 right_boundary_idx);
-  bool delim_idx_in_range = left_boundary_idx <= delim_idx && right_boundary_idx >= delim_idx;
-  if (delim_idx_in_range) {
-    // todo: can deprecate this by adding to if predicate
-    if (delim_idx == left_boundary_idx || delim_idx == right_boundary_idx) {
-      // if first or last token is a delim (prevents out of range access in recursive calls)
-      return false;
+
+//// if it's a set of extra brackets return false. (!(...))
+//  if (first_token.GetTokenTag() == TokenTag::kOpenBracket && last_token.GetTokenTag() == TokenTag::kCloseBracket) {
+//    return false;
+////    return IsExpr(statement_tokens, left_boundary_idx + 1, right_boundary_idx - 1);
+//  }
+
+  // case 1: NOT
+  // !(x > 1)
+  // bool is_not_expr == start with !, then open bracket then last is close
+  bool is_negated_expr = first_token.GetTokenString() == "!"
+      && statement_tokens.at(left_boundary_idx + 1).GetTokenTag() == TokenTag::kOpenBracket
+      && statement_tokens.at(right_boundary_idx).GetTokenTag() == TokenTag::kCloseBracket;
+  if (is_negated_expr) {
+    return IsCondExpr(statement_tokens, left_boundary_idx + 2, right_boundary_idx - 1);
+  } else { // it's a binary boolean operation
+    int bracket_stack_indicator = 0;
+    int middle_ptr = left_boundary_idx; // set invalid first
+    for (; middle_ptr <= right_boundary_idx; middle_ptr++) {
+      const Token& current_token = statement_tokens.at(middle_ptr);
+      string current_token_string = current_token.GetTokenString();
+      TokenTag current_tag = current_token.GetTokenTag();
+      // case 1: it's openbracket
+      if (current_tag == TokenTag::kOpenBracket) {
+        bracket_stack_indicator++;
+      } else if (current_tag == TokenTag::kCloseBracket) {
+        if (bracket_stack_indicator == 0) {
+          return false;
+        } else {
+          bracket_stack_indicator--;
+        }
+      } else if (std::regex_match(current_token_string,
+                                  RegexPatterns::GetBinaryBooleanOperatorPattern())) { // encountered && or ||
+        if (bracket_stack_indicator == 0) {
+          break;
+        }
+      }
     }
-    bool right_part_is_cond_expr = IsCondExpr(statement_tokens, delim_idx + 1, right_boundary_idx);
-    if (!right_part_is_cond_expr) {
-      return false;
+    if (middle_ptr >= right_boundary_idx) { // iterate thru, nothing hits
+      return IsRelExpr(statement_tokens, left_boundary_idx, right_boundary_idx);
+      // rel expr
+    } else {
+      bool left_is_cond_expr = IsCondExpr(statement_tokens, left_boundary_idx + 1, middle_ptr - 2);
+      bool right_is_cond_expr = IsCondExpr(statement_tokens, middle_ptr + 2, right_boundary_idx - 1);
+      return left_is_cond_expr && right_is_cond_expr;
     }
-    bool left_part_is_cond_expr = IsCondExpr(statement_tokens, left_boundary_idx, delim_idx - 1);
-    return left_part_is_cond_expr;
+
   }
-  return false;
+
+
+  // (xxxx && xxx)
+
+  // sweep from left,
+
+
+  // if last token is NOT closed bracket, check if IsRelExpr
+
+  // case 2:
+
+
+
+
+
+
+  //  case 1: unary boolean operator:
+  // guarantee: it contains a cond expr delimiter
+  if (first_token.GetTokenString() == "!") {
+
+  } else { //  it's either && or ||
+
+
+  }
+
+
+  //case 1: simplest cse: rel_expr
+
+
+
 }
+
+//bool SyntaxValidator::IsCondExpr(const vector<Token>& statement_tokens, int left_boundary_idx, int right_boundary_idx) {
+//  // [TODO iter 2]: not sure how to handle redundant bracket for cond expr because will wrongly remove outer brackets for
+//  //               (cond_expr) <bool> (cond_expr) because removing the outer ones
+//  //               will give unequal bracketing
+//
+//  /// case 1 it's a relative expr:
+//  if (IsRelExpr(statement_tokens, left_boundary_idx, right_boundary_idx)) {
+//    return true;
+//  }
+//  const Token& first_token = statement_tokens.at(left_boundary_idx);
+//  const Token& second_token = statement_tokens.at(left_boundary_idx + 1);
+//  // case 2: unary "not" operator, note that needs to be surrounded with an open bracket:
+//  bool first_token_is_unary_operator = std::regex_match(first_token.GetTokenString(),
+//                                                        RegexPatterns::GetUnaryBooleanOperatorPattern());
+//  if (first_token_is_unary_operator && second_token.GetTokenTag() == TokenTag::kOpenBracket) {
+//    return IsCondExpr(statement_tokens, left_boundary_idx + 1, right_boundary_idx); // keep the Open Bracket
+//  }
+//  /// case 3: it's (<cond_expr>) <binary bool operator> (<cond_expr>)
+//  int delim_idx = Token::GetLastMatchingTokenIdx(statement_tokens,
+//                                                 RegexPatterns::GetBinaryBooleanOperatorPattern(),
+//                                                 left_boundary_idx,
+//                                                 right_boundary_idx);
+//  bool delim_idx_in_range = left_boundary_idx <= delim_idx && right_boundary_idx >= delim_idx;
+//  if (delim_idx_in_range) {
+//    // todo: can deprecate this by adding to if predicate
+//    if (delim_idx == left_boundary_idx || delim_idx == right_boundary_idx) {
+//      // if first or last token is a delim (prevents out of range access in recursive calls)
+//      return false;
+//    }
+//    bool right_part_is_cond_expr = IsCondExpr(statement_tokens, delim_idx + 1, right_boundary_idx);
+//    if (!right_part_is_cond_expr) {
+//      return false;
+//    }
+//    bool left_part_is_cond_expr = IsCondExpr(statement_tokens, left_boundary_idx, delim_idx - 1);
+//    return left_part_is_cond_expr;
+//  }
+//  return false;
+//}
+
 
 /**
  * This runs the statement against a blacklist rule: \n
@@ -454,11 +622,35 @@ bool SyntaxValidator::StatementPassesCommonBlacklistRules(const vector<Token>& s
   bool valid_last_token
       = std::regex_match(last_token.GetTokenString(), RegexPatterns::GetValidStatementTerminalToken());
   // for container statements (if and while statements)
-  int num_open_brackets = Token::CountTokens(statement_tokens, TokenTag::kOpenBracket);
-  int num_close_brackets = Token::CountTokens(statement_tokens, TokenTag::kCloseBracket);
-  bool brackets_are_balanced = num_close_brackets == num_open_brackets;
+  // ========================== refactor to a separate fn where i do a stack based counting for bracket (either left or right sweep)
+  // 1. for loop ===> if token.GetTokenTag()== open or close brace do smth with stack
+
+  //  2.
+  if (!valid_last_token) {
+    return false;
+  }
+  bool brackets_are_balanced = true;
+  int stack_indicator = 0;
+  for (int i = 0; i < statement_tokens.size(); i++) {
+    Token current_token = statement_tokens.at(i);
+    TokenTag current_tag = current_token.GetTokenTag();
+    if (current_tag == TokenTag::kOpenBracket) {
+      stack_indicator++;
+    } else if (current_tag == TokenTag::kCloseBracket) {
+      stack_indicator--;
+      if (stack_indicator < 0) {
+        brackets_are_balanced = false;
+      }
+    }
+  }
+  if (stack_indicator != 0) {
+    brackets_are_balanced = false;
+  }
+  if (!brackets_are_balanced) {
+    return false;
+  }
   bool name_tokens_are_delimited = VerifyNameTokensAreDelimited(statement_tokens);
-  return valid_last_token && brackets_are_balanced && name_tokens_are_delimited;
+  return name_tokens_are_delimited;
 }
 // verify that if there's more than one name token, they aren't side by side without any delimiter b/w them
 bool SyntaxValidator::VerifyNameTokensAreDelimited(const vector<Token>& statement_tokens) {
