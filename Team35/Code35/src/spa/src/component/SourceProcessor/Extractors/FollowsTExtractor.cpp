@@ -12,7 +12,7 @@
  *      // this starts a new thread of extracting
  *    // continue
  *    if stmt found in follows hash
- *      recurse(following stmt) and get followsT of following stmt
+ *      recurse(following stmt) and Get followsT of following stmt
  *      add the following stmt and followsT to followsT hash of stmt
  *    else base case: no following statement
  *      return empty list

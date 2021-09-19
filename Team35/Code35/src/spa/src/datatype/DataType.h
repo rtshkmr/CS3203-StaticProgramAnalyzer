@@ -98,7 +98,7 @@ class ConstantValue {
  public:
   ConstantValue(const std::string& constant);
 
-  int get();
+  int Get();
 
   bool operator<(const ConstantValue& other) const;
 

@@ -159,8 +159,8 @@ TEST_CASE("5. Miscellaneous entity and relationship retrievals") {
 //            "assign a; Select v such that Uses(a, _)", // QueryProcessor should be able to handle underscore wildcard
 
 //            The following are not in the scope of iter 1.
-//            "read r; print p; assign a; Select p such that Follows(r, p) such that Follows(p, a)", // should get "2", get "" instead
-//            "read r; print p; assign a; Select p such that Follows(p, r) such that Follows(p, a)", // should get "", get "2 instead
+//            "read r; print p; assign a; Select p such that Follows(r, p) such that Follows(p, a)", // should get "2", Get "" instead
+//            "read r; print p; assign a; Select p such that Follows(p, r) such that Follows(p, a)", // should get "", Get "2 instead
   };
 
   std::vector<std::list<std::string>> answer_list = {

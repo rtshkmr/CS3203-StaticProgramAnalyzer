@@ -108,7 +108,7 @@ void PSubsystem::ProcessStatement(std::string statement) {
 
     //evaluate what type of stmt it is:
     //if, else, while, assign, call, print, read
-    //TODO: convert multiple-if to get type from EntityFactory
+    //TODO: convert multiple-if to Get type from EntityFactory
     if (IfEntity* if_entity = dynamic_cast<IfEntity*>(stmt)) {
       HandleIfStmt(if_entity);
     } else if (ElseEntity* else_entity = dynamic_cast<ElseEntity*>(stmt)) {

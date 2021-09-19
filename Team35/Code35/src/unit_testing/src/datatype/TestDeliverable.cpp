@@ -220,7 +220,7 @@ TEST_CASE("1.Deliverable.Add relationships") {
     std::list<Variable*> expected_var1_list = {var_x_, var_z_, var_y_};
     REQUIRE(* actual_var1_list == expected_var1_list);
 
-    // Check duplicate does not get added in
+    // Check duplicate does not Get added in
     deliverable.AddUsesRelationship(cont_if_1, var_z_);  // (Container, Variable)
     std::list<Variable*> add_dup_var_list = {var_x_, var_y_, var_z_};
     deliverable.AddUsesRelationship(cont_if_1, & add_dup_var_list); // (Container, list of Variables)
@@ -311,7 +311,7 @@ TEST_CASE("1.Deliverable.Add relationships") {
     REQUIRE(actual_var1_list->size() == 3);
     REQUIRE(* actual_var1_list == expected_var1_list);
 
-    // Check duplicate does not get added in
+    // Check duplicate does not Get added in
     deliverable.AddModifiesRelationship(cont_if_1, var_z_);  // (Container, Variable)
     std::list<Variable*> add_dup_var_list = {var_x_, var_y_, var_z_};
     deliverable.AddModifiesRelationship(cont_if_1, & add_dup_var_list); // (Container, list of Variables)

@@ -207,7 +207,7 @@ ConstantValue::ConstantValue(const std::string& constant) {
  * Gets the constant value.
  * @return [Not Null] The constant value
  */
-int ConstantValue::get() {
+int ConstantValue::Get() {
   return value_;
 }
 
@@ -422,7 +422,7 @@ auto Token::GetTokenMatchReverseIterator(const std::vector<Token>& tokens,
                                          const std::regex& desired_pattern,
                                          int left_boundary_idx,
                                          int right_boundary_idx) {
-  // from the given actual indices, get respective reverse iterators for the range
+  // from the given actual indices, Get respective reverse iterators for the range
   auto rBeginning = tokens.crbegin() + ((tokens.size() - 1) - right_boundary_idx);
   auto rEnding = tokens.crend() - left_boundary_idx;
   // nb: find_if checks within a half-open range but we want inclusive behaviour:
@@ -439,7 +439,7 @@ auto Token::GetTokenMatchReverseIterator(const std::vector<Token>& tokens,
                                          TokenTag target_token_tag,
                                          int left_boundary_idx,
                                          int right_boundary_idx) {
-  // from the given actual indices, get respective reverse iterators for the range
+  // from the given actual indices, Get respective reverse iterators for the range
   auto rBeginning = tokens.crbegin() + ((tokens.size() - 1) - right_boundary_idx);
   auto rEnding = tokens.crend() - left_boundary_idx;
   // nb: find_if checks within a half-open range but we want inclusive behaviour:

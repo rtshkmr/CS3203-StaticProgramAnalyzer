@@ -426,7 +426,7 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetModifiedBy(std::string 
 }
 
 /**
- * From an assign statement, get its AssignEntity object
+ * From an assign statement, Get its AssignEntity object
  * @param stmt_ref is a string representing the statement number (e.g. "1", "2", "3", ...)
  * @return vector containing one AssignEntity object
  */
@@ -435,7 +435,7 @@ std::vector<AssignEntity> PKB::GetPatternByAssign(std::string stmt_ref) {
 }
 
 /**
- * From a variable name, get all AssignEntity object with the variable on the LHS
+ * From a variable name, Get all AssignEntity object with the variable on the LHS
  * @param var_name is a string representing the variable name (e.g. "give", "me", "A", ...)
  * @return vector containing the AssignEntity objects associated with var_name
  */
@@ -479,7 +479,7 @@ void PKB::PopulateVarList(const std::list<Variable*>& var_list) {
 void PKB::PopulateConstList(const std::list<ConstantValue*>& const_list) {
   const_table_ = std::list<std::string>();
   for (auto const& i: const_list) {
-    int const_value = i->get();
+    int const_value = i->Get();
     const_table_.push_back(std::to_string(const_value));
     type_map_[std::to_string(const_value)] = DesignEntity::kConstant;
   }

@@ -8,10 +8,10 @@
  * for each proc in proc list
  *  for each stmt in stmt list
  *    recurse helper(stmt):
- *      get children list
+ *      Get children list
  *      base case: no children list, return empty list
  *      for each child
- *        recurse(child) and get childrenT list
+ *        recurse(child) and Get childrenT list
  *        add this child and its childrenT list to parentT
  *      return all childrenT of this stmt
  */
