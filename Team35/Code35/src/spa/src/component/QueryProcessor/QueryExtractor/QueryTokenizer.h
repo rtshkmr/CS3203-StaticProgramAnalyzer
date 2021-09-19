@@ -7,6 +7,9 @@
 #include <component/QueryProcessor/types/Types.h>
 #include <datatype/DataType.h>
 
+/**
+ * QueryTokenizer is the component that tokenizes the input pql query.
+ */
 class QueryTokenizer {
   private:
     std::string query;
