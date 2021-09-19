@@ -52,7 +52,7 @@ PKB* SourceProcessor::ProcessSourceFile(std::string file_name) {
  * Terminates Parser execution and logger, and exits program.
  */
 void SourceProcessor::Terminate() {
-  L("[EXIT] TERMINATING PROGRAM");
+  L("[ERROR] TERMINATING PROGRAM");
   LoggerTerminate();
   std::exit(EXIT_FAILURE);
 }
