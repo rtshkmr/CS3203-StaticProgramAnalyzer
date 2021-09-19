@@ -27,9 +27,9 @@ class QueryEvaluator {
 
     void PopulateSynonymValues(QueryEvaluatorTable* table);
     void EvaluateAllGroups(QueryEvaluatorTable* table);
-    std::vector<std::string> GetResult(QueryEvaluatorTable* table);
+    std::vector<std::string> GetResult(QueryEvaluatorTable* table) const;
     void PreprocessBooleanGroup(std::vector<Clause*> clauseList);
-    void ProcessGroup(std::vector<Clause*> clauseList, QueryEvaluatorTable* table);
+    void ProcessGroup(const std::vector<Clause*>& clauseList, QueryEvaluatorTable* table);
 };
 
 #endif //INC_21S1_CP_SPA_TEAM_35_QUERYEVALUATOR_H

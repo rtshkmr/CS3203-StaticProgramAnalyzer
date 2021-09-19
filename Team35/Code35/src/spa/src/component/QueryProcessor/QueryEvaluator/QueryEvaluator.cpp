@@ -1,8 +1,18 @@
 #include <util/Logger.h>
+
+#include <utility>
 #include "QueryEvaluator.h"
 
+/**
+ * Processes the group list containing the information of the query. This method will then make the relevant calls to
+ * various methods to further process each group of queries.
+ * @param syn_list The list of synonyms declared in the query declaration.
+ * @param target The target synonym of the Select clause.
+ * @param groups The list of groups extracted from the query provided.
+ * @param pkb The populated PKB database.
+ */
 QueryEvaluator::QueryEvaluator(std::list<Synonym> syn_list, Synonym target, std::list<Group*> groups, PKB pkb)
-: synonym_list{syn_list}, target_synonym{target}, group_list{groups}, pkb{pkb}, boolean_result{true},
+: synonym_list{std::move(syn_list)}, target_synonym{std::move(target)}, group_list{std::move(groups)}, pkb{std::move(pkb)}, boolean_result{true},
   map_of_synonym_values{}, synonym_design_entity_map() {}
 
 std::vector<std::string> QueryEvaluator::EvaluateQuery() {
@@ -23,25 +33,29 @@ std::vector<std::string> QueryEvaluator::EvaluateQuery() {
  */
 void QueryEvaluator::PopulateSynonymValues(QueryEvaluatorTable* table) {
     // Query all the design entities and add them to an unordered_map.
-    for (auto iter = synonym_list.begin(); iter != synonym_list.end(); iter++) {
-        DesignEntity synonym_design_entity = iter->GetType();
-        std::string synonym_name = iter->GetName();
+    for (auto iter : synonym_list) {
+        DesignEntity synonym_design_entity = iter.GetType();
+        std::string synonym_name = iter.GetName();
         synonym_design_entity_map[synonym_name] = synonym_design_entity;
         std::list<std::string> list_of_synonym_values = pkb.GetDesignEntity(synonym_design_entity);
         map_of_synonym_values[synonym_name] = list_of_synonym_values;
 
-        if (iter->GetName() == target_synonym.GetName()) {
+        if (iter.GetName() == target_synonym.GetName()) {
             table->AddTargetSynonym(list_of_synonym_values);
         }
     }
 }
 
+/**
+ * For each group, they may be boolean or not; each group will be processed according to whether they are boolean or not.
+ * @param table The current table in question for the boolean or non-boolean group.
+ */
 void QueryEvaluator::EvaluateAllGroups(QueryEvaluatorTable* table) {
     // For each group, evaluate the group with target synonym first if applicable
-    for (auto iter = group_list.begin(); iter != group_list.end(); iter++) {
-        std::vector<Clause*> clause_list = (*iter)->GetClauses();
+    for (auto iter : group_list) {
+        std::vector<Clause*> clause_list = (*iter).GetClauses();
 
-        if ((*iter)->ContainsTargetSynonym()) {
+        if ((*iter).ContainsTargetSynonym()) {
         // This Group contains the target synonym
           ProcessGroup(clause_list, table);
         } else {
@@ -52,7 +66,7 @@ void QueryEvaluator::EvaluateAllGroups(QueryEvaluatorTable* table) {
     }
 }
 
-std::vector<std::string> QueryEvaluator::GetResult(QueryEvaluatorTable* table) {
+std::vector<std::string> QueryEvaluator::GetResult(QueryEvaluatorTable* table) const {
   if (!boolean_result) {
     std::vector<std::string> empty_list = {};
     return empty_list;
@@ -61,18 +75,17 @@ std::vector<std::string> QueryEvaluator::GetResult(QueryEvaluatorTable* table) {
   }
 }
 
-void QueryEvaluator::ProcessGroup(std::vector<Clause*> clause_list, QueryEvaluatorTable* table) {
+void QueryEvaluator::ProcessGroup(const std::vector<Clause*>& clause_list, QueryEvaluatorTable* table) {
 
-    for (auto iter = clause_list.begin(); iter != clause_list.end(); iter++) {
-        Clause* currentClause = *iter;
+    for (Clause* current_clause : clause_list) {
 
-        if (typeid(*currentClause) == typeid(SuchThat)) {
+        if (typeid(*current_clause) == typeid(SuchThat)) {
             // Evaluate such that clause here
-            SuchThat* st = dynamic_cast<SuchThat*>(currentClause);
+            auto* st = dynamic_cast<SuchThat*>(current_clause);
             EvaluateSuchThatClause(*st, table, pkb, synonym_list);
         } else {
             // Evaluate pattern clause here
-            Pattern* p = dynamic_cast<Pattern*>(currentClause);
+            auto* p = dynamic_cast<Pattern*>(current_clause);
             ProcessPatternClause(*p, table, pkb, synonym_design_entity_map);
         }
     }
@@ -80,9 +93,9 @@ void QueryEvaluator::ProcessGroup(std::vector<Clause*> clause_list, QueryEvaluat
 
 void QueryEvaluator::PreprocessBooleanGroup(std::vector<Clause*> clause_list) {
     Clause* firstClause = clause_list[0];
-    std::string synonym_name = "";
+    std::string synonym_name;
     if (typeid(*firstClause) == typeid(SuchThat)) {
-        SuchThat* st = dynamic_cast<SuchThat*>(firstClause);
+        auto* st = dynamic_cast<SuchThat*>(firstClause);
         if (st->left_is_synonym) {
             synonym_name = st->left_hand_side;
         } else if (st->right_is_synonym) {
@@ -90,22 +103,22 @@ void QueryEvaluator::PreprocessBooleanGroup(std::vector<Clause*> clause_list) {
         } else {
             // If no synonym, no need for a table. Also, should be in a group of size 1.
             bool result = EvaluateNoSynonym(*st, pkb);
-            if (result == false) {
+            if (!result) {
               boolean_result = false;        // Call to the class variable directly
             }
         }
     } else if (typeid(*firstClause) == typeid(Pattern)) {
-        Pattern* pattern = dynamic_cast<Pattern*>(firstClause);
+        auto* pattern = dynamic_cast<Pattern*>(firstClause);
         synonym_name = pattern->assign_synonym;
     } else {
         // No code should run here for iter 1 since there is only such that and pattern clause.
     }
 
-    if (synonym_name != "") {
+    if (!synonym_name.empty()) {
       QueryEvaluatorTable current_table(synonym_name);
       current_table.AddTargetSynonym(map_of_synonym_values[synonym_name]);
       ProcessGroup(clause_list, &current_table);
-      if (current_table.GetResults().size() == 0) {
+      if (current_table.GetResults().empty()) {
         boolean_result = false;
       }
     }

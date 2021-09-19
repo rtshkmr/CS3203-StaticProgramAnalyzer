@@ -13,15 +13,15 @@
 #include "component/PKB/PKB.h"
 #include "QueryPKB.h"
 
-void EvaluateSuchThatClause(SuchThat such_that_clause, QueryEvaluatorTable* table, PKB pkb,
-                            std::list<Synonym> synonym_list);
-void ProcessQueryGivenFirstSynonym(PKB pkb, SuchThat such_that_clause, QueryEvaluatorTable* table);
-void ProcessQueryGivenSecondSynonym(PKB pkb, SuchThat such_that_clause, QueryEvaluatorTable* table);
-void BothSynonymInTable(PKB pkb, SuchThat such_that_clause, QueryEvaluatorTable* table);
+void EvaluateSuchThatClause(const SuchThat& such_that_clause, QueryEvaluatorTable* table, const PKB& pkb,
+                            const std::list<Synonym>& synonym_list);
+void ProcessQueryGivenFirstSynonym(const PKB& pkb, const SuchThat& such_that_clause, QueryEvaluatorTable* table);
+void ProcessQueryGivenSecondSynonym(const PKB& pkb, const SuchThat& such_that_clause, QueryEvaluatorTable* table);
+void BothSynonymInTable(const PKB& pkb, const SuchThat& such_that_clause, QueryEvaluatorTable* table);
 void ProcessNewColumn(std::string target_synonym_name, Synonym new_synonym, QueryEvaluatorTable* table,
-                      RelRef relationship, bool givenFirstParam, PKB pkb);
+                      RelRef relationship, bool givenFirstParam, const PKB& pkb);
 bool SynonymTypeMatches(DesignEntity current_synonym, DesignEntity synonym_type_to_match);
-bool EvaluateNoSynonym(SuchThat st, PKB pkb);
-Synonym GetSynonymFromName(std::string synonym_name, std::list<Synonym> synonym_list);
+bool EvaluateNoSynonym(const SuchThat& st, const PKB& pkb);
+Synonym GetSynonymFromName(const std::string& synonym_name, const std::list<Synonym>& synonym_list);
 
 #endif //AUTOTESTER_EVALUATESUCHTHATCLAUSE_H
