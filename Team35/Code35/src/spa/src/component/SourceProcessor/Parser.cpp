@@ -33,7 +33,11 @@ void Parser::Parse(const std::string& file_name) {
         continue;
       }
 
-      if (byte == ' ' || byte == '\t' || byte == '\a' || byte == '\n' || byte == '\v' || byte == '\r' || byte == '\f') {
+      if (byte == '\t' || byte == '\a' || byte == '\n' || byte == '\v' || byte == '\r' || byte == '\f') {
+        byte = ' ';
+      }
+
+      if (byte == ' ') {
         if (chara.empty() || !chara.empty() && chara.back() == ' ') {
           continue;
         }
