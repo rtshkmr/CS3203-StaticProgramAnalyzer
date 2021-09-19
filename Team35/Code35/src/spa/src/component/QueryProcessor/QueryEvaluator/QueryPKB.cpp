@@ -7,13 +7,13 @@
 bool QueryPkbForRelationshipExistence(PKB database, RelRef r) {
   switch(r) {
     case RelRef::kFollows:
-      return database.hasFollows();
+      return database.HasFollows();
     case RelRef::kParent:
-      return database.hasParent();
+      return database.HasParent();
     case RelRef::kUsesS:
-      return database.hasUses();
+      return database.HasUses();
     case RelRef::kModifiesS:
-      return database.hasModifies();
+      return database.HasModifies();
     default:
       return false;
   }

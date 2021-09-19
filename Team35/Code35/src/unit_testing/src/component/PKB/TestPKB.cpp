@@ -141,35 +141,35 @@ TEST_CASE("2.PKB.PKB population and retrieval") {
     // Check if PKB can store and retrieve the existence of any relationship
     SECTION("Has Relationship") {
         SECTION("Follows") {
-            REQUIRE(pkb.hasFollows());
+            REQUIRE(pkb.HasFollows());
         }
 
         SECTION("Previous") {
-            REQUIRE(pkb.hasPrevious());
+            REQUIRE(pkb.HasPrevious());
         }
 
         SECTION("Parent") {
-            REQUIRE(!pkb.hasParent());
+            REQUIRE(!pkb.HasParent());
         }
 
         SECTION("Child") {
-            REQUIRE(!pkb.hasChild());
+            REQUIRE(!pkb.HasChild());
         }
 
         SECTION("Uses") {
-            REQUIRE(pkb.hasUses());
+            REQUIRE(pkb.HasUses());
         }
 
         SECTION("UsedBy") {
-            REQUIRE(pkb.hasUsedBy());
+            REQUIRE(pkb.HasUsedBy());
         }
 
         SECTION("Modifies") {
-            REQUIRE(pkb.hasModifies());
+            REQUIRE(pkb.HasModifies());
         }
 
         SECTION("ModifiedBy") {
-            REQUIRE(pkb.hasModifiedBy());
+            REQUIRE(pkb.HasModifiedBy());
         }
     }
 

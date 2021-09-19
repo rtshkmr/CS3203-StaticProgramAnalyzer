@@ -35,7 +35,7 @@ std::list<std::string> PKB::GetDesignEntity(DesignEntity de) {
  * @param
  * @return True if there is at least one follows relationship, otherwise False
  */
-bool PKB::hasFollows() {
+bool PKB::HasFollows() {
     return !follows_map_.empty();
 };
 
@@ -44,7 +44,7 @@ bool PKB::hasFollows() {
  * @param
  * @return True if there is at least one previous relationship, otherwise False
  */
-bool PKB::hasPrevious() {
+bool PKB::HasPrevious() {
     return !previous_map_.empty();
 }
 
@@ -53,7 +53,7 @@ bool PKB::hasPrevious() {
  * @param
  * @return True if there is at least one parent relationship, otherwise False
  */
-bool PKB::hasParent() {
+bool PKB::HasParent() {
     return !parent_map_.empty();
 }
 
@@ -62,7 +62,7 @@ bool PKB::hasParent() {
  * @param
  * @return True if there is at least one child relationship, otherwise False
  */
-bool PKB::hasChild() {
+bool PKB::HasChild() {
     return !child_map_.empty();
 }
 
@@ -71,7 +71,7 @@ bool PKB::hasChild() {
  * @param
  * @return True if there is at least one follows* relationship, otherwise False
  */
-bool PKB::hasFollowsT() {
+bool PKB::HasFollowsT() {
     return !follows_t_map_.empty();
 };
 
@@ -80,7 +80,7 @@ bool PKB::hasFollowsT() {
  * @param
  * @return True if there is at least one previous* relationship, otherwise False
  */
-bool PKB::hasPreviousT() {
+bool PKB::HasPreviousT() {
     return !previous_t_map_.empty();
 }
 
@@ -89,7 +89,7 @@ bool PKB::hasPreviousT() {
  * @param
  * @return True if there is at least one parent* relationship, otherwise False
  */
-bool PKB::hasParentT() {
+bool PKB::HasParentT() {
     return !parent_t_map_.empty();
 }
 
@@ -98,7 +98,7 @@ bool PKB::hasParentT() {
  * @param
  * @return True if there is at least one child* relationship, otherwise False
  */
-bool PKB::hasChildT() {
+bool PKB::HasChildT() {
     return !child_t_map_.empty();
 }
 
@@ -107,7 +107,7 @@ bool PKB::hasChildT() {
  * @param
  * @return True if there is at least one uses relationship, otherwise False
  */
-bool PKB::hasUses() {
+bool PKB::HasUses() {
     // Must check if both container and statement maps are empty
     return !use_s_map_.empty() || !use_c_map_.empty();
 }
@@ -117,7 +117,7 @@ bool PKB::hasUses() {
  * @param
  * @return True if there is at least one used by relationship, otherwise False
  */
-bool PKB::hasUsedBy() {
+bool PKB::HasUsedBy() {
     // Must check if both container and statement maps are empty
     return !used_by_s_map_.empty() || !used_by_c_map_.empty();
 }
@@ -127,7 +127,7 @@ bool PKB::hasUsedBy() {
  * @param
  * @return True if there is at least one modifies relationship, otherwise False
  */
-bool PKB::hasModifies() {
+bool PKB::HasModifies() {
     // Must check if both container and statement maps are empty
     return !modifies_s_map_.empty() || !modifies_c_map_.empty();
 }
@@ -137,7 +137,7 @@ bool PKB::hasModifies() {
  * @param
  * @return True if there is at least one modified by relationship, otherwise False
  */
-bool PKB::hasModifiedBy() {
+bool PKB::HasModifiedBy() {
     // Must check if both container and statement maps are empty
     return !modified_by_s_map_.empty() || !modified_by_c_map_.empty();
 }
@@ -943,7 +943,6 @@ void PKB::PopulateModifiedBySMap(std::unordered_map<Variable*, std::list<Stateme
  * @return
  */
 void PKB::PopulateModifiesCMap(std::unordered_map<Container*, std::list<Variable*>*> c_modifies_hash) {
-//    for (std::pair<Container *, std::list<Variable *> *> kv : c_modifies_hash) {
     for (std::pair<Container*, std::list<Variable*>*> kv : c_modifies_hash) {
         Statement* c_stmt = dynamic_cast<Statement*>(kv.first);
         auto* k_number = const_cast<StatementNumber*>(c_stmt->GetStatementNumber());
