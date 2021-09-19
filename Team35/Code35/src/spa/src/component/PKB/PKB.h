@@ -29,18 +29,18 @@ class PKB {
   std::vector<AssignEntity> GetPatternByAssign(std::string stmtRef);
   std::vector<AssignEntity> GetPatternByVariable(std::string varName);
 
-  bool hasFollows();
-  bool hasPrevious();
-  bool hasParent();
-  bool hasChild();
-  bool hasFollowsT();
-  bool hasPreviousT();
-  bool hasParentT();
-  bool hasChildT();
-  bool hasUses();
-  bool hasUsedBy();
-  bool hasModifies();
-  bool hasModifiedBy();
+  bool HasFollows();
+  bool HasPrevious();
+  bool HasParent();
+  bool HasChild();
+  bool HasFollowsT();
+  bool HasPreviousT();
+  bool HasParentT();
+  bool HasChildT();
+  bool HasUses();
+  bool HasUsedBy();
+  bool HasModifies();
+  bool HasModifiedBy();
 
   PKB() = default;
  private:

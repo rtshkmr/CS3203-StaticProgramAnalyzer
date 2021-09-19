@@ -4,11 +4,13 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <unordered_set>
 #include "QueryTokenizer.h"
 #include <component/QueryProcessor/types/Types.h>
 
 class QueryParser {
   private:
+    std::unordered_set<std::string> synonyms_name_set;
     std::vector<Clause*>& clauses;
     std::list<Group*>& groups;
     std::list<Synonym>& synonyms;
@@ -36,11 +38,12 @@ class QueryParser {
     void GetDeclaration();
     std::vector<Token> GetSynonyms();
   public:
-  QueryParser(std::vector<Clause*>& clauses, std::list<Group*>& groups, std::list<Synonym>& synonyms,
-              Synonym& target, QueryTokenizer tokenizer) :
-              clauses(clauses), groups(groups), synonyms(synonyms), target(target), tokenizer(tokenizer) {};
-  void parse();
-  std::list<Group*> GetGroupsList() { return groups; };
+    QueryParser(std::vector<Clause*>& clauses, std::list<Group*>& groups, std::list<Synonym>& synonyms,
+                Synonym& target, QueryTokenizer tokenizer) :
+                clauses(clauses), groups(groups), synonyms(synonyms), target(target), tokenizer(tokenizer) {};
+    void parse();
+    std::list<Group*> GetGroupsList() { return groups; };
+    static Synonym GetSynonymInfo(std::string syn_name, std::list<Synonym>* synonyms);
 };
 
 #endif //AUTOTESTER_QUERYPARSER_H
