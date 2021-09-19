@@ -148,7 +148,7 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
   }
   SECTION("Is Term function check") {
     string line = "VarNameIsASingleFactor "
-                  "var1 * var2 % var3 / var4 % var5 * var6 var7 + var8 % ";
+                  "var1 * var2 % var3 / var4 % var5 * var6 + var7 + var8 % ";
 
     vector<Token> tokens = Tokenizer::CreateTokens(line);
 
@@ -173,17 +173,17 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
     REQUIRE(SyntaxValidator::IsTerm(tokens, 1, 3)); // delim by *
     REQUIRE(SyntaxValidator::IsTerm(tokens, 7, 9)); // delim by %
     REQUIRE(SyntaxValidator::IsTerm(tokens, 1, 9)); // delim by %
-    REQUIRE_FALSE(SyntaxValidator::IsTerm(tokens, 10, 12)); // invalid start with a delim
+    REQUIRE_FALSE(SyntaxValidator::IsTerm(tokens, 10, 13)); // invalid start with a delim
     REQUIRE_FALSE(SyntaxValidator::IsTerm(tokens, 1, 10)); // invalid ends with a delim
     REQUIRE_FALSE(SyntaxValidator::IsTerm(tokens, 2, 10)); // invalid starts and ends with a delim
-    REQUIRE_FALSE(SyntaxValidator::IsTerm(tokens, 12, 14)); // invalid delim
+    REQUIRE_FALSE(SyntaxValidator::IsTerm(tokens, 13, 15)); // invalid delim
   }
 
 
   // expr: expr ‘+’ term | expr ‘-’ term | term
   SECTION("Is Expr Function Check") {
-    string line = "VarNameIsASingeFactor "
-                  "var1 + var2 - var3 - var4 + var5 - var6 var7 / var8";
+    string line = "HelloWorld "
+                  "var1 + var2 - var3 - var4 + var5 - var6 + var7 / var8";
 
     vector<Token> tokens = Tokenizer::CreateTokens(line);
 
@@ -207,7 +207,7 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
     REQUIRE(SyntaxValidator::IsExpr(tokens, 1, 3)); // delim by *
     REQUIRE(SyntaxValidator::IsExpr(tokens, 7, 9)); // delim by %
     REQUIRE(SyntaxValidator::IsExpr(tokens, 1, 9)); // delim by %
-    REQUIRE_FALSE(SyntaxValidator::IsExpr(tokens, 10, 12)); // invalid start with a delim
+    REQUIRE_FALSE(SyntaxValidator::IsExpr(tokens, 10, 13)); // invalid start with a delim
     REQUIRE_FALSE(SyntaxValidator::IsExpr(tokens, 1, 10)); // invalid ends with a delim
     REQUIRE_FALSE(SyntaxValidator::IsExpr(tokens, 2, 10)); // invalid starts and ends with a delim
   }
@@ -271,7 +271,7 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
     REQUIRE_FALSE(SyntaxValidator::IsRelExpr(tokens, 8, 20)); // Rel expression is not cond expr
   }
   SECTION("Is CondExpr tests") {
-    string line = "if((x>=1)&&((y>69)||(z<0)) || !(3 > 1)) !!TheMatrixIsReal !!(x > 1){";
+    string line = "if((x>=1)&&((y>69)||(z<0)) || !(3 > 1)) !!TheMatrixIsReal !!(x > 1){       while ((left==right) && (b>=c))  (k + j1k * chArlie){";
     vector<Token> tokens = Tokenizer::CreateTokens(line);
 //    [0] = {Token} {token_string_="if", token_tag_=kName}
 //    [1] = {Token} {token_string_="(", token_tag_=kOpenBracket}
@@ -313,11 +313,38 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
 //    [37] = {Token} {token_string_="1", token_tag_=kInteger}
 //    [38] = {Token} {token_string_=")", token_tag_=kCloseBracket}
 //    [39] = {Token} {token_string_="{", token_tag_=kOpenBrace}
+//    [40] = {Token} {token_string_="while", token_tag_=kName}
+//    [41] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [42] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [43] = {Token} {token_string_="left", token_tag_=kName}
+//    [44] = {Token} {token_string_="==", token_tag_=kBinaryComparisonOperator}
+//    [45] = {Token} {token_string_="right", token_tag_=kName}
+//    [46] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//    [47] = {Token} {token_string_="&&", token_tag_=kBooleanOperator}
+//    [48] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [49] = {Token} {token_string_="b", token_tag_=kName}
+//    [50] = {Token} {token_string_=">=", token_tag_=kBinaryComparisonOperator}
+//    [51] = {Token} {token_string_="c", token_tag_=kName}
+//    [52] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//    [53] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//    [54] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [55] = {Token} {token_string_="k", token_tag_=kName}
+//    [56] = {Token} {token_string_="+", token_tag_=kBinaryArithmeticOperator}
+//    [57] = {Token} {token_string_="j1k", token_tag_=kName}
+//    [58] = {Token} {token_string_="*", token_tag_=kBinaryArithmeticOperator}
+//    [59] = {Token} {token_string_="chArlie", token_tag_=kName}
+//    [60] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//    [61] = {Token} {token_string_="{", token_tag_=kOpenBrace}
     REQUIRE(SyntaxValidator::IsCondExpr(tokens, 9, 13)); // is just a rel_expr
     REQUIRE(SyntaxValidator::IsCondExpr(tokens, 9, 19)); // (<cond_expr>) || (<cond_expr>)
     REQUIRE(SyntaxValidator::IsCondExpr(tokens, 22, 27)); // !(<cond_expr>)
+//    REQUIRE(SyntaxValidator::IsCondExpr(tokens, 41, 53)); // !(<cond_expr>)
+//    REQUIRE(SyntaxValidator::IsCondExpr(tokens, 54, 60)); // !(<cond_expr>)
+//    REQUIRE(SyntaxValidator::IsTerm(tokens, 57, 59)); // !(<cond_expr>)
+
     REQUIRE_FALSE(SyntaxValidator::IsCondExpr(tokens, 29, 31)); // !!xxx
     REQUIRE_FALSE(SyntaxValidator::IsCondExpr(tokens, 32, 38)); // !!xxx
+
 //    REQUIRE(SyntaxValidator::IsCondExpr(tokens, 2, 20)); // (<cond_expr>) || (<cond_expr>)
   }
   SECTION("Check StatementPassesCommonBlacklistRules function") {

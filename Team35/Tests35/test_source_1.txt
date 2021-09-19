@@ -1,4 +1,5 @@
-procedure p {
+procedure p
+{
     x = z * 3 + 2 * y;
     print
     me;

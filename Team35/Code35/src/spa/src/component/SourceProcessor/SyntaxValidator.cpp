@@ -6,6 +6,7 @@
 #include "SyntaxValidator.h"
 #include <cassert>
 #include <datatype/RegexPatterns.h>
+#include <stack>
 
 using std::string;
 using std::vector;
@@ -237,37 +238,108 @@ bool SyntaxValidator::IsTerm(const vector<Token>& statement_tokens, int left_bou
  */
 bool SyntaxValidator::IsExpr(const vector<Token>& statement_tokens, int left_boundary_idx, int right_boundary_idx) {
   /// case 0: accept and recurse if there are redundant set of brackets around current inspection range
+
   const Token& first_token = statement_tokens.at(left_boundary_idx);
   const Token& last_token = statement_tokens.at(right_boundary_idx);
+
+  // if it's a set of extra brackets:
   if (first_token.GetTokenTag() == TokenTag::kOpenBracket && last_token.GetTokenTag() == TokenTag::kCloseBracket) {
     return IsExpr(statement_tokens, left_boundary_idx + 1, right_boundary_idx - 1);
   }
+
 
   /// case 1, it's a term, recurse early
   if (IsTerm(statement_tokens, left_boundary_idx, right_boundary_idx)) {
     return true;
   }
+
+  std::stack<Token> bracket_stack;
+  int middle_ptr =  -1;
   /// case 2: <expr><delim><term>
-  auto delim_idx = Token::GetLastMatchingTokenIdx(statement_tokens,
-                                                  RegexPatterns::GetExprDelimiterPattern(),
-                                                  left_boundary_idx,
-                                                  right_boundary_idx);
-  bool delim_idx_in_range = left_boundary_idx <= delim_idx && right_boundary_idx >= delim_idx;
-  if (delim_idx_in_range) {
-    if (delim_idx == left_boundary_idx || delim_idx == right_boundary_idx) {
-      // if first or last token is a delim (prevents out of range access in recursive calls)
-      return false;
+  // sweep from right and check with stack
+  for (int right_ptr = right_boundary_idx; right_ptr >= left_boundary_idx; right_ptr--) {
+    const Token& current_token = statement_tokens.at(right_ptr);
+    TokenTag current_tag = current_token.GetTokenTag();
+    if (current_tag == TokenTag::kCloseBracket) {
+      bracket_stack.push(current_token);
+    } else if (current_tag == TokenTag::kOpenBracket) {
+      bracket_stack.pop();
+    } else if (current_token.GetTokenString() == "+"
+        || current_token.GetTokenString() == "-") {
+      bool can_recurse = bracket_stack.empty();
+      if (can_recurse) {
+        // break because found my "middle"
+        middle_ptr = right_ptr;
+        break;
+      }
     }
-    bool right_part_is_term = IsTerm(statement_tokens, delim_idx + 1, right_boundary_idx);
-    if (!right_part_is_term) {
-      return false;
-    }
-    bool left_part_is_expr = IsExpr(statement_tokens, left_boundary_idx, delim_idx - 1);
-    return left_part_is_expr;
-  } else {
-    return false;
   }
+
+  // guarantee: middle_ptr will always be init has been init:
+  /*
+   * Reason being that if there were no desired delims (+ or -) it would be a term
+   * and if it wasn't a term then there would have been extra brackets
+   */
+  bool assertion_passed = middle_ptr > left_boundary_idx;
+  assert(middle_ptr > left_boundary_idx);
+  bool left_is_expr = IsExpr(statement_tokens, left_boundary_idx, middle_ptr - 1);
+  bool right_is_term = IsTerm(statement_tokens, middle_ptr + 1, right_boundary_idx);
+  return left_is_expr && right_is_term;
 }
+//bool SyntaxValidator::IsExpr(const vector<Token>& statement_tokens, int left_boundary_idx, int right_boundary_idx) {
+//  /// case 0: accept and recurse if there are redundant set of brackets around current inspection range
+//  std::stack<Token> bracket_stack;
+//
+//  const Token& first_token = statement_tokens.at(left_boundary_idx);
+//  const Token& last_token = statement_tokens.at(right_boundary_idx);
+//
+//  // if it's a set of extra brackets:
+//  if (first_token.GetTokenTag() == TokenTag::kOpenBracket && last_token.GetTokenTag() == TokenTag::kCloseBracket) {
+//    return IsExpr(statement_tokens, left_boundary_idx + 1, right_boundary_idx - 1);
+//  }
+//
+//
+//  /// case 1, it's a term, recurse early
+//  if (IsTerm(statement_tokens, left_boundary_idx, right_boundary_idx)) {
+//    return true;
+//  }
+//
+//  // sweep from right and check with stack
+//
+//
+//
+//
+//  /// case 2: <expr><delim><term>
+//  auto delim_idx = Token::GetLastMatchingTokenIdx(statement_tokens,
+//                                                  RegexPatterns::GetExprDelimiterPattern(),
+//                                                  left_boundary_idx,
+//                                                  right_boundary_idx);
+//
+//
+//  // check if the range from right boundary to delim_idx has a bracket:
+//  // if there is, search for that, add it to stack
+//
+//
+//
+//
+//
+//
+//  bool delim_idx_in_range = left_boundary_idx <= delim_idx && right_boundary_idx >= delim_idx;
+//  if (delim_idx_in_range) {
+//    if (delim_idx == left_boundary_idx || delim_idx == right_boundary_idx) {
+//      // if first or last token is a delim (prevents out of range access in recursive calls)
+//      return false;
+//    }
+//    bool right_part_is_term = IsTerm(statement_tokens, delim_idx + 1, right_boundary_idx);
+//    if (!right_part_is_term) {
+//      return false;
+//    }
+//    bool left_part_is_expr = IsExpr(statement_tokens, left_boundary_idx, delim_idx - 1);
+//    return left_part_is_expr;
+//  } else {
+//    return false;
+//  }
+//}
 
 /**
  *  A relative factor is anything to the left or right of a boolean comparison operator. Note that a relative factor will be
@@ -377,6 +449,7 @@ bool SyntaxValidator::IsCondExpr(const vector<Token>& statement_tokens, int left
  * @return
  */
 bool SyntaxValidator::StatementPassesCommonBlacklistRules(const vector<Token>& statement_tokens) {
+  // todo: check bracket using a stack instead of pure counting
   const Token& last_token = statement_tokens.at(statement_tokens.size() - 1);
   bool valid_last_token
       = std::regex_match(last_token.GetTokenString(), RegexPatterns::GetValidStatementTerminalToken());
