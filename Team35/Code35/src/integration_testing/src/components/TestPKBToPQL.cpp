@@ -163,38 +163,24 @@ TEST_CASE("5. Miscellaneous entity and relationship retrievals") {
 //            "read r; print p; assign a; Select p such that Follows(p, r) such that Follows(p, a)", // should get "", get "2 instead
   };
 
-  std::vector<std::string> answer_list = {
-      "x y z",
-      "3 4 5",
-      "1",
-      "Week4",
-      "3 4 5",
-      "1",
-      "3 4 5",
-      "2",
-      "3 4",
-      "x y z",
-      "",
-
-      "dummy"
+  std::vector<std::list<std::string>> answer_list = {
+      {"x","y","z"},
+      {"3","4","5"},
+      {"1"},
+      {"Week4"},
+      {"3","4","5"},
+      {"1"},
+      {"3","4","5"},
+      {"2"},
+      {"3","4"},
+      {"x","y","z"},
+      {},
+      {"dummy"}
   };
-
-  std::vector<std::list<std::string>> answers;
-  std::string space_delimiter = " ";
-  for (std::string answer: answer_list) {
-    size_t pos = 0;
-    std::list<std::string> result_list;
-    while ((pos = answer.find(space_delimiter)) != std::string::npos) {
-      result_list.push_back(answer.substr(0, pos));
-      answer.erase(0, pos + space_delimiter.length());
-    }
-    answers.push_back(result_list);
-  }
-
   for (int i = 0; i < query_list.size(); i++) {
     std::string* query = & query_list.at(i);
     std::list<std::string> answer = QuerySystemController::Evaluate(query, & pkb);
-    REQUIRE(answer == answers[i]);
+    REQUIRE(answer == answer_list[i]);
   }
 }
 
