@@ -1,5 +1,6 @@
 #include "QueryParser.h"
 #include "QueryTokenizer.h"
+#include "QueryValidator.h"
 #include <component/QueryProcessor/types/Exceptions.h>
 #include <datatype/RegexPatterns.h>
 #include <unordered_set>
@@ -21,8 +22,17 @@ Token QueryParser::eat(TokenTag token_type) {
   return token;
 }
 
+/* Helper function to obtain synonym info (ie type) given it exists in list of synonyms. */
+Synonym QueryParser::GetSynonymInfo(std::string syn_name, std::list<Synonym>* synonyms) {
+  for (Synonym& t : *synonyms) {
+    if (t.GetName().compare(syn_name) == 0) {
+      return Synonym(syn_name, t.GetType());
+    }
+  }
+  return Synonym("", DesignEntity::kInvalid);
+};
+
 std::vector<Token> QueryParser::GetSynonyms() {
-  // TODO: here, add support for multiple synonyms. e.g. variable v1, v2;
   // TODO: here, add support for constant type, since TokenTag for that will be int.
   std::vector<Token> tokens;
   tokens.push_back(eat(TokenTag::kName));
@@ -45,7 +55,11 @@ void QueryParser::GetDeclaration() {
   std::vector<Token> s = GetSynonyms();
   // populate synonyms list with Synonym objects.
   for (Token& t : s) {
+    if (synonyms_name_set.find(t.GetTokenString()) != synonyms_name_set.end()) {
+      throw PQLValidationException("Duplicate synonym was declared.");
+    }
     this->synonyms.emplace_back(t.GetTokenString(), de);
+    this->synonyms_name_set.emplace(t.GetTokenString());
   }
 }
 
@@ -166,6 +180,11 @@ std::pair<Clause*, bool> QueryParser::parse_relRef() {
     rel_type = std::string(rel_type + "S");
   }
 
+  // semantic validation of relRef.
+  if (!QueryValidator::Is_Semantically_Valid_RelRef(lhs, rhs, GetRelRef(rel_type),
+                                                   is_lhs_syn, is_rhs_syn, &synonyms)) {
+    throw PQLValidationException("Received semantically invalid " + rel_type + " cl.");
+  }
   // TODO: this could introduce a memory leak...
   Clause* cl = new SuchThat(lhs, rhs, GetRelRef(rel_type), is_lhs_syn, is_rhs_syn);
   return std::make_pair(cl, is_lhs_tgt_syn || is_rhs_tgt_syn);
