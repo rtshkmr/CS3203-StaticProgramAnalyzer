@@ -1,5 +1,5 @@
-24 - Gets all counter-type stmt
-assign a; variable v;
-Select a such that Uses(a, v) pattern a(v, _"1"_)
-12, 16
+29 - Find the if assignment that is not the first stmt
+assign assign;
+Select assign such that Follow(_, assign) pattern assign("if", _)
+25
 5000
