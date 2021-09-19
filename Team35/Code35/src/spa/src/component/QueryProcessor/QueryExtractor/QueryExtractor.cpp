@@ -8,6 +8,6 @@ void QueryExtractor::ExtractQuery() {
   tokenizer.SetQueryString(&query);
   std::vector<Clause*> clauses;
   QueryParser parser = QueryParser(clauses, groups, synonyms, target, tokenizer);
-  parser.parse();
+  parser.Parse();
 
 }

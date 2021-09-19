@@ -1,5 +1,4 @@
 #include "QueryParser.h"
-#include "QueryTokenizer.h"
 #include "QueryValidator.h"
 #include <component/QueryProcessor/types/Exceptions.h>
 #include <datatype/RegexPatterns.h>
@@ -62,7 +61,7 @@ void QueryParser::GetDeclaration() {
   }
 }
 
-void QueryParser::parse_declarations() {
+void QueryParser::ParseDeclarations() {
   // a syntactically valid synonym list contains > 0 synonym declarations, each followed by a semicolon.
   GetDeclaration();
   eat(TokenTag::kSemicolon);
@@ -91,7 +90,7 @@ void QueryParser::GetTarget() {
 
 // stmtRef: synonym | ‘_’ | INTEGER
 // returns a tuple of values corresponding to <stmtref string, isSynonym, isTargetSyononym>
-std::tuple<std::string, bool, bool> QueryParser::parse_stmtRef() {
+std::tuple<std::string, bool, bool> QueryParser::ParseStmtRef() {
   bool is_synonym = false;
   bool is_target_synonym = false;
   std::string curr_lookahead = lookahead.GetTokenString();
@@ -121,7 +120,7 @@ std::tuple<std::string, bool, bool> QueryParser::parse_stmtRef() {
   eat(lookahead.GetTokenTag());
   return std::make_tuple(curr_lookahead, is_synonym, is_target_synonym);
 }
-std::pair<Clause*, bool> QueryParser::parse_relRef() {
+std::pair<Clause*, bool> QueryParser::ParseRelRef() {
   std::unordered_set<std::string> relRefs = {"Follows", "Parent", "Uses", "Modifies"};
   std::unordered_set<std::string>::const_iterator got = relRefs.find(lookahead.GetTokenString());
   if (got == relRefs.end()) {
@@ -139,7 +138,7 @@ std::pair<Clause*, bool> QueryParser::parse_relRef() {
   // TODO: add support in the future for modifiesP, usesP case: (entRef ‘,’ entRef)
   std::string lhs; bool is_lhs_syn; bool is_lhs_tgt_syn;
   // UsesS|ModifiesS: ‘Uses|Modifies’ ‘(’ stmtRef ‘,’ entRef ‘)’
-  std::tie(lhs, is_lhs_syn, is_lhs_tgt_syn) = parse_stmtRef();
+  std::tie(lhs, is_lhs_syn, is_lhs_tgt_syn) = ParseStmtRef();
 
   if (lhs.compare("_") == 0 && (rel_type.compare("Modifies") == 0 || rel_type.compare("Uses") == 0)) {
     throw PQLValidationException("Semantically invalid to have _ as first argument for " + rel_type);
@@ -148,7 +147,7 @@ std::pair<Clause*, bool> QueryParser::parse_relRef() {
   eat(TokenTag::kComma);
   std::string rhs; bool is_rhs_syn; bool is_rhs_tgt_syn;
   if (rel_type.compare("Uses") == 0 || rel_type.compare("Modifies") == 0) {
-    Token tok = parse_entRef(false);
+    Token tok = ParseEntRef(false);
     rhs = tok.GetTokenString();
     bool _is_rhs_syn = false;
     bool _is_rhs_tgt_syn = false;
@@ -164,7 +163,7 @@ std::pair<Clause*, bool> QueryParser::parse_relRef() {
     is_rhs_syn = _is_rhs_syn;
     is_rhs_tgt_syn = _is_rhs_tgt_syn;
   } else {
-    std::tie(rhs, is_rhs_syn, is_rhs_tgt_syn) = parse_stmtRef();
+    std::tie(rhs, is_rhs_syn, is_rhs_tgt_syn) = ParseStmtRef();
   }
 
   eat(TokenTag::kCloseBracket);
@@ -184,25 +183,25 @@ std::pair<Clause*, bool> QueryParser::parse_relRef() {
   return std::make_pair(cl, is_lhs_tgt_syn || is_rhs_tgt_syn);
 }
 
-void QueryParser::parse_such_that() {
+void QueryParser::ParseSuchThat() {
   // TODO: add support for multiple relRefs (separated by and)
   eat(TokenTag::kSuchThat);
-  std::pair<Clause*, bool> clause_info = parse_relRef();
+  std::pair<Clause*, bool> clause_info = ParseRelRef();
   // add group.
   clauses.emplace_back(clause_info.first);
 }
 
 // entRef : synonym | ‘_’ | ‘"’ IDENT ‘"’
 /* Takes in a boolean 1 if parsing of entRef is for pattern, 0 otherwise */
-Token QueryParser::parse_entRef(bool isPatternCl) {
+Token QueryParser::ParseEntRef(bool isPatternCl) {
   std::string token_name;
   TokenTag token_type;
   if (lookahead.GetTokenTag() == TokenTag::kName) {
     // parse as known synonym. Synonym must be variable for pattern cl.
-    if (isPatternCl && !is_valid_synonym(lookahead, DesignEntity::kVariable)) {
+    if (isPatternCl && !IsValidSynonym(lookahead, DesignEntity::kVariable)) {
       throw PQLParseException("Unknown synonym received as entRef in lhs of pattern cl.");
     }
-    if (!isPatternCl && !is_valid_synonym(lookahead)) {
+    if (!isPatternCl && !IsValidSynonym(lookahead)) {
       throw PQLParseException("Unknown synonym received as entRef in lhs of cl.");
     }
     token_name = eat(TokenTag::kName).GetTokenString();
@@ -223,7 +222,7 @@ Token QueryParser::parse_entRef(bool isPatternCl) {
 }
 
 // iteration 1: factor: var_name | const_value
-std::string QueryParser::parse_factor() {
+std::string QueryParser::ParseFactor() {
   std::stringstream ss;
   if (lookahead.GetTokenTag() == TokenTag::kInteger) {
     // parse as constant
@@ -238,7 +237,7 @@ std::string QueryParser::parse_factor() {
 }
 
 // iteration 1: expression-spec: ‘_’ ‘"’ factor ‘"’ ‘_’ | ‘_’
-std::pair<std::string, bool> QueryParser::parse_expressionSpec() {
+std::pair<std::string, bool> QueryParser::ParseExpressionSpec() {
 //  std::cout << "parsing expressionSpec..." << std::endl;
   bool is_exact_match = false;
   std::stringstream rhs_ss;
@@ -255,7 +254,7 @@ std::pair<std::string, bool> QueryParser::parse_expressionSpec() {
     // consider as ‘_’ ‘"’ factor ‘"’ ‘_’
     rhs_ss.str("");
     eat(TokenTag::kStringQuote);
-    rhs_ss << parse_factor();
+    rhs_ss << ParseFactor();
     eat(TokenTag::kStringQuote);
     eat(TokenTag::kUnderscore);
   } else {
@@ -265,7 +264,7 @@ std::pair<std::string, bool> QueryParser::parse_expressionSpec() {
   return std::make_pair(rhs_ss.str(), is_exact_match);
 }
 
-bool QueryParser::is_valid_synonym(Token token) {
+bool QueryParser::IsValidSynonym(Token token) {
   if (token.GetTokenTag() != TokenTag::kName) {
     return 0;
   }
@@ -284,7 +283,7 @@ bool QueryParser::is_valid_synonym(Token token) {
   return 1;
 }
 // returns 1 if syn for pattern clause is valid name and type, 0 otherwise.
-bool QueryParser::is_valid_synonym(Token token, DesignEntity de) {
+bool QueryParser::IsValidSynonym(Token token, DesignEntity de) {
   if (token.GetTokenTag() != TokenTag::kName) {
     return 0;
   }
@@ -303,10 +302,10 @@ bool QueryParser::is_valid_synonym(Token token, DesignEntity de) {
   return 1;
 }
 
-void QueryParser::parse_pattern() {
+void QueryParser::ParsePattern() {
   eat(TokenTag::kName); // eat 'pattern' keyword
   // check if syn-assign valid
-  if (!is_valid_synonym(lookahead, DesignEntity::kAssign)) {
+  if (!IsValidSynonym(lookahead, DesignEntity::kAssign)) {
     throw PQLParseException("Expected valid syn-assign for pattern cl, instead got " + lookahead.GetTokenString());
   }
 
@@ -315,12 +314,12 @@ void QueryParser::parse_pattern() {
   eat(TokenTag::kName); // eat 'syn-assign'
   eat(TokenTag::kOpenBracket);
   // parse_lhs
-  Token lhs_token = parse_entRef(true);
+  Token lhs_token = ParseEntRef(true);
   eat(TokenTag::kComma);
   std::string lhs = lhs_token.GetTokenString();
-  bool lhs_is_syn = is_valid_synonym(lhs_token, DesignEntity::kVariable);
+  bool lhs_is_syn = IsValidSynonym(lhs_token, DesignEntity::kVariable);
   //parse_rhs
-  std::pair<std::string, bool> rhs_info = parse_expressionSpec();
+  std::pair<std::string, bool> rhs_info = ParseExpressionSpec();
   eat(TokenTag::kCloseBracket);
 
   // TODO: this could introduce a memory leak...
@@ -328,7 +327,7 @@ void QueryParser::parse_pattern() {
   clauses.emplace_back(cl);
 }
 
-void QueryParser::parse_select() {
+void QueryParser::ParseSelect() {
   if (lookahead.GetTokenString().compare("Select") != 0) {
     throw PQLParseException("Expected \'Select\' keyword, instead got " + lookahead.GetTokenString());
   }
@@ -339,27 +338,27 @@ void QueryParser::parse_select() {
     return;
   }
   if (lookahead.GetTokenTag() == TokenTag::kSuchThat) {
-    parse_such_that();
+    ParseSuchThat();
   }
   if (lookahead.GetTokenTag() == TokenTag::kName && lookahead.GetTokenString().compare("pattern") == 0) {
-    parse_pattern();
+    ParsePattern();
   }
   if (lookahead.GetTokenTag() != TokenTag::kInvalid) {
     throw PQLParseException("Incorrect query. Expected at most 1 such that and 1 pattern for iteration 1.");
   }
 }
 
-void QueryParser::parse_query() {
+void QueryParser::ParseQuery() {
   // parse synonym declarations first, if they exist.
   if (lookahead.GetTokenString().compare("Select") != 0) {
-    parse_declarations();
+    ParseDeclarations();
   }
   // TODO: more validation for synonyms (ie. no duplicate synonym)
   // parse select clause
-  parse_select();
+  ParseSelect();
 }
 
-void QueryParser::group_clauses() {
+void QueryParser::GroupClauses() {
   // TODO: implement grouping algorithm.
   // current implementation assumes only 1 such that and 1 pattern clause; manually grouping by common synonym.
   if (clauses.size() == 0) {
@@ -432,9 +431,9 @@ void QueryParser::group_clauses() {
   }
 }
 
-void QueryParser::parse() {
+void QueryParser::Parse() {
   // lookahead is used for LL(1) predictive parsing.
   lookahead = tokenizer.GetNextToken();
-  parse_query();
-  group_clauses();
+  ParseQuery();
+  GroupClauses();
 }
