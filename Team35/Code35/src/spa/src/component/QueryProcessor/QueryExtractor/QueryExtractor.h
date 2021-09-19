@@ -9,7 +9,6 @@
  * QueryExtractor is in charge of tokenizing, parsing and validating a query,
  * before sending it off to QueryEvaluator.
  */
-
 class QueryExtractor {
   private:
     std::string query;

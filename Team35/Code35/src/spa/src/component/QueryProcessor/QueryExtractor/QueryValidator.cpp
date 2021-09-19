@@ -58,6 +58,16 @@ bool QueryValidator::IsValid_LhsStmt_RhsStmt(std::string l, std::string r, bool 
   return true;
 }
 
+/**
+ * Checks for semantic validify of a RelRef, by calling helper functions.
+ * @param lhs is a string representing left hand side argument.
+ * @param rhs is a string representing right hand side argument.
+ * @param rf is the relRef enum type.
+ * @param lhs_is_syn is a bool that evaluates to true if lhs is a synonym, false otherwise.
+ * @param rhs_is_syn is a bool that evaluates to true if rhs is a synonym, false otherwise.
+ * @param synonyms is a reference to the list of synonyms.
+ * @return true if RelRef has semantically valid left and right arguments, false otherwise.
+ */
 bool QueryValidator::Is_Semantically_Valid_RelRef(std::string lhs, std::string rhs, RelRef rf, bool lhs_is_syn,
                                                          bool rhs_is_syn, std::list<Synonym>* synonyms) {
   if (rf == RelRef::kUsesS || rf == RelRef::kModifiesS) {
