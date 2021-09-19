@@ -5,7 +5,7 @@
  * Groups queries that should be evaluated together, based on existence of common synonyms.
  */
 void QueryOptimizer::GroupClauses(std::vector<Clause*>* clauses, std::list<Group*>* groups, Synonym* target) {
-  // TODO: implement grouping algorithm.
+  // [TODO iter 2]: implement grouping algorithm.
   // current implementation assumes only 1 such that and 1 pattern clause; manually grouping by common synonym.
   if (clauses->size() == 0) {
     return;

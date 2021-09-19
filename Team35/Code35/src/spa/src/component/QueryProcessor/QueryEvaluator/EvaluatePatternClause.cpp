@@ -29,8 +29,6 @@ void ProcessPatternClause(const Pattern& pattern, QueryEvaluatorTable* table, co
       // Technically this is not possible
     }
   } else {
-    // Case of 1 synonym (assign)
-    // This section to be targeted in issue 92
     if (table->ContainsColumn(assign_synonym_name)) {
       EvaluatePatternSingleSynonym(pattern, table, pkb);
     } else {
