@@ -33,7 +33,6 @@ Synonym QueryParser::GetSynonymInfo(std::string syn_name, std::list<Synonym>* sy
 };
 
 std::vector<Token> QueryParser::GetSynonyms() {
-  // TODO: here, add support for multiple synonyms. e.g. variable v1, v2;
   // TODO: here, add support for constant type, since TokenTag for that will be int.
   std::vector<Token> tokens;
   tokens.push_back(eat(TokenTag::kName));
@@ -56,7 +55,11 @@ void QueryParser::GetDeclaration() {
   std::vector<Token> s = GetSynonyms();
   // populate synonyms list with Synonym objects.
   for (Token& t : s) {
+    if (synonyms_name_set.find(t.GetTokenString()) != synonyms_name_set.end()) {
+      throw PQLValidationException("Duplicate synonym was declared.");
+    }
     this->synonyms.emplace_back(t.GetTokenString(), de);
+    this->synonyms_name_set.emplace(t.GetTokenString());
   }
 }
 

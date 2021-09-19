@@ -4,11 +4,13 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <unordered_set>
 #include "QueryTokenizer.h"
 #include <component/QueryProcessor/types/Types.h>
 
 class QueryParser {
   private:
+    std::unordered_set<std::string> synonyms_name_set;
     std::vector<Clause*>& clauses;
     std::list<Group*>& groups;
     std::list<Synonym>& synonyms;
