@@ -15,12 +15,11 @@ namespace sp {
      * file by calling the Parser and DesignExtractor and populates the PKB when the preprocessing is done.
      */
     class SourceProcessor {
-    private:
-        Deliverable deliverable_;
     public:
         SourceProcessor() = default;
 
         static PKB* ProcessSourceFile(std::string file_name);
+        static void Terminate(std::string msg);
     };
 }
 

@@ -1,3 +1,4 @@
+#include <exception/SyntaxException.h>
 #include "catch.hpp"
 #include "datatype/DataType.h"
 
@@ -173,10 +174,10 @@ TEST_CASE("1.DataType.ConstantValue") {
     REQUIRE(cv4.get() == 0);
     REQUIRE(cv5.get() == -12345678);
 
-    REQUIRE_THROWS_AS(ConstantValue("999999999999999999999999999999999999999"), std::out_of_range);
-    REQUIRE_THROWS_AS(ConstantValue("9hello"), std::invalid_argument);
-    REQUIRE_THROWS_AS(ConstantValue("he11o"), std::invalid_argument);
-    REQUIRE_THROWS_AS(ConstantValue("hell0"), std::invalid_argument);
+    REQUIRE_THROWS_AS(ConstantValue("999999999999999999999999999999999999999"), SyntaxException);
+    REQUIRE_THROWS_AS(ConstantValue("9hello"), SyntaxException);
+    REQUIRE_THROWS_AS(ConstantValue("he11o"), SyntaxException);
+    REQUIRE_THROWS_AS(ConstantValue("hell0"), SyntaxException);
   }
 
   SECTION("Operators") {

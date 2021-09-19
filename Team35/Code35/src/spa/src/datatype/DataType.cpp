@@ -7,6 +7,7 @@
 #include "DataType.h"
 #include <datatype/RegexPatterns.h>
 #include <cassert>
+#include <exception/SyntaxException.h>
 
 /**
  * This method checks if the given string as in the correct name syntax.
@@ -188,14 +189,17 @@ bool VariableName::operator==(const VariableName& other) const {
  * This ConstantValue constructor check if the constant received is valid (valid = integer up to +- 2,147,483,647),
  *   and stores as a ConstantValue object.
  * @param constant [NOT NULL] The constant (in string) as extracted from SIMPLE program
- * @throws invalid_argument when a non-integer in passed in
- * @throws out_of_range when integers that had exceeded the range.
+ * @throws SyntaxException when a non-integer in passed in or when integers that had exceeded the range.
  */
 ConstantValue::ConstantValue(const std::string& constant) {
   size_t num_chars = 0;
-  value_ = stoi(constant, & num_chars);
+  try {
+    value_ = stoi(constant, & num_chars);
+  } catch (std::exception ia) {
+    throw SyntaxException("Argument is not smaller that max int.");
+  }
   if (num_chars != constant.size()) {
-    throw std::invalid_argument("Constant is not valid. Numbers mixed with letters.");
+    throw SyntaxException("Constant is not valid. Numbers mixed with letters.");
   }
 }
 
