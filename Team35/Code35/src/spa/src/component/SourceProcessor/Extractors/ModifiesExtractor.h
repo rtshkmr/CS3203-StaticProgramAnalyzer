@@ -20,6 +20,8 @@ class ModifiesExtractor {
   void ExtractModifiesInCallContainer(CallEntity* call_entity,
                                       Container* container,
                                       std::vector<Procedure*>* extracted_procedures);
+  void EraseElseAndProcFromModifies();
+  void EraseReverseRelationship(Container* container, std::list<Variable*>* var_list);
 };
 
 #endif //AUTOTESTER_SRC_SPA_SRC_COMPONENT_SOURCEPROCESSOR_EXTRACTORS_MODIFIESEXTRACTOR_H_

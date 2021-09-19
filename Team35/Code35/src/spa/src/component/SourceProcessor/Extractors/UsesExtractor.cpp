@@ -27,29 +27,7 @@ void UsesExtractor::Extract(Deliverable* deliverable) {
     }
   }
 
-  // TODO iter2: remove deletion of procedure
-  // deletes procedure and else entries in the container_modifies_hash and container_modified_by_hash
-  std::list<Container*> cont_list;
-  for (auto pair: deliverable_->container_use_hash_) {
-    Container* container = pair.first;
-    std::list<Variable*>* var_list = pair.second;
-    if (dynamic_cast<ElseEntity*>(container)) {
-      for (auto var: *var_list) {
-        deliverable_->container_used_by_hash_.find(var)->second->remove(container);
-      }
-      cont_list.push_back(pair.first);
-    } else if (dynamic_cast<Procedure*>(container)) {
-      for (auto var: *var_list) {
-        if (deliverable_->container_used_by_hash_.count(var)) {
-          deliverable_->container_used_by_hash_.find(var)->second->remove(container);
-        }
-      }
-      cont_list.push_back(pair.first);
-    }
-  }
-  for (auto cont: cont_list) {
-    deliverable_->container_use_hash_.erase(cont);
-  }
+  EraseElseAndProcFromUses();
 }
 
 /**
@@ -135,4 +113,35 @@ void UsesExtractor::ExtractUsesInCallContainer(CallEntity* call_entity,
     extracted_procedures->push_back(called_proc);
   }
   deliverable_->AddUsesRelationship(container, var_list);
+}
+
+/**
+ * TODO iter2: remove deletion of procedure
+ * deletes procedure and else entries in the container_modifies_hash and container_modified_by_hash
+ */
+void UsesExtractor::EraseElseAndProcFromUses() {
+  std::list<Container*> deleting_cont_list;
+  for (auto pair: deliverable_->container_use_hash_) {
+    Container* container = pair.first;
+    std::list<Variable*>* var_list = pair.second;
+    if (dynamic_cast<ElseEntity*>(container) || dynamic_cast<Procedure*>(container)) {
+      EraseReverseRelationship(container, var_list);
+      deleting_cont_list.push_back(container);
+    }
+  }
+  for (auto cont: deleting_cont_list) {
+    deliverable_->container_use_hash_.erase(cont);
+  }
+}
+
+void UsesExtractor::EraseReverseRelationship(Container* container, std::list<Variable*>* var_list) {
+  for (auto var: *var_list) {
+    if (deliverable_->container_used_by_hash_.count(var)) {
+      std::list<Container*>* var_cont_list = deliverable_->container_used_by_hash_.find(var)->second;
+      var_cont_list->remove(container);
+      if (var_cont_list->empty()) {
+        deliverable_->container_used_by_hash_.erase(var);
+      }
+    }
+  }
 }
