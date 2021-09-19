@@ -182,8 +182,8 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
 
   // expr: expr ‘+’ term | expr ‘-’ term | term
   SECTION("Is Expr Function Check") {
-    string line = "VarNameIsASingeFactor "
-                  "var1 + var2 - var3 - var4 + var5 - var6 var7 / var8";
+    string line = "HelloWorld "
+                  "var1 + var2 - var3 - var4 + var5 - var6  var7 / var8";
 
     vector<Token> tokens = Tokenizer::CreateTokens(line);
 
@@ -204,11 +204,11 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
 //    [14] = {Token} {token_string_="var8", token_tag_=kName}
 
     REQUIRE(SyntaxValidator::IsExpr(tokens, 0, 0)); // justa factor
-    REQUIRE(SyntaxValidator::IsExpr(tokens, 1, 3)); // delim by *
-    REQUIRE(SyntaxValidator::IsExpr(tokens, 7, 9)); // delim by %
-    REQUIRE(SyntaxValidator::IsExpr(tokens, 1, 9)); // delim by %
-    REQUIRE_FALSE(SyntaxValidator::IsExpr(tokens, 10, 12)); // invalid start with a delim
-    REQUIRE_FALSE(SyntaxValidator::IsExpr(tokens, 1, 10)); // invalid ends with a delim
+    REQUIRE(SyntaxValidator::IsExpr(tokens, 1, 3)); // delim by +
+    REQUIRE(SyntaxValidator::IsExpr(tokens, 7, 9)); // delim by +
+    REQUIRE(SyntaxValidator::IsExpr(tokens, 1, 9)); // a bunch of + and - done correctly
+    REQUIRE_FALSE(SyntaxValidator::IsExpr(tokens, 10, 13)); // invalid start with a delim
+    REQUIRE_FALSE(SyntaxValidator::IsExpr(tokens, 1, 10)); // invalid start with a delim
     REQUIRE_FALSE(SyntaxValidator::IsExpr(tokens, 2, 10)); // invalid starts and ends with a delim
   }
 
@@ -238,7 +238,9 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
   }
   SECTION("Is RelExpr tests") {
     string line = "if((x>=1)&&((y>69)||(z<0))){";
+    string new_line = "!(200) |  !(xyz) | (p) && (q == 2)";
     vector<Token> tokens = Tokenizer::CreateTokens(line);
+    vector<Token> new_tokens = Tokenizer::CreateTokens(new_line);
 //    [0] = {Token} {token_string_="if", token_tag_=kIfKeyword}
 //    [1] = {Token} {token_string_="(", token_tag_=kOpenBracket}
 //    [2] = {Token} {token_string_="(", token_tag_=kOpenBracket}
@@ -263,15 +265,42 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
 //    [21] = {Token} {token_string_=")", token_tag_=kCloseBracket}
 //    [22] = {Token} {token_string_="{", token_tag_=kOpenBrace}
     REQUIRE(SyntaxValidator::IsRelExpr(tokens, 3, 5)); // no brackets just rel_expr
-    REQUIRE(SyntaxValidator::IsRelExpr(tokens, 2, 6)); // one layer of brackets around rel_expr
-    REQUIRE(SyntaxValidator::IsRelExpr(tokens, 9, 13)); // one layer of brackets around rel_expr
-    REQUIRE(SyntaxValidator::IsRelExpr(tokens, 9, 13)); // one layer of brackets around rel_expr
+    REQUIRE_FALSE(SyntaxValidator::IsRelExpr(tokens, 2, 6)); // can't have rel_expr with extra bracket surrounding it
+    REQUIRE_FALSE(SyntaxValidator::IsRelExpr(tokens, 9, 13)); // one layer of brackets around rel_expr
     REQUIRE(SyntaxValidator::IsRelExpr(tokens, 16, 18)); // one layer of brackets around rel_expr
     REQUIRE_FALSE(SyntaxValidator::IsRelExpr(tokens, 16, 19)); // uneven bracketing
     REQUIRE_FALSE(SyntaxValidator::IsRelExpr(tokens, 8, 20)); // Rel expression is not cond expr
+
+//    [0] = {Token} {token_string_="!", token_tag_=kBooleanOperator}
+//    [1] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [2] = {Token} {token_string_="200", token_tag_=kInteger}
+//    [3] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//    [4] = {Token} {token_string_="|", token_tag_=kInvalid}
+//    [5] = {Token} {token_string_="!", token_tag_=kBooleanOperator}
+//    [6] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [7] = {Token} {token_string_="xyz", token_tag_=kName}
+//    [8] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//    [9] = {Token} {token_string_="|", token_tag_=kInvalid}
+//    [10] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [11] = {Token} {token_string_="p", token_tag_=kName}
+//    [12] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//    [13] = {Token} {token_string_="&&", token_tag_=kBooleanOperator}
+//    [14] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [15] = {Token} {token_string_="q", token_tag_=kName}
+//    [16] = {Token} {token_string_="==", token_tag_=kBinaryComparisonOperator}
+//    [17] = {Token} {token_string_="2", token_tag_=kInteger}
+//    [18] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+
+    REQUIRE_FALSE(SyntaxValidator::IsRelExpr(new_tokens,0, 3)); // uneven bracketing
+    REQUIRE_FALSE(SyntaxValidator::IsRelExpr(new_tokens,5, 8)); // uneven bracketing
+    REQUIRE_FALSE(SyntaxValidator::IsRelExpr(new_tokens,10, 18)); // uneven bracketing
+
+
+
+
   }
   SECTION("Is CondExpr tests") {
-    string line = "if((x>=1)&&((y>69)||(z<0)) || !(3 > 1)) !!TheMatrixIsReal !!(x > 1){";
+    string line = "if((x>=1)&&((y>69)||(z<0)) || !(3 > 1)) !!TheMatrixIsReal !!(x > 1){       while ((left==right) && (b>=c))  (k + j1k * chArlie){";
     vector<Token> tokens = Tokenizer::CreateTokens(line);
 //    [0] = {Token} {token_string_="if", token_tag_=kName}
 //    [1] = {Token} {token_string_="(", token_tag_=kOpenBracket}
@@ -313,12 +342,44 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
 //    [37] = {Token} {token_string_="1", token_tag_=kInteger}
 //    [38] = {Token} {token_string_=")", token_tag_=kCloseBracket}
 //    [39] = {Token} {token_string_="{", token_tag_=kOpenBrace}
-    REQUIRE(SyntaxValidator::IsCondExpr(tokens, 9, 13)); // is just a rel_expr
+//    [40] = {Token} {token_string_="while", token_tag_=kName}
+//    [41] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [42] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [43] = {Token} {token_string_="left", token_tag_=kName}
+//    [44] = {Token} {token_string_="==", token_tag_=kBinaryComparisonOperator}
+//    [45] = {Token} {token_string_="right", token_tag_=kName}
+//    [46] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//    [47] = {Token} {token_string_="&&", token_tag_=kBooleanOperator}
+//    [48] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [49] = {Token} {token_string_="b", token_tag_=kName}
+//    [50] = {Token} {token_string_=">=", token_tag_=kBinaryComparisonOperator}
+//    [51] = {Token} {token_string_="c", token_tag_=kName}
+//    [52] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//    [53] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//    [54] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [55] = {Token} {token_string_="k", token_tag_=kName}
+//    [56] = {Token} {token_string_="+", token_tag_=kBinaryArithmeticOperator}
+//    [57] = {Token} {token_string_="j1k", token_tag_=kName}
+//    [58] = {Token} {token_string_="*", token_tag_=kBinaryArithmeticOperator}
+//    [59] = {Token} {token_string_="chArlie", token_tag_=kName}
+//    [60] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//    [61] = {Token} {token_string_="{", token_tag_=kOpenBrace}
+    REQUIRE_FALSE(SyntaxValidator::IsCondExpr(tokens, 9, 13)); // not cond expr not rel expr cuz extra brackets
     REQUIRE(SyntaxValidator::IsCondExpr(tokens, 9, 19)); // (<cond_expr>) || (<cond_expr>)
     REQUIRE(SyntaxValidator::IsCondExpr(tokens, 22, 27)); // !(<cond_expr>)
+//    REQUIRE(SyntaxValidator::IsCondExpr(tokens, 41, 53)); // !(<cond_expr>)
+//    REQUIRE(SyntaxValidator::IsCondExpr(tokens, 54, 60)); // !(<cond_expr>)
+//    REQUIRE(SyntaxValidator::IsTerm(tokens, 57, 59)); // !(<cond_expr>)
+
     REQUIRE_FALSE(SyntaxValidator::IsCondExpr(tokens, 29, 31)); // !!xxx
     REQUIRE_FALSE(SyntaxValidator::IsCondExpr(tokens, 32, 38)); // !!xxx
+
 //    REQUIRE(SyntaxValidator::IsCondExpr(tokens, 2, 20)); // (<cond_expr>) || (<cond_expr>)
+    string new_line = "!(200) |  !(xyz) | (p) && (q == 2)";
+    vector<Token> new_tokens = Tokenizer::CreateTokens(new_line);
+    REQUIRE_FALSE(SyntaxValidator::IsCondExpr(new_tokens,0, 3)); // uneven bracketing
+    REQUIRE_FALSE(SyntaxValidator::IsCondExpr(new_tokens,5, 8)); // uneven bracketing
+    REQUIRE_FALSE(SyntaxValidator::IsCondExpr(new_tokens,10, 18)); // uneven bracketing
   }
   SECTION("Check StatementPassesCommonBlacklistRules function") {
 
