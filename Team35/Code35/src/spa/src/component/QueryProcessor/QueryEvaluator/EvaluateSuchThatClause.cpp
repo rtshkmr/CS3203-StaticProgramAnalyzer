@@ -163,7 +163,8 @@ void ProcessQueryGivenFirstSynonym(PKB pkb, SuchThat such_that_clause, QueryEval
             }
         } else {
             for (auto resultIter = output.begin(); resultIter != output.end(); resultIter++ ) {
-                if (std::get<1>(*resultIter) == second_parameter) {
+              std::string possible_value = std::get<1>(*resultIter);
+                if (possible_value == second_parameter) {
                     containsRelationship = true;
                     break;
                 }
