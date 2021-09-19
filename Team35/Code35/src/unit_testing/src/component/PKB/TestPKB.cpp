@@ -3,7 +3,7 @@
 #include <component/PKB/PKB.h>
 #include <datatype/Deliverable.h>
 
-TEST_CASE("PKB population and retrieval") {
+TEST_CASE("2.PKB.PKB population and retrieval") {
 
     Deliverable d1_ = Deliverable();
 

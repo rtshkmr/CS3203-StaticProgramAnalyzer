@@ -1,10 +1,12 @@
+#include "PKB.h"
 #include <stdio.h>
 #include <iostream>
-#include <cassert>
-#include <typeinfo>
+#include <util/Logger.h>
 
+constexpr auto L = [](auto msg){
+    LOG(spa_logger << Logger::Prettify(msg));
+};
 
-#include "PKB.h"
 
 std::list<std::string> PKB::GetDesignEntity(DesignEntity de) {
     std::list<std::string> result = std::list<std::string>();
@@ -85,6 +87,7 @@ bool PKB::hasModifiedBy() {
 }
 
 void PKB::PopulateDataStructures(Deliverable d) {
+    L("... PKB will be populated by Deliverable object from SourceProcessor\n");
 
     PopulateProcList(d.proc_list_);
     PopulateVarList(d.var_list_);
@@ -116,6 +119,8 @@ void PKB::PopulateDataStructures(Deliverable d) {
     PopulateModifiedBySMap(d.modified_by_hash_);
     PopulateModifiesCMap(d.container_modifies_hash_);
     PopulateModifiedByCMap(d.container_modified_by_hash_);
+
+    L("[DONE] PKB POPULATED WITHOUT ERROR\n");
 }
 
 std::list<std::tuple<DesignEntity, std::string>> PKB::GetFollows(std::string stmt) {
@@ -585,7 +590,6 @@ void PKB::PopulateUsedBySMap(std::unordered_map<Variable*, std::list<Statement*>
 
 void PKB::PopulateUseCMap(std::unordered_map<Container*, std::list<Variable*>*> c_use_hash) {
     for (std::pair<Container*, std::list<Variable*>*> kv : c_use_hash) {
-//        std::string type = typeid(kv.first).name();
         Statement* c_stmt = dynamic_cast<Statement*>(kv.first);
         auto* kNumber = const_cast<StatementNumber*>(c_stmt->GetStatementNumber());
 
