@@ -6,7 +6,6 @@
 #include "SyntaxValidator.h"
 #include <cassert>
 #include <datatype/RegexPatterns.h>
-#include <stack>
 
 using std::string;
 using std::vector;
@@ -198,7 +197,6 @@ bool SyntaxValidator::IsTerm(const vector<Token>& statement_tokens, int left_bou
   TokenTag first_token_tag = statement_tokens.at(left_boundary_idx).GetTokenTag();
   TokenTag last_token_tag = statement_tokens.at(right_boundary_idx).GetTokenTag();
   if (first_token_tag == TokenTag::kOpenBracket && last_token_tag == TokenTag::kCloseBracket) {
-//    return IsTerm(statement_tokens, left_boundary_idx + 1, right_boundary_idx - 1);
     return IsFactor(statement_tokens, left_boundary_idx, right_boundary_idx);
   }
   /// case 1: whole range makes up a factor:
@@ -289,7 +287,7 @@ bool SyntaxValidator::IsRelFactor(const vector<Token>& statement_tokens,
                                   int right_boundary_idx) {
   TokenTag first_token_tag = statement_tokens.at(left_boundary_idx).GetTokenTag();
   TokenTag last_token_tag = statement_tokens.at(right_boundary_idx).GetTokenTag();
-  // todo: try do let IsExpr handle the strpping and don't do any stripping here, just recurse into IsExpr regardless
+  // [TODO iter 2]: try do let IsExpr handle the strpping and don't do any stripping here, just recurse into IsExpr regardless
   if (first_token_tag == TokenTag::kOpenBracket && last_token_tag == TokenTag::kCloseBracket) {
     return IsRelFactor(statement_tokens, left_boundary_idx + 1, right_boundary_idx - 1);
   }
@@ -321,7 +319,6 @@ bool SyntaxValidator::IsRelExpr(const vector<Token>& statement_tokens, int left_
 }
 
 bool SyntaxValidator::IsCondExpr(const vector<Token>& statement_tokens, int left_boundary_idx, int right_boundary_idx) {
-  // [TODO iter 2]: not sure how to handle redundant bracket for cond expr because will wrongly remove outer brackets for
   //               (cond_expr) <bool> (cond_expr) because removing the outer ones
   //               will give unequal bracketing
 
