@@ -7,106 +7,83 @@ using namespace entity_utils;
 TEST_CASE("1.UsesExtractor.Extract Uses basic conditions") {
   // setup
   Deliverable deliverable;
-  ReadEntity* read_x_ = GetReadX();
-  ReadEntity* read_y_ = GetReadY();
-  ReadEntity* read_z_ = GetReadZ();
-  ReadEntity* read_i_ = GetReadI();
-  ReadEntity* read_n_ = GetReadN();
-  ReadEntity* read_m_ = GetReadM();
-  PrintEntity* print_x_ = GetPrintX();
-  PrintEntity* print_y_ = GetPrintY();
-  PrintEntity* print_z_ = GetPrintZ();
-  PrintEntity* print_i_ = GetPrintI();
-  PrintEntity* print_n_ = GetPrintN();
-  PrintEntity* print_m_ = GetPrintM();
   AssignEntity* assign_1_ = GetAssign1();
-  AssignEntity* assign_2_ = GetAssign2();
-  AssignEntity* assign_3_ = GetAssign3();
   AssignEntity* assign_4_ = GetAssign4();
-  AssignEntity* assign_5_ = GetAssign5();
   AssignEntity* assign_6_ = GetAssign6();
   AssignEntity* assign_7_ = GetAssign7();
-  AssignEntity* assign_8_ = GetAssign8();
-  AssignEntity* assign_9_ = GetAssign9();
-  AssignEntity* assign_10_ = GetAssign10();
   IfEntity* if_1_ = GetIf1();
-  IfEntity* if_2_ = GetIf2();
-  IfEntity* if_3_ = GetIf3();
-  IfEntity* if_4_ = GetIf4();
   ElseEntity* else_1_ = GetElse();
-  ElseEntity* else_2_ = GetElse();
-  ElseEntity* else_3_ = GetElse();
-  ElseEntity* else_4_ = GetElse();
   WhileEntity* while_1_ = GetWhileEntity3();
-  WhileEntity* while_2_ = GetWhileEntity2();
-  WhileEntity* while_3_ = GetWhileEntity3();
 
-//  SECTION("Procedure with no container") {
-//    // proc with no container
-//    /*
-//     * procedure proc1 {
-//     *  print x;
-//     * }
-//     */
-//    Procedure* proc1 = new Procedure(new ProcedureName("proc1"));
-//    proc1->AddStatement(new PrintEntity(var_x_));
-//
-//    deliverable.proc_list_.push_back(proc1);
-//    std::list<Variable*> proc_var_list = {
-//        var_x_ // from print
-//    };
-//    deliverable.container_use_hash_.insert(std::make_pair(proc1, &proc_var_list));
-//
-//    UsesExtractor uses_extractor{};
-//    uses_extractor.Extract(&deliverable);
-//
+  SECTION("Procedure with no container") {
+    // proc with no container
+    /*
+     * procedure proc1 {
+     *  print x;
+     * }
+     */
+    Procedure* proc1 = new Procedure(new ProcedureName("proc1"));
+    proc1->AddStatement(new PrintEntity(var_x_));
+
+    deliverable.proc_list_.push_back(proc1);
+    std::list<Variable*> proc_var_list = {
+        var_x_ // from print
+    };
+    deliverable.container_use_hash_.insert(std::make_pair(proc1, &proc_var_list));
+
+    UsesExtractor uses_extractor{};
+    uses_extractor.Extract(&deliverable);
+
+    CHECK(deliverable.container_use_hash_.count(proc1) == 0);
+// [TODO: iter2]
 //    std::list<Variable*> actual_var_list = *deliverable.container_use_hash_.find(proc1)->second;
 //    std::list<Variable*> expected_var_list = {var_x_};
 //
 //    CHECK(actual_var_list == expected_var_list);
-//  }
+  }
 
-//  SECTION("Procedure with no var") {
-//    // proc with no container
-//    /*
-//     * procedure proc1 {
-//     *  read x;
-//     * }
-//     */
-//    Procedure* proc1 = new Procedure(new ProcedureName("proc1"));
-//    proc1->AddStatement(new ReadEntity(var_x_));
-//
-//    deliverable.proc_list_.push_back(proc1);
-//
-//    UsesExtractor uses_extractor{};
-//    uses_extractor.Extract(&deliverable);
-//
-//    CHECK(deliverable.container_use_hash_.find(proc1) == deliverable.container_use_hash_.end());
-//  }
+  SECTION("Procedure with no var") {
+    // proc with no container
+    /*
+     * procedure proc1 {
+     *  read x;
+     * }
+     */
+    Procedure* proc1 = new Procedure(new ProcedureName("proc1"));
+    proc1->AddStatement(new ReadEntity(var_x_));
 
-//  SECTION("Procedure calls procedure with no var") {
-//    // proc with no container
-//    /*
-//     * procedure proc1 {
-//     *  call proc2;
-//     * }
-//     * procedure proc2 {
-//     *  read x;
-//     * }
-//     */
-//    Procedure* proc1 = new Procedure(new ProcedureName("proc1"));
-//    Procedure* proc2 = new Procedure(new ProcedureName("proc2"));
-//    proc2->AddStatement(new ReadEntity(var_x_));
-//    proc1->AddStatement(new CallEntity(proc2));
-//
-//    deliverable.proc_list_.push_back(proc1);
-//    deliverable.proc_list_.push_back(proc2);
-//
-//    UsesExtractor uses_extractor{};
-//    uses_extractor.Extract(&deliverable);
-//
-//    CHECK(deliverable.container_use_hash_.find(proc1) == deliverable.container_use_hash_.end());
-//  }
+    deliverable.proc_list_.push_back(proc1);
+
+    UsesExtractor uses_extractor{};
+    uses_extractor.Extract(&deliverable);
+
+    CHECK(deliverable.container_use_hash_.count(proc1) == 0);
+  }
+
+  SECTION("Procedure calls procedure with no var") {
+    // proc with no container
+    /*
+     * procedure proc1 {
+     *  call proc2;
+     * }
+     * procedure proc2 {
+     *  read x;
+     * }
+     */
+    Procedure* proc1 = new Procedure(new ProcedureName("proc1"));
+    Procedure* proc2 = new Procedure(new ProcedureName("proc2"));
+    proc2->AddStatement(new ReadEntity(var_x_));
+    proc1->AddStatement(new CallEntity(proc2));
+
+    deliverable.proc_list_.push_back(proc1);
+    deliverable.proc_list_.push_back(proc2);
+
+    UsesExtractor uses_extractor{};
+    uses_extractor.Extract(&deliverable);
+
+    CHECK(deliverable.container_use_hash_.count(proc1) == 0);
+    CHECK(deliverable.container_use_hash_.count(proc2) == 0);
+  }
 
   SECTION("Procedure with 1 if container") {
     // proc with if container
@@ -247,36 +224,18 @@ TEST_CASE("1.UsesExtractor.Extract Uses basic conditions") {
 TEST_CASE("1.UsesExtractor.Extract Uses nested containers") {
   // setup
   Deliverable deliverable;
-  ReadEntity* read_x_ = GetReadX();
-  ReadEntity* read_y_ = GetReadY();
-  ReadEntity* read_z_ = GetReadZ();
-  ReadEntity* read_i_ = GetReadI();
-  ReadEntity* read_n_ = GetReadN();
-  ReadEntity* read_m_ = GetReadM();
-  PrintEntity* print_x_ = GetPrintX();
-  PrintEntity* print_y_ = GetPrintY();
-  PrintEntity* print_z_ = GetPrintZ();
-  PrintEntity* print_i_ = GetPrintI();
-  PrintEntity* print_n_ = GetPrintN();
-  PrintEntity* print_m_ = GetPrintM();
   AssignEntity* assign_1_ = GetAssign1();
-  AssignEntity* assign_2_ = GetAssign2();
   AssignEntity* assign_3_ = GetAssign3();
   AssignEntity* assign_4_ = GetAssign4();
   AssignEntity* assign_5_ = GetAssign5();
   AssignEntity* assign_6_ = GetAssign6();
   AssignEntity* assign_7_ = GetAssign7();
-  AssignEntity* assign_8_ = GetAssign8();
-  AssignEntity* assign_9_ = GetAssign9();
-  AssignEntity* assign_10_ = GetAssign10();
   IfEntity* if_1_ = GetIf1();
   IfEntity* if_2_ = GetIf2();
   IfEntity* if_3_ = GetIf3();
-  IfEntity* if_4_ = GetIf4();
   ElseEntity* else_1_ = GetElse();
   ElseEntity* else_2_ = GetElse();
   ElseEntity* else_3_ = GetElse();
-  ElseEntity* else_4_ = GetElse();
   WhileEntity* while_1_ = GetWhileEntity3();
   WhileEntity* while_2_ = GetWhileEntity2();
   WhileEntity* while_3_ = GetWhileEntity3();

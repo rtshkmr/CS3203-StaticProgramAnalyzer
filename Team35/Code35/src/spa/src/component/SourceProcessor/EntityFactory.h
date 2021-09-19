@@ -6,7 +6,6 @@
 #define AUTOTESTER_TEAM00_CODE00_SRC_SPA_SRC_COMPONENT_SOURCEPROCESSOR_ENTITYFACTORY_H_
 
 #include <model/Entity.h>
-#include <vector>
 
 class EntityFactory {
  public:

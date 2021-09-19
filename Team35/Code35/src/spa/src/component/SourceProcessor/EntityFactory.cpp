@@ -1,10 +1,8 @@
 #include <cassert>
 #include <stdexcept>
-#include <iostream>
 #include <utility>
 #include "EntityFactory.h"
 #include "model/Statement.h"
-#include "datatype/DataType.h"
 
 using std::string;
 using std::vector;
@@ -28,7 +26,7 @@ Entity* EntityFactory::CreateEntities(vector<Token> tokens) {
     case TokenTag::kProcedureKeyword: {
       assert(tokens[1].GetTokenTag() == TokenTag::kName);
       std::string proc_token_string = tokens[1].GetTokenString();
-      // todo: need to check if proc was already created and defined
+      // TODO iter2: need to check if proc was already created and defined (issue #27)
       return CreateProcedure(proc_token_string);
     }
     case TokenTag::kReadKeyword: {
@@ -124,7 +122,6 @@ Entity* EntityFactory::CreateAssignEntity(vector<Token> tokens) {
 vector<Token> EntityFactory::GetExpressionTokens(vector<Token> tokens, TokenTag start_tag, TokenTag end_tag) {
   int start_iter = -1;
   int end_iter = -1;
-  int tokens_size = tokens.size();
   // finding first start tag
   start_iter = Token::GetFirstMatchingTokenIdx(tokens, start_tag);
   // finding last end tag
@@ -134,7 +131,7 @@ vector<Token> EntityFactory::GetExpressionTokens(vector<Token> tokens, TokenTag 
   }
   if (start_iter + 1 >= end_iter) {
     throw std::invalid_argument("EF:There is nothing between start and end tag.\n");
-  };
+  }
 
   // collecting tokens
   vector<Token> expression_tokens;
@@ -184,14 +181,14 @@ vector<ConstantValue*> EntityFactory::GetConstantsFromExpressionTokens(vector<To
 }
 
 Procedure* EntityFactory::CreateProcedure(std::string proc_name) {
-  //TODO: Create destructor for ProcedureName and Procedure.
+  // TODO iter2: Create destructor for ProcedureName and Procedure.
   Procedure* p = new Procedure(new ProcedureName(std::move(proc_name)));
   proc_list_->push_back(p);
   return p;
 }
 
 Variable* EntityFactory::CreateVariable(std::string var_name) {
-  //TODO: Create destructor for VariableName and Variable.
+  //TODO iter2: Create destructor for VariableName and Variable.
   Variable* v = new Variable(new VariableName(std::move(var_name)));
   var_list_->push_back(v);
   return v;
@@ -207,8 +204,6 @@ ConstantValue* EntityFactory::CreateConstantValue(std::string const_val) {
  * Tries to retrieve the correct procedure object using the name. If fails, create a new Procedure object.
  */
 Procedure* EntityFactory::RetrieveProcedure(std::string proc_name) {
-  //TODO: improve the algo
-
   ProcedureName temp_proc_name = ProcedureName(proc_name);
   for (auto const &proc : *proc_list_) {
     if (*proc->GetName() == temp_proc_name) { // uses the overloaded ==
@@ -223,8 +218,6 @@ Procedure* EntityFactory::RetrieveProcedure(std::string proc_name) {
  * Tries to retrieve the correct variable object using the name. If fails, create a new Variable object.
  */
 Variable* EntityFactory::RetrieveVariable(std::string var_name) {
-  //TODO: improve the algo
-
   VariableName temp_var_name = VariableName(var_name);
   for (auto const &var : *var_list_) {
     if (*var->GetName() == temp_var_name) { // uses the overloaded ==
