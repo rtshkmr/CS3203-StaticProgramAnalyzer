@@ -30,13 +30,13 @@ PKB* SourceProcessor::ProcessSourceFile(std::string file_name) {
   } catch (SyntaxException s) {
     std::cerr << "Syntax Error\n";
     std::cerr << s.what() << std::endl;
-    return new PKB();
+    Terminate();
   } catch (IterationOneException s) {
     std::cerr << "Syntax Error (due to Iteration 1 requirement)\n";
     std::cerr << s.what() << std::endl;
 
     L("[EXIT] SOURCE PROC");
-    return new PKB();
+    Terminate();
   }
 
   Deliverable* deliverable = parser.GetDeliverables();
@@ -46,4 +46,13 @@ PKB* SourceProcessor::ProcessSourceFile(std::string file_name) {
   PKB* new_pkb = new PKB();
   new_pkb->PopulateDataStructures(*deliverable);
   return new_pkb;
+}
+
+/**
+ * Terminates Parser execution and logger, and exits program.
+ */
+void SourceProcessor::Terminate() {
+  L("[EXIT] TERMINATING PROGRAM");
+  LoggerTerminate();
+  std::exit(EXIT_FAILURE);
 }
