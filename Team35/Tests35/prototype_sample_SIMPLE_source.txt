@@ -11,7 +11,7 @@ if (!(a != 0)) then{
 	while (x >tmp) {
         x = x + 1;
         if (left!=1) then {
-          while (((left + 1) !=(((right * 1)))) && (b>=c)){
+          while (((    (y > 69) && (x < 5)      ) || (y < 5)) && (z < 10)){
             Romeo = Romeo - 1;
             b = 0;
             c = delta    + l  / width + Romeo; }}
