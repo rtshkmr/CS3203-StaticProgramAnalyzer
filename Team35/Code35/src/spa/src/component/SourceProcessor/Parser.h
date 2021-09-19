@@ -18,7 +18,7 @@ namespace par {
     public:
         Parser() = default;
 
-        void Parse(std::string file_name);
+        void Parse(const std::string& file_name);
 
         Deliverable* GetDeliverables();
     };
