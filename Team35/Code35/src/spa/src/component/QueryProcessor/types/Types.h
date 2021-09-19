@@ -42,7 +42,7 @@ static DesignEntity GetDesignEntity(std::string reference) {
   } else if (reference == "procedure") {
       return DesignEntity::kProcedure;
   }
-  // TODO: Throw an error if this line is reached.
+
   return DesignEntity::kInvalid;
 }
 

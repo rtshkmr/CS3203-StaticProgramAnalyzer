@@ -28,6 +28,7 @@ add_library(spa ${srcs} ${headers}
         src/component/QueryProcessor/QueryExtractor/QueryTokenizer.h src/component/QueryProcessor/QueryExtractor/QueryTokenizer.cpp
         src/component/QueryProcessor/QueryExtractor/QueryParser.h src/component/QueryProcessor/QueryExtractor/QueryParser.cpp
         src/component/QueryProcessor/QueryExtractor/QueryExtractor.h src/component/QueryProcessor/QueryExtractor/QueryExtractor.cpp
+        src/component/QueryProcessor/QueryExtractor/QueryValidator.h src/component/QueryProcessor/QueryExtractor/QueryValidator.cpp
         src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatClause.h src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatClause.cpp
         src/component/QueryProcessor/QueryEvaluator/EvaluatePatternClause.h src/component/QueryProcessor/QueryEvaluator/EvaluatePatternClause.cpp
         src/component/QueryProcessor/QueryEvaluator/QueryPKB.h src/component/QueryProcessor/QueryEvaluator/QueryPKB.cpp

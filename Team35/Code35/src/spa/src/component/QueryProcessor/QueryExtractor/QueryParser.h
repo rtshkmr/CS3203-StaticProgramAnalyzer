@@ -36,11 +36,12 @@ class QueryParser {
     void GetDeclaration();
     std::vector<Token> GetSynonyms();
   public:
-  QueryParser(std::vector<Clause*>& clauses, std::list<Group*>& groups, std::list<Synonym>& synonyms,
-              Synonym& target, QueryTokenizer tokenizer) :
-              clauses(clauses), groups(groups), synonyms(synonyms), target(target), tokenizer(tokenizer) {};
-  void parse();
-  std::list<Group*> GetGroupsList() { return groups; };
+    QueryParser(std::vector<Clause*>& clauses, std::list<Group*>& groups, std::list<Synonym>& synonyms,
+                Synonym& target, QueryTokenizer tokenizer) :
+                clauses(clauses), groups(groups), synonyms(synonyms), target(target), tokenizer(tokenizer) {};
+    void parse();
+    std::list<Group*> GetGroupsList() { return groups; };
+    static Synonym GetSynonymInfo(std::string syn_name, std::list<Synonym>* synonyms);
 };
 
 #endif //AUTOTESTER_QUERYPARSER_H
