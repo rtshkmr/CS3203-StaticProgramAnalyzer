@@ -44,27 +44,15 @@ void TestWrapper::parse(std::string file_name) {
 
 }
 
-std::vector<std::string> split(std::string const& input) {
-  std::istringstream buffer(input);
-  std::vector<std::string> ret;
-
-  std::copy(std::istream_iterator<std::string>(buffer),
-            std::istream_iterator<std::string>(),
-            std::back_inserter(ret));
-  return ret;
-}
-
 // method to evaluating a query
 void TestWrapper::evaluate(std::string query, std::list<std::string>& results) {
   L("[BEFORE] EVALUATING  QUERY ");
 // call your evaluator to evaluate the query here
-  std::optional<std::string> s = QuerySystemController::Evaluate(& query, pkb);
+  std::optional<std::list<std::string>> populated_result_list = QuerySystemController::Evaluate(& query, pkb);
   L("... Query System controller has evaluated the query");
-  if (s) {
-    std::vector<std::string> res_vec = split(s.value());
-
-    for (std::string s : res_vec) {
-      results.push_back(s);
+  if (populated_result_list) {
+    for(const auto& elem : populated_result_list.value()){
+      results.push_back(elem);
     }
   }
   L("EVALUATED QUERY");
