@@ -25,19 +25,19 @@ class QueryParser {
     Token Eat(TokenTag tokenType);
 
     void ParseQuery();
+    void ParseSelect();
+    void ParseSuchThat();
+    void ParsePattern();
     void ParseDeclarations();
+    void ParseTarget();
+    void ParseDeclaration();
+
     std::tuple<std::string, bool, bool> ParseStmtRef();
     std::pair<Clause*, bool> ParseRelRef();
     Token ParseEntRef(bool isPatternCl);
-    std::string ParseFactor();
     std::pair<std::string, bool> ParseExpressionSpec();
-    void ParseSuchThat();
-    void ParsePattern();
-    void ParseSelect();
-
-    void GetTarget();
-    void GetDeclaration();
-    std::vector<Token> GetSynonyms();
+    std::string ParseFactor();
+    std::vector<Token> ParseSynonyms();
 
     bool IsValidSynonym(Token token);
     bool IsValidSynonym(Token token, DesignEntity de);
