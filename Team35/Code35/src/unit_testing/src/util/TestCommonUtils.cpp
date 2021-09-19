@@ -5,7 +5,7 @@
 #include <filesystem>
 #include "catch.hpp"
 
-TEST_CASE("Testing time util") {
+TEST_CASE("0.Utils.Testing time util") {
   std::string date_time = TimeUtil::GetDateTimeStr();
   std::string file_name_date_time = TimeUtil::GetDateTimeFileNameStr();
   std::cout << ("date time is: " + date_time + "\n");
@@ -13,10 +13,8 @@ TEST_CASE("Testing time util") {
   int x = 1;
 }
 
-TEST_CASE("Testing basic LOG function") {
+TEST_CASE("0.Testing basic LOG function") {
   LoggerSettings logger_settings;
-//  logger_settings.filepath_ = std::filesystem::current_path().string();
-//  logger_settings.filename_ = "testing_logger_obj_filename.log";
   logger_settings.can_overwrite_file_ = true;
   logger_settings.out_to_stdout_ = true;
   logger_settings.out_to_file_ = true;

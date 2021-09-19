@@ -8,6 +8,11 @@
 
 using namespace sp;
 
+
+constexpr auto L = [](auto msg){
+  LOG(spa_logger << Logger::Prettify(msg));
+};
+
 /**
  * Processes the file by parsing it and extracting the entities and relationships to be populated in the PKB.
  * Returns a newly created PKB.
@@ -16,8 +21,8 @@ using namespace sp;
  * @return Source process status
  */
 PKB* SourceProcessor::ProcessSourceFile(std::string file_name) {
-  LOG (spa_logger << "==========================  [ENTER] SOURCE PROC ======================");
-  LOG(spa_logger << "... processing source file");
+  L ("[ENTER] SOURCE PROC ");
+  L("... processing source file");
   par::Parser parser;
 
   try {
@@ -30,7 +35,7 @@ PKB* SourceProcessor::ProcessSourceFile(std::string file_name) {
     std::cerr << "Syntax Error (due to Iteration 1 requirement)\n";
     std::cerr << s.what() << std::endl;
 
-    LOG (spa_logger << "\n\n\n==========================  [EXIT] SOURCE PROC ======================\n\n\n");
+    L("[EXIT] SOURCE PROC");
     return new PKB();
   }
 

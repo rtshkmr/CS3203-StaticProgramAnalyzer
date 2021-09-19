@@ -15,7 +15,7 @@ class Logger;
 extern Logger spa_logger;
 #define LoggerInit(logger_settings) spa_logger.InitLogger(logger_settings);
 #define LoggerTerminate() spa_logger.TerminateLogger();
-#define LOG (spa_logger << spa_logger.AddPrefix(__FILE__, __LINE__));
+#define LOG (spa_logger << spa_logger.AddPrefix(__FILE__, __LINE__,__func__));
 
 class LoggerSettings {
  public:
@@ -47,7 +47,8 @@ class Logger {
   template<typename T>
   Logger& operator<<(T t);
   Logger& operator<<(std::ostream& (* fun)(std::ostream&));
-  [[nodiscard]] std::string AddPrefix(const std::string& file, int line) const;
+  [[nodiscard]] std::string AddPrefix(const std::string& file, const int line, const std::string& function) const;
+  static std::string Prettify(const std::string& original_mesage);
 };
 
 /**

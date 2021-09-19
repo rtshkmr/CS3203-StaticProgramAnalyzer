@@ -5,8 +5,12 @@
 #include "Logger.h"
 
 Logger spa_logger;
+static std::string marker = "~~~~~~~~~~~~~~~~~";
+
+/**
+ * Constructs a default logger settings object
+ */
 LoggerSettings::LoggerSettings() {
-  this->filepath_ = "";
   this->filename_ = "Team35_SPA.log";
   this->can_overwrite_file_ = true;
   this->out_to_file_ = true;
@@ -55,15 +59,15 @@ bool Logger::InitLogger(const LoggerSettings& settings) {
   }
   return true;
 }
-std::string Logger::AddPrefix(const std::string& file, const int line) const {
+std::string Logger::AddPrefix(const std::string& file, const int line, const std::string& function) const {
   std::string result;
-  result += "\n";
+  result += "\n" + marker + "\n";
   if (this->logger_settings_.include_datetime_) {
     result += TimeUtil::GetDateTimeStr();
     if (!this->logger_settings_.include_file_line_) {
       result += ": ";
     } else {
-      result += ", ";
+      result += "\n";
     }
   }
   if (this->logger_settings_.include_file_line_) {
@@ -72,3 +76,10 @@ std::string Logger::AddPrefix(const std::string& file, const int line) const {
   result += "\n";
   return result;
 }
+
+std::string Logger::Prettify(const std::string& original_mesage) {
+  return ">>>>> [INFO] "
+      + original_mesage + "\n"
+      + marker + "\n";
+}
+

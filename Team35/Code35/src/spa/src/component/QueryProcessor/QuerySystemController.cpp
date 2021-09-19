@@ -8,8 +8,13 @@
 #include <component/QueryProcessor/QueryExtractor/QueryExtractor.h>
 #include <util/Logger.h>
 
+constexpr auto L = [](auto msg) {
+  LOG
+  (spa_logger << Logger::Prettify(msg));
+};
+
 std::string QuerySystemController::Evaluate(std::string* query, PKB* pkb) {
-  LOG (spa_logger << "\n\n\n==========================  [ENTER] Query System Controller EVALUATE ======================\n\n\n");
+  L("[ENTER] Query System Controller EVALUATE");
   auto query_extractor = QueryExtractor(query);
   try {
     query_extractor.ExtractQuery();
@@ -19,17 +24,17 @@ std::string QuerySystemController::Evaluate(std::string* query, PKB* pkb) {
   auto query_evaluator = QueryEvaluator(query_extractor.GetSynonymsList(),
                                         query_extractor.GetTarget(),
                                         query_extractor.GetGroupsList(),
-                                        *pkb);
+                                        * pkb);
 
-  LOG (spa_logger << "\n\n\n==========================  [ENTER] Query Evaluator Evaluate Query ======================\n\n\n");
+  L("[ENTER] Query Evaluator Evaluate Query");
   std::vector<std::string> result_list = query_evaluator.EvaluateQuery();
-  LOG (spa_logger << "\n\n\n==========================  [EXIT] Query Evaluator Evaluate Query ======================\n\n\n");
+  L("[EXIT] Query Evaluator Evaluate Query ");
   if (!result_list.empty()) {
     std::string result_string = QueryProjector::FormatQuery(result_list);
-    LOG (spa_logger << "\n\n\n==========================  [EXIT] Query System Controller EVALUATE ======================\n\n\n");
+    L("[EXIT] Query System Controller EVALUATE ");
     return result_string;
   }
-  LOG (spa_logger << "\n\n\n==========================  [EXIT] Query System Controller EVALUATE ======================\n\n\n");
+  L("[EXIT] Query System Controller EVALUATE ");
   return "";
 };
 
