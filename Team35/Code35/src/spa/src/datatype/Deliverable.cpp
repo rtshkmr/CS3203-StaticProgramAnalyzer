@@ -28,6 +28,13 @@ void Deliverable::AddReadEntity(ReadEntity* read_entity) {
   read_list_.push_back(read_entity);
 }
 
+/**
+ * Adds Follows relationship into the hashmap of deliverable. Follows is a 1-to-1 bidirectional relationship
+ * so f2 cannot be inserted into followed_by_hash if f1 was not inserted into follow_hash_.
+ *
+ * @param f1 Previous Statement.
+ * @param f2 Following Statement.
+ */
 void Deliverable::AddFollowRelationship(Statement* f1, Statement* f2) {
   // Follows is a 1-to-1 relationship so if f1 was not inserted into follow_hash_,
   // f2 cannot be inserted into followed_by_hash

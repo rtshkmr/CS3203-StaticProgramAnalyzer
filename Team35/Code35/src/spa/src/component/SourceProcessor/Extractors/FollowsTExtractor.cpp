@@ -22,13 +22,14 @@ void FollowsTExtractor::Extract(Deliverable* deliverable) {
 
   for (Procedure* proc: deliverable_->proc_list_) {
     if (proc->GetStatementList()->size() > 0) {
-      // todo: change to assert when empty procs are handled in iter1
+      // TODO iter2: change to assert when after empty procs are handled
       // empty procs are created when there is a call but the procedure was not defined
       Statement* first_statement = proc->GetStatementList()->front();
       ExtractFollowsTFromThread(first_statement);
     }
   }
 }
+
 /**
  * Extracts Follows* relationship recursively from the thread of Statements that Follow one another transitively.
  * Adds any intermediate Follows* relationship to the deliverable.

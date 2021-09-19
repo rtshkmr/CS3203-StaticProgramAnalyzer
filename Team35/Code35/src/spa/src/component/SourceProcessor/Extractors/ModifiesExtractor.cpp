@@ -18,7 +18,7 @@ void ModifiesExtractor::Extract(Deliverable* deliverable) {
     }
   }
 
-  // todo: remove deletion of procedure after iter1
+  // TODO iter2: remove deletion of procedure
   // deletes procedure and else entries in the container_modifies_hash and container_modified_by_hash
   std::list<Container*> cont_list;
   for (auto pair: deliverable_->container_modifies_hash_) {
@@ -36,7 +36,6 @@ void ModifiesExtractor::Extract(Deliverable* deliverable) {
         }
       }
       cont_list.push_back(pair.first);
-
     }
   }
   for (auto cont: cont_list) {
