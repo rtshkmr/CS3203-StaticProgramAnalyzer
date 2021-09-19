@@ -39,7 +39,7 @@ PKB* SourceProcessor::ProcessSourceFile(std::string file_name) {
   } catch (std::exception e) {
     std::cerr << "Exception error\n";
     std::cerr << e.what() << std::endl;
-    Terminate(std::string("Unfortunately, there was some exception thrown."));
+    Terminate(std::string("Unfortunately, there was an unknown exception thrown due to an invalid SIMPLE program."));
   }
 
   Deliverable* deliverable = parser.GetDeliverables();
