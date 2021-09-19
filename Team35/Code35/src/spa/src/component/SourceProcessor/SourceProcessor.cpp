@@ -30,13 +30,12 @@ PKB* SourceProcessor::ProcessSourceFile(std::string file_name) {
   } catch (SyntaxException s) {
     std::cerr << "Syntax Error\n";
     std::cerr << s.what() << std::endl;
-    Terminate();
+    Terminate(std::string("Unfortunately, there was a syntax error in the input SIMPLE Program:("));
   } catch (IterationOneException s) {
     std::cerr << "Syntax Error (due to Iteration 1 requirement)\n";
     std::cerr << s.what() << std::endl;
-
     L("[EXIT] SOURCE PROC");
-    Terminate();
+    Terminate(std::string("Unfortunately, the Source input had something that isn't supported for SPA Iteration 1"));
   }
 
   Deliverable* deliverable = parser.GetDeliverables();
@@ -51,8 +50,9 @@ PKB* SourceProcessor::ProcessSourceFile(std::string file_name) {
 /**
  * Terminates Parser execution and logger, and exits program.
  */
-void SourceProcessor::Terminate() {
-  L("[ERROR] TERMINATING PROGRAM");
+void SourceProcessor::Terminate(std::string msg) {
+  std::string logger_output = msg + "\n [ERROR] TERMINATING PROGRAM";
+  L(logger_output);
   LoggerTerminate();
   std::exit(EXIT_FAILURE);
 }

@@ -19,7 +19,7 @@ namespace sp {
         SourceProcessor() = default;
 
         static PKB* ProcessSourceFile(std::string file_name);
-        static void Terminate();
+        static void Terminate(std::string msg);
     };
 }
 
