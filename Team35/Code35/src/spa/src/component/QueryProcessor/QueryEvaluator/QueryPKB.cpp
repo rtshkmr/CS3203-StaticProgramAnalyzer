@@ -19,7 +19,7 @@ bool QueryPkbForRelationshipExistence(PKB database, RelRef r) {
   }
 }
 
-std::list<std::tuple<DesignEntity, std::string>> QueryPKBSuchThat(PKB database, RelRef r, std::string stmt, bool is_first_param) {
+std::list<std::tuple<DesignEntity, std::string>> QueryPKBSuchThat(PKB database, RelRef r, const std::string& stmt, bool is_first_param) {
   switch(r) {
     case RelRef::kFollows:
       return is_first_param ? database.GetFollows(stmt) : database.GetPrevious(stmt);
@@ -39,6 +39,6 @@ std::list<std::tuple<DesignEntity, std::string>> QueryPKBSuchThat(PKB database, 
   }
 }
 
-std::vector<AssignEntity> QueryPkbPattern(PKB database, bool is_assign_synonym, std::string value) {
+std::vector<AssignEntity> QueryPkbPattern(PKB database, bool is_assign_synonym, const std::string& value) {
   return is_assign_synonym ? database.GetPatternByAssign(value) : database.GetPatternByVariable(value);
 }
