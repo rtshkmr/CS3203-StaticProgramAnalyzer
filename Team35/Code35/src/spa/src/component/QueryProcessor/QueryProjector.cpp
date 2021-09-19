@@ -5,15 +5,4 @@ std::list<std::string> QueryProjector::FormatQuery(std::vector<std::string> resu
   results.erase(std::unique(results.begin(), results.end() ), results.end() );
   std::list<std::string> result_list(results.begin(), results.end());
   return result_list;
-
-
-//  std::string output;
-//
-//
-//  for (std::string result : results) {
-//    output += result;
-//    output += " ";
-//  }
-//  output.erase(output.size() - 1);
-//  return output;
 };
