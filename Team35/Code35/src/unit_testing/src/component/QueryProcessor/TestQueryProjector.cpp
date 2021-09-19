@@ -1,4 +1,5 @@
 #include "catch.hpp"
+#include <list>
 #include "component/QueryProcessor/QueryProjector.h"
 
 TEST_CASE("3.QueryProjector.Given list of string of statement ref") {
