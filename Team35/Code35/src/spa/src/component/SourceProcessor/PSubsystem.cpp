@@ -1,10 +1,7 @@
 #include <stdexcept>
 #include <cassert>
-#include <iostream>
-#include <util/Logger.h>
 #include "PSubsystem.h"
 #include "Tokenizer.h"
-#include "EntityFactory.h"
 #include "exception/SyntaxException.h"
 #include "exception/IterationOneException.h"
 
