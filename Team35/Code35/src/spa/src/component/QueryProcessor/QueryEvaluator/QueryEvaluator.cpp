@@ -66,6 +66,11 @@ void QueryEvaluator::EvaluateAllGroups(QueryEvaluatorTable* table) {
     }
 }
 
+/**
+ * Determing the result of the query by factoring in the result of the boolean groups.
+ * @param table The table containing the target synonym.
+ * @return a list of strings representing the final correct values.
+ */
 std::vector<std::string> QueryEvaluator::GetResult(QueryEvaluatorTable* table) const {
   if (!boolean_result) {
     std::vector<std::string> empty_list = {};
@@ -75,6 +80,11 @@ std::vector<std::string> QueryEvaluator::GetResult(QueryEvaluatorTable* table) c
   }
 }
 
+/**
+ * Process each group based on whether the contain the target synonym or not.
+ * @param clause_list The list of clauses for a particular group.
+ * @param table The table representing a particular group.
+ */
 void QueryEvaluator::ProcessGroup(const std::vector<Clause*>& clause_list, QueryEvaluatorTable* table) {
 
     for (Clause* current_clause : clause_list) {
@@ -91,6 +101,10 @@ void QueryEvaluator::ProcessGroup(const std::vector<Clause*>& clause_list, Query
     }
 }
 
+/**
+ * Finds the main synonym for a boolean group and adding it to the table representing the current boolean group.
+ * @param clause_list The list of clause in the current group.
+ */
 void QueryEvaluator::PreprocessBooleanGroup(std::vector<Clause*> clause_list) {
     Clause* firstClause = clause_list[0];
     std::string synonym_name;

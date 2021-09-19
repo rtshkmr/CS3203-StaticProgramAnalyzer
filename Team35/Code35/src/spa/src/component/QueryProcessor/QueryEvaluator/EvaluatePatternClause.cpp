@@ -4,6 +4,14 @@
 
 #include "EvaluatePatternClause.h"
 
+/**
+ * For each pattern clause, there are many different types of configurations provided to the pattern clause, and each
+ * type will be sent to a relevant method to further process that type of clause.
+ * @param pattern The pattern clause
+ * @param table The table containing the synonym of the current pattern clause.
+ * @param pkb The pkb containing the information about the source program.
+ * @param synonym_design_entity_map The unordered map, mapping the name of the synonym to its design entity.
+ */
 void ProcessPatternClause(const Pattern& pattern, QueryEvaluatorTable* table, const PKB& pkb,
                           std::unordered_map<std::string, DesignEntity> synonym_design_entity_map) {
   std::string assign_synonym_name = pattern.assign_synonym;
@@ -121,6 +129,7 @@ void EvaluatePatternDoubleSynonymSecondPresent(const Pattern& p, QueryEvaluatorT
       std::string name = vn.getName();
       std::string statement_number = std::to_string(assign_entity.GetStatementNumber()->getNum());
 
+      // If the LHS or RHS of the pattern does not match, do not add it to the table.
       if (name != current_variable || !HasExpressionMatch(p, assign_entity)) {
         continue;
       }
@@ -130,6 +139,7 @@ void EvaluatePatternDoubleSynonymSecondPresent(const Pattern& p, QueryEvaluatorT
       repeat_count++;
     }
 
+    // If there are no variables matching at all, delete this current row since it does not hold true.
     if (!has_variable) {
       table->DeleteRow(table_index);
       table_index--;
