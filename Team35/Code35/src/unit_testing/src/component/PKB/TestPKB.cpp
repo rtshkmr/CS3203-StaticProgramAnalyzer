@@ -58,7 +58,7 @@ TEST_CASE("2.PKB.PKB population and retrieval") {
 
     pkb.PopulateDataStructures(d1_);
 
-
+    // Check if PKB can store and retrieve individual elements (e.g. read, print, constant, variable)
     SECTION("Get DesignEntity") {
 
         SECTION("Procedure") {
@@ -103,6 +103,7 @@ TEST_CASE("2.PKB.PKB population and retrieval") {
 
     }
 
+    // Check if PKB can store and retrieve relationships
     SECTION("Get Relationship") {
         SECTION("Follows") {
             std::list<std::tuple<DesignEntity, std::string>> follows_list{std::make_tuple(DesignEntity::kAssign, "2")};
@@ -137,6 +138,7 @@ TEST_CASE("2.PKB.PKB population and retrieval") {
         }
     }
 
+    // Check if PKB can store and retrieve the existence of any relationship
     SECTION("Has Relationship") {
         SECTION("Follows") {
             REQUIRE(pkb.hasFollows());
@@ -171,6 +173,7 @@ TEST_CASE("2.PKB.PKB population and retrieval") {
         }
     }
 
+    // Check if PKB can store and retrieve assign expressions given either variable name or statement number
     SECTION("Assignment Expressions") {
         SECTION("GetPatternByAssign") {
             std::vector<AssignEntity> pkbEntityVector = pkb.GetPatternByAssign("2");
