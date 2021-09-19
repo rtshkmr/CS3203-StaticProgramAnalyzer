@@ -6,18 +6,18 @@
 
 void ProcessPatternClause(const Pattern pattern, QueryEvaluatorTable* table, const PKB pkb,
                           std::unordered_map<std::string, DesignEntity> synonym_design_entity_map) {
-  std::string assignSynonymName = pattern.assign_synonym;
-  std::string variableValue = pattern.left_hand_side;
+  std::string assign_synonym_name = pattern.assign_synonym;
+  std::string variable_value = pattern.left_hand_side;
 
   if (pattern.left_is_synonym) {
     // Case for 2 synonyms
-    if (table->ContainsColumn(variableValue) && table->ContainsColumn(assignSynonymName)) {
+    if (table->ContainsColumn(variable_value) && table->ContainsColumn(assign_synonym_name)) {
       // Both synonym in table
       EvaluatePatternDoubleSynonym(pattern, table, pkb);
-    } else if (table->ContainsColumn(assignSynonymName)) {
+    } else if (table->ContainsColumn(assign_synonym_name)) {
       // Table only contains assign synonym
       EvaluatePatternDoubleSynonymFirstPresent(pattern, table, pkb);
-    } else if (table->ContainsColumn(variableValue)) {
+    } else if (table->ContainsColumn(variable_value)) {
       // Table only contains variable synonym
       EvaluatePatternDoubleSynonymSecondPresent(pattern, table, pkb, synonym_design_entity_map);
     } else {
@@ -27,7 +27,7 @@ void ProcessPatternClause(const Pattern pattern, QueryEvaluatorTable* table, con
   } else {
     // Case of 1 synonym (assign)
     // This section to be targeted in issue 92
-    if (table->ContainsColumn(assignSynonymName)) {
+    if (table->ContainsColumn(assign_synonym_name)) {
       EvaluatePatternSingleSynonym(pattern, table, pkb);
     } else {
       // Technically this should never run

@@ -13,6 +13,8 @@
 #include "component/PKB/PKB.h"
 #include "QueryPKB.h"
 
+void EvaluateSuchThatClause(SuchThat such_that_clause, QueryEvaluatorTable* table, PKB pkb,
+                            std::list<Synonym> synonym_list);
 void ProcessQueryGivenFirstSynonym(PKB pkb, SuchThat such_that_clause, QueryEvaluatorTable* table);
 void ProcessQueryGivenSecondSynonym(PKB pkb, SuchThat such_that_clause, QueryEvaluatorTable* table);
 void BothSynonymInTable(PKB pkb, SuchThat such_that_clause, QueryEvaluatorTable* table);
@@ -20,5 +22,6 @@ void ProcessNewColumn(std::string target_synonym_name, Synonym new_synonym, Quer
                       RelRef relationship, bool givenFirstParam, PKB pkb);
 bool SynonymTypeMatches(DesignEntity current_synonym, DesignEntity synonym_type_to_match);
 bool EvaluateNoSynonym(SuchThat st, PKB pkb);
+Synonym GetSynonymFromName(std::string synonym_name, std::list<Synonym> synonym_list);
 
 #endif //AUTOTESTER_EVALUATESUCHTHATCLAUSE_H

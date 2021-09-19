@@ -17,18 +17,19 @@ class QueryEvaluator {
     QueryEvaluator(std::list<Synonym> syn_list, Synonym target, std::list<Group*> groups, PKB pkb);
     std::vector<std::string> EvaluateQuery();
   private:
-    std::list<Synonym> synonymlist;
-    Synonym targetSynonym;
-    std::list<Group*> groupList;
+    std::list<Synonym> synonym_list;
+    Synonym target_synonym;
+    std::list<Group*> group_list;
     PKB pkb;
-    bool booleanResult;
+    bool boolean_result;
     std::unordered_map<std::string, std::list<std::string>> map_of_synonym_values;
     std::unordered_map<std::string, DesignEntity> synonym_design_entity_map;
+
     void PopulateSynonymValues(QueryEvaluatorTable* table);
     void EvaluateAllGroups(QueryEvaluatorTable* table);
-    void EvaluateSuchThatClause(SuchThat st, QueryEvaluatorTable* table);
-    void ProcessBooleanGroup(std::vector<Clause*> clauseList);
-    void ProcessNonBooleanGroup(std::vector<Clause*> clauseList, QueryEvaluatorTable* table);
+    std::vector<std::string> GetResult(QueryEvaluatorTable* table);
+    void PreprocessBooleanGroup(std::vector<Clause*> clauseList);
+    void ProcessGroup(std::vector<Clause*> clauseList, QueryEvaluatorTable* table);
 };
 
 #endif //INC_21S1_CP_SPA_TEAM_35_QUERYEVALUATOR_H
