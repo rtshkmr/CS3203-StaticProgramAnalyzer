@@ -121,7 +121,7 @@ void EvaluatePatternDoubleSynonymSecondPresent(Pattern p, QueryEvaluatorTable* t
       const VariableName* variable_name = assign_entity.GetVariable()->GetName();
       VariableName vn = *variable_name;
       std::string name = vn.getName();
-      std::string statement_number = std::to_string(assign_entity.GetStatementNumber()->getNum());
+      std::string statement_number = std::to_string(assign_entity.GetStatementNumber()->GetNum());
 
       if (name != current_variable || !HasExpressionMatch(p, assign_entity)) {
         continue;

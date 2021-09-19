@@ -9,7 +9,7 @@
 #ifndef AUTOTESTER_DATATYPE_H
 #define AUTOTESTER_DATATYPE_H
 
-bool ValidateName(std::string name);
+bool ValidateName(const std::string& name);
 
 /**
  * StatementNumber refers to the numbering of statements (program counter).
@@ -23,7 +23,7 @@ class StatementNumber {
  public:
   StatementNumber(int sn);
 
-  int getNum();
+  int GetNum() const;
 
   bool operator<(const StatementNumber& other) const;
 
@@ -82,7 +82,7 @@ class VariableName {
 
   bool operator<(const VariableName& other) const;
 
-  bool operator==(VariableName other) const;
+  bool operator==(const VariableName& other) const;
 };
 
 /**
@@ -96,7 +96,7 @@ class ConstantValue {
   int value_;
 
  public:
-  ConstantValue(std::string constant);
+  ConstantValue(const std::string& constant);
 
   int get();
 

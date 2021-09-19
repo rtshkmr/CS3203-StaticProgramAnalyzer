@@ -1,6 +1,5 @@
 #include "catch.hpp"
 
-#include <iostream>
 #include <component/SourceProcessor/Tokenizer.h>
 #include <component/SourceProcessor/SyntaxValidator.h>
 #include <regex>
@@ -107,7 +106,6 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
   SECTION("Testing time util") {
     std::string date_time = TimeUtil::GetDateTimeStr();
     std::string file_name_date_time = TimeUtil::GetDateTimeFileNameStr();
-    int x = 1;
   }
 
   SECTION("Test count tokens") {
@@ -334,7 +332,7 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
       positive_statements.emplace_back("if(x > 12) then {");
       positive_statements.emplace_back("while (timeLeft > 0) {");
 
-      for (const auto& statement : positive_statements) {
+      for (const auto& statement: positive_statements) {
         vector<Token> tokenized_statement = Tokenizer::CreateTokens(statement);
         bool valid = SyntaxValidator::StatementPassesCommonBlacklistRules(tokenized_statement);
         REQUIRE(valid);
@@ -349,7 +347,7 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
       negative_statements.emplace_back("if(x > 12 then ");
       negative_statements.emplace_back("if(x > 12)) then {");
       negative_statements.emplace_back("while (timeLeft > 0) ");
-      for (const auto& statement : negative_statements) {
+      for (const auto& statement: negative_statements) {
         vector<Token> tokenized_statement = Tokenizer::CreateTokens(statement);
         bool invalid = !SyntaxValidator::StatementPassesCommonBlacklistRules(tokenized_statement);
         REQUIRE(invalid);

@@ -7,107 +7,55 @@
 
 using namespace std;
 
-vector<string> lines = {
-//    R"(procedure         Week4 {read x;)",
-//    R"(procedure Week4 {read x;)",
-//    R"(    print x; )",
-//    R"( y = 1;)",
-//    R"(z                                                                                                   = 3;)",
-//    R"(call Z;})",
-//    R"(if(x >= 1) {read x; call helloProc;})", // cond_expr encapsulated by brackets
-//    R"(if(x >= 1))", // cond_expr encapsulated by brackets
-//    R"(if(x >= 1) {read x; call helloProc;} else { x = 1; })", // cond_expr encapsulated by brackets
-//    R"(x=1;)", // cond_expr encapsulated by brackets : this fails to separate the =1;
-//    R"(if(x >= 1) {read x; call helloProc;} else {x= 1; })",
-//    R"(if(x >= 1) {read x; call helloProc;} else {x =1; })", // cond_expr encapsulated by brackets
-//    R"(if((x>=1)&&((y>69)||(z<0)) && (!!TheMatrixIsReal)){)", // nested cond expr without any spacing b/w any impt characters
-    R"(if(x >= 1) then {read x; call helloProc;} else {x=1;})",
-    R"(procedure=1)",
-    R"(procedure procedure {)",
-    R"(procedure if {)",
-    R"(procedure then {)",
-    R"(procedure while {)",
-    R"(if = 10;)",
-    R"(else = 12;)",
-    R"(while = 12 + if;)",
-    R"(while = 12 + then;)",
-    R"(if = if + then;)",
-    R"(if = if + then;)",
-    R"(x = while + then * procedure;)",
-};
-
 TEST_CASE("1.Tokenizer.Tokenizer displays current tokenization status") {
+  vector<string> lines = {
+      R"(procedure         Week4 {read x;)",
+      R"(procedure Week4 {read x;)",
+      R"(    print x; )",
+      R"( y = 1;)",
+      R"(z                                                                                                   = 3;)",
+      R"(call Z;})",
+      R"(if(x >= 1) {read x; call helloProc;})", // cond_expr encapsulated by brackets
+      R"(if(x >= 1))", // cond_expr encapsulated by brackets
+      R"(if(x >= 1) {read x; call helloProc;} else { x = 1; })", // cond_expr encapsulated by brackets
+      R"(x=1;)", // cond_expr encapsulated by brackets : this fails to separate the =1;
+      R"(if(x >= 1) {read x; call helloProc;} else {x= 1; })",
+      R"(if(x >= 1) {read x; call helloProc;} else {x =1; })", // cond_expr encapsulated by brackets
+      R"(if((x>=1)&&((y>69)||(z<0)) && !(TheMatrixIsReal)){)", // nested cond expr without any spacing b/w any impt characters
+      R"(if(x >= 1) then {read x; call helloProc;} else {x=1;})",
+      R"(procedure=1)",
+      R"(procedure procedure {)",
+      R"(procedure if {)",
+      R"(procedure then {)",
+      R"(procedure while {)",
+      R"(if = 10;)",
+      R"(else = 12;)",
+      R"(while = 12 + if;)",
+      R"(while = 12 + then;)",
+      R"(if = if + then;)",
+      R"(if = if + then;)",
+      R"(x = while + then * procedure;)",
+  };
   vector<Token> program_tokens = {};
   int line_counter = 0;
   cout << " currently testing:   \n";
-//  vector<string> valid_program_lines =
   for (const auto& line: lines) {
     cout << line << "\n";
   }
   cout << "\n\n";
-  for (const auto& line : lines) {
+  for (const auto& line: lines) {
     cout << "=============[Line Number: " << ++line_counter << " ]===================\n";
     int token_counter = 0;
     vector<Token> tokens = Tokenizer::CreateTokens(line);
     program_tokens.insert(program_tokens.end(), tokens.begin(), tokens.end());
-    for (auto token : tokens) {
+    for (const auto& token: tokens) {
       cout << "[" << ++token_counter << "]token string:  " + token.GetTokenString() << "\n";
     }
     cout << "===================================================\n";
   }
 }
 
-/*
-TEST_CASE(
-    "1.Tokenizer.Tokenize Starting valid_program_lines with variable white spacing between important delimiting characters should give the same number of tokens") {
-  vector<string> starting_variations = {
-      R"(procedure Week4{read x;)", // no extra white space
-      R"(procedure Week4 { read x;)", // formatted whitespace
-      R"(procedure Week4 {                                            read                                  x          ;                              )", // extreme white space
-      R"(procedure Week4 {read x;)",
-      R"(procedure Week4{ read x ;)",
-  };
-
-  vector<string> ending_variations = {
-      R"(call Z;})",
-      R"(call Z;})",
-      R"(call                  Z                      ;          }         )",
-      R"(call Z ;})",
-      R"(call Z; })",
-      R"(call Z ; })",
-  };
-  vector<vector<Token>> starting_outputs;
-  for (auto& starting_line_variation : starting_variations) {
-    vector<Token> output = Tokenizer::CreateTokens(starting_line_variation);
-    starting_outputs.push_back(output);
-  }
-  vector<Token> starting_variation_reference = starting_outputs.at(0);
-  for (int i = 1; i < starting_outputs.capacity() - 1; i++) {
-    vector<Token> other = starting_outputs.at(i);
-    REQUIRE(starting_variation_reference.capacity() == other.capacity());
-    // fixme: fix equality operator after implementing tagging
-    //    for(int x = 0; x < starting_variation_reference.capacity();x++) {
-    //      Token reference_token = starting_variation_reference.at(x);
-    //      Token other_token = other.at(x);
-    //      REQUIRE(reference_token == other_token);
-    //    }
-  }
-
-  vector<vector<Token>> ending_outputs;
-  for (auto& ending_line_variation:ending_variations) {
-    vector<Token> output = Tokenizer::CreateTokens(ending_line_variation);
-    ending_outputs.push_back(output);
-  }
-  vector<Token> ending_variation_reference = ending_outputs.at(0);
-  for (int i = 1; i < ending_outputs.capacity() - 1; i++) {
-    vector<Token> other = ending_outputs.at(i);
-    REQUIRE(ending_variation_reference.capacity() == other.capacity());
-  }
-}
-*/
-
 TEST_CASE("1.Tokenizer.RegexPatterns pattern tests for token_strings") {
-
   regex fixed_keyword_pat = RegexPatterns::GetFixedKeywordPattern();
   regex fixed_char_pat = RegexPatterns::GetFixedCharPattern(); // for braces, semicolon...
   regex binary_arithmetic_operator_pat = RegexPatterns::GetBinaryArithmeticOperatorPattern(); // for math
@@ -172,7 +120,7 @@ TEST_CASE("1.Tokenizer.Successfully handles the tagging strings with a TokenTag"
 
   string invalid_token_strings[] = {"1Hello", "}}", ">>"};
   vector<Token> invalid_tokens;
-  for (const auto& token_string:invalid_token_strings) {
+  for (const auto& token_string: invalid_token_strings) {
     invalid_tokens.emplace_back(token_string, Token::TagStringWithToken(token_string));
   }
 
@@ -186,7 +134,7 @@ TEST_CASE("1.Tokenizer.Successfully handles the tagging strings with a TokenTag"
       && Token("then", Token::TagStringWithToken("then")) == then_token;
 
   bool successful_handling_invalid_inputs = true;
-  for (auto& token : invalid_tokens) {
+  for (auto& token: invalid_tokens) {
     successful_handling_invalid_inputs = (token.GetTokenTag() == TokenTag::kInvalid);
   }
 
@@ -208,5 +156,4 @@ TEST_CASE("1.Tokenizer.Successfully handles the tagging strings with a TokenTag"
         && one == Token("1", Token::TagStringWithToken("1"));
     REQUIRE(matches);
   }
-
 }

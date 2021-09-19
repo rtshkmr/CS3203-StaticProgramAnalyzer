@@ -25,8 +25,8 @@ TEST_CASE("1.DataType.StatementNumber") {
     StatementNumber sn = StatementNumber(39);
     StatementNumber sn2(10);
 
-    REQUIRE(sn.getNum() == 39);
-    REQUIRE(sn2.getNum() == 10);
+    REQUIRE(sn.GetNum() == 39);
+    REQUIRE(sn2.GetNum() == 10);
     REQUIRE_THROWS_AS(StatementNumber(0), std::invalid_argument);
     REQUIRE_THROWS_AS(StatementNumber(-28), std::invalid_argument);
   }
