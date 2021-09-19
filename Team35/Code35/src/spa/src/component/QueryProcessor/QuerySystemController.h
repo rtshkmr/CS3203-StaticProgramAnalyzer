@@ -8,8 +8,8 @@
 #include <component/PKB/PKB.h>
 
 class QuerySystemController {
-  public:
-    static std::list<std::string> Evaluate(std::string *query, PKB* pkb);
+ public:
+  static std::list<std::string> Evaluate(std::string* query, PKB* pkb);
 };
 
 #endif //AUTOTESTER_QUERYSYSTEMCONTROLLER_H

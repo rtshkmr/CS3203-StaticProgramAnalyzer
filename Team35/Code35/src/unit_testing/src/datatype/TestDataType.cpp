@@ -205,8 +205,8 @@ TEST_CASE("1.Datatype.TokenTag") {
     Token token1_duplicate = Token("hello", TokenTag::kName);
     Token token2 = Token("procedure", TokenTag::kProcedureKeyword);
     Token token2_different_tags = Token("procedure", TokenTag::kName);
-    REQUIRE(token1==token1_duplicate);
-    REQUIRE_FALSE(token2==token2_different_tags);
+    REQUIRE(token1 == token1_duplicate);
+    REQUIRE_FALSE(token2 == token2_different_tags);
   }
 }
 

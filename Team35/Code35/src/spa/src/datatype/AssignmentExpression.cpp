@@ -22,7 +22,7 @@ AssignmentExpression::AssignmentExpression(std::string infix) {
  * @param c The character to check
  * @return true if it is one of the character; false otherwise.
  */
-bool IsOperator(char &c) {
+bool IsOperator(char& c) {
   if (c == '+' || c == '-' || c == '*' || c == '/' || c == '%' || c == '^' || c == '(' || c == ')')
     return true;
   else
@@ -32,7 +32,7 @@ bool IsOperator(char &c) {
 // Operator Rank only returns the input value rank.
 // lower rank = push
 // always return an odd number so stack value is even.
-int OperatorRank(char &c) {
+int OperatorRank(char& c) {
   if (c == ')') return 7;
   if (c == '(') return -1;
   if (c == '+' || c == '-') return 1;
@@ -63,9 +63,9 @@ std::vector<std::string> ConvertEquationIntoTokens(std::string eqn) {
 
   std::stack<char> operator_stack;
 
-  for (char &c: eqn) {
+  for (char& c: eqn) {
     if (IsOperator(c)) {
-      std::string s = ConvertToStringAndClearBuffer(&chara);
+      std::string s = ConvertToStringAndClearBuffer(& chara);
       if (!s.empty()) {
         tokens.push_back(s);
       }
@@ -124,7 +124,7 @@ std::vector<std::string> ConvertEquationIntoTokens(std::string eqn) {
     }
   }
 
-  std::string s = ConvertToStringAndClearBuffer(&chara);
+  std::string s = ConvertToStringAndClearBuffer(& chara);
   if (!s.empty()) {
     tokens.push_back(s);
   }

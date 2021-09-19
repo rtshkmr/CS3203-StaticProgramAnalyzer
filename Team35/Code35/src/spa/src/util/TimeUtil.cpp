@@ -87,11 +87,11 @@ std::string TimeUtil::FormatDateTimeFileName(const tm* tm) {
 
   std::stringstream string_stream;
   static std::string file_name_field_delim = "_";
-  int year = (*tm).tm_year + 1900;
-  int month = (*tm).tm_mon + 1;
-  int day = (*tm).tm_mday ;
-  int hour = (*tm).tm_hour ;
-  int sec = (*tm).tm_sec;
+  int year = (* tm).tm_year + 1900;
+  int month = (* tm).tm_mon + 1;
+  int day = (* tm).tm_mday;
+  int hour = (* tm).tm_hour;
+  int sec = (* tm).tm_sec;
 
   // year
   string_stream << year << file_name_field_delim;
@@ -108,10 +108,10 @@ std::string TimeUtil::FormatDateTimeFileName(const tm* tm) {
 
   // time
   string_stream << hour << file_name_field_delim;
-  if (hour< 10) {
-    string_stream << "0" << hour<< file_name_field_delim;
+  if (hour < 10) {
+    string_stream << "0" << hour << file_name_field_delim;
   } else {
-    string_stream << hour<< file_name_field_delim;
+    string_stream << hour << file_name_field_delim;
   }
   if (sec < 10) {
     string_stream << "0" << sec;

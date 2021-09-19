@@ -164,16 +164,16 @@ TEST_CASE("5. Miscellaneous entity and relationship retrievals") {
   };
 
   std::vector<std::list<std::string>> answer_list = {
-      {"x","y","z"},
-      {"3","4","5"},
+      {"x", "y", "z"},
+      {"3", "4", "5"},
       {"1"},
       {"Week4"},
-      {"3","4","5"},
+      {"3", "4", "5"},
       {"1"},
-      {"3","4","5"},
+      {"3", "4", "5"},
       {"2"},
-      {"3","4"},
-      {"x","y","z"},
+      {"3", "4"},
+      {"x", "y", "z"},
       {},
       {"dummy"}
   };

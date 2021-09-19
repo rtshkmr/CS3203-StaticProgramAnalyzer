@@ -8,9 +8,9 @@
 
 using namespace sp;
 
-
-constexpr auto L = [](auto msg){
-  LOG(spa_logger << Logger::Prettify(msg));
+constexpr auto L = [](auto msg) {
+  LOG
+  (spa_logger << Logger::Prettify(msg));
 };
 
 /**
@@ -21,7 +21,7 @@ constexpr auto L = [](auto msg){
  * @return Source process status
  */
 PKB* SourceProcessor::ProcessSourceFile(std::string file_name) {
-  L ("[ENTER] SOURCE PROC ");
+  L("[ENTER] SOURCE PROC ");
   L("... processing source file");
   par::Parser parser;
 
@@ -47,7 +47,7 @@ PKB* SourceProcessor::ProcessSourceFile(std::string file_name) {
   design_extractor.ExtractDesignAbstractions();
 
   PKB* new_pkb = new PKB();
-  new_pkb->PopulateDataStructures(*deliverable);
+  new_pkb->PopulateDataStructures(* deliverable);
   return new_pkb;
 }
 

@@ -20,9 +20,11 @@ TEST_CASE("0.Testing basic LOG function") {
   logger_settings.out_to_file_ = true;
 
   LoggerInit(logger_settings);
-  LOG (spa_logger << "sup boisss i'm a message" << std::endl);
+  LOG
+  (spa_logger << "sup boisss i'm a message" << std::endl);
   auto* dummy_proc = new Procedure(new ProcedureName("SexyProc"));
-  LOG(spa_logger << "sup boiss i'm a procedure newww: " << (*dummy_proc).GetName());
+  LOG
+  (spa_logger << "sup boiss i'm a procedure newww: " << (* dummy_proc).GetName());
   LoggerTerminate();
   int x = 1;
 }

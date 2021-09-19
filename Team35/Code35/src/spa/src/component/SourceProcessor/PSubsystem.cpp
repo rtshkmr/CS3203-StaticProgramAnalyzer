@@ -174,8 +174,9 @@ void PSubsystem::SetStatementObject(Statement* statement) {
     deliverable_->AddParentRelationship(dynamic_cast<Statement*>(parent_stack_.top()), statement);
   }
 
-  if (current_node_type_ != 3 && current_node_->GetStatementList()->size() == 1 || // 1 because this is newly added in Line curr - 13
-      (current_node_type_ == 3 && new_else)) {
+  if (current_node_type_ != 3 && current_node_->GetStatementList()->size() == 1
+      || // 1 because this is newly added in Line curr - 13
+          (current_node_type_ == 3 && new_else)) {
     //just entered a stack, follow nothing.
     follow_stack_.push(statement);
   } else {
@@ -248,7 +249,7 @@ void PSubsystem::HandleReadStmt(ReadEntity* read_entity) {
 }
 
 void PSubsystem::CheckForIfElseValidity() {
-  for (auto const &i : *deliverable_->GetIfList()) {
+  for (auto const& i: * deliverable_->GetIfList()) {
     if (i->GetElseEntity() == nullptr) {
       throw SyntaxException("Encountered If statement without Else construct");
     }

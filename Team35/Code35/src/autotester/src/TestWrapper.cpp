@@ -4,8 +4,9 @@
 #include <sstream>
 #include <util/Logger.h>
 
-constexpr auto L = [](auto msg){
-  LOG(spa_logger << Logger::Prettify(msg));
+constexpr auto L = [](auto msg) {
+  LOG
+  (spa_logger << Logger::Prettify(msg));
 };
 
 void Setup() {
@@ -51,7 +52,7 @@ void TestWrapper::evaluate(std::string query, std::list<std::string>& results) {
   std::optional<std::list<std::string>> populated_result_list = QuerySystemController::Evaluate(& query, pkb);
   L("... Query System controller has evaluated the query");
   if (populated_result_list) {
-    for(const auto& elem : populated_result_list.value()){
+    for (const auto& elem: populated_result_list.value()) {
       results.push_back(elem);
     }
   }

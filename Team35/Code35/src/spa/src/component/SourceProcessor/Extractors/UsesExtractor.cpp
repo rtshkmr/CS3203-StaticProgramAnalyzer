@@ -22,7 +22,7 @@ void UsesExtractor::Extract(Deliverable* deliverable) {
   for (Procedure* proc: deliverable_->proc_list_) {
     if (std::find(extracted_procedures.begin(), extracted_procedures.end(), proc)
         == extracted_procedures.end()) { // procedure not found in extracted_procedures
-      ExtractUsesInContainer(proc, &extracted_procedures);
+      ExtractUsesInContainer(proc, & extracted_procedures);
       extracted_procedures.push_back(proc);
     }
   }
@@ -42,7 +42,7 @@ void UsesExtractor::Extract(Deliverable* deliverable) {
  */
 std::list<Variable*>* UsesExtractor::ExtractUsesInContainer(Container* container,
                                                             std::vector<Procedure*>* extracted_procedures) {
-  for (Statement* statement: *container->GetStatementList()) {
+  for (Statement* statement: * container->GetStatementList()) {
     if (IfEntity* if_entity = dynamic_cast<IfEntity*>(statement)) {
       ExtractUsesInIfContainer(if_entity, container, extracted_procedures);
     } else if (WhileEntity* while_entity = dynamic_cast<WhileEntity*>(statement)) {
@@ -135,7 +135,7 @@ void UsesExtractor::EraseElseAndProcFromUses() {
 }
 
 void UsesExtractor::EraseReverseRelationship(Container* container, std::list<Variable*>* var_list) {
-  for (auto var: *var_list) {
+  for (auto var: * var_list) {
     if (deliverable_->container_used_by_hash_.count(var)) {
       std::list<Container*>* var_cont_list = deliverable_->container_used_by_hash_.find(var)->second;
       var_cont_list->remove(container);

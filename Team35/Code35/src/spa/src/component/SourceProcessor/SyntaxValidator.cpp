@@ -308,8 +308,11 @@ bool SyntaxValidator::IsRelExpr(const vector<Token>& statement_tokens, int left_
   if (first_token_is_binary_comp_delim || last_token_is_binary_comp_delim) {
     return false;
   }
-  int middle_ptr = SyntaxValidator::FindSplitPoint(statement_tokens, left_boundary_idx, right_boundary_idx, RegexPatterns::GetBinaryComparisonPattern());
-  if (middle_ptr <=  left_boundary_idx) { // iterate thru, nothing hits
+  int middle_ptr = SyntaxValidator::FindSplitPoint(statement_tokens,
+                                                   left_boundary_idx,
+                                                   right_boundary_idx,
+                                                   RegexPatterns::GetBinaryComparisonPattern());
+  if (middle_ptr <= left_boundary_idx) { // iterate thru, nothing hits
     return false; // cfm got operator
   } else {
     bool left_is_rel_factor = IsRelFactor(statement_tokens, left_boundary_idx, middle_ptr - 1);

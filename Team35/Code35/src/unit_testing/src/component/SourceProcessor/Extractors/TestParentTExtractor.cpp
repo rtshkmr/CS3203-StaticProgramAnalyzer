@@ -44,7 +44,7 @@ TEST_CASE("1.ParentTExtractor.Extract ParentT basic conditions") {
     deliverable.proc_list_.push_back(proc1);
 
     ParentTExtractor parent_t_extractor{};
-    parent_t_extractor.Extract(&deliverable);
+    parent_t_extractor.Extract(& deliverable);
 
     // no parent
     std::unordered_map<Statement*, std::list<Statement*>*> ptct = deliverable.parent_to_child_T_hash_;
@@ -79,12 +79,12 @@ TEST_CASE("1.ParentTExtractor.Extract ParentT basic conditions") {
     deliverable.AddParentRelationship(if_1_, assign_6_);
 
     ParentTExtractor parent_t_extractor{};
-    parent_t_extractor.Extract(&deliverable);
+    parent_t_extractor.Extract(& deliverable);
 
     // Parent*(1, _)
     std::list<Statement*> expected_children_1 = std::list<Statement*>{assign_1_, read_y_, assign_5_, assign_6_};
     std::list<Statement*>* actual_children_1 = deliverable.parent_to_child_T_hash_.find(if_1_)->second;
-    CHECK(*actual_children_1 == expected_children_1);
+    CHECK(* actual_children_1 == expected_children_1);
     CHECK(deliverable.parent_to_child_T_hash_.size() == 1);
   }
 
@@ -109,12 +109,12 @@ TEST_CASE("1.ParentTExtractor.Extract ParentT basic conditions") {
     deliverable.AddParentRelationship(while_3_, assign_5_);
 
     ParentTExtractor parent_t_extractor{};
-    parent_t_extractor.Extract(&deliverable);
+    parent_t_extractor.Extract(& deliverable);
 
     // Parent*(2, _)
     std::list<Statement*> expected_children_1 = std::list<Statement*>{read_z_, assign_5_};
     std::list<Statement*>* actual_children_1 = deliverable.parent_to_child_T_hash_.find(while_3_)->second;
-    CHECK(*actual_children_1 == expected_children_1);
+    CHECK(* actual_children_1 == expected_children_1);
     CHECK(deliverable.parent_to_child_T_hash_.size() == 1);
   }
 
@@ -155,16 +155,16 @@ TEST_CASE("1.ParentTExtractor.Extract ParentT basic conditions") {
     deliverable.AddParentRelationship(while_1_, print_y_);
 
     ParentTExtractor parent_t_extractor{};
-    parent_t_extractor.Extract(&deliverable);
+    parent_t_extractor.Extract(& deliverable);
 
     // Parent*(3, _)
     std::list<Statement*> expected_children_1 = std::list<Statement*>{assign_2_, read_y_};
     std::list<Statement*>* actual_children_1 = deliverable.parent_to_child_T_hash_.find(if_2_)->second;
-    CHECK(*actual_children_1 == expected_children_1);
+    CHECK(* actual_children_1 == expected_children_1);
     // Parent*(7, _)
     std::list<Statement*> expected_children_2 = std::list<Statement*>{print_y_};
     std::list<Statement*>* actual_children_2 = deliverable.parent_to_child_T_hash_.find(while_1_)->second;
-    CHECK(*actual_children_2 == expected_children_2);
+    CHECK(* actual_children_2 == expected_children_2);
     CHECK(deliverable.parent_to_child_T_hash_.size() == 2);
   }
 }
@@ -239,24 +239,24 @@ TEST_CASE("1.ParentTExtractor.Extract ParentT nested containers") {
     deliverable.AddParentRelationship(if_3_, read_z_);
 
     ParentTExtractor parent_t_extractor{};
-    parent_t_extractor.Extract(&deliverable);
+    parent_t_extractor.Extract(& deliverable);
 
     // Parent*(1, _)
     std::list<Statement*> expected_children_1 =
         std::list<Statement*>{assign_1_, assign_3_, if_2_, assign_4_, if_3_, assign_5_, read_z_, print_i_};
     std::list<Statement*>* actual_children_1 = deliverable.parent_to_child_T_hash_.find(if_1_)->second;
-    CHECK(*actual_children_1 == expected_children_1);
+    CHECK(* actual_children_1 == expected_children_1);
     // Parent*(3, _)
     std::unordered_map<Statement*, std::list<Statement*>*> ptct = deliverable.parent_to_child_T_hash_;
     CHECK(ptct.find(assign_3_) == ptct.end());
     // Parent*(4, _)
     std::list<Statement*> expected_children_4 = std::list<Statement*>{assign_4_, if_3_, assign_5_, read_z_};
     std::list<Statement*>* actual_children_4 = deliverable.parent_to_child_T_hash_.find(if_2_)->second;
-    CHECK(*actual_children_4 == expected_children_4);
+    CHECK(* actual_children_4 == expected_children_4);
     // Parent*(6, _)
     std::list<Statement*> expected_children_6 = std::list<Statement*>{assign_5_, read_z_};
     std::list<Statement*>* actual_children_6 = deliverable.parent_to_child_T_hash_.find(if_3_)->second;
-    CHECK(*actual_children_6 == expected_children_6);
+    CHECK(* actual_children_6 == expected_children_6);
 
     CHECK(deliverable.parent_to_child_T_hash_.size() == 3);
   }
@@ -309,21 +309,21 @@ TEST_CASE("1.ParentTExtractor.Extract ParentT nested containers") {
     deliverable.AddParentRelationship(if_3_, read_z_);
 
     ParentTExtractor parent_t_extractor{};
-    parent_t_extractor.Extract(&deliverable);
+    parent_t_extractor.Extract(& deliverable);
 
     // Parent*(1, _)
     std::list<Statement*> expected_children_1 =
         std::list<Statement*>{assign_1_, if_2_, if_3_, assign_5_, read_z_, assign_4_, print_i_, assign_3_};
     std::list<Statement*>* actual_children_1 = deliverable.parent_to_child_T_hash_.find(if_1_)->second;
-    CHECK(*actual_children_1 == expected_children_1);
+    CHECK(* actual_children_1 == expected_children_1);
     // Parent*(3, _)
     std::list<Statement*> expected_children_3 = std::list<Statement*>{if_3_, assign_5_, read_z_, assign_4_};
     std::list<Statement*>* actual_children_3 = deliverable.parent_to_child_T_hash_.find(if_2_)->second;
-    CHECK(*actual_children_3 == expected_children_3);
+    CHECK(* actual_children_3 == expected_children_3);
     // Parent*(4, _)
     std::list<Statement*> expected_children_4 = std::list<Statement*>{assign_5_, read_z_};
     std::list<Statement*>* actual_children_4 = deliverable.parent_to_child_T_hash_.find(if_3_)->second;
-    CHECK(*actual_children_4 == expected_children_4);
+    CHECK(* actual_children_4 == expected_children_4);
     // Parent*(9, _)
     std::unordered_map<Statement*, std::list<Statement*>*> ptct = deliverable.parent_to_child_T_hash_;
     CHECK(ptct.find(assign_3_) == ptct.end());
@@ -367,21 +367,21 @@ TEST_CASE("1.ParentTExtractor.Extract ParentT nested containers") {
     deliverable.AddParentRelationship(while_3_, assign_5_);
 
     ParentTExtractor parent_t_extractor{};
-    parent_t_extractor.Extract(&deliverable);
+    parent_t_extractor.Extract(& deliverable);
 
     // Parent*(1, _)
     std::list<Statement*> expected_children_1 =
         std::list<Statement*>{assign_1_, while_2_, assign_3_, while_3_, assign_5_, read_x_, read_y_};
     std::list<Statement*>* actual_children_1 = deliverable.parent_to_child_T_hash_.find(while_1_)->second;
-    CHECK(*actual_children_1 == expected_children_1);
+    CHECK(* actual_children_1 == expected_children_1);
     // Parent*(3, _)
     std::list<Statement*> expected_children_3 = std::list<Statement*>{assign_3_, while_3_, assign_5_, read_x_};
     std::list<Statement*>* actual_children_3 = deliverable.parent_to_child_T_hash_.find(while_2_)->second;
-    CHECK(*actual_children_3 == expected_children_3);
+    CHECK(* actual_children_3 == expected_children_3);
     // Parent*(5, _)
     std::list<Statement*> expected_children_5 = std::list<Statement*>{assign_5_};
     std::list<Statement*>* actual_children_5 = deliverable.parent_to_child_T_hash_.find(while_3_)->second;
-    CHECK(*actual_children_5 == expected_children_5);
+    CHECK(* actual_children_5 == expected_children_5);
     // Parent*(8, _)
     std::unordered_map<Statement*, std::list<Statement*>*> ptct = deliverable.parent_to_child_T_hash_;
     CHECK(ptct.find(read_y_) == ptct.end());
@@ -442,29 +442,29 @@ TEST_CASE("1.ParentTExtractor.Extract ParentT nested containers") {
     deliverable.AddParentRelationship(while_3_, if_2_);
 
     ParentTExtractor parent_t_extractor{};
-    parent_t_extractor.Extract(&deliverable);
+    parent_t_extractor.Extract(& deliverable);
 
     // Parent*(1, _)
     std::list<Statement*> expected_children_1 =
         std::list<Statement*>{assign_1_, while_1_, read_x_, while_2_, read_y_, assign_6_};
     std::list<Statement*>* actual_children_1 = deliverable.parent_to_child_T_hash_.find(if_1_)->second;
-    CHECK(*actual_children_1 == expected_children_1);
+    CHECK(* actual_children_1 == expected_children_1);
     // Parent*(3, _)
     std::list<Statement*> expected_children_3 = std::list<Statement*>{read_x_};
     std::list<Statement*>* actual_children_3 = deliverable.parent_to_child_T_hash_.find(while_1_)->second;
-    CHECK(*actual_children_3 == expected_children_3);
+    CHECK(* actual_children_3 == expected_children_3);
     // Parent*(5, _)
     std::list<Statement*> expected_children_5 = std::list<Statement*>{read_y_};
     std::list<Statement*>* actual_children_5 = deliverable.parent_to_child_T_hash_.find(while_2_)->second;
-    CHECK(*actual_children_5 == expected_children_5);
+    CHECK(* actual_children_5 == expected_children_5);
     // Parent*(8, _)
     std::list<Statement*> expected_children_8 = std::list<Statement*>{print_x_, if_2_, assign_2_, assign_3_};
     std::list<Statement*>* actual_children_8 = deliverable.parent_to_child_T_hash_.find(while_3_)->second;
-    CHECK(*actual_children_8 == expected_children_8);
+    CHECK(* actual_children_8 == expected_children_8);
     // Parent*(10, _)
     std::list<Statement*> expected_children_10 = std::list<Statement*>{assign_2_, assign_3_};
     std::list<Statement*>* actual_children_10 = deliverable.parent_to_child_T_hash_.find(if_2_)->second;
-    CHECK(*actual_children_10 == expected_children_10);
+    CHECK(* actual_children_10 == expected_children_10);
 
     CHECK(deliverable.parent_to_child_T_hash_.size() == 5);
   }

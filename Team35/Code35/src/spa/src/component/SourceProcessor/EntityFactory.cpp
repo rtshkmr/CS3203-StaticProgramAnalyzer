@@ -144,7 +144,7 @@ vector<Token> EntityFactory::GetExpressionTokens(vector<Token> tokens, TokenTag 
 
 string EntityFactory::ConvertTokensToString(vector<Token> tokens) {
   std::string expression_string;
-  for (auto &token: tokens) {
+  for (auto& token: tokens) {
     expression_string += token.GetTokenString();
   }
   return expression_string;
@@ -152,7 +152,7 @@ string EntityFactory::ConvertTokensToString(vector<Token> tokens) {
 
 vector<Variable*> EntityFactory::GetVariablesFromExpressionTokens(vector<Token> tokens) {
   vector<Variable*> variables;
-  for (auto &token: tokens) {
+  for (auto& token: tokens) {
     if (token.GetTokenTag() == TokenTag::kName) {
       Variable* curr_var = RetrieveVariable(token.GetTokenString());
       auto iter = std::find(variables.begin(), variables.end(), curr_var);
@@ -167,7 +167,7 @@ vector<Variable*> EntityFactory::GetVariablesFromExpressionTokens(vector<Token> 
 
 vector<ConstantValue*> EntityFactory::GetConstantsFromExpressionTokens(vector<Token> tokens) {
   vector<ConstantValue*> constants;
-  for (auto &token: tokens) {
+  for (auto& token: tokens) {
     if (token.GetTokenTag() == TokenTag::kInteger) {
       ConstantValue* curr_const = CreateConstantValue(token.GetTokenString());
       auto iter = std::find(constants.begin(), constants.end(), curr_const);
@@ -205,8 +205,8 @@ ConstantValue* EntityFactory::CreateConstantValue(std::string const_val) {
  */
 Procedure* EntityFactory::RetrieveProcedure(std::string proc_name) {
   ProcedureName temp_proc_name = ProcedureName(proc_name);
-  for (auto const &proc : *proc_list_) {
-    if (*proc->GetName() == temp_proc_name) { // uses the overloaded ==
+  for (auto const& proc: * proc_list_) {
+    if (* proc->GetName() == temp_proc_name) { // uses the overloaded ==
       return proc;
     }
   }
@@ -219,8 +219,8 @@ Procedure* EntityFactory::RetrieveProcedure(std::string proc_name) {
  */
 Variable* EntityFactory::RetrieveVariable(std::string var_name) {
   VariableName temp_var_name = VariableName(var_name);
-  for (auto const &var : *var_list_) {
-    if (*var->GetName() == temp_var_name) { // uses the overloaded ==
+  for (auto const& var: * var_list_) {
+    if (* var->GetName() == temp_var_name) { // uses the overloaded ==
       return var;
     }
   }

@@ -12,16 +12,20 @@
 
 class Tokenizer {
  public:
-  static std::vector<Token> CreateTokens(const std::string &statement_string);
+  static std::vector<Token> CreateTokens(const std::string& statement_string);
  private:
-  static Token* CreateToken(const std::string& token_string, int token_idx, const std::vector<std::string>& statement_token_strings);
-  static std::vector<std::string> SplitString(const std::string &delimiter,
-                                              const std::string &input,
+  static Token* CreateToken(const std::string& token_string,
+                            int token_idx,
+                            const std::vector<std::string>& statement_token_strings);
+  static std::vector<std::string> SplitString(const std::string& delimiter,
+                                              const std::string& input,
                                               bool retain_delimiter);
-  static std::vector<std::string> SplitSubTokenStrings(std::string &string_token);
-  static bool IsWhiteSpace(std::string &test_string);
+  static std::vector<std::string> SplitSubTokenStrings(std::string& string_token);
+  static bool IsWhiteSpace(std::string& test_string);
   static std::vector<std::string> SplitSentenceIntoStringTokens(const std::string& statement_string);
-  static bool IsActualKeyword(const std::string& token_string, int token_idx, const std::vector<std::string>& token_strings);
+  static bool IsActualKeyword(const std::string& token_string,
+                              int token_idx,
+                              const std::vector<std::string>& token_strings);
 };
 
 #endif //AUTOTESTER_TEAM00_CODE00_SRC_SPA_SRC_COMPONENT_SOURCEPROCESSOR_TOKENIZER_H_

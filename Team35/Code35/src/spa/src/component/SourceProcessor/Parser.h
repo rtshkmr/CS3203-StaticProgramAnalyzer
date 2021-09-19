@@ -8,20 +8,20 @@
  * This namespace provides a scope for Parser related declarations.
  */
 namespace par {
-    /**
-     * Parser is a facade that takes in the source program from the SourceProcessor, checks the syntax, creates the
-     * necessary data structures and sends these Deliverables back.
-     */
-    class Parser {
-    private:
-        Deliverable deliverable_;
-    public:
-        Parser() = default;
+/**
+ * Parser is a facade that takes in the source program from the SourceProcessor, checks the syntax, creates the
+ * necessary data structures and sends these Deliverables back.
+ */
+class Parser {
+ private:
+  Deliverable deliverable_;
+ public:
+  Parser() = default;
 
-        void Parse(const std::string& file_name);
+  void Parse(const std::string& file_name);
 
-        Deliverable* GetDeliverables();
-    };
+  Deliverable* GetDeliverables();
+};
 }
 
 #endif //AUTOTESTER_PARSER_H

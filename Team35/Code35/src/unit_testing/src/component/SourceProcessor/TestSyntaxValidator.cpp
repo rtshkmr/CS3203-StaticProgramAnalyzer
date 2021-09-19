@@ -291,16 +291,17 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
 //    [17] = {Token} {token_string_="2", token_tag_=kInteger}
 //    [18] = {Token} {token_string_=")", token_tag_=kCloseBracket}
 
-    REQUIRE_FALSE(SyntaxValidator::IsRelExpr(new_tokens,0, 3)); // uneven bracketing
-    REQUIRE_FALSE(SyntaxValidator::IsRelExpr(new_tokens,5, 8)); // uneven bracketing
-    REQUIRE_FALSE(SyntaxValidator::IsRelExpr(new_tokens,10, 18)); // uneven bracketing
+    REQUIRE_FALSE(SyntaxValidator::IsRelExpr(new_tokens, 0, 3)); // uneven bracketing
+    REQUIRE_FALSE(SyntaxValidator::IsRelExpr(new_tokens, 5, 8)); // uneven bracketing
+    REQUIRE_FALSE(SyntaxValidator::IsRelExpr(new_tokens, 10, 18)); // uneven bracketing
 
 
 
 
   }
   SECTION("Is CondExpr tests") {
-    string line = "if((x>=1)&&((y>69)||(z<0)) || !(3 > 1)) !!TheMatrixIsReal !!(x > 1){       while ((left==right) && (b>=c))  (k + j1k * chArlie){";
+    string line =
+        "if((x>=1)&&((y>69)||(z<0)) || !(3 > 1)) !!TheMatrixIsReal !!(x > 1){       while ((left==right) && (b>=c))  (k + j1k * chArlie){";
     vector<Token> tokens = Tokenizer::CreateTokens(line);
 //    [0] = {Token} {token_string_="if", token_tag_=kName}
 //    [1] = {Token} {token_string_="(", token_tag_=kOpenBracket}
@@ -377,9 +378,9 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
 //    REQUIRE(SyntaxValidator::IsCondExpr(tokens, 2, 20)); // (<cond_expr>) || (<cond_expr>)
     string new_line = "!(200) |  !(xyz) | (p) && (q == 2)";
     vector<Token> new_tokens = Tokenizer::CreateTokens(new_line);
-    REQUIRE_FALSE(SyntaxValidator::IsCondExpr(new_tokens,0, 3)); // uneven bracketing
-    REQUIRE_FALSE(SyntaxValidator::IsCondExpr(new_tokens,5, 8)); // uneven bracketing
-    REQUIRE_FALSE(SyntaxValidator::IsCondExpr(new_tokens,10, 18)); // uneven bracketing
+    REQUIRE_FALSE(SyntaxValidator::IsCondExpr(new_tokens, 0, 3)); // uneven bracketing
+    REQUIRE_FALSE(SyntaxValidator::IsCondExpr(new_tokens, 5, 8)); // uneven bracketing
+    REQUIRE_FALSE(SyntaxValidator::IsCondExpr(new_tokens, 10, 18)); // uneven bracketing
   }
   SECTION("Check StatementPassesCommonBlacklistRules function") {
 

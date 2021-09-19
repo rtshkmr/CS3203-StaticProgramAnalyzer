@@ -52,9 +52,9 @@ void EvaluatePatternDoubleSynonym(const Pattern& p, QueryEvaluatorTable* table, 
 
     std::vector<AssignEntity> possible_variable_list = QueryPkbPattern(pkb, true, current_assign_stmt);
     // Assert size == 1
-    for (auto possible_variable : possible_variable_list) {
+    for (auto possible_variable: possible_variable_list) {
       const VariableName* possible_variable_name = possible_variable.GetVariable()->GetName();
-      if (*possible_variable_name == current_variable_name && HasExpressionMatch(p, possible_variable)) {
+      if (* possible_variable_name == current_variable_name && HasExpressionMatch(p, possible_variable)) {
         has_relationship = true;
       }
     }
@@ -92,7 +92,7 @@ void EvaluatePatternDoubleSynonymFirstPresent(const Pattern& p, QueryEvaluatorTa
       }
 
       const VariableName* variable_name = assign_entity.GetVariable()->GetName();
-      VariableName vn = *variable_name;
+      VariableName vn = * variable_name;
       std::string name = vn.getName();
       table->AddMultipleRowForAllColumn(p.left_hand_side, i, name, repeat_count);
       repeat_count++;
@@ -102,7 +102,8 @@ void EvaluatePatternDoubleSynonymFirstPresent(const Pattern& p, QueryEvaluatorTa
 }
 
 void EvaluatePatternDoubleSynonymSecondPresent(const Pattern& p, QueryEvaluatorTable* table, const PKB& pkb,
-                                               std::unordered_map<std::string, DesignEntity> synonym_design_entity_map) {
+                                               std::unordered_map<std::string,
+                                                                  DesignEntity> synonym_design_entity_map) {
   // Both are synonyms but only variable synonym in table
   std::vector<std::string> variable_list = table->GetColumn(p.left_hand_side);
   std::string stmt_synonym = table->GetStatementSynonym(synonym_design_entity_map);
@@ -117,9 +118,9 @@ void EvaluatePatternDoubleSynonymSecondPresent(const Pattern& p, QueryEvaluatorT
     bool has_variable = false;
     int repeat_count = 0;
 
-    for (auto assign_entity : assign_entity_list) {
+    for (auto assign_entity: assign_entity_list) {
       const VariableName* variable_name = assign_entity.GetVariable()->GetName();
-      VariableName vn = *variable_name;
+      VariableName vn = * variable_name;
       std::string name = vn.getName();
       std::string statement_number = std::to_string(assign_entity.GetStatementNumber()->GetNum());
 
@@ -139,8 +140,8 @@ void EvaluatePatternDoubleSynonymSecondPresent(const Pattern& p, QueryEvaluatorT
       table_index--;
       table_size--;
     } else {
-      table_index += repeat_count -1;
-      table_size += repeat_count -1;
+      table_index += repeat_count - 1;
+      table_size += repeat_count - 1;
     }
     variable_list_reference++;
   }
@@ -161,7 +162,7 @@ void EvaluatePatternSingleSynonym(const Pattern& p, QueryEvaluatorTable* table, 
 
     // Get the retrieved variable name
     const VariableName* variable_name = assign_entity.GetVariable()->GetName();
-    VariableName vn = *variable_name;
+    VariableName vn = * variable_name;
     std::string name = vn.getName();
 
     assign_reference++;

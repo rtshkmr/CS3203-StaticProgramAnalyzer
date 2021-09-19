@@ -13,7 +13,7 @@ void ModifiesExtractor::Extract(Deliverable* deliverable) {
   for (Procedure* proc: deliverable_->proc_list_) {
     if (std::find(extracted_procedures.begin(), extracted_procedures.end(), proc)
         == extracted_procedures.end()) { // procedure not found in extracted_procedures
-      ExtractModifiesInContainer(proc, &extracted_procedures);
+      ExtractModifiesInContainer(proc, & extracted_procedures);
       extracted_procedures.push_back(proc);
     }
   }
@@ -33,7 +33,7 @@ void ModifiesExtractor::Extract(Deliverable* deliverable) {
  */
 std::list<Variable*>* ModifiesExtractor::ExtractModifiesInContainer(Container* container,
                                                                     std::vector<Procedure*>* extracted_procedures) {
-  for (Statement* statement: *container->GetStatementList()) {
+  for (Statement* statement: * container->GetStatementList()) {
     if (IfEntity* if_entity = dynamic_cast<IfEntity*>(statement)) {
       ExtractModifiesInIfContainer(if_entity, container, extracted_procedures);
     } else if (WhileEntity* while_entity = dynamic_cast<WhileEntity*>(statement)) {
@@ -127,7 +127,7 @@ void ModifiesExtractor::EraseElseAndProcFromModifies() {
 }
 
 void ModifiesExtractor::EraseReverseRelationship(Container* container, std::list<Variable*>* var_list) {
-  for (auto var: *var_list) {
+  for (auto var: * var_list) {
     if (deliverable_->container_modified_by_hash_.count(var)) {
       std::list<Container*>* var_cont_list = deliverable_->container_modified_by_hash_.find(var)->second;
       var_cont_list->remove(container);

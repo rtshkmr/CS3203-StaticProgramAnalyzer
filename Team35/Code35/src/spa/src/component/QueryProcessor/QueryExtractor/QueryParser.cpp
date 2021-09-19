@@ -5,7 +5,6 @@
 #include <unordered_set>
 #include <sstream>
 
-
 /**
  * Checks that current lookahead has the same expected type. If valid, advances tokenizer to next lookahead.
  * @param token_type is the type of the lookahead token, of type TokenTag enum.
@@ -31,7 +30,7 @@ Token QueryParser::Eat(TokenTag token_type) {
  * @return a Synonym object with the corresponding information, or a dummy Synonym with invalid fields if not exists.
  */
 Synonym QueryParser::GetSynonymInfo(std::string syn_name, std::list<Synonym>* synonyms) {
-  for (Synonym& t : *synonyms) {
+  for (Synonym& t: * synonyms) {
     if (t.GetName().compare(syn_name) == 0) {
       return Synonym(syn_name, t.GetType());
     }
@@ -66,7 +65,7 @@ void QueryParser::ParseDeclaration() {
   DesignEntity de = GetDesignEntity(design_entity);
   std::vector<Token> s = ParseSynonyms();
   // populate synonyms list with Synonym objects.
-  for (Token& t : s) {
+  for (Token& t: s) {
     if (synonyms_name_set.find(t.GetTokenString()) != synonyms_name_set.end()) {
       throw PQLValidationException("Duplicate synonym was declared.");
     }
@@ -82,7 +81,7 @@ void QueryParser::ParseDeclarations() {
   // a syntactically valid synonym list contains > 0 synonym declarations, each followed by a semicolon.
   ParseDeclaration();
   Eat(TokenTag::kSemicolon);
-  while (lookahead.GetTokenString().compare("Select") != 0 && lookahead.GetTokenTag() != TokenTag::kInvalid ) {
+  while (lookahead.GetTokenString().compare("Select") != 0 && lookahead.GetTokenTag() != TokenTag::kInvalid) {
     ParseDeclaration();
     Eat(TokenTag::kSemicolon);
   }
@@ -92,20 +91,20 @@ void QueryParser::ParseDeclarations() {
  * Parses the target synonym.
  */
 void QueryParser::ParseTarget() {
-   Token target_synonym = Eat(TokenTag::kName);
-   std::string target = target_synonym.GetTokenString();
-   // target must be a known synonym
-   bool hasSynonym = false;
-   for (Synonym& t : synonyms) {
-     if (t.GetName() == target) {
-       hasSynonym = true;
-       this->target = Synonym(target, t.GetType());
-       break;
-     }
-   }
-   if (!hasSynonym) {
-     throw PQLParseException("Incorrect target synonym for \'Select\' query.");
-   }
+  Token target_synonym = Eat(TokenTag::kName);
+  std::string target = target_synonym.GetTokenString();
+  // target must be a known synonym
+  bool hasSynonym = false;
+  for (Synonym& t: synonyms) {
+    if (t.GetName() == target) {
+      hasSynonym = true;
+      this->target = Synonym(target, t.GetType());
+      break;
+    }
+  }
+  if (!hasSynonym) {
+    throw PQLParseException("Incorrect target synonym for \'Select\' query.");
+  }
 }
 
 // stmtRef: synonym | ‘_’ | INTEGER
@@ -157,7 +156,9 @@ std::pair<Clause*, bool> QueryParser::ParseRelRef() {
   Eat(TokenTag::kOpenBracket);
 
   // parse left-hand side
-  std::string lhs; bool is_lhs_syn; bool is_lhs_tgt_syn;
+  std::string lhs;
+  bool is_lhs_syn;
+  bool is_lhs_tgt_syn;
   // UsesS|ModifiesS: ‘Uses|Modifies’ ‘(’ stmtRef ‘,’ entRef ‘)’
   // TODO: add support in the future for modifiesP, usesP case: (entRef ‘,’ entRef)
   std::tie(lhs, is_lhs_syn, is_lhs_tgt_syn) = ParseStmtRef();
@@ -168,13 +169,15 @@ std::pair<Clause*, bool> QueryParser::ParseRelRef() {
 
   Eat(TokenTag::kComma);
   // parse right-hand side
-  std::string rhs; bool is_rhs_syn; bool is_rhs_tgt_syn;
+  std::string rhs;
+  bool is_rhs_syn;
+  bool is_rhs_tgt_syn;
   if (rel_type.compare("Uses") == 0 || rel_type.compare("Modifies") == 0) {
     Token tok = ParseEntRef(false);
     rhs = tok.GetTokenString();
     bool _is_rhs_syn = false;
     bool _is_rhs_tgt_syn = false;
-    for (Synonym& s : synonyms) {
+    for (Synonym& s: synonyms) {
       if (s.GetName() == rhs) {
         _is_rhs_syn = true;
         if (rhs == this->target.GetName()) {
@@ -197,7 +200,7 @@ std::pair<Clause*, bool> QueryParser::ParseRelRef() {
 
   // semantic validation of relRef.
   if (!QueryValidator::Is_Semantically_Valid_RelRef(lhs, rhs, GetRelRef(rel_type),
-                                                   is_lhs_syn, is_rhs_syn, &synonyms)) {
+                                                    is_lhs_syn, is_rhs_syn, & synonyms)) {
     throw PQLValidationException("Received semantically invalid " + rel_type + " cl.");
   }
 
@@ -259,7 +262,7 @@ std::string QueryParser::ParseFactor() {
   if (lookahead.GetTokenTag() == TokenTag::kInteger) {
     // parse as constant
     ss << Eat(TokenTag::kInteger).GetTokenString();
-  } else if (lookahead.GetTokenTag() == TokenTag::kName){
+  } else if (lookahead.GetTokenTag() == TokenTag::kName) {
     // parse as var_name
     ss << Eat(TokenTag::kName).GetTokenString();
   } else {
@@ -316,7 +319,7 @@ bool QueryParser::IsValidSynonym(Token token, DesignEntity de) {
   std::string syn_name = token.GetTokenString();
   // syn_name must be a known synonym, and of permitted type.
   bool is_valid = false;
-  for (Synonym& s : synonyms) {
+  for (Synonym& s: synonyms) {
     if (s.GetName() == syn_name && s.GetType() == de) {
       is_valid = true;
       break;
