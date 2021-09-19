@@ -40,7 +40,7 @@ void Deliverable::AddFollowRelationship(Statement* f1, Statement* f2) {
   // f2 cannot be inserted into followed_by_hash
   if (follow_hash_.insert({f1, f2}).second) {   // only inserts if the key is unique
     followed_by_hash_.insert({f2, f1}); // only inserts if the insertion into follow_hash is true
-  };
+  }
 }
 
 void Deliverable::AddFollowsTransitiveRelationship(Statement* before, Statement* after) {

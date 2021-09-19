@@ -131,7 +131,7 @@ vector<Token> EntityFactory::GetExpressionTokens(vector<Token> tokens, TokenTag 
   }
   if (start_iter + 1 >= end_iter) {
     throw std::invalid_argument("EF:There is nothing between start and end tag.\n");
-  };
+  }
 
   // collecting tokens
   vector<Token> expression_tokens;
