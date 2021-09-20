@@ -196,14 +196,13 @@ bool SyntaxValidator::IsFactor(const std::vector<Token>& statement_tokens,
 bool SyntaxValidator::IsTerm(const vector<Token>& statement_tokens, int left_boundary_idx, int right_boundary_idx) {
   TokenTag first_token_tag = statement_tokens.at(left_boundary_idx).GetTokenTag();
   TokenTag last_token_tag = statement_tokens.at(right_boundary_idx).GetTokenTag();
-  if (first_token_tag == TokenTag::kOpenBracket && last_token_tag == TokenTag::kCloseBracket) {
-    return IsFactor(statement_tokens, left_boundary_idx, right_boundary_idx);
-  }
+//  if (first_token_tag == TokenTag::kOpenBracket && last_token_tag == TokenTag::kCloseBracket) {
+//    return IsFactor(statement_tokens, left_boundary_idx, right_boundary_idx);
+//  }
   /// case 1: whole range makes up a factor:
   if (IsFactor(statement_tokens, left_boundary_idx, right_boundary_idx)) {
     return true;
   }
-
   /// case 2: <term><operator><factor>
   int middle_ptr = SyntaxValidator::FindSplitPoint(statement_tokens, left_boundary_idx, right_boundary_idx, RegexPatterns::GetTermDelimiterPattern());
   if (middle_ptr <= left_boundary_idx) {
@@ -236,9 +235,9 @@ bool SyntaxValidator::IsExpr(const vector<Token>& statement_tokens, int left_bou
     return false;
   }
   // if it's a set of extra brackets:
-  if (first_token.GetTokenTag() == TokenTag::kOpenBracket && last_token.GetTokenTag() == TokenTag::kCloseBracket) {
-    return IsExpr(statement_tokens, left_boundary_idx + 1, right_boundary_idx - 1);
-  }
+//  if (first_token.GetTokenTag() == TokenTag::kOpenBracket && last_token.GetTokenTag() == TokenTag::kCloseBracket) {
+//    return IsExpr(statement_tokens, left_boundary_idx + 1, right_boundary_idx - 1);
+//  }
   /// case 1, it's a term, recurse early
   if (IsTerm(statement_tokens, left_boundary_idx, right_boundary_idx)) {
     return true;
@@ -277,9 +276,9 @@ bool SyntaxValidator::IsRelFactor(const vector<Token>& statement_tokens,
   TokenTag first_token_tag = statement_tokens.at(left_boundary_idx).GetTokenTag();
   TokenTag last_token_tag = statement_tokens.at(right_boundary_idx).GetTokenTag();
   // [TODO iter 2]: try do let IsExpr handle the strpping and don't do any stripping here, just recurse into IsExpr regardless
-  if (first_token_tag == TokenTag::kOpenBracket && last_token_tag == TokenTag::kCloseBracket) {
-    return IsRelFactor(statement_tokens, left_boundary_idx + 1, right_boundary_idx - 1);
-  }
+//  if (first_token_tag == TokenTag::kOpenBracket && last_token_tag == TokenTag::kCloseBracket) {
+//    return IsRelFactor(statement_tokens, left_boundary_idx + 1, right_boundary_idx - 1);
+//  }
   bool is_factor = IsFactor(statement_tokens,
                             left_boundary_idx,
                             right_boundary_idx);// accepts redundant bracketing of expr e.g. ((x+1))

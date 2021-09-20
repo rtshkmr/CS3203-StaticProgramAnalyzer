@@ -403,8 +403,31 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
 //    [13] = {Token} {token_string_=")", token_tag_=kCloseBracket}
 //    [14] = {Token} {token_string_=")", token_tag_=kCloseBracket}
 //    [15] = {Token} {token_string_=")", token_tag_=kCloseBracket}
-     bool check_true = SyntaxValidator::IsCondExpr(post_tokens, 2, 14);
-     REQUIRE(check_true);
+//     bool check_true = SyntaxValidator::IsCondExpr(post_tokens, 2, 14);
+//     REQUIRE(check_true);
+
+    string post_sub_line_2 = " while (a>=((1*1)/(10))) ";
+    vector<Token> post_tokens_2 = Tokenizer::CreateTokens(post_sub_line_2);
+
+//    [0] = {Token} {token_string_="while", token_tag_=kName}
+//    [1] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [2] = {Token} {token_string_="a", token_tag_=kName}
+//    [3] = {Token} {token_string_=">=", token_tag_=kBinaryComparisonOperator}
+//    [4] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [5] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [6] = {Token} {token_string_="1", token_tag_=kInteger}
+//    [7] = {Token} {token_string_="*", token_tag_=kBinaryArithmeticOperator}
+//    [8] = {Token} {token_string_="1", token_tag_=kInteger}
+//    [9] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//    [10] = {Token} {token_string_="/", token_tag_=kBinaryArithmeticOperator}
+//    [11] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+//    [12] = {Token} {token_string_="10", token_tag_=kInteger}
+//    [13] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//    [14] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+//    [15] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+    bool check_true_2 = SyntaxValidator::IsCondExpr(post_tokens_2, 2, 14);
+    REQUIRE(check_true_2);
+    int y  = 1;
   }
   SECTION("Check StatementPassesCommonBlacklistRules function") {
 
