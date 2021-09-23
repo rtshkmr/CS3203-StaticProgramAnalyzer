@@ -6,7 +6,7 @@ classDiagram
 
     Program "1" *-- "1..*" Procedure :contains
 
-    Procedure "1" *-- "0..*" Statement :has
+    Procedure "1" *-- "1..*" Statement :has
 
     Statement <|-- ReadEntity
     Statement <|-- PrintEntity
@@ -68,7 +68,7 @@ classDiagram
 
     class ElseEntity { }
     
-    IfEntity "1" *-- "0-1" ElseEntity :contains
+    IfEntity "1" *-- "1" ElseEntity :contains
 
 
     Container <|-- Procedure
