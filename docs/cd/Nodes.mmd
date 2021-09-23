@@ -4,70 +4,74 @@ classDiagram
     Entity <|-- Procedure
     Entity <|-- Statement
 
-    ControlNode <|-- ClosingBrace
-    ControlNode <|-- Exception
-
     Program "1" *-- "1..*" Procedure :contains
 
     Procedure "1" *-- "0..*" Statement :has
 
-    Statement <|-- Read
-    Statement <|-- Print
-    Statement <|-- Call
-    Statement <|-- Assign
-    Statement <|-- While
-    Statement <|-- If
-    Statement <|-- Else
+    Statement <|-- ReadEntity
+    Statement <|-- PrintEntity
+    Statement <|-- CallEntity
+    Statement <|-- AssignEntity
+    Statement <|-- WhileEntity
+    Statement <|-- IfEntity
+    Statement <|-- ElseEntity
 
     class Entity {
         <<abstract>>
     }
 
+    class Container {
+        <<abstract>> 
+        -statement_list:list<Statement*>
+    }
+
     class Variable {
-        -variableName: VariableName
+        -variable_name: VariableName*
     }
 
     class Procedure {
-        -procedureName: ProcedureName
+        -procedure_name_: ProcedureName*
     }
 
     class Statement {
         <<abstract>>
-        #lineNumber: LineNumber
-        #stmtNumber: StatementNumber
-        #parentNode: Statement 
-        #beforeNode: Statement
+        #line_number_: LineNumber*
+        #statement_number_: StatementNumber*
+        #parent_node_: Container*
+        #before_node: Statement*
     }
 
-    class Read {
-        - var: Variable
+    class ReadEntity {
+        - var_name_: Variable*
     }
 
-    class Print {
-        - var: Varable
+    class PrintEntity {
+        - var_name_: Variable*
     }
 
-    class Call {
-        - proc: Procedure
+    class CallEntity {
+        - proc_name_: Procedure*
     }
 
-    class Assign {
-        - assignedTo: Variable
-        - expr: AssignmentExpression
+    class AssignEntity {
+        - assigned_to: Variable*
+        - expr_: AssignmentExpression*
     }
 
-    class While {
-        - condExpr: ConditionalExpression
-        - stmtList: List<Statement>
+    class WhileEntity {
+        - cond_expr_: ConditionalExpression*
     }
 
-    class If {
-        - condExpr: ConditionalExpression
-        - ifStmtList: List<Statement>
+    class IfEntity {
+        - cond_expr_: ConditionalExpression*
     }
 
-    class Else {
-        - elseStmtList: List<Statement> 
-    }
+    class ElseEntity { }
     
-    If "1" *-- "0-1" Else :contains
+    IfEntity "1" *-- "0-1" ElseEntity :contains
+
+
+    Container <|-- Procedure
+    Container <|-- WhileEntity
+    Container <|-- IfEntity
+    Container <|-- ElseEntity
