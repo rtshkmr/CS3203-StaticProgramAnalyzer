@@ -1,7 +1,5 @@
 sequenceDiagram
     autonumber
-    participant AT as AutoTester
-    participant SP as SourceProcessor
     participant P as Parser
     %% subsystem creates nodes and storing AST while the lines are being read
     %% Psystem contains statement stacks..
@@ -10,11 +8,6 @@ sequenceDiagram
     participant CGV as SyntaxValidator
     %% EntityFactory modifies necessary DSes (creates Entities, add entries into relationship, entity tables ...)
     participant EF as EntityFactory
-    participant DE as DesignExtractor
-    participant PKB as ProgramKnowledgeBase
-
-    AT->>+SP: ProcessSourceFile(source_file)
-    SP ->>+ P: Parse(source_file)
 
     %% initialises the necessary data structures inside PSub, these DSes (AST, RelationshipTables, EntityTables) will be accumulated
     %% Assumption: P will check correctness while building DSes %
@@ -44,24 +37,3 @@ sequenceDiagram
     %% at this point, all the statements have been processed, the parser is ready for deliverables to be sent to SP
     P ->>+PSub: GetDeliverables()
     PSub -->>-P: Deliverable* deliverable
-
-    P -->>-SP:
-
-    opt error thrown by Parser
-        SP ->>SP : Terminate(msg)
-    end
-
-    SP ->>+P: GetDeliverables()
-    P -->>-SP: Deliverable* deliverable
-
-    %% todo: add in DE activities
-    SP ->>+DE: ExtractDesignAbstractions()
-    %% DE and SP will comms with each other bidirectionally
-    %% todo: these sequences will be fleshed out in a separate sequence diagram
-
-    SP ->>+PKB: PopulateDataStructures(deliverable)
-
-    SP -->>- AT: PKB* pkb
-
-    %% Transitive => Parents*, Children* Follows*, FollowedBy* Use, UsedBy, Modifies, ModifiesBy
-    %% This sequence of steps ends when the source processing is done and deliverables sent to PKB %%
