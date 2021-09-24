@@ -241,8 +241,39 @@
         loop every item in populated_result_list
             AutoTester->>AutoTester: add item to results
         end
+        
+### queries_extractor.mmd
+    sequenceDiagram
+        autonumber
+        participant QueryExtractor
+        participant QueryParser
+        participant QueryTokenizer
+        participant QueryValidator
+        participant QueryOptimizer
 
-### queries.mmd
+        %% This sd is for per query (PQL statement) basis.
+        %% TODO: include initialiser
+        QueryExtractor->>QueryTokenizer: init()
+        QueryTokenizer-->>QueryExtractor: QueryTokenizer tokenizer
+        QueryExtractor->>QueryParser: init(list<Clause> clauses, list<Group> groups, list<Synonym> synonyms, Synonym target, tokenizer)
+        QueryParser-->>QueryExtractor: QueryParser parser
+        QueryExtractor->>QueryParser: parser.Parse()
+        Note right of QueryParser: Calls multiple handlers according to <br> grammar rules (recursive descent)
+        loop is expecting tokens based on grammar rules
+            QueryParser->>QueryTokenizer: GetNextToken()
+            QueryTokenizer-->>QueryParser: Token t
+            Note right of QueryParser: First layer of validations
+            opt is relRef
+                Note right of QueryParser: Additional layer of validations
+                QueryParser->>QueryValidator: Is_Semantically_Valid_RelRef()
+                QueryValidator-->>QueryParser: Boolean b
+            end
+        end
+        QueryParser-->>QueryExtractor: 
+        QueryExtractor->>QueryOptimizer: GroupClauses(clauses, groups, target)
+        QueryOptimizer-->>QueryExtractor: 
+
+### queries.mmd (deprecated)
 
     sequenceDiagram
         autonumber
