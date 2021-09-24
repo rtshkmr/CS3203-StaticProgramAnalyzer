@@ -22,7 +22,7 @@ sequenceDiagram
 
     %% statement here refers to the source code in between two semicolons
     %% If valid_state == false in ValidateSyntax, the loop terminates
-    loop has_next_stmt && valid_state
+    loop has_next_stmt && valid_syntax
         P ->>+ PSub: ProcessStatement(stmt)
         PSub ->>+ Tkn: CreateTokens(stmt)
         %% a token looks like: (<symbol>, <tokenTag>) brace_open brace_close
@@ -30,7 +30,7 @@ sequenceDiagram
 
         %% We ask the validator to validate the syntax for a single statement, if there's an error at any token, it should fail early
         PSub ->>+ CGV: ValidateSyntax(vector<Token>)
-        CGV -->>-PSub: bool valid_state
+        CGV -->>-PSub: bool valid_syntax
 
         %% create Entities:  Entity here refers to the Abstraction Entity as described by the wiki/lecture 1 slides
         PSub ->>+EF:CreateEntities(vector<Token>)
@@ -59,7 +59,7 @@ sequenceDiagram
     %% DE and SP will comms with each other bidirectionally
     %% todo: these sequences will be fleshed out in a separate sequence diagram
 
-    SP ->>+PKB: PopulateDataStructures(Deliverable d)
+    SP ->>+PKB: PopulateDataStructures(deliverable)
 
     SP -->>- AT: PKB* pkb
 
