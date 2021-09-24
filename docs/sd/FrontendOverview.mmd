@@ -10,6 +10,8 @@ sequenceDiagram
     AutoTester ->> SourceProcessor: ProcessSourceFile(source_file)
 
         SourceProcessor ->> Parser: Parse(source_file)
+        SourceProcessor ->>+ Parser: GetDeliverables()
+        Parser -->>- SourceProcessor: Deliverable* deliverable
 
         %% Transitive => Parents*, Children* Follows*, FollowedBy* Use, UsedBy, Modifies, ModifiesBy
         SourceProcessor ->> DesignExtractor: ExtractDesignAbstractions()
