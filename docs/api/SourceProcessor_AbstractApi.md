@@ -20,6 +20,8 @@
 #### API
 1. PKB* ProcessSourceFile(STRING sourceFilePath)
    * Description: Processes the source file at the path given, and returns a PKB pointer to the PKB that is populated with the necessary data.
+2. VOID Terminate(STRING message)
+   * Description: Terminates Parser execution and logger, and exits program.
 
 ### Parser
 **Overview**: `Parser` is a facade that takes in the source program from the `SourceProcessor`,
@@ -28,7 +30,7 @@ checks the syntax, creates the necessary data structures and sends these Deliver
 1. VOID Parse(STRING sourceFilePath)
    * Description: Parses the source file at the path given, by calling the `PSubsystem`.
 
-2. DELIVERABLE* SendDeliverables()
+2. DELIVERABLE* GetDeliverables()
    * Description: Wraps the necessary data structures in a Deliverable object and sends the pointer of the Deliverable to the SourceProcessor.
 
 ### PSubsystem
@@ -40,7 +42,7 @@ tokenized then its syntax is validated, entity objects are created and relations
    * Description: Initializes the data structures for the Deliverable and helper stacks.
 2. VOID ProcessStatement(STRING stmt)
    * Description: Tokenizes the statement, validates its concrete syntax and creates Entities and relationships that will then be added to the Deliverable.
-3. DELIVERABLE* SendDeliverables()
+3. DELIVERABLE* GetDeliverables()
    * Description: Wraps the necessary data structures in a Deliverable object and sends the Deliverable to the Parser.
 
 ### Tokenizer
