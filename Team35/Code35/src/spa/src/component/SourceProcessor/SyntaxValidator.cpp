@@ -194,36 +194,18 @@ bool SyntaxValidator::IsFactor(const std::vector<Token>& statement_tokens,
  * @return  true if specified range of tokens in statement_tokens makes up a Term
  */
 bool SyntaxValidator::IsTerm(const vector<Token>& statement_tokens, int left_boundary_idx, int right_boundary_idx) {
-  TokenTag first_token_tag = statement_tokens.at(left_boundary_idx).GetTokenTag();
-  TokenTag last_token_tag = statement_tokens.at(right_boundary_idx).GetTokenTag();
-  if (first_token_tag == TokenTag::kOpenBracket && last_token_tag == TokenTag::kCloseBracket) {
-    return IsFactor(statement_tokens, left_boundary_idx, right_boundary_idx);
-  }
   /// case 1: whole range makes up a factor:
   if (IsFactor(statement_tokens, left_boundary_idx, right_boundary_idx)) {
     return true;
   }
   /// case 2: <term><operator><factor>
-  int delim_idx = Token::GetLastMatchingTokenIdx(statement_tokens,
-                                                 RegexPatterns::GetTermDelimiterPattern(),
-                                                 left_boundary_idx,
-                                                 right_boundary_idx);
-  bool delim_idx_in_range = left_boundary_idx <= delim_idx && right_boundary_idx >= delim_idx;
-  if (delim_idx_in_range) {
-    if (delim_idx == left_boundary_idx || delim_idx == right_boundary_idx) {
-      // if first or last token is a delim (prevents out of range access in recursive calls)
-      return false;
-    }
-    // checks right part first to fail early and prevent recursive loops
-    bool right_part_is_factor = IsFactor(statement_tokens, delim_idx + 1, right_boundary_idx);
-    if (!right_part_is_factor) {
-      return false;
-    }
-    bool left_part_is_term = IsTerm(statement_tokens, left_boundary_idx, delim_idx - 1);
-    return left_part_is_term;
-  } else {
-    return false;
+  int middle_ptr = SyntaxValidator::FindSplitPoint(statement_tokens, left_boundary_idx, right_boundary_idx, RegexPatterns::GetTermDelimiterPattern());
+  if (middle_ptr <= left_boundary_idx) {
+    return false; // todo: check if need recurse
   }
+  bool right_part_is_factor = IsFactor(statement_tokens, middle_ptr + 1, right_boundary_idx);
+  bool left_part_is_term = IsTerm(statement_tokens, left_boundary_idx, middle_ptr - 1);
+  return right_part_is_factor && left_part_is_term;
 }
 /**
  *  An Expression is either single term or it's combination of another sub-expression and a term, delimited by a specific set
@@ -246,10 +228,6 @@ bool SyntaxValidator::IsExpr(const vector<Token>& statement_tokens, int left_bou
       std::regex_match(last_token.GetTokenString(), RegexPatterns::GetExprDelimiterPattern());
   if (first_token_is_expr_delim || last_token_is_expr_delim) {
     return false;
-  }
-  // if it's a set of extra brackets:
-  if (first_token.GetTokenTag() == TokenTag::kOpenBracket && last_token.GetTokenTag() == TokenTag::kCloseBracket) {
-    return IsExpr(statement_tokens, left_boundary_idx + 1, right_boundary_idx - 1);
   }
   /// case 1, it's a term, recurse early
   if (IsTerm(statement_tokens, left_boundary_idx, right_boundary_idx)) {
@@ -285,12 +263,6 @@ bool SyntaxValidator::IsExpr(const vector<Token>& statement_tokens, int left_bou
 bool SyntaxValidator::IsRelFactor(const vector<Token>& statement_tokens,
                                   int left_boundary_idx,
                                   int right_boundary_idx) {
-  TokenTag first_token_tag = statement_tokens.at(left_boundary_idx).GetTokenTag();
-  TokenTag last_token_tag = statement_tokens.at(right_boundary_idx).GetTokenTag();
-  // [TODO iter 2]: try do let IsExpr handle the strpping and don't do any stripping here, just recurse into IsExpr regardless
-  if (first_token_tag == TokenTag::kOpenBracket && last_token_tag == TokenTag::kCloseBracket) {
-    return IsRelFactor(statement_tokens, left_boundary_idx + 1, right_boundary_idx - 1);
-  }
   bool is_factor = IsFactor(statement_tokens,
                             left_boundary_idx,
                             right_boundary_idx);// accepts redundant bracketing of expr e.g. ((x+1))
