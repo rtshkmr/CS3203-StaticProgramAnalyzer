@@ -242,7 +242,7 @@
             AutoTester->>AutoTester: add item to results
         end
         
-### queries_extractor.mmd
+### query_extractor.mmd
     sequenceDiagram
         autonumber
         participant QueryExtractor
@@ -251,8 +251,6 @@
         participant QueryValidator
         participant QueryOptimizer
 
-        %% This sd is for per query (PQL statement) basis.
-        %% TODO: include initialiser
         QueryExtractor->>QueryTokenizer: init()
         QueryTokenizer-->>QueryExtractor: QueryTokenizer tokenizer
         QueryExtractor->>QueryParser: init(list<Clause> clauses, list<Group> groups, list<Synonym> synonyms, Synonym target, tokenizer)
