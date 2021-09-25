@@ -1,0 +1,25 @@
+stateDiagram-v2
+    direction LR
+    ValidateSyntax: 
+    note left of ValidateSyntax
+       Tokens representing a statement.
+    end note
+
+    state handler <<choice>>
+    note left of handler
+    deduces statement type based on first token
+    end note
+    VerifyAgainstBlacklistRules
+    
+    [*] --> ValidateSyntax
+    ValidateSyntax --> VerifyAgainstBlacklistRules
+    VerifyAgainstBlacklistRules --> handler
+    %% cases based on statement type:
+    handler --> ValidateProcedureSyntax 
+    handler --> ValidateMacroFunctions
+    handler --> ValidateIfStatements
+    handler --> ValidateWhileStatements
+    ValidateProcedureSyntax --> [*]
+    ValidateMacroFunctions --> [*]
+    ValidateIfStatements --> [*]
+    ValidateWhileStatements --> [*]
