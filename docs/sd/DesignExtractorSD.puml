@@ -1,0 +1,46 @@
+@startuml de
+  skinparam shadowing false
+  skinparam sequence {
+    ArrowColor black
+    LifeLineBorderColor grey
+    LifeLineBackgroundColor lightgray
+    ParticipantBorderColor lavender
+    ParticipantBackgroundColor lavender
+  }
+
+  participant SourceProcessor
+  participant DesignExtractor
+  participant UsesExtractor
+  participant ModifiesExtractor
+  participant ParentTExtractor
+  participant FollowsTExtractor
+
+  create DesignExtractor
+  SourceProcessor -> DesignExtractor: DesignExtractor(deliverable)
+  SourceProcessor -> DesignExtractor: ExtractDesignAbstractions()
+  activate DesignExtractor
+
+  DesignExtractor -> UsesExtractor: Extract(deliverable)
+  activate UsesExtractor
+  UsesExtractor --> DesignExtractor
+  deactivate UsesExtractor
+
+  DesignExtractor -> ModifiesExtractor: Extract(deliverable)
+  activate ModifiesExtractor
+  ModifiesExtractor --> DesignExtractor
+  deactivate ModifiesExtractor
+
+  DesignExtractor -> ParentTExtractor: Extract(deliverable)
+  activate ParentTExtractor
+  ParentTExtractor --> DesignExtractor
+  deactivate ParentTExtractor
+
+  DesignExtractor -> FollowsTExtractor: Extract(deliverable)
+  activate FollowsTExtractor
+  FollowsTExtractor --> DesignExtractor
+  deactivate FollowsTExtractor
+
+  DesignExtractor --> SourceProcessor
+  deactivate DesignExtractor
+
+@enduml
