@@ -7,16 +7,16 @@ sequenceDiagram
     participant QueryProjector
 
     %% This sd is for per query (PQL statement) basis.
-    AutoTester ->> QuerySystemController: Evaluate(query, pkb)
-    QuerySystemController ->> QueryExtractor: ExtractQuery()
+    AutoTester ->>+ QuerySystemController: Evaluate(query, pkb)
+    QuerySystemController ->>+ QueryExtractor: ExtractQuery()
     Note right of QueryExtractor: Ref <br/> SD_Extract_Query
-    QueryExtractor-->>QuerySystemController: Populate query objects
-    QuerySystemController->>QueryEvaluator: EvaluateQuery()
+    QueryExtractor-->>-QuerySystemController: Populate query objects
+    QuerySystemController->>+QueryEvaluator: EvaluateQuery()
     Note right of QueryEvaluator: Ref <br/> SD_Evaluate_Query
-    QueryEvaluator-->>QuerySystemController: list<string> result_list
-    QuerySystemController->>QueryProjector: FormatQuery(result_list)
-    QueryProjector-->>QuerySystemController: list<string> populated_result_list
-    QuerySystemController-->>AutoTester: list<string> populated_result_list
+    QueryEvaluator-->>-QuerySystemController: list<string> result_list
+    QuerySystemController->>+QueryProjector: FormatQuery(result_list)
+    QueryProjector-->>-QuerySystemController: list<string> populated_result_list
+    QuerySystemController-->>-AutoTester: list<string> populated_result_list
     loop every item in populated_result_list
         AutoTester->>AutoTester: add item to results
     end
