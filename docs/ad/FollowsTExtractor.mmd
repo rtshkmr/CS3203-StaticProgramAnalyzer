@@ -1,0 +1,32 @@
+stateDiagram
+  s1: 1. Iterate through Procedure list <br/>of Deliverable
+  s2: 2. Call recursive method with first <br/>Statement of the statement list
+
+  s3: 3. Recurse with following Statement
+  s4: 4. Recurse with first <br/>Statement in Container
+  s5: 5. Return list of Statements that are Followed <br/>by this Statement from the deliverable
+
+  s6: 6. Add Follows* relationship between <br/>Statement and the statement list returned by <br/>the recursive method to deliverable
+
+  state stmt_end <<choice>>
+  state rec_if <<choice>>
+  state ret_if <<choice>>
+  state proc_end <<choice>>
+
+  [*] --> s1
+  s1 --> s2
+  s2 --> rec_if
+  rec_if --> s3: [else]
+  rec_if --> s4: [if Statement is Container]
+  s4 --> s2
+
+  s3 --> stmt_end
+  stmt_end --> s2: [Following statement exists]
+  stmt_end --> s5: [end of statement list]
+
+  s5 --> s6
+  s6 --> ret_if
+  ret_if --> s5: [Recursive method called <br/>by intermediate Statement]
+  ret_if --> proc_end: [Recursive method called by first<br/> Statement in a statement list]
+  proc_end --> s1: [else]
+  proc_end --> [*]: [if end of Procedure list]

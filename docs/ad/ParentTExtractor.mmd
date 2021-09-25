@@ -1,0 +1,42 @@
+stateDiagram
+  s1: 1. Iterate through Procedure list <br/>of Deliverable
+  s2: 2. Iterate through Statement list
+  s3: 3. Call recursive method with Statement
+  s4: 4. Return empty list
+  s5: 5. Iterate through Children list
+
+  s6: 6. Recurse with Child Statement
+  s7: 7. Return list of Children of <br/>this Statement from the deliverable
+
+  s8: 8. Add Parent* relationship between <br/>Statement and the Children list returned by <br/>the recursive method to deliverable
+
+  state stmts_end <<choice>>
+  state rec_if <<choice>>
+  state ret_if <<choice>>
+  state chi_if <<choice>>
+  state proc_end <<choice>>
+
+  [*] --> s1
+  s1 --> s2
+  s2 --> s3
+  s3 --> rec_if
+
+  rec_if --> s4: [else]
+  rec_if --> s5: [Statement has a child]
+
+  s5 --> s6
+  s6 --> s3
+  chi_if --> s7: [if end of children list]
+  chi_if --> s5: [else]
+  s7 --> s8
+
+  s4 --> ret_if
+  ret_if --> stmts_end: [Recursive method<br/> called by Statement]
+  ret_if --> chi_if: [Recursive method called<br/> by intermediate Child]
+
+  s8 --> stmts_end
+  stmts_end --> s2: [else]
+  stmts_end --> proc_end: [if end of statement list]
+
+  proc_end --> s1: [else]
+  proc_end --> [*]: [if end of Procedure list]
