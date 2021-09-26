@@ -5,6 +5,7 @@
         ArrowColor gray
     }
     skinparam classAttributeIconSize 0
+    skinparam shadowing false
     hide circle
 
     class Deliverable {
