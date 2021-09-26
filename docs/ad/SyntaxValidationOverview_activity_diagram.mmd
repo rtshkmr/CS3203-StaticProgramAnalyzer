@@ -13,13 +13,23 @@ stateDiagram-v2
     
     [*] --> ValidateSyntax
     ValidateSyntax --> VerifyAgainstBlacklistRules
+    note right of VerifyAgainstBlacklistRules
+    Ruleset includes things 
+    like bracket matching, 
+    delimiting of statements etc.
+    end note
     VerifyAgainstBlacklistRules --> handler
     %% cases based on statement type:
     handler --> ValidateProcedureSyntax 
     handler --> ValidateMacroFunctions
+    note right of ValidateMacroFunctions
+    Macro Functions:
+    Read, Write,Print,Call
+
+    end note
     handler --> ValidateIfStatements
     handler --> ValidateWhileStatements
-    ValidateProcedureSyntax --> [*]
-    ValidateMacroFunctions --> [*]
     ValidateIfStatements --> [*]
     ValidateWhileStatements --> [*]
+    ValidateProcedureSyntax --> [*]
+    ValidateMacroFunctions --> [*]
