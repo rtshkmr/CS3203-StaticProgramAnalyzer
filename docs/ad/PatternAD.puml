@@ -1,0 +1,30 @@
+@startuml
+<Style>
+activityDiagram {
+  BackgroundColor lavender
+  BorderColor lavender
+  FontName arial
+  FontSize 13
+LineColor Black
+}
+document {
+   BackgroundColor transparent
+}
+</style>
+skinparam sequence {
+  ArrowColor black
+  BorderColor black
+  ActivityBorderColor black
+}
+start
+if (Is pattern clause?) then (yes)
+  if (Given assign value) then (yes)
+    :GetPatternByAssign;
+  else (Given variable)
+    :GetPatternByVariable;
+  endif
+else (No)
+stop
+endif
+stop
+@enduml

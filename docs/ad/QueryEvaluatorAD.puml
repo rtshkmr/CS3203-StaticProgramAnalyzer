@@ -1,0 +1,46 @@
+@startuml
+<Style>
+activityDiagram {
+  BackgroundColor lavender
+  BorderColor lavender
+  FontName arial
+  FontSize 13
+LineColor Black
+}
+document {
+   BackgroundColor transparent
+}
+</style>
+skinparam sequence {
+  ArrowColor black
+  BorderColor black
+  ActivityBorderColor black
+}
+|Query Extractor|
+start
+if (Is query valid?) then (no)
+  stop
+else (yes)
+  :Pass relevant info to Query Evaluator;
+endif
+|Query Evaluator|
+repeat
+    if (Is boolean group?) is (yes) then
+        :Create table for this group;
+        else
+    endif
+    repeat
+        :Extract clause info;
+        |PKB|
+        :Query PKB;
+        |Query Evaluator|
+        :Update table;
+    repeat while (has clause in current group?) is (yes)
+    ->no;
+repeat while (has more groups?) is (yes)
+->no;
+
+|Query Projector|
+:Query Projector Formats answer;
+stop
+@enduml

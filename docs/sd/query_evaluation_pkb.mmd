@@ -1,102 +1,84 @@
 sequenceDiagram
-    participant QueryPreProcessor
+    participant QueryController
     participant QueryEvaluator
     participant PKB
-    participant QueryResultProjector
+    participant SuchThatEvaluator
+    participant PatternEvaluator
 
     % synList - all syn declared
     % e.g assign a; variable v;
     % Select v such that Parent (a, 1) pattern a ("x", "1 + 2")
-    QueryPreProcessor->>+QueryEvaluator: QueryStruct(SYNONYM[] synList, SYNONYM target, SUCH_THAT[] stList, PATTERN[] patternList)
+    QueryController->>+QueryEvaluator: EvaluateQuery(synonym_list, target, groups, pkb)
 
-    QueryEvaluator->>+PKB: getProcTable()
-    PKB-->>-QueryEvaluator: PROC[]
+    %QueryEvaluator->>+PKB: getProcTable()
+    %PKB-->>-QueryEvaluator: PROC[]
     % querying smts or var is not put into an alt else to illustrate extension for procedure and call queries later on
     loop Every valid synonym declaration
-        opt querying statements
-            % Note that Stmt can be ‘stmt’ | ‘read’ | ‘print’ | ‘while’ | ‘if’ | ‘assign’
-            QueryEvaluator->>+PKB: getStmtTable(STMT_TYPE stmtType)
-            PKB-->>-QueryEvaluator: STMT[] listOfStmt, ERR_CODE err
-        end
-        opt querying variables
-            % Note that Var can be ‘variable’ | ‘constant’
-            QueryEvaluator->>+PKB: getVarTable(VAR_TYPE varType)
-            PKB-->>-QueryEvaluator: STMT[] listOfVar, ERR_CODE err
-        end
+        QueryEvaluator->>+PKB: GetDesignEntity(DesignEntity)
+        PKB-->>-QueryEvaluator: String[] list_of_values
     end
 
     % For each such that or pattern
-    loop Every such that clause
-        opt Select s such that Follows (stmt1, s)
-            QueryEvaluator->>+PKB: getFollows (STMT stmt1)
-            PKB-->>-QueryEvaluator: STMT clauseResult
-        end
-        opt Select s such that Follows* (stmt1, s)
-            QueryEvaluator->>+PKB: getFollowsStar (STMT stmt1)
-            PKB-->>-QueryEvaluator: STMT[] clauseResult
-        end
-        opt Select s such that Follows (s, stmt1)
-            QueryEvaluator->>+PKB: getPrevious (STMT stmt1)
-             PKB-->>-QueryEvaluator: STMT clauseResult
-        end
-        opt Select s such that Follows* (s, stmt1)
-            QueryEvaluator->>+PKB: getPreviousStar (STMT stmt1)
-            PKB-->>-QueryEvaluator: STMT[] clauseResult
-        end
-        opt Select s such that Parent (s, stmt1)
-            QueryEvaluator->>+PKB: getParent (STMT stmt1)
-            PKB-->>-QueryEvaluator: STMT clauseResult
-        end
-        opt Select s such that Parent* (s, stmt1)
-            QueryEvaluator->>+PKB: getParentStar (STMT stmt1)
-            PKB-->>-QueryEvaluator: STMT[] clauseResult
-        end
-         opt Select s such that Parent (stmt1, s)
-            QueryEvaluator->>+PKB: getChild (STMT stmt1)
-            PKB-->>-QueryEvaluator: STMT clauseResult
-        end
-        opt Select s such that Parent* (stmt1, s)
-            QueryEvaluator->>+PKB: getChildStar (STMT stmt1)
-            PKB-->>-QueryEvaluator: STMT[] clauseResult
-        end
-        opt Select v such that Uses (stmt1, v)
-            QueryEvaluator->>+PKB: getVarUsed (STMT stmt1)
-            PKB-->>-QueryEvaluator: VAR clauseResult
-        end
-        opt Select s such that Uses (s, var1)
-            QueryEvaluator->>+PKB: getStmtUsing (VAR var1)
-            PKB-->>-QueryEvaluator: STMT[] clauseResult
-        end
-        opt Select v such that Modifies (stmt1, v)
-            QueryEvaluator->>+PKB: getVarModified (STMT stmt1)
-            PKB-->>-QueryEvaluator: VAR clauseResult
-        end
-        opt Select s such that Modifies (s, var1)
-            QueryEvaluator->>+PKB: getStmtModifying (VAR var1)
-            PKB-->>-QueryEvaluator: STMT[] clauseResult
-        end
-    end
+    loop Every clause
+        alt is SuchThat
+            QueryEvaluator->>+SuchThatEvaluator: EvaluateSuchThatClause(clause, table, pkb, synonym_list)
+            opt Select s, Follows (stmt1, s)
+                SuchThatEvaluator->>+PKB: getFollows (STMT stmt1)
+            end
+            opt Select s, Follows (s, stmt1)
+                SuchThatEvaluator->>+PKB: getPrevious (STMT stmt1)
+            end
+            Note left of SuchThatEvaluator: There are many other RelRef types omited for brevity
 
-    opt has >= 1 pattern-cl && notCached
-        QueryEvaluator ->> PKB: getAllAssignStmts()
-        PKB -->> QueryEvaluator: AST_ASSIGN[] assignStmts
-        QueryEvaluator ->> QueryEvaluator: cacheAssignStmts
-    end
-    loop Each pattern clause
-        QueryEvaluator->>QueryEvaluator: STMT[] comparePattern(PATTERN p)
-        note right of QueryEvaluator: Case lhs: <br/>if "var_name" (exact match): filter assignStmts<br/>if synonym: variable filter assignStmts<br/>if _ (any match): do nothing
-    note right of QueryEvaluator: Case rhs: <br/> if "..." (exact match): filter assignStmts<br/>if _"..."_ (partial match): check AST_ASSIGNS for subtree match first<br/>if _ (any match): do nothing
+            Note left of SuchThatEvaluator: This includes Follows*, Parent, Parent*, Uses
+
+            %opt Select s, Follows* (stmt1, s)
+            %    SuchThatEvaluator->>+PKB: getFollowsStar (STMT stmt1)
+            %end
+            %opt Select s, Follows* (s, stmt1)
+            %    SuchThatEvaluator->>+PKB: getPreviousStar (STMT stmt1)
+            %end
+            %opt Select s, Parent (s, stmt1)
+            %    SuchThatEvaluator->>+PKB: getParent (STMT stmt1)
+            %end
+            %opt Select s, Parent* (s, stmt1)
+            %    SuchThatEvaluator->>+PKB: getParentStar (STMT stmt1)
+            %end
+            %opt Select s, Parent (stmt1, s)
+            %    SuchThatEvaluator->>+PKB: getChild (STMT stmt1)
+            %end
+            %opt Select s, Parent*(stmt1, s)
+            %    SuchThatEvaluator->>+PKB: getChildStar (STMT stmt1)
+            %end
+            %opt Select v, Uses(s1, v)
+            %    SuchThatEvaluator->>+PKB: getVarUsed (STMT stmt1)
+            %end
+            %opt Select s, Uses (s, v1)
+            %    SuchThatEvaluator->>+PKB: getStmtUsing (VAR var1)
+            %end
+            opt Select v, Modifies(s1, v)
+                SuchThatEvaluator->>+PKB: getVarModified (STMT stmt1)
+            end
+            opt Select s,Modifies(s, v1)
+                SuchThatEvaluator->>+PKB: getStmtModifying (VAR var1)
+            end
+            SuchThatEvaluator-->>-QueryEvaluator:
+        else is Pattern
+            QueryEvaluator->>PatternEvaluator: EvaluatePatternClause(clause, table, pkb, synonym_design_entity_map)
+
+            alt given Assignment Statement
+                PatternEvaluator->>+PKB: getPatternByAssign()
+            else given Variable
+                PatternEvaluator->>+PKB: getAllAssignStmt()
+            end
+
+        end
+
     end
 
     % Consider extracting the work of combining clauses to another
     % component.
 
-    % Compute combination of clause results
-    opt querying statements
-        QueryEvaluator->>+QueryEvaluator: STMT[] ComputeCombinedResult(STMT[][])
-    end
-    opt querying variables
-        QueryEvaluator->>+QueryEvaluator: VAR[] ComputeCombinedResult(VAR[][])
-    end
+    QueryEvaluator->>QueryController: String[] RESULT
 
-    QueryEvaluator->>QueryResultProjector: STMT[]/VAR[] RESULT
+

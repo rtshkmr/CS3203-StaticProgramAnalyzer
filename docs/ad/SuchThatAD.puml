@@ -1,0 +1,43 @@
+@startuml
+<Style>
+activityDiagram {
+  BackgroundColor lavender
+  BorderColor lavender
+  FontName arial
+  FontSize 13
+LineColor Black
+}
+document {
+   BackgroundColor transparent
+}
+</style>
+skinparam sequence {
+  ArrowColor black
+  BorderColor black
+  ActivityBorderColor black
+}
+start
+if (Is such that clause?) then (yes)
+  if (Is Follows) then (yes)
+    if (Given first parameter) then (yes)
+      :GetFollows;
+    else (No)
+      :GetPrevious;
+    endif
+  elseif (Is Follows*) then (yes)
+    if (Given first parameter) then (yes)
+      :GetFollowsT;
+    else (No)
+      :GetPreviousT;
+    endif
+  else (No)
+     :Other RelRefs includes
+Parent, Parent*, Uses, Modifies
+but is omited for brevity;
+    stop
+  endif
+  stop
+else (No)
+stop
+endif
+@enduml
