@@ -1,0 +1,14 @@
+graph TD
+    A[Is_Syntactically_Valid_RelRef] --> C{is UsesS or ModifiesS}
+
+    C -->|Yes| D{neither clause <br>is a synonym}
+    C -->|No| E{are there synonyms <br>that are variables <br> or procedures}
+
+    D-->|Yes| G(return No)
+    D-->|No| I{all synonyms <br>are in whitelist}
+
+    I-->|Yes| F(return Yes)
+    I-->|No| G(return No)
+
+    E-->|Yes| G(return No)
+    E-->|No| F(return Yes)
