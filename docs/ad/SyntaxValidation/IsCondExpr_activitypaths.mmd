@@ -1,0 +1,37 @@
+stateDiagram-v2
+    %% logic for conditional expression
+    [*] --> IsCondExpr
+    note left of [*]
+    Called by ValidateWhileKeyword Handler
+    to verify if 
+     a>=(1*(1/(10)))
+     is a conditional expr
+    end note
+        
+    state is_negated_expr <<choice>>
+    IsCondExpr --> is_negated_expr
+
+    is_negated_expr --> IsCondExpr: if is a negation of a cond expr
+    is_negated_expr --> FindSplitPoint: need to try recursing
+    note right of FindSplitPoint
+      Finds if there's a token matching
+       a desired delimiter pattern
+
+        This uses a stack-based approach 
+    that ensures the nesting of brackets
+    is considered when looking for a valid split point
+    to recurse from
+
+    end note
+    state split_point_found <<choice>>
+     note right of split_point_found
+        Expr Delimiters (+, -)
+    end note
+    FindSplitPoint --> split_point_found
+    split_point_found --> IsRelExpr: if no target delimiter
+    split_point_found --> IsCondExpr : check left & right of split point
+    note left of IsRelExpr
+    to verify if 
+     a>=(1*(1/(10)))
+     is a relative expr
+    end note

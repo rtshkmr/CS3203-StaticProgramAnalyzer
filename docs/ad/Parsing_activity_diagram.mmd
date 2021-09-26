@@ -1,0 +1,35 @@
+stateDiagram-v2
+    [*] --> Tokenizer
+    note left of [*]
+    input example statement 03: 
+    while (a>=(1*(1/(10)))) {
+    end note
+    note right of Tokenizer
+    [Tagged Tokens]
+    --
+[00] = {Token} {token_string_="while", token_tag_=kWhileKeyword}
+[01] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+[02] = {Token} {token_string_="a", token_tag_=kName}
+[03] = {Token} {token_string_=">=", token_tag_=kBinaryComparisonOperator}
+[04] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+[05] = {Token} {token_string_="1", token_tag_=kInteger}
+[06] = {Token} {token_string_="*", token_tag_=kBinaryArithmeticOperator}
+[07] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+[08] = {Token} {token_string_="1", token_tag_=kInteger}
+[09] = {Token} {token_string_="/", token_tag_=kBinaryArithmeticOperator}
+[10] = {Token} {token_string_="(", token_tag_=kOpenBracket}
+[11] = {Token} {token_string_="10", token_tag_=kInteger}
+[12] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+[13] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+[14] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+[15] = {Token} {token_string_=")", token_tag_=kCloseBracket}
+[16] = {Token} {token_string_="{", token_tag_=kOpenBrace}
+    --
+
+
+    
+
+    end note
+    Tokenizer --> SyntaxValidator:tagged tokens
+    SyntaxValidator --> EntityFactory: validated tokens
+    EntityFactory --> [*]

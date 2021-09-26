@@ -1,0 +1,29 @@
+stateDiagram-v2
+    %% logic for conditional expression
+    [*] --> IsCondExpr: "a>=(1*(1/(10)))"
+    note left of [*]
+    Recursive calls when validating 
+    "a>=(1*(1/(10)))"
+    Helper functions like FindSplitPoint and 
+    blacklist checks have been omitted for brevity
+    end note
+    IsCondExpr --> IsRelExpr: "a>=(1*(1/(10)))"
+    IsRelExpr --> IsRelFactor: "a"
+    IsRelExpr --> IsRelFactor: "(1*(1/(10)))"
+    IsRelFactor --> IsFactor: "a"
+    IsRelFactor --> IsFactor: "(1*(1/(10)))"
+    IsFactor --> IsExpr: "(1*(1/(10)))"
+    IsFactor --> True: "a"
+    IsExpr --> IsExpr: "1*(1/(10))"
+    IsExpr --> IsTerm: "1*(1/(10))"
+    IsTerm --> IsTerm: "1/(10)"
+    IsTerm --> IsTerm: "1"
+    IsTerm --> IsFactor: "1"
+    IsTerm --> IsFactor: "(10)"
+    IsFactor --> IsExpr:"10"
+    IsExpr --> IsTerm: "10"
+    IsTerm --> IsFactor: "10"
+    IsFactor --> True: "10"
+    IsFactor --> True: "1"
+
+

@@ -1,0 +1,27 @@
+stateDiagram-v2
+    %% logic for rel expression
+    [*] --> IsRelExpr
+    note left of [*]
+    Called by IsCondExpr 
+    end note
+    IsRelExpr --> FindSplitPoint: need to try recursing
+    state split_point_found <<choice>>
+     note left of split_point_found
+        Delimiters: (==,>,>=,<,<=,!=)
+        i.e. Binary Comparison Operators
+    end note
+    FindSplitPoint --> split_point_found
+    split_point_found --> false: if no target delimiter
+    split_point_found --> IsRelFactor : check left & right of split point
+    note left of IsRelExpr
+    to verify if 
+     a>=(1*(1/(10)))
+     is a relative expr
+    end note
+
+    note right of IsRelFactor
+    check if 
+    1) LHS: "a" is a relative factor
+    2) RHS:"(1*(1/(10)))" is a relative factor
+
+    end note
