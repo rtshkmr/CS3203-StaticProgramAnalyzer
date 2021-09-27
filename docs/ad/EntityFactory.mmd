@@ -1,0 +1,25 @@
+stateDiagram
+  check: 1. Check the TokenTag of first keyword Token in the vector
+  match: 2. TokenTag matches "read"
+  handle: 3. Handle Token accordingly
+  retrieve: 4. Retrieve Variable pointer
+  createvar: 5. Create a new Variable "x" and adds it to the var_list
+  createread: 6. Create ReadEntity using the Variable
+  ret: 7. Return Entity created
+
+  state varif <<choice>>
+  state varend <<choice>>
+
+  [*] --> check
+  check --> match
+  match --> handle
+  handle --> varif
+  varif --> retrieve: [Variable "x" exists in var_list]
+  varif --> createvar: [else]
+
+  retrieve --> varend
+  createvar --> varend
+
+  varend --> createread
+  createread --> ret
+  ret --> [*]

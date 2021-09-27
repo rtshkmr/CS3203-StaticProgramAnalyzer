@@ -14,114 +14,87 @@
 #### API:
 
 1. PROC[] getProcTable()
-    * Description: Returns a list of PROC. If the procTable is empty, return an empty list.
-2. STMT[] getStmtTable(STMT_TYPE stmtType)
-    * Description: Returns a list of STMT with the type corresponding to STMT_TYPE.
-      If there are no such types of STMT, return an empty list.
-3. VAR[] getVarTable(STMT_TYPE stmtType)
-    * Description: Returns a list of STMT with the type corresponding to STMT_TYPE.
-      If there are no such types of STMT, return an empty list.
-4. STMT[] getFollows(STMT stmt)
-    * Description: Returns a list containing 1 STMT which follows stmt.
-      If there is not STMT that follows, return an empty list.
-5. STMT[] getPrevious(STMT stmt)
-    * Description: Returns a list containing 1 STMT, x, where stmt follows x.
-      If there is no previous STMT, return an empty list.
-6. BOOLEAN isFollows(STMT stmt1, STMT stmt2)
-    * Description: Returns true if stmt1 follows stmt2. False otherwise.
-7. STMT[] getFollowsStar(STMT stmt)
-    * Description: Returns a list of STMT which follows* stmt.
-      If there is no STMT that follows, return an empty list.
-8. STMT[] getPreviousStar(STMT stmt)
-    * Description: Returns a list of STMT, x, where stmt follows* x.
-      If there is no previous STMT, return an empty list.
-9. BOOLEAN isFollowsStar(STMT stmt1, STMT stmt2)
-    * Description: Returns true if stmt1 follows* stmt2. False otherwise.
-10. sim. for getParent(STMT stmt), getChild(STMT stmt), isParent(STMT stmt1, STMT2)
-    getParentStar(STMT stmt), getChildStar(STMT stmt), isParentStar(STMT stmt1, STMT, stmt2)
-11. VAR[] getVarUsed(STMT stmt)
+   * Required only in iter 2
+   * Description: Returns a list of PROC. If the procTable is empty, return an empty list.
+2. list<string> getDesignEntity(DesignEntity de)
+    * Description: Returns a list of strings with the corresponding data to that Design Entity.
+    If there are no such types of DesignEntity, return an empty list.
+3. list<tuple<DesignEntity, string>> GetFollows(string stmt)
+    * Description: Returns a list containing 1 string which follows stmt.
+    If there is no stmt that follows, return an empty list.
+4. list<tuple<DesignEntity, string>> GetPrevious(string stmt)
+    * Description: Returns a list containing 1 string, x, where stmt follows x.
+   If there is no previous stmt, return an empty list.
+5. list<tuple<DesignEntity, string>> GetFollowsStar(string stmt)
+    * Description: Returns a list of stmt which follows* stmt.
+      If there is no string that follows, return an empty list.
+6. list<tuple<DesignEntity, string>> GetPreviousStar(string stmt)
+   * Description: Returns a list of stmt, x, where stmt follows* x.
+     If there is no previous string, return an empty list.
+7. list<tuple<DesignEntity, string>> GetParent(string stmt)
+   * Description: Returns a list containing 1 stmt, s, where Parent(s, stmt)
+8. list<tuple<DesignEntity, string>> GetChild(string stmt)
+   * Description: Returns a list containing 1 stmt, s, where Parent(stmt, s)
+9. list<tuple<DesignEntity, string>> GetParentStar(string stmt)
+   * Description: Returns a list containing 1 stmt, s, where Parent*(s, stmt)
+10. list<tuple<DesignEntity, string>> GetChildStar(string stmt)
+    * Description: Returns a list containing 1 stmt, s, where Parent*(stmt, s)
+11. list<tuple<DesignEntity, string>> GetUsedBy(string stmt)
     * Description: Returns a list of VAR, v, where Uses (stmt, v). Empty list otherwise.
-12. STMT[] getStmtUsing(Var v)
-    * Description: Returns a list of STMT, s, where Uses (s, v). Empty list otherwise.
-13. BOOLEAN isUses(STMT s, VAR v)
-    * Description: Returns true if Uses(s, v). False otherwise.
-14. sim. for getVarModified()
-15. sim. for getStmtModifying()
-16. sim. for isModifies(STMT s, VAR v)
+12. list<tuple<DesignEntity, string>> GetUses(string var)
+    * Description: Returns a list of stmt, s, where Uses (s, v). Empty list otherwise.
+13. list<tuple<DesignEntity, string>> GetModifiedBy(string stmt)
+    * Description:  Returns a list of VAR, v, where Modifies (stmt, v). Empty list otherwise.
+14. list<tuple<DesignEntity, string>> GetModifies(string var)
+    * Description: Returns a list of stmt, s, where Modifies (s, v). Empty list otherwise.
+15. vector<AssignEntity> getPatternByAssign(string stmtRef)
+    * Description: Returns a list of a single OBJECT containing varName and expression.
+16. vector<AssignEntity> getPatternByVariable(string varName)
+    * Description: Returns a list of OBJECTs(?) each containing varName(LHS) and expression(RHS).
 
 
+## Query Processor Abstract API
 
-## Source Processor Abstract API
+### List of Components (Only lists important ones)
+1. QueryExtractor
+2. QueryOptimizer
+3. QueryEvaluator
+4. QueryProjector
 
-### Important Definitions
-* **Source Statement**:  SIMPLE code surrounded by two `;` symbols or by `{` and `;` (first statement)
-* **Token** (format): should at least contain the original symbol and some tokenTag for categorisation
-* **Deliverables**: A wrapper object that contains the AST, EntityTables, RelationshipTables that will be stored in the `PKB`
-* **Entity**: Design entities such as stmt as listed in the SPA requirements
+### QueryExtractor
+**Overview**: `QueryExtractor` is a facade that calls subcomponents (`QueryTokenizer`, `QueryParser`, `QueryValidator`) in order to tokenize, parse and validate the user query and populate the relevant information inside the query objects.
 
-### List of Components
-1. SourceProcessor
-2. Parser
-3. PSubsystem
-4. Tokenizer
-5. ConcreteGrammarValidator
-6. EntityFactory
-7. DesignExtractor
-
-### SourceProcessor
-**Overview**: `SourceProcessor` manages the data flow between the `Parser`, `DesignExtractor` and the `PKB`. It holds the necessary data structures(Deliverables) for preprocessing of source code and populates the `PKB` when the preprocessing is done.
 #### API
-1. IDENTIFIER processSourceFile(FILE sourceFile)
+1. VOID ExtractQuery(STRING query)
+   * Description: Processes the query string, modifying the query objects in QueryExtractor in-place with the extracted information.
 
-### Parser
-**Overview**: `Parser` is a facade that takes in the source program from the `SourceProcessor`,
-checks the syntax, creates the necessary data structures and sends these Deliverables back.
+
+### QueryOptimizer
+**Overview**: `QueryOptimizer` executes extra logic on the initial query object, in order to group the clauses in strategic ways to increase performance during evaluation. 
+
 #### API
-1. IDENTIFIER parse(FILE sourceFile)
+1. static void GroupClauses(std::vector<Clause*>* clauses, std::list<Group*>* groups, Synonym* target);
+   * Description: Groups clauses (queries) that should be evaluated together, based on existence of common synonyms. The newly formed Groups of clauses are added in-place to the Groups data structure of the query object. Note: For iteration 1, the grouping algorithm has a rudimentary implementation as a maximum of 1 such that and 1 pattern clause is expected.
 
-2. IDENTIFIER sendDeliverables()
-    * Description: Wraps the necessary data structures in a Deliverables object and sends the Deliverables to the SourceProcessor.
 
-### PSubsystem
-**Overview**: `PSubsystem` contains data structures that accumulate(AST, EntityTables, RelationshipTables, Helper Stacks that keep track of tokens and determine how the Deliverables are being modified).
-It receives a single Source Statement from the `Parser` and initiates a pipeline for processing it: the statement is
-tokenized then its syntax is validated, entity nodes are created and added to the AST, relationships are added.
+### QueryEvaluator
+**Overview**: `QueryEvaluator` receives and further processes the query objects received from `QueryExtractor`, and evaluates the queries.
+
 #### API
-1. IDENTIFIER initDataStructures()
-    * Description: Initializes the data structures for the Deliverables and helper stacks.
-2. IDENTIFIER processStatement(STRING stmt)
-    * Description: Tokenizes the statement, validates its concrete syntax and creates Entities and relationships that will then be added to the Deliverables.
-3. IDENTIFIER sendDeliverables()
-    * Description: Wraps the necessary data structures in a Deliverables object and sends the Deliverables to the Parser.
+1. VOID QueryEvaluator(std::list<Synonym> syn_list, Synonym target, std::list<Group*> groups, PKB pkb);
+   * Description: Initialiser for the QueryEvaluator instance, which takes in the query objects representing a valid parsed query, and an instance of the PKB object.
 
-### Tokenizer
-**Overview**: `Tokenizer` is responsible for converting the string format of a Source Statement into a list of lexical tokens, as defined in the Concrete Grammar Syntax.
+
+### QueryProjector
+**Overview**: `QueryProjector` receives raw results of query evaluation, and formats them before passing the results to the autotester.
+
 #### API
-1. LIST\<TOKENS\> createTokens(STRING stmt)
-    * Description: Creates tokens out of the statement according to the Syntax.
-
-### ConcreteGrammarValidator
-**Overview**: `ConcreteGrammarValidator` checks whether the tokenized statement follows the Concrete Grammar Syntax.
-#### API
-1. IDENTIFIER validateConcreteSyntax(LIST\<TOKENS\> tokens)
-    * Description: Validates the syntax of the list of tokens.
-
-### EntityFactory
-**Overview**: `EntityFactory` is responsible for creating the Entity nodes for the AST from the tokenized statement provided. Entity can be an Abstract/Parent class.
-#### API
-1. IDENTIFIER createEntities(LIST\<TOKENS\> tokens)
-    * Description: Builds the sub-tree of the AST from the list of tokens that represent a statement.
-
-### DesignExtractor
-**Overview**: Extracts program design abstractions that cannot be extracted in the one pass of parsing of the source code, namely the transitive relationships.
-#### API
-1. IDENTIFIER extractDesignAbstractions()
-    * Description: Extracts program design abstractions from the data available after parsing and populates the relevant tables.
+1. std::list<std::string> FormatQuery(std::vector<std::string> results);
+   * Description: receives raw results of query evaluation as a vector of strings, and formats them before passing the list results to the autotester.
 
 
 
-
-Template for Abstract API
+## Template for Abstract API
 
 ### \<Insert Module/Component Name\>
 **Overview**: <insert purpose/responsibility of module>
