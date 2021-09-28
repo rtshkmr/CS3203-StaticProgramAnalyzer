@@ -219,8 +219,11 @@ void PSubsystem::HandleIfStmt(IfEntity* if_entity) {
 
 void PSubsystem::HandleElseStmt(ElseEntity* else_entity) {
   IfEntity* if_entity = dynamic_cast<IfEntity*>(parent_stack_.top());
+  if (if_entity == nullptr) {
+    //If assertion failed, Else did not follow If
+    throw SyntaxException("Encountered If statement without Else construct");
+  }
 
-  assert (if_entity != nullptr); //If assertion failed, Else did not follow If
   parent_stack_.push(else_entity);
 
   if_entity->SetElseEntity(else_entity);
@@ -269,9 +272,7 @@ void PSubsystem::HandleReadStmt(ReadEntity* read_entity) {
 
 void PSubsystem::CheckForIfElseValidity() {
   for (auto const& i: * deliverable_->GetIfList()) {
-    if (i->GetElseEntity() == nullptr) {
-      throw SyntaxException("Encountered If statement without Else construct");
-    }
+    assert(i->GetElseEntity() != nullptr);
   }
 }
 
