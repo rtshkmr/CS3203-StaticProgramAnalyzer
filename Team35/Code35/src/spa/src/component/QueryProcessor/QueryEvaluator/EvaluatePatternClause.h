@@ -5,7 +5,7 @@
 #include "component/QueryProcessor/types/QueryEvaluatorTable.h"
 #include "component/QueryProcessor/types/Types.h"
 #include "component/PKB/PKB.h"
-#include "QueryPKB.h"
+#include "PKBDispatcher.h"
 #include "model/Statement.h"
 
 void ProcessPatternClause(const Pattern& pattern, QueryEvaluatorTable* table, const PKB& pkb,

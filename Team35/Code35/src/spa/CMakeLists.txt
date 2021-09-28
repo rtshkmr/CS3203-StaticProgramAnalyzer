@@ -32,7 +32,7 @@ add_library(spa ${srcs} ${headers}
         src/component/QueryProcessor/QueryExtractor/QueryValidator.h src/component/QueryProcessor/QueryExtractor/QueryValidator.cpp
         src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatClause.h src/component/QueryProcessor/QueryEvaluator/EvaluateSuchThatClause.cpp
         src/component/QueryProcessor/QueryEvaluator/EvaluatePatternClause.h src/component/QueryProcessor/QueryEvaluator/EvaluatePatternClause.cpp
-        src/component/QueryProcessor/QueryEvaluator/QueryPKB.h src/component/QueryProcessor/QueryEvaluator/QueryPKB.cpp
+        src/component/QueryProcessor/QueryEvaluator/PKBDispatcher.h src/component/QueryProcessor/QueryEvaluator/PKBDispatcher.cpp
         src/component/QueryProcessor/QueryEvaluator/QueryEvaluator.h src/component/QueryProcessor/QueryEvaluator/QueryEvaluator.cpp
         src/component/QueryProcessor/QueryProjector.h src/component/QueryProcessor/QueryProjector.cpp
         src/component/QueryProcessor/QuerySystemController.h src/component/QueryProcessor/QuerySystemController.cpp

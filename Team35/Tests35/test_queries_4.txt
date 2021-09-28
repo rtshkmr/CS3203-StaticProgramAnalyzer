@@ -108,3 +108,8 @@ stmt s1; assign a1; variable v1, v2;
 Select s1 such that Uses(s1, v1) pattern a1(v2, _"z"_)
 1, 2, 3, 4, 5, 8, 9
 5000
+23 - ParentT with double wildcards (invalid)
+print p;
+Select p such that Parent*(_, _)
+none
+5000

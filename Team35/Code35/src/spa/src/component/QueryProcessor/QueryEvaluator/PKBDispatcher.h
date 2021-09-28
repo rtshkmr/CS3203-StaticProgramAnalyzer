@@ -1,5 +1,5 @@
-#ifndef AUTOTESTER_QUERYPKB_H
-#define AUTOTESTER_QUERYPKB_H
+#ifndef AUTOTESTER_PKBDISPATCHER_H
+#define AUTOTESTER_PKBDISPATCHER_H
 
 #include <list>
 #include "component/QueryProcessor/types/Types.h"
@@ -13,4 +13,4 @@ std::list<std::tuple<DesignEntity, std::string>> QueryPKBSuchThat(PKB pkb,
                                                                   bool is_first_param);
 std::vector<AssignEntity> QueryPkbPattern(PKB database, bool is_assign_synonym, const std::string& value);
 
-#endif //AUTOTESTER_QUERYPKB_H
+#endif //AUTOTESTER_PKBDISPATCHER_H

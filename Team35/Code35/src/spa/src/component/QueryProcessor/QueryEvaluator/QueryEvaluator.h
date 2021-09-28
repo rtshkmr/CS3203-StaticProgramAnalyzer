@@ -8,7 +8,7 @@
 #include "component/QueryProcessor/types/QueryEvaluatorTable.h"
 #include "component/QueryProcessor/types/QueryEvaluatorTable.h"
 #include "component/PKB/PKB.h"
-#include "QueryPKB.h"
+#include "PKBDispatcher.h"
 #include "EvaluateSuchThatClause.h"
 #include "EvaluatePatternClause.h"
 
