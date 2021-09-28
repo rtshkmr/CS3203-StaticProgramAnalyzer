@@ -1,0 +1,20 @@
+1 - Parent of read
+stmt s; read r;
+Select s such that Parent(s, r)
+2, 5
+5000
+1 - Parent of print
+stmt s; read r;
+Select s such that Parent(s, r)
+2, 5
+5000
+1 - Parent* of read
+stmt s; read r;
+Select s such that Parent(s, r)
+1, 2, 5
+5000
+1 - Parent* of print
+stmt s; read r;
+Select s such that Parent(s, r)
+1, 2, 5
+5000
