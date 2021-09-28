@@ -1,0 +1,19 @@
+procedure if {
+    if (while != 0) then {
+       if (procedure != 99) then {
+           print ProcessStmtNow;
+           read cont1nueREad1ng;
+       } else {
+           print print;
+           read read;
+       }
+    } else {
+        if (while == 1) then {
+            read a;
+            print b;
+        } else {
+            print c;
+            read d;
+        }
+    }
+}
