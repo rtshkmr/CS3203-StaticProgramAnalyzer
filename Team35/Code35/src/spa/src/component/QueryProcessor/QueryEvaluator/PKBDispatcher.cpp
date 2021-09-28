@@ -1,8 +1,10 @@
-#include "QueryPKB.h"
+#include "PKBDispatcher.h"
 
 bool QueryPkbForRelationshipExistence(PKB database, RelRef r) {
   switch (r) {
+    case RelRef::kFollowsT:
     case RelRef::kFollows:return database.HasFollows();
+    case RelRef::kParentT:
     case RelRef::kParent:return database.HasParent();
     case RelRef::kUsesS:return database.HasUses();
     case RelRef::kModifiesS:return database.HasModifies();

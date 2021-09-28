@@ -323,3 +323,13 @@ variable v1;
 Select v1 such that Modifies(-1, v1)
 none
 5000
+66 - ParentT with double wildcards (valid)
+while w;
+Select w such that Parent*(_, _)
+7
+5000
+67 - FollowsT with double wildcards (valid)
+while w;
+Select w such that Follows*(_, _)
+7
+5000

@@ -7,7 +7,7 @@
 #include <component/QueryProcessor/types/Types.h>
 #include <component/QueryProcessor/types/QueryEvaluatorTable.h>
 #include "component/PKB/PKB.h"
-#include "QueryPKB.h"
+#include "PKBDispatcher.h"
 
 void EvaluateSuchThatClause(const SuchThat& such_that_clause, QueryEvaluatorTable* table, const PKB& pkb,
                             const std::list<Synonym>& synonym_list);
