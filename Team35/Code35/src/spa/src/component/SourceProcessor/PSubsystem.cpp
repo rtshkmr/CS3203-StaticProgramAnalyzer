@@ -80,7 +80,7 @@ void PSubsystem::ProcessStatement(std::string statement) {
         current_nest = parent_stack_.top();
         if (WhileEntity* while_entity = dynamic_cast<WhileEntity*>(current_nest)) {
           current_node_type_ = 1;
-        }else if (IfEntity* if_entity = dynamic_cast<IfEntity*>(current_nest)) {
+        } else if (IfEntity* if_entity = dynamic_cast<IfEntity*>(current_nest)) {
           current_node_type_ = 2;
         } else if (ElseEntity* else_entity = dynamic_cast<ElseEntity*>(current_nest)) {
           current_node_type_ = 3;
@@ -220,7 +220,6 @@ void PSubsystem::HandleElseStmt(ElseEntity* else_entity) {
   IfEntity* if_entity = dynamic_cast<IfEntity*>(parent_stack_.top());
 
   assert (if_entity != nullptr); //If assertion failed, Else did not follow If
-  //parent_stack_.push(if_entity);
   parent_stack_.push(else_entity);
 
   if_entity->SetElseEntity(else_entity);
