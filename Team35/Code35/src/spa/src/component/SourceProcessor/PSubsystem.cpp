@@ -88,6 +88,7 @@ void PSubsystem::ProcessStatement(std::string statement) {
           //dirty way to get the original if-statement (should be 2nd highest)
           parent_stack_.pop(); //pop this else;
           current_node_ = parent_stack_.top();
+          assert (dynamic_cast<IfEntity*>(current_node_) != nullptr);
           parent_stack_.push(else_entity);
         } else {
           throw std::invalid_argument("[ERROR] Retrace error. There should not be any other types ");
