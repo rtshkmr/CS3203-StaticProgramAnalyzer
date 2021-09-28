@@ -248,3 +248,8 @@ assign pattern; if Modifies; print print;
 Select print such that Modifies (Modifies, "x") pattern pattern(_, _)
 14, 21, 22
 5000
+51 - Double Synonym with matching synonyms
+assign a1; variable v1;
+Select a1 such that Uses (a1, v1) pattern a1 (v1, _)
+3, 8, 11, 16
+5000
