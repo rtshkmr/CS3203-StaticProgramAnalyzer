@@ -44,6 +44,7 @@ class PSubsystem {
   void HandlePrintStmt(PrintEntity* print_entity);
 
   void CheckForIfElseValidity();
+  void PSubsystem::CheckForProcedureExisting();
 
  public:
   PSubsystem() = default;

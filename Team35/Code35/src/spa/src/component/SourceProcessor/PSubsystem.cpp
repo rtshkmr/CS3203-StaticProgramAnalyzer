@@ -3,7 +3,6 @@
 #include "PSubsystem.h"
 #include "Tokenizer.h"
 #include "exception/SyntaxException.h"
-#include "exception/IterationOneException.h"
 
 using namespace psub;
 
@@ -61,6 +60,7 @@ void PSubsystem::ProcessStatement(std::string statement) {
     if (current_node_type_ == 0 && parent_stack_.empty()) {
       current_node_type_ = -1;
       current_node_ = nullptr;
+      current_procedure_ = nullptr;
     } else {
       Container* current_nest = parent_stack_.top();
       parent_stack_.pop();
@@ -98,19 +98,10 @@ void PSubsystem::ProcessStatement(std::string statement) {
     return;
   }
 
-  /// TO BE DELETED AFTER ITERATION 1;
-  if (tokens[0].GetTokenTag() == TokenTag::kProcedureKeyword && !deliverable_->GetProcList()->empty()) {
-    valid_state = false;
-    throw IterationOneException("Multiple Procedure found!");
-  } else if (tokens[0].GetTokenTag() == TokenTag::kCallKeyword) {
-    valid_state = false;
-    throw IterationOneException("Call statement found!");
-  }
-
   Entity* entityObj = entity_factory_.CreateEntities(tokens);
 
   if (current_node_type_ == -1) { //when current_node_ is null. Only happens when not reading within a procedure.
-    assert(current_procedure_ == nullptr && current_node_ == nullptr);
+    assert(current_procedure_ == nullptr && current_node_ == nullptr && follow_stack_.empty() && parent_stack_.empty());
     if (Procedure* procedure = dynamic_cast<Procedure*>(entityObj)) {
       PerformNewProcedureSteps(procedure);
       return;
@@ -159,7 +150,6 @@ void PSubsystem::PerformNewProcedureSteps(Procedure* procedure) {
     Program* program = new Program(procedure);
     deliverable_->SetProgram(program);
   } else {
-    throw IterationOneException("[2] Encountered multiple procedures"); //TODO: remove after Iteration 1
     deliverable_->GetProgram()->AddProcedure(procedure);
   }
 }
@@ -278,8 +268,29 @@ void PSubsystem::CheckForIfElseValidity() {
   }
 }
 
+void PSubsystem::CheckForProcedureExisting() {
+  // Check if Program.procList === Deliverables.procList
+  // assumption: EntityFactory will create into Deliverables.procList whenever encountered
+  //             Program.procList will be created when "procedure x {" is encountered.
+  //   So, if both are same, it would be correct.
+  //   Note that Program.procList is strictly <= Deliverables.procList because EntityFactory will create procedure too.
+  //  NOTE:: This method does not check for self-call & recursive call. TODO: this
+
+  std::list<Procedure*>* program_proclist = deliverable_->GetProgram()->GetProcedureList();
+  std::list<Procedure*>* del_proclist = deliverable_->GetProcList();
+
+  program_proclist->sort([](Procedure* a, Procedure* b) { return *a->GetName() < *b->GetName(); } );
+  del_proclist->sort([](Procedure* a, Procedure* b) { return *a->GetName() < *b->GetName(); } );
+  bool equal = std::equal(program_proclist->begin(), program_proclist->end(), del_proclist->begin(), del_proclist->end());
+
+  if (!equal) {
+    throw SyntaxException("[2] A call is made to unreferenced procedure");
+  }
+}
+
 Deliverable* PSubsystem::GetDeliverables() {
   CheckForIfElseValidity(); //TODO: to put it within main handling if possible.
+  CheckForProcedureExisting();
 
   valid_state = false; //to prevent further processsing.
   return deliverable_;
