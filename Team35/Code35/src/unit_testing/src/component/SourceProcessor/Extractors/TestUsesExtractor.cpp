@@ -34,12 +34,10 @@ TEST_CASE("1.UsesExtractor.Extract Uses basic conditions") {
     UsesExtractor uses_extractor{};
     uses_extractor.Extract(& deliverable);
 
-    CHECK(deliverable.container_use_hash_.count(proc1) == 0);
-// [TODO: iter2]
-//    std::list<Variable*> actual_var_list = *deliverable.container_use_hash_.find(proc1)->second;
-//    std::list<Variable*> expected_var_list = {var_x_};
-//
-//    CHECK(actual_var_list == expected_var_list);
+    std::list<Variable*> actual_var_list = *deliverable.container_use_hash_.find(proc1)->second;
+    std::list<Variable*> expected_var_list = {var_x_};
+
+    CHECK(actual_var_list == expected_var_list);
   }
 
   SECTION("Procedure with no var") {
@@ -116,20 +114,17 @@ TEST_CASE("1.UsesExtractor.Extract Uses basic conditions") {
     std::list<Variable*> if_var_list = {
         var_x_, // from if condition
         var_z_,
-    };
-    deliverable.container_use_hash_.insert(std::make_pair(if_1_, & if_var_list));
-    std::list<Variable*> else_var_list = {
         var_i_
     };
-    deliverable.container_use_hash_.insert(std::make_pair(else_1_, & else_var_list));
+    deliverable.container_use_hash_.insert(std::make_pair(if_1_, & if_var_list));
 
     UsesExtractor uses_extractor{};
     uses_extractor.Extract(& deliverable);
 
-//    std::list<Variable*> actual_var_list = *deliverable.container_use_hash_.find(proc1)->second;
-    std::list<Variable*> expected_var_list = {var_y_, var_i_, var_x_, var_z_};
+    std::list<Variable*> actual_var_list = *deliverable.container_use_hash_.find(proc1)->second;
+    std::list<Variable*> expected_var_list = {var_y_, var_x_, var_z_, var_i_};
 
-//    CHECK(actual_var_list == expected_var_list);
+    CHECK(actual_var_list == expected_var_list);
 
     //intermediate change
     std::list<Variable*> expected_if_var_list = {var_x_, var_z_, var_i_};
@@ -175,50 +170,50 @@ TEST_CASE("1.UsesExtractor.Extract Uses basic conditions") {
     UsesExtractor uses_extractor{};
     uses_extractor.Extract(& deliverable);
 
-//    std::list<Variable*> actual_var_list = *deliverable.container_use_hash_.find(proc2)->second;
+    std::list<Variable*> actual_var_list = *deliverable.container_use_hash_.find(proc2)->second;
     std::list<Variable*> expected_var_list = {var_y_, var_z_, var_x_, var_i_};
 
     CHECK(* deliverable.container_use_hash_.find(while_1_)->second == while_var_list); // no change to inner container
-//    CHECK(actual_var_list == expected_var_list);
+    CHECK(actual_var_list == expected_var_list);
   }
 
-//  SECTION("Procedure with 1 call container") {
-//    // proc with call container
-//    /*
-//     * procedure proc3 {
-//     * y = z
-//     * call proc4
-//     * }
-//     * procedure proc4 {
-//     * y = i
-//     * }
-//     */
-//    Procedure* proc3 = new Procedure(new ProcedureName("proc3"));
-//    Procedure* proc4 = new Procedure(new ProcedureName("proc4"));
-//    proc3->AddStatement(assign_4_);
-//    proc3->AddStatement(new CallEntity(proc4));
-//    proc4->AddStatement(assign_6_);
-//
-//    deliverable.proc_list_.push_back(proc3);
-//    deliverable.proc_list_.push_back(proc4);
-//    std::list<Variable*> proc3_var_list = {
-//        var_z_
-//    };
-//    deliverable.container_use_hash_.insert(std::make_pair(proc3, &proc3_var_list));
-//    std::list<Variable*> proc4_var_list = {
-//        var_i_
-//    };
-//    deliverable.container_use_hash_.insert(std::make_pair(proc4, &proc4_var_list));
-//
-//    UsesExtractor uses_extractor{};
-//    uses_extractor.Extract(&deliverable);
-//
-//    std::list<Variable*> actual_var_list = *deliverable.container_use_hash_.find(proc3)->second;
-//    std::list<Variable*> expected_var_list = {var_z_, var_i_};
-//
-//    CHECK(*deliverable.container_use_hash_.find(proc4)->second == proc4_var_list); // no change to inner container
-//    CHECK(actual_var_list == expected_var_list);
-//  }
+  SECTION("Procedure with 1 call container") {
+    // proc with call container
+    /*
+     * procedure proc3 {
+     * y = z
+     * call proc4
+     * }
+     * procedure proc4 {
+     * y = i
+     * }
+     */
+    Procedure* proc3 = new Procedure(new ProcedureName("proc3"));
+    Procedure* proc4 = new Procedure(new ProcedureName("proc4"));
+    proc3->AddStatement(assign_4_);
+    proc3->AddStatement(new CallEntity(proc4));
+    proc4->AddStatement(assign_6_);
+
+    deliverable.proc_list_.push_back(proc3);
+    deliverable.proc_list_.push_back(proc4);
+    std::list<Variable*> proc3_var_list = {
+        var_z_
+    };
+    deliverable.container_use_hash_.insert(std::make_pair(proc3, &proc3_var_list));
+    std::list<Variable*> proc4_var_list = {
+        var_i_
+    };
+    deliverable.container_use_hash_.insert(std::make_pair(proc4, &proc4_var_list));
+
+    UsesExtractor uses_extractor{};
+    uses_extractor.Extract(&deliverable);
+
+    std::list<Variable*> actual_var_list = *deliverable.container_use_hash_.find(proc3)->second;
+    std::list<Variable*> expected_var_list = {var_z_, var_i_};
+
+    CHECK(*deliverable.container_use_hash_.find(proc4)->second == proc4_var_list); // no change to inner container
+    CHECK(actual_var_list == expected_var_list);
+  }
 }
 
 TEST_CASE("1.UsesExtractor.Extract Uses nested containers") {
@@ -284,12 +279,9 @@ TEST_CASE("1.UsesExtractor.Extract Uses nested containers") {
     std::list<Variable*> if1_var_list = {
         var_x_, // from if condition
         var_z_,
-    };
-    deliverable.container_use_hash_.insert(std::make_pair(if_1_, & if1_var_list));
-    std::list<Variable*> else_var_list = {
         var_i_
     };
-    deliverable.container_use_hash_.insert(std::make_pair(else_1_, & else_var_list));
+    deliverable.container_use_hash_.insert(std::make_pair(if_1_, & if1_var_list));
     std::list<Variable*> if2_var_list = {
         var_y_, // from if condition
         var_z_,
@@ -297,22 +289,19 @@ TEST_CASE("1.UsesExtractor.Extract Uses nested containers") {
     deliverable.container_use_hash_.insert(std::make_pair(if_2_, & if2_var_list));
     std::list<Variable*> if3_var_list = {
         var_z_, // from if condition
-    };
-    deliverable.container_use_hash_.insert(std::make_pair(if_3_, & if3_var_list));
-    std::list<Variable*> else3_var_list = {
         var_i_
     };
-    deliverable.container_use_hash_.insert(std::make_pair(else_3_, & else3_var_list));
+    deliverable.container_use_hash_.insert(std::make_pair(if_3_, & if3_var_list));
 
     UsesExtractor uses_extractor{};
     uses_extractor.Extract(& deliverable);
 
-//    std::list<Variable*> actual_var_list = *deliverable.container_use_hash_.find(proc1)->second;
-    std::list<Variable*> expected_var_list = {var_i_, var_x_, var_z_, var_y_};
+    std::list<Variable*> actual_var_list = *deliverable.container_use_hash_.find(proc1)->second;
+    std::list<Variable*> expected_var_list = {var_x_, var_z_, var_i_, var_y_};
 
-//    CHECK(actual_var_list == expected_var_list);
+    CHECK(actual_var_list == expected_var_list);
 
-    // intermediate change to if container
+    // no change to innermost container
     std::list<Variable*> expected_if3_var_list = {var_z_, var_i_};
     CHECK(* deliverable.container_use_hash_.find(if_3_)->second == expected_if3_var_list);
     // intermediate change to secondary container
@@ -361,66 +350,66 @@ TEST_CASE("1.UsesExtractor.Extract Uses nested containers") {
     UsesExtractor uses_extractor{};
     uses_extractor.Extract(& deliverable);
 
-//    std::list<Variable*> actual_var_list = *deliverable.container_use_hash_.find(proc2)->second;
+    std::list<Variable*> actual_var_list = *deliverable.container_use_hash_.find(proc2)->second;
     std::list<Variable*> expected_var_list = {var_x_, var_z_, var_y_, var_i_};
 
     CHECK(* deliverable.container_use_hash_.find(while_3_)->second == while3_var_list); // no change to inner container
-//    CHECK(actual_var_list == expected_var_list);
+    CHECK(actual_var_list == expected_var_list);
 
     std::list<Variable*> secondary_var_list = {var_y_, var_z_, var_i_};
     // intermediate change to secondary container
     CHECK(* deliverable.container_use_hash_.find(while_2_)->second == secondary_var_list);
   }
 
-//  SECTION("Procedure with 2 call container") {
-//    // proc with call container
-//    /*
-//     * procedure proc3 {
-//     * y = z
-//     * call proc4
-//     * }
-//     * procedure proc4 {
-//     * z=3
-//     * call proc2
-//     * }
-//     * procedure proc2 {
-//     * y=i
-//     * }
-//     */
-//    Procedure* proc3 = new Procedure(new ProcedureName("proc3"));
-//    Procedure* proc4 = new Procedure(new ProcedureName("proc4"));
-//    Procedure* proc2 = new Procedure(new ProcedureName("proc2"));
-//    proc3->AddStatement(assign_4_);
-//    proc3->AddStatement(new CallEntity(proc4));
-//    proc4->AddStatement(assign_3_);
-//    proc4->AddStatement(new CallEntity(proc2));
-//    proc2->AddStatement(assign_6_);
-//
-//    deliverable.proc_list_.push_back(proc3);
-//    deliverable.proc_list_.push_back(proc4);
-//    deliverable.proc_list_.push_back(proc2);
-//    std::list<Variable*> proc3_var_list = {
-//        var_z_
-//    };
-//    deliverable.container_use_hash_.insert(std::make_pair(proc3, &proc3_var_list));
-//    std::list<Variable*> proc2_var_list = {
-//        var_i_
-//    };
-//    deliverable.container_use_hash_.insert(std::make_pair(proc2, &proc2_var_list));
-//
-//    UsesExtractor uses_extractor{};
-//    uses_extractor.Extract(&deliverable);
-//
-//    std::list<Variable*> actual_var_list = *deliverable.container_use_hash_.find(proc3)->second;
-//    std::list<Variable*> expected_var_list = {var_z_, var_i_};
-//
-//    CHECK(*deliverable.container_use_hash_.find(proc2)->second == proc2_var_list); // no change to inner container
-//    CHECK(actual_var_list == expected_var_list);
-//
-//    std::list<Variable*> secondary_var_list = {var_i_};
-//    // intermediate change to secondary container
-//    CHECK(*deliverable.container_use_hash_.find(proc4)->second == secondary_var_list);
-//  }
+  SECTION("Procedure with 2 call container") {
+    // proc with call container
+    /*
+     * procedure proc3 {
+     * y = z
+     * call proc4
+     * }
+     * procedure proc4 {
+     * z=3
+     * call proc2
+     * }
+     * procedure proc2 {
+     * y=i
+     * }
+     */
+    Procedure* proc3 = new Procedure(new ProcedureName("proc3"));
+    Procedure* proc4 = new Procedure(new ProcedureName("proc4"));
+    Procedure* proc2 = new Procedure(new ProcedureName("proc2"));
+    proc3->AddStatement(assign_4_);
+    proc3->AddStatement(new CallEntity(proc4));
+    proc4->AddStatement(assign_3_);
+    proc4->AddStatement(new CallEntity(proc2));
+    proc2->AddStatement(assign_6_);
+
+    deliverable.proc_list_.push_back(proc3);
+    deliverable.proc_list_.push_back(proc4);
+    deliverable.proc_list_.push_back(proc2);
+    std::list<Variable*> proc3_var_list = {
+        var_z_
+    };
+    deliverable.container_use_hash_.insert(std::make_pair(proc3, &proc3_var_list));
+    std::list<Variable*> proc2_var_list = {
+        var_i_
+    };
+    deliverable.container_use_hash_.insert(std::make_pair(proc2, &proc2_var_list));
+
+    UsesExtractor uses_extractor{};
+    uses_extractor.Extract(&deliverable);
+
+    std::list<Variable*> actual_var_list = *deliverable.container_use_hash_.find(proc3)->second;
+    std::list<Variable*> expected_var_list = {var_z_, var_i_};
+
+    CHECK(*deliverable.container_use_hash_.find(proc2)->second == proc2_var_list); // no change to inner container
+    CHECK(actual_var_list == expected_var_list);
+
+    std::list<Variable*> secondary_var_list = {var_i_};
+    // intermediate change to secondary container
+    CHECK(*deliverable.container_use_hash_.find(proc4)->second == secondary_var_list);
+  }
 
   SECTION("Procedure with multiple container") {
     // proc with if container
@@ -448,12 +437,9 @@ TEST_CASE("1.UsesExtractor.Extract Uses nested containers") {
     std::list<Variable*> if_var_list = {
         var_x_, // from if condition
         var_z_,
-    };
-    deliverable.container_use_hash_.insert(std::make_pair(if_1_, & if_var_list));
-    std::list<Variable*> else_var_list = {
         var_i_
     };
-    deliverable.container_use_hash_.insert(std::make_pair(else_1_, & else_var_list));
+    deliverable.container_use_hash_.insert(std::make_pair(if_1_, & if_var_list));
     std::list<Variable*> while_var_list = {
         var_z_,
     };
@@ -462,13 +448,13 @@ TEST_CASE("1.UsesExtractor.Extract Uses nested containers") {
     UsesExtractor uses_extractor{};
     uses_extractor.Extract(& deliverable);
 
-//    std::list<Variable*> actual_var_list = *deliverable.container_use_hash_.find(proc1)->second;
-    std::list<Variable*> expected_var_list = {var_i_, var_x_, var_z_};
+    std::list<Variable*> actual_var_list = *deliverable.container_use_hash_.find(proc1)->second;
+    std::list<Variable*> expected_var_list = {var_x_, var_z_, var_i_};
 
     CHECK(* deliverable.container_use_hash_.find(while_1_)->second == while_var_list); // no change to inner container
-//    CHECK(actual_var_list == expected_var_list);
+    CHECK(actual_var_list == expected_var_list);
 
-    // intermediate change to if container
+    // no change to inner container
     std::list<Variable*> expected_if_var_list = {var_x_, var_z_, var_i_};
     CHECK(* deliverable.container_use_hash_.find(if_1_)->second == expected_if_var_list);
   }

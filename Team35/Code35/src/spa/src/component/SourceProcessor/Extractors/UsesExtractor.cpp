@@ -27,7 +27,7 @@ void UsesExtractor::Extract(Deliverable* deliverable) {
     }
   }
 
-  EraseElseAndProcFromUses();
+  EraseElseFromUses();
 }
 
 /**
@@ -71,7 +71,6 @@ void UsesExtractor::ExtractUsesInIfContainer(IfEntity* if_entity,
   // the map in deliverable
   // Then the nested Variables in If can be extracted and added to the outer container
   std::list<Variable*>* nested_else_var_list = ExtractUsesInContainer(if_entity->GetElseEntity(), extracted_procedures);
-  deliverable_->AddUsesRelationship(container, nested_else_var_list);
   deliverable_->AddUsesRelationship(if_entity, nested_else_var_list);
 
   std::list<Variable*>* nested_if_var_list = ExtractUsesInContainer(if_entity, extracted_procedures);
@@ -116,15 +115,14 @@ void UsesExtractor::ExtractUsesInCallContainer(CallEntity* call_entity,
 }
 
 /**
- * TODO iter2: remove deletion of procedure
- * deletes procedure and else entries in the container_modifies_hash and container_modified_by_hash
+ * deletes else entries in the container_modifies_hash and container_modified_by_hash
  */
-void UsesExtractor::EraseElseAndProcFromUses() {
+void UsesExtractor::EraseElseFromUses() {
   std::list<Container*> deleting_cont_list;
   for (auto pair: deliverable_->container_use_hash_) {
     Container* container = pair.first;
     std::list<Variable*>* var_list = pair.second;
-    if (dynamic_cast<ElseEntity*>(container) || dynamic_cast<Procedure*>(container)) {
+    if (dynamic_cast<ElseEntity*>(container)) {
       EraseReverseRelationship(container, var_list);
       deleting_cont_list.push_back(container);
     }
