@@ -276,15 +276,17 @@ void PSubsystem::CheckForProcedureExisting() {
   //   Note that Program.procList is strictly <= Deliverables.procList because EntityFactory will create procedure too.
   //  NOTE:: This method does not check for self-call & recursive call. TODO: this
 
-  std::list<Procedure*>* program_proclist = deliverable_->GetProgram()->GetProcedureList();
+  // Note that using dup to ensure that my Program.procList still has the original procedure structure.
+  // Note that from this method onwards, deliverables.procList will be in sorted order.
+  std::list<Procedure*> program_proclist_dup(*deliverable_->GetProgram()->GetProcedureList());
   std::list<Procedure*>* del_proclist = deliverable_->GetProcList();
 
-  program_proclist->sort([](Procedure* a, Procedure* b) { return *a->GetName() < *b->GetName(); } );
+  program_proclist_dup.sort([](Procedure* a, Procedure* b) { return *a->GetName() < *b->GetName(); } );
   del_proclist->sort([](Procedure* a, Procedure* b) { return *a->GetName() < *b->GetName(); } );
-  bool equal = std::equal(program_proclist->begin(), program_proclist->end(), del_proclist->begin(), del_proclist->end());
+  bool equal = std::equal(program_proclist_dup.begin(), program_proclist_dup.end(), del_proclist->begin(), del_proclist->end());
 
   if (!equal) {
-    throw SyntaxException("[2] A call is made to unreferenced procedure");
+    throw SyntaxException("A call is made to unreferenced procedure");
   }
 }
 
