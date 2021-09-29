@@ -108,6 +108,14 @@ Deliverable* SetUpDeliverable_Transitive() {
     deliverable->const_list_.push_back(cv_0);
     deliverable->const_list_.push_back(cv_5);
 
+    // Add statement numbers to statements
+    stmt1->SetStatementNumber(new StatementNumber(1));
+    stmt2->SetStatementNumber(new StatementNumber(2));
+    stmt3->SetStatementNumber(new StatementNumber(3));
+    stmt4->SetStatementNumber(new StatementNumber(4));
+    stmt5->SetStatementNumber(new StatementNumber(5));
+    stmt6->SetStatementNumber(new StatementNumber(6));
+
     // Add statements
 
     deliverable->AddStatement(stmt1);
@@ -185,41 +193,41 @@ Deliverable* SetUpDeliverable_Transitive() {
     return deliverable;
 }
 
-//TEST_CASE("3.QueryProcessor.Query Relationship Existence") {
-//  Deliverable* deliverable = SetUpDeliverable_Transitive();
-//  PKB pkb = PKB();
-//  pkb.PopulateDataStructures(* deliverable);
-//
-//  SECTION("For Parent") {
-//    bool result = QueryPkbForRelationshipExistence(pkb, RelRef::kParent);
+TEST_CASE("3.QueryProcessor.Query Relationship Existence") {
+  Deliverable* deliverable = SetUpDeliverable_Transitive();
+  PKB pkb = PKB();
+  pkb.PopulateDataStructures(* deliverable);
+
+  SECTION("For Parent") {
+    bool result = QueryPkbForRelationshipExistence(pkb, RelRef::kParent);
+    REQUIRE(result);
+  }
+  SECTION("For ParentT") {
+    bool result = QueryPkbForRelationshipExistence(pkb, RelRef::kParentT);
+    REQUIRE(result);
+  }
+  SECTION("For Follows") {
+    bool result = QueryPkbForRelationshipExistence(pkb, RelRef::kFollows);
+    REQUIRE(result);
+  }
+  SECTION("For FollowsT") {
+    bool result = QueryPkbForRelationshipExistence(pkb, RelRef::kFollowsT);
+    REQUIRE(result);
+  }
+  SECTION("For UsesS") {
+    bool result = QueryPkbForRelationshipExistence(pkb, RelRef::kUsesS);
+    REQUIRE(result);
+  }
+//  SECTION("For UsesP") {
+//    bool result = QueryPkbForRelationshipExistence(pkb, RelRef::kUsesP);
 //    REQUIRE(result);
 //  }
-//  SECTION("For ParentT") {
-//    bool result = QueryPkbForRelationshipExistence(pkb, RelRef::kParentT);
+  SECTION("For ModifiesS") {
+    bool result = QueryPkbForRelationshipExistence(pkb, RelRef::kModifiesS);
+    REQUIRE(result);
+  }
+//  SECTION("For ModifiesP") {
+//    bool result = QueryPkbForRelationshipExistence(pkb, RelRef::kModifiesP);
 //    REQUIRE(result);
 //  }
-//  SECTION("For Follows") {
-//    bool result = QueryPkbForRelationshipExistence(pkb, RelRef::kFollows);
-//    REQUIRE(result);
-//  }
-//  SECTION("For FollowsT") {
-//    bool result = QueryPkbForRelationshipExistence(pkb, RelRef::kFollowsT);
-//    REQUIRE(result);
-//  }
-//  SECTION("For UsesS") {
-//    bool result = QueryPkbForRelationshipExistence(pkb, RelRef::kUsesS);
-//    REQUIRE(result);
-//  }
-////  SECTION("For UsesP") {
-////    bool result = QueryPkbForRelationshipExistence(pkb, RelRef::kUsesP);
-////    REQUIRE(result);
-////  }
-//  SECTION("For ModifiesS") {
-//    bool result = QueryPkbForRelationshipExistence(pkb, RelRef::kModifiesS);
-//    REQUIRE(result);
-//  }
-////  SECTION("For ModifiesP") {
-////    bool result = QueryPkbForRelationshipExistence(pkb, RelRef::kModifiesP);
-////    REQUIRE(result);
-////  }
-//}
+}
