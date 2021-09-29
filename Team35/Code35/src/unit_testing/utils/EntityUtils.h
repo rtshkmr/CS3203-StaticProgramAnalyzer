@@ -211,9 +211,9 @@ inline IfEntity* GetIf7() {
 }
 
 // 3 variable style
-// if ((z == y) && (z == y)) { }
+// if ((z == y) && (z == x)) { }
 inline IfEntity* GetIf8() {
-  return new IfEntity("(z == y) && (z == y)",
+  return new IfEntity("(z == y) && (z == x)",
                       std::vector<Variable*>{
                           var_z_,
                           var_y_,
@@ -223,9 +223,9 @@ inline IfEntity* GetIf8() {
 }
 
 // 3 variable style + 2 constants
-// if (((x == 0 ) && (x == y)) || ((x >= 1) && (x == z))) { }
+// if (((x == 0) && (x == y)) || ((x >= 1) && (x == z))) { }
 inline IfEntity* GetIf9() {
-  return new IfEntity("((x == 0 ) && (x == y)) || ((x >= 1) && (x == z))",
+  return new IfEntity("((x == 0) && (x == y)) || ((x >= 1) && (x == z))",
                       std::vector<Variable*>{
                           var_x_,
                           var_y_,
