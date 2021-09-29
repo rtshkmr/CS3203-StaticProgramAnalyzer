@@ -468,7 +468,6 @@ TEST_CASE("SP to PKB relationships tests") {
     CHECK(actual_list2 == expected_list_var4);
   }
 
-  // todo: test nesting in else block
   SECTION("Parent Else Block") {
       // Children of statement 3
       std::list<std::tuple<DesignEntity, std::string>>
@@ -547,5 +546,48 @@ TEST_CASE("SP to PKB relationships tests") {
       CHECK((std::find(stmt_21_parent.begin(), stmt_21_parent.end(), expected_stmt_21_parent) != stmt_21_parent.end()));
       CHECK(stmt_21_parent.size() == 1);
   }
-  // todo: test reverse relationships
+
+  SECTION("Reverse Relationship") {
+      std::list<std::tuple<DesignEntity, std::string>> previous_stmt2 = pkb->GetPrevious("2");
+      std::tuple<DesignEntity, std::string> expected_prev_stmt_2 = std::make_tuple(DesignEntity::kAssign, "1");
+      CHECK(previous_stmt2.size() == 1);
+      CHECK((std::find(previous_stmt2.begin(), previous_stmt2.end(), expected_prev_stmt_2) != previous_stmt2.end()));
+
+      std::list<std::tuple<DesignEntity, std::string>> previous_stmt4 = pkb->GetPrevious("4");
+      CHECK(previous_stmt4.size() == 0);
+
+      std::list<std::tuple<DesignEntity, std::string>> previous_stmt7 = pkb->GetPrevious("7");
+      CHECK(previous_stmt7.size() == 0);
+
+      std::list<std::tuple<DesignEntity, std::string>> previous_stmt9 = pkb->GetPrevious("9");
+      CHECK(previous_stmt9.size() == 0);
+
+      std::list<std::tuple<DesignEntity, std::string>> previous_stmt12 = pkb->GetPrevious("12");
+      CHECK(previous_stmt12.size() == 0);
+
+      std::list<std::tuple<DesignEntity, std::string>> previous_stmt15 = pkb->GetPrevious("15");
+      CHECK(previous_stmt15.size() == 0);
+
+      std::list<std::tuple<DesignEntity, std::string>> previous_stmt16 = pkb->GetPrevious("16");
+      std::tuple<DesignEntity, std::string> expected_prev_stmt_16 = std::make_tuple(DesignEntity::kIf, "11");
+      CHECK(previous_stmt16.size() == 1);
+      CHECK((std::find(previous_stmt16.begin(), previous_stmt16.end(), expected_prev_stmt_16) != previous_stmt16.end()));
+
+      std::list<std::tuple<DesignEntity, std::string>> previous_stmt17 = pkb->GetPrevious("17");
+      CHECK(previous_stmt17.size() == 0);
+
+      std::list<std::tuple<DesignEntity, std::string>> previous_stmt18 = pkb->GetPrevious("18");
+      CHECK(previous_stmt18.size() == 0);
+
+      std::list<std::tuple<DesignEntity, std::string>> previous_stmt19 = pkb->GetPrevious("19");
+      std::tuple<DesignEntity, std::string> expected_prev_stmt_19 = std::make_tuple(DesignEntity::kIf, "3");
+      CHECK(previous_stmt19.size() == 1);
+      CHECK((std::find(previous_stmt19.begin(), previous_stmt19.end(), expected_prev_stmt_19) != previous_stmt19.end()));
+
+      std::list<std::tuple<DesignEntity, std::string>> previous_stmt20 = pkb->GetPrevious("20");
+      CHECK(previous_stmt20.size() == 0);
+
+      std::list<std::tuple<DesignEntity, std::string>> previous_stmt21 = pkb->GetPrevious("21");
+      CHECK(previous_stmt21.size() == 0);
+  }
 }
