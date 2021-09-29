@@ -8,7 +8,7 @@ using std::string;
 using std::vector;
 
 IfEntity::IfEntity(std::string condition, vector<Variable*> expr_variables, vector<ConstantValue*> expr_constants) {
-  cond_expr_ = new ConditionalExpression(condition);
+  cond_expr_ = new ConditionalExpression(condition, expr_variables);
   this->expr_variables = std::move(expr_variables);
   this->expr_constants = std::move(expr_constants);
 }
@@ -44,7 +44,7 @@ ElseEntity::ElseEntity() {
 WhileEntity::WhileEntity(std::string condition,
                          vector<Variable*> expr_variables,
                          vector<ConstantValue*> expr_constants) {
-  cond_expr_ = new ConditionalExpression(condition);
+  cond_expr_ = new ConditionalExpression(condition, expr_variables);
   this->expr_variables = std::move(expr_variables);
   this->expr_constants = std::move(expr_constants);
 }

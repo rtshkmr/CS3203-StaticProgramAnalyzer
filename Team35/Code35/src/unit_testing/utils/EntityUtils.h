@@ -188,6 +188,56 @@ inline ElseEntity* GetElse() {
   return new ElseEntity();
 }
 
+// no variable style
+// if (1 == 2) { }
+inline IfEntity* GetIf6() {
+  return new IfEntity("1 == 2",
+                      std::vector<Variable*>{ },
+                      std::vector<ConstantValue*>{
+                          const_1_,
+                          const_2_
+                      });
+}
+
+// 2 variable style
+// if (x == y) { }
+inline IfEntity* GetIf7() {
+  return new IfEntity("x == y",
+                      std::vector<Variable*>{
+                          var_x_,
+                          var_y_
+                      },
+                      std::vector<ConstantValue*>{});
+}
+
+// 3 variable style
+// if ((z == y) && (z == y)) { }
+inline IfEntity* GetIf8() {
+  return new IfEntity("(z == y) && (z == y)",
+                      std::vector<Variable*>{
+                          var_z_,
+                          var_y_,
+                          var_x_
+                      },
+                      std::vector<ConstantValue*>{});
+}
+
+// 3 variable style + 2 constants
+// if (((x == 0 ) && (x == y)) || ((x >= 1) && (x == z))) { }
+inline IfEntity* GetIf9() {
+  return new IfEntity("((x == 0 ) && (x == y)) || ((x >= 1) && (x == z))",
+                      std::vector<Variable*>{
+                          var_x_,
+                          var_y_,
+                          var_z_
+                      },
+                      std::vector<ConstantValue*>{
+                          const_1_,
+                          const_2_
+                      });
+}
+
+
 // while
 inline WhileEntity* GetWhileEntity1() {
   return new WhileEntity("x==0", std::vector<Variable*>{

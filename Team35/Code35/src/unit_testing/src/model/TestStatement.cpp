@@ -32,7 +32,7 @@ TEST_CASE("1.Model.Statement.IfEntity.ElseEntity") {
   else_entity->AddStatement(print_entity);
 
   SECTION ("Check Conditional Elements") {
-    REQUIRE(if1->GetCondExpr()->GetExpressionString() == ConditionalExpression(condition).GetExpressionString());
+    REQUIRE(if1->GetCondExpr()->GetExpressionString() == ConditionalExpression(condition, expr_var).GetExpressionString());
     REQUIRE(if1->GetExpressionVariables() == expr_var);
     REQUIRE(if1->GetExpressionConstants() == expr_constants);
   }
@@ -128,7 +128,7 @@ TEST_CASE("1.Model.Statement.WhileEntity") {
 
   SECTION ("Check Conditional Elements") {
     REQUIRE(
-        while_entity->GetCondExpr()->GetExpressionString() == ConditionalExpression(condition).GetExpressionString());
+        while_entity->GetCondExpr()->GetExpressionString() == ConditionalExpression(condition, expr_a_var).GetExpressionString());
     REQUIRE(while_entity->GetExpressionVariables() == expr_var);
     REQUIRE(while_entity->GetExpressionConstants() == expr_constants);
   }
