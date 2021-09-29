@@ -469,5 +469,83 @@ TEST_CASE("SP to PKB relationships tests") {
   }
 
   // todo: test nesting in else block
+  SECTION("Parent Else Block") {
+      // Children of statement 3
+      std::list<std::tuple<DesignEntity, std::string>>
+      expected_list_stmt3_else = std::list<std::tuple<DesignEntity, std::string>>{
+          std::make_tuple(DesignEntity::kPrint, "18")
+      };
+
+      std::list<std::tuple<DesignEntity, std::string>> stmt_3_children = pkb->GetParent("3");
+
+      for (auto stmt : expected_list_stmt3_else) {
+          CHECK((std::find(stmt_3_children.begin(), stmt_3_children.end(), stmt) != stmt_3_children.end()));
+      }
+
+      CHECK(stmt_3_children.size() == 4);
+
+      std::list<std::tuple<DesignEntity, std::string>> stmt_18_parent = pkb->GetChild("18");
+      std::tuple<DesignEntity, std::string> expected_stmt_18_parent = std::make_tuple(DesignEntity::kIf, "3");
+      CHECK((std::find(stmt_18_parent.begin(), stmt_18_parent.end(), expected_stmt_18_parent) != stmt_18_parent.end()));
+      CHECK(stmt_18_parent.size() == 1);
+
+
+      // Children of statement 8
+      std::list<std::tuple<DesignEntity, std::string>>
+      expected_list_stmt8_else = std::list<std::tuple<DesignEntity, std::string>>{
+          std::make_tuple(DesignEntity::kPrint, "17")
+      };
+
+      std::list<std::tuple<DesignEntity, std::string>> stmt_8_children = pkb->GetParent("8");
+
+      for (auto stmt : expected_list_stmt8_else) {
+          CHECK((std::find(stmt_8_children.begin(), stmt_8_children.end(), stmt) != stmt_8_children.end()));
+      }
+
+      CHECK(stmt_8_children.size() == 5);
+
+      std::list<std::tuple<DesignEntity, std::string>> stmt_17_parent = pkb->GetChild("17");
+      std::tuple<DesignEntity, std::string> expected_stmt_17_parent = std::make_tuple(DesignEntity::kIf, "8");
+      CHECK((std::find(stmt_17_parent.begin(), stmt_17_parent.end(), expected_stmt_17_parent) != stmt_17_parent.end()));
+      CHECK(stmt_17_parent.size() == 1);
+
+      // Children of statement 11
+      std::list<std::tuple<DesignEntity, std::string>>
+      expected_list_stmt11_else = std::list<std::tuple<DesignEntity, std::string>>{
+          std::make_tuple(DesignEntity::kPrint, "15")
+      };
+
+      std::list<std::tuple<DesignEntity, std::string>> stmt_11_children = pkb->GetParent("11");
+
+      for (auto stmt : expected_list_stmt11_else) {
+          CHECK((std::find(stmt_11_children.begin(), stmt_11_children.end(), stmt) != stmt_11_children.end()));
+      }
+
+      CHECK(stmt_11_children.size() == 4);
+
+      std::list<std::tuple<DesignEntity, std::string>> stmt_15_parent = pkb->GetChild("15");
+      std::tuple<DesignEntity, std::string> expected_stmt_15_parent = std::make_tuple(DesignEntity::kIf, "11");
+      CHECK((std::find(stmt_15_parent.begin(), stmt_15_parent.end(), expected_stmt_15_parent) != stmt_15_parent.end()));
+      CHECK(stmt_15_parent.size() == 1);
+
+      // Children of statement 19
+      std::list<std::tuple<DesignEntity, std::string>>
+      expected_list_stmt19_else = std::list<std::tuple<DesignEntity, std::string>>{
+          std::make_tuple(DesignEntity::kPrint, "21")
+      };
+
+      std::list<std::tuple<DesignEntity, std::string>> stmt_19_children = pkb->GetParent("19");
+
+      for (auto stmt : expected_list_stmt19_else) {
+          CHECK((std::find(stmt_19_children.begin(), stmt_19_children.end(), stmt) != stmt_19_children.end()));
+      }
+
+      CHECK(stmt_19_children.size() == 2);
+
+      std::list<std::tuple<DesignEntity, std::string>> stmt_21_parent = pkb->GetChild("21");
+      std::tuple<DesignEntity, std::string> expected_stmt_21_parent = std::make_tuple(DesignEntity::kIf, "19");
+      CHECK((std::find(stmt_21_parent.begin(), stmt_21_parent.end(), expected_stmt_21_parent) != stmt_21_parent.end()));
+      CHECK(stmt_21_parent.size() == 1);
+  }
   // todo: test reverse relationships
 }
