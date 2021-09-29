@@ -14,19 +14,7 @@
  */
 ConditionalExpression::ConditionalExpression(std::string expr, std::vector<Variable*> var_list) {
   actual_expression_ = expr;
-  var_list_ = SortVariable(var_list);
-}
-
-/**
- * This function contains the algorithm to sort a vector<Variable*>.
- * @param var_list The vector<Variable*> to be sorted.
- * @return The vector<Variable*> after sorting.
- */
-std::vector<Variable*> ConditionalExpression::SortVariable(std::vector<Variable*> var_list) {
-  std::vector<Variable*> var_list_copy = var_list;
-  std::sort(var_list_copy.begin(), var_list_copy.end(),
-            [](Variable* a, Variable* b) { return *a->GetName() < *b->GetName(); });
-  return var_list_copy;
+  var_list_ = Variable::SortVariableVector(var_list);
 }
 
 /**
