@@ -150,6 +150,13 @@ void PSubsystem::PerformNewProcedureSteps(Procedure* procedure) {
     Program* program = new Program(procedure);
     deliverable_->SetProgram(program);
   } else {
+    // throw error if this name is duplicated
+    for (auto const& proc: * deliverable_->GetProgram()->GetProcedureList()) {
+      if (*proc->GetName() == *procedure->GetName()) { // uses the overloaded ==
+        throw SyntaxException("Encountered 2 procedures with the same name.");
+      }
+    }
+
     deliverable_->GetProgram()->AddProcedure(procedure);
   }
 }
