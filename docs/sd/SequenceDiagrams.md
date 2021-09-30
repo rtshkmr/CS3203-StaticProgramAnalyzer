@@ -218,7 +218,60 @@
         %% By right, AST should not be used for resolving queries (anything, we try to add aux Data Structures)
         %% This sequence of steps ends when the source processing is done and deliverables sent to PKB %%
 
-### queries.mmd
+### queries_overview.mmd
+    sequenceDiagram
+        autonumber
+        participant AutoTester
+        participant QuerySystemController
+        participant QueryExtractor
+        participant QueryEvaluator
+        participant QueryProjector
+
+        %% This sd is for per query (PQL statement) basis.
+        AutoTester ->>+ QuerySystemController: Evaluate(query, pkb)
+        QuerySystemController ->>+ QueryExtractor: ExtractQuery()
+        Note right of QueryExtractor: Ref <br/> SD_Extract_Query
+        QueryExtractor-->>-QuerySystemController: Populate query objects
+        QuerySystemController->>+QueryEvaluator: EvaluateQuery()
+        Note right of QueryEvaluator: Ref <br/> SD_Evaluate_Query
+        QueryEvaluator-->>-QuerySystemController: list<string> result_list
+        QuerySystemController->>+QueryProjector: FormatQuery(result_list)
+        QueryProjector-->>-QuerySystemController: list<string> populated_result_list
+        QuerySystemController-->>-AutoTester: list<string> populated_result_list
+        loop every item in populated_result_list
+            AutoTester->>AutoTester: add item to results
+        end
+        
+### query_extractor.mmd
+    sequenceDiagram
+        autonumber
+        participant QueryExtractor
+        participant QueryParser
+        participant QueryTokenizer
+        participant QueryValidator
+        participant QueryOptimizer
+
+        QueryExtractor->>QueryTokenizer: init()
+        QueryTokenizer-->>QueryExtractor: QueryTokenizer tokenizer
+        QueryExtractor->>QueryParser: init(list<Clause> clauses, list<Group> groups, list<Synonym> synonyms, Synonym target, tokenizer)
+        QueryParser-->>QueryExtractor: QueryParser parser
+        QueryExtractor->>QueryParser: parser.Parse()
+        Note right of QueryParser: Calls multiple handlers according to <br> grammar rules (recursive descent)
+        loop is expecting tokens based on grammar rules
+            QueryParser->>QueryTokenizer: GetNextToken()
+            QueryTokenizer-->>QueryParser: Token t
+            Note right of QueryParser: First layer of validations
+            opt is relRef
+                Note right of QueryParser: Additional layer of validations
+                QueryParser->>QueryValidator: Is_Semantically_Valid_RelRef()
+                QueryValidator-->>QueryParser: Boolean b
+            end
+        end
+        QueryParser-->>QueryExtractor: 
+        QueryExtractor->>QueryOptimizer: GroupClauses(clauses, groups, target)
+        QueryOptimizer-->>QueryExtractor: 
+
+### queries.mmd (deprecated)
 
     sequenceDiagram
         autonumber
@@ -230,9 +283,11 @@
         participant UI
 
         %% This sd is for per query (PQL statement) basis. 
-        AutoTester ->> PqlPreprocessor: query(q)
+        AutoTester ->> PqlPreprocessor: evaluate(q)
+        PqlPreprocessor->>PqlPreprocessor: tokenizePql(q)
+        PqlPreprocessor->>PqlPreprocessor: parsePql(q)
         PqlPreprocessor->>PqlPreprocessor: verifyPql(q)
-        PqlPreprocessor->>PqlPreprocessor: orderClause()
+        PqlPreprocessor->>PqlPreprocessor: orderClauses()
         PqlPreprocessor->>QueryEvaluator: sendQueryStruct(q)
 
         %% Refer to query_evaluation_pkb.mmd
@@ -324,14 +379,15 @@
                 PKB-->>-QueryEvaluator: STMT[] clauseResult
             end
         end
-
-        opt has pattern clause
-            QueryEvaluator->>+PKB: getAllAssignStmt()
-            PKB-->>-QueryEvaluator: []AST_ASSIGN assignStatements
+        opt has >= 1 pattern-cl && notCached
+            QueryEvaluator ->> PKB: getAllAssignStmts()
+            PKB -->> QueryEvaluator: AST_ASSIGN[] assignStmts
+            QueryEvaluator ->> QueryEvaluator: cacheAssignStmts
         end
-
         loop Each pattern clause
             QueryEvaluator->>QueryEvaluator: STMT[] comparePattern(PATTERN p)
+            note right of QueryEvaluator: Case lhs: <br/>if "var_name" (exact match): filter assignStmts<br/>if synonym: variable filter assignStmts<br/>if _ (any match): do nothing
+        note right of QueryEvaluator: Case rhs: <br/> if "..." (exact match): filter assignStmts<br/>if _"..."_ (partial match): check AST_ASSIGNS for subtree match first<br/>if _ (any match): do nothing
         end
 
         % Consider extracting the work of combining clauses to another

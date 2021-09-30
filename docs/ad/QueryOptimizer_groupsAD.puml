@@ -1,0 +1,39 @@
+@startuml
+<Style>
+activityDiagram {
+  BackgroundColor lavender
+  BorderColor lavender
+  FontName arial
+  FontSize 13
+LineColor Black
+}
+document {
+   BackgroundColor transparent
+}
+</style>
+skinparam sequence {
+  ArrowColor black
+  BorderColor black
+  ActivityBorderColor black
+}
+
+(*) --> if "has at least 1 clause" then
+
+  -->[true] "add 1st cl to group"
+
+  if "has exactly 2 cl" then
+    -->[true] if "has common synonyms" then
+        -->[true] "add 2nd cl to same group"
+        -> (*)
+        else
+        -->[false] "add 2nd cl to diff group"
+        --> (*)
+        endif
+  else
+    ->[false] (*)
+  endif
+
+else
+
+  ->[false] "invalid query"
+@enduml

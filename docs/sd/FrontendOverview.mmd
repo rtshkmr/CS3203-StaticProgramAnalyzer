@@ -1,0 +1,22 @@
+sequenceDiagram
+    autonumber
+    participant AutoTester
+    participant SourceProcessor
+    participant Parser
+    participant DesignExtractor
+    participant PKB
+
+    %% Assumption: This sd only focus on parsing %
+    AutoTester ->>+ SourceProcessor: ProcessSourceFile(source_file)
+
+        SourceProcessor ->> Parser: Parse(source_file)
+        SourceProcessor ->>+ Parser: GetDeliverables()
+        Parser -->>- SourceProcessor: Deliverable* deliverable
+
+        %% Transitive => Parents*, Children* Follows*, FollowedBy* Use, UsedBy, Modifies, ModifiesBy
+        SourceProcessor ->> DesignExtractor: ExtractDesignAbstractions()
+
+        SourceProcessor ->> PKB: PopulateDataStructures(deliverable)
+        %% By right, AST should not be used for resolving queries (anything, we try to add aux Data Structures)
+    SourceProcessor -->>- AutoTester: PKB* pkb
+    %% This program ends when preprocessing is finish %%

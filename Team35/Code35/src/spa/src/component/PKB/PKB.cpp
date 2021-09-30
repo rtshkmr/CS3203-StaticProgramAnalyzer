@@ -226,8 +226,8 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetPrevious(std::string st
  */
 std::list<std::tuple<DesignEntity, std::string>> PKB::GetParent(std::string stmt) {
   std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
-  auto parent_iter = parent_t_map_.find(stmt);
-  if (parent_iter != parent_t_map_.end()) {
+  auto parent_iter = parent_map_.find(stmt);
+  if (parent_iter != parent_map_.end()) {
     std::list<std::tuple<DesignEntity, std::string>*>* children = parent_iter->second;
     for (auto s: * children) {
       ret_list.push_back(* s);

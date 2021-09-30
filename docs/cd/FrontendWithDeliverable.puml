@@ -1,0 +1,79 @@
+@startuml fe
+    skinparam class {
+        BackgroundColor lavender
+        BorderColor lightsteelblue
+        ArrowColor gray
+    }
+    skinparam classAttributeIconSize 0
+    skinparam shadowing false
+    hide circle
+
+    class Deliverable {
+    }
+
+    class PKB {
+        +PopulateDataStructures(Deliverable)
+    }
+
+    class SourceProcessor {
+        +ProcessSourceFile(string): PKB*
+    }
+
+    class Parser {
+        +deliverable_: Deliverable*
+
+        +Parse(string)
+        +GetDeliverables(): Deliverable*
+    }
+
+    class DesignExtractor {
+        +deliverable_: Deliverable*
+
+        +ExtractDesignAbstractions()
+    }
+
+    class PSubsystem {
+        -deliverable_: Deliverable*
+        -syntax_validator_: SyntaxValidator
+        -EntityFactory: entity_factory_
+        -parent_stack_: stack<Container*>
+        -follow_stack_: stack<Statement*>
+        -valid_state: bool
+
+        +InitDataStructures()
+        +ProcessStatement(string)
+        +GetDeliverables(): Deliverable*
+    }
+
+    class Tokenizer {
+        +CreateTokens(string): vector<Token>
+    }
+
+    class SyntaxValidator {
+        +ValidateSyntax(vector<Token>): bool
+    }
+
+    class EntityFactory {
+        -proc_list_: std::list<Procedure*>*
+        -var_list_: std::list<Variable*>*
+        -const_list_: std::list<ConstantValue*>*
+
+        +CreateEntities(vector<Token>): Entity*
+    }
+
+    SourceProcessor --> Parser
+    SourceProcessor --> DesignExtractor
+    SourceProcessor --> PKB
+
+    Parser --> PSubsystem
+
+    PSubsystem --> Tokenizer
+    PSubsystem --> SyntaxValidator
+    PSubsystem o--> EntityFactory
+
+    PKB -- Deliverable
+    PSubsystem -- Deliverable
+    Parser -- Deliverable
+    DesignExtractor -- Deliverable
+
+@enduml

@@ -1,0 +1,34 @@
+stateDiagram
+  s1: 1. Iterate through Procedure list <br/>of Deliverable
+  s2: 2. Call recursive method with Container
+  s3: 3. Iterate through Statement list <br/>of Container
+
+  s4: 4. Recurse with Container
+  s5: 5. Return list of variables that are Used/Modified <br/>by this Container from the deliverable
+
+  s6: 6. Add Uses/Modifies relationship between <br/>Container and the variable list returned by <br/>the recursive method to deliverable
+
+  state stmt_if <<choice>>
+  state stmts_end <<choice>>
+  state rec_if <<choice>>
+  state proc_end <<choice>>
+
+  [*] --> s1
+  s1 --> s2
+  s2 --> s3
+  s3 --> stmt_if
+
+  stmt_if --> stmts_end: [else]
+  stmt_if --> s4: [Statement is Container]
+  stmts_end --> s5: [if end of Statement list]
+  s4 --> s2
+  s5 --> rec_if
+
+  stmts_end --> s3: [else]
+
+  rec_if --> s6: [Recursive method called by<br/> intermediate Statement]
+  s6 --> stmts_end
+
+  rec_if --> proc_end: [Recursive method<br/> called by Procedure]
+  proc_end --> s1: [else]
+  proc_end --> [*]: [if end of Procedure list]

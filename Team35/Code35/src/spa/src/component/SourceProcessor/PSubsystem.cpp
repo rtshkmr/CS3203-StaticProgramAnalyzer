@@ -52,6 +52,9 @@ void PSubsystem::ProcessStatement(std::string statement) {
     //assertion: case 1: close brace for procedure --> type = 0 & parent_stack = empty
     //           case 2: close brace for others    --> type > 0 & parent_stack ! empty
     assert((current_node_type_ > 0 && !parent_stack_.empty()) || current_node_type_ == 0 && parent_stack_.empty());
+
+    if (current_node_type_ == 2) return; // do not pop anything in if-close brace. pop 2 when finishing else.
+
     follow_stack_.pop(); //this is allowed because any stmtList must be 1..* statements. so no condition for if (...) { }
 
     // case 1
@@ -61,6 +64,13 @@ void PSubsystem::ProcessStatement(std::string statement) {
     } else {
       Container* current_nest = parent_stack_.top();
       parent_stack_.pop();
+
+      if (current_node_type_ == 3) { //double pop for else clause
+        current_nest = parent_stack_.top();
+        parent_stack_.pop();
+        follow_stack_.pop();
+      }
+
       current_node_ = dynamic_cast<Statement*>(current_nest)->GetParentNode();
 
       if (parent_stack_.empty()) { //back to procedure stmtlist
@@ -72,6 +82,14 @@ void PSubsystem::ProcessStatement(std::string statement) {
           current_node_type_ = 1;
         } else if (IfEntity* if_entity = dynamic_cast<IfEntity*>(current_nest)) {
           current_node_type_ = 2;
+        } else if (ElseEntity* else_entity = dynamic_cast<ElseEntity*>(current_nest)) {
+          current_node_type_ = 3;
+
+          //dirty way to get the original if-statement (should be 2nd highest)
+          parent_stack_.pop(); //pop this else;
+          current_node_ = parent_stack_.top();
+          assert (dynamic_cast<IfEntity*>(current_node_) != nullptr);
+          parent_stack_.push(else_entity);
         } else {
           throw std::invalid_argument("[ERROR] Retrace error. There should not be any other types ");
         }
@@ -171,7 +189,7 @@ void PSubsystem::SetStatementObject(Statement* statement) {
   if (!parent_stack_.empty()) {
     assert(current_node_type_ == 1 || current_node_type_ == 2 || current_node_type_ == 3);
     statement->SetParentNode(parent_stack_.top());
-    deliverable_->AddParentRelationship(dynamic_cast<Statement*>(parent_stack_.top()), statement);
+    deliverable_->AddParentRelationship(dynamic_cast<Statement*>(current_node_), statement);
   }
 
   if (current_node_type_ != 3 && current_node_->GetStatementList()->size() == 1
@@ -200,9 +218,13 @@ void PSubsystem::HandleIfStmt(IfEntity* if_entity) {
 }
 
 void PSubsystem::HandleElseStmt(ElseEntity* else_entity) {
-  IfEntity* if_entity = dynamic_cast<IfEntity*>(current_node_->GetStatementList()->back());
-  assert (if_entity != nullptr); //If assertion failed, Else did not follow If
-  parent_stack_.push(if_entity);
+  IfEntity* if_entity = dynamic_cast<IfEntity*>(parent_stack_.top());
+  if (if_entity == nullptr) {
+    //If assertion failed, Else did not follow If
+    throw SyntaxException("Encountered Else statement without If construct");
+  }
+
+  parent_stack_.push(else_entity);
 
   if_entity->SetElseEntity(else_entity);
   current_node_type_ = 3;

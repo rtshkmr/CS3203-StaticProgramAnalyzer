@@ -1,28 +1,34 @@
 classDiagram
     class StatementNumber {
-        -num:int
+        -num_:int
     }
 
     class LineNumber {
-        -num:int
+        -num_:int
     }
         
     class ProcedureName {
-        -name:string
+        -name_:string
     }
 
     class VariableName {
-        -name:string
+        -name_:string
     }
 
     class Constant {
-        -digits:int
+        -value_:int
     }
 
     class AssignmentExpression {
-        PLACEHOLDER
+        -expression_:string
+        +GetExpressionString()
+        +CheckExist(string input)
+        +CheckExact(String input)
     }
     
     class ConditionalExpression {
-        -expression:string
+        -expression_:string
+        +GetExpressionString()
+        +CheckExist(string input)
+        +CheckExact(String input)
     }
