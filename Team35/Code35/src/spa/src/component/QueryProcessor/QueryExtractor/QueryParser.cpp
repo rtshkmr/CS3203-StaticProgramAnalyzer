@@ -170,24 +170,13 @@ std::pair<Clause*, bool> QueryParser::ParseRelRef() {
   Eat(TokenTag::kComma);
   // parse right-hand side
   std::string rhs;
-  bool is_rhs_syn;
-  bool is_rhs_tgt_syn;
+  bool is_rhs_syn = false;
+  bool is_rhs_tgt_syn = false;
   if (rel_type.compare("Uses") == 0 || rel_type.compare("Modifies") == 0) {
     Token tok = ParseEntRef(false);
     rhs = tok.GetTokenString();
-    bool _is_rhs_syn = false;
-    bool _is_rhs_tgt_syn = false;
-    for (Synonym& s: synonyms) {
-      if (s.GetName() == rhs) {
-        _is_rhs_syn = true;
-        if (rhs == this->target.GetName()) {
-          _is_rhs_tgt_syn = true;
-        }
-        break;
-      }
-    }
-    is_rhs_syn = _is_rhs_syn;
-    is_rhs_tgt_syn = _is_rhs_tgt_syn;
+    is_rhs_syn = IsValidSynonym(tok);
+    is_rhs_tgt_syn = tok.GetTokenString() == this->target.GetName();
   } else {
     std::tie(rhs, is_rhs_syn, is_rhs_tgt_syn) = ParseStmtRef();
   }
