@@ -390,7 +390,6 @@ void QueryParser::ParseQuery() {
   if (lookahead.GetTokenString().compare("Select") != 0) {
     ParseDeclarations();
   }
-  // TODO: more validation for synonyms (ie. no duplicate synonym)
   // parse select clause
   ParseSelect();
 }
