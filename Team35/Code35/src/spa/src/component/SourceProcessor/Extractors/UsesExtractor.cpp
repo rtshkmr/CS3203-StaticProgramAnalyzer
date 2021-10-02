@@ -140,7 +140,7 @@ void UsesExtractor::ExtractUsesInCallContainer(CallEntity* call_entity,
 }
 
 /**
- * Erases else entries in the container_modifies_hash and container_modified_by_hash. Else entries are created as an
+ * Erases else entries in the container_uses_hash and container_used_by_hash. Else entries are created as an
  * intermediate result when there is nesting within the Else block, and are not needed for queries.
  */
 void UsesExtractor::EraseElseFromUses() {

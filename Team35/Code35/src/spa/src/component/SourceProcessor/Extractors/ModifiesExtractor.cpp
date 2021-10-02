@@ -26,6 +26,7 @@ void ModifiesExtractor::Extract(Deliverable* deliverable) {
  * deliverable.
  * Assumes that the variables of the direct children Statements of the container has already been added into the
  * deliverable.
+ * Assumes that all local ModifiesP has been added by PSubsystem.
  *
  * @param container Stores a list of Statements.
  * @param extracted_procedures Vector that stores the procedures that have been extracted.
@@ -66,8 +67,14 @@ void ModifiesExtractor::ExtractModifiesInIfContainer(IfEntity* if_entity,
   deliverable_->AddModifiesRelationship(if_entity, nested_else_var_list);
 
   std::list<Variable*>* nested_if_var_list = ExtractModifiesInContainer(if_entity, extracted_procedures);
-  deliverable_->AddModifiesRelationship(container, nested_if_var_list);
 
+  // todo: use this when Calls relationship table is set up
+  // no need to add relationship to procedure as it is assumed to be done in PSubsystem
+  //  if (Procedure* proc = dynamic_cast<Procedure*>(container)) {
+  //    return;
+  //  }
+
+  deliverable_->AddModifiesRelationship(container, nested_if_var_list);
 }
 
 /**
@@ -77,6 +84,13 @@ void ModifiesExtractor::ExtractModifiesInWhileContainer(WhileEntity* while_entit
                                                         Container* container,
                                                         std::vector<Procedure*>* extracted_procedures) {
   std::list<Variable*>* nested_var_list = ExtractModifiesInContainer(while_entity, extracted_procedures);
+
+  // todo: use this when Calls relationship table is set up
+  // no need to add relationship to procedure as it is assumed to be done in PSubsystem
+  //  if (Procedure* proc = dynamic_cast<Procedure*>(container)) {
+  //    return;
+  //  }
+
   deliverable_->AddModifiesRelationship(container, nested_var_list);
 }
 
@@ -88,6 +102,10 @@ void ModifiesExtractor::ExtractModifiesInCallContainer(CallEntity* call_entity,
                                                        std::vector<Procedure*>* extracted_procedures) {
   Procedure* called_proc = call_entity->GetProcedure();
   std::list<Variable*>* var_list;
+
+  // extracted_procedures is needed to ensure dfs of call stmts. When a called_proc has not been extracted, it might
+  // have call stmts whose transitive relations within the call stmts are not yet extracted so the dfs must extract from
+  // the called_proc before continuing with the current procedure.
   if (std::find(extracted_procedures->begin(), extracted_procedures->end(), called_proc)
       != extracted_procedures->end()) { // procedure found in extracted_procedures
 
@@ -103,11 +121,20 @@ void ModifiesExtractor::ExtractModifiesInCallContainer(CallEntity* call_entity,
     var_list = ExtractModifiesInContainer(called_proc, extracted_procedures);
     extracted_procedures->push_back(called_proc);
   }
+
+  // todo: use this when Calls relationship table is set up and the current_procedure of a call stmt can be found
+  // if this call stmt is nested, add the relationships inside this call stmt to the current procedure too, because
+  // 1st level containers of procedures will not add to the procedure.
+  //  if (dynamic_cast<Procedure*>(container) == nullptr) {
+  //    deliverable_->AddModifiesRelationship(current_procedure, var_list);
+  //  }
+
   deliverable_->AddModifiesRelationship(container, var_list);
 }
 
 /**
- * Deletes else entries in the container_modifies_hash and container_modified_by_hash.
+ * Erases else entries in the container_modifies_hash and container_modified_by_hash. Else entries are created as an
+ * intermediate result when there is nesting within the Else block, and are not needed for queries.
  */
 void ModifiesExtractor::EraseElseFromModifies() {
   std::list<Container*> deleting_cont_list;

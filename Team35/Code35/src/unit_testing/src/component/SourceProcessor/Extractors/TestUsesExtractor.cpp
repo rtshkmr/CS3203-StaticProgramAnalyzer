@@ -306,6 +306,9 @@ TEST_CASE("1.UsesExtractor.Extract Uses nested containers") {
 
     CHECK(actual_var_list == expected_var_list);
 
+    // else should not be in modifies hash
+    CHECK(deliverable.container_use_hash_.count(else_2_) == 0);
+
     // no change to innermost container
     std::list<Variable*> expected_if3_var_list = {var_z_, var_i_};
     CHECK(* deliverable.container_use_hash_.find(if_3_)->second == expected_if3_var_list);
@@ -556,15 +559,16 @@ TEST_CASE("1.UsesExtractor.Extract Uses nested calls") {
   deliverable.container_use_hash_.insert(std::make_pair(while_1, &while1_var_list));
   std::list<Variable*> while2_var_list = {
       var_x_,
-      };
+  };
   deliverable.container_use_hash_.insert(std::make_pair(while_2, &while2_var_list));
   std::list<Variable*> if1_var_list = {
       var_x_,
-      };
+  };
   deliverable.container_use_hash_.insert(std::make_pair(if_1, &if1_var_list));
   std::list<Variable*> if2_var_list = {
       var_x_,
-      var_n_,};
+      var_n_,
+  };
   deliverable.container_use_hash_.insert(std::make_pair(if_2, &if2_var_list));
 
   SECTION("Called procedures parsed later") {
