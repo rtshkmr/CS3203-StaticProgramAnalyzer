@@ -61,7 +61,6 @@ void EvaluatePatternDoubleSynonym(const Pattern& p, QueryEvaluatorTable* table, 
 
     if (!has_relationship) {
       table->DeleteRow(table_index);
-      number_of_iterations--;
       table_index--;
     }
     table_index++;
