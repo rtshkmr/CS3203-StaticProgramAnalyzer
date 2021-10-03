@@ -3,20 +3,20 @@
 #include <unordered_set>
 
 std::unordered_set<DesignEntity> valid_lhs_UsesS = {DesignEntity::kAssign, DesignEntity::kPrint,
-                                                    DesignEntity::kIf, DesignEntity::kWhile, DesignEntity::kStmt,
-                                                    DesignEntity::kProcedure, DesignEntity::kCall};
+                                                    DesignEntity::kIf, DesignEntity::kWhile, DesignEntity::kStmt};
+
+std::unordered_set<DesignEntity> valid_lhs_UsesP_ModifiesP = {DesignEntity::kProcedure, DesignEntity::kCall};
 
 std::unordered_set<DesignEntity> valid_lhs_ModifiesS = {DesignEntity::kAssign, DesignEntity::kRead,
-                                                        DesignEntity::kIf, DesignEntity::kWhile, DesignEntity::kStmt,
-                                                        DesignEntity::kProcedure, DesignEntity::kCall};
+                                                        DesignEntity::kIf, DesignEntity::kWhile, DesignEntity::kStmt};
 
-bool QueryValidator::IsValid_LhsStmt_RhsProc(std::string l, std::string r, bool lhs_is_syn,
+bool QueryValidator::IsValid_LhsStmt_RhsEnt(std::string l, std::string r, bool lhs_is_syn,
                                              bool rhs_is_syn, std::list<Synonym>* synonyms, RelRef rf) {
   DesignEntity lhs = QueryParser::GetSynonymInfo(l, synonyms).GetType();
   DesignEntity rhs = QueryParser::GetSynonymInfo(r, synonyms).GetType();
-  // if both are not synonyms
+  // if both are not synonyms, no semantic validation is needed.
   if (lhs == DesignEntity::kInvalid && rhs == DesignEntity::kInvalid) {
-    return false;
+    return true;
   }
 
   std::unordered_set<DesignEntity>* valid_lhs = (rf == RelRef::kUsesS) ? & valid_lhs_UsesS : & valid_lhs_ModifiesS;
@@ -40,6 +40,34 @@ bool QueryValidator::IsValid_LhsStmt_RhsProc(std::string l, std::string r, bool 
   return true;
 }
 
+bool QueryValidator::IsValid_LhsEnt_RhsEnt(std::string l, std::string r, bool lhs_is_syn,
+                                             bool rhs_is_syn, std::list<Synonym>* synonyms, RelRef rf) {
+  DesignEntity lhs = QueryParser::GetSynonymInfo(l, synonyms).GetType();
+  DesignEntity rhs = QueryParser::GetSynonymInfo(r, synonyms).GetType();
+  // if both are not synonyms, no semantic validation is needed
+  if (lhs == DesignEntity::kInvalid && rhs == DesignEntity::kInvalid) {
+    return true;
+  }
+
+  // if both are synonyms
+  if (lhs != DesignEntity::kInvalid && rhs != DesignEntity::kInvalid) {
+    // lhs must be proc or call
+    bool lhs_is_valid = (valid_lhs_UsesP_ModifiesP.find(lhs) != valid_lhs_UsesP_ModifiesP.end()) ? true : false;
+    // rhs must be a variable
+    bool rhs_is_valid = (rhs == DesignEntity::kVariable) ? true : false;
+    return lhs_is_valid && rhs_is_valid;
+  }
+
+  // if one is synonym
+  if (rhs != DesignEntity::kInvalid) {
+    return (rhs == DesignEntity::kVariable) ? true : false;
+  }
+  if (lhs != DesignEntity::kInvalid) {
+    return (valid_lhs_UsesP_ModifiesP.find(lhs) != valid_lhs_UsesP_ModifiesP.end()) ? true : false;
+  }
+  return true;
+}
+
 bool QueryValidator::IsValid_LhsStmt_RhsStmt(std::string l, std::string r, bool lhs_is_syn,
                                              bool rhs_is_syn, std::list<Synonym>* synonyms) {
   // Synonyms involved in relationships between statements cannot be variable or procedure.
@@ -59,7 +87,7 @@ bool QueryValidator::IsValid_LhsStmt_RhsStmt(std::string l, std::string r, bool 
 }
 
 /**
- * Checks for semantic validify of a RelRef, by calling helper functions.
+ * Checks for semantic validity of a RelRef, by calling helper functions.
  * @param lhs is a string representing left hand side argument.
  * @param rhs is a string representing right hand side argument.
  * @param rf is the relRef enum type.
@@ -71,7 +99,9 @@ bool QueryValidator::IsValid_LhsStmt_RhsStmt(std::string l, std::string r, bool 
 bool QueryValidator::Is_Semantically_Valid_RelRef(std::string lhs, std::string rhs, RelRef rf, bool lhs_is_syn,
                                                   bool rhs_is_syn, std::list<Synonym>* synonyms) {
   if (rf == RelRef::kUsesS || rf == RelRef::kModifiesS) {
-    return QueryValidator::IsValid_LhsStmt_RhsProc(lhs, rhs, lhs_is_syn, rhs_is_syn, synonyms, rf);
+    return QueryValidator::IsValid_LhsStmt_RhsEnt(lhs, rhs, lhs_is_syn, rhs_is_syn, synonyms, rf);
+  } if (rf == RelRef::kUsesP || rf == RelRef::kModifiesP) {
+    return QueryValidator::IsValid_LhsEnt_RhsEnt(lhs, rhs, lhs_is_syn, rhs_is_syn, synonyms, rf);
   } else {
     return QueryValidator::IsValid_LhsStmt_RhsStmt(lhs, rhs, lhs_is_syn, rhs_is_syn, synonyms);
   }

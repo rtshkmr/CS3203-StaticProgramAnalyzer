@@ -136,6 +136,46 @@ std::tuple<std::string, bool, bool> QueryParser::ParseStmtRef() {
   return std::make_tuple(curr_lookahead, is_synonym, is_target_synonym);
 }
 
+// stmtRef: synonym | ‘_’ | INTEGER
+// entRef: synonym | ‘_’ | ‘"’ IDENT ‘"’
+/**
+ * Parses a statement reference (StmtRef) or an entity reference (entRef). This method is called when there is
+ * an ambiguity of whether we are parsing StmtRef or entRef (i.e. for lhs of UsesS vs UsesP, ModifiesS vs ModifiesP).
+ * @returns a tuple of values corresponding to lookahead string, bool isSynonym, bool isTargetSyononym,
+ * bool is_uses_or_modifies_p.
+ */
+std::tuple<std::string, bool, bool, bool> QueryParser::ParseStmtOrEntRef() {
+  bool is_uses_or_modifies_p = false; // assume we are parsing stmtref (not UsesP or ModifiesP) in default cases.
+  bool is_synonym = false;
+  bool is_target_synonym = false;
+  std::string curr_lookahead = lookahead.GetTokenString();
+
+  // determine if EntRef for ambiguous case of SYNONYM
+  if (lookahead.GetTokenTag() == TokenTag::kName) {
+    if (synonyms_name_set.find(curr_lookahead) == synonyms_name_set.end()) {
+      throw PQLParseException("Unknown synonym supplied in clause.");
+    }
+    DesignEntity de = QueryParser::GetSynonymInfo(curr_lookahead, &synonyms).GetType();
+    is_uses_or_modifies_p = de == DesignEntity::kProcedure || de == DesignEntity::kCall;
+  }
+
+  // determine if EntRef for unambiguous cases
+  if (lookahead.GetTokenTag() == TokenTag::kStringQuote) {
+    is_uses_or_modifies_p = true;
+  }
+
+  // dispatch parsing to correct handler
+  if (is_uses_or_modifies_p) {
+    Token tok = ParseEntRef(false);
+    is_synonym = IsValidSynonym(tok);
+    is_target_synonym = tok.GetTokenString() == this->target.GetName();
+  } else {
+    std::tie(curr_lookahead, is_synonym, is_target_synonym) = ParseStmtRef();
+  }
+
+  return std::make_tuple(curr_lookahead, is_synonym, is_target_synonym, is_uses_or_modifies_p);
+}
+
 /**
  * Parses a relationship reference (RelRef).
  * @returns a tuple of values corresponding to Clause object, bool isTargetSynonym.
@@ -159,9 +199,13 @@ std::pair<Clause*, bool> QueryParser::ParseRelRef() {
   std::string lhs;
   bool is_lhs_syn;
   bool is_lhs_tgt_syn;
-  // UsesS|ModifiesS: ‘Uses|Modifies’ ‘(’ stmtRef ‘,’ entRef ‘)’
-  // TODO: add support in the future for modifiesP, usesP case: (entRef ‘,’ entRef)
-  std::tie(lhs, is_lhs_syn, is_lhs_tgt_syn) = ParseStmtRef();
+  bool is_uses_or_modifies_p = false;
+
+  if (rel_type.compare("Uses") == 0 || rel_type.compare("Modifies") == 0) {
+    std::tie(lhs, is_lhs_syn, is_lhs_tgt_syn, is_uses_or_modifies_p) = ParseStmtOrEntRef();
+  } else {
+    std::tie(lhs, is_lhs_syn, is_lhs_tgt_syn) = ParseStmtRef();
+  }
 
   if (lhs.compare("_") == 0 && (rel_type.compare("Modifies") == 0 || rel_type.compare("Uses") == 0)) {
     throw PQLValidationException("Semantically invalid to have _ as first argument for " + rel_type);
@@ -170,33 +214,22 @@ std::pair<Clause*, bool> QueryParser::ParseRelRef() {
   Eat(TokenTag::kComma);
   // parse right-hand side
   std::string rhs;
-  bool is_rhs_syn;
-  bool is_rhs_tgt_syn;
+  bool is_rhs_syn = false;
+  bool is_rhs_tgt_syn = false;
   if (rel_type.compare("Uses") == 0 || rel_type.compare("Modifies") == 0) {
     Token tok = ParseEntRef(false);
     rhs = tok.GetTokenString();
-    bool _is_rhs_syn = false;
-    bool _is_rhs_tgt_syn = false;
-    for (Synonym& s: synonyms) {
-      if (s.GetName() == rhs) {
-        _is_rhs_syn = true;
-        if (rhs == this->target.GetName()) {
-          _is_rhs_tgt_syn = true;
-        }
-        break;
-      }
-    }
-    is_rhs_syn = _is_rhs_syn;
-    is_rhs_tgt_syn = _is_rhs_tgt_syn;
+    is_rhs_syn = IsValidSynonym(tok);
+    is_rhs_tgt_syn = tok.GetTokenString() == this->target.GetName();
   } else {
     std::tie(rhs, is_rhs_syn, is_rhs_tgt_syn) = ParseStmtRef();
   }
 
-  Eat(TokenTag::kCloseBracket);
-
-  if (rel_type.compare("Uses") == 0 || rel_type.compare("Modifies") == 0) {
-    rel_type = std::string(rel_type + "S");
+  if (rel_type.compare("Modifies") == 0 || rel_type.compare("Uses") == 0) {
+    rel_type = is_uses_or_modifies_p ? std::string(rel_type + "P") : std::string(rel_type + "S");
   }
+
+  Eat(TokenTag::kCloseBracket);
 
   // semantic validation of relRef.
   if (!QueryValidator::Is_Semantically_Valid_RelRef(lhs, rhs, GetRelRef(rel_type),
@@ -390,7 +423,6 @@ void QueryParser::ParseQuery() {
   if (lookahead.GetTokenString().compare("Select") != 0) {
     ParseDeclarations();
   }
-  // TODO: more validation for synonyms (ie. no duplicate synonym)
   // parse select clause
   ParseSelect();
 }
