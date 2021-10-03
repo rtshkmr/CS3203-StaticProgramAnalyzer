@@ -16,10 +16,16 @@ class PKB {
   std::list<std::tuple<DesignEntity, std::string>> GetPrevious(std::string stmt);
   std::list<std::tuple<DesignEntity, std::string>> GetParent(std::string stmt);
   std::list<std::tuple<DesignEntity, std::string>> GetChild(std::string stmt);
+
   std::list<std::tuple<DesignEntity, std::string>> GetUses(std::string stmt);
-  std::list<std::tuple<DesignEntity, std::string>> GetUsedBy(std::string stmt);
+  std::list<std::tuple<DesignEntity, std::string>> GetUsedBy(std::string var);
   std::list<std::tuple<DesignEntity, std::string>> GetModifies(std::string stmt);
-  std::list<std::tuple<DesignEntity, std::string>> GetModifiedBy(std::string stmt);
+  std::list<std::tuple<DesignEntity, std::string>> GetModifiedBy(std::string var);
+
+  std::list<std::tuple<DesignEntity, std::string>> GetUsesP(std::string procedure);
+  std::list<std::tuple<DesignEntity, std::string>> GetUsedByP(std::string var);
+  std::list<std::tuple<DesignEntity, std::string>> GetModifiesP(std::string procedure);
+  std::list<std::tuple<DesignEntity, std::string>> GetModifiedByP(std::string var);
 
   std::list<std::tuple<DesignEntity, std::string>> GetFollowsT(std::string stmt);
   std::list<std::tuple<DesignEntity, std::string>> GetPreviousT(std::string stmt);

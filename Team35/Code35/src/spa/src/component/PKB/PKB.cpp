@@ -426,6 +426,81 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetModifiedBy(std::string 
 }
 
 /**
+ * Returns a list of tuples representing elements that fulfill the uses relationship with the specified procedure
+ * @param procedure is a string representing the procedure
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and variable name (string)
+ */
+std::list<std::tuple<DesignEntity, std::string>> PKB::GetUsesP(std::string procedure) {
+    std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
+    // For container map
+    auto use_c_iter = use_c_map_.find(procedure);
+    if (use_c_iter != use_c_map_.end()) {
+        std::list<std::tuple<DesignEntity, std::string>*>* use_c = use_c_iter->second;
+        for (auto v: * use_c) {
+            ret_list.push_back(* v);
+        }
+    }
+    return ret_list;
+}
+
+/**
+ * Returns a list of procedures representing elements that fulfill the used by relationship with the specified variable
+ * @param var is a string representing the variable name (e.g. "i", "byte", "u", ...)
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and procedure name (string)
+ */
+std::list<std::tuple<DesignEntity, std::string>> PKB::GetUsedByP(std::string var) {
+    std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
+    // For container map
+    auto used_by_c_iter = used_by_c_map_.find(var);
+    if (used_by_c_iter != used_by_c_map_.end()) {
+        std::list<std::tuple<DesignEntity, std::string>*>* used_by_c = used_by_c_iter->second;
+        for (auto c: * used_by_c) {
+            ret_list.push_back(* c);
+        }
+    }
+    return ret_list;
+}
+
+/**
+ * Returns a list of tuples representing elements that fulfill the modifies relationship with the specified procedure
+ * @param procedure is a string representing the statement number (e.g. "1", "2", "3", ...)
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and variable name (string)
+ */
+std::list<std::tuple<DesignEntity, std::string>> PKB::GetModifiesP(std::string procedure) {
+    std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
+    // For container map
+    auto modifies_c_iter = modifies_c_map_.find(procedure);
+    if (modifies_c_iter != modifies_c_map_.end()) {
+        std::list<std::tuple<DesignEntity, std::string>*>* modifies_c = modifies_c_iter->second;
+        for (auto v: * modifies_c) {
+            ret_list.push_back(* v);
+        }
+    }
+    return ret_list;
+}
+
+/**
+ * Returns a list of tuples representing elements that fulfill the modified by relationship with the specified variable
+ * @param var is a string representing the variable name (e.g. "i", "byte", "u", ...)
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and procedure name (string)
+ */
+std::list<std::tuple<DesignEntity, std::string>> PKB::GetModifiedByP(std::string var) {
+    std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
+    // For container map
+    auto modified_by_c_iter = modified_by_c_map_.find(var);
+    if (modified_by_c_iter != modified_by_c_map_.end()) {
+        std::list<std::tuple<DesignEntity, std::string>*>* modified_by_c = modified_by_c_iter->second;
+        for (auto c: * modified_by_c) {
+            ret_list.push_back(* c);
+        }
+    }
+    return ret_list;
+}
+
+
+
+
+/**
  * From an assign statement, Get its AssignEntity object
  * @param stmt_ref is a string representing the statement number (e.g. "1", "2", "3", ...)
  * @return vector containing one AssignEntity object
@@ -837,10 +912,18 @@ void PKB::PopulateUsedBySMap(std::unordered_map<Variable*, std::list<Statement*>
  */
 void PKB::PopulateUseCMap(std::unordered_map<Container*, std::list<Variable*>*> c_use_hash) {
   for (std::pair<Container*, std::list<Variable*>*> kv: c_use_hash) {
-    Statement* c_stmt = dynamic_cast<Statement*>(kv.first);
-    auto* k_number = const_cast<StatementNumber*>(c_stmt->GetStatementNumber());
 
-    std::string k_string = std::to_string(k_number->GetNum());
+      std::string k_string;
+      if (dynamic_cast<Statement*>(kv.first) != nullptr) {
+          Statement* c_stmt = dynamic_cast<Statement*>(kv.first);
+          auto* k_number = const_cast<StatementNumber*>(c_stmt->GetStatementNumber());
+          k_string = std::to_string(k_number->GetNum());
+      } else if (dynamic_cast<Procedure*>(kv.first) != nullptr) {
+          Procedure* proc = dynamic_cast<Procedure*>(kv.first);
+          auto* k_number = const_cast<ProcedureName*>(proc->GetName());
+          k_string = k_number->getName();
+      }
+
     auto result_ptr = new std::list<std::tuple<DesignEntity, std::string>*>();
 
     std::list<Variable*>* used_variables = kv.second;
@@ -874,11 +957,18 @@ void PKB::PopulateUsedByCMap(std::unordered_map<Variable*, std::list<Container*>
     std::list<Container*>* using_statements = kv.second;
 
     for (Container* stmt: * using_statements) {
-      Statement* c_stmt = dynamic_cast<Statement*>(stmt);
-      auto* stmt_num = const_cast<StatementNumber*>(c_stmt->GetStatementNumber());
-      std::string stmt_ref = std::to_string(stmt_num->GetNum());
+      std::string ref;
+      if (dynamic_cast<Statement*>(kv.first) != nullptr) {
+          Statement* c_stmt = dynamic_cast<Statement*>(stmt);
+          auto* stmt_num = const_cast<StatementNumber*>(c_stmt->GetStatementNumber());
+          std::string ref = std::to_string(stmt_num->GetNum());
+      } else if (dynamic_cast<Procedure*>(kv.first) != nullptr) {
+          Procedure* proc = dynamic_cast<Procedure*>(kv.first);
+          auto* k_number = const_cast<ProcedureName*>(proc->GetName());
+          ref = k_number->getName();
+      }
 
-      std::tuple<DesignEntity, std::string>* entity_ptr = new std::tuple(type_map_[stmt_ref], stmt_ref);
+      std::tuple<DesignEntity, std::string>* entity_ptr = new std::tuple(type_map_[ref], ref);
       result_ptr->push_back(entity_ptr);
     }
 
@@ -945,9 +1035,16 @@ void PKB::PopulateModifiedBySMap(std::unordered_map<Variable*, std::list<Stateme
  */
 void PKB::PopulateModifiesCMap(std::unordered_map<Container*, std::list<Variable*>*> c_modifies_hash) {
   for (std::pair<Container*, std::list<Variable*>*> kv: c_modifies_hash) {
-    Statement* c_stmt = dynamic_cast<Statement*>(kv.first);
-    auto* k_number = const_cast<StatementNumber*>(c_stmt->GetStatementNumber());
-    std::string k_string = std::to_string(k_number->GetNum());
+      std::string k_string;
+      if (dynamic_cast<Statement*>(kv.first) != nullptr) {
+          Statement* c_stmt = dynamic_cast<Statement*>(kv.first);
+          auto* k_number = const_cast<StatementNumber*>(c_stmt->GetStatementNumber());
+          k_string = std::to_string(k_number->GetNum());
+      } else if (dynamic_cast<Procedure*>(kv.first) != nullptr) {
+          Procedure* proc = dynamic_cast<Procedure*>(kv.first);
+          auto* k_number = const_cast<ProcedureName*>(proc->GetName());
+          k_string = k_number->getName();
+      }
     auto result_ptr = new std::list<std::tuple<DesignEntity, std::string>*>();
 
     std::list<Variable*>* used_variables = kv.second;
@@ -981,11 +1078,18 @@ void PKB::PopulateModifiedByCMap(std::unordered_map<Variable*, std::list<Contain
     std::list<Container*>* using_statements = kv.second;
 
     for (Container* stmt: * using_statements) {
-      Statement* c_stmt = dynamic_cast<Statement*>(stmt);
-      auto* stmt_num = const_cast<StatementNumber*>(c_stmt->GetStatementNumber());
-      std::string stmt_ref = std::to_string(stmt_num->GetNum());
+        std::string ref;
+        if (dynamic_cast<Statement*>(kv.first) != nullptr) {
+            Statement* c_stmt = dynamic_cast<Statement*>(stmt);
+            auto* stmt_num = const_cast<StatementNumber*>(c_stmt->GetStatementNumber());
+            std::string ref = std::to_string(stmt_num->GetNum());
+        } else if (dynamic_cast<Procedure*>(kv.first) != nullptr) {
+            Procedure* proc = dynamic_cast<Procedure*>(kv.first);
+            auto* k_number = const_cast<ProcedureName*>(proc->GetName());
+            ref = k_number->getName();
+        }
 
-      std::tuple<DesignEntity, std::string>* entity_ptr = new std::tuple(type_map_[stmt_ref], stmt_ref);
+        std::tuple<DesignEntity, std::string>* entity_ptr = new std::tuple(type_map_[ref], ref);
       result_ptr->push_back(entity_ptr);
     }
 
