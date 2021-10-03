@@ -46,99 +46,81 @@ void PSubsystem::ProcessStatement(std::string statement) {
   }
 
   if (tokens[0].GetTokenTag() == TokenTag::kCloseBrace) {
-    //close brace, no need to create entity;
-
-    //assertion: case 1: close brace for procedure --> type = 0 & parent_stack = empty
-    //           case 2: close brace for others    --> type > 0 & parent_stack ! empty
-    assert((current_node_type_ > 0 && !parent_stack_.empty()) || current_node_type_ == 0 && parent_stack_.empty());
-
-    if (current_node_type_ == 2) return; // do not pop anything in if-close brace. pop 2 when finishing else.
-
-    follow_stack_.pop(); //this is allowed because any stmtList must be 1..* statements. so no condition for if (...) { }
-
-    // case 1
-    if (current_node_type_ == 0 && parent_stack_.empty()) {
-      current_node_type_ = -1;
-      current_node_ = nullptr;
-      current_procedure_ = nullptr;
-    } else {
-      Container* current_nest = parent_stack_.top();
-      parent_stack_.pop();
-
-      if (current_node_type_ == 3) { //double pop for else clause
-        current_nest = parent_stack_.top();
-        parent_stack_.pop();
-        follow_stack_.pop();
-      }
-
-      current_node_ = dynamic_cast<Statement*>(current_nest)->GetParentNode();
-
-      if (parent_stack_.empty()) { //back to procedure stmtlist
-        current_node_type_ = 0;
-        current_node_ = current_procedure_;
-      } else {
-        current_nest = parent_stack_.top();
-        if (WhileEntity* while_entity = dynamic_cast<WhileEntity*>(current_nest)) {
-          current_node_type_ = 1;
-        } else if (IfEntity* if_entity = dynamic_cast<IfEntity*>(current_nest)) {
-          current_node_type_ = 2;
-        } else if (ElseEntity* else_entity = dynamic_cast<ElseEntity*>(current_nest)) {
-          current_node_type_ = 3;
-
-          //dirty way to get the original if-statement (should be 2nd highest)
-          parent_stack_.pop(); //pop this else;
-          current_node_ = parent_stack_.top();
-          assert (dynamic_cast<IfEntity*>(current_node_) != nullptr);
-          parent_stack_.push(else_entity);
-        } else {
-          throw std::invalid_argument("[ERROR] Retrace error. There should not be any other types ");
-        }
-      }
-    }
-    return;
+    return HandleCloseBrace(); // Close Brace can early return without creating entity.
   }
 
-  Entity* entityObj = entity_factory_.CreateEntities(tokens);
+  EntityEnum ent = EntityEnum::kNone;
+  Entity* entityObj = entity_factory_.CreateEntities(tokens, ent);
 
   if (current_node_type_ == -1) { //when current_node_ is null. Only happens when not reading within a procedure.
-    assert(current_procedure_ == nullptr && current_node_ == nullptr && follow_stack_.empty() && parent_stack_.empty());
+    assert(ent == EntityEnum::kProcedureEntity && current_procedure_ == nullptr && current_node_ == nullptr && follow_stack_.empty() && parent_stack_.empty());
     if (Procedure* procedure = dynamic_cast<Procedure*>(entityObj)) {
-      PerformNewProcedureSteps(procedure);
-      return;
+      return PerformNewProcedureSteps(procedure);
     } else {
       throw std::invalid_argument("[ERROR] Expected a procedure entity.");
     }
   }
 
   //From here onwards, Entity must be a Statement type;
-
   if (Statement* stmt = dynamic_cast<Statement*>(entityObj)) {
     SetStatementObject(stmt);
-
-    //evaluate what type of stmt it is:
-    //if, else, while, assign, call, print, read
-    //TODO: convert multiple-if to Get type from EntityFactory
-    if (IfEntity* if_entity = dynamic_cast<IfEntity*>(stmt)) {
-      HandleIfStmt(if_entity);
-    } else if (ElseEntity* else_entity = dynamic_cast<ElseEntity*>(stmt)) {
-      HandleElseStmt(else_entity);
-    } else if (WhileEntity* while_entity = dynamic_cast<WhileEntity*>(stmt)) {
-      HandleWhileStmt(while_entity);
-    } else if (AssignEntity* assign_entity = dynamic_cast<AssignEntity*>(stmt)) {
-      HandleAssignStmt(assign_entity);
-    } else if (CallEntity* call_entity = dynamic_cast<CallEntity*>(stmt)) {
-      HandleCallStmt(call_entity);
-    } else if (PrintEntity* print_entity = dynamic_cast<PrintEntity*>(stmt)) {
-      HandlePrintStmt(print_entity);
-    } else if (ReadEntity* read_entity = dynamic_cast<ReadEntity*>(stmt)) {
-      HandleReadStmt(read_entity);
-    } else {
-      throw std::logic_error("This shouldn't happen... Not one of the Statement types.");
-    }
+    HandleStatement statement = statement_pointer_[static_cast<int>(ent)];
+    (this->*statement)(entityObj);
   } else {
     throw std::invalid_argument("[ERROR] current_node_ is not null and Entity is not a Statement type.");
   }
 //  LOG (spa_logger << "\n\n\n==========================  [EXIT] ProcessStatement ======================\n\n\n");
+}
+
+void PSubsystem::HandleCloseBrace() {
+  //assertion: case 1: close brace for procedure --> type = 0 & parent_stack = empty
+  //           case 2: close brace for others    --> type > 0 & parent_stack ! empty
+  assert((current_node_type_ > 0 && !parent_stack_.empty()) || current_node_type_ == 0 && parent_stack_.empty());
+
+  if (current_node_type_ == 2) return; // do not pop anything in if-close brace. pop 2 when finishing else.
+
+  follow_stack_.pop(); //this is allowed because any stmtList must be 1..* statements. so no condition for if (...) { }
+
+  // case 1
+  if (current_node_type_ == 0 && parent_stack_.empty()) {
+    current_node_type_ = -1;
+    current_node_ = nullptr;
+    current_procedure_ = nullptr;
+  } else {
+    Container* current_nest = parent_stack_.top();
+    parent_stack_.pop();
+
+    if (current_node_type_ == 3) { //double pop for else clause
+      current_nest = parent_stack_.top();
+      parent_stack_.pop();
+      follow_stack_.pop();
+    }
+
+    current_node_ = dynamic_cast<Statement*>(current_nest)->GetParentNode();
+
+    if (parent_stack_.empty()) { //back to procedure stmtlist
+      current_node_type_ = 0;
+      current_node_ = current_procedure_;
+    } else {
+      current_nest = parent_stack_.top();
+      if (WhileEntity* while_entity = dynamic_cast<WhileEntity*>(current_nest)) {
+        current_node_type_ = 1;
+      } else if (IfEntity* if_entity = dynamic_cast<IfEntity*>(current_nest)) {
+        current_node_type_ = 2;
+      } else if (ElseEntity* else_entity = dynamic_cast<ElseEntity*>(current_nest)) {
+        current_node_type_ = 3;
+
+        //dirty way to get the original if-statement (should be 2nd highest)
+        parent_stack_.pop(); //pop this else;
+        current_node_ = parent_stack_.top();
+        assert (dynamic_cast<IfEntity*>(current_node_) != nullptr);
+        parent_stack_.push(else_entity);
+      } else {
+        throw std::invalid_argument("[ERROR] Retrace error. There should not be any other types ");
+      }
+    }
+  }
+  return;
 }
 
 void PSubsystem::PerformNewProcedureSteps(Procedure* procedure) {
@@ -203,7 +185,13 @@ void PSubsystem::SetStatementObject(Statement* statement) {
 
 }
 
-void PSubsystem::HandleIfStmt(IfEntity* if_entity) {
+void PSubsystem::HandleError(Entity* entity) {
+  throw std::invalid_argument("invalid blehhhh");
+}
+
+void PSubsystem::HandleIfStmt(Entity* entity) {
+  IfEntity* if_entity = dynamic_cast<IfEntity*>(entity);
+  assert(if_entity);
   deliverable_->AddIfEntity(if_entity);
   parent_stack_.push(if_entity);
   current_node_type_ = 2;
@@ -214,7 +202,9 @@ void PSubsystem::HandleIfStmt(IfEntity* if_entity) {
   }
 }
 
-void PSubsystem::HandleElseStmt(ElseEntity* else_entity) {
+void PSubsystem::HandleElseStmt(Entity* entity) {
+  ElseEntity* else_entity = dynamic_cast<ElseEntity*>(entity);
+  assert(else_entity);
   IfEntity* if_entity = dynamic_cast<IfEntity*>(parent_stack_.top());
   if (if_entity == nullptr) {
     //If assertion failed, Else did not follow If
@@ -228,7 +218,9 @@ void PSubsystem::HandleElseStmt(ElseEntity* else_entity) {
   current_node_ = if_entity;
 }
 
-void PSubsystem::HandleWhileStmt(WhileEntity* while_entity) {
+void PSubsystem::HandleWhileStmt(Entity* entity) {
+  WhileEntity* while_entity = dynamic_cast<WhileEntity*>(entity);
+  assert(while_entity);
   deliverable_->AddWhileEntity(while_entity);
   parent_stack_.push(while_entity);
   current_node_type_ = 1;
@@ -239,7 +231,9 @@ void PSubsystem::HandleWhileStmt(WhileEntity* while_entity) {
   }
 }
 
-void PSubsystem::HandleAssignStmt(AssignEntity* assign_entity) {
+void PSubsystem::HandleAssignStmt(Entity* entity) {
+  AssignEntity* assign_entity = dynamic_cast<AssignEntity*>(entity);
+  assert(assign_entity);
   deliverable_->AddAssignEntity(assign_entity);
   deliverable_->AddModifiesRelationship(assign_entity, assign_entity->GetVariable());
   deliverable_->AddModifiesRelationship(current_node_, assign_entity->GetVariable());  //container level
@@ -250,18 +244,24 @@ void PSubsystem::HandleAssignStmt(AssignEntity* assign_entity) {
   }
 }
 
-void PSubsystem::HandleCallStmt(CallEntity* call_entity) {
+void PSubsystem::HandleCallStmt(Entity* entity) {
+  CallEntity* call_entity = dynamic_cast<CallEntity*>(entity);
+  assert(call_entity);
   deliverable_->AddCallEntity(call_entity);
   //TODO: cater for cross procedure call modifies and uses
 }
 
-void PSubsystem::HandlePrintStmt(PrintEntity* print_entity) {
+void PSubsystem::HandlePrintStmt(Entity* entity) {
+  PrintEntity* print_entity = dynamic_cast<PrintEntity*>(entity);
+  assert(print_entity);
   deliverable_->AddPrintEntity(print_entity);
   deliverable_->AddUsesRelationship(print_entity, print_entity->GetVariable());
   deliverable_->AddUsesRelationship(current_node_, print_entity->GetVariable());   //container level
 }
 
-void PSubsystem::HandleReadStmt(ReadEntity* read_entity) {
+void PSubsystem::HandleReadStmt(Entity* entity) {
+  ReadEntity* read_entity = dynamic_cast<ReadEntity*>(entity);
+  assert(read_entity);
   deliverable_->AddReadEntity(read_entity);
   deliverable_->AddModifiesRelationship(read_entity, read_entity->GetVariable());
   deliverable_->AddModifiesRelationship(current_node_, read_entity->GetVariable());  //container level

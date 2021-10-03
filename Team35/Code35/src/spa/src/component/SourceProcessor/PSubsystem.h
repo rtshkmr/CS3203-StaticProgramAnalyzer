@@ -19,7 +19,13 @@ namespace psub {
  * created and added to the AST, relationships are added.
  */
 class PSubsystem {
+  typedef void (PSubsystem::*HandleStatement)(Entity*);
+
  private:
+  std::vector<HandleStatement> statement_pointer_ = {&PSubsystem::HandleError, &PSubsystem::HandleIfStmt,
+                                                     &PSubsystem::HandleWhileStmt, &PSubsystem::HandleAssignStmt,
+                                                     &PSubsystem::HandleCallStmt, &PSubsystem::HandlePrintStmt,
+                                                     &PSubsystem::HandleReadStmt, &PSubsystem::HandleElseStmt};
   Procedure* current_procedure_;
   Deliverable* deliverable_;
   SyntaxValidator syntax_validator_;
@@ -35,13 +41,15 @@ class PSubsystem {
   // private methods for selfcall
   void PerformNewProcedureSteps(Procedure* procedure);
   void SetStatementObject(Statement* statement);
-  void HandleIfStmt(IfEntity* if_entity);
-  void HandleElseStmt(ElseEntity* else_entity);
-  void HandleWhileStmt(WhileEntity* while_entity);
-  void HandleAssignStmt(AssignEntity* assign_entity);
-  void HandleCallStmt(CallEntity* call_entity);
-  void HandleReadStmt(ReadEntity* read_entity);
-  void HandlePrintStmt(PrintEntity* print_entity);
+  void HandleCloseBrace();
+  void HandleError(Entity* entity);
+  void HandleIfStmt(Entity* entity);
+  void HandleElseStmt(Entity* entity);
+  void HandleWhileStmt(Entity* entity);
+  void HandleAssignStmt(Entity* entity);
+  void HandleCallStmt(Entity* entity);
+  void HandleReadStmt(Entity* entity);
+  void HandlePrintStmt(Entity* entity);
 
   void CheckForIfElseValidity();
   void CheckForProcedureExisting();

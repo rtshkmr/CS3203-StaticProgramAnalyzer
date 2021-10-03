@@ -20,10 +20,11 @@ EntityFactory::EntityFactory(std::list<Procedure*>* proc_list,
  * Must assume that the tokens are in the form of a statement e.g. the 1st word is the keyword
  * and that the tokenized statement is syntactically correct
  */
-Entity* EntityFactory::CreateEntities(vector<Token> tokens) {
+Entity* EntityFactory::CreateEntities(vector<Token> tokens, EntityEnum& ent) {
   Token first_token = tokens.front();
   switch (first_token.GetTokenTag()) {
     case TokenTag::kProcedureKeyword: {
+      ent = EntityEnum::kProcedureEntity;
       assert(tokens[1].GetTokenTag() == TokenTag::kName);
       std::string proc_token_string = tokens[1].GetTokenString();
       // TODO iter2: need to check if proc was already created and defined (issue #27)
@@ -31,30 +32,37 @@ Entity* EntityFactory::CreateEntities(vector<Token> tokens) {
       return RetrieveProcedure(proc_token_string);
     }
     case TokenTag::kReadKeyword: {
+      ent = EntityEnum::kReadEntity;
       assert(tokens[1].GetTokenTag() == TokenTag::kName);
       std::string read_var_string = tokens[1].GetTokenString();
       return new ReadEntity(RetrieveVariable(read_var_string));
     }
     case TokenTag::kPrintKeyword: {
+      ent = EntityEnum::kPrintEntity;
       assert(tokens[1].GetTokenTag() == TokenTag::kName);
       std::string print_var_string = tokens[1].GetTokenString();
       return new PrintEntity(RetrieveVariable(print_var_string));
     }
     case TokenTag::kCallKeyword: {
+      ent = EntityEnum::kCallEntity;
       assert(tokens[1].GetTokenTag() == TokenTag::kName);
       std::string call_proc_string = tokens[1].GetTokenString();
       return new CallEntity(RetrieveProcedure(call_proc_string));
     }
     case TokenTag::kWhileKeyword: {
+      ent = EntityEnum::kWhileEntity;
       return CreateConditionalEntity(tokens, TokenTag::kWhileKeyword);
     }
     case TokenTag::kIfKeyword: {
+      ent = EntityEnum::kIfEntity;
       return CreateConditionalEntity(tokens, TokenTag::kIfKeyword);
     }
     case TokenTag::kElseKeyword: {
+      ent = EntityEnum::kElseEntity;
       return new ElseEntity();
     }
     case TokenTag::kName: {   // assignment statement
+      ent = EntityEnum::kAssignEntity;
       return CreateAssignEntity(tokens);
     }
     default:throw std::invalid_argument("Tokens cannot be made into entity in EF.");
