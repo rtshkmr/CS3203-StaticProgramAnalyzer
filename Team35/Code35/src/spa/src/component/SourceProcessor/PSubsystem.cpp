@@ -12,7 +12,7 @@ void PSubsystem::InitDataStructures() {
   valid_state = true;
   current_procedure_ = nullptr;
   current_node_ = nullptr;
-  current_node_type_ = -1;
+  current_node_type_ = NodeType::kNone;
   parent_stack_ = std::stack<Container*>();
   follow_stack_ = std::stack<Statement*>();
   program_counter_ = 0;
@@ -52,7 +52,7 @@ void PSubsystem::ProcessStatement(std::string statement) {
   EntityEnum ent = EntityEnum::kNone;
   Entity* entityObj = entity_factory_.CreateEntities(tokens, ent);
 
-  if (current_node_type_ == -1) { //when current_node_ is null. Only happens when not reading within a procedure.
+  if (current_node_type_ == NodeType::kNone) { //when current_node_ is null. Only happens when not reading within a procedure.
     assert(ent == EntityEnum::kProcedureEntity && current_procedure_ == nullptr && current_node_ == nullptr && follow_stack_.empty() && parent_stack_.empty());
     if (Procedure* procedure = dynamic_cast<Procedure*>(entityObj)) {
       return PerformNewProcedureSteps(procedure);
@@ -75,22 +75,23 @@ void PSubsystem::ProcessStatement(std::string statement) {
 void PSubsystem::HandleCloseBrace() {
   //assertion: case 1: close brace for procedure --> type = 0 & parent_stack = empty
   //           case 2: close brace for others    --> type > 0 & parent_stack ! empty
-  assert((current_node_type_ > 0 && !parent_stack_.empty()) || current_node_type_ == 0 && parent_stack_.empty());
+  assert((current_node_type_ != NodeType::kProcedure && !parent_stack_.empty()) ||
+              current_node_type_ == NodeType::kProcedure && parent_stack_.empty());
 
-  if (current_node_type_ == 2) return; // do not pop anything in if-close brace. pop 2 when finishing else.
+  if (current_node_type_ == NodeType::kIf) return; // do not pop anything in if-close brace. pop 2 when finishing else.
 
   follow_stack_.pop(); //this is allowed because any stmtList must be 1..* statements. so no condition for if (...) { }
 
   // case 1
-  if (current_node_type_ == 0 && parent_stack_.empty()) {
-    current_node_type_ = -1;
+  if (current_node_type_ == NodeType::kProcedure && parent_stack_.empty()) {
+    current_node_type_ = NodeType::kNone;
     current_node_ = nullptr;
     current_procedure_ = nullptr;
   } else {
     Container* current_nest = parent_stack_.top();
     parent_stack_.pop();
 
-    if (current_node_type_ == 3) { //double pop for else clause
+    if (current_node_type_ == NodeType::kElse) { //double pop for else clause
       current_nest = parent_stack_.top();
       parent_stack_.pop();
       follow_stack_.pop();
@@ -99,16 +100,16 @@ void PSubsystem::HandleCloseBrace() {
     current_node_ = dynamic_cast<Statement*>(current_nest)->GetParentNode();
 
     if (parent_stack_.empty()) { //back to procedure stmtlist
-      current_node_type_ = 0;
+      current_node_type_ = NodeType::kProcedure;
       current_node_ = current_procedure_;
     } else {
       current_nest = parent_stack_.top();
       if (WhileEntity* while_entity = dynamic_cast<WhileEntity*>(current_nest)) {
-        current_node_type_ = 1;
+        current_node_type_ = NodeType::kWhile;
       } else if (IfEntity* if_entity = dynamic_cast<IfEntity*>(current_nest)) {
-        current_node_type_ = 2;
+        current_node_type_ = NodeType::kIf;
       } else if (ElseEntity* else_entity = dynamic_cast<ElseEntity*>(current_nest)) {
-        current_node_type_ = 3;
+        current_node_type_ = NodeType::kElse;
 
         //dirty way to get the original if-statement (should be 2nd highest)
         parent_stack_.pop(); //pop this else;
@@ -126,7 +127,7 @@ void PSubsystem::HandleCloseBrace() {
 void PSubsystem::PerformNewProcedureSteps(Procedure* procedure) {
   current_procedure_ = procedure;
   current_node_ = procedure;
-  current_node_type_ = 0;
+  current_node_type_ = NodeType::kProcedure;
 
   if (deliverable_->GetProgram() == nullptr) {
     Program* program = new Program(procedure);
@@ -154,7 +155,7 @@ void PSubsystem::SetStatementObject(Statement* statement) {
 
   bool new_else = false;
   //to check if adding stmt to Else block
-  if (current_node_type_ == 3) {
+  if (current_node_type_ == NodeType::kElse) {
     IfEntity* if_entity = dynamic_cast<IfEntity*>(current_node_);
     assert (if_entity != nullptr);
     if_entity->GetElseStmtList()->push_back(statement);
@@ -166,14 +167,14 @@ void PSubsystem::SetStatementObject(Statement* statement) {
   }
 
   if (!parent_stack_.empty()) {
-    assert(current_node_type_ == 1 || current_node_type_ == 2 || current_node_type_ == 3);
+    assert(current_node_type_ != NodeType::kNone);
     statement->SetParentNode(parent_stack_.top());
     deliverable_->AddParentRelationship(dynamic_cast<Statement*>(current_node_), statement);
   }
 
-  if (current_node_type_ != 3 && current_node_->GetStatementList()->size() == 1
+  if (current_node_type_ != NodeType::kElse && current_node_->GetStatementList()->size() == 1
       || // 1 because this is newly added in Line curr - 13
-          (current_node_type_ == 3 && new_else)) {
+          (current_node_type_ == NodeType::kElse && new_else)) {
     //just entered a stack, follow nothing.
     follow_stack_.push(statement);
   } else {
@@ -194,7 +195,7 @@ void PSubsystem::HandleIfStmt(Entity* entity) {
   assert(if_entity);
   deliverable_->AddIfEntity(if_entity);
   parent_stack_.push(if_entity);
-  current_node_type_ = 2;
+  current_node_type_ = NodeType::kIf;
   current_node_ = if_entity;
 
   for (Variable* v: if_entity->GetExpressionVariables()) {
@@ -214,7 +215,7 @@ void PSubsystem::HandleElseStmt(Entity* entity) {
   parent_stack_.push(else_entity);
 
   if_entity->SetElseEntity(else_entity);
-  current_node_type_ = 3;
+  current_node_type_ = NodeType::kElse;
   current_node_ = if_entity;
 }
 
@@ -223,7 +224,7 @@ void PSubsystem::HandleWhileStmt(Entity* entity) {
   assert(while_entity);
   deliverable_->AddWhileEntity(while_entity);
   parent_stack_.push(while_entity);
-  current_node_type_ = 1;
+  current_node_type_ = NodeType::kWhile;
   current_node_ = while_entity;
 
   for (Variable* v: while_entity->GetExpressionVariables()) {

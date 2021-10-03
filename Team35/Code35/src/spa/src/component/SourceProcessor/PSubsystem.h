@@ -11,6 +11,15 @@
  * This namespace provides a scope for PSubsystem related declarations.
  */
 namespace psub {
+
+enum class NodeType {
+  kNone = -1,
+  kProcedure = 0,
+  kWhile = 1,
+  kIf = 2,
+  kElse = 3
+};
+
 /**
  * This class handles the interactions between sub-components that help parse the source code. It contains the
  * data structures that accumulate (AST, EntityTables, RelationshipTables, Helper Stacks that keep track of tokens
@@ -33,7 +42,7 @@ class PSubsystem {
 
   bool valid_state = true;
   Container* current_node_;
-  int current_node_type_ = -1; // -1 => no current node; 0 = procedure; 1 = while; 2 = if; 3 = else;
+  NodeType current_node_type_ = NodeType::kNone; // -1 => no current node; 0 = procedure; 1 = while; 2 = if; 3 = else;
   std::stack<Container*> parent_stack_;
   std::stack<Statement*> follow_stack_;
   int program_counter_ = 0;
