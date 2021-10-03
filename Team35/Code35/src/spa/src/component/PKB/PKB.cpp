@@ -455,7 +455,9 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetUsedByP(std::string var
     if (used_by_c_iter != used_by_c_map_.end()) {
         std::list<std::tuple<DesignEntity, std::string>*>* used_by_c = used_by_c_iter->second;
         for (auto c: * used_by_c) {
-            ret_list.push_back(* c);
+          if (std::get<0>(*c) == DesignEntity::kProcedure) {
+            ret_list.push_back(*c);
+          }
         }
     }
     return ret_list;
@@ -491,7 +493,9 @@ std::list<std::tuple<DesignEntity, std::string>> PKB::GetModifiedByP(std::string
     if (modified_by_c_iter != modified_by_c_map_.end()) {
         std::list<std::tuple<DesignEntity, std::string>*>* modified_by_c = modified_by_c_iter->second;
         for (auto c: * modified_by_c) {
-            ret_list.push_back(* c);
+          if (std::get<0>(*c) == DesignEntity::kProcedure) {
+            ret_list.push_back(*c);
+          }
         }
     }
     return ret_list;
