@@ -11,7 +11,9 @@
  */
 class QueryValidator {
  private:
-  static bool IsValid_LhsStmt_RhsProc(std::string l, std::string r, bool lhs_is_syn,
+  static bool IsValid_LhsStmt_RhsEnt(std::string l, std::string r, bool lhs_is_syn,
+                                      bool rhs_is_syn, std::list<Synonym>* synonyms, RelRef rf);
+  static bool IsValid_LhsEnt_RhsEnt(std::string l, std::string r, bool lhs_is_syn,
                                       bool rhs_is_syn, std::list<Synonym>* synonyms, RelRef rf);
   static bool IsValid_LhsStmt_RhsStmt(std::string l, std::string r, bool lhs_is_syn,
                                       bool rhs_is_syn, std::list<Synonym>* synonyms);
