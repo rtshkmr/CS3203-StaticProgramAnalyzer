@@ -4,7 +4,6 @@
 
 TEST_CASE("SP to PKB basic retrieval") {
   PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/basic_source.txt");
-
   SECTION("Procedure") {
     REQUIRE(std::list<std::string>{"Week4"} == pkb->GetDesignEntity(DesignEntity::kProcedure));
   }
@@ -398,6 +397,21 @@ TEST_CASE("SP to PKB relationships tests") {
         std::make_tuple(DesignEntity::kVariable, "cont1nueREad1ng"),
     };
     CHECK(pkb->GetUses("3") == expected_list_var4);
+
+    // procedure container
+    std::list<std::tuple<DesignEntity, std::string>>
+    expected_list_var5 = std::list<std::tuple<DesignEntity, std::string>>{
+      std::make_tuple(DesignEntity::kVariable, "fileName"),
+      std::make_tuple(DesignEntity::kVariable, "byte"),
+      std::make_tuple(DesignEntity::kVariable, "chara"),
+      std::make_tuple(DesignEntity::kVariable, "psubsystem"),
+      std::make_tuple(DesignEntity::kVariable, "ProcessStmtNow"),
+      std::make_tuple(DesignEntity::kVariable, "cont1nueREad1ng"),
+      std::make_tuple(DesignEntity::kVariable, "SyntaxErr0rFound"),
+      std::make_tuple(DesignEntity::kVariable, "InvalidFileName"),
+      std::make_tuple(DesignEntity::kVariable, "pr0cessSuccessfuI"),
+      };
+    CHECK(pkb->GetUsesP("Parser") == expected_list_var5);
   }
 
   SECTION("Modifies statement") {
@@ -466,6 +480,17 @@ TEST_CASE("SP to PKB relationships tests") {
       };
     std::list<std::tuple<DesignEntity, std::string>> actual_list2 = pkb->GetModifies("3");
     CHECK(actual_list2 == expected_list_var4);
+
+    // procedure container
+    std::list<std::tuple<DesignEntity, std::string>>
+    expected_list_var5 = std::list<std::tuple<DesignEntity, std::string>>{
+      std::make_tuple(DesignEntity::kVariable, "psubsystem"),
+      std::make_tuple(DesignEntity::kVariable, "chara"),
+      std::make_tuple(DesignEntity::kVariable, "byte"),
+      std::make_tuple(DesignEntity::kVariable, "lastByte"),
+      std::make_tuple(DesignEntity::kVariable, "fileName"),
+      };
+    CHECK(pkb->GetModifiesP("Parser") == expected_list_var5);
   }
 
   SECTION("Parent Else Block") {
@@ -589,5 +614,17 @@ TEST_CASE("SP to PKB relationships tests") {
 
       std::list<std::tuple<DesignEntity, std::string>> previous_stmt21 = pkb->GetPrevious("21");
       CHECK(previous_stmt21.size() == 0);
+
+      std::list<std::tuple<DesignEntity, std::string>> expected_procedure =
+          std::list<std::tuple<DesignEntity, std::string>>{std::make_tuple(DesignEntity::kProcedure, "Parser")};
+      CHECK(pkb->GetUsedByP("fileName") == expected_procedure);
+      CHECK(pkb->GetUsedByP("chara") == expected_procedure);
+      CHECK(pkb->GetUsedByP("psubsystem") == expected_procedure);
+      CHECK(pkb->GetUsedByP("SyntaxErr0rFound") == expected_procedure);
+
+      CHECK(pkb->GetModifiedByP("fileName") == expected_procedure);
+      CHECK(pkb->GetModifiedByP("chara") == expected_procedure);
+      CHECK(pkb->GetModifiedByP("psubsystem") == expected_procedure);
+      CHECK(pkb->GetModifiedByP("lastByte") == expected_procedure);
   }
 }

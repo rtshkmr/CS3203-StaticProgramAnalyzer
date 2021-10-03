@@ -296,7 +296,7 @@ inline WhileEntity* GetWhileEntity3() {
 //ElseEntity* else_2 = GetElse();
 //ElseEntity* else_3 = GetElse();
 //ElseEntity* else_4 = GetElse();
-//WhileEntity* while_1 = GetWhileEntity3();
+//WhileEntity* while_1 = GetWhileEntity1();
 //WhileEntity* while_2 = GetWhileEntity2();
 //WhileEntity* while_3 = GetWhileEntity3();
 
