@@ -53,11 +53,11 @@ void PSubsystem::ProcessStatement(std::string statement) {
   Entity* entityObj = entity_factory_.CreateEntities(tokens, ent);
 
   if (current_node_type_ == NodeType::kNone) { //when current_node_ is null. Only happens when not reading within a procedure.
-    assert(ent == EntityEnum::kProcedureEntity && current_procedure_ == nullptr && current_node_ == nullptr && follow_stack_.empty() && parent_stack_.empty());
     if (Procedure* procedure = dynamic_cast<Procedure*>(entityObj)) {
       return PerformNewProcedureSteps(procedure);
+      assert(ent == EntityEnum::kProcedureEntity && current_procedure_ == nullptr && current_node_ == nullptr && follow_stack_.empty() && parent_stack_.empty());
     } else {
-      throw std::invalid_argument("[ERROR] Expected a procedure entity.");
+      throw SyntaxException("Expected a procedure entity at this location but was given another type.");
     }
   }
 
