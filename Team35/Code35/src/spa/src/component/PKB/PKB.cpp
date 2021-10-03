@@ -958,12 +958,10 @@ void PKB::PopulateUsedByCMap(std::unordered_map<Variable*, std::list<Container*>
 
     for (Container* stmt: * using_statements) {
       std::string ref;
-      if (dynamic_cast<Statement*>(kv.first) != nullptr) {
-          Statement* c_stmt = dynamic_cast<Statement*>(stmt);
+      if (Statement* c_stmt = dynamic_cast<Statement*>(stmt)) {
           auto* stmt_num = const_cast<StatementNumber*>(c_stmt->GetStatementNumber());
-          std::string ref = std::to_string(stmt_num->GetNum());
-      } else if (dynamic_cast<Procedure*>(kv.first) != nullptr) {
-          Procedure* proc = dynamic_cast<Procedure*>(kv.first);
+          ref = std::to_string(stmt_num->GetNum());
+      } else if (Procedure* proc = dynamic_cast<Procedure*>(stmt)) {
           auto* k_number = const_cast<ProcedureName*>(proc->GetName());
           ref = k_number->getName();
       }
@@ -1079,12 +1077,10 @@ void PKB::PopulateModifiedByCMap(std::unordered_map<Variable*, std::list<Contain
 
     for (Container* stmt: * using_statements) {
         std::string ref;
-        if (dynamic_cast<Statement*>(kv.first) != nullptr) {
-            Statement* c_stmt = dynamic_cast<Statement*>(stmt);
+        if (Statement* c_stmt = dynamic_cast<Statement*>(stmt)) {
             auto* stmt_num = const_cast<StatementNumber*>(c_stmt->GetStatementNumber());
-            std::string ref = std::to_string(stmt_num->GetNum());
-        } else if (dynamic_cast<Procedure*>(kv.first) != nullptr) {
-            Procedure* proc = dynamic_cast<Procedure*>(kv.first);
+            ref = std::to_string(stmt_num->GetNum());
+        } else if (Procedure* proc = dynamic_cast<Procedure*>(stmt)) {
             auto* k_number = const_cast<ProcedureName*>(proc->GetName());
             ref = k_number->getName();
         }
