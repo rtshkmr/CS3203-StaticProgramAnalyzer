@@ -9,14 +9,19 @@
 #include <datatype/DataType.h>
 
 class Block {
- public:
+ private:
   std::set<StatementNumber> stmtNoList = {};
+ public:
   int start;
   int end;
   bool isWhile = false;
   std::set<Block*> next_block_ = {};
 
   Block() {};
+
+  void AddStmt(StatementNumber);
+  void RemoveStmt(StatementNumber);
+  int StmtListSize();
 };
 
 #endif //AUTOTESTER_SRC_SPA_SRC_MODEL_CFG_H_

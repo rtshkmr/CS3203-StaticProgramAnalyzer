@@ -175,7 +175,7 @@ void PSubsystem::SetStatementObject(Statement* statement) {
   StatementNumber* statement_number = new StatementNumber(program_counter_);
   statement->SetStatementNumber(statement_number);
   deliverable_->AddStatement(statement);
-  block_stack_.top()->stmtNoList.insert(StatementNumber(program_counter_));
+  block_stack_.top()->AddStmt(StatementNumber(program_counter_));
 
   bool new_else = false;
   //to check if adding stmt to Else block
@@ -222,19 +222,23 @@ void PSubsystem::HandleIfStmt(Entity* entity) {
   current_node_type_ = NodeType::kIf;
   current_node_ = if_entity;
 
-  // remove the stmtNumber from previous block and add it to the cond block
-  int num = if_entity->GetStatementNumber()->GetNum();
-  block_stack_.top()->stmtNoList.erase(StatementNumber(num));
-  Block* block_if_cond = new Block();
-  block_if_cond->stmtNoList.insert(StatementNumber(num));
-
-  block_stack_.top()->next_block_.insert(block_if_cond);
-  if (!block_stack_.top()->isWhile)
-    block_stack_.pop(); // pop the previous progline if it isnt while (no loopback to care)
+  Block* block_if_cond = nullptr;
+  // remove the stmtNumber from previous block and add it to the cond block if size > 1
+  if (block_stack_.top()->StmtListSize() > 1) {
+    int num = if_entity->GetStatementNumber()->GetNum();
+    block_stack_.top()->RemoveStmt(StatementNumber(num));
+    block_if_cond = new Block();
+    block_if_cond->AddStmt(StatementNumber(num));
+    block_stack_.top()->next_block_.insert(block_if_cond);
+    if (!block_stack_.top()->isWhile)
+      block_stack_.pop(); // pop the previous progline if it isnt while (no loopback to care)
+    block_stack_.push(block_if_cond);
+  } else {
+    block_if_cond = block_stack_.top();
+  }
 
   Block* block_if_stmt = new Block();
   block_if_cond->next_block_.insert(block_if_stmt);
-  block_stack_.push(block_if_cond);
   block_stack_.push(block_if_stmt);
 
   for (Variable* v: if_entity->GetExpressionVariables()) {
@@ -275,21 +279,24 @@ void PSubsystem::HandleWhileStmt(Entity* entity) {
   current_node_type_ = NodeType::kWhile;
   current_node_ = while_entity;
 
+  Block* block_while_cond = nullptr;
+  // remove the stmtNumber from previous block and add it to the cond block if size > 1
+  if (block_stack_.top()->StmtListSize() > 1) {
+    int num = while_entity->GetStatementNumber()->GetNum();
+    block_stack_.top()->RemoveStmt(StatementNumber(num));
+    block_while_cond = new Block();
+    block_while_cond->AddStmt(StatementNumber(num));
+    block_stack_.top()->next_block_.insert(block_while_cond);
+    if (!block_stack_.top()->isWhile)
+      block_stack_.pop(); // pop the previous progline if it isnt while (no loopback to care)
+    block_stack_.push(block_while_cond);
+  } else {
+    block_while_cond = block_stack_.top();
+  }
 
-  // remove the stmtNumber from previous block and add it to the cond block
-  int num = while_entity->GetStatementNumber()->GetNum();
-  block_stack_.top()->stmtNoList.erase(StatementNumber(num));
-  Block* block_while_cond = new Block();
-  block_while_cond->stmtNoList.insert(StatementNumber(num));
   block_while_cond->isWhile = true;
-
-  block_stack_.top()->next_block_.insert(block_while_cond);
-  if (!block_stack_.top()->isWhile)
-    block_stack_.pop(); // pop the previous progline if it isnt while (no loopback to care)
-
   Block* block_while_stmt = new Block();
   block_while_cond->next_block_.insert(block_while_stmt);
-  block_stack_.push(block_while_cond);
   block_stack_.push(block_while_stmt);
 
   for (Variable* v: while_entity->GetExpressionVariables()) {
