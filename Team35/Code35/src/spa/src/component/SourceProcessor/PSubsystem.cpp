@@ -199,7 +199,9 @@ void PSubsystem::HandleIfStmt(Entity* entity) {
   current_node_ = if_entity;
 
   for (Variable* v: if_entity->GetExpressionVariables()) {
-    deliverable_->AddUsesRelationship(current_node_, v);   //container level which is this if-entity
+    deliverable_->AddUsesRelationship(current_procedure_, v); //procedure level
+    if (current_procedure_ != current_node_)
+      deliverable_->AddUsesRelationship(current_node_, v);   //container level which is this if-entity
   }
 }
 
@@ -228,7 +230,9 @@ void PSubsystem::HandleWhileStmt(Entity* entity) {
   current_node_ = while_entity;
 
   for (Variable* v: while_entity->GetExpressionVariables()) {
-    deliverable_->AddUsesRelationship(current_node_, v);   //container level which is this while-entity
+    deliverable_->AddUsesRelationship(current_procedure_, v); //procedure level
+    if (current_procedure_ != current_node_)
+      deliverable_->AddUsesRelationship(current_node_, v);   //container level which is this while-entity
   }
 }
 
@@ -237,11 +241,15 @@ void PSubsystem::HandleAssignStmt(Entity* entity) {
   assert(assign_entity);
   deliverable_->AddAssignEntity(assign_entity);
   deliverable_->AddModifiesRelationship(assign_entity, assign_entity->GetVariable());
-  deliverable_->AddModifiesRelationship(current_node_, assign_entity->GetVariable());  //container level
+  deliverable_->AddModifiesRelationship(current_procedure_, assign_entity->GetVariable());  //procedure level
+  if (current_procedure_ != current_node_)
+    deliverable_->AddModifiesRelationship(current_node_, assign_entity->GetVariable());  //container level
 
   for (Variable* v: assign_entity->GetExpressionVariables()) {
     deliverable_->AddUsesRelationship(assign_entity, v);
-    deliverable_->AddUsesRelationship(current_node_, v);   //container level
+    deliverable_->AddUsesRelationship(current_procedure_, v); //procedure level
+    if (current_procedure_ != current_node_)
+      deliverable_->AddUsesRelationship(current_node_, v);   //container level
   }
 }
 
@@ -257,7 +265,9 @@ void PSubsystem::HandlePrintStmt(Entity* entity) {
   assert(print_entity);
   deliverable_->AddPrintEntity(print_entity);
   deliverable_->AddUsesRelationship(print_entity, print_entity->GetVariable());
-  deliverable_->AddUsesRelationship(current_node_, print_entity->GetVariable());   //container level
+  deliverable_->AddUsesRelationship(current_procedure_, print_entity->GetVariable()); //procedure level
+  if (current_procedure_ != current_node_)
+    deliverable_->AddUsesRelationship(current_node_, print_entity->GetVariable());   //container level
 }
 
 void PSubsystem::HandleReadStmt(Entity* entity) {
@@ -265,7 +275,9 @@ void PSubsystem::HandleReadStmt(Entity* entity) {
   assert(read_entity);
   deliverable_->AddReadEntity(read_entity);
   deliverable_->AddModifiesRelationship(read_entity, read_entity->GetVariable());
-  deliverable_->AddModifiesRelationship(current_node_, read_entity->GetVariable());  //container level
+  deliverable_->AddUsesRelationship(current_procedure_, read_entity->GetVariable()); //procedure level
+  if (current_procedure_ != current_node_)
+    deliverable_->AddModifiesRelationship(current_node_, read_entity->GetVariable());  //container level
 }
 
 void PSubsystem::CheckForIfElseValidity() {

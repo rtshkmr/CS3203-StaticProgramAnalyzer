@@ -79,6 +79,8 @@ class Variable : public Entity {
   Variable(VariableName* variableName);
 
   const VariableName* GetName();
+
+  static std::vector<Variable*> SortVariableVector(std::vector<Variable*> var_list);
 };
 
 /**
