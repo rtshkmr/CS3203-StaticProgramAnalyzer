@@ -9,8 +9,8 @@ using std::vector;
 
 IfEntity::IfEntity(std::string condition, vector<Variable*> expr_variables, vector<ConstantValue*> expr_constants) {
   cond_expr_ = new ConditionalExpression(condition, expr_variables);
-  this->expr_variables = std::move(expr_variables);
-  this->expr_constants = std::move(expr_constants);
+  this->control_variables = std::move(expr_variables);
+  this->control_constants = std::move(expr_constants);
 }
 
 ConditionalExpression* IfEntity::GetCondExpr() {
@@ -18,11 +18,11 @@ ConditionalExpression* IfEntity::GetCondExpr() {
 }
 
 vector<Variable*> IfEntity::GetExpressionVariables() {
-  return expr_variables;
+  return control_variables;
 }
 
 vector<ConstantValue*> IfEntity::GetExpressionConstants() {
-  return expr_constants;
+  return control_constants;
 }
 
 ElseEntity* IfEntity::GetElseEntity() {
@@ -45,8 +45,8 @@ WhileEntity::WhileEntity(std::string condition,
                          vector<Variable*> expr_variables,
                          vector<ConstantValue*> expr_constants) {
   cond_expr_ = new ConditionalExpression(condition, expr_variables);
-  this->expr_variables = std::move(expr_variables);
-  this->expr_constants = std::move(expr_constants);
+  this->control_variables = std::move(expr_variables);
+  this->control_constants = std::move(expr_constants);
 }
 
 ConditionalExpression* WhileEntity::GetCondExpr() {
@@ -54,11 +54,11 @@ ConditionalExpression* WhileEntity::GetCondExpr() {
 }
 
 vector<Variable*> WhileEntity::GetExpressionVariables() {
-  return expr_variables;
+  return control_variables;
 }
 
 vector<ConstantValue*> WhileEntity::GetExpressionConstants() {
-  return expr_constants;
+  return control_constants;
 }
 
 AssignEntity::AssignEntity(Variable* var,
