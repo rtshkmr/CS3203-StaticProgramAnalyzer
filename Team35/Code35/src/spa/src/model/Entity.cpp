@@ -10,7 +10,7 @@ void Container::AddStatement(Statement* stmt) {
 }
 
 std::list<Statement*>* Container::GetStatementList() {
-  return & statement_list_;
+  return &statement_list_;
 }
 
 Procedure::Procedure(ProcedureName* pName) {
@@ -27,6 +27,18 @@ Variable::Variable(VariableName* vName) {
 
 const VariableName* Variable::GetName() {
   return variable_name_;
+}
+
+/**
+* This function contains the algorithm to sort a vector<Variable*>.
+* @param var_list The vector<Variable*> to be sorted.
+* @return The vector<Variable*> after sorting.
+*/
+std::vector<Variable*> Variable::SortVariableVector(std::vector<Variable*> var_list) {
+  std::vector<Variable*> var_list_copy = var_list;
+  std::sort(var_list_copy.begin(), var_list_copy.end(),
+            [](Variable* a, Variable* b) { return *a->GetName() < *b->GetName(); });
+  return var_list_copy;
 }
 
 Program::Program(Procedure* p) {
