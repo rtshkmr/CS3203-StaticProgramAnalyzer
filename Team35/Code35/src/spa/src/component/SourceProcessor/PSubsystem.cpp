@@ -99,15 +99,16 @@ void PSubsystem::HandleCloseBrace() {
 
       Block* block_end_else = new Block();
       block_stack_.top()->next_block_.insert(block_end_else);
-      block_stack_.pop();
+      block_stack_.pop(); //pop the else block
       block_stack_.top()->next_block_.insert(block_end_else);
-      block_stack_.pop();
+      block_stack_.pop(); //pop the if_stmt block
+      block_stack_.pop(); //pop the if_cond block
       block_stack_.push(block_end_else);
     } else if (current_node_type_ == NodeType::kWhile) {
-      block_stack_.pop();
+      block_stack_.pop(); // pop the while_stmt block --> assume that while_stmt is 1 block only
       Block* block_end_while = new Block();
-      block_stack_.top()->next_block_.insert(block_end_while); //cond block
-      block_stack_.pop();
+      block_stack_.top()->next_block_.insert(block_end_while);
+      block_stack_.pop(); //pop the while_cond block
       block_stack_.push(block_end_while);
     }
 
@@ -216,12 +217,14 @@ void PSubsystem::HandleIfStmt(Entity* entity) {
   current_node_type_ = NodeType::kIf;
   current_node_ = if_entity;
 
+  // remove the stmtNumber from previous block and add it to the cond block
   int num = if_entity->GetStatementNumber()->GetNum();
   block_stack_.top()->stmtNoList.erase(StatementNumber(num));
   Block* block_if_cond = new Block();
   block_if_cond->stmtNoList.insert(StatementNumber(num));
 
   block_stack_.top()->next_block_.insert(block_if_cond);
+  block_stack_.pop(); // throw away the previous block before cond.
 
   Block* block_if_stmt = new Block();
   block_if_cond->next_block_.insert(block_if_stmt);
@@ -251,7 +254,7 @@ void PSubsystem::HandleElseStmt(Entity* entity) {
   current_node_ = if_entity;
 
   Block* block_if_stmt = block_stack_.top();
-  block_stack_.pop();
+  block_stack_.pop(); //pop so that the if_cond can perform next_block map to else block
   Block* block_else = new Block();
   block_stack_.top()->next_block_.insert(block_else);
   block_stack_.push(block_if_stmt);
@@ -267,15 +270,18 @@ void PSubsystem::HandleWhileStmt(Entity* entity) {
   current_node_ = while_entity;
 
 
-  //get this statement number
+  // remove the stmtNumber from previous block and add it to the cond block
   int num = while_entity->GetStatementNumber()->GetNum();
   block_stack_.top()->stmtNoList.erase(StatementNumber(num));
   Block* block_while_cond = new Block();
   block_while_cond->stmtNoList.insert(StatementNumber(num));
-  Block* block_while_stmt = new Block();
+
   block_stack_.top()->next_block_.insert(block_while_cond);
+  block_stack_.pop(); // throw away the previous block before cond.
+
+  Block* block_while_stmt = new Block();
   block_while_cond->next_block_.insert(block_while_stmt);
-  block_while_stmt->next_block_.insert(block_while_cond);
+  block_while_stmt->next_block_.insert(block_while_cond); // extra linkback is assuming only 1 level of nest
   block_stack_.push(block_while_cond);
   block_stack_.push(block_while_stmt);
 
