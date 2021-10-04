@@ -6,6 +6,7 @@
 
 #include <list>
 #include <datatype/DataType.h>
+#include <set>
 
 enum class EntityEnum {
   kNone = 0,
@@ -90,10 +91,13 @@ class Procedure : public Entity, public Container {
 class Variable : public Entity {
  private:
   const VariableName* variable_name_;
+  std::vector<std::set<Entity*>> var_to_entity = { {}, {}, {}, {}, {}, {}, {} }; //Remap procedure (8) to 0
  public:
   Variable(VariableName* variableName);
 
   const VariableName* GetName();
+
+  void AddEntity(Entity* entity);
 
   static std::vector<Variable*> SortVariableVector(std::vector<Variable*> var_list);
 };

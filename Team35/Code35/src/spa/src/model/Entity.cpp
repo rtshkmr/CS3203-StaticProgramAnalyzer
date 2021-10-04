@@ -35,6 +35,12 @@ const VariableName* Variable::GetName() {
   return variable_name_;
 }
 
+void Variable::AddEntity(Entity* entity) {
+  EntityEnum ent = entity->getEntityEnum();
+  int lot = (static_cast<int>(ent) == 8) ? 0 : static_cast<int>(ent); //remap procedure (8) to (0)
+  var_to_entity.at(lot).insert(entity);
+}
+
 /**
 * This function contains the algorithm to sort a vector<Variable*>.
 * @param var_list The vector<Variable*> to be sorted.
