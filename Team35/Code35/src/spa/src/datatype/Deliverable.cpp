@@ -239,6 +239,32 @@ void Deliverable::AddModifiesRelationship(Container* container, std::list<Variab
   }
 }
 
+void Deliverable::AddCallsRelationship(Procedure* p1, Procedure* p2) {
+  if (calls_hash.count(p1)) {
+    std::list<Procedure*>* calls_proc = calls_hash.find(p1)->second;
+    if (std::find(calls_proc->begin(), calls_proc->end(), p2) == calls_proc->end()) {
+      // add procedure p2 if it does not exist in calls_proc
+      calls_proc->push_back(p2);
+    }
+  } else {
+    std::list<Procedure*>* lst = new std::list<Procedure*>();
+    lst->push_back(p2);
+    calls_hash.insert(make_pair(p1, lst));
+  }
+
+  if (calls_by_hash.count(p2)) {
+    std::list<Procedure*>* call_by_proc = calls_by_hash.find(p2)->second;
+    if (std::find(call_by_proc->begin(), call_by_proc->end(), p1) == call_by_proc->end()) {
+      // add procedure p1 if it does not exist in call_by_proc
+      call_by_proc->push_back(p1);
+    }
+  } else {
+    std::list<Procedure*>* lst = new std::list<Procedure*>();
+    lst->push_back(p1);
+    calls_by_hash.insert(make_pair(p2, lst));
+  }
+}
+
 void Deliverable::SetProgram(Program* program) {
   this->program_ = program;
 }
