@@ -61,7 +61,7 @@ class PSubsystem {
   void HandlePrintStmt(Entity* entity);
 
   void CheckForIfElseValidity();
-  void CheckForProcedureExisting();
+  void CheckForExistingProcedure();
 
  public:
   PSubsystem() = default;

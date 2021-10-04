@@ -63,8 +63,8 @@ void PSubsystem::ProcessStatement(std::string statement) {
   //From here onwards, Entity must be a Statement type;
   if (Statement* stmt = dynamic_cast<Statement*>(entityObj)) {
     SetStatementObject(stmt);
-    HandleStatement statement = statement_pointer_[static_cast<int>(entityObj->getEntityEnum())];
-    (this->*statement)(entityObj);
+    HandleStatement f_ptr = statement_pointer_[static_cast<int>(entityObj->getEntityEnum())];
+    (this->*f_ptr)(entityObj);
   } else {
     throw SyntaxException("Expected a Statement but was given a procedure declaration.");
   }
@@ -287,7 +287,7 @@ void PSubsystem::CheckForIfElseValidity() {
   }
 }
 
-void PSubsystem::CheckForProcedureExisting() {
+void PSubsystem::CheckForExistingProcedure() {
   // Check if Program.procList === Deliverables.procList
   // assumption: EntityFactory will create into Deliverables.procList whenever encountered
   //             Program.procList will be created when "procedure x {" is encountered.
@@ -311,7 +311,7 @@ void PSubsystem::CheckForProcedureExisting() {
 
 Deliverable* PSubsystem::GetDeliverables() {
   CheckForIfElseValidity(); //TODO: to put it within main handling if possible.
-  CheckForProcedureExisting();
+  CheckForExistingProcedure();
 
   valid_state = false; //to prevent further processsing.
   return deliverable_;
