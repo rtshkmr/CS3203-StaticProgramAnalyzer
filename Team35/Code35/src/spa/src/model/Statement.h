@@ -23,12 +23,13 @@ class ElseEntity;
  *   -  A list of Statement to execute when the above condition is true, which is defined in the inherited Container
  *   abstract class.
  *   -  An ElseEntity object which contains the statements to execute if the conditional expression evaluates to false.
+ *   - control variables and constants
  */
 class IfEntity : public Statement, public Container {
  private:
   ConditionalExpression* cond_expr_;
-  std::vector<Variable*> expr_variables;
-  std::vector<ConstantValue*> expr_constants;
+  std::vector<Variable*> control_variables;
+  std::vector<ConstantValue*> control_constants;
   ElseEntity* else_entity_ = nullptr; //TODO: check if keeping ELSE as object or merge ELSE object into IF object
 
  public:
@@ -63,12 +64,13 @@ class ElseEntity : public Statement, public Container {
  *   -  ConditionalExpression which is the conditional expression for the if-statement.
  *   -  A list of Statement to execute when the above condition is true, which is defined in the inherited Container
  *   abstract class.
+ *   - control variables and constants
  */
 class WhileEntity : public Statement, public Container {
  private:
   ConditionalExpression* cond_expr_;
-  std::vector<Variable*> expr_variables;
-  std::vector<ConstantValue*> expr_constants;
+  std::vector<Variable*> control_variables;
+  std::vector<ConstantValue*> control_constants;
  public:
   WhileEntity(std::string condition, std::vector<Variable*> expr_variables, std::vector<ConstantValue*> expr_constants);
 
