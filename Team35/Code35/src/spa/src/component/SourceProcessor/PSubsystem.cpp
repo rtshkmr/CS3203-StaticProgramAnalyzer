@@ -88,6 +88,8 @@ void PSubsystem::HandleCloseBrace() {
     current_node_type_ = NodeType::kNone;
     current_node_ = nullptr;
     current_procedure_ = nullptr;
+    block_stack_.pop();
+    assert(block_stack_.empty());
   } else {
     Container* current_nest = parent_stack_.top();
     parent_stack_.pop();
