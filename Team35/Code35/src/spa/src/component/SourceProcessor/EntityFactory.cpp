@@ -26,8 +26,7 @@ Entity* EntityFactory::CreateEntities(vector<Token> tokens) {
     case TokenTag::kProcedureKeyword: {
       assert(tokens[1].GetTokenTag() == TokenTag::kName);
       std::string proc_token_string = tokens[1].GetTokenString();
-      // TODO iter2: need to check if proc was already created and defined (issue #27)
-      return CreateProcedure(proc_token_string);
+      return RetrieveProcedure(proc_token_string);
     }
     case TokenTag::kReadKeyword: {
       assert(tokens[1].GetTokenTag() == TokenTag::kName);

@@ -1,6 +1,5 @@
 #include <util/Logger.h>
 #include <exception/SyntaxException.h>
-#include <exception/IterationOneException.h>
 #include "SourceProcessor.h"
 #include "Parser.h"
 #include "DesignExtractor.h"
@@ -31,11 +30,6 @@ PKB* SourceProcessor::ProcessSourceFile(std::string file_name) {
     std::cerr << "Syntax Error\n";
     std::cerr << s.what() << std::endl;
     Terminate(std::string("Unfortunately, there was a syntax error in the input SIMPLE Program:("));
-  } catch (IterationOneException s) {
-    std::cerr << "Syntax Error (due to Iteration 1 requirement)\n";
-    std::cerr << s.what() << std::endl;
-    L("[EXIT] SOURCE PROC");
-    Terminate(std::string("Unfortunately, the Source input had something that isn't supported for SPA Iteration 1"));
   } catch (std::exception e) {
     std::cerr << "Exception error\n";
     std::cerr << e.what() << std::endl;
