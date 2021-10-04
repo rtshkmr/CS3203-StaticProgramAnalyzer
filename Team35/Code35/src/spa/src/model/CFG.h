@@ -13,6 +13,7 @@ class Block {
   std::set<StatementNumber> stmtNoList = {};
   int start;
   int end;
+  bool isWhile = false;
   std::set<Block*> next_block_ = {};
 
   Block() {};

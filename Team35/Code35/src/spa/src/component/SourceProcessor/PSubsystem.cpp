@@ -105,7 +105,10 @@ void PSubsystem::HandleCloseBrace() {
       block_stack_.pop(); //pop the if_cond block
       block_stack_.push(block_end_else);
     } else if (current_node_type_ == NodeType::kWhile) {
-      block_stack_.pop(); // pop the while_stmt block --> assume that while_stmt is 1 block only
+      Block* lastStmt = block_stack_.top();
+      block_stack_.pop(); // link the last stmt to the while_cond block, and pop it.
+      lastStmt->next_block_.insert(block_stack_.top());
+
       Block* block_end_while = new Block();
       block_stack_.top()->next_block_.insert(block_end_while);
       block_stack_.pop(); //pop the while_cond block
@@ -224,7 +227,8 @@ void PSubsystem::HandleIfStmt(Entity* entity) {
   block_if_cond->stmtNoList.insert(StatementNumber(num));
 
   block_stack_.top()->next_block_.insert(block_if_cond);
-  block_stack_.pop(); // throw away the previous block before cond.
+  if (!block_stack_.top()->isWhile)
+    block_stack_.pop(); // pop the previous progline if it isnt while (no loopback to care)
 
   Block* block_if_stmt = new Block();
   block_if_cond->next_block_.insert(block_if_stmt);
@@ -275,13 +279,14 @@ void PSubsystem::HandleWhileStmt(Entity* entity) {
   block_stack_.top()->stmtNoList.erase(StatementNumber(num));
   Block* block_while_cond = new Block();
   block_while_cond->stmtNoList.insert(StatementNumber(num));
+  block_while_cond->isWhile = true;
 
   block_stack_.top()->next_block_.insert(block_while_cond);
-  block_stack_.pop(); // throw away the previous block before cond.
+  if (!block_stack_.top()->isWhile)
+    block_stack_.pop(); // pop the previous progline if it isnt while (no loopback to care)
 
   Block* block_while_stmt = new Block();
   block_while_cond->next_block_.insert(block_while_stmt);
-  block_while_stmt->next_block_.insert(block_while_cond); // extra linkback is assuming only 1 level of nest
   block_stack_.push(block_while_cond);
   block_stack_.push(block_while_stmt);
 
