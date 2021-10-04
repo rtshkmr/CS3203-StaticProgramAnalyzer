@@ -5,6 +5,10 @@
 #include <list>
 #include "Entity.h"
 
+EntityEnum Entity::getEntityEnum() {
+  return type;
+}
+
 void Container::AddStatement(Statement* stmt) {
   statement_list_.push_back(stmt);
 }
@@ -14,6 +18,7 @@ std::list<Statement*>* Container::GetStatementList() {
 }
 
 Procedure::Procedure(ProcedureName* pName) {
+  type = EntityEnum::kProcedureEntity;
   procedure_name_ = pName;
 }
 
@@ -22,6 +27,7 @@ const ProcedureName* Procedure::GetName() {
 }
 
 Variable::Variable(VariableName* vName) {
+  type = EntityEnum::kNone;
   variable_name_ = vName;
 }
 

@@ -49,12 +49,11 @@ void PSubsystem::ProcessStatement(std::string statement) {
     return HandleCloseBrace(); // Close Brace can early return without creating entity.
   }
 
-  EntityEnum ent = EntityEnum::kNone;
-  Entity* entityObj = entity_factory_.CreateEntities(tokens, ent);
+  Entity* entityObj = entity_factory_.CreateEntities(tokens);
 
   if (current_node_type_ == NodeType::kNone) { //when current_node_ is null. Only happens when not reading within a procedure.
     if (Procedure* procedure = dynamic_cast<Procedure*>(entityObj)) {
-      assert(ent == EntityEnum::kProcedureEntity && current_procedure_ == nullptr && current_node_ == nullptr && follow_stack_.empty() && parent_stack_.empty());
+      assert(entityObj->getEntityEnum() == EntityEnum::kProcedureEntity && current_procedure_ == nullptr && current_node_ == nullptr && follow_stack_.empty() && parent_stack_.empty());
       return PerformNewProcedureSteps(procedure);
     } else {
       throw SyntaxException("Expected a procedure entity at this location but was given another type.");
@@ -64,7 +63,7 @@ void PSubsystem::ProcessStatement(std::string statement) {
   //From here onwards, Entity must be a Statement type;
   if (Statement* stmt = dynamic_cast<Statement*>(entityObj)) {
     SetStatementObject(stmt);
-    HandleStatement statement = statement_pointer_[static_cast<int>(ent)];
+    HandleStatement statement = statement_pointer_[static_cast<int>(entityObj->getEntityEnum())];
     (this->*statement)(entityObj);
   } else {
     throw SyntaxException("Expected a Statement but was given a procedure declaration.");
