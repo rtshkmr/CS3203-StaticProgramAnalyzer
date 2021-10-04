@@ -37,7 +37,7 @@ const VariableName* Variable::GetName() {
 
 void Variable::AddEntity(Entity* entity) {
   EntityEnum ent = entity->getEntityEnum();
-  int lot = (static_cast<int>(ent) == 8) ? 0 : static_cast<int>(ent); //remap procedure (8) to (0)
+  int lot = (ent == EntityEnum::kProcedureEntity) ? 0 : static_cast<int>(ent); //remap procedure to (0)
   var_to_entity.at(lot).insert(entity);
 }
 
