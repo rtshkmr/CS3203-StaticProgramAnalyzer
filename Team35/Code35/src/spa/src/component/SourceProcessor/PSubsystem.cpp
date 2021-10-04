@@ -54,8 +54,8 @@ void PSubsystem::ProcessStatement(std::string statement) {
 
   if (current_node_type_ == NodeType::kNone) { //when current_node_ is null. Only happens when not reading within a procedure.
     if (Procedure* procedure = dynamic_cast<Procedure*>(entityObj)) {
-      return PerformNewProcedureSteps(procedure);
       assert(ent == EntityEnum::kProcedureEntity && current_procedure_ == nullptr && current_node_ == nullptr && follow_stack_.empty() && parent_stack_.empty());
+      return PerformNewProcedureSteps(procedure);
     } else {
       throw SyntaxException("Expected a procedure entity at this location but was given another type.");
     }
@@ -67,7 +67,7 @@ void PSubsystem::ProcessStatement(std::string statement) {
     HandleStatement statement = statement_pointer_[static_cast<int>(ent)];
     (this->*statement)(entityObj);
   } else {
-    throw std::invalid_argument("[ERROR] current_node_ is not null and Entity is not a Statement type.");
+    throw SyntaxException("Expected a Statement but was given a procedure declaration.");
   }
 //  LOG (spa_logger << "\n\n\n==========================  [EXIT] ProcessStatement ======================\n\n\n");
 }
@@ -187,7 +187,7 @@ void PSubsystem::SetStatementObject(Statement* statement) {
 }
 
 void PSubsystem::HandleError(Entity* entity) {
-  throw std::invalid_argument("invalid blehhhh");
+  throw SyntaxException("Statement is not cast into objects. Check EntityFactory::CreateEntities");
 }
 
 void PSubsystem::HandleIfStmt(Entity* entity) {
