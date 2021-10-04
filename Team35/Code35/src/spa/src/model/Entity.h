@@ -6,6 +6,8 @@
 
 #include <list>
 #include <datatype/DataType.h>
+#include <set>
+#include "CFG.h"
 
 enum class EntityEnum {
   kNone = 0,
@@ -78,10 +80,15 @@ class Container {
 class Procedure : public Entity, public Container {
  private:
   const ProcedureName* procedure_name_;
+  const Block* block_root_ = nullptr;
  public:
   Procedure(ProcedureName* procedureName);
 
   const ProcedureName* GetName();
+
+  const void SetBlockRoot(Block* block);
+
+  const Block* GetBlockRoot();
 };
 
 /**

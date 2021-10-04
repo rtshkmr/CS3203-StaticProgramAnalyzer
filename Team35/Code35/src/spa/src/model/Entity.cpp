@@ -26,6 +26,14 @@ const ProcedureName* Procedure::GetName() {
   return procedure_name_;
 }
 
+const void Procedure::SetBlockRoot(Block* block) {
+  this->block_root_ = block;
+}
+
+const Block* Procedure::GetBlockRoot() {
+  return this->block_root_;
+}
+
 Variable::Variable(VariableName* vName) {
   type = EntityEnum::kNone;
   variable_name_ = vName;

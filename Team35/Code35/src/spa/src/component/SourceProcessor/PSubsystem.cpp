@@ -15,6 +15,7 @@ void PSubsystem::InitDataStructures() {
   current_node_type_ = NodeType::kNone;
   parent_stack_ = std::stack<Container*>();
   follow_stack_ = std::stack<Statement*>();
+  block_stack_ = std::stack<Block*>();
   program_counter_ = 0;
 
   deliverable_ = new Deliverable(); //created in heap so that can pass this object to PKB
@@ -53,7 +54,8 @@ void PSubsystem::ProcessStatement(std::string statement) {
 
   if (current_node_type_ == NodeType::kNone) { //when current_node_ is null. Only happens when not reading within a procedure.
     if (Procedure* procedure = dynamic_cast<Procedure*>(entityObj)) {
-      assert(entityObj->getEntityEnum() == EntityEnum::kProcedureEntity && current_procedure_ == nullptr && current_node_ == nullptr && follow_stack_.empty() && parent_stack_.empty());
+      assert(entityObj->getEntityEnum() == EntityEnum::kProcedureEntity && current_procedure_ == nullptr
+          && current_node_ == nullptr && follow_stack_.empty() && parent_stack_.empty() && block_stack_.empty());
       return PerformNewProcedureSteps(procedure);
     } else {
       throw SyntaxException("Expected a procedure entity at this location but was given another type.");
@@ -94,6 +96,19 @@ void PSubsystem::HandleCloseBrace() {
       current_nest = parent_stack_.top();
       parent_stack_.pop();
       follow_stack_.pop();
+
+      Block* block_end_else = new Block();
+      block_stack_.top()->next_block_.insert(block_end_else);
+      block_stack_.pop();
+      block_stack_.top()->next_block_.insert(block_end_else);
+      block_stack_.pop();
+      block_stack_.push(block_end_else);
+    } else if (current_node_type_ == NodeType::kWhile) {
+      block_stack_.pop();
+      Block* block_end_while = new Block();
+      block_stack_.top()->next_block_.insert(block_end_while); //cond block
+      block_stack_.pop();
+      block_stack_.push(block_end_while);
     }
 
     current_node_ = dynamic_cast<Statement*>(current_nest)->GetParentNode();
@@ -127,6 +142,9 @@ void PSubsystem::PerformNewProcedureSteps(Procedure* procedure) {
   current_procedure_ = procedure;
   current_node_ = procedure;
   current_node_type_ = NodeType::kProcedure;
+  Block* block_root = new Block();
+  block_stack_.push(block_root);
+  procedure->SetBlockRoot(block_root);
 
   if (deliverable_->GetProgram() == nullptr) {
     Program* program = new Program(procedure);
@@ -151,6 +169,7 @@ void PSubsystem::SetStatementObject(Statement* statement) {
   StatementNumber* statement_number = new StatementNumber(program_counter_);
   statement->SetStatementNumber(statement_number);
   deliverable_->AddStatement(statement);
+  block_stack_.top()->stmtNoList.insert(StatementNumber(program_counter_));
 
   bool new_else = false;
   //to check if adding stmt to Else block
@@ -197,6 +216,18 @@ void PSubsystem::HandleIfStmt(Entity* entity) {
   current_node_type_ = NodeType::kIf;
   current_node_ = if_entity;
 
+  int num = if_entity->GetStatementNumber()->GetNum();
+  block_stack_.top()->stmtNoList.erase(StatementNumber(num));
+  Block* block_if_cond = new Block();
+  block_if_cond->stmtNoList.insert(StatementNumber(num));
+
+  block_stack_.top()->next_block_.insert(block_if_cond);
+
+  Block* block_if_stmt = new Block();
+  block_if_cond->next_block_.insert(block_if_stmt);
+  block_stack_.push(block_if_cond);
+  block_stack_.push(block_if_stmt);
+
   for (Variable* v: if_entity->GetExpressionVariables()) {
     deliverable_->AddUsesRelationship(current_procedure_, v); //procedure level
     if (current_procedure_ != current_node_)
@@ -218,6 +249,13 @@ void PSubsystem::HandleElseStmt(Entity* entity) {
   if_entity->SetElseEntity(else_entity);
   current_node_type_ = NodeType::kElse;
   current_node_ = if_entity;
+
+  Block* block_if_stmt = block_stack_.top();
+  block_stack_.pop();
+  Block* block_else = new Block();
+  block_stack_.top()->next_block_.insert(block_else);
+  block_stack_.push(block_if_stmt);
+  block_stack_.push(block_else);
 }
 
 void PSubsystem::HandleWhileStmt(Entity* entity) {
@@ -227,6 +265,19 @@ void PSubsystem::HandleWhileStmt(Entity* entity) {
   parent_stack_.push(while_entity);
   current_node_type_ = NodeType::kWhile;
   current_node_ = while_entity;
+
+
+  //get this statement number
+  int num = while_entity->GetStatementNumber()->GetNum();
+  block_stack_.top()->stmtNoList.erase(StatementNumber(num));
+  Block* block_while_cond = new Block();
+  block_while_cond->stmtNoList.insert(StatementNumber(num));
+  Block* block_while_stmt = new Block();
+  block_stack_.top()->next_block_.insert(block_while_cond);
+  block_while_cond->next_block_.insert(block_while_stmt);
+  block_while_stmt->next_block_.insert(block_while_cond);
+  block_stack_.push(block_while_cond);
+  block_stack_.push(block_while_stmt);
 
   for (Variable* v: while_entity->GetExpressionVariables()) {
     deliverable_->AddUsesRelationship(current_procedure_, v); //procedure level

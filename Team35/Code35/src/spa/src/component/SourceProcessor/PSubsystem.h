@@ -4,6 +4,7 @@
 #include <string>
 #include <stack>
 #include <datatype/Deliverable.h>
+#include <model/CFG.h>
 #include "SyntaxValidator.h"
 #include "EntityFactory.h"
 
@@ -45,6 +46,7 @@ class PSubsystem {
   NodeType current_node_type_ = NodeType::kNone; // -1 => no current node; 0 = procedure; 1 = while; 2 = if; 3 = else;
   std::stack<Container*> parent_stack_;
   std::stack<Statement*> follow_stack_;
+  std::stack<Block*> block_stack_;
   int program_counter_ = 0;
 
   // private methods for selfcall
