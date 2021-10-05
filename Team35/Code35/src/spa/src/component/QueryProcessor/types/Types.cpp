@@ -73,4 +73,8 @@ bool Group::ContainsTargetSynonym() {
   return has_target_synonym;
 }
 
+std::vector<Synonym> Group::GetTargetSynonyms() {
+  return target_synonyms;
+}
+
 

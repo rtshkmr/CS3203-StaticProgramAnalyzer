@@ -135,14 +135,18 @@ struct Pattern : Clause {
 
 class Group {
  private:
+  std::vector<Synonym> target_synonyms;
   std::vector<Clause*> clauses;
   bool has_target_synonym;
  public:
   Group(std::vector<Clause*> clauses, bool has_target_synonym) :
       has_target_synonym(has_target_synonym), clauses(clauses) {};
+  Group(std::vector<Clause*> clauses, bool has_target_synonym, std::vector<Synonym> target_synonyms) :
+  has_target_synonym(has_target_synonym), clauses(clauses), target_synonyms(target_synonyms) {};
   bool AddClauseToVector(Clause* clause);
   std::vector<Clause*> GetClauses();
   bool ContainsTargetSynonym();
+  std::vector<Synonym> GetTargetSynonyms();
 };
 
 #endif //AUTOTESTER_TYPES_H
