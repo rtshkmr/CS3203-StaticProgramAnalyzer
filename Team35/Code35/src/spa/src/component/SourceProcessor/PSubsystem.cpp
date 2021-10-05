@@ -142,8 +142,7 @@ void PSubsystem::HandleCloseBrace() {
       }
     }
   }
-  return;
-}
+  }
 
 void PSubsystem::PerformNewProcedureSteps(Procedure* procedure) {
   current_procedure_ = procedure;
@@ -307,7 +306,7 @@ void PSubsystem::CreateBodyBlock() {
   block_stack_.push(block_else);
 }
 
-void PSubsystem::AddControlVariableRelationships(std::vector<Variable*> control_variables) {
+void PSubsystem::AddControlVariableRelationships(const std::vector<Variable*>& control_variables) {
   for (Variable* v: control_variables) {
     deliverable_->AddUsesRelationship(current_procedure_, v); //procedure level
     if (current_procedure_ != current_node_)

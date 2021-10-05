@@ -65,7 +65,7 @@ class PSubsystem {
   Block* CreateConditionalBlock(Statement* conditional_statement);
   void CreateBodyBlock(Block* conditional_block);
   void CreateBodyBlock();
-  void AddControlVariableRelationships(std::vector<Variable*> control_variables);
+  void AddControlVariableRelationships(const std::vector<Variable*>& control_variables);
   void CheckForIfElseValidity();
   void CheckForExistingProcedure();
 
