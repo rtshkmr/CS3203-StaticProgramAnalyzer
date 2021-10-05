@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <datatype/DataType.h>
+//#include <component/QueryProcessor/types/QueryEvaluatorTable.h>
 #include <typeinfo>
 
 enum class DesignEntity {
@@ -42,10 +43,23 @@ enum class RelRef {
 
 RelRef GetRelRef(std::string reference);
 
+enum class Attribute {
+  kStmtNumber,
+  kProcName,
+  kVarName,
+  kValue
+};
+
+struct QueryInfo {
+  bool all_boolean_true;
+  // std::vector<*QueryEvaluatorTable> table_list;
+};
+
 class Synonym {
  private:
   std::string name;
   DesignEntity type;
+  // Attribute return_attribute;
  public:
   Synonym() {};
   Synonym(std::string name, DesignEntity type) : name(name), type(type) {};
