@@ -32,6 +32,15 @@ inline ConstantValue* const_3_ = new ConstantValue("3");
 inline Procedure* GetProc1() {
   return new Procedure(new ProcedureName("proc1"));
 }
+inline Procedure* GetProc2() {
+  return new Procedure(new ProcedureName("proc2"));
+}
+inline Procedure* GetProc3() {
+  return new Procedure(new ProcedureName("proc3"));
+}
+inline Procedure* GetProc4() {
+  return new Procedure(new ProcedureName("proc4"));
+}
 
 // read
 inline ReadEntity* GetReadX() {
