@@ -94,7 +94,6 @@ static RelRef GetRelRef(std::string reference) {
   } else if (reference == "Affects*") {
     return RelRef::kAffectsT;
   }
-  // TODO: Throw an error if this line is reached.
   return RelRef::kInvalid;
 }
 
