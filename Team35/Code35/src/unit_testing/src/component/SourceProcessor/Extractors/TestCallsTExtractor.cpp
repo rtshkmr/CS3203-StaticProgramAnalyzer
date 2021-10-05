@@ -2,6 +2,7 @@
 #include "catch.hpp"
 #include "component/SourceProcessor/Extractors/CallsTExtractor.h"
 #include "../../../../utils/EntityUtils.h"
+#include "../../../../utils/TestUtils.h"
 
 using namespace entity_utils;
 
@@ -40,10 +41,10 @@ TEST_CASE("1.CallsTExtractor.Extract CallsT positive tests") {
     std::list<Procedure*>* actual_proc_list1 = deliverable.calls_T_hash_.find(proc1)->second;
     std::list<Procedure*>* actual_proc_list3 = deliverable.calls_T_hash_.find(proc3)->second;
     std::list<Procedure*> expected_proc_list1 = std::list<Procedure*>{
-      proc2, proc4
+        proc2, proc4
     };
     std::list<Procedure*> expected_proc_list3 = std::list<Procedure*>{
-      proc2, proc4
+        proc2, proc4
     };
 
     CHECK(*actual_proc_list1 == expected_proc_list1);
@@ -53,10 +54,10 @@ TEST_CASE("1.CallsTExtractor.Extract CallsT positive tests") {
 
     // reverse
     std::list<Procedure*> expected_proc_list4 = std::list<Procedure*>{
-      proc1, proc3
+        proc1, proc3
     };
-    CHECK(*deliverable.called_by_T_hash_.find(proc2)->second == expected_proc_list4);
-    CHECK(*deliverable.called_by_T_hash_.find(proc4)->second == expected_proc_list4);
+    CHECK(TestUtils::AreListsEqual(*deliverable.called_by_T_hash_.find(proc2)->second, expected_proc_list4));
+    CHECK(TestUtils::AreListsEqual(*deliverable.called_by_T_hash_.find(proc4)->second, expected_proc_list4));
   }
 
   SECTION("Transitive Calls") {
@@ -88,13 +89,13 @@ TEST_CASE("1.CallsTExtractor.Extract CallsT positive tests") {
     std::list<Procedure*>* actual_proc_list2 = deliverable.calls_T_hash_.find(proc2)->second;
     std::list<Procedure*>* actual_proc_list3 = deliverable.calls_T_hash_.find(proc3)->second;
     std::list<Procedure*> expected_proc_list1 = std::list<Procedure*>{
-      proc4, proc3, proc2
+        proc4, proc3, proc2
     };
     std::list<Procedure*> expected_proc_list2 = std::list<Procedure*>{
-      proc4, proc3
+        proc4, proc3
     };
     std::list<Procedure*> expected_proc_list3 = std::list<Procedure*>{
-      proc4
+        proc4
     };
 
     CHECK(*actual_proc_list1 == expected_proc_list1);
@@ -104,10 +105,10 @@ TEST_CASE("1.CallsTExtractor.Extract CallsT positive tests") {
 
     // reverse
     std::list<Procedure*> expected_proc_list4 = std::list<Procedure*>{
-      proc3, proc2, proc1
+        proc3, proc2, proc1
     };
     std::list<Procedure*> expected_proc_list5 = std::list<Procedure*>{
-      proc2, proc1
+        proc2, proc1
     };
     CHECK(deliverable.called_by_T_hash_.count(proc1) == 0);
     CHECK(*deliverable.called_by_T_hash_.find(proc2)->second == std::list<Procedure*>{proc1});
