@@ -224,7 +224,7 @@ void PSubsystem::HandleIfStmt(Entity* entity) {
 
   Block* block_if_cond = nullptr;
   // remove the stmtNumber from previous block and add it to the cond block if size > 1
-  if (block_stack_.top()->StmtListSize() > 1) {
+  if (block_stack_.top()->size() > 1) {
     int num = if_entity->GetStatementNumber()->GetNum();
     block_stack_.top()->RemoveStmt(StatementNumber(num));
     block_if_cond = new Block();
@@ -281,7 +281,7 @@ void PSubsystem::HandleWhileStmt(Entity* entity) {
 
   Block* block_while_cond = nullptr;
   // remove the stmtNumber from previous block and add it to the cond block if size > 1
-  if (block_stack_.top()->StmtListSize() > 1) {
+  if (block_stack_.top()->size() > 1) {
     int num = while_entity->GetStatementNumber()->GetNum();
     block_stack_.top()->RemoveStmt(StatementNumber(num));
     block_while_cond = new Block();

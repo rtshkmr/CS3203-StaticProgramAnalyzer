@@ -10,10 +10,9 @@
 
 class Block {
  private:
-  std::set<StatementNumber> stmtNoList = {};
+  int start = -1;
+  int end = -1;
  public:
-  int start;
-  int end;
   bool isWhile = false;
   std::set<Block*> next_block_ = {};
 
@@ -21,7 +20,8 @@ class Block {
 
   void AddStmt(StatementNumber);
   void RemoveStmt(StatementNumber);
-  int StmtListSize();
+  bool find(StatementNumber);
+  int size();
 };
 
 #endif //AUTOTESTER_SRC_SPA_SRC_MODEL_CFG_H_
