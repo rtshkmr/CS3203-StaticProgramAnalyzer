@@ -32,7 +32,7 @@ void PSubsystem::InitDataStructures() {
  * @throws IterationOneException throws when Call statement was called
  * @throws IterationOneException throws when more than one procedure is processed.
  */
-void PSubsystem::ProcessStatement(std::string statement) {
+void PSubsystem::ProcessStatement(const std::string& statement) {
 //  LOG (spa_logger << "\n\n\n==========================  [ENTER] ProcessStatement ======================\n\n\n");
   if (!valid_state) {
     throw SyntaxException("Unable to process statement due to an earlier syntax error found, or closed");
@@ -222,9 +222,10 @@ void PSubsystem::HandleIfStmt(Entity* entity) {
   parent_stack_.push(if_entity);
   current_node_type_ = NodeType::kIf;
   current_node_ = if_entity;
-  Block* block_if_cond = CreateConditionalBlock(entity, NodeType::kIf);
+  Statement* conditional_statement = dynamic_cast<Statement*>(entity);
+  Block* block_if_cond = CreateConditionalBlock(conditional_statement);
   CreateBodyBlock(block_if_cond);
-  AddControlVariableRelationships(NodeType::kIf, entity);
+  AddControlVariableRelationships(if_entity->GetControlVariables());
 }
 
 void PSubsystem::HandleElseStmt(Entity* entity) {
@@ -250,9 +251,11 @@ void PSubsystem::HandleWhileStmt(Entity* entity) {
   current_node_type_ = NodeType::kWhile;
   current_node_ = while_entity;
 
-  Block* block_while_cond = CreateConditionalBlock(entity, NodeType::kWhile);
+  Statement* conditional_statement = dynamic_cast<Statement*>(entity);
+  Block* block_while_cond = CreateConditionalBlock(conditional_statement);
+  block_while_cond->isWhile = true;
   CreateBodyBlock(block_while_cond);
-  AddControlVariableRelationships(NodeType::kWhile, entity);
+  AddControlVariableRelationships(while_entity->GetControlVariables());
 }
 
 /**
@@ -262,24 +265,8 @@ void PSubsystem::HandleWhileStmt(Entity* entity) {
  * @param node_type
  * @return pointer to the newly created conditional block
  */
-Block* PSubsystem::CreateConditionalBlock(Entity* entity, NodeType node_type) {
-  int statement_num;
-  switch (node_type) {
-    case NodeType::kWhile: {
-      statement_num = dynamic_cast<WhileEntity*>(entity)->GetStatementNumber()->GetNum();
-      break;
-    };
-    case NodeType::kIf: {
-      statement_num = dynamic_cast<IfEntity*>(entity)->GetStatementNumber()->GetNum();
-      break;
-    };
-    case NodeType::kNone:
-    case NodeType::kProcedure:
-    case NodeType::kElse: {
-      throw SyntaxException("Wrongly asked to handle a block as a conditional block");
-      // todo: probably better to make this an assert instead of an exception?
-    }
-  }
+Block* PSubsystem::CreateConditionalBlock(Statement* conditional_statement) {
+  int statement_num = conditional_statement->GetStatementNumber()->GetNum();
   // HANDLE THE CONDITION
   Block* conditional_block;
   // remove the stmtNumber from previous block and add it to the cond block if size > 1
@@ -295,7 +282,7 @@ Block* PSubsystem::CreateConditionalBlock(Entity* entity, NodeType node_type) {
   } else {
     conditional_block = block_stack_.top();
   }
-  conditional_block->isWhile = node_type == NodeType::kWhile;
+  return conditional_block;
 }
 
 /**
@@ -312,7 +299,6 @@ void PSubsystem::CreateBodyBlock(Block* conditional_block) {
  *  Overloaded function to create Else block's body
  */
 void PSubsystem::CreateBodyBlock() {
-  // QQ: should this be abstracted away too?
   Block* block_if_body = block_stack_.top();
   block_stack_.pop(); //pop so that the if_cond can perform next_block map to else block
   Block* block_else = new Block();
@@ -321,23 +307,7 @@ void PSubsystem::CreateBodyBlock() {
   block_stack_.push(block_else);
 }
 
-void PSubsystem::AddControlVariableRelationships(NodeType node_type, Entity* entity) {
-  std::vector<Variable*> control_variables;
-  switch (node_type) {
-    case NodeType::kIf: {
-      control_variables = dynamic_cast<IfEntity*>(entity)->GetControlVariables();
-      break;
-    }
-    case NodeType::kWhile:{
-      control_variables = dynamic_cast<WhileEntity*>(entity)->GetControlVariables();
-      break;
-    };
-    case NodeType::kNone:
-    case NodeType::kProcedure:
-    case NodeType::kElse:{
-      throw SyntaxException("Wrongly asked to handle control variables for incorrect block types");
-    };
-  }
+void PSubsystem::AddControlVariableRelationships(std::vector<Variable*> control_variables) {
   for (Variable* v: control_variables) {
     deliverable_->AddUsesRelationship(current_procedure_, v); //procedure level
     if (current_procedure_ != current_node_)

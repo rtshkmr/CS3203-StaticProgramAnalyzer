@@ -62,9 +62,10 @@ class PSubsystem {
   void HandleReadStmt(Entity* entity);
   void HandlePrintStmt(Entity* entity);
   Block* CreateConditionalBlock(Entity* entity, NodeType node_type);
+  Block* CreateConditionalBlock(Statement* conditional_statement);
   void CreateBodyBlock(Block* conditional_block);
   void CreateBodyBlock();
-  void AddControlVariableRelationships(NodeType node_type, Entity* entity);
+  void AddControlVariableRelationships(std::vector<Variable*> control_variables);
   void CheckForIfElseValidity();
   void CheckForExistingProcedure();
 
@@ -73,7 +74,7 @@ class PSubsystem {
 
   void InitDataStructures();
 
-  void ProcessStatement(std::string statement);
+  void ProcessStatement(const std::string& statement);
 
   Deliverable* GetDeliverables();
 };
