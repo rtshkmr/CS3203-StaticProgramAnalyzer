@@ -29,13 +29,13 @@ enum class NodeType {
  * created and added to the AST, relationships are added.
  */
 class PSubsystem {
-  typedef void (PSubsystem::*HandleStatement)(Entity*);
+  typedef void (PSubsystem::*StatementHandler)(Entity*);
 
  private:
-  std::vector<HandleStatement> statement_pointer_ = {&PSubsystem::HandleError, &PSubsystem::HandleIfStmt,
-                                                     &PSubsystem::HandleWhileStmt, &PSubsystem::HandleAssignStmt,
-                                                     &PSubsystem::HandleCallStmt, &PSubsystem::HandlePrintStmt,
-                                                     &PSubsystem::HandleReadStmt, &PSubsystem::HandleElseStmt};
+  std::vector<StatementHandler> statement_handlers_ = {&PSubsystem::HandleError, &PSubsystem::HandleIfStmt,
+                                                       &PSubsystem::HandleWhileStmt, &PSubsystem::HandleAssignStmt,
+                                                       &PSubsystem::HandleCallStmt, &PSubsystem::HandlePrintStmt,
+                                                       &PSubsystem::HandleReadStmt, &PSubsystem::HandleElseStmt};
   Procedure* current_procedure_;
   Deliverable* deliverable_;
   SyntaxValidator syntax_validator_;

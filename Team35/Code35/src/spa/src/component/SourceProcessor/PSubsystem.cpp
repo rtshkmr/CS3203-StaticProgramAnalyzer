@@ -50,7 +50,7 @@ void PSubsystem::ProcessStatement(std::string statement) {
     return HandleCloseBrace(); // Close Brace can early return without creating entity.
   }
 
-  Entity* entityObj = entity_factory_.CreateEntities(tokens);
+  Entity* entityObj = entity_factory_.CreateEntity(tokens);
 
   if (current_node_type_ == NodeType::kNone) { //when current_node_ is null. Only happens when not reading within a procedure.
     if (Procedure* procedure = dynamic_cast<Procedure*>(entityObj)) {
@@ -65,8 +65,8 @@ void PSubsystem::ProcessStatement(std::string statement) {
   //From here onwards, Entity must be a Statement type;
   if (Statement* stmt = dynamic_cast<Statement*>(entityObj)) {
     SetStatementObject(stmt);
-    HandleStatement f_ptr = statement_pointer_[static_cast<int>(entityObj->getEntityEnum())];
-    (this->*f_ptr)(entityObj);
+    StatementHandler handler = statement_handlers_[static_cast<int>(entityObj->getEntityEnum())];
+    (this->*handler)(entityObj);
   } else {
     throw SyntaxException("Expected a Statement but was given a procedure declaration.");
   }
@@ -103,7 +103,7 @@ void PSubsystem::HandleCloseBrace() {
       block_stack_.top()->next_block_.insert(block_end_else);
       block_stack_.pop(); //pop the else block
       block_stack_.top()->next_block_.insert(block_end_else);
-      block_stack_.pop(); //pop the if_stmt block
+      block_stack_.pop(); //pop the if_body block
       block_stack_.pop(); //pop the if_cond block
       block_stack_.push(block_end_else);
     } else if (current_node_type_ == NodeType::kWhile) {
@@ -211,7 +211,7 @@ void PSubsystem::SetStatementObject(Statement* statement) {
 }
 
 void PSubsystem::HandleError(Entity* entity) {
-  throw SyntaxException("Statement is not cast into objects. Check EntityFactory::CreateEntities");
+  throw SyntaxException("Statement is not cast into objects. Check EntityFactory::CreateEntity");
 }
 
 void PSubsystem::HandleIfStmt(Entity* entity) {
@@ -237,11 +237,11 @@ void PSubsystem::HandleIfStmt(Entity* entity) {
     block_if_cond = block_stack_.top();
   }
 
-  Block* block_if_stmt = new Block();
-  block_if_cond->next_block_.insert(block_if_stmt);
-  block_stack_.push(block_if_stmt);
+  Block* block_if_body = new Block();
+  block_if_cond->next_block_.insert(block_if_body);
+  block_stack_.push(block_if_body);
 
-  for (Variable* v: if_entity->GetExpressionVariables()) {
+  for (Variable* v: if_entity->GetControlVariables()) {
     deliverable_->AddUsesRelationship(current_procedure_, v); //procedure level
     if (current_procedure_ != current_node_)
       deliverable_->AddUsesRelationship(current_node_, v);   //container level which is this if-entity
@@ -263,11 +263,11 @@ void PSubsystem::HandleElseStmt(Entity* entity) {
   current_node_type_ = NodeType::kElse;
   current_node_ = if_entity;
 
-  Block* block_if_stmt = block_stack_.top();
+  Block* block_if_body = block_stack_.top();
   block_stack_.pop(); //pop so that the if_cond can perform next_block map to else block
   Block* block_else = new Block();
   block_stack_.top()->next_block_.insert(block_else);
-  block_stack_.push(block_if_stmt);
+  block_stack_.push(block_if_body);
   block_stack_.push(block_else);
 }
 
@@ -295,11 +295,11 @@ void PSubsystem::HandleWhileStmt(Entity* entity) {
   }
 
   block_while_cond->isWhile = true;
-  Block* block_while_stmt = new Block();
-  block_while_cond->next_block_.insert(block_while_stmt);
-  block_stack_.push(block_while_stmt);
+  Block* block_while_body = new Block();
+  block_while_cond->next_block_.insert(block_while_body);
+  block_stack_.push(block_while_body);
 
-  for (Variable* v: while_entity->GetExpressionVariables()) {
+  for (Variable* v: while_entity->GetControlVariables()) {
     deliverable_->AddUsesRelationship(current_procedure_, v); //procedure level
     if (current_procedure_ != current_node_)
       deliverable_->AddUsesRelationship(current_node_, v);   //container level which is this while-entity
