@@ -14,7 +14,7 @@ IfEntity::IfEntity(std::string condition, vector<Variable*> expr_variables, vect
   this->control_constants = std::move(expr_constants);
 
   for(auto* variable : control_variables) {
-    variable->AddEntity(this);
+    variable->AddStatement(this);
   }
 }
 
@@ -55,7 +55,7 @@ WhileEntity::WhileEntity(std::string condition,
   this->control_constants = std::move(expr_constants);
 
   for(auto* variable : control_variables) {
-    variable->AddEntity(this);
+    variable->AddStatement(this);
   }
 }
 
@@ -81,9 +81,9 @@ AssignEntity::AssignEntity(Variable* var,
   this->expr_variables = std::move(expr_variables);
   this->expr_constants = std::move(expr_constants);
 
-  var->AddEntity(this);
+  var->AddStatement(this);
   for(auto* variable : this->expr_variables) {
-    variable->AddEntity(this);
+    variable->AddStatement(this);
   }
 }
 
@@ -115,7 +115,7 @@ Procedure* CallEntity::GetProcedure() {
 PrintEntity::PrintEntity(Variable* var_name) {
   type = EntityEnum::kPrintEntity;
   var_name_ = var_name;
-  var_name_->AddEntity(this);
+  var_name_->AddStatement(this);
 }
 
 Variable* PrintEntity::GetVariable() {
@@ -125,7 +125,7 @@ Variable* PrintEntity::GetVariable() {
 ReadEntity::ReadEntity(Variable* var_name) {
   type = EntityEnum::kReadEntity;
   var_name_ = var_name;
-  var_name_->AddEntity(this);
+  var_name_->AddStatement(this);
 }
 
 Variable* ReadEntity::GetVariable() {

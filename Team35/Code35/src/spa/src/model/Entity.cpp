@@ -35,10 +35,14 @@ const VariableName* Variable::GetName() {
   return variable_name_;
 }
 
-void Variable::AddEntity(Entity* entity) {
-  EntityEnum ent = entity->getEntityEnum();
-  int lot = (ent == EntityEnum::kProcedureEntity) ? 0 : static_cast<int>(ent); //remap procedure to (0)
-  var_to_entity.at(lot).insert(entity);
+void Variable::AddStatement(Statement* stmt) {
+  EntityEnum ent = stmt->getEntityEnum();
+  int lot = static_cast<int>(ent) - 1; // remove procedure from 0.
+  var_to_statement.at(lot).insert(stmt);
+}
+
+std::vector<std::set<Statement*>> Variable::GetStatementTable() {
+  return var_to_statement;
 }
 
 /**
