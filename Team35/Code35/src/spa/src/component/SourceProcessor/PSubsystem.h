@@ -32,10 +32,10 @@ class PSubsystem {
   typedef void (PSubsystem::*StatementHandler)(Entity*);
 
  private:
-  std::vector<StatementHandler> statement_handlers_ = {&PSubsystem::HandleError, &PSubsystem::HandleIfStmt,
-                                                       &PSubsystem::HandleWhileStmt, &PSubsystem::HandleAssignStmt,
-                                                       &PSubsystem::HandleCallStmt, &PSubsystem::HandlePrintStmt,
-                                                       &PSubsystem::HandleReadStmt, &PSubsystem::HandleElseStmt};
+  std::vector<StatementHandler> statement_handlers_ = {& PSubsystem::HandleError, & PSubsystem::HandleIfStmt,
+                                                       & PSubsystem::HandleWhileStmt, & PSubsystem::HandleAssignStmt,
+                                                       & PSubsystem::HandleCallStmt, & PSubsystem::HandlePrintStmt,
+                                                       & PSubsystem::HandleReadStmt, & PSubsystem::HandleElseStmt};
   Procedure* current_procedure_;
   Deliverable* deliverable_;
   SyntaxValidator syntax_validator_;
@@ -61,6 +61,8 @@ class PSubsystem {
   void HandleCallStmt(Entity* entity);
   void HandleReadStmt(Entity* entity);
   void HandlePrintStmt(Entity* entity);
+  Block* CreateConditionalBlock(Entity* entity, NodeType node_type);
+  void CreateBodyBlock(Block* conditional_block);
 
   void CheckForIfElseValidity();
   void CheckForExistingProcedure();

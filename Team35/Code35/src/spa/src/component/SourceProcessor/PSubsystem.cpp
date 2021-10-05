@@ -52,10 +52,11 @@ void PSubsystem::ProcessStatement(std::string statement) {
 
   Entity* entityObj = entity_factory_.CreateEntity(tokens);
 
-  if (current_node_type_ == NodeType::kNone) { //when current_node_ is null. Only happens when not reading within a procedure.
+  if (current_node_type_
+      == NodeType::kNone) { //when current_node_ is null. Only happens when not reading within a procedure.
     if (Procedure* procedure = dynamic_cast<Procedure*>(entityObj)) {
       assert(entityObj->getEntityEnum() == EntityEnum::kProcedureEntity && current_procedure_ == nullptr
-          && current_node_ == nullptr && follow_stack_.empty() && parent_stack_.empty() && block_stack_.empty());
+                 && current_node_ == nullptr && follow_stack_.empty() && parent_stack_.empty() && block_stack_.empty());
       return PerformNewProcedureSteps(procedure);
     } else {
       throw SyntaxException("Expected a procedure entity at this location but was given another type.");
@@ -77,7 +78,7 @@ void PSubsystem::HandleCloseBrace() {
   //assertion: case 1: close brace for procedure --> type = 0 & parent_stack = empty
   //           case 2: close brace for others    --> type > 0 & parent_stack ! empty
   assert((current_node_type_ != NodeType::kProcedure && !parent_stack_.empty()) ||
-              current_node_type_ == NodeType::kProcedure && parent_stack_.empty());
+      current_node_type_ == NodeType::kProcedure && parent_stack_.empty());
 
   if (current_node_type_ == NodeType::kIf) return; // do not pop anything in if-close brace. pop 2 when finishing else.
 
@@ -158,7 +159,7 @@ void PSubsystem::PerformNewProcedureSteps(Procedure* procedure) {
   } else {
     // throw error if this name is duplicated
     for (auto const& proc: * deliverable_->GetProgram()->GetProcedureList()) {
-      if (*proc->GetName() == *procedure->GetName()) { // uses the overloaded ==
+      if (* proc->GetName() == * procedure->GetName()) { // uses the overloaded ==
         throw SyntaxException("Encountered 2 procedures with the same name.");
       }
     }
@@ -222,24 +223,8 @@ void PSubsystem::HandleIfStmt(Entity* entity) {
   current_node_type_ = NodeType::kIf;
   current_node_ = if_entity;
 
-  Block* block_if_cond = nullptr;
-  // remove the stmtNumber from previous block and add it to the cond block if size > 1
-  if (block_stack_.top()->size() > 1) {
-    int num = if_entity->GetStatementNumber()->GetNum();
-    block_stack_.top()->RemoveStmt(StatementNumber(num));
-    block_if_cond = new Block();
-    block_if_cond->AddStmt(StatementNumber(num));
-    block_stack_.top()->next_block_.insert(block_if_cond);
-    if (!block_stack_.top()->isWhile)
-      block_stack_.pop(); // pop the previous progline if it isnt while (no loopback to care)
-    block_stack_.push(block_if_cond);
-  } else {
-    block_if_cond = block_stack_.top();
-  }
-
-  Block* block_if_body = new Block();
-  block_if_cond->next_block_.insert(block_if_body);
-  block_stack_.push(block_if_body);
+  Block* block_if_cond = CreateConditionalBlock(entity, NodeType::kIf);
+  CreateBodyBlock(block_if_cond);
 
   for (Variable* v: if_entity->GetControlVariables()) {
     deliverable_->AddUsesRelationship(current_procedure_, v); //procedure level
@@ -256,13 +241,13 @@ void PSubsystem::HandleElseStmt(Entity* entity) {
     //If assertion failed, Else did not follow If
     throw SyntaxException("Encountered Else statement without If construct");
   }
-
   parent_stack_.push(else_entity);
 
   if_entity->SetElseEntity(else_entity);
   current_node_type_ = NodeType::kElse;
   current_node_ = if_entity;
 
+  // QQ: should this be abstracted away too?
   Block* block_if_body = block_stack_.top();
   block_stack_.pop(); //pop so that the if_cond can perform next_block map to else block
   Block* block_else = new Block();
@@ -279,31 +264,67 @@ void PSubsystem::HandleWhileStmt(Entity* entity) {
   current_node_type_ = NodeType::kWhile;
   current_node_ = while_entity;
 
-  Block* block_while_cond = nullptr;
-  // remove the stmtNumber from previous block and add it to the cond block if size > 1
-  if (block_stack_.top()->size() > 1) {
-    int num = while_entity->GetStatementNumber()->GetNum();
-    block_stack_.top()->RemoveStmt(StatementNumber(num));
-    block_while_cond = new Block();
-    block_while_cond->AddStmt(StatementNumber(num));
-    block_stack_.top()->next_block_.insert(block_while_cond);
-    if (!block_stack_.top()->isWhile)
-      block_stack_.pop(); // pop the previous progline if it isnt while (no loopback to care)
-    block_stack_.push(block_while_cond);
-  } else {
-    block_while_cond = block_stack_.top();
-  }
-
-  block_while_cond->isWhile = true;
-  Block* block_while_body = new Block();
-  block_while_cond->next_block_.insert(block_while_body);
-  block_stack_.push(block_while_body);
+  Block* block_while_cond = CreateConditionalBlock(entity, NodeType::kWhile);
+  CreateBodyBlock(block_while_cond);
 
   for (Variable* v: while_entity->GetControlVariables()) {
     deliverable_->AddUsesRelationship(current_procedure_, v); //procedure level
     if (current_procedure_ != current_node_)
       deliverable_->AddUsesRelationship(current_node_, v);   //container level which is this while-entity
   }
+}
+
+/**
+ *
+* Abstracted logic for handling the blocks if and while blocks:
+ * @param entity
+ * @param node_type
+ * @return pointer to the newly created conditional block
+ */
+Block* PSubsystem::CreateConditionalBlock(Entity* entity, NodeType node_type) {
+  int statement_num;
+  switch (node_type) {
+    case NodeType::kWhile: {
+      statement_num = dynamic_cast<WhileEntity*>(entity)->GetStatementNumber()->GetNum();
+      break;
+    };
+    case NodeType::kIf: {
+      statement_num = dynamic_cast<IfEntity*>(entity)->GetStatementNumber()->GetNum();
+      break;
+    };
+    case NodeType::kNone:
+    case NodeType::kProcedure:
+    case NodeType::kElse: {
+      throw SyntaxException("Wrongly asked to handle a block as a conditional block");
+      // todo: probably better to make this an assert instead of an exception?
+    }
+  }
+  // HANDLE THE CONDITION
+  Block* conditional_block;
+  // remove the stmtNumber from previous block and add it to the cond block if size > 1
+  if (block_stack_.top()->size() > 1) {
+    block_stack_.top()->RemoveStmt(StatementNumber(statement_num));
+    conditional_block = new Block();
+    conditional_block->AddStmt(StatementNumber(statement_num));
+    block_stack_.top()->next_block_.insert(conditional_block);
+    if (!block_stack_.top()->isWhile) {
+      block_stack_.pop(); // pop the previous progline if it isnt while (no loopback to care)
+    }
+    block_stack_.push(conditional_block);
+  } else {
+    conditional_block = block_stack_.top();
+  }
+  conditional_block->isWhile = node_type == NodeType::kWhile;
+}
+
+/**
+* Abstracted logic for handling the blocks representing the body within if and while
+ * @param conditional_block the conditional block that shall be linked to this newly created body block
+ */
+void PSubsystem::CreateBodyBlock(Block* conditional_block) {
+  Block* body_block = new Block();
+  conditional_block->next_block_.insert(body_block);
+  block_stack_.push(body_block);
 }
 
 void PSubsystem::HandleAssignStmt(Entity* entity) {
@@ -368,12 +389,13 @@ void PSubsystem::CheckForExistingProcedure() {
 
   // Note that using dup to ensure that my Program.procList still has the original procedure structure.
   // Note that from this method onwards, deliverables.procList will be in sorted order.
-  std::list<Procedure*> program_proclist_dup(*deliverable_->GetProgram()->GetProcedureList());
+  std::list<Procedure*> program_proclist_dup(* deliverable_->GetProgram()->GetProcedureList());
   std::list<Procedure*>* del_proclist = deliverable_->GetProcList();
 
-  program_proclist_dup.sort([](Procedure* a, Procedure* b) { return *a->GetName() < *b->GetName(); } );
-  del_proclist->sort([](Procedure* a, Procedure* b) { return *a->GetName() < *b->GetName(); } );
-  bool equal = std::equal(program_proclist_dup.begin(), program_proclist_dup.end(), del_proclist->begin(), del_proclist->end());
+  program_proclist_dup.sort([](Procedure* a, Procedure* b) { return * a->GetName() < * b->GetName(); });
+  del_proclist->sort([](Procedure* a, Procedure* b) { return * a->GetName() < * b->GetName(); });
+  bool equal =
+      std::equal(program_proclist_dup.begin(), program_proclist_dup.end(), del_proclist->begin(), del_proclist->end());
 
   if (!equal) {
     throw SyntaxException("A call is made to unreferenced procedure");
