@@ -4,6 +4,7 @@
 
 #include <regex>
 #include <stack>
+#include <utility>
 #include "AssignmentExpression.h"
 
 /**
@@ -13,7 +14,7 @@
  * @param infix The infix assignment to be stored.
  */
 AssignmentExpression::AssignmentExpression(std::string infix) {
-  expression_ = ParseInfixToPostfix(infix);
+  expression_ = ParseInfixToPostfix(std::move(infix));
 }
 
 // Operator Rank only returns the input value rank.
@@ -122,9 +123,9 @@ std::string AssignmentExpression::ParseInfixToPostfix(std::string infix) {
 
   ///Assumption: equation has been checked, and in correct format.
 
-  std::vector<std::string> tokens = ConvertEquationIntoTokens(infix);
+  std::vector<std::string> tokens = ConvertEquationIntoTokens(std::move(infix));
   std::string combine = " "; // Insert a space in front of variable -- so that CheckExist does not match partial var
-  for (std::string s: tokens) {
+  for (const std::string& s: tokens) {
     combine.append(s);
   }
 
@@ -147,7 +148,7 @@ std::string AssignmentExpression::GetExpressionString() {
  * @return true if exist; false otherwise.
  */
 bool AssignmentExpression::CheckExist(std::string pattern) {
-  std::string queryPostfix = ParseInfixToPostfix(pattern);
+  std::string queryPostfix = ParseInfixToPostfix(std::move(pattern));
 
   if (expression_.find(queryPostfix) != std::string::npos) {
     return true;
@@ -163,7 +164,7 @@ bool AssignmentExpression::CheckExist(std::string pattern) {
  * @return true if exist; false otherwise.
  */
 bool AssignmentExpression::CheckExact(std::string pattern) {
-  std::string queryPostfix = ParseInfixToPostfix(pattern);
+  std::string queryPostfix = ParseInfixToPostfix(std::move(pattern));
 
   return expression_ == queryPostfix;
 }
