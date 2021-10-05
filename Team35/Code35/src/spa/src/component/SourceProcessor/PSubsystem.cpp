@@ -222,15 +222,9 @@ void PSubsystem::HandleIfStmt(Entity* entity) {
   parent_stack_.push(if_entity);
   current_node_type_ = NodeType::kIf;
   current_node_ = if_entity;
-
   Block* block_if_cond = CreateConditionalBlock(entity, NodeType::kIf);
   CreateBodyBlock(block_if_cond);
-
-  for (Variable* v: if_entity->GetControlVariables()) {
-    deliverable_->AddUsesRelationship(current_procedure_, v); //procedure level
-    if (current_procedure_ != current_node_)
-      deliverable_->AddUsesRelationship(current_node_, v);   //container level which is this if-entity
-  }
+  AddControlVariableRelationships(NodeType::kIf, entity);
 }
 
 void PSubsystem::HandleElseStmt(Entity* entity) {
@@ -242,18 +236,10 @@ void PSubsystem::HandleElseStmt(Entity* entity) {
     throw SyntaxException("Encountered Else statement without If construct");
   }
   parent_stack_.push(else_entity);
-
   if_entity->SetElseEntity(else_entity);
   current_node_type_ = NodeType::kElse;
   current_node_ = if_entity;
-
-  // QQ: should this be abstracted away too?
-  Block* block_if_body = block_stack_.top();
-  block_stack_.pop(); //pop so that the if_cond can perform next_block map to else block
-  Block* block_else = new Block();
-  block_stack_.top()->next_block_.insert(block_else);
-  block_stack_.push(block_if_body);
-  block_stack_.push(block_else);
+  CreateBodyBlock();
 }
 
 void PSubsystem::HandleWhileStmt(Entity* entity) {
@@ -266,12 +252,7 @@ void PSubsystem::HandleWhileStmt(Entity* entity) {
 
   Block* block_while_cond = CreateConditionalBlock(entity, NodeType::kWhile);
   CreateBodyBlock(block_while_cond);
-
-  for (Variable* v: while_entity->GetControlVariables()) {
-    deliverable_->AddUsesRelationship(current_procedure_, v); //procedure level
-    if (current_procedure_ != current_node_)
-      deliverable_->AddUsesRelationship(current_node_, v);   //container level which is this while-entity
-  }
+  AddControlVariableRelationships(NodeType::kWhile, entity);
 }
 
 /**
@@ -326,6 +307,45 @@ void PSubsystem::CreateBodyBlock(Block* conditional_block) {
   conditional_block->next_block_.insert(body_block);
   block_stack_.push(body_block);
 }
+
+/**
+ *  Overloaded function to create Else block's body
+ */
+void PSubsystem::CreateBodyBlock() {
+  // QQ: should this be abstracted away too?
+  Block* block_if_body = block_stack_.top();
+  block_stack_.pop(); //pop so that the if_cond can perform next_block map to else block
+  Block* block_else = new Block();
+  block_stack_.top()->next_block_.insert(block_else);
+  block_stack_.push(block_if_body);
+  block_stack_.push(block_else);
+}
+
+void PSubsystem::AddControlVariableRelationships(NodeType node_type, Entity* entity) {
+  std::vector<Variable*> control_variables;
+  switch (node_type) {
+    case NodeType::kIf: {
+      control_variables = dynamic_cast<IfEntity*>(entity)->GetControlVariables();
+      break;
+    }
+    case NodeType::kWhile:{
+      control_variables = dynamic_cast<WhileEntity*>(entity)->GetControlVariables();
+      break;
+    };
+    case NodeType::kNone:
+    case NodeType::kProcedure:
+    case NodeType::kElse:{
+      throw SyntaxException("Wrongly asked to handle control variables for incorrect block types");
+    };
+  }
+  for (Variable* v: control_variables) {
+    deliverable_->AddUsesRelationship(current_procedure_, v); //procedure level
+    if (current_procedure_ != current_node_)
+      deliverable_->AddUsesRelationship(current_node_, v);   //container level which is this while-entity
+  }
+}
+
+
 
 void PSubsystem::HandleAssignStmt(Entity* entity) {
   AssignEntity* assign_entity = dynamic_cast<AssignEntity*>(entity);
@@ -409,4 +429,5 @@ Deliverable* PSubsystem::GetDeliverables() {
   valid_state = false; //to prevent further processsing.
   return deliverable_;
 }
+
 

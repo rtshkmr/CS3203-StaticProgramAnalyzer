@@ -63,7 +63,8 @@ class PSubsystem {
   void HandlePrintStmt(Entity* entity);
   Block* CreateConditionalBlock(Entity* entity, NodeType node_type);
   void CreateBodyBlock(Block* conditional_block);
-
+  void CreateBodyBlock();
+  void AddControlVariableRelationships(NodeType node_type, Entity* entity);
   void CheckForIfElseValidity();
   void CheckForExistingProcedure();
 
