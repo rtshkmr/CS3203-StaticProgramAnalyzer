@@ -20,7 +20,7 @@ class ModifiesExtractor {
   void ExtractModifiesInCallContainer(CallEntity* call_entity,
                                       Container* container,
                                       std::vector<Procedure*>* extracted_procedures);
-  void EraseElseAndProcFromModifies();
+  void EraseElseFromModifies();
   void EraseReverseRelationship(Container* container, std::list<Variable*>* var_list);
 };
 

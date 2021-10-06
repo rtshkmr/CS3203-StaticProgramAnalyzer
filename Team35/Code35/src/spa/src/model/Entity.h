@@ -7,12 +7,27 @@
 #include <list>
 #include <datatype/DataType.h>
 
+enum class EntityEnum {
+  kNone = 0,
+  kIfEntity = 1,
+  kWhileEntity = 2,
+  kAssignEntity = 3,
+  kCallEntity = 4,
+  kPrintEntity = 5,
+  kReadEntity = 6,
+  kElseEntity = 7,
+  kProcedureEntity = 8
+};
+
 /**
  * Entity is an abstract class, an overarching class that covers any entity found in the program.
  */
 class Entity {
+ protected:
+  EntityEnum type;
  public:
   virtual ~Entity() {};
+  EntityEnum getEntityEnum();
 };
 
 class Container;

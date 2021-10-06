@@ -20,7 +20,7 @@ class UsesExtractor {
   void ExtractUsesInCallContainer(CallEntity* call_entity,
                                   Container* container,
                                   std::vector<Procedure*>* extracted_procedures);
-  void EraseElseAndProcFromUses();
+  void EraseElseFromUses();
   void EraseReverseRelationship(Container* container, std::list<Variable*>* var_list);
 };
 

@@ -26,23 +26,16 @@ Entity* EntityFactory::CreateEntities(vector<Token> tokens) {
     case TokenTag::kProcedureKeyword: {
       assert(tokens[1].GetTokenTag() == TokenTag::kName);
       std::string proc_token_string = tokens[1].GetTokenString();
-      // TODO iter2: need to check if proc was already created and defined (issue #27)
-      return CreateProcedure(proc_token_string);
+      return RetrieveProcedure(proc_token_string);
     }
     case TokenTag::kReadKeyword: {
-      assert(tokens[1].GetTokenTag() == TokenTag::kName);
-      std::string read_var_string = tokens[1].GetTokenString();
-      return new ReadEntity(RetrieveVariable(read_var_string));
+      return CreateReadEntity(tokens);
     }
     case TokenTag::kPrintKeyword: {
-      assert(tokens[1].GetTokenTag() == TokenTag::kName);
-      std::string print_var_string = tokens[1].GetTokenString();
-      return new PrintEntity(RetrieveVariable(print_var_string));
+      return CreatePrintEntity(tokens);
     }
     case TokenTag::kCallKeyword: {
-      assert(tokens[1].GetTokenTag() == TokenTag::kName);
-      std::string call_proc_string = tokens[1].GetTokenString();
-      return new CallEntity(RetrieveProcedure(call_proc_string));
+      return CreateCallEntity(tokens);
     }
     case TokenTag::kWhileKeyword: {
       return CreateConditionalEntity(tokens, TokenTag::kWhileKeyword);
@@ -58,6 +51,24 @@ Entity* EntityFactory::CreateEntities(vector<Token> tokens) {
     }
     default:throw std::invalid_argument("Tokens cannot be made into entity in EF.");
   }
+}
+
+Entity* EntityFactory::CreateReadEntity(std::vector<Token> tokens) {
+  assert(tokens[1].GetTokenTag() == TokenTag::kName);
+  std::string read_var_string = tokens[1].GetTokenString();
+  return new ReadEntity(RetrieveVariable(read_var_string));
+}
+
+Entity* EntityFactory::CreatePrintEntity(std::vector<Token> tokens) {
+  assert(tokens[1].GetTokenTag() == TokenTag::kName);
+  std::string print_var_string = tokens[1].GetTokenString();
+  return new PrintEntity(RetrieveVariable(print_var_string));
+}
+
+Entity* EntityFactory::CreateCallEntity(std::vector<Token> tokens) {
+  assert(tokens[1].GetTokenTag() == TokenTag::kName);
+  std::string call_proc_string = tokens[1].GetTokenString();
+  return new CallEntity(RetrieveProcedure(call_proc_string));
 }
 
 /**

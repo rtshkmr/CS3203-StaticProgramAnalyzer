@@ -11,6 +11,15 @@
  * This namespace provides a scope for PSubsystem related declarations.
  */
 namespace psub {
+
+enum class NodeType {
+  kNone = -1,
+  kProcedure = 0,
+  kWhile = 1,
+  kIf = 2,
+  kElse = 3
+};
+
 /**
  * This class handles the interactions between sub-components that help parse the source code. It contains the
  * data structures that accumulate (AST, EntityTables, RelationshipTables, Helper Stacks that keep track of tokens
@@ -19,7 +28,13 @@ namespace psub {
  * created and added to the AST, relationships are added.
  */
 class PSubsystem {
+  typedef void (PSubsystem::*HandleStatement)(Entity*);
+
  private:
+  std::vector<HandleStatement> statement_pointer_ = {&PSubsystem::HandleError, &PSubsystem::HandleIfStmt,
+                                                     &PSubsystem::HandleWhileStmt, &PSubsystem::HandleAssignStmt,
+                                                     &PSubsystem::HandleCallStmt, &PSubsystem::HandlePrintStmt,
+                                                     &PSubsystem::HandleReadStmt, &PSubsystem::HandleElseStmt};
   Procedure* current_procedure_;
   Deliverable* deliverable_;
   SyntaxValidator syntax_validator_;
@@ -27,7 +42,7 @@ class PSubsystem {
 
   bool valid_state = true;
   Container* current_node_;
-  int current_node_type_ = -1; // -1 => no current node; 0 = procedure; 1 = while; 2 = if; 3 = else;
+  NodeType current_node_type_ = NodeType::kNone; // -1 => no current node; 0 = procedure; 1 = while; 2 = if; 3 = else;
   std::stack<Container*> parent_stack_;
   std::stack<Statement*> follow_stack_;
   int program_counter_ = 0;
@@ -35,15 +50,18 @@ class PSubsystem {
   // private methods for selfcall
   void PerformNewProcedureSteps(Procedure* procedure);
   void SetStatementObject(Statement* statement);
-  void HandleIfStmt(IfEntity* if_entity);
-  void HandleElseStmt(ElseEntity* else_entity);
-  void HandleWhileStmt(WhileEntity* while_entity);
-  void HandleAssignStmt(AssignEntity* assign_entity);
-  void HandleCallStmt(CallEntity* call_entity);
-  void HandleReadStmt(ReadEntity* read_entity);
-  void HandlePrintStmt(PrintEntity* print_entity);
+  void HandleCloseBrace();
+  void HandleError(Entity* entity);
+  void HandleIfStmt(Entity* entity);
+  void HandleElseStmt(Entity* entity);
+  void HandleWhileStmt(Entity* entity);
+  void HandleAssignStmt(Entity* entity);
+  void HandleCallStmt(Entity* entity);
+  void HandleReadStmt(Entity* entity);
+  void HandlePrintStmt(Entity* entity);
 
   void CheckForIfElseValidity();
+  void CheckForExistingProcedure();
 
  public:
   PSubsystem() = default;

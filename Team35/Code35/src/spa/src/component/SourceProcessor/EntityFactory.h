@@ -27,8 +27,12 @@ class EntityFactory {
   Procedure* RetrieveProcedure(std::string proc_name);
   Variable* RetrieveVariable(std::string var_name);
 
+  Entity* CreateReadEntity(std::vector<Token> tokens);
+  Entity* CreatePrintEntity(std::vector<Token> tokens);
+  Entity* CreateCallEntity(std::vector<Token> tokens);
   Entity* CreateConditionalEntity(std::vector<Token> tokens, TokenTag entity_type);
   Entity* CreateAssignEntity(std::vector<Token> tokens);
+
   static std::string ConvertTokensToString(std::vector<Token> tokens);
   std::vector<Variable*> GetVariablesFromExpressionTokens(std::vector<Token> tokens);
   std::vector<ConstantValue*> GetConstantsFromExpressionTokens(std::vector<Token> tokens);
