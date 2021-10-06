@@ -28,7 +28,7 @@ class QueryEvaluatorTable {
   // Add row (and new col)
   bool AddRow(std::string synonym, int index, std::string value);
 
-  // Return vector of target synonym
+  // Return vector of target synonym results
   std::vector<std::string> GetResults();
 
   // Return vector of specified synonym

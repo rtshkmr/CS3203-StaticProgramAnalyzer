@@ -20,7 +20,8 @@ QueryEvaluator::QueryEvaluator(std::list<Synonym> syn_list, Synonym target, std:
       map_of_synonym_values{},
       synonym_design_entity_map() {}
 
-std::vector<std::string> QueryEvaluator::EvaluateQuery() {
+UnformattedQueryResult QueryEvaluator::EvaluateQuery() {
+  UnformattedQueryResult unformatted_result = UnformattedQueryResult(true);
 
   QueryEvaluatorTable target_synonym_table(target_synonym.GetName());
 
@@ -28,7 +29,11 @@ std::vector<std::string> QueryEvaluator::EvaluateQuery() {
   EvaluateAllGroups(& target_synonym_table);
 
   // Check the boolean conditions and return the final results
-  return GetResult(& target_synonym_table);
+  unformatted_result.AddTable(& target_synonym_table);
+  if (!boolean_result) {
+    unformatted_result.SetBooleanResult(false);
+  }
+  return unformatted_result;
 }
 
 /**

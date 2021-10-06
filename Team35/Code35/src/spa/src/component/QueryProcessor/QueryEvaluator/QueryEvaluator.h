@@ -7,6 +7,7 @@
 #include "component/QueryProcessor/types/Types.h"
 #include "component/QueryProcessor/types/QueryEvaluatorTable.h"
 #include "component/QueryProcessor/types/QueryEvaluatorTable.h"
+#include "component/QueryProcessor/types/UnformattedQueryResult.h"
 #include "component/PKB/PKB.h"
 #include "PKBDispatcher.h"
 #include "EvaluateSuchThatClause.h"
@@ -14,8 +15,8 @@
 
 class QueryEvaluator {
  public:
-  QueryEvaluator(std::list<Synonym> syn_list, Synonym target, std::list<Group*> groups, PKB pkb);
-  std::vector<std::string> EvaluateQuery();
+  QueryEvaluator(PKB pkb);
+  UnformattedQueryResult EvaluateQuery();
  private:
   std::list<Synonym> synonym_list;
   Synonym target_synonym;

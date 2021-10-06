@@ -9,7 +9,7 @@ constexpr auto L = [](auto msg) {
   (spa_logger << Logger::Prettify(msg));
 };
 
-std::list<std::string> QuerySystemController::Evaluate(std::string* query, PKB* pkb) {
+std::vector<std::string> QuerySystemController::Evaluate(std::string* query, PKB* pkb) {
   L("[ENTER] Query System Controller EVALUATE");
   auto query_extractor = QueryExtractor(query);
   try {
@@ -17,21 +17,15 @@ std::list<std::string> QuerySystemController::Evaluate(std::string* query, PKB* 
   } catch (const std::runtime_error& error) {
     return {};
   }
-  auto query_evaluator = QueryEvaluator(query_extractor.GetSynonymsList(),
-                                        query_extractor.GetTarget(),
-                                        query_extractor.GetGroupsList(),
-                                        * pkb);
+  auto query_evaluator = QueryEvaluator(* pkb);
 
   L("[ENTER] Query Evaluator Evaluate Query");
-  std::vector<std::string> result_list = query_evaluator.EvaluateQuery();
+  UnformattedQueryResult unformatted_results = query_evaluator.EvaluateQuery();
   L("[EXIT] Query Evaluator Evaluate Query ");
 
-  if (!result_list.empty()) {
-    std::list<std::string> populated_result_list = QueryProjector::FormatQuery(result_list);
-    L("[EXIT] Query System Controller EVALUATE ");
-    return populated_result_list;
-  }
+  QueryProjector query_projector = QueryProjector(query_extractor.GetSynonymsList());
+  std::vector<std::string> populated_result_list = query_projector.FormatQuery(unformatted_results);
   L("[EXIT] Query System Controller EVALUATE ");
-  return {};
+  return populated_result_list;
 };
 
