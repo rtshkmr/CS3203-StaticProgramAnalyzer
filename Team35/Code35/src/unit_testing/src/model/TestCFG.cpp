@@ -4,7 +4,7 @@
 TEST_CASE("1.CFG.Block.StatementRange") {
   Block b;
 
-  REQUIRE_FALSE(b.find(3));
+  REQUIRE_FALSE(b.CheckIfStatementInCluster(3));
   REQUIRE(b.size() == 0);
 
   b.AddStmt(StatementNumber(2));
@@ -14,13 +14,13 @@ TEST_CASE("1.CFG.Block.StatementRange") {
   b.AddStmt(StatementNumber(6));
 
   REQUIRE(b.size() == 5);
-  REQUIRE_FALSE(b.find(StatementNumber(1)));
-  REQUIRE(b.find(StatementNumber(2)));
-  REQUIRE(b.find(StatementNumber(3)));
-  REQUIRE(b.find(StatementNumber(4)));
-  REQUIRE(b.find(StatementNumber(5)));
-  REQUIRE(b.find(StatementNumber(6)));
-  REQUIRE_FALSE(b.find(StatementNumber(7)));
+  REQUIRE_FALSE(b.CheckIfStatementInCluster(StatementNumber(1)));
+  REQUIRE(b.CheckIfStatementInCluster(StatementNumber(2)));
+  REQUIRE(b.CheckIfStatementInCluster(StatementNumber(3)));
+  REQUIRE(b.CheckIfStatementInCluster(StatementNumber(4)));
+  REQUIRE(b.CheckIfStatementInCluster(StatementNumber(5)));
+  REQUIRE(b.CheckIfStatementInCluster(StatementNumber(6)));
+  REQUIRE_FALSE(b.CheckIfStatementInCluster(StatementNumber(7)));
 
   SECTION("Remove middle stmt") {
     REQUIRE_THROWS(b.RemoveStmt(StatementNumber(4)));
@@ -28,24 +28,24 @@ TEST_CASE("1.CFG.Block.StatementRange") {
 
   SECTION("Remove tail stmt - success") {
     b.RemoveStmt(6);
-    REQUIRE_FALSE(b.find(StatementNumber(6)));
+    REQUIRE_FALSE(b.CheckIfStatementInCluster(StatementNumber(6)));
   }
 
   SECTION("Remove tail stmt twice - success") {
     b.RemoveStmt(6);
     b.RemoveStmt(5);
-    REQUIRE_FALSE(b.find(StatementNumber(5)));
+    REQUIRE_FALSE(b.CheckIfStatementInCluster(StatementNumber(5)));
   }
 
   SECTION("Remove head stmt - success") {
     b.RemoveStmt(2);
-    REQUIRE_FALSE(b.find(StatementNumber(2)));
+    REQUIRE_FALSE(b.CheckIfStatementInCluster(StatementNumber(2)));
   }
 
   SECTION("Remove tail stmt twice - success") {
     b.RemoveStmt(2);
     b.RemoveStmt(3);
-    REQUIRE_FALSE(b.find(StatementNumber(3)));
+    REQUIRE_FALSE(b.CheckIfStatementInCluster(StatementNumber(3)));
   }
 }
 

@@ -62,8 +62,8 @@ class PSubsystem {
   void HandleReadStmt(Entity* entity);
   void HandlePrintStmt(Entity* entity);
   ConditionalBlock* CreateConditionalBlock(Statement* conditional_statement);
-  void CreateBodyBlock(Block* conditional_block);
-  void CreateBodyBlock();
+  void CreateBodyBlock(ConditionalBlock* conditional_block);
+  void CreateBodyBlock(); // for else body
   void AddControlVariableRelationships(const std::vector<Variable*>& control_variables);
   void CheckForIfElseValidity();
   void CheckForExistingProcedure();

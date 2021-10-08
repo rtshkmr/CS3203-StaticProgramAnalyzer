@@ -26,12 +26,11 @@ const ProcedureName* Procedure::GetName() {
   return procedure_name_;
 }
 
-const void Procedure::SetBlockRoot(Block* block) {
-  this->block_root_ = block;
+const void Procedure::SetClusterRoot(Cluster* cluster) {
+  this->cluster_root_ = cluster;
 }
-
-const Block* Procedure::GetBlockRoot() {
-  return this->block_root_;
+const Cluster* Procedure::GetClusterRoot() {
+  return this->cluster_root_;
 }
 
 Variable::Variable(VariableName* vName) {

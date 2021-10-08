@@ -148,9 +148,10 @@ void PSubsystem::PerformNewProcedureSteps(Procedure* procedure) {
   current_procedure_ = procedure;
   current_node_ = procedure;
   current_node_type_ = NodeType::kProcedure;
-  Block* block_root = new Block();
-  block_stack_.push(block_root);
-  procedure->SetBlockRoot(block_root);
+  Cluster* cluster_root = new Cluster();
+  // QQ: can't dynamic cast this :(
+  block_stack_.push(static_cast<Block* const>(cluster_root));
+  procedure->SetClusterRoot(cluster_root);
 
   if (deliverable_->GetProgram() == nullptr) {
     Program* program = new Program(procedure);
@@ -273,11 +274,11 @@ ConditionalBlock* PSubsystem::CreateConditionalBlock(Statement* conditional_stat
     block_stack_.top()->RemoveStmt(StatementNumber(statement_num));
     conditional_block = new ConditionalBlock();
     conditional_block->AddStmt(StatementNumber(statement_num));
-    block_stack_.top()->next_block_.insert(conditional_block);
+    block_stack_.top()->next_block_.insert(static_cast<Block*>(conditional_block));
     if (!block_stack_.top()->isWhile) {
       block_stack_.pop(); // pop the previous progline if it isnt while (no loopback to care)
     }
-    block_stack_.push(conditional_block);
+    block_stack_.push(static_cast<Block* const>(conditional_block));
   } else {
     // QQ: can't seem to use dynamic cast here,
     conditional_block = static_cast<ConditionalBlock*>(block_stack_.top());
@@ -289,10 +290,10 @@ ConditionalBlock* PSubsystem::CreateConditionalBlock(Statement* conditional_stat
 * Abstracted logic for handling the blocks representing the body within if and while
  * @param conditional_block the conditional block that shall be linked to this newly created body block
  */
-void PSubsystem::CreateBodyBlock(Block* conditional_block) {
+void PSubsystem::CreateBodyBlock(ConditionalBlock* conditional_block) {
   BodyBlock* body_block = new BodyBlock();
-  conditional_block->next_block_.insert(body_block);
-  block_stack_.push(body_block);
+  conditional_block->next_block_.insert(static_cast<Block* const>(body_block));
+  block_stack_.push(static_cast<Block*>(body_block));
 }
 
 /**
