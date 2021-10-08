@@ -5,14 +5,14 @@
 #include "CFG.h"
 
 void Block::AddStmt(StatementNumber sn) {
-  if (start == end && start == -1) { //new block
-    start = end = sn.GetNum();
+  if (start_ == end_ && start_ == -1) { //new block
+    start_ = end_ = sn.GetNum();
   } else {
     //acts as a deque.
-    if (sn.GetNum() == start - 1) {
-      start -= 1;
-    } else if (sn.GetNum() == end + 1) {
-      end += 1;
+    if (sn.GetNum() == start_ - 1) {
+      start_ -= 1;
+    } else if (sn.GetNum() == end_ + 1) {
+      end_ += 1;
     } else {
       throw std::invalid_argument("Expectation of continuous numbers");
     }
@@ -20,24 +20,28 @@ void Block::AddStmt(StatementNumber sn) {
 }
 
 void Block::RemoveStmt(StatementNumber sn) {
-  if (start == end && end == sn.GetNum()) {
-    start = end = -1;
-  } else if (sn.GetNum() == end) {
-    end--;
-  } else if (sn.GetNum() == start) {
-    start++;
+  if (start_ == end_ && end_ == sn.GetNum()) {
+    start_ = end_ = -1;
+  } else if (sn.GetNum() == end_) {
+    end_--;
+  } else if (sn.GetNum() == start_) {
+    start_++;
   } else {
     throw std::invalid_argument("Expectation of continuous numbers");
   }
 }
 
 bool Block::find(StatementNumber sn) {
-  if (start == -1 && end == -1) return false;
+  if (start_ == -1 && end_ == -1) return false;
   int num = sn.GetNum();
-  return start <= num && num <= end;
+  return start_ <= num && num <= end_;
 }
 
 int Block::size() {
-  if (start == -1 && end == -1) return 0;
-  return end - start + 1;
+  if (start_ == -1 && end_ == -1) return 0;
+  return end_ - start_ + 1;
+}
+
+void ConditionalBlock::AddControlVariable(VariableName* control_variable) {
+  this->control_variables_.insert(control_variable);
 }

@@ -61,8 +61,7 @@ class PSubsystem {
   void HandleCallStmt(Entity* entity);
   void HandleReadStmt(Entity* entity);
   void HandlePrintStmt(Entity* entity);
-  Block* CreateConditionalBlock(Entity* entity, NodeType node_type);
-  Block* CreateConditionalBlock(Statement* conditional_statement);
+  ConditionalBlock* CreateConditionalBlock(Statement* conditional_statement);
   void CreateBodyBlock(Block* conditional_block);
   void CreateBodyBlock();
   void AddControlVariableRelationships(const std::vector<Variable*>& control_variables);

@@ -222,7 +222,7 @@ void PSubsystem::HandleIfStmt(Entity* entity) {
   current_node_type_ = NodeType::kIf;
   current_node_ = if_entity;
   Statement* conditional_statement = dynamic_cast<Statement*>(entity);
-  Block* block_if_cond = CreateConditionalBlock(conditional_statement);
+  ConditionalBlock* block_if_cond = CreateConditionalBlock(conditional_statement);
   CreateBodyBlock(block_if_cond);
   AddControlVariableRelationships(if_entity->GetControlVariables());
 }
@@ -251,7 +251,7 @@ void PSubsystem::HandleWhileStmt(Entity* entity) {
   current_node_ = while_entity;
 
   Statement* conditional_statement = dynamic_cast<Statement*>(entity);
-  Block* block_while_cond = CreateConditionalBlock(conditional_statement);
+  ConditionalBlock* block_while_cond = CreateConditionalBlock(conditional_statement);
   block_while_cond->isWhile = true;
   CreateBodyBlock(block_while_cond);
   AddControlVariableRelationships(while_entity->GetControlVariables());
@@ -264,14 +264,14 @@ void PSubsystem::HandleWhileStmt(Entity* entity) {
  * @param node_type
  * @return pointer to the newly created conditional block
  */
-Block* PSubsystem::CreateConditionalBlock(Statement* conditional_statement) {
+ConditionalBlock* PSubsystem::CreateConditionalBlock(Statement* conditional_statement) {
   int statement_num = conditional_statement->GetStatementNumber()->GetNum();
   // HANDLE THE CONDITION
-  Block* conditional_block;
+  ConditionalBlock* conditional_block;
   // remove the stmtNumber from previous block and add it to the cond block if size > 1
   if (block_stack_.top()->size() > 1) {
     block_stack_.top()->RemoveStmt(StatementNumber(statement_num));
-    conditional_block = new Block();
+    conditional_block = new ConditionalBlock();
     conditional_block->AddStmt(StatementNumber(statement_num));
     block_stack_.top()->next_block_.insert(conditional_block);
     if (!block_stack_.top()->isWhile) {
@@ -279,7 +279,8 @@ Block* PSubsystem::CreateConditionalBlock(Statement* conditional_statement) {
     }
     block_stack_.push(conditional_block);
   } else {
-    conditional_block = block_stack_.top();
+    // QQ: can't seem to use dynamic cast here,
+    conditional_block = static_cast<ConditionalBlock*>(block_stack_.top());
   }
   return conditional_block;
 }
@@ -289,7 +290,7 @@ Block* PSubsystem::CreateConditionalBlock(Statement* conditional_statement) {
  * @param conditional_block the conditional block that shall be linked to this newly created body block
  */
 void PSubsystem::CreateBodyBlock(Block* conditional_block) {
-  Block* body_block = new Block();
+  BodyBlock* body_block = new BodyBlock();
   conditional_block->next_block_.insert(body_block);
   block_stack_.push(body_block);
 }
@@ -306,11 +307,12 @@ void PSubsystem::CreateBodyBlock() {
   block_stack_.push(block_else);
 }
 
+// todo: double check that only control variables are being handled here and not variables within the body
 void PSubsystem::AddControlVariableRelationships(const std::vector<Variable*>& control_variables) {
   for (Variable* v: control_variables) {
     deliverable_->AddUsesRelationship(current_procedure_, v); //procedure level
     if (current_procedure_ != current_node_)
-      deliverable_->AddUsesRelationship(current_node_, v);   //container level which is this while-entity
+      deliverable_->AddUsesRelationship(current_node_, v);
   }
 }
 

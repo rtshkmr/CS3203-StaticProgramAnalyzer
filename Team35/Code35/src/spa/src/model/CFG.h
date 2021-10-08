@@ -10,8 +10,8 @@
 
 class Block {
  private:
-  int start = -1;
-  int end = -1;
+  int start_ = -1;
+  int end_ = -1;
  public:
   bool isWhile = false;
   std::set<Block*> next_block_ = {};
@@ -22,6 +22,24 @@ class Block {
   void RemoveStmt(StatementNumber);
   bool find(StatementNumber);
   int size();
+};
+
+class ConditionalBlock : public Block {
+ private:
+  std::set<VariableName*> control_variables_;
+  std::set<ConstantValue*> control_constants_;
+
+ public:
+  ConditionalBlock() {};
+  void AddControlVariable(VariableName* control_variable);
+};
+
+class BodyBlock : public Block {
+ private:
+  std::set<VariableName*> modified_variables_;
+
+ public:
+  BodyBlock() {};
 };
 
 #endif //AUTOTESTER_SRC_SPA_SRC_MODEL_CFG_H_
