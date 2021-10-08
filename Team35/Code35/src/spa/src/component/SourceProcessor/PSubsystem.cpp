@@ -55,7 +55,7 @@ void PSubsystem::ProcessStatement(const std::string& statement) {
   if (current_node_type_
       == NodeType::kNone) { //when current_node_ is null. Only happens when not reading within a procedure.
     if (Procedure* procedure = dynamic_cast<Procedure*>(entityObj)) {
-      assert(entityObj->getEntityEnum() == EntityEnum::kProcedureEntity && current_procedure_ == nullptr
+      assert(entityObj->GetEntityEnum() == EntityEnum::kProcedureEntity && current_procedure_ == nullptr
                  && current_node_ == nullptr && follow_stack_.empty() && parent_stack_.empty() && block_stack_.empty());
       return PerformNewProcedureSteps(procedure);
     } else {
@@ -66,7 +66,7 @@ void PSubsystem::ProcessStatement(const std::string& statement) {
   //From here onwards, Entity must be a Statement type;
   if (Statement* stmt = dynamic_cast<Statement*>(entityObj)) {
     SetStatementObject(stmt);
-    StatementHandler handler = statement_handlers_[static_cast<int>(entityObj->getEntityEnum())];
+    StatementHandler handler = statement_handlers_[static_cast<int>(entityObj->GetEntityEnum())];
     (this->*handler)(entityObj);
   } else {
     throw SyntaxException("Expected a Statement but was given a procedure declaration.");
@@ -74,85 +74,141 @@ void PSubsystem::ProcessStatement(const std::string& statement) {
 //  LOG (spa_logger << "\n\n\n==========================  [EXIT] ProcessStatement ======================\n\n\n");
 }
 
-void PSubsystem::HandleCloseBrace() {
-  //assertion: case 1: close brace for procedure --> type = 0 & parent_stack = empty
-  //           case 2: close brace for others    --> type > 0 & parent_stack ! empty
-  assert((current_node_type_ != NodeType::kProcedure && !parent_stack_.empty()) ||
-      current_node_type_ == NodeType::kProcedure && parent_stack_.empty());
+/**
+ * Handles the closing of if-blocks. Currently has no effects, method has been abstracted out to keep abstraction levels
+ * in the caller function equal.
+ */
+void PSubsystem::CloseIfBlock() {
+  if (current_node_type_ == NodeType::kIf) return;// do not pop anything in if-close brace. pop 2 when finishing else.
+}
 
-  if (current_node_type_ == NodeType::kIf) return; // do not pop anything in if-close brace. pop 2 when finishing else.
-
-  follow_stack_.pop(); //this is allowed because any stmtList must be 1..* statements. so no condition for if (...) { }
-
-  // case 1
+void PSubsystem::CloseProcedureBlock() {
   if (current_node_type_ == NodeType::kProcedure && parent_stack_.empty()) {
     current_node_type_ = NodeType::kNone;
     current_node_ = nullptr;
     current_procedure_ = nullptr;
     block_stack_.pop();
     assert(block_stack_.empty());
+  }
+}
+
+void PSubsystem::CloseElseBlock(Container* current_nest) {
+  current_nest = parent_stack_.top();
+  parent_stack_.pop();
+  follow_stack_.pop();
+  Block* block_end_else = new Block();
+  block_stack_.top()->next_block_.insert(block_end_else);
+  block_stack_.pop(); //pop the else block
+  block_stack_.top()->next_block_.insert(block_end_else);
+  block_stack_.pop(); //pop the if_body block
+  block_stack_.pop(); //pop the if_cond block
+  block_stack_.push(block_end_else);
+}
+
+void PSubsystem::CloseWhileBlock() {
+  Block* lastStmt = block_stack_.top();
+  block_stack_.pop(); // link the last stmt to the while_cond block, and pop it.
+  lastStmt->next_block_.insert(block_stack_.top());
+
+  Block* block_end_while = new Block();
+  block_stack_.top()->next_block_.insert(block_end_while);
+  block_stack_.pop(); //pop the while_cond block
+  block_stack_.push(block_end_while);
+}
+
+void PSubsystem::ProcessOuterParentNode(Container* current_nest) {
+  // get to outer node and process:
+  current_node_ = dynamic_cast<Statement*>(current_nest)->GetParentNode();
+  parent_stack_.empty()
+  ? ProcessOuterNodeAsProcedure()
+  : ProcessOuterNodeType(current_nest);
+}
+
+void PSubsystem::ProcessOuterNodeAsProcedure() {
+  current_node_type_ = NodeType::kProcedure;
+  current_node_ = current_procedure_;
+}
+
+void PSubsystem::ProcessOuterNodeType(Container* current_nest) {
+  current_nest = parent_stack_.top();
+  if (WhileEntity* while_entity = dynamic_cast<WhileEntity*>(current_nest)) {
+    current_node_type_ = NodeType::kWhile;
+  } else if (IfEntity* if_entity = dynamic_cast<IfEntity*>(current_nest)) {
+    current_node_type_ = NodeType::kIf;
+  } else if (ElseEntity* else_entity = dynamic_cast<ElseEntity*>(current_nest)) {
+    current_node_type_ = NodeType::kElse;
+
+    //dirty way to get the original if-statement (should be 2nd highest)
+    parent_stack_.pop(); //pop this else;
+    current_node_ = parent_stack_.top();
+    assert (dynamic_cast<IfEntity*>(current_node_) != nullptr);
+    parent_stack_.push(else_entity);
+  } else {
+    throw std::invalid_argument("[ERROR] Retrace error. There should not be any other types ");
+  }
+}
+
+/**
+ * Handles the effects of encountering a close brace character. Here are the following cases based on the current node: \n
+ * IF node: do nothing (compensate when handling else block) \n
+ * Procedure node and Empty parent stack (ready to close off the procedure block)
+ *
+ *
+ * Precondition: If it's a close brace for an entire procedure, the parent stack should be empty  else for other node
+ * types, the parent stack should be non-empty (since we expect the statement to be nested within some kind of cluster.
+ */
+void PSubsystem::HandleCloseBrace() {
+  //assertion: case 1: close brace for procedure --> type = 0 & parent_stack = empty
+  //           case 2: close brace for others    --> type > 0 & parent_stack ! empty
+  assert((current_node_type_ != NodeType::kProcedure && !parent_stack_.empty()) ||
+      current_node_type_ == NodeType::kProcedure && parent_stack_.empty());
+
+  if (current_node_type_ == NodeType::kIf) {
+    CloseIfBlock();
+    return; // do not pop anything in if-close brace. pop 2 when finishing else.
+  }
+
+  follow_stack_.pop(); //this is allowed because any stmtList must be 1..* statements. so no condition for if (...) { }
+
+  if (current_node_type_ == NodeType::kProcedure && parent_stack_.empty()) {
+    CloseProcedureBlock();
   } else {
     Container* current_nest = parent_stack_.top();
     parent_stack_.pop();
-
     if (current_node_type_ == NodeType::kElse) { //double pop for else clause
-      current_nest = parent_stack_.top();
-      parent_stack_.pop();
-      follow_stack_.pop();
-
-      Block* block_end_else = new Block();
-      block_stack_.top()->next_block_.insert(block_end_else);
-      block_stack_.pop(); //pop the else block
-      block_stack_.top()->next_block_.insert(block_end_else);
-      block_stack_.pop(); //pop the if_body block
-      block_stack_.pop(); //pop the if_cond block
-      block_stack_.push(block_end_else);
+      CloseElseBlock(current_nest);
     } else if (current_node_type_ == NodeType::kWhile) {
-      Block* lastStmt = block_stack_.top();
-      block_stack_.pop(); // link the last stmt to the while_cond block, and pop it.
-      lastStmt->next_block_.insert(block_stack_.top());
-
-      Block* block_end_while = new Block();
-      block_stack_.top()->next_block_.insert(block_end_while);
-      block_stack_.pop(); //pop the while_cond block
-      block_stack_.push(block_end_while);
+      CloseWhileBlock();
     }
-
-    current_node_ = dynamic_cast<Statement*>(current_nest)->GetParentNode();
-
-    if (parent_stack_.empty()) { //back to procedure stmtlist
-      current_node_type_ = NodeType::kProcedure;
-      current_node_ = current_procedure_;
-    } else {
-      current_nest = parent_stack_.top();
-      if (WhileEntity* while_entity = dynamic_cast<WhileEntity*>(current_nest)) {
-        current_node_type_ = NodeType::kWhile;
-      } else if (IfEntity* if_entity = dynamic_cast<IfEntity*>(current_nest)) {
-        current_node_type_ = NodeType::kIf;
-      } else if (ElseEntity* else_entity = dynamic_cast<ElseEntity*>(current_nest)) {
-        current_node_type_ = NodeType::kElse;
-
-        //dirty way to get the original if-statement (should be 2nd highest)
-        parent_stack_.pop(); //pop this else;
-        current_node_ = parent_stack_.top();
-        assert (dynamic_cast<IfEntity*>(current_node_) != nullptr);
-        parent_stack_.push(else_entity);
-      } else {
-        throw std::invalid_argument("[ERROR] Retrace error. There should not be any other types ");
-      }
-    }
+    ProcessOuterParentNode(current_nest);
   }
-  }
+}
 
+/**
+ *  Every procedure is a Cluster on it's own and every other statement shall
+ *  be within its collection of clusters.
+ * @return
+ */
+Cluster* InitClusterRoot() {
+  Cluster* cluster_root = new Cluster(); // the outer procedure
+  return cluster_root;
+
+}
+
+/**
+ * Given a new procedure, inits the cluster root, inits program if this is the first
+ * procedure encountered so far, and finally, throws an error if this procedure name is a duplicate
+ * declaration of procedure.
+ * @param procedure procedure entity created from the line that represents the start of a procedure
+ */
 void PSubsystem::PerformNewProcedureSteps(Procedure* procedure) {
   current_procedure_ = procedure;
   current_node_ = procedure;
   current_node_type_ = NodeType::kProcedure;
-  Cluster* cluster_root = new Cluster();
+  Cluster* cluster_root = InitClusterRoot();
   // QQ: can't dynamic cast this :(
-  block_stack_.push(static_cast<Block* const>(cluster_root));
+  block_stack_.push(static_cast<Block*>(cluster_root));
   procedure->SetClusterRoot(cluster_root);
-
   if (deliverable_->GetProgram() == nullptr) {
     Program* program = new Program(procedure);
     deliverable_->SetProgram(program);
@@ -163,7 +219,6 @@ void PSubsystem::PerformNewProcedureSteps(Procedure* procedure) {
         throw SyntaxException("Encountered 2 procedures with the same name.");
       }
     }
-
     deliverable_->GetProgram()->AddProcedure(procedure);
   }
 }
@@ -316,8 +371,6 @@ void PSubsystem::AddControlVariableRelationships(const std::vector<Variable*>& c
       deliverable_->AddUsesRelationship(current_node_, v);
   }
 }
-
-
 
 void PSubsystem::HandleAssignStmt(Entity* entity) {
   AssignEntity* assign_entity = dynamic_cast<AssignEntity*>(entity);

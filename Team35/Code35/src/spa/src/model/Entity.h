@@ -29,7 +29,7 @@ class Entity {
   EntityEnum type;
  public:
   virtual ~Entity() {};
-  EntityEnum getEntityEnum();
+  EntityEnum GetEntityEnum();
 };
 
 class Container;

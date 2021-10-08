@@ -67,6 +67,9 @@ class PSubsystem {
   void AddControlVariableRelationships(const std::vector<Variable*>& control_variables);
   void CheckForIfElseValidity();
   void CheckForExistingProcedure();
+  void CloseIfBlock();
+  void CloseProcedureBlock();
+  void CloseElseBlock(Container* current_nest);
 
  public:
   PSubsystem() = default;
@@ -76,6 +79,10 @@ class PSubsystem {
   void ProcessStatement(const std::string& statement);
 
   Deliverable* GetDeliverables();
+  void CloseWhileBlock();
+  void ProcessOuterNodeAsProcedure();
+  void ProcessOuterParentNode(Container* current_nest);
+  void ProcessOuterNodeType(Container* current_nest);
 };
 }
 

@@ -5,7 +5,7 @@
 #include <list>
 #include "Entity.h"
 
-EntityEnum Entity::getEntityEnum() {
+EntityEnum Entity::GetEntityEnum() {
   return type;
 }
 
