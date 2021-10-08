@@ -70,7 +70,11 @@ class PSubsystem {
   void CloseIfBlock();
   void CloseProcedureBlock();
   void CloseElseBlock(Container* current_nest);
-
+  void CloseWhileBlock();
+  void ProcessOuterNodeAsProcedure();
+  void ProcessOuterParentNode(Container* current_nest);
+  void ProcessOuterNodeType(Container* current_nest);
+  std::vector<Token> GetValidatedTokens(const std::string& statement);
  public:
   PSubsystem() = default;
 
@@ -79,10 +83,9 @@ class PSubsystem {
   void ProcessStatement(const std::string& statement);
 
   Deliverable* GetDeliverables();
-  void CloseWhileBlock();
-  void ProcessOuterNodeAsProcedure();
-  void ProcessOuterParentNode(Container* current_nest);
-  void ProcessOuterNodeType(Container* current_nest);
+
+  void ProcessEntityAsNewProcedure(Entity* entity);
+  void ProcessEntityAsStatement(Entity* entityObj);
 };
 }
 

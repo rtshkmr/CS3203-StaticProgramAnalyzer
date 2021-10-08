@@ -26,14 +26,12 @@ void PSubsystem::InitDataStructures() {
 }
 
 /**
- * Process 1 statement at a time, and append relationship into Deliverables map.
- * @param statement Statement to be processed
- * @throws SyntaxException throws when a syntax error was found in this statement or any previous statement
- * @throws IterationOneException throws when Call statement was called
- * @throws IterationOneException throws when more than one procedure is processed.
+ *  Tokenizes and validates tokens (syntax validation) in a statement-level.
+ * @param statement string representation of a statement
+ * @return a validated vector of tokens
+ * @throws SyntaxException if there's a syntax exception found during this stage
  */
-void PSubsystem::ProcessStatement(const std::string& statement) {
-//  LOG (spa_logger << "\n\n\n==========================  [ENTER] ProcessStatement ======================\n\n\n");
+std::vector<Token> PSubsystem::GetValidatedTokens(const std::string& statement) {
   if (!valid_state) {
     throw SyntaxException("Unable to process statement due to an earlier syntax error found, or closed");
   }
@@ -45,24 +43,21 @@ void PSubsystem::ProcessStatement(const std::string& statement) {
     valid_state = false;
     throw SyntaxException("Invalid syntax found.");
   }
+  return tokens;
+}
 
-  if (tokens[0].GetTokenTag() == TokenTag::kCloseBrace) {
-    return HandleCloseBrace(); // Close Brace can early return without creating entity.
+void PSubsystem::ProcessEntityAsNewProcedure(Entity* entityObj) {
+  if (Procedure* procedure = dynamic_cast<Procedure*>(entityObj)) {
+    assert(entityObj->GetEntityEnum() == EntityEnum::kProcedureEntity && current_procedure_ == nullptr
+               && current_node_ == nullptr && follow_stack_.empty() && parent_stack_.empty() && block_stack_.empty());
+    return PerformNewProcedureSteps(procedure);
+  } else {
+    throw SyntaxException("Expected a procedure entity at this location but was given another type.");
   }
+}
 
-  Entity* entityObj = entity_factory_.CreateEntity(tokens);
 
-  if (current_node_type_
-      == NodeType::kNone) { //when current_node_ is null. Only happens when not reading within a procedure.
-    if (Procedure* procedure = dynamic_cast<Procedure*>(entityObj)) {
-      assert(entityObj->GetEntityEnum() == EntityEnum::kProcedureEntity && current_procedure_ == nullptr
-                 && current_node_ == nullptr && follow_stack_.empty() && parent_stack_.empty() && block_stack_.empty());
-      return PerformNewProcedureSteps(procedure);
-    } else {
-      throw SyntaxException("Expected a procedure entity at this location but was given another type.");
-    }
-  }
-
+void PSubsystem::ProcessEntityAsStatement(Entity* entityObj) {
   //From here onwards, Entity must be a Statement type;
   if (Statement* stmt = dynamic_cast<Statement*>(entityObj)) {
     SetStatementObject(stmt);
@@ -71,7 +66,27 @@ void PSubsystem::ProcessStatement(const std::string& statement) {
   } else {
     throw SyntaxException("Expected a Statement but was given a procedure declaration.");
   }
-//  LOG (spa_logger << "\n\n\n==========================  [EXIT] ProcessStatement ======================\n\n\n");
+}
+
+/**
+ * Process 1 statement at a time, and append relationship into Deliverables map.
+ * @param statement Statement to be processed
+ * @throws SyntaxException throws when a syntax error was found in this statement or any previous statement
+ * @throws IterationOneException throws when Call statement was called
+ * @throws IterationOneException throws when more than one procedure is processed.
+ */
+void PSubsystem::ProcessStatement(const std::string& statement) {
+//  LOG (spa_logger << "\n\n\n==========================  [ENTER] ProcessStatement ======================\n\n\n");
+  std::vector<Token> tokens = GetValidatedTokens(statement);
+  if (tokens[0].GetTokenTag() == TokenTag::kCloseBrace) {
+    return HandleCloseBrace(); // Close Brace can early return without creating entity.
+  }
+  Entity* entityObj = entity_factory_.CreateEntity(tokens);
+  if (current_node_type_ == NodeType::kNone) { // Only happens when not reading within a procedure.
+    ProcessEntityAsNewProcedure(entityObj);
+    return;
+  }
+  ProcessEntityAsStatement(entityObj);
 }
 
 /**
