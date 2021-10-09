@@ -10,6 +10,7 @@
 
   participant SourceProcessor
   participant DesignExtractor
+  participant CallsTExtractor
   participant UsesExtractor
   participant ModifiesExtractor
   participant ParentTExtractor
@@ -19,6 +20,11 @@
   SourceProcessor -> DesignExtractor: DesignExtractor(deliverable)
   SourceProcessor -> DesignExtractor: ExtractDesignAbstractions()
   activate DesignExtractor
+
+  DesignExtractor -> CallsTExtractor: Extract(deliverable)
+  activate CallsTExtractor
+  CallsTExtractor --> DesignExtractor
+  deactivate CallsTExtractor
 
   DesignExtractor -> UsesExtractor: Extract(deliverable)
   activate UsesExtractor
