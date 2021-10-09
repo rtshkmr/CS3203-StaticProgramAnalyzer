@@ -442,7 +442,6 @@ TEST_CASE("3.QueryExtractor.Single well-formed pattern with correct syn-assign b
   }
 }
 
-// for iteration 1: rhs is an expression-spec: ‘_’ ‘"’ factor ‘"’ ‘_’ | ‘_’
 TEST_CASE("3.QueryExtractor.Single well-formed pattern with correct syn-assign and correct args; should PASS") {
   SECTION("rhs is underscore") {
     std::string query = "assign a1; Select a1 pattern a1 ( _ , _)";
@@ -483,7 +482,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed pattern with correct syn-assign a
     delete cl;
   }
 
-  SECTION("rhs is factor string of type const") {
+  SECTION("rhs is partial match with factor string of type const") {
     std::string query = "assign a1; Select a1 pattern a1 ( _ , _\"69\"_)";
     auto query_extractor = QueryExtractor(& query);
     query_extractor.ExtractQuery();
@@ -522,7 +521,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed pattern with correct syn-assign a
     delete cl;
   }
 
-  SECTION("rhs is a factor string of type variable name") {
+  SECTION("rhs is partial match with factor string of type variable name") {
     std::string query = "assign a1; Select a1 pattern a1 ( _ , _\"count\"_)";
     auto query_extractor = QueryExtractor(& query);
     query_extractor.ExtractQuery();
@@ -533,6 +532,84 @@ TEST_CASE("3.QueryExtractor.Single well-formed pattern with correct syn-assign a
     std::list<Synonym> expected_synonyms = {Synonym("a1", DesignEntity::kAssign)};
     Synonym expected_target = Synonym("a1", DesignEntity::kAssign);
     Clause* cl = new Pattern("_", "count", "a1", false, false);
+    std::vector<Clause*> clauses;
+    clauses.push_back(cl);
+    std::list<Group*> expected_groups;
+    Group expected_group = Group(clauses, true);
+    expected_groups.push_back(& expected_group);
+
+    // validate target
+    REQUIRE(AreSynonymsEqual(expected_target, target));
+    // validate synonyms
+    auto it1 = expected_synonyms.begin();
+    auto it2 = synonyms.begin();
+    while (it1 != expected_synonyms.end() && it2 != synonyms.end()) {
+      REQUIRE(AreSynonymsEqual(* it1, * it2));
+      it1++;
+      it2++;
+    }
+    // validate groups
+    REQUIRE(expected_groups.size() == groups.size());
+    auto it3 = expected_groups.begin();
+    auto it4 = groups.begin();
+    while (it3 != expected_groups.end() && it4 != groups.end()) {
+      REQUIRE(AreGroupsEqual(* it3, * it4));
+      it3++;
+      it4++;
+    }
+    delete cl;
+  }
+
+  SECTION("rhs is partial match with complex expression-spec") {
+    std::string query = "assign a1; Select a1 pattern a1 ( _ , _\"v + x * y + z * t\"_)";
+    auto query_extractor = QueryExtractor(& query);
+    query_extractor.ExtractQuery();
+    std::list<Synonym> synonyms = query_extractor.GetSynonymsList();
+    Synonym target = query_extractor.GetTarget();
+    std::list<Group*> groups = query_extractor.GetGroupsList();
+
+    std::list<Synonym> expected_synonyms = {Synonym("a1", DesignEntity::kAssign)};
+    Synonym expected_target = Synonym("a1", DesignEntity::kAssign);
+    Clause* cl = new Pattern("_", "v + x * y + z * t", "a1", false, false);
+    std::vector<Clause*> clauses;
+    clauses.push_back(cl);
+    std::list<Group*> expected_groups;
+    Group expected_group = Group(clauses, true);
+    expected_groups.push_back(& expected_group);
+
+    // validate target
+    REQUIRE(AreSynonymsEqual(expected_target, target));
+    // validate synonyms
+    auto it1 = expected_synonyms.begin();
+    auto it2 = synonyms.begin();
+    while (it1 != expected_synonyms.end() && it2 != synonyms.end()) {
+      REQUIRE(AreSynonymsEqual(* it1, * it2));
+      it1++;
+      it2++;
+    }
+    // validate groups
+    REQUIRE(expected_groups.size() == groups.size());
+    auto it3 = expected_groups.begin();
+    auto it4 = groups.begin();
+    while (it3 != expected_groups.end() && it4 != groups.end()) {
+      REQUIRE(AreGroupsEqual(* it3, * it4));
+      it3++;
+      it4++;
+    }
+    delete cl;
+  }
+
+  SECTION("rhs is exact match with complex expression-spec") {
+    std::string query = "assign a1; Select a1 pattern a1 ( _ , \"v + x * y + z * t\")";
+    auto query_extractor = QueryExtractor(& query);
+    query_extractor.ExtractQuery();
+    std::list<Synonym> synonyms = query_extractor.GetSynonymsList();
+    Synonym target = query_extractor.GetTarget();
+    std::list<Group*> groups = query_extractor.GetGroupsList();
+
+    std::list<Synonym> expected_synonyms = {Synonym("a1", DesignEntity::kAssign)};
+    Synonym expected_target = Synonym("a1", DesignEntity::kAssign);
+    Clause* cl = new Pattern("_", "v + x * y + z * t", "a1", false, true);
     std::vector<Clause*> clauses;
     clauses.push_back(cl);
     std::list<Group*> expected_groups;
