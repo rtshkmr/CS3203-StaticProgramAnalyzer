@@ -438,7 +438,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed pattern with correct syn-assign b
     std::string query = "assign a1; Select a1 pattern a1 ( _ , \"count\"_)";
     auto query_extractor = QueryExtractor(& query);
     REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
-                        Catch::Contains("Invalid expression-spec for rhs of pattern clause in iteration 1."));
+                        Catch::Contains("Unexpected token"));
   }
 }
 

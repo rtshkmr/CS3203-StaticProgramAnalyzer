@@ -1,6 +1,8 @@
 #include "QueryParser.h"
 #include "QueryValidator.h"
 #include <component/QueryProcessor/types/Exceptions.h>
+#include <component/SourceProcessor/Tokenizer.h>
+#include <component/SourceProcessor/SyntaxValidator.h>
 #include <datatype/RegexPatterns.h>
 #include <unordered_set>
 #include <sstream>
@@ -304,33 +306,53 @@ std::string QueryParser::ParseFactor() {
   return ss.str();
 }
 
-// iteration 1: expression-spec: ‘_’ ‘"’ factor ‘"’ ‘_’ | ‘_’
+// expression-spec : ‘"‘ expr’"’ | ‘_’ ‘"’ expr ‘"’ ‘_’ | ‘_’
 /**
  * Parses an expression-spec.
- * @return a pair of values corresponding to string expr-spec, bool is_exact_match which is true if
- * expr-spec is an exact match, or false if it is a wildcard/partial match.
+ * @return a pair of values corresponding to string expr-spec, bool is_exact_match.
+ * expr-spec only includes '_' for the case that it is a wildcard; for partial match leading/trailing '_' is excluded.
+ * is_exact_match is true if expr-spec is an exact match, or false if it is a wildcard/partial match.
  */
 std::pair<std::string, bool> QueryParser::ParseExpressionSpec() {
   bool is_exact_match = false;
+  bool is_partial_match = false;
+  bool is_wildcard = false;
   std::stringstream rhs_ss;
 
-  // for iteration 1, there are no exact matches that are to be expected.
-  if (lookahead.GetTokenTag() == TokenTag::kStringQuote) {
-    throw PQLParseException("Invalid expression-spec for rhs of pattern clause in iteration 1.");
-  }
-  Eat(TokenTag::kUnderscore);
-  rhs_ss << "_";
-  if (lookahead.GetTokenTag() == TokenTag::kCloseBracket) {
-    // consider rhs as '_' case due to end of expression-spec.
-  } else if (lookahead.GetTokenTag() == TokenTag::kStringQuote) {
-    // consider as ‘_’ ‘"’ factor ‘"’ ‘_’
-    rhs_ss.str("");
-    Eat(TokenTag::kStringQuote);
-    rhs_ss << ParseFactor();
-    Eat(TokenTag::kStringQuote);
+  // case wildcard or partial match
+  if (lookahead.GetTokenTag() == TokenTag::kUnderscore) {
     Eat(TokenTag::kUnderscore);
-  } else {
-    throw PQLParseException("Invalid expression-spec for rhs of pattern clause in iteration 1.");
+    if (lookahead.GetTokenTag() == TokenTag::kStringQuote) {
+      is_partial_match = true;
+    } else {
+      rhs_ss << '_';
+      is_wildcard = true;
+    }
+  }
+
+  // parse expr for case partial or exact match.
+  if (lookahead.GetTokenTag() == TokenTag::kStringQuote) {
+    if (!is_partial_match) {
+      is_exact_match = true;
+    }
+    std::string expr_candidate_str = tokenizer.SkipTokenizerTillStringQuoteDelimiter();
+    std::vector<Token> toks = Tokenizer::CreateTokens(expr_candidate_str);
+    bool is_expr = SyntaxValidator::IsExpr(toks, 0, toks.size() - 1);
+    if (is_expr) {
+      rhs_ss << expr_candidate_str;
+    } else {
+      throw PQLParseException("Expected valid expression-spec. Received: " + expr_candidate_str);
+    }
+    // advance tokenizer past string quote and optional underscore
+    lookahead = tokenizer.GetNextToken();
+    Eat(TokenTag::kStringQuote);
+    if (is_partial_match) {
+      Eat(TokenTag::kUnderscore);
+    }
+  }
+
+  if (!(is_wildcard || is_exact_match || is_partial_match)) {
+    throw PQLParseException("Invalid expression-spec was neither wildcard, partial nor exact match.");
   }
 
   return std::make_pair(rhs_ss.str(), is_exact_match);
