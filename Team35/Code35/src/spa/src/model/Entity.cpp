@@ -32,6 +32,12 @@ const void Procedure::SetClusterRoot(Cluster* cluster) {
 const Cluster* Procedure::GetClusterRoot() {
   return this->cluster_root_;
 }
+const Block* Procedure::GetBlockRoot() {
+  return this->block_root_;
+}
+const void Procedure::SetBlockRoot(Block* block_root) {
+  this->block_root_ = block_root;
+}
 
 Variable::Variable(VariableName* vName) {
   type = EntityEnum::kNone;

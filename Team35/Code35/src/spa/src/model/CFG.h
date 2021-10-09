@@ -14,20 +14,26 @@ class Block;
 class Cluster {
 
  private:
-  std::list<Cluster> clusters_;
+  std::list<Cluster*> nested_clusters_;
  protected:
   int start_ = -1;
   int end_ = -1;
   std::set<VariableName*> modified_variables_; // QQ: why does it throw error if I use Variable instead of VariableName* !?
+  Cluster* parent_cluster_;
+  // todo: is it better to have as a field the position idx in the nested_clusters list of the parent? if not need to do a linear search each time.
  public:
   Cluster() {};
   int size() const;
-  void AddCluster(Cluster new_cluster);
+  void AddChildCluster(Cluster* new_cluster);
   void AddStmt(StatementNumber statement_number);
   void RemoveStmt(StatementNumber statement_number);
-  bool CheckIfStatementInCluster(StatementNumber sn) const;
+  bool CheckIfStatementInRange(StatementNumber sn) const;
+  Cluster* GetParentCluster();
+  std::list<Cluster*> GetNestedClusters();
+  Cluster* GetNextSiblingCluster();
+  void SetParentCluster(Cluster* parent_cluster);
   /// ISSUE 2: to use dynamic_cast, need a virtual method; suggesstion -> create a virtual destructor (good practice too)
-  virtual std::set<Block*> GetNextBlock() { //to be overwritten by child. -> bad imp; [for testing use]
+  virtual std::set<Block*> GetNextBlocks() { //to be overwritten by child. -> bad imp; [for testing use]
     throw std::invalid_argument("Should not access this if you are not Block");
   }
 
@@ -45,10 +51,11 @@ class Block: public Cluster {
 
  public:
   bool isWhile = false;
-  // std::set<Block*, Block::BlockComparator> next_block_ = {};
-  std::set<Block*> next_block_ = {};
-  std::set<Block*> GetNextBlock() {
-    return next_block_;
+  // std::set<Block*, Block::BlockComparator> next_blocks_ = {};
+  // QQ:variable had to be renamed into plural
+  std::set<Block*> next_blocks_ = {};
+  std::set<Block*> GetNextBlocks() {
+    return next_blocks_;
   }
 
   Block(){};

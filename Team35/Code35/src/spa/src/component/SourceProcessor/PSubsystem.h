@@ -47,7 +47,8 @@ class PSubsystem {
   std::stack<Container*> parent_stack_;
   std::stack<Statement*> follow_stack_;
   /// ISSUE 1: Trying to add Cluster as a Block.
-  std::stack<Cluster*> block_stack_;
+  std::stack<Block*> block_stack_;
+  std::stack<Cluster*> cluster_stack_;
   int program_counter_ = 0;
 
   // private methods for selfcall
@@ -76,6 +77,7 @@ class PSubsystem {
   void ProcessOuterParentNode(Container* current_nest);
   void ProcessOuterNodeType(Container* current_nest);
   std::vector<Token> GetValidatedTokens(const std::string& statement);
+  void InitRootClusterAndBlock(Procedure* procedure);
  public:
   PSubsystem() = default;
 
@@ -86,7 +88,7 @@ class PSubsystem {
   Deliverable* GetDeliverables();
 
   void ProcessEntityAsNewProcedure(Entity* entity);
-  void ProcessEntityAsStatement(Entity* entityObj);
+  void ProcessEntityAsStatement(Entity* entity);
 };
 }
 
