@@ -15,7 +15,7 @@ void PSubsystem::InitDataStructures() {
   current_node_type_ = NodeType::kNone;
   parent_stack_ = std::stack<Container*>();
   follow_stack_ = std::stack<Statement*>();
-  block_stack_ = std::stack<Block*>();
+  block_stack_ = std::stack<Cluster*>();
   program_counter_ = 0;
 
   deliverable_ = new Deliverable(); //created in heap so that can pass this object to PKB
@@ -112,21 +112,21 @@ void PSubsystem::CloseElseBlock(Container* current_nest) {
   parent_stack_.pop();
   follow_stack_.pop();
   Block* block_end_else = new Block();
-  block_stack_.top()->next_block_.insert(block_end_else);
+  block_stack_.top()->GetNextBlock().insert(block_end_else);
   block_stack_.pop(); //pop the else block
-  block_stack_.top()->next_block_.insert(block_end_else);
+  block_stack_.top()->GetNextBlock().insert(block_end_else);
   block_stack_.pop(); //pop the if_body block
   block_stack_.pop(); //pop the if_cond block
   block_stack_.push(block_end_else);
 }
 
 void PSubsystem::CloseWhileBlock() {
-  Block* lastStmt = block_stack_.top();
+  Block* lastStmt = dynamic_cast<Block*>(block_stack_.top());
   block_stack_.pop(); // link the last stmt to the while_cond block, and pop it.
-  lastStmt->next_block_.insert(block_stack_.top());
+  lastStmt->GetNextBlock().insert(dynamic_cast<Block*>(block_stack_.top()));
 
   Block* block_end_while = new Block();
-  block_stack_.top()->next_block_.insert(block_end_while);
+  block_stack_.top()->GetNextBlock().insert(block_end_while);
   block_stack_.pop(); //pop the while_cond block
   block_stack_.push(block_end_while);
 }
@@ -188,13 +188,15 @@ void PSubsystem::HandleCloseBrace() {
   if (current_node_type_ == NodeType::kProcedure && parent_stack_.empty()) {
     CloseProcedureBlock();
   } else {
-    Container* current_nest = parent_stack_.top();
-    parent_stack_.pop();
+    /// FOR ISSUE 3 -> current_next PLACEMENT IS CRUCIAL FOR IF-STATEMENT, because it pops the else first
     if (current_node_type_ == NodeType::kElse) { //double pop for else clause
-      CloseElseBlock(current_nest);
+      CloseElseBlock(nullptr);
     } else if (current_node_type_ == NodeType::kWhile) {
       CloseWhileBlock();
     }
+
+    Container* current_nest = parent_stack_.top();
+    parent_stack_.pop();
     ProcessOuterParentNode(current_nest);
   }
 }
@@ -205,9 +207,10 @@ void PSubsystem::HandleCloseBrace() {
  * @return
  */
 Cluster* InitClusterRoot() {
-  Cluster* cluster_root = new Cluster(); // the outer procedure
+  /// ISSUE 1&2: In order for the first while/if block to access previous next_block, need create as Block
+  /// This is for you to change cluster to add next cluster for now.
+  Cluster* cluster_root = new Block(); // the outer procedure
   return cluster_root;
-
 }
 
 /**
@@ -222,7 +225,8 @@ void PSubsystem::PerformNewProcedureSteps(Procedure* procedure) {
   current_node_type_ = NodeType::kProcedure;
   Cluster* cluster_root = InitClusterRoot();
   // QQ: can't dynamic cast this :(
-  block_stack_.push(static_cast<Block*>(cluster_root));
+  /// ISSUE 1: Trying to place a Cluster-type into Block-type stack.
+  block_stack_.push(cluster_root);
   procedure->SetClusterRoot(cluster_root);
   if (deliverable_->GetProgram() == nullptr) {
     Program* program = new Program(procedure);
@@ -344,8 +348,8 @@ ConditionalBlock* PSubsystem::CreateConditionalBlock(Statement* conditional_stat
     block_stack_.top()->RemoveStmt(StatementNumber(statement_num));
     conditional_block = new ConditionalBlock();
     conditional_block->AddStmt(StatementNumber(statement_num));
-    block_stack_.top()->next_block_.insert(static_cast<Block*>(conditional_block));
-    if (!block_stack_.top()->isWhile) {
+    block_stack_.top()->GetNextBlock().insert(conditional_block);
+    if (!dynamic_cast<Block*>(block_stack_.top())->isWhile) {
       block_stack_.pop(); // pop the previous progline if it isnt while (no loopback to care)
     }
     block_stack_.push(static_cast<Block* const>(conditional_block));
@@ -370,10 +374,10 @@ void PSubsystem::CreateBodyBlock(ConditionalBlock* conditional_block) {
  *  Overloaded function to create Else block's body
  */
 void PSubsystem::CreateBodyBlock() {
-  Block* block_if_body = block_stack_.top();
+  Block* block_if_body = dynamic_cast<Block*>(block_stack_.top());
   block_stack_.pop(); //pop so that the if_cond can perform next_block map to else block
   Block* block_else = new Block();
-  block_stack_.top()->next_block_.insert(block_else);
+  block_stack_.top()->GetNextBlock().insert(block_else);
   block_stack_.push(block_if_body);
   block_stack_.push(block_else);
 }
