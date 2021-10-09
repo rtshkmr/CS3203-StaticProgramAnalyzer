@@ -96,17 +96,12 @@ void QueryParser::ParseTarget() {
   Token target_synonym = Eat(TokenTag::kName);
   std::string target = target_synonym.GetTokenString();
   // target must be a known synonym
-  bool hasSynonym = false;
-  for (Synonym& t: synonyms) {
-    if (t.GetName() == target) {
-      hasSynonym = true;
-      this->target = Synonym(target, t.GetType());
-      break;
-    }
-  }
-  if (!hasSynonym) {
+  if (synonyms_name_set.find(target) == synonyms_name_set.end()) {
     throw PQLParseException("Incorrect target synonym for \'Select\' query.");
   }
+  DesignEntity de = QueryParser::GetSynonymInfo(target, &synonyms).GetType();
+  this->target_synonyms_list.push_back(Synonym(target, de));
+  this->target_synonyms_name_set.emplace(target);
 }
 
 // stmtRef: synonym | ‘_’ | INTEGER
@@ -124,7 +119,7 @@ std::tuple<std::string, bool, bool> QueryParser::ParseStmtRef() {
       throw PQLParseException("Unknown synonym supplied in clause.");
     }
     is_synonym = true;
-    if (target.GetName().compare(curr_lookahead) == 0) {
+    if (target_synonyms_name_set.find(curr_lookahead) != target_synonyms_name_set.end()) {
       is_target_synonym = true;
     }
   } else if (lookahead.GetTokenTag() == TokenTag::kInteger) {
@@ -170,7 +165,7 @@ std::tuple<std::string, bool, bool, bool> QueryParser::ParseStmtOrEntRef() {
   if (is_uses_or_modifies_p) {
     Token tok = ParseEntRef(false);
     is_synonym = IsValidSynonym(tok);
-    is_target_synonym = tok.GetTokenString() == this->target.GetName();
+    is_target_synonym = target_synonyms_name_set.find(tok.GetTokenString()) != target_synonyms_name_set.end();
   } else {
     std::tie(curr_lookahead, is_synonym, is_target_synonym) = ParseStmtRef();
   }
@@ -222,7 +217,7 @@ std::pair<Clause*, bool> QueryParser::ParseRelRef() {
     Token tok = ParseEntRef(false);
     rhs = tok.GetTokenString();
     is_rhs_syn = IsValidSynonym(tok);
-    is_rhs_tgt_syn = tok.GetTokenString() == this->target.GetName();
+    is_rhs_tgt_syn = target_synonyms_name_set.find(tok.GetTokenString()) != target_synonyms_name_set.end();
   } else {
     std::tie(rhs, is_rhs_syn, is_rhs_tgt_syn) = ParseStmtRef();
   }

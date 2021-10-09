@@ -18,7 +18,8 @@ class QueryParser {
   std::vector<Clause*>& clauses;
   std::list<Group*>& groups;
   std::list<Synonym>& synonyms;
-  Synonym& target;
+  std::vector<Synonym>& target_synonyms_list;
+  std::unordered_set<std::string> target_synonyms_name_set;
 
   Token lookahead = Token("", TokenTag::kInvalid);
   QueryTokenizer tokenizer;
@@ -44,8 +45,9 @@ class QueryParser {
   bool IsValidSynonym(Token token, DesignEntity de);
  public:
   QueryParser(std::vector<Clause*>& clauses, std::list<Group*>& groups, std::list<Synonym>& synonyms,
-              Synonym& target, QueryTokenizer tokenizer) :
-      clauses(clauses), groups(groups), synonyms(synonyms), target(target), tokenizer(tokenizer) {};
+              std::vector<Synonym>& target_synonyms_list, QueryTokenizer tokenizer) :
+      clauses(clauses), groups(groups), synonyms(synonyms),
+      target_synonyms_list(target_synonyms_list), tokenizer(tokenizer) {};
   void Parse();
   std::list<Group*> GetGroupsList() { return groups; };
   static Synonym GetSynonymInfo(std::string syn_name, std::list<Synonym>* synonyms);

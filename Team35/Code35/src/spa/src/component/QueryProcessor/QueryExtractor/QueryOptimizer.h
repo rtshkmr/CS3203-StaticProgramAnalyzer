@@ -8,7 +8,8 @@
 
 class QueryOptimizer {
  public:
-  static void GroupClauses(std::vector<Clause*>* clauses, std::list<Group*>* groups, Synonym* target);
+  static void GroupClauses(std::vector<Clause*>* clauses, std::list<Group*>* groups,
+                           std::vector<Synonym>* target_synonyms);
 };
 
 #endif //AUTOTESTER_QUERYOPTIMIZER_H

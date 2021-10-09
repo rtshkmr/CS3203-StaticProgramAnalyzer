@@ -4,30 +4,31 @@
 /**
  * Groups queries that should be evaluated together, based on existence of common synonyms.
  */
-void QueryOptimizer::GroupClauses(std::vector<Clause*>* clauses, std::list<Group*>* groups, Synonym* target) {
+void QueryOptimizer::GroupClauses(std::vector<Clause*>* clauses, std::list<Group*>* groups,
+                                  std::vector<Synonym>* target_synonyms) {
   // [TODO iter 2]: implement grouping algorithm.
   // current implementation assumes only 1 such that and 1 pattern clause; manually grouping by common synonym.
   if (clauses->size() == 0) {
     return;
   }
-
+  auto target = target_synonyms->at(0);
   if (clauses->size() == 1) {
     // expecting 1 such that or 1 pattern clause
     bool has_target_syn = false;
     // such that clause
     if (typeid(* (* clauses)[0]) == typeid(SuchThat)) {
       SuchThat* st = dynamic_cast<SuchThat*>((* clauses)[0]);
-      if (st->left_is_synonym && st->left_hand_side.compare(target->GetName()) == 0) {
+      if (st->left_is_synonym && st->left_hand_side.compare(target.GetName()) == 0) {
         has_target_syn = true;
-      } else if (st->right_is_synonym && st->right_hand_side.compare(target->GetName()) == 0) {
+      } else if (st->right_is_synonym && st->right_hand_side.compare(target.GetName()) == 0) {
         has_target_syn = true;
       }
     } else {
       // pattern clause
       Pattern* pt = dynamic_cast<Pattern*>((* clauses)[0]);
       // has_target_syn if lhs is a target synonym, or if  syn-assn is a target synonym
-      if (pt->assign_synonym.compare(target->GetName()) == 0 ||
-          pt->left_is_synonym && pt->left_hand_side.compare(target->GetName()) == 0) {
+      if (pt->assign_synonym.compare(target.GetName()) == 0 ||
+          pt->left_is_synonym && pt->left_hand_side.compare(target.GetName()) == 0) {
         has_target_syn = true;
       }
     }
@@ -42,9 +43,9 @@ void QueryOptimizer::GroupClauses(std::vector<Clause*>* clauses, std::list<Group
     bool has_target_syn = false;
     if (typeid(* (* clauses)[0]) == typeid(SuchThat)) {
       SuchThat* st = dynamic_cast<SuchThat*>((* clauses)[0]);
-      if (st->left_is_synonym && st->left_hand_side.compare(target->GetName()) == 0) {
+      if (st->left_is_synonym && st->left_hand_side.compare(target.GetName()) == 0) {
         has_target_syn = true;
-      } else if (st->right_is_synonym && st->right_hand_side.compare(target->GetName()) == 0) {
+      } else if (st->right_is_synonym && st->right_hand_side.compare(target.GetName()) == 0) {
         has_target_syn = true;
       }
     }
@@ -65,8 +66,8 @@ void QueryOptimizer::GroupClauses(std::vector<Clause*>* clauses, std::list<Group
       std::vector<Clause*> cl2;
       cl2.push_back(pt);
       bool pattern_cl_has_tgt_syn = false;
-      if (pt->assign_synonym.compare(target->GetName()) == 0 ||
-          pt->left_is_synonym && pt->left_hand_side.compare(target->GetName()) == 0) {
+      if (pt->assign_synonym.compare(target.GetName()) == 0 ||
+          pt->left_is_synonym && pt->left_hand_side.compare(target.GetName()) == 0) {
         pattern_cl_has_tgt_syn = true;
       }
       Group* g2 = new Group(cl2, pattern_cl_has_tgt_syn);

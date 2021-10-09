@@ -10,7 +10,7 @@ void QueryExtractor::ExtractQuery() {
   auto tokenizer = QueryTokenizer();
   tokenizer.SetQueryString(& query);
   std::vector<Clause*> clauses;
-  QueryParser parser = QueryParser(clauses, groups, synonyms, target, tokenizer);
+  QueryParser parser = QueryParser(clauses, groups, synonyms, target_synonyms, tokenizer);
   parser.Parse();
-  QueryOptimizer::GroupClauses(& clauses, & groups, & target);
+  QueryOptimizer::GroupClauses(& clauses, & groups, & target_synonyms);
 }
