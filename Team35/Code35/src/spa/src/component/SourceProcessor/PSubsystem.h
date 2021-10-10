@@ -71,10 +71,10 @@ class PSubsystem {
   void CheckForExistingProcedure();
   void CloseIfBlock();
   void CloseProcedureBlock();
-  void CloseElseBlock(Container* current_nest);
+  void CloseElseBlock();
   void CloseWhileBlock();
   void ProcessOuterNodeAsProcedure();
-  void ProcessOuterParentNode(Container* current_nest);
+  void ProcessOuterParentNode();
   void ProcessOuterNodeType(Container* current_nest);
   std::vector<Token> GetValidatedTokens(const std::string& statement);
   void InitRootClusterAndBlock(Procedure* procedure);

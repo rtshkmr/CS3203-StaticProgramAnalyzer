@@ -93,7 +93,10 @@ void PSubsystem::ProcessStatement(const std::string& statement) {
  * in the caller function equal.
  */
 void PSubsystem::CloseIfBlock() {
-  if (current_node_type_ == NodeType::kIf) return;// do not pop anything in if-close brace. pop 2 when finishing else.
+  if (current_node_type_ == NodeType::kIf) {
+    // todo: probably have to update cluster's fields
+    return;// do not pop anything in if-close brace. pop 2 when finishing else.
+  }
 }
 
 void PSubsystem::CloseProcedureBlock() {
@@ -103,20 +106,25 @@ void PSubsystem::CloseProcedureBlock() {
     current_procedure_ = nullptr;
     block_stack_.pop();
     assert(block_stack_.empty());
+    bool is_currently_in_outermost_cluster = cluster_stack_.size() == 1;
+    assert(is_currently_in_outermost_cluster);
+    cluster_stack_.pop();
   }
 }
 
-void PSubsystem::CloseElseBlock(Container* current_nest) {
-  current_nest = parent_stack_.top();
+void PSubsystem::CloseElseBlock() {
   parent_stack_.pop();
   follow_stack_.pop();
-  Block* block_end_else = new Block();
+  Block* block_end_else = new Block(); // exit block, QQ: is this really needed!?
   block_stack_.top()->GetNextBlocks().insert(block_end_else);
   block_stack_.pop(); //pop the else block
   block_stack_.top()->GetNextBlocks().insert(block_end_else);
   block_stack_.pop(); //pop the if_body block
   block_stack_.pop(); //pop the if_cond block
   block_stack_.push(block_end_else);
+  bool is_currently_in_nested_cluster = cluster_stack_.size() > 1;
+  assert(is_currently_in_nested_cluster);
+  cluster_stack_.pop();
 }
 
 void PSubsystem::CloseWhileBlock() {
@@ -128,9 +136,15 @@ void PSubsystem::CloseWhileBlock() {
   block_stack_.top()->GetNextBlocks().insert(block_end_while);
   block_stack_.pop(); //pop the while_cond block
   block_stack_.push(block_end_while);
+  bool is_currently_in_nested_cluster = cluster_stack_.size() > 1;
+  assert(is_currently_in_nested_cluster);
+  cluster_stack_.pop();
 }
 
-void PSubsystem::ProcessOuterParentNode(Container* current_nest) {
+void PSubsystem::ProcessOuterParentNode() {
+  /// FOR ISSUE 3 -> current_next PLACEMENT IS CRUCIAL FOR IF-STATEMENT, because it pops the else first
+  Container* current_nest = parent_stack_.top();
+  parent_stack_.pop(); // QQ: pops out the if block?
   // get to outer node and process:
   current_node_ = dynamic_cast<Statement*>(current_nest)->GetParentNode();
   parent_stack_.empty() ? ProcessOuterNodeAsProcedure() : ProcessOuterNodeType(current_nest);
@@ -185,16 +199,12 @@ void PSubsystem::HandleCloseBrace() {
   if (current_node_type_ == NodeType::kProcedure && parent_stack_.empty()) {
     CloseProcedureBlock();
   } else {
-    /// FOR ISSUE 3 -> current_next PLACEMENT IS CRUCIAL FOR IF-STATEMENT, because it pops the else first
     if (current_node_type_ == NodeType::kElse) { //double pop for else clause
-      CloseElseBlock(nullptr);
+      CloseElseBlock();
     } else if (current_node_type_ == NodeType::kWhile) {
       CloseWhileBlock();
     }
-
-    Container* current_nest = parent_stack_.top();
-    parent_stack_.pop();
-    ProcessOuterParentNode(current_nest);
+    ProcessOuterParentNode();
   }
 }
 
