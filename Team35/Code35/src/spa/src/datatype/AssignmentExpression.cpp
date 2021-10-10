@@ -7,6 +7,9 @@
 #include <utility>
 #include "AssignmentExpression.h"
 
+#define CLOSE_BRACKET 7
+#define OPEN_BRACKET -1
+
 /**
  * This is the constructor for AssignmentExpression.
  * To create this object, you should be dealing with an assign-statement, and the input for this constructor
@@ -17,10 +20,12 @@ AssignmentExpression::AssignmentExpression(std::string infix) {
   expression_ = ParseInfixToPostfix(std::move(infix));
 }
 
-// Operator Rank only returns the input value rank.
-// lower rank = push
-// always return an odd number so stack value is even.
-// if it is not operator, return -INT32_MAX;
+/**
+ * Gets the rank of the character. This rank is used to compare the level of precedence.
+ * This function only returns odd numbers as the even numbers are reserved for operators within the stack (left-associative)
+ * @param c Character to be evaluated
+ * @return An odd integer which represents the rank, -INT32_MAX if it is not an operator.
+ */
 int OperatorRank(char& c) {
   switch (c) {
     case ')': return 7;
@@ -53,21 +58,33 @@ void ConvertToStringAndClearBuffer(std::vector<char>* chara, std::vector<std::st
   }
 }
 
+/**
+ * Given the operator_stack and token_list, it will take the top-most operator from the operator_stack, and append it
+ *      to the token_list.
+ */
 void PushTopOperatorToTokenStack(std::stack<char>* operator_stack, std::vector<std::string>* tokens) {
   std::string s2 = std::string() + operator_stack->top() + ' ';
   operator_stack->pop();
   tokens->push_back(s2);
 }
 
+/**
+ * This function handles a close bracket encounter in infix.
+ * This function will pop all of the operators in the operator stack (and append it to token_list), until a open_bracket
+ *     is found.
+ */
 void HandleCloseBracket(std::stack<char>* operator_stack, std::vector<std::string>* tokens) {
   int op_rank = OperatorRank(operator_stack->top());
-  while (op_rank != -1) {
+  while (op_rank != OPEN_BRACKET) {
     PushTopOperatorToTokenStack(operator_stack, tokens);
     op_rank = OperatorRank(operator_stack->top());
   }
   operator_stack->pop(); // this is a (used) open bracket.
 }
 
+/**
+ * This method will split the infix equation into a list of tokens, which are in postfix order.
+ */
 std::vector<std::string> ConvertEquationIntoTokens(std::string eqn) {
   std::vector<char> chara;
   std::vector<std::string> tokens;
@@ -86,14 +103,14 @@ std::vector<std::string> ConvertEquationIntoTokens(std::string eqn) {
 
     int rank = OperatorRank(c);
 
-    if (rank == -1 || operator_stack.empty()) { // ( found or no operator to pop --> Push and leave
+    if (rank == OPEN_BRACKET || operator_stack.empty()) { // ( found or no operator to pop --> Push and leave
       operator_stack.push(c);
       continue;
     }
 
     int stack_rank = OperatorRank(operator_stack.top()) + 1; //stack rank always higher, due to left-associativity
 
-    if (rank == 7) { // ) found; Pop everything until Open Bracket, and leave.
+    if (rank == CLOSE_BRACKET) { // ) found; Pop everything until Open Bracket, and leave.
       HandleCloseBracket(&operator_stack, &tokens);
       continue;
     }
@@ -150,11 +167,7 @@ std::string AssignmentExpression::GetExpressionString() {
 bool AssignmentExpression::CheckExist(std::string pattern) {
   std::string queryPostfix = ParseInfixToPostfix(std::move(pattern));
 
-  if (expression_.find(queryPostfix) != std::string::npos) {
-    return true;
-  } else {
-    return false;
-  }
+  return (expression_.find(queryPostfix) != std::string::npos);
 }
 
 /**
