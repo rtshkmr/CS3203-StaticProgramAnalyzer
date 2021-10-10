@@ -64,8 +64,8 @@ class PSubsystem {
   void HandleReadStmt(Entity* entity);
   void HandlePrintStmt(Entity* entity);
   ConditionalBlock* CreateConditionalBlock(Statement* conditional_statement);
-  void CreateBodyBlock(ConditionalBlock* conditional_block);
-  void CreateBodyBlock(); // for else body
+  BodyBlock* CreateBodyBlock(ConditionalBlock* conditional_block);
+  BodyBlock* CreateBodyBlock(); // for else body
   void AddControlVariableRelationships(const std::vector<Variable*>& control_variables);
   void CheckForIfElseValidity();
   void CheckForExistingProcedure();
@@ -89,6 +89,8 @@ class PSubsystem {
 
   void ProcessEntityAsNewProcedure(Entity* entity);
   void ProcessEntityAsStatement(Entity* entity);
+  void CreateNewNestedCluster(ConditionalBlock* conditional_block, BodyBlock* body_block);
+  void UpdateClusterWithElseBlock(BodyBlock* block_else_body);
 };
 }
 

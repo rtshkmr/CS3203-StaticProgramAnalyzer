@@ -18,13 +18,15 @@ class Cluster {
  protected:
   int start_ = -1;
   int end_ = -1;
-  std::set<VariableName*> modified_variables_; // QQ: why does it throw error if I use Variable instead of VariableName* !?
+  std::set<VariableName*>
+      modified_variables_; // QQ: why does it throw error if I use Variable instead of VariableName* !?
   Cluster* parent_cluster_;
   // todo: is it better to have as a field the position idx in the nested_clusters list of the parent? if not need to do a linear search each time.
  public:
   Cluster() {};
   int size() const;
   void AddChildCluster(Cluster* new_cluster);
+  void AddSiblingCluster(Cluster* new_sibling_cluster);
   void AddStmt(StatementNumber statement_number);
   void RemoveStmt(StatementNumber statement_number);
   bool CheckIfStatementInRange(StatementNumber sn) const;
@@ -33,32 +35,32 @@ class Cluster {
   Cluster* GetNextSiblingCluster();
   void SetParentCluster(Cluster* parent_cluster);
   /// ISSUE 2: to use dynamic_cast, need a virtual method; suggesstion -> create a virtual destructor (good practice too)
-  virtual std::set<Block*> GetNextBlocks() { //to be overwritten by child. -> bad imp; [for testing use]
-    throw std::invalid_argument("Should not access this if you are not Block");
-  }
+  // todo: use Cluster instead of block here
+  virtual ~Cluster();
 
   // todo: add more helper functions:
   bool IsVariableModified(VariableName target_variable);
 };
 
-class Block: public Cluster {
+class Block : public Cluster {
   /// EXTRA THINGS TO ADD SINCE FOR SET (since set is sorting pointers)
   struct BlockComparator {
-    bool operator()(const Block* lhs, const Block* rhs) const  {
+    bool operator()(const Block* lhs, const Block* rhs) const {
       return lhs->start_ < rhs->start_;
     }
   };
 
  public:
+  Block() {};
+  ~Block();
+
   bool isWhile = false;
   // std::set<Block*, Block::BlockComparator> next_blocks_ = {};
-  // QQ:variable had to be renamed into plural
   std::set<Block*> next_blocks_ = {};
   std::set<Block*> GetNextBlocks() {
     return next_blocks_;
   }
 
-  Block(){};
 };
 
 class ConditionalBlock : public Block {
@@ -67,7 +69,8 @@ class ConditionalBlock : public Block {
   std::set<ConstantValue*> control_constants_;
 
  public:
-  ConditionalBlock(){};
+  ~ConditionalBlock();
+  ConditionalBlock() {};
   void AddControlVariable(VariableName* control_variable);
 };
 
@@ -76,7 +79,8 @@ class BodyBlock : public Block {
   std::set<VariableName*> modified_variables_;
 
  public:
-  BodyBlock(){};
+  ~BodyBlock();
+  BodyBlock() {};
 };
 
 #endif //AUTOTESTER_SRC_SPA_SRC_MODEL_CFG_H_

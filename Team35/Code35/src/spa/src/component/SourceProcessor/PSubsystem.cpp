@@ -133,9 +133,7 @@ void PSubsystem::CloseWhileBlock() {
 void PSubsystem::ProcessOuterParentNode(Container* current_nest) {
   // get to outer node and process:
   current_node_ = dynamic_cast<Statement*>(current_nest)->GetParentNode();
-  parent_stack_.empty()
-  ? ProcessOuterNodeAsProcedure()
-  : ProcessOuterNodeType(current_nest);
+  parent_stack_.empty() ? ProcessOuterNodeAsProcedure() : ProcessOuterNodeType(current_nest);
 }
 
 void PSubsystem::ProcessOuterNodeAsProcedure() {
@@ -293,6 +291,11 @@ void PSubsystem::HandleError(Entity* entity) {
   throw SyntaxException("Statement is not cast into objects. Check EntityFactory::CreateEntity");
 }
 
+/**
+ * Updates PSubsystem's internal state to reflect parent-child relationships,
+ * sets up conditional and body blocks and then encapsulates them within a new cluster.
+ * @param entity
+ */
 void PSubsystem::HandleIfStmt(Entity* entity) {
   IfEntity* if_entity = dynamic_cast<IfEntity*>(entity);
   assert(if_entity);
@@ -302,11 +305,16 @@ void PSubsystem::HandleIfStmt(Entity* entity) {
   current_node_ = if_entity;
   Statement* conditional_statement = dynamic_cast<Statement*>(entity);
   ConditionalBlock* block_if_cond = CreateConditionalBlock(conditional_statement);
-  CreateBodyBlock(block_if_cond);
+  BodyBlock* block_if_body = CreateBodyBlock(block_if_cond);
   // todo: make it into add control var + const later
   AddControlVariableRelationships(if_entity->GetControlVariables());
+  CreateNewNestedCluster(block_if_cond, block_if_body);
 }
 
+/**
+ * Updates internal state by linking the If and Else entities.
+ * @param entity
+ */
 void PSubsystem::HandleElseStmt(Entity* entity) {
   ElseEntity* else_entity = dynamic_cast<ElseEntity*>(entity);
   assert(else_entity);
@@ -319,7 +327,8 @@ void PSubsystem::HandleElseStmt(Entity* entity) {
   if_entity->SetElseEntity(else_entity);
   current_node_type_ = NodeType::kElse;
   current_node_ = if_entity;
-  CreateBodyBlock();
+  BodyBlock* block_else_body = CreateBodyBlock();
+  UpdateClusterWithElseBlock(block_else_body);
 }
 
 void PSubsystem::HandleWhileStmt(Entity* entity) {
@@ -333,8 +342,9 @@ void PSubsystem::HandleWhileStmt(Entity* entity) {
   Statement* conditional_statement = dynamic_cast<Statement*>(entity);
   ConditionalBlock* block_while_cond = CreateConditionalBlock(conditional_statement);
   block_while_cond->isWhile = true;
-  CreateBodyBlock(block_while_cond);
+  BodyBlock* block_while_body = CreateBodyBlock(block_while_cond);
   AddControlVariableRelationships(while_entity->GetControlVariables());
+  CreateNewNestedCluster(block_while_cond, block_while_body);
 }
 
 /**
@@ -359,7 +369,7 @@ ConditionalBlock* PSubsystem::CreateConditionalBlock(Statement* conditional_stat
     }
     block_stack_.push(static_cast<Block* const>(conditional_block));
   } else {
-    // QQ: can't seem to use dynamic cast here,
+    // QQ: need to convert this to dynamic_cast by adding a virtual destructor as WeiJie advised?
     conditional_block = static_cast<ConditionalBlock*>(block_stack_.top());
   }
   return conditional_block;
@@ -369,22 +379,24 @@ ConditionalBlock* PSubsystem::CreateConditionalBlock(Statement* conditional_stat
 * Abstracted logic for handling the blocks representing the body within if and while
  * @param conditional_block the conditional block that shall be linked to this newly created body block
  */
-void PSubsystem::CreateBodyBlock(ConditionalBlock* conditional_block) {
+BodyBlock* PSubsystem::CreateBodyBlock(ConditionalBlock* conditional_block) {
   BodyBlock* body_block = new BodyBlock();
-  conditional_block->next_blocks_.insert(static_cast<Block* const>(body_block));
-  block_stack_.push(static_cast<Block*>(body_block));
+  conditional_block->next_blocks_.insert(dynamic_cast<Block*>(body_block));
+  block_stack_.push(dynamic_cast<Block*>(body_block));
+  return body_block;
 }
 
 /**
  *  Overloaded function to create Else block's body
  */
-void PSubsystem::CreateBodyBlock() {
+BodyBlock* PSubsystem::CreateBodyBlock() {
   Block* block_if_body = dynamic_cast<Block*>(block_stack_.top());
   block_stack_.pop(); //pop so that the if_cond can perform next_block map to else block
-  Block* block_else = new Block();
-  block_stack_.top()->GetNextBlocks().insert(block_else);
+  BodyBlock* block_else_body = new BodyBlock();
+  block_stack_.top()->GetNextBlocks().insert(block_else_body);
   block_stack_.push(block_if_body);
-  block_stack_.push(block_else);
+  block_stack_.push(block_else_body);
+  return block_else_body;
 }
 
 // todo: double check that only control variables are being handled here and not variables within the body
@@ -480,6 +492,31 @@ Deliverable* PSubsystem::GetDeliverables() {
 
   valid_state = false; //to prevent further processsing.
   return deliverable_;
+}
+
+/**
+ * Creates a new nested cluster, adds it as a nested cluster within the existing parent cluster and pushes to cluster_stack
+ * @param conditional_block
+ * @param body_block
+ */
+void PSubsystem::CreateNewNestedCluster(ConditionalBlock* conditional_block, BodyBlock* body_block) {
+  assert(!cluster_stack_.empty()); // can only be called from within a cluster
+  Cluster* new_cluster = new Cluster();
+  Cluster* existing_parent_cluster = cluster_stack_.top();
+  existing_parent_cluster->AddChildCluster(new_cluster);
+  new_cluster->AddChildCluster(conditional_block);
+  new_cluster->AddChildCluster(body_block);
+  new_cluster->SetParentCluster(existing_parent_cluster);
+  cluster_stack_.push(new_cluster);
+}
+
+/**
+ * Since we're already in a If Cluster, add the else block as a nested child.
+ * @param block_else_body
+ */
+void PSubsystem::UpdateClusterWithElseBlock(BodyBlock* block_else_body) {
+  Cluster* if_cluster = cluster_stack_.top();
+  if_cluster->AddChildCluster(block_else_body);
 }
 
 

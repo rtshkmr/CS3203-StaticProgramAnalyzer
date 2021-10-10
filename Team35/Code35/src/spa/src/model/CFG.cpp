@@ -13,6 +13,7 @@ void ConditionalBlock::AddControlVariable(VariableName* control_variable) {
   this->control_variables_.insert(control_variable);
 }
 
+
 /**
  * Adds a new cluster to list of clusters within it.
  * @param new_cluster
@@ -109,3 +110,17 @@ Cluster* Cluster::GetNextSiblingCluster() {
 std::list<Cluster*> Cluster::GetNestedClusters() {
   return this->nested_clusters_;
 }
+
+void Cluster::AddSiblingCluster(Cluster* new_sibling_cluster) {
+  Cluster* existing_parent_cluster = parent_cluster_;
+  if(parent_cluster_ == nullptr) { // the outermost cluster can't have any siblings
+    throw std::invalid_argument("The outermost cluster (representing a procedure) should never have any siblings");
+  }
+  parent_cluster_->AddChildCluster(new_sibling_cluster);
+}
+
+// default destructors:
+Cluster::~Cluster() = default;
+Block::~Block() = default;
+ConditionalBlock::~ConditionalBlock() = default;
+BodyBlock::~BodyBlock() = default;
