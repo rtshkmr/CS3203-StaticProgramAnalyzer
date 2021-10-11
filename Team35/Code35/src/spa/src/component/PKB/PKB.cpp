@@ -9,141 +9,6 @@ constexpr auto L = [](auto msg) {
 };
 
 /**
- * Returns a list of strings representing elements of the specified DesignEntity type
- * @param de is an enum of the types of DesignEntity (e.g. read, print, assign, etc.)
- * @return list of strings in which each string is the identifier of an element
- */
-std::list<std::string> PKB::GetDesignEntity(DesignEntity de) {
-  std::list<std::string> result = std::list<std::string>();
-  switch (de) {
-    case DesignEntity::kStmt:return stmt_table_;
-    case DesignEntity::kRead:return read_table_;
-    case DesignEntity::kPrint:return print_table_;
-    case DesignEntity::kCall:return call_table_;
-    case DesignEntity::kWhile:return while_table_;
-    case DesignEntity::kIf:return if_table_;
-    case DesignEntity::kAssign:return assign_table_;
-    case DesignEntity::kVariable:return var_table_;
-    case DesignEntity::kConstant:return const_table_;
-    case DesignEntity::kProcedure:return proc_table_;
-    case DesignEntity::kInvalid:return {};
-    default:return {};
-  }
-}
-
-/**
- * Returns boolean of whether there exists any follows relationship
- * @param
- * @return True if there is at least one follows relationship, otherwise False
- */
-bool PKB::HasFollows() {
-  return !follows_map_.empty();
-};
-
-/**
- * Returns boolean of whether there exists any Previous relationship
- * @param
- * @return True if there is at least one previous relationship, otherwise False
- */
-bool PKB::HasPrevious() {
-  return !previous_map_.empty();
-}
-
-/**
- * Returns boolean of whether there exists any parent relationship
- * @param
- * @return True if there is at least one parent relationship, otherwise False
- */
-bool PKB::HasParent() {
-  return !parent_map_.empty();
-}
-
-/**
- * Returns boolean of whether there exists any child relationship
- * @param
- * @return True if there is at least one child relationship, otherwise False
- */
-bool PKB::HasChild() {
-  return !child_map_.empty();
-}
-
-/**
- * Returns boolean of whether there exists any follows* relationship
- * @param
- * @return True if there is at least one follows* relationship, otherwise False
- */
-bool PKB::HasFollowsT() {
-  return !follows_t_map_.empty();
-};
-
-/**
- * Returns boolean of whether there exists any previous* relationship
- * @param
- * @return True if there is at least one previous* relationship, otherwise False
- */
-bool PKB::HasPreviousT() {
-  return !previous_t_map_.empty();
-}
-
-/**
- * Returns boolean of whether there exists any parent* relationship
- * @param
- * @return True if there is at least one parent* relationship, otherwise False
- */
-bool PKB::HasParentT() {
-  return !parent_t_map_.empty();
-}
-
-/**
- * Returns boolean of whether there exists any child* relationship
- * @param
- * @return True if there is at least one child* relationship, otherwise False
- */
-bool PKB::HasChildT() {
-  return !child_t_map_.empty();
-}
-
-/**
- * Returns boolean of whether there exists any uses relationship
- * @param
- * @return True if there is at least one uses relationship, otherwise False
- */
-bool PKB::HasUses() {
-  // Must check if both container and statement maps are empty
-  return !use_s_map_.empty() || !use_c_map_.empty();
-}
-
-/**
- * Returns boolean of whether there exists any used by relationship
- * @param
- * @return True if there is at least one used by relationship, otherwise False
- */
-bool PKB::HasUsedBy() {
-  // Must check if both container and statement maps are empty
-  return !used_by_s_map_.empty() || !used_by_c_map_.empty();
-}
-
-/**
- * Returns boolean of whether there exists any modifies relationship
- * @param
- * @return True if there is at least one modifies relationship, otherwise False
- */
-bool PKB::HasModifies() {
-  // Must check if both container and statement maps are empty
-  return !modifies_s_map_.empty() || !modifies_c_map_.empty();
-}
-
-/**
- * Returns boolean of whether there exists any modified by relationship
- * @param
- * @return True if there is at least one modified by relationship, otherwise False
- */
-bool PKB::HasModifiedBy() {
-  // Must check if both container and statement maps are empty
-  return !modified_by_s_map_.empty() || !modified_by_c_map_.empty();
-}
-
-/**
  * Populates the respective entity lists and relationship hashmaps
  * @param d is a Deliverable object initialised in PSubsystem
  * @return
@@ -151,6 +16,60 @@ bool PKB::HasModifiedBy() {
 void PKB::PopulateDataStructures(Deliverable d) {
   L("... PKB will be populated by Deliverable object from SourceProcessor\n");
 
+  InitializeDataStructures();
+
+  PopulateProcEntities(d.proc_list_);
+  PopulateVarEntities(d.var_list_);
+  PopulateConstEntities(d.const_list_);
+  PopulateStmtEntities(d.stmt_list_);
+  PopulateIfEntities(d.if_list_);
+  PopulateWhileEntities(d.while_list_);
+  PopulateAssignEntities(d.assign_list_);
+  PopulateCallEntities(d.call_list_);
+  PopulatePrintEntities(d.print_list_);
+  PopulateReadEntities(d.read_list_);
+
+  PopulateFollows(d.follow_hash_);
+  PopulateFollowedBy(d.followed_by_hash_);
+  PopulateChild(d.child_to_parent_hash_);
+
+  const std::vector<PKBRelRefs> refs_to_populate {
+      PKBRelRefs::kFollowsT,
+      PKBRelRefs::kFollowedByT,
+      PKBRelRefs::kParent,
+      PKBRelRefs::kParentT,
+      PKBRelRefs::kChildT,
+      PKBRelRefs::kUsesS,
+      PKBRelRefs::kUsesC,
+      PKBRelRefs::kUsedByS,
+      PKBRelRefs::kUsedByC,
+      PKBRelRefs::kModifiesS,
+      PKBRelRefs::kModifiesC,
+      PKBRelRefs::kModifiedByS,
+      PKBRelRefs::kModifiedByC
+  };
+
+  std::vector<std::unordered_map<Entity*, std::list<Entity*>*>*> hashes;
+  hashes.push_back(reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.follows_T_hash_));
+  hashes.push_back(reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.followed_by_T_hash_));
+  hashes.push_back(reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.parent_to_child_hash_));
+  hashes.push_back(reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.parent_to_child_T_hash_));
+  hashes.push_back(reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.child_to_parent_T_hash_));
+  hashes.push_back(reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.use_hash_));
+  hashes.push_back(reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.container_use_hash_));
+  hashes.push_back(reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.used_by_hash_));
+  hashes.push_back(reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.container_used_by_hash_));
+  hashes.push_back(reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.modifies_hash_));
+  hashes.push_back(reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.container_modifies_hash_));
+  hashes.push_back(reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.modified_by_hash_));
+  hashes.push_back(reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.container_modified_by_hash_));
+
+  for (int i = 0; i < hashes.size(); i++) {
+      PopulateRelationship(hashes.at(i), refs_to_populate.at(i));
+  }
+
+
+  // TO BE DEPRECATED FROM HERE
   PopulateProcList(d.proc_list_);
   PopulateVarList(d.var_list_);
   PopulateConstList(d.const_list_);
@@ -181,346 +100,237 @@ void PKB::PopulateDataStructures(Deliverable d) {
   PopulateModifiedBySMap(d.modified_by_hash_);
   PopulateModifiesCMap(d.container_modifies_hash_);
   PopulateModifiedByCMap(d.container_modified_by_hash_);
+  // UNTIL HERE
 
   L("[DONE] PKB POPULATED WITHOUT ERROR\n");
 }
 
-/**
- * Returns a list of tuples representing elements that fulfill the follows relationship with the specified statement
- * @param stmt is a string representing the statement number (e.g. "1", "2", "3", ...)
- * @return list of tuples; each tuple consists of its type (DesignEntity) and statement number (string)
- */
-std::list<std::tuple<DesignEntity, std::string>> PKB::GetFollows(std::string stmt) {
-  std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
-  auto follows_iter = follows_map_.find(stmt);
-  if (follows_iter == follows_map_.end()) {
-    return ret_list;
-  } else {
-    std::tuple<DesignEntity, std::string> follows = follows_iter->second;
-    ret_list.push_back(follows);
-    return ret_list;
-  }
+std::vector<Entity*> PKB::GetRelationship(PKBRelRefs ref, std::string entity) {
+    return relationship_table_[ref][entity];
 }
 
-/**
- * Returns a list of tuples representing elements that fulfill the previous relationship with the specified statement
- * @param stmt is a string representing the statement number (e.g. "1", "2", "3", ...)
- * @return list of tuples; each tuple consists of its type (DesignEntity) and statement number (string)
- */
-std::list<std::tuple<DesignEntity, std::string>> PKB::GetPrevious(std::string stmt) {
-  std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
-  auto previous_iter = previous_map_.find(stmt);
-  if (previous_iter == previous_map_.end()) {
-    return ret_list;
-  } else {
-    std::tuple<DesignEntity, std::string> previous = previous_iter->second;
-    ret_list.push_back(previous);
-    return ret_list;
-  }
-}
 
-/**
- * Returns a list of tuples representing elements that fulfill the parent relationship with the specified statement
- * @param stmt is a string representing the statement number (e.g. "1", "2", "3", ...)
- * @return list of tuples; each tuple consists of its type (DesignEntity) and statement number (string)
- */
-std::list<std::tuple<DesignEntity, std::string>> PKB::GetParent(std::string stmt) {
-  std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
-  auto parent_iter = parent_map_.find(stmt);
-  if (parent_iter != parent_map_.end()) {
-    std::list<std::tuple<DesignEntity, std::string>*>* children = parent_iter->second;
-    for (auto s: * children) {
-      ret_list.push_back(* s);
-    }
-  }
-  return ret_list;
-}
-
-/**
- * Returns a list of tuples representing elements that fulfill the child relationship with the specified statement
- * @param stmt is a string representing the statement number (e.g. "1", "2", "3", ...)
- * @return list of tuples; each tuple consists of its type (DesignEntity) and statement number (string)
- */
-std::list<std::tuple<DesignEntity, std::string>> PKB::GetChild(std::string stmt) {
-  std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
-  auto child_iter = child_map_.find(stmt);
-  if (child_iter == child_map_.end()) {
-    return ret_list;
-  } else {
-    std::tuple<DesignEntity, std::string> child = child_iter->second;
-    ret_list.push_back(child);
-    return ret_list;
-  }
-}
-
-/**
- * Returns a list of tuples representing elements that fulfill the follows* relationship with the specified statement
- * @param stmt is a string representing the statement number (e.g. "1", "2", "3", ...)
- * @return list of tuples; each tuple consists of its type (DesignEntity) and statement number (string)
- */
-std::list<std::tuple<DesignEntity, std::string>> PKB::GetFollowsT(std::string stmt) {
-  std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
-  auto follows_iter = follows_t_map_.find(stmt);
-  if (follows_iter != follows_t_map_.end()) {
-    std::list<std::tuple<DesignEntity, std::string>*>* before = follows_iter->second;
-    for (auto s: * before) {
-      ret_list.push_back(* s);
-    }
-  }
-  return ret_list;
-}
-
-/**
- * Returns a list of tuples representing elements that fulfill the previous* relationship with the specified statement
- * @param stmt is a string representing the statement number (e.g. "1", "2", "3", ...)
- * @return list of tuples; each tuple consists of its type (DesignEntity) and statement number (string)
- */
-std::list<std::tuple<DesignEntity, std::string>> PKB::GetPreviousT(std::string stmt) {
-  std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
-  auto previous_iter = previous_t_map_.find(stmt);
-  if (previous_iter != previous_t_map_.end()) {
-    std::list<std::tuple<DesignEntity, std::string>*>* after = previous_iter->second;
-    for (auto s: * after) {
-      ret_list.push_back(* s);
-    }
-  }
-  return ret_list;
-}
-
-/**
- * Returns a list of tuples representing elements that fulfill the parent* relationship with the specified statement
- * @param stmt is a string representing the statement number (e.g. "1", "2", "3", ...)
- * @return list of tuples; each tuple consists of its type (DesignEntity) and statement number (string)
- */
-std::list<std::tuple<DesignEntity, std::string>> PKB::GetParentT(std::string stmt) {
-  std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
-  auto parent_iter = parent_t_map_.find(stmt);
-  if (parent_iter != parent_t_map_.end()) {
-    std::list<std::tuple<DesignEntity, std::string>*>* children = parent_iter->second;
-    for (auto s: * children) {
-      ret_list.push_back(* s);
-    }
-  }
-  return ret_list;
-}
-
-/**
- * Returns a list of tuples representing elements that fulfill the child* relationship with the specified statement
- * @param stmt is a string representing the statement number (e.g. "1", "2", "3", ...)
- * @return list of tuples; each tuple consists of its type (DesignEntity) and statement number (string)
- */
-std::list<std::tuple<DesignEntity, std::string>> PKB::GetChildT(std::string stmt) {
-  std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
-  auto child_iter = child_t_map_.find(stmt);
-  if (child_iter != child_t_map_.end()) {
-    std::list<std::tuple<DesignEntity, std::string>*>* parents = child_iter->second;
-    for (auto s: * parents) {
-      ret_list.push_back(* s);
-    }
-  }
-  return ret_list;
-}
-
-/**
- * Returns a list of tuples representing elements that fulfill the uses relationship with the specified statement
- * @param stmt is a string representing the statement number (e.g. "1", "2", "3", ...)
- * @return list of tuples; each tuple consists of its type (DesignEntity) and variable name (string)
- */
-std::list<std::tuple<DesignEntity, std::string>> PKB::GetUses(std::string stmt) {
-  std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
-  // For statement map
-  auto use_s_iter = use_s_map_.find(stmt);
-  if (use_s_iter != use_s_map_.end()) {
-    std::list<std::tuple<DesignEntity, std::string>*>* use_s = use_s_iter->second;
-    for (auto v: * use_s) {
-      ret_list.push_back(* v);
-    }
-  }
-  // For container map
-  auto use_c_iter = use_c_map_.find(stmt);
-  if (use_c_iter != use_c_map_.end()) {
-    std::list<std::tuple<DesignEntity, std::string>*>* use_c = use_c_iter->second;
-    for (auto v: * use_c) {
-      ret_list.push_back(* v);
-    }
-  }
-  return ret_list;
-}
-
-/**
- * Returns a list of tuples representing elements that fulfill the used by relationship with the specified statement
- * @param var is a string representing the variable name (e.g. "i", "byte", "u", ...)
- * @return list of tuples; each tuple consists of its type (DesignEntity) and statement number (string)
- */
-std::list<std::tuple<DesignEntity, std::string>> PKB::GetUsedBy(std::string var) {
-  std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
-  // For statement map
-  auto used_by_s_iter = used_by_s_map_.find(var);
-  if (used_by_s_iter != used_by_s_map_.end()) {
-    std::list<std::tuple<DesignEntity, std::string>*>* used_by_s = used_by_s_iter->second;
-    for (auto s: * used_by_s) {
-      ret_list.push_back(* s);
-    }
-  }
-  // For container map
-  auto used_by_c_iter = used_by_c_map_.find(var);
-  if (used_by_c_iter != used_by_c_map_.end()) {
-    std::list<std::tuple<DesignEntity, std::string>*>* used_by_c = used_by_c_iter->second;
-    for (auto c: * used_by_c) {
-      ret_list.push_back(* c);
-    }
-  }
-  return ret_list;
-}
-
-/**
- * Returns a list of tuples representing elements that fulfill the modifies relationship with the specified statement
- * @param stmt is a string representing the statement number (e.g. "1", "2", "3", ...)
- * @return list of tuples; each tuple consists of its type (DesignEntity) and variable name (string)
- */
-std::list<std::tuple<DesignEntity, std::string>> PKB::GetModifies(std::string stmt) {
-  std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
-  // For statement map
-  auto modifies_s_iter = modifies_s_map_.find(stmt);
-  if (modifies_s_iter != modifies_s_map_.end()) {
-    std::list<std::tuple<DesignEntity, std::string>*>* modifies_s = modifies_s_iter->second;
-    for (auto v: * modifies_s) {
-      ret_list.push_back(* v);
-    }
-  }
-  // For container map
-  auto modifies_c_iter = modifies_c_map_.find(stmt);
-  if (modifies_c_iter != modifies_c_map_.end()) {
-    std::list<std::tuple<DesignEntity, std::string>*>* modifies_c = modifies_c_iter->second;
-    for (auto v: * modifies_c) {
-      ret_list.push_back(* v);
-    }
-  }
-  return ret_list;
-}
-
-/**
- * Returns a list of tuples representing elements that fulfill the modified by relationship with the specified statement
- * @param var is a string representing the variable name (e.g. "i", "byte", "u", ...)
- * @return list of tuples; each tuple consists of its type (DesignEntity) and statement number (string)
- */
-std::list<std::tuple<DesignEntity, std::string>> PKB::GetModifiedBy(std::string var) {
-  std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
-  // For statement map
-  auto modified_by_s_iter = modified_by_s_map_.find(var);
-  if (modified_by_s_iter != modified_by_s_map_.end()) {
-    std::list<std::tuple<DesignEntity, std::string>*>* modified_by_s = modified_by_s_iter->second;
-    for (auto s: * modified_by_s) {
-      ret_list.push_back(* s);
-    }
-  }
-  // For container map
-  auto modified_by_c_iter = modified_by_c_map_.find(var);
-  if (modified_by_c_iter != modified_by_c_map_.end()) {
-    std::list<std::tuple<DesignEntity, std::string>*>* modified_by_c = modified_by_c_iter->second;
-    for (auto c: * modified_by_c) {
-      ret_list.push_back(* c);
-    }
-  }
-  return ret_list;
-}
-
-/**
- * Returns a list of tuples representing elements that fulfill the uses relationship with the specified procedure
- * @param procedure is a string representing the procedure
- * @return list of tuples; each tuple consists of its type (DesignEntity) and variable name (string)
- */
-std::list<std::tuple<DesignEntity, std::string>> PKB::GetUsesP(std::string procedure) {
-    std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
-    // For container map
-    auto use_c_iter = use_c_map_.find(procedure);
-    if (use_c_iter != use_c_map_.end()) {
-        std::list<std::tuple<DesignEntity, std::string>*>* use_c = use_c_iter->second;
-        for (auto v: * use_c) {
-            ret_list.push_back(* v);
+void PKB::InitializeDataStructures() {
+    for (DesignEntity param1 : all_design_entities) {
+        for (DesignEntity param2 : all_design_entities) {
+            first_param_map_[param1].push_back(std::make_tuple(param1, param2));
+            second_param_map_[param2].push_back(std::make_tuple(param1, param2));
         }
     }
-    return ret_list;
 }
 
-/**
- * Returns a list of procedures representing elements that fulfill the used by relationship with the specified variable
- * @param var is a string representing the variable name (e.g. "i", "byte", "u", ...)
- * @return list of tuples; each tuple consists of its type (DesignEntity) and procedure name (string)
- */
-std::list<std::tuple<DesignEntity, std::string>> PKB::GetUsedByP(std::string var) {
-    std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
-    // For container map
-    auto used_by_c_iter = used_by_c_map_.find(var);
-    if (used_by_c_iter != used_by_c_map_.end()) {
-        std::list<std::tuple<DesignEntity, std::string>*>* used_by_c = used_by_c_iter->second;
-        for (auto c: * used_by_c) {
-          if (std::get<0>(*c) == DesignEntity::kProcedure) {
-            ret_list.push_back(*c);
-          }
+void PKB::PopulateProcEntities(const std::list<Procedure*>& proc_list) {
+    for (Procedure* proc : proc_list) {
+        type_to_entity_map_[DesignEntity::kProcedure].push_back(proc);
+        ProcedureName proc_name = *proc->GetName();
+        std::string name_string = proc_name.getName();
+        entity_string_to_type_map_[name_string] = DesignEntity::kProcedure;
+        entity_object_to_type_map_[proc] = DesignEntity::kProcedure;
+    }
+}
+
+void PKB::PopulateVarEntities(const std::list<Variable*>& var_list) {
+    for (Variable* var : var_list) {
+        type_to_entity_map_[DesignEntity::kVariable].push_back(var);
+        VariableName var_name = *var->GetName();
+        std::string name_string = var_name.getName();
+        entity_string_to_type_map_[name_string] = DesignEntity::kVariable;
+        entity_object_to_type_map_[var] = DesignEntity::kVariable;
+    }
+}
+
+void PKB::PopulateConstEntities(const std::list<ConstantValue*>& const_list) {
+    for (ConstantValue* cv : const_list) {
+        Constant* constant = new Constant(cv);
+        type_to_entity_map_[DesignEntity::kConstant].push_back(constant);
+        int cv_int = cv->Get();
+        std::string name_string = std::to_string(cv_int);
+        entity_string_to_type_map_["c" + name_string] = DesignEntity::kConstant;
+        entity_object_to_type_map_[constant] = DesignEntity::kConstant;
+    }
+}
+
+void PKB::PopulateStmtEntities(const std::list<Statement*>& stmt_list) {
+    for (Statement* stmt : stmt_list) {
+        type_to_entity_map_[DesignEntity::kStmt].push_back(stmt);
+        StatementNumber stmt_number = *stmt->GetStatementNumber();
+        std::string name_string = std::to_string(stmt_number.GetNum());
+    }
+}
+
+void PKB::PopulateIfEntities(const std::list<IfEntity*>& if_list) {
+    for (IfEntity* ifs : if_list) {
+        type_to_entity_map_[DesignEntity::kIf].push_back(ifs);
+        StatementNumber stmt_number = *ifs->GetStatementNumber();
+        std::string name_string = std::to_string(stmt_number.GetNum());
+        entity_string_to_type_map_[name_string] = DesignEntity::kIf;
+        entity_object_to_type_map_[ifs] = DesignEntity::kIf;
+        if_map_[name_string].push_back(ifs);
+        for (Variable* var : ifs->GetExpressionVariables()) {
+            VariableName* variable_name = const_cast<VariableName*>(var->GetName());
+            std::string variable_string = variable_name->getName();
+            if_map_[variable_string].push_back(ifs);
         }
     }
-    return ret_list;
 }
 
-/**
- * Returns a list of tuples representing elements that fulfill the modifies relationship with the specified procedure
- * @param procedure is a string representing the statement number (e.g. "1", "2", "3", ...)
- * @return list of tuples; each tuple consists of its type (DesignEntity) and variable name (string)
- */
-std::list<std::tuple<DesignEntity, std::string>> PKB::GetModifiesP(std::string procedure) {
-    std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
-    // For container map
-    auto modifies_c_iter = modifies_c_map_.find(procedure);
-    if (modifies_c_iter != modifies_c_map_.end()) {
-        std::list<std::tuple<DesignEntity, std::string>*>* modifies_c = modifies_c_iter->second;
-        for (auto v: * modifies_c) {
-            ret_list.push_back(* v);
+void PKB::PopulateWhileEntities(const std::list<WhileEntity*>& while_list) {
+    for (WhileEntity* while_stmt : while_list) {
+        type_to_entity_map_[DesignEntity::kWhile].push_back(while_stmt);
+        StatementNumber stmt_number = *while_stmt->GetStatementNumber();
+        std::string name_string = std::to_string(stmt_number.GetNum());
+        entity_string_to_type_map_[name_string] = DesignEntity::kWhile;
+        entity_object_to_type_map_[while_stmt] = DesignEntity::kWhile;
+        while_map_[name_string].push_back(while_stmt);
+        for (Variable* var : while_stmt->GetExpressionVariables()) {
+            VariableName* variable_name = const_cast<VariableName*>(var->GetName());
+            std::string variable_string = variable_name->getName();
+            while_map_[variable_string].push_back(while_stmt);
         }
     }
-    return ret_list;
 }
 
-/**
- * Returns a list of tuples representing elements that fulfill the modified by relationship with the specified variable
- * @param var is a string representing the variable name (e.g. "i", "byte", "u", ...)
- * @return list of tuples; each tuple consists of its type (DesignEntity) and procedure name (string)
- */
-std::list<std::tuple<DesignEntity, std::string>> PKB::GetModifiedByP(std::string var) {
-    std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
-    // For container map
-    auto modified_by_c_iter = modified_by_c_map_.find(var);
-    if (modified_by_c_iter != modified_by_c_map_.end()) {
-        std::list<std::tuple<DesignEntity, std::string>*>* modified_by_c = modified_by_c_iter->second;
-        for (auto c: * modified_by_c) {
-          if (std::get<0>(*c) == DesignEntity::kProcedure) {
-            ret_list.push_back(*c);
-          }
+void PKB::PopulateAssignEntities(const std::list<AssignEntity*>& assign_list) {
+    for (AssignEntity* assign_stmt : assign_list) {
+        type_to_entity_map_[DesignEntity::kAssign].push_back(assign_stmt);
+        StatementNumber stmt_number = *assign_stmt->GetStatementNumber();
+        std::string name_string = std::to_string(stmt_number.GetNum());
+        entity_string_to_type_map_[name_string] = DesignEntity::kAssign;
+        entity_object_to_type_map_[assign_stmt] = DesignEntity::kAssign;
+        assign_map_[name_string].push_back(assign_stmt);
+        Variable* var = assign_stmt->GetVariable();
+        auto* var_name = const_cast<VariableName*>(var->GetName());
+        std::string variable_string = var_name->getName();
+        assign_map_[variable_string].push_back(assign_stmt);
+    }
+}
+
+void PKB::PopulateCallEntities(const std::list<CallEntity*>& call_list) {
+    for (CallEntity* call_stmt : call_list) {
+        type_to_entity_map_[DesignEntity::kCall].push_back(call_stmt);
+        StatementNumber stmt_number = *call_stmt->GetStatementNumber();
+        std::string name_string = std::to_string(stmt_number.GetNum());
+        entity_string_to_type_map_[name_string] = DesignEntity::kCall;
+        entity_object_to_type_map_[call_stmt] = DesignEntity::kCall;
+    }
+}
+
+void PKB::PopulatePrintEntities(const std::list<PrintEntity*>& print_list) {
+    for (PrintEntity* print_stmt : print_list) {
+        type_to_entity_map_[DesignEntity::kPrint].push_back(print_stmt);
+        StatementNumber stmt_number = *print_stmt->GetStatementNumber();
+        std::string name_string = std::to_string(stmt_number.GetNum());
+        entity_string_to_type_map_[name_string] = DesignEntity::kPrint;
+        entity_object_to_type_map_[print_stmt] = DesignEntity::kPrint;
+    }
+}
+
+void PKB::PopulateReadEntities(const std::list<ReadEntity*>& read_list) {
+    for (ReadEntity* read_stmt : read_list) {
+        type_to_entity_map_[DesignEntity::kRead].push_back(read_stmt);
+        StatementNumber stmt_number = *read_stmt->GetStatementNumber();
+        std::string name_string = std::to_string(stmt_number.GetNum());
+        entity_string_to_type_map_[name_string] = DesignEntity::kRead;
+        entity_object_to_type_map_[read_stmt] = DesignEntity::kRead;
+    }
+}
+
+DesignEntity PKB::GetTypeFromEntityString(std::string entity_string) {
+    if (entity_string_to_type_map_.find(entity_string) == entity_string_to_type_map_.end()) {
+        return DesignEntity::kInvalid;
+    } else {
+        return entity_string_to_type_map_[entity_string];
+    }
+}
+
+DesignEntity PKB::GetTypeFromEntity(Entity* entity) {
+    if (entity_object_to_type_map_.find(entity) == entity_object_to_type_map_.end()) {
+        return DesignEntity::kInvalid;
+    } else {
+        return entity_object_to_type_map_[entity];
+    }
+}
+
+std::vector<Entity*> PKB::GetDesignEntities(DesignEntity de) {
+    return type_to_entity_map_[de];
+}
+
+std::vector<AssignEntity*> PKB::GetAssignEntityByStmtRef(std::string stmtRef) {
+    return assign_map_[stmtRef];
+}
+
+std::vector<AssignEntity*> PKB::GetAssignEntityByVariable(std::string variable) {
+    return assign_map_[variable];
+}
+
+std::vector<WhileEntity*> PKB::GetWhileEntityByStmtRef(std::string stmtRef) {
+    return while_map_[stmtRef];
+}
+
+std::vector<WhileEntity*> PKB::GetWhileEntityByVariable(std::string variable) {
+    return while_map_[variable];
+}
+
+std::vector<IfEntity*> PKB::GetIfEntityByStmtRef(std::string stmtRef) {
+    return if_map_[stmtRef];
+}
+
+std::vector<IfEntity*> PKB::GetIfEntityByVariable(std::string variable) {
+    return if_map_[variable];
+}
+
+bool PKB::HasRelationship(PKBRelRefs ref) {
+    return !relationship_table_[ref].empty();
+}
+
+void PKB::PopulateFollows(std::unordered_map<Statement*, Statement*>& follow_hash) {
+    for (std::pair<Statement*, Statement*> kv: follow_hash) {
+        auto* k_number = const_cast<StatementNumber*>(kv.first->GetStatementNumber());
+        std::string k_string = std::to_string(k_number->GetNum());
+        relationship_table_[PKBRelRefs::kFollows][k_string].push_back(kv.second);
+    }
+}
+
+void PKB::PopulateFollowedBy(std::unordered_map<Statement*, Statement*>& followed_by_hash) {
+    for (std::pair<Statement*, Statement*> kv: followed_by_hash) {
+        auto* k_number = const_cast<StatementNumber*>(kv.first->GetStatementNumber());
+        std::string k_string = std::to_string(k_number->GetNum());
+        relationship_table_[PKBRelRefs::kFollowedBy][k_string].push_back(kv.second);
+    }
+}
+
+void PKB::PopulateChild(std::unordered_map<Statement*, Statement*>& child_to_parent_hash) {
+    for (std::pair<Statement*, Statement*> kv: child_to_parent_hash) {
+        auto* k_number = const_cast<StatementNumber*>(kv.first->GetStatementNumber());
+        std::string k_string = std::to_string(k_number->GetNum());
+        relationship_table_[PKBRelRefs::kChild][k_string].push_back(kv.second);
+    }
+}
+
+void PKB::PopulateRelationship(std::unordered_map<Entity*, std::list<Entity*>*>* hash, PKBRelRefs ref) {
+    for (std::pair<Entity*, std::list<Entity*>*> kv: *hash) {
+        std::string k_string;
+        if (dynamic_cast<Statement*>(kv.first) != nullptr) {
+            Statement* stmt = dynamic_cast<Statement*>(kv.first);
+            auto* k_number = const_cast<StatementNumber*>(stmt->GetStatementNumber());
+            k_string = std::to_string(k_number->GetNum());
+        } else if (dynamic_cast<Variable*>(kv.first) != nullptr) {
+            Variable* var = dynamic_cast<Variable*>(kv.first);
+            VariableName* variable_name = const_cast<VariableName*>(var->GetName());
+            k_string = variable_name->getName();
+        } else if (dynamic_cast<Procedure*>(kv.first) != nullptr) {
+            Procedure* proc = dynamic_cast<Procedure*>(kv.first);
+            ProcedureName* proc_name = const_cast<ProcedureName*>(proc->GetName());
+            k_string = proc_name->getName();
+        }
+        for (Entity* entity : *kv.second) {
+            relationship_table_[ref][k_string].push_back(entity);
         }
     }
-    return ret_list;
 }
 
 
-
-
-/**
- * From an assign statement, Get its AssignEntity object
- * @param stmt_ref is a string representing the statement number (e.g. "1", "2", "3", ...)
- * @return vector containing one AssignEntity object
- */
-std::vector<AssignEntity> PKB::GetPatternByAssign(std::string stmt_ref) {
-  return assign_expr_map_[stmt_ref];
-}
-
-/**
- * From a variable name, Get all AssignEntity object with the variable on the LHS
- * @param var_name is a string representing the variable name (e.g. "give", "me", "A", ...)
- * @return vector containing the AssignEntity objects associated with var_name
- */
-std::vector<AssignEntity> PKB::GetPatternByVariable(std::string var_name) {
-  return assign_expr_map_[var_name];
-}
+// TO BE DEPRECATED FROM HERE
 
 /**
  * Populates the PKB proc_table_ and adds type info to type_map_
@@ -1096,3 +906,475 @@ void PKB::PopulateModifiedByCMap(std::unordered_map<Variable*, std::list<Contain
     modified_by_c_map_[k_string] = result_ptr;
   }
 }
+
+/**
+ * Returns a list of strings representing elements of the specified DesignEntity type
+ * @param de is an enum of the types of DesignEntity (e.g. read, print, assign, etc.)
+ * @return list of strings in which each string is the identifier of an element
+ */
+std::list<std::string> PKB::GetDesignEntity(DesignEntity de) {
+    std::list<std::string> result = std::list<std::string>();
+    switch (de) {
+        case DesignEntity::kStmt:return stmt_table_;
+        case DesignEntity::kRead:return read_table_;
+        case DesignEntity::kPrint:return print_table_;
+        case DesignEntity::kCall:return call_table_;
+        case DesignEntity::kWhile:return while_table_;
+        case DesignEntity::kIf:return if_table_;
+        case DesignEntity::kAssign:return assign_table_;
+        case DesignEntity::kVariable:return var_table_;
+        case DesignEntity::kConstant:return const_table_;
+        case DesignEntity::kProcedure:return proc_table_;
+        case DesignEntity::kInvalid:return {};
+        default:return {};
+    }
+}
+
+/**
+ * Returns boolean of whether there exists any follows relationship
+ * @param
+ * @return True if there is at least one follows relationship, otherwise False
+ */
+bool PKB::HasFollows() {
+    return !follows_map_.empty();
+};
+
+/**
+ * Returns boolean of whether there exists any Previous relationship
+ * @param
+ * @return True if there is at least one previous relationship, otherwise False
+ */
+bool PKB::HasPrevious() {
+    return !previous_map_.empty();
+}
+
+/**
+ * Returns boolean of whether there exists any parent relationship
+ * @param
+ * @return True if there is at least one parent relationship, otherwise False
+ */
+bool PKB::HasParent() {
+    return !parent_map_.empty();
+}
+
+/**
+ * Returns boolean of whether there exists any child relationship
+ * @param
+ * @return True if there is at least one child relationship, otherwise False
+ */
+bool PKB::HasChild() {
+    return !child_map_.empty();
+}
+
+/**
+ * Returns boolean of whether there exists any follows* relationship
+ * @param
+ * @return True if there is at least one follows* relationship, otherwise False
+ */
+bool PKB::HasFollowsT() {
+    return !follows_t_map_.empty();
+};
+
+/**
+ * Returns boolean of whether there exists any previous* relationship
+ * @param
+ * @return True if there is at least one previous* relationship, otherwise False
+ */
+bool PKB::HasPreviousT() {
+    return !previous_t_map_.empty();
+}
+
+/**
+ * Returns boolean of whether there exists any parent* relationship
+ * @param
+ * @return True if there is at least one parent* relationship, otherwise False
+ */
+bool PKB::HasParentT() {
+    return !parent_t_map_.empty();
+}
+
+/**
+ * Returns boolean of whether there exists any child* relationship
+ * @param
+ * @return True if there is at least one child* relationship, otherwise False
+ */
+bool PKB::HasChildT() {
+    return !child_t_map_.empty();
+}
+
+/**
+ * Returns boolean of whether there exists any uses relationship
+ * @param
+ * @return True if there is at least one uses relationship, otherwise False
+ */
+bool PKB::HasUses() {
+    // Must check if both container and statement maps are empty
+    return !use_s_map_.empty() || !use_c_map_.empty();
+}
+
+/**
+ * Returns boolean of whether there exists any used by relationship
+ * @param
+ * @return True if there is at least one used by relationship, otherwise False
+ */
+bool PKB::HasUsedBy() {
+    // Must check if both container and statement maps are empty
+    return !used_by_s_map_.empty() || !used_by_c_map_.empty();
+}
+
+/**
+ * Returns boolean of whether there exists any modifies relationship
+ * @param
+ * @return True if there is at least one modifies relationship, otherwise False
+ */
+bool PKB::HasModifies() {
+    // Must check if both container and statement maps are empty
+    return !modifies_s_map_.empty() || !modifies_c_map_.empty();
+}
+
+/**
+ * Returns boolean of whether there exists any modified by relationship
+ * @param
+ * @return True if there is at least one modified by relationship, otherwise False
+ */
+bool PKB::HasModifiedBy() {
+    // Must check if both container and statement maps are empty
+    return !modified_by_s_map_.empty() || !modified_by_c_map_.empty();
+}
+
+
+/**
+ * Returns a list of tuples representing elements that fulfill the follows relationship with the specified statement
+ * @param stmt is a string representing the statement number (e.g. "1", "2", "3", ...)
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and statement number (string)
+ */
+std::list<std::tuple<DesignEntity, std::string>> PKB::GetFollows(std::string stmt) {
+    std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
+    auto follows_iter = follows_map_.find(stmt);
+    if (follows_iter == follows_map_.end()) {
+        return ret_list;
+    } else {
+        std::tuple<DesignEntity, std::string> follows = follows_iter->second;
+        ret_list.push_back(follows);
+        return ret_list;
+    }
+}
+
+/**
+ * Returns a list of tuples representing elements that fulfill the previous relationship with the specified statement
+ * @param stmt is a string representing the statement number (e.g. "1", "2", "3", ...)
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and statement number (string)
+ */
+std::list<std::tuple<DesignEntity, std::string>> PKB::GetPrevious(std::string stmt) {
+    std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
+    auto previous_iter = previous_map_.find(stmt);
+    if (previous_iter == previous_map_.end()) {
+        return ret_list;
+    } else {
+        std::tuple<DesignEntity, std::string> previous = previous_iter->second;
+        ret_list.push_back(previous);
+        return ret_list;
+    }
+}
+
+/**
+ * Returns a list of tuples representing elements that fulfill the parent relationship with the specified statement
+ * @param stmt is a string representing the statement number (e.g. "1", "2", "3", ...)
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and statement number (string)
+ */
+std::list<std::tuple<DesignEntity, std::string>> PKB::GetParent(std::string stmt) {
+    std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
+    auto parent_iter = parent_map_.find(stmt);
+    if (parent_iter != parent_map_.end()) {
+        std::list<std::tuple<DesignEntity, std::string>*>* children = parent_iter->second;
+        for (auto s: * children) {
+            ret_list.push_back(* s);
+        }
+    }
+    return ret_list;
+}
+
+/**
+ * Returns a list of tuples representing elements that fulfill the child relationship with the specified statement
+ * @param stmt is a string representing the statement number (e.g. "1", "2", "3", ...)
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and statement number (string)
+ */
+std::list<std::tuple<DesignEntity, std::string>> PKB::GetChild(std::string stmt) {
+    std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
+    auto child_iter = child_map_.find(stmt);
+    if (child_iter == child_map_.end()) {
+        return ret_list;
+    } else {
+        std::tuple<DesignEntity, std::string> child = child_iter->second;
+        ret_list.push_back(child);
+        return ret_list;
+    }
+}
+
+/**
+ * Returns a list of tuples representing elements that fulfill the follows* relationship with the specified statement
+ * @param stmt is a string representing the statement number (e.g. "1", "2", "3", ...)
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and statement number (string)
+ */
+std::list<std::tuple<DesignEntity, std::string>> PKB::GetFollowsT(std::string stmt) {
+    std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
+    auto follows_iter = follows_t_map_.find(stmt);
+    if (follows_iter != follows_t_map_.end()) {
+        std::list<std::tuple<DesignEntity, std::string>*>* before = follows_iter->second;
+        for (auto s: * before) {
+            ret_list.push_back(* s);
+        }
+    }
+    return ret_list;
+}
+
+/**
+ * Returns a list of tuples representing elements that fulfill the previous* relationship with the specified statement
+ * @param stmt is a string representing the statement number (e.g. "1", "2", "3", ...)
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and statement number (string)
+ */
+std::list<std::tuple<DesignEntity, std::string>> PKB::GetPreviousT(std::string stmt) {
+    std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
+    auto previous_iter = previous_t_map_.find(stmt);
+    if (previous_iter != previous_t_map_.end()) {
+        std::list<std::tuple<DesignEntity, std::string>*>* after = previous_iter->second;
+        for (auto s: * after) {
+            ret_list.push_back(* s);
+        }
+    }
+    return ret_list;
+}
+
+/**
+ * Returns a list of tuples representing elements that fulfill the parent* relationship with the specified statement
+ * @param stmt is a string representing the statement number (e.g. "1", "2", "3", ...)
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and statement number (string)
+ */
+std::list<std::tuple<DesignEntity, std::string>> PKB::GetParentT(std::string stmt) {
+    std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
+    auto parent_iter = parent_t_map_.find(stmt);
+    if (parent_iter != parent_t_map_.end()) {
+        std::list<std::tuple<DesignEntity, std::string>*>* children = parent_iter->second;
+        for (auto s: * children) {
+            ret_list.push_back(* s);
+        }
+    }
+    return ret_list;
+}
+
+/**
+ * Returns a list of tuples representing elements that fulfill the child* relationship with the specified statement
+ * @param stmt is a string representing the statement number (e.g. "1", "2", "3", ...)
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and statement number (string)
+ */
+std::list<std::tuple<DesignEntity, std::string>> PKB::GetChildT(std::string stmt) {
+    std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
+    auto child_iter = child_t_map_.find(stmt);
+    if (child_iter != child_t_map_.end()) {
+        std::list<std::tuple<DesignEntity, std::string>*>* parents = child_iter->second;
+        for (auto s: * parents) {
+            ret_list.push_back(* s);
+        }
+    }
+    return ret_list;
+}
+
+/**
+ * Returns a list of tuples representing elements that fulfill the uses relationship with the specified statement
+ * @param stmt is a string representing the statement number (e.g. "1", "2", "3", ...)
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and variable name (string)
+ */
+std::list<std::tuple<DesignEntity, std::string>> PKB::GetUses(std::string stmt) {
+    std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
+    // For statement map
+    auto use_s_iter = use_s_map_.find(stmt);
+    if (use_s_iter != use_s_map_.end()) {
+        std::list<std::tuple<DesignEntity, std::string>*>* use_s = use_s_iter->second;
+        for (auto v: * use_s) {
+            ret_list.push_back(* v);
+        }
+    }
+    // For container map
+    auto use_c_iter = use_c_map_.find(stmt);
+    if (use_c_iter != use_c_map_.end()) {
+        std::list<std::tuple<DesignEntity, std::string>*>* use_c = use_c_iter->second;
+        for (auto v: * use_c) {
+            ret_list.push_back(* v);
+        }
+    }
+    return ret_list;
+}
+
+/**
+ * Returns a list of tuples representing elements that fulfill the used by relationship with the specified statement
+ * @param var is a string representing the variable name (e.g. "i", "byte", "u", ...)
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and statement number (string)
+ */
+std::list<std::tuple<DesignEntity, std::string>> PKB::GetUsedBy(std::string var) {
+    std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
+    // For statement map
+    auto used_by_s_iter = used_by_s_map_.find(var);
+    if (used_by_s_iter != used_by_s_map_.end()) {
+        std::list<std::tuple<DesignEntity, std::string>*>* used_by_s = used_by_s_iter->second;
+        for (auto s: * used_by_s) {
+            ret_list.push_back(* s);
+        }
+    }
+    // For container map
+    auto used_by_c_iter = used_by_c_map_.find(var);
+    if (used_by_c_iter != used_by_c_map_.end()) {
+        std::list<std::tuple<DesignEntity, std::string>*>* used_by_c = used_by_c_iter->second;
+        for (auto c: * used_by_c) {
+            ret_list.push_back(* c);
+        }
+    }
+    return ret_list;
+}
+
+/**
+ * Returns a list of tuples representing elements that fulfill the modifies relationship with the specified statement
+ * @param stmt is a string representing the statement number (e.g. "1", "2", "3", ...)
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and variable name (string)
+ */
+std::list<std::tuple<DesignEntity, std::string>> PKB::GetModifies(std::string stmt) {
+    std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
+    // For statement map
+    auto modifies_s_iter = modifies_s_map_.find(stmt);
+    if (modifies_s_iter != modifies_s_map_.end()) {
+        std::list<std::tuple<DesignEntity, std::string>*>* modifies_s = modifies_s_iter->second;
+        for (auto v: * modifies_s) {
+            ret_list.push_back(* v);
+        }
+    }
+    // For container map
+    auto modifies_c_iter = modifies_c_map_.find(stmt);
+    if (modifies_c_iter != modifies_c_map_.end()) {
+        std::list<std::tuple<DesignEntity, std::string>*>* modifies_c = modifies_c_iter->second;
+        for (auto v: * modifies_c) {
+            ret_list.push_back(* v);
+        }
+    }
+    return ret_list;
+}
+
+/**
+ * Returns a list of tuples representing elements that fulfill the modified by relationship with the specified statement
+ * @param var is a string representing the variable name (e.g. "i", "byte", "u", ...)
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and statement number (string)
+ */
+std::list<std::tuple<DesignEntity, std::string>> PKB::GetModifiedBy(std::string var) {
+    std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
+    // For statement map
+    auto modified_by_s_iter = modified_by_s_map_.find(var);
+    if (modified_by_s_iter != modified_by_s_map_.end()) {
+        std::list<std::tuple<DesignEntity, std::string>*>* modified_by_s = modified_by_s_iter->second;
+        for (auto s: * modified_by_s) {
+            ret_list.push_back(* s);
+        }
+    }
+    // For container map
+    auto modified_by_c_iter = modified_by_c_map_.find(var);
+    if (modified_by_c_iter != modified_by_c_map_.end()) {
+        std::list<std::tuple<DesignEntity, std::string>*>* modified_by_c = modified_by_c_iter->second;
+        for (auto c: * modified_by_c) {
+            ret_list.push_back(* c);
+        }
+    }
+    return ret_list;
+}
+
+/**
+ * Returns a list of tuples representing elements that fulfill the uses relationship with the specified procedure
+ * @param procedure is a string representing the procedure
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and variable name (string)
+ */
+std::list<std::tuple<DesignEntity, std::string>> PKB::GetUsesP(std::string procedure) {
+    std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
+    // For container map
+    auto use_c_iter = use_c_map_.find(procedure);
+    if (use_c_iter != use_c_map_.end()) {
+        std::list<std::tuple<DesignEntity, std::string>*>* use_c = use_c_iter->second;
+        for (auto v: * use_c) {
+            ret_list.push_back(* v);
+        }
+    }
+    return ret_list;
+}
+
+/**
+ * Returns a list of procedures representing elements that fulfill the used by relationship with the specified variable
+ * @param var is a string representing the variable name (e.g. "i", "byte", "u", ...)
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and procedure name (string)
+ */
+std::list<std::tuple<DesignEntity, std::string>> PKB::GetUsedByP(std::string var) {
+    std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
+    // For container map
+    auto used_by_c_iter = used_by_c_map_.find(var);
+    if (used_by_c_iter != used_by_c_map_.end()) {
+        std::list<std::tuple<DesignEntity, std::string>*>* used_by_c = used_by_c_iter->second;
+        for (auto c: * used_by_c) {
+            if (std::get<0>(*c) == DesignEntity::kProcedure) {
+                ret_list.push_back(*c);
+            }
+        }
+    }
+    return ret_list;
+}
+
+/**
+ * Returns a list of tuples representing elements that fulfill the modifies relationship with the specified procedure
+ * @param procedure is a string representing the statement number (e.g. "1", "2", "3", ...)
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and variable name (string)
+ */
+std::list<std::tuple<DesignEntity, std::string>> PKB::GetModifiesP(std::string procedure) {
+    std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
+    // For container map
+    auto modifies_c_iter = modifies_c_map_.find(procedure);
+    if (modifies_c_iter != modifies_c_map_.end()) {
+        std::list<std::tuple<DesignEntity, std::string>*>* modifies_c = modifies_c_iter->second;
+        for (auto v: * modifies_c) {
+            ret_list.push_back(* v);
+        }
+    }
+    return ret_list;
+}
+
+/**
+ * Returns a list of tuples representing elements that fulfill the modified by relationship with the specified variable
+ * @param var is a string representing the variable name (e.g. "i", "byte", "u", ...)
+ * @return list of tuples; each tuple consists of its type (DesignEntity) and procedure name (string)
+ */
+std::list<std::tuple<DesignEntity, std::string>> PKB::GetModifiedByP(std::string var) {
+    std::list<std::tuple<DesignEntity, std::string>> ret_list = std::list<std::tuple<DesignEntity, std::string>>();
+    // For container map
+    auto modified_by_c_iter = modified_by_c_map_.find(var);
+    if (modified_by_c_iter != modified_by_c_map_.end()) {
+        std::list<std::tuple<DesignEntity, std::string>*>* modified_by_c = modified_by_c_iter->second;
+        for (auto c: * modified_by_c) {
+            if (std::get<0>(*c) == DesignEntity::kProcedure) {
+                ret_list.push_back(*c);
+            }
+        }
+    }
+    return ret_list;
+}
+
+/**
+ * From an assign statement, Get its AssignEntity object
+ * @param stmt_ref is a string representing the statement number (e.g. "1", "2", "3", ...)
+ * @return vector containing one AssignEntity object
+ */
+std::vector<AssignEntity> PKB::GetPatternByAssign(std::string stmt_ref) {
+    return assign_expr_map_[stmt_ref];
+}
+
+/**
+ * From a variable name, Get all AssignEntity object with the variable on the LHS
+ * @param var_name is a string representing the variable name (e.g. "give", "me", "A", ...)
+ * @return vector containing the AssignEntity objects associated with var_name
+ */
+std::vector<AssignEntity> PKB::GetPatternByVariable(std::string var_name) {
+    return assign_expr_map_[var_name];
+}
+
+// TO HERE
