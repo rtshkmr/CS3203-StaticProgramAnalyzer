@@ -3,21 +3,36 @@
 
 #include <string>
 #include <vector>
+#include <array>
 #include <datatype/DataType.h>
 #include <typeinfo>
 
-enum class DesignEntity {
-  kStmt,
-  kRead,
-  kPrint,
-  kCall,
-  kWhile,
-  kIf,
-  kAssign,
-  kVariable,
-  kConstant,
-  kProcedure,
-  kInvalid
+enum class DesignEntity : unsigned int {
+  kStmt = 0,
+  kRead = 1,
+  kPrint = 2,
+  kCall = 3,
+  kWhile = 4,
+  kIf = 5,
+  kAssign = 6,
+  kVariable = 7,
+  kConstant = 8,
+  kProcedure = 9,
+  kInvalid = 10,
+};
+
+const std::array<DesignEntity, 11> all_design_entities = {
+    DesignEntity:: kStmt,
+    DesignEntity:: kRead,
+    DesignEntity:: kPrint,
+    DesignEntity:: kCall,
+    DesignEntity:: kWhile,
+    DesignEntity:: kIf,
+    DesignEntity:: kAssign,
+    DesignEntity:: kVariable,
+    DesignEntity:: kConstant,
+    DesignEntity:: kProcedure,
+    DesignEntity:: kInvalid,
 };
 
 static DesignEntity GetDesignEntity(std::string reference) {
@@ -46,6 +61,44 @@ static DesignEntity GetDesignEntity(std::string reference) {
   return DesignEntity::kInvalid;
 }
 
+enum class PKBRelRefs {
+  kFollows,
+  kFollowsT,
+  kFollowedBy,
+  kFollowedByT,
+  kParent,
+  kParentT,
+  kChild,
+  kChildT,
+  kUsesS,
+  kUsesC,
+  kUsedByS,
+  kUsedByC,
+  kModifiesS,
+  kModifiesC,
+  kModifiedByS,
+  kModifiedByC
+};
+
+const std::array<PKBRelRefs, 16> pkb_rel_refs = {
+    PKBRelRefs::kFollows,
+    PKBRelRefs::kFollowsT,
+    PKBRelRefs::kFollowedBy,
+    PKBRelRefs::kFollowedByT,
+    PKBRelRefs::kParent,
+    PKBRelRefs::kParentT,
+    PKBRelRefs::kChild,
+    PKBRelRefs::kChildT,
+    PKBRelRefs::kUsesS,
+    PKBRelRefs::kUsesC,
+    PKBRelRefs::kUsedByS,
+    PKBRelRefs::kUsedByC,
+    PKBRelRefs::kModifiesS,
+    PKBRelRefs::kModifiesC,
+    PKBRelRefs::kModifiedByS,
+    PKBRelRefs::kModifiedByC
+};
+
 enum class RelRef {
   kModifiesP,
   kModifiesS,
@@ -61,7 +114,8 @@ enum class RelRef {
   kNextT,
   kAffects,
   kAffectsT,
-  kInvalid
+  kWildcard,
+  kInvalid,
 };
 
 static RelRef GetRelRef(std::string reference) {
