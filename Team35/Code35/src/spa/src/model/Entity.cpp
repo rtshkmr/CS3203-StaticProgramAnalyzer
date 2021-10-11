@@ -47,6 +47,15 @@ std::vector<Variable*> Variable::SortVariableVector(std::vector<Variable*> var_l
   return var_list_copy;
 }
 
+Constant::Constant(ConstantValue* cv) {
+    type = EntityEnum::kNone;
+    constant_value_ = cv;
+}
+
+const ConstantValue* Constant::GetValue() {
+    return constant_value_;
+}
+
 Program::Program(Procedure* p) {
   procedure_list_.push_back(p);
 }
