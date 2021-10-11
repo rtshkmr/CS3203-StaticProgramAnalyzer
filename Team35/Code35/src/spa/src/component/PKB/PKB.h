@@ -12,9 +12,9 @@ typedef std::tuple<DesignEntity, DesignEntity> type_combo;
 struct type_combo_hash {
   std::size_t operator()(const type_combo& combo) const
   {
-      return static_cast<std::size_t>(get<0>(combo))
+      return static_cast<std::size_t>(std::get<0>(combo))
       * static_cast<std::size_t>(DesignEntity::kInvalid)
-      + static_cast<std::size_t>(get<1>(combo));
+      + static_cast<std::size_t>(std::get<1>(combo));
   }
 };
 
