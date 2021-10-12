@@ -140,9 +140,29 @@ void Cluster::UpdateParentClusterRange(Cluster* new_nested_cluster) {
     }
   }
 }
+std::pair<int, int> Cluster::GetStartEndRange() {
+  return std::pair<int, int>(this->start_, this->end_);
+}
 
 // default destructors:
 Cluster::~Cluster() = default;
 Block::~Block() = default;
 ConditionalBlock::~ConditionalBlock() = default;
 BodyBlock::~BodyBlock() = default;
+/**
+ * Returns unique exit blocks for every call.
+ * @return
+ */
+Block* Block::GetNewExitBlock() {
+  // to differentiate ExitBlocks from others.
+  Block* exit_block = new Block();
+  exit_block->start_ = -INT32_MAX;
+  exit_block->end_ = -INT32_MAX;
+  return exit_block;
+}
+bool Block::IsExitBlock(Block* block) {
+  std::pair<int, int> range = block->GetStartEndRange();
+  return std::get<0>(range) == -INT32_MAX && std::get<1>(range) == -INT32_MAX;
+}
+
+

@@ -22,6 +22,7 @@ class Cluster {
  public:
   Cluster() {};
   int size() const;
+  std::pair<int, int> GetStartEndRange();
   void AddChildCluster(Cluster* new_nested_cluster);
   void UpdateParentClusterRange(Cluster* new_nested_cluster);
   void AddSiblingCluster(Cluster* new_sibling_cluster);
@@ -47,6 +48,8 @@ class Block : public Cluster {
  public:
   Block() {};
   ~Block();
+  static Block* GetNewExitBlock();
+  bool IsExitBlock(Block* block);
 
   bool isWhile = false;
   // std::set<Block*, Block::BlockComparator> next_blocks_ = {};

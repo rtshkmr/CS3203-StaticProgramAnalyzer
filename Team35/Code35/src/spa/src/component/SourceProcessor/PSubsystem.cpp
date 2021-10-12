@@ -116,13 +116,17 @@ void PSubsystem::CloseElseBlock() {
   if (current_node_type_ == NodeType::kElse) {
     parent_stack_.pop();
     follow_stack_.pop();
-    Block* block_end_else = new Block(); // exit block, QQ: is this really needed!?
-    block_stack_.top()->GetNextBlocks().insert(block_end_else);
-    block_stack_.pop(); //pop the else block
-    block_stack_.top()->GetNextBlocks().insert(block_end_else);
+    Block* block_if_else_exit = Block::GetNewExitBlock(); // exit block, QQ: is this really needed!?
+    Block* else_body_block = block_stack_.top();
+    else_body_block->next_blocks_.insert(block_if_else_exit); // else body block
+    block_stack_.pop(); //pop the else body block
+    Block* if_body_block = block_stack_.top();
+    if_body_block->next_blocks_.insert(block_if_else_exit);
     block_stack_.pop(); //pop the if_body block
+    Block* if_cond_block = block_stack_.top();
+    if_cond_block->next_blocks_.insert(else_body_block);
     block_stack_.pop(); //pop the if_cond block
-    block_stack_.push(block_end_else);
+    block_stack_.push(block_if_else_exit);
     bool is_currently_in_nested_cluster = cluster_stack_.size() > 1;
     assert(is_currently_in_nested_cluster);
     cluster_stack_.pop();
@@ -132,12 +136,12 @@ void PSubsystem::CloseElseBlock() {
 void PSubsystem::CloseWhileBlock() {
   Block* lastStmt = dynamic_cast<Block*>(block_stack_.top());
   block_stack_.pop(); // link the last stmt to the while_cond block, and pop it.
-  lastStmt->GetNextBlocks().insert(dynamic_cast<Block*>(block_stack_.top()));
+  lastStmt->next_blocks_.insert(dynamic_cast<Block*>(block_stack_.top()));
 
-  Block* block_end_while = new Block();
-  block_stack_.top()->GetNextBlocks().insert(block_end_while);
+  Block* block_while_exit = Block::GetNewExitBlock();
+  block_stack_.top()->GetNextBlocks().insert(block_while_exit);
   block_stack_.pop(); //pop the while_cond block
-  block_stack_.push(block_end_while);
+  block_stack_.push(block_while_exit);
   bool is_currently_in_nested_cluster = cluster_stack_.size() > 1;
   assert(is_currently_in_nested_cluster);
   cluster_stack_.pop();
@@ -374,7 +378,8 @@ ConditionalBlock* PSubsystem::CreateConditionalBlock(Statement* conditional_stat
     block_stack_.top()->RemoveStmt(StatementNumber(statement_num));
     conditional_block = new ConditionalBlock();
     conditional_block->AddStmt(StatementNumber(statement_num));
-    block_stack_.top()->GetNextBlocks().insert(conditional_block);
+//    block_stack_.top()->GetNextBlocks().insert(conditional_block);
+    block_stack_.top()->next_blocks_.insert(conditional_block);
     bool block_is_not_while = !dynamic_cast<Block*>(block_stack_.top())->isWhile;
     if (block_is_not_while) {
       block_stack_.pop(); // pop the previous progline if it isnt while (no loopback to care)
@@ -405,7 +410,8 @@ BodyBlock* PSubsystem::CreateBodyBlock() {
   Block* block_if_body = dynamic_cast<Block*>(block_stack_.top());
   block_stack_.pop(); //pop so that the if_cond can perform next_block map to else block
   BodyBlock* block_else_body = new BodyBlock();
-  block_stack_.top()->GetNextBlocks().insert(block_else_body);
+//  block_stack_.top()->GetNextBlocks().insert(block_else_body);
+  block_stack_.top()->next_blocks_.insert(block_else_body);
   block_stack_.push(block_if_body);
   block_stack_.push(block_else_body);
   return block_else_body;
