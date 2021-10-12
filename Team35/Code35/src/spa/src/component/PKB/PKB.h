@@ -32,9 +32,11 @@ class PKB {
   std::vector<Entity*> GetDesignEntities(DesignEntity de);
 
   // Getting type from entity string
+  [[deprecated]] // Because the object itself with have a type_enum
   DesignEntity GetTypeFromEntityString(std::string entity_string);
 
   // Getting type from entity
+  [[deprecated]] // Because the object itself with have a type_enum
   DesignEntity GetTypeFromEntity(Entity* entity);
 
   // Getting entities for pattern matching
