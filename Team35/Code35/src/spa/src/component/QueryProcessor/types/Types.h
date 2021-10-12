@@ -125,6 +125,8 @@ class Synonym {
 struct Clause {
   std::string left_hand_side;
   std::string right_hand_side;
+  Synonym *first_synonym;
+  Synonym *second_synonym;
   virtual std::string getType() { return ""; };
   virtual bool isEqual(Clause toObj) { return 1; };
   virtual ~Clause() {};

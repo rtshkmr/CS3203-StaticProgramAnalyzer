@@ -1,36 +1,31 @@
 #ifndef INC_21S1_CP_SPA_TEAM_35_QUERYEVALUATOR_H
 #define INC_21S1_CP_SPA_TEAM_35_QUERYEVALUATOR_H
 
-#include <list>
-#include <string>
-#include <vector>
-#include "component/QueryProcessor/types/Types.h"
-#include "component/QueryProcessor/types/QueryEvaluatorTable.h"
-#include "component/QueryProcessor/types/QueryEvaluatorTable.h"
-#include "component/QueryProcessor/types/UnformattedQueryResult.h"
-#include "component/PKB/PKB.h"
-#include "PKBDispatcher.h"
-#include "EvaluateSuchThatClause.h"
-#include "EvaluatePatternClause.h"
+//#include <list>
+//#include <string>
+//#include <vector>
+//#include "component/QueryProcessor/types/Types.h"
+//#include "component/QueryProcessor/types/QueryEvaluatorTable.h"
+//#include "component/QueryProcessor/types/UnformattedQueryResult.h"
+//#include "component/PKB/PKB.h"
+//#include "ClauseStrategy.h"
+//#include "component/QueryProcessor/types/ClauseInformation.h"
+
+#include <component/PKB/PKB.h>
+#include <component/QueryProcessor/types/UnformattedQueryResult.h>
+//#include "ClauseCommand.h"
 
 class QueryEvaluator {
- public:
-  QueryEvaluator(PKB pkb);
-  UnformattedQueryResult EvaluateQuery();
- private:
-  std::list<Synonym> synonym_list;
-  Synonym target_synonym;
-  std::list<Group*> group_list;
-  PKB pkb;
-  bool boolean_result;
-  std::unordered_map<std::string, std::list<std::string>> map_of_synonym_values;
-  std::unordered_map<std::string, DesignEntity> synonym_design_entity_map;
+  public:
+    QueryEvaluator(PKB *pkb);
+    UnformattedQueryResult EvaluateQuery(const std::vector<Group>&);
+  private:
+    PKB *pkb;
+    bool boolean_result;
 
-  void PopulateSynonymValues(QueryEvaluatorTable* table);
-  void EvaluateAllGroups(QueryEvaluatorTable* table);
-  std::vector<std::string> GetResult(QueryEvaluatorTable* table) const;
-  void PreprocessBooleanGroup(std::vector<Clause*> clauseList);
-  void ProcessGroup(const std::vector<Clause*>& clauseList, QueryEvaluatorTable* table);
+    void ProcessGroup(QueryEvaluatorTable *table, Group group);
+    void PreprocessBooleanGroup(Group group);
+    bool ProcessSingleClauseBooleanGroup(Group group);
 };
 
 #endif //INC_21S1_CP_SPA_TEAM_35_QUERYEVALUATOR_H
