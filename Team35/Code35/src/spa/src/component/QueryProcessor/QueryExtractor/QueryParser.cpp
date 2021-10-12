@@ -101,7 +101,7 @@ void QueryParser::ParseTarget() {
   }
   DesignEntity de = QueryParser::GetSynonymInfo(target, &synonyms).GetType();
   this->target_synonyms_list.push_back(Synonym(target, de));
-  this->target_synonyms_name_set.emplace(target);
+  this->target_synonyms_map.insert(std::make_pair(target, de));
 }
 
 // stmtRef: synonym | ‘_’ | INTEGER
@@ -119,7 +119,7 @@ std::tuple<std::string, bool, bool> QueryParser::ParseStmtRef() {
       throw PQLParseException("Unknown synonym supplied in clause.");
     }
     is_synonym = true;
-    if (target_synonyms_name_set.find(curr_lookahead) != target_synonyms_name_set.end()) {
+    if (target_synonyms_map.find(curr_lookahead) != target_synonyms_map.end()) {
       is_target_synonym = true;
     }
   } else if (lookahead.GetTokenTag() == TokenTag::kInteger) {
@@ -165,7 +165,7 @@ std::tuple<std::string, bool, bool, bool> QueryParser::ParseStmtOrEntRef() {
   if (is_uses_or_modifies_p) {
     Token tok = ParseEntRef(false);
     is_synonym = IsValidSynonym(tok);
-    is_target_synonym = target_synonyms_name_set.find(tok.GetTokenString()) != target_synonyms_name_set.end();
+    is_target_synonym = target_synonyms_map.find(tok.GetTokenString()) != target_synonyms_map.end();
   } else {
     std::tie(curr_lookahead, is_synonym, is_target_synonym) = ParseStmtRef();
   }
@@ -217,7 +217,7 @@ std::pair<Clause*, bool> QueryParser::ParseRelRef() {
     Token tok = ParseEntRef(false);
     rhs = tok.GetTokenString();
     is_rhs_syn = IsValidSynonym(tok);
-    is_rhs_tgt_syn = target_synonyms_name_set.find(tok.GetTokenString()) != target_synonyms_name_set.end();
+    is_rhs_tgt_syn = target_synonyms_map.find(tok.GetTokenString()) != target_synonyms_map.end();
   } else {
     std::tie(rhs, is_rhs_syn, is_rhs_tgt_syn) = ParseStmtRef();
   }
@@ -246,6 +246,14 @@ void QueryParser::ParseSuchThat() {
   Eat(TokenTag::kSuchThat);
   std::pair<Clause*, bool> clause_info = ParseRelRef();
   clauses.emplace_back(clause_info.first);
+}
+
+/**
+ * Parses a with clause
+ */
+void QueryParser::ParseWith() {
+  // TODO: add support for multiple relRefs (separated by and)
+  throw PQLParseException("Support for with clause not implemented yet.");
 }
 
 // entRef : synonym | ‘_’ | ‘"’ IDENT ‘"’
@@ -417,17 +425,20 @@ void QueryParser::ParseSelect() {
   }
   Eat(TokenTag::kName); // 'Select' is tokenized as a name.
   ParseTarget();
-  // if there are more tokens, we are expecting either such that or pattern clauses.
-  if (lookahead.GetTokenTag() == TokenTag::kInvalid) {
-    return;
-  }
-  if (lookahead.GetTokenTag() == TokenTag::kSuchThat) {
-    ParseSuchThat();
-  }
-  if (lookahead.GetTokenTag() == TokenTag::kName && lookahead.GetTokenString().compare("pattern") == 0) {
-    ParsePattern();
-  }
-  if (lookahead.GetTokenTag() != TokenTag::kInvalid) {
+  // while there are more tokens, we are expecting ( suchthat-cl | with-cl | pattern-cl )*
+  while (lookahead.GetTokenTag() != TokenTag::kInvalid) {
+    if (lookahead.GetTokenTag() == TokenTag::kSuchThat) {
+      ParseSuchThat();
+      continue;
+    }
+    if (lookahead.GetTokenTag() == TokenTag::kName && lookahead.GetTokenString().compare("pattern") == 0) {
+      ParsePattern();
+      continue;
+    }
+    if (lookahead.GetTokenTag() == TokenTag::kName && lookahead.GetTokenString().compare("with") == 0) {
+      ParseWith();
+      continue;
+    }
     throw PQLParseException("Incorrect query. Expected at most 1 such that and 1 pattern for iteration 1.");
   }
 }
