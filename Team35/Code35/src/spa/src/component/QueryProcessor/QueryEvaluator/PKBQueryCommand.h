@@ -15,21 +15,6 @@ class PKBQueryCommand {
     PKBRelRefs GetPKBRelRef(RelRef relation);
 };
 
-//class PKBQueryInvoker {
-//  private:
-//    PKBBooleanQueryCommand *existence;
-//    PKBQueryCommand *normal_query;
-//  public:
-//    ~PKBQueryInvoker() {
-//      delete existence;
-//      delete normal_query;
-//    }
-//    void SetExistence(PKBBooleanQueryCommand *command);
-//    void SetNormalQuery(PKBQueryCommand *command);
-//    std::vector<Entity *> SendCommandToReceiver(SuchThat *such_that_clause);
-//    std::vector<Entity *> SendCommandToReceiver(std::string stmt, bool is_first_param);
-//};
-
 class PKBQueryReceiver {
   private:
     PKB *pkb;

@@ -1,52 +1,54 @@
-#ifndef INC_21S1_CP_SPA_TEAM_35_QUERYEVALUATORTABLE_H
-#define INC_21S1_CP_SPA_TEAM_35_QUERYEVALUATORTABLE_H
+#ifndef AUTOTESTER_QUERYEVALUATORTABLE_H
+#define AUTOTESTER_QUERYEVALUATORTABLE_H
 
+//#include <unordered_map>
+//#include <string>
+//#include <vector>
+//#include <utility>
+//#include <model/Entity.h>
+//#include "Types.h"
+
+#include <model/Entity.h>
 #include <unordered_map>
-#include <string>
-#include <vector>
-#include <utility>
-#include <list>
 #include "Types.h"
 
 class QueryEvaluatorTable {
- public:
-  QueryEvaluatorTable(std::string target);
+  public:
+    QueryEvaluatorTable(Synonym *target);
+    QueryEvaluatorTable(std::vector<Synonym *> target_list);
 
-  // Add column to table
-  bool AddColumn(std::string synonym);
+    // Add target synonym column with values to table
+    bool AddTargetSynonymValues(std::vector<Entity *> entity_list);
+    // Add column to table
+    bool AddColumn(Synonym *synonym);
+    bool ContainsColumn(Synonym *synonym);
+    // Add Rows to table
+    bool AddMultipleRowForAllColumn(Synonym *synonym, int index, Entity *entity, int repeat_count);
+    // Delete row
+    bool DeleteRow(int index);
+    // Return vector of specified synonym
+    std::vector<Entity *> GetColumn(Synonym *synonym);
+    int GetColumnSize();
+    int GetRowSize();
 
-  bool AddRowForAllColumn(std::string synonym, int index, std::string value);
+    // Return vector of target synonym results
+    std::vector<Entity *> GetResults();
+    //
+    //    // Empty column but keep the synonym (header) in the table
+    //    bool RemoveColumn(std::string synonym);
+    //
+    //
+    //
+    //
+    //    std::string GetStatementSynonym(std::unordered_map<std::string, DesignEntity> synonym_design_entity_map);
+    // Add row (and new col)
+    bool AddRow(Synonym *synonym, int index, Entity *entity);
 
-  bool AddMultipleRowForAllColumn(std::string synonym, int index, std::string value, int count);
+  private:
+    std::unordered_map<Synonym *, std::vector<Entity *>> unordered_map;
+    Synonym *target_synonym;
+    std::vector<Synonym *> target_synonym_list;
 
-  // Add target synonym column with values to table
-  bool AddTargetSynonym(std::list<std::string> synonymList);
-
-  // Delete row
-  bool DeleteRow(int index);
-
-  // Add row (and new col)
-  bool AddRow(std::string synonym, int index, std::string value);
-
-  // Return vector of target synonym results
-  std::vector<std::string> GetResults();
-
-  // Return vector of specified synonym
-  std::vector<std::string> GetColumn(std::string synonym);
-
-  // Empty column but keep the synonym (header) in the table
-  bool RemoveColumn(std::string synonym);
-
-  bool ContainsColumn(std::string synonym);
-
-  int GetSize();
-
-  int GetRowSize();
-
-  std::string GetStatementSynonym(std::unordered_map<std::string, DesignEntity> synonym_design_entity_map);
- private:
-  std::unordered_map<std::string, std::vector<std::string>> um;
-  std::string target_synonym;
 };
 
-#endif //INC_21S1_CP_SPA_TEAM_35_QUERYEVALUATORTABLE_H
+#endif //AUTOTESTER_QUERYEVALUATORTABLE_H

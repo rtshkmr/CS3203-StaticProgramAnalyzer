@@ -19,8 +19,7 @@ UnformattedQueryResult QueryEvaluator::EvaluateQuery(const std::vector<Group>& l
       // Evaluate non-boolean group
       Synonym first_target_synonym = current_group.GetTargetSynonyms()[0];
       // TODO: Check if this table creation is correct??
-//      QueryEvaluatorTable *table = new QueryEvaluatorTable(&first_target_synonym);
-      QueryEvaluatorTable *table = new QueryEvaluatorTable("Temp");
+      QueryEvaluatorTable *table = new QueryEvaluatorTable(&first_target_synonym);
       DesignEntity de = first_target_synonym.GetType();
 
       // TODO:
