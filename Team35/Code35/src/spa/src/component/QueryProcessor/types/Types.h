@@ -126,8 +126,8 @@ struct Clause {
   std::string left_hand_side;
   std::string right_hand_side;
   virtual std::vector<std::string> GetAllSynonymNamesOfClause() { return {}; };
-  Synonym *first_synonym;
-  Synonym *second_synonym;
+  Synonym first_synonym;
+  Synonym second_synonym;
   virtual std::string getType() { return ""; };
   virtual bool isEqual(Clause toObj) { return 1; };
   virtual ~Clause() {};
