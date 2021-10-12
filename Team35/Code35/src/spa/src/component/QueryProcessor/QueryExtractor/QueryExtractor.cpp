@@ -13,9 +13,8 @@ void QueryExtractor::ExtractQuery() {
   QueryParser parser = QueryParser(clauses, groups, synonyms, target_synonyms, target_synonyms_map, tokenizer);
   parser.Parse();
   QueryExtractor::PopulateSynAdjacencyList(& map_of_syn_to_clause_indices, & clauses);
-  //QueryGrouper::GroupClauses(& clauses, & groups, & target_synonyms);
-  QueryGrouper::GroupClausesV2(& clauses, & groups, & target_synonyms, &target_synonyms_map,
-                                 & map_of_syn_to_clause_indices);
+  QueryGrouper::GroupClauses(& clauses, & groups, & target_synonyms, &target_synonyms_map,
+                             & map_of_syn_to_clause_indices);
 }
 
 void QueryExtractor::PopulateSynAdjacencyList(std::unordered_map<std::string, std::vector<int>>* map_of_syn_to_cl_indices,

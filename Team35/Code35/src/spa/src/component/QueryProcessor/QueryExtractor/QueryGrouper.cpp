@@ -5,7 +5,7 @@
 /**
  * Groups multiple queries that should be evaluated together, based on existence of common synonyms.
  */
-void QueryGrouper::GroupClausesV2(std::vector<Clause*>* clauses, std::list<Group*>* groups,
+void QueryGrouper::GroupClauses(std::vector<Clause*>* clauses, std::list<Group*>* groups,
                                     std::vector<Synonym>* target_synonyms,
                                     std::unordered_map<std::string, DesignEntity>* target_synonyms_map,
                                     std::unordered_map<std::string, std::vector<int>>* map_of_syn_to_clause_indices) {
@@ -107,79 +107,3 @@ void QueryGrouper::UpdateGroupMetadata(Group* group, std::unordered_set<std::str
   group->UpdateHasTargetSynonymAttr();
 }
 
-/**
- * Groups up to 2 queries that should be evaluated together, based on existence of common synonyms.
- */
-void QueryGrouper::GroupClauses(std::vector<Clause*>* clauses, std::list<Group*>* groups,
-                                  std::vector<Synonym>* target_synonyms) {
-  // [TODO iter 2]: implement grouping algorithm.
-  // current implementation assumes only 1 such that and 1 pattern clause; manually grouping by common synonym.
-  if (clauses->size() == 0) {
-    return;
-  }
-  auto target = target_synonyms->at(0);
-  if (clauses->size() == 1) {
-    // expecting 1 such that or 1 pattern clause
-    bool has_target_syn = false;
-    // such that clause
-    if (typeid(* (* clauses)[0]) == typeid(SuchThat)) {
-      SuchThat* st = dynamic_cast<SuchThat*>((* clauses)[0]);
-      if (st->left_is_synonym && st->left_hand_side.compare(target.GetName()) == 0) {
-        has_target_syn = true;
-      } else if (st->right_is_synonym && st->right_hand_side.compare(target.GetName()) == 0) {
-        has_target_syn = true;
-      }
-    } else {
-      // pattern clause
-      Pattern* pt = dynamic_cast<Pattern*>((* clauses)[0]);
-      // has_target_syn if lhs is a target synonym, or if  syn-assn is a target synonym
-      if (pt->assign_synonym.compare(target.GetName()) == 0 ||
-          pt->left_is_synonym && pt->left_hand_side.compare(target.GetName()) == 0) {
-        has_target_syn = true;
-      }
-    }
-    // add clause into its own group
-    std::vector<Clause*> cl1;
-    cl1.push_back((* clauses)[0]);
-    Group* g1 = new Group(cl1, has_target_syn);
-    groups->push_back(g1);
-
-  } else if (clauses->size() == 2) {
-    // expecting 1 such that followed by 1 pattern clause
-    bool has_target_syn = false;
-    if (typeid(* (* clauses)[0]) == typeid(SuchThat)) {
-      SuchThat* st = dynamic_cast<SuchThat*>((* clauses)[0]);
-      if (st->left_is_synonym && st->left_hand_side.compare(target.GetName()) == 0) {
-        has_target_syn = true;
-      } else if (st->right_is_synonym && st->right_hand_side.compare(target.GetName()) == 0) {
-        has_target_syn = true;
-      }
-    }
-    std::vector<Clause*> cl1;
-    cl1.push_back((* clauses)[0]);
-    Group* g1 = new Group(cl1, has_target_syn);
-    groups->push_back(g1);
-
-    // if 1x pattern cl has common synonym, it goes in the same group.
-    Pattern* pt = dynamic_cast<Pattern*>((* clauses)[1]);
-    bool has_common_assign_syn = pt->assign_synonym.compare(cl1[0]->left_hand_side) == 0;
-    bool has_common_args = pt->left_is_synonym && (
-        pt->left_hand_side.compare(cl1[0]->left_hand_side) == 0 ||
-            pt->left_hand_side.compare(cl1[0]->right_hand_side) == 0);
-    if (has_common_assign_syn || has_common_args) {
-      g1->AddClauseToVector(pt);
-    } else {
-      std::vector<Clause*> cl2;
-      cl2.push_back(pt);
-      bool pattern_cl_has_tgt_syn = false;
-      if (pt->assign_synonym.compare(target.GetName()) == 0 ||
-          pt->left_is_synonym && pt->left_hand_side.compare(target.GetName()) == 0) {
-        pattern_cl_has_tgt_syn = true;
-      }
-      Group* g2 = new Group(cl2, pattern_cl_has_tgt_syn);
-      groups->push_back(g2);
-    }
-  } else {
-    throw PQLValidationException("Got more than 2 clauses.");
-  }
-}
