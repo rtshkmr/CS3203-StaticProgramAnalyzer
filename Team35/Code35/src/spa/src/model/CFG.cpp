@@ -16,6 +16,7 @@ int Cluster::size() const {
  */
 void Cluster::AddChildCluster(Cluster* new_nested_cluster) {
   this->nested_clusters_.push_back(new_nested_cluster);
+  new_nested_cluster->SetParentCluster(this);
 //  this->UpdateParentClusterRange(new_nested_cluster);
 
 }

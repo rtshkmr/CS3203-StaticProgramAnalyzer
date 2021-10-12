@@ -219,9 +219,6 @@ void PSubsystem::HandleCloseBrace() {
  * @return
  */
 void PSubsystem::InitRootClusterAndBlock(Procedure* procedure) {
-  /// ISSUE 1&2: In order for the first while/if block to access previous next_block, need create as Block
-  /// This is for you to change cluster to add next cluster for now.
-  // todo: a cluster contains a list of nested blocks, so when creating new proc, need a cluster and separately, also root block that is an element of the nested cluster set within the outermost cluster that represents the procedure
   Cluster* cluster_root = new Cluster(); // the outer procedure
   Block* block_root = new Block();
   cluster_root->AddChildCluster(block_root);
@@ -521,7 +518,6 @@ void PSubsystem::CreateNewNestedCluster(ConditionalBlock* conditional_block, Bod
   existing_parent_cluster->AddChildCluster(new_cluster);
   new_cluster->AddChildCluster(conditional_block);
   new_cluster->AddChildCluster(body_block);
-  new_cluster->SetParentCluster(existing_parent_cluster);
   cluster_stack_.push(new_cluster);
 }
 
