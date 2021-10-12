@@ -59,10 +59,12 @@ DesignEntity GetDesignEntity(std::string reference) {
   return DesignEntity::kInvalid;
 }
 
-bool Group::AddClauseToVector(Clause* clause) {
-  auto initialSize = clauses.size();
+void Group::AddSynToTargetSyns(Synonym s) {
+  target_synonyms.push_back(s);
+}
+
+void Group::AddClauseToVector(Clause* clause) {
   clauses.push_back(clause);
-  return (clauses.size() == initialSize + 1);
 }
 
 std::vector<Clause*> Group::GetClauses() {
@@ -77,4 +79,6 @@ std::vector<Synonym> Group::GetTargetSynonyms() {
   return target_synonyms;
 }
 
-
+void Group::UpdateHasTargetSynonymAttr() {
+  has_target_synonym = target_synonyms.size() > 0 ? true : false;
+}
