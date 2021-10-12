@@ -1,15 +1,15 @@
 #include "QueryEvaluatorTable.h"
 
 bool QueryEvaluatorTable::AddTargetSynonymValues(std::vector<Entity *> entity_list) {
-  unordered_map[target_synonym] = entity_list;
+  synonym_to_entity_map[target_synonym] = entity_list;
   return true;
 }
 
 
 bool QueryEvaluatorTable::AddColumn(Synonym *synonym) {
-  if (unordered_map.find(synonym) == unordered_map.end()) {
+  if (synonym_to_entity_map.find(synonym) == synonym_to_entity_map.end()) {
     std::vector<Entity *> synonym_list;
-    unordered_map.insert(std::make_pair(synonym, synonym_list));
+    synonym_to_entity_map.insert(std::make_pair(synonym, synonym_list));
     return true;
   } else {
     return false;
@@ -17,16 +17,16 @@ bool QueryEvaluatorTable::AddColumn(Synonym *synonym) {
 }
 
 bool QueryEvaluatorTable::ContainsColumn(Synonym *synonym) {
-  auto search = unordered_map.find(synonym);
-  return search != unordered_map.end();
+  auto search = synonym_to_entity_map.find(synonym);
+  return search != synonym_to_entity_map.end();
 }
 
 bool QueryEvaluatorTable::AddRow(Synonym *synonym, int index, Entity *entity) {
   // assert that index == size
-  if (index != unordered_map[synonym].size()) {
+  if (index != synonym_to_entity_map[synonym].size()) {
     return false;
   }
-  unordered_map[synonym].push_back(entity);
+  synonym_to_entity_map[synonym].push_back(entity);
   return true;
 }
 
@@ -46,7 +46,7 @@ bool QueryEvaluatorTable::AddMultipleRowForAllColumn(Synonym *synonym, int index
     return false;
   }
 
-  for (auto tableIterator = unordered_map.begin(); tableIterator != unordered_map.end(); tableIterator++) {
+  for (auto tableIterator = synonym_to_entity_map.begin(); tableIterator != synonym_to_entity_map.end(); tableIterator++) {
     if (tableIterator->first == synonym) {
       AddRow(synonym, index + repeat_count, entity);
     } else {
@@ -61,10 +61,10 @@ bool QueryEvaluatorTable::AddMultipleRowForAllColumn(Synonym *synonym, int index
 }
 
 bool QueryEvaluatorTable::DeleteRow(int index) {
-  if (unordered_map[target_synonym].size() - 1 < index) {
+  if (synonym_to_entity_map[target_synonym].size() - 1 < index) {
     return false;
   }
-  for (auto iter = unordered_map.begin(); iter != unordered_map.end(); ++iter) {
+  for (auto iter = synonym_to_entity_map.begin(); iter != synonym_to_entity_map.end(); ++iter) {
     std::vector<Entity *> current_column = iter->second;
     unsigned long size = current_column.size();
     if (index < size) {
@@ -76,24 +76,24 @@ bool QueryEvaluatorTable::DeleteRow(int index) {
 }
 
 std::vector<Entity *> QueryEvaluatorTable::GetColumn(Synonym *synonym) {
-  auto search = unordered_map.find(synonym);
-  //assert search != unordered_map.end()
+  auto search = synonym_to_entity_map.find(synonym);
+  //assert search != synonym_to_entity_map.end()
   return search->second;
 }
 
 int QueryEvaluatorTable::GetColumnSize() {
-  return unordered_map.size();
+  return synonym_to_entity_map.size();
 }
 
 int QueryEvaluatorTable::GetRowSize() {
-  auto search = unordered_map.find(target_synonym);
-  //assert search != unordered_map.end()
+  auto search = synonym_to_entity_map.find(target_synonym);
+  //assert search != synonym_to_entity_map.end()
   return search->second.size();
 }
 
 std::vector<Entity *> QueryEvaluatorTable::GetResults() {
-  auto search = unordered_map.find(target_synonym);
-  //assert search != unordered_map.end()
+  auto search = synonym_to_entity_map.find(target_synonym);
+  //assert search != synonym_to_entity_map.end()
   return search->second;
 }
 

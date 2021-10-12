@@ -1,7 +1,7 @@
 #ifndef AUTOTESTER_QUERYEVALUATORTABLE_H
 #define AUTOTESTER_QUERYEVALUATORTABLE_H
 
-//#include <unordered_map>
+//#include <synonym_to_entity_map>
 //#include <string>
 //#include <vector>
 //#include <utility>
@@ -40,12 +40,12 @@ class QueryEvaluatorTable {
     //
     //
     //
-    //    std::string GetStatementSynonym(std::unordered_map<std::string, DesignEntity> synonym_design_entity_map);
+    //    std::string GetStatementSynonym(std::synonym_to_entity_map<std::string, DesignEntity> synonym_design_entity_map);
     // Add row (and new col)
     bool AddRow(Synonym *synonym, int index, Entity *entity);
 
   private:
-    std::unordered_map<Synonym *, std::vector<Entity *>> unordered_map;
+    std::unordered_map<Synonym *, std::vector<Entity *>> synonym_to_entity_map;
     Synonym *target_synonym;
     std::vector<Synonym *> target_synonym_list;
 
