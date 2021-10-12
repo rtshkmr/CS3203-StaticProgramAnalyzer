@@ -87,9 +87,9 @@ void QueryEvaluator::PreprocessBooleanGroup(Group group) {
   if (typeid(* firstClause) == typeid(SuchThat)) {
     auto* st = dynamic_cast<SuchThat*>(firstClause);
     if (st->left_is_synonym) {
-      main_synonym = st->first_synonym;
+      main_synonym = &st->first_synonym;
     } else if (st->right_is_synonym) {
-      main_synonym = st->second_synonym;
+      main_synonym = &st->second_synonym;
     } else {
       // If no synonym, no need for a table. Also, should be in a group of size 1.
       // TODO: add function for no syn
@@ -98,7 +98,7 @@ void QueryEvaluator::PreprocessBooleanGroup(Group group) {
     }
   } else if (typeid(* firstClause) == typeid(Pattern)) {
     auto* pattern = dynamic_cast<Pattern*>(firstClause);
-    main_synonym = pattern->first_synonym;
+    main_synonym = &pattern->first_synonym;
   } else {
     // No code should run here for iter 1 since there is only such that and pattern clause.
   }
