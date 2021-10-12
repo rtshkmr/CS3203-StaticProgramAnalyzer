@@ -99,6 +99,19 @@ class Variable : public Entity {
 };
 
 /**
+ * Constant is a derived class of Entity. This class contains the value of the constant.
+ */
+class Constant : public Entity {
+ private:
+  const ConstantValue* constant_value_;
+ public:
+  Constant(ConstantValue* constantValue);
+
+  const ConstantValue* GetValue();
+};
+
+
+/**
  * Program is the root node of the AST. It contains the different Procedures found within the SIMPLE source code.
  */
 class Program {
