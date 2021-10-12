@@ -89,8 +89,6 @@ class PSubsystem {
 
   void ProcessEntityAsNewProcedure(Entity* entity);
   void ProcessEntityAsStatement(Entity* entity);
-  void CreateNewNestedCluster(ConditionalBlock* conditional_block, BodyBlock* body_block);
-  void UpdateClusterWithElseBlock(BodyBlock* block_else_body);
 };
 }
 

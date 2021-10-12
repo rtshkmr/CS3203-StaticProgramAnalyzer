@@ -85,7 +85,6 @@ void PSubsystem::ProcessStatement(const std::string& statement) {
   return (current_node_type_ == NodeType::kNone)// Only happens when not reading within a procedure.
          ? ProcessEntityAsNewProcedure(entity)
          : ProcessEntityAsStatement(entity);
-
 }
 
 /**
@@ -95,12 +94,17 @@ void PSubsystem::ProcessStatement(const std::string& statement) {
 void PSubsystem::CloseIfBlock() {
   if (current_node_type_ == NodeType::kIf) {
     // todo: probably have to update cluster's fields
+    int x = 1; // todo: get the if-body from the top of block stack, if cond from 2nd pos of block stack and the outer cluster from the cluster stack top
+//    BodyBlock* if_body = block_stack_.top();
+//    block_stack_.pop();
+//    ConditionalBlock* if_cond = block_stack_.top();
     return;// do not pop anything in if-close brace. pop 2 when finishing else.
   }
 }
 
 void PSubsystem::CloseProcedureBlock() {
   if (current_node_type_ == NodeType::kProcedure && parent_stack_.empty()) {
+    const Cluster* assigned_cluster_root = current_procedure_->GetClusterRoot();
     current_node_type_ = NodeType::kNone;
     current_node_ = nullptr;
     current_procedure_ = nullptr;
@@ -108,7 +112,12 @@ void PSubsystem::CloseProcedureBlock() {
     assert(block_stack_.empty()); // FIXME this is the failing assertion now
     bool is_currently_in_outermost_cluster = cluster_stack_.size() == 1;
     assert(is_currently_in_outermost_cluster);
+
+    // put the block root into the
+    Cluster* ready_cluster = cluster_stack_.top();
     cluster_stack_.pop(); // cluster_stack is now empty since the Procedure has been closed.
+    bool last_popped_equals_cluster_root = ready_cluster == assigned_cluster_root;
+    assert(last_popped_equals_cluster_root);
   }
 }
 
@@ -129,22 +138,42 @@ void PSubsystem::CloseElseBlock() {
     block_stack_.push(block_if_else_exit);
     bool is_currently_in_nested_cluster = cluster_stack_.size() > 1;
     assert(is_currently_in_nested_cluster);
+    // add to cluster here:
+    Cluster* if_cluster = cluster_stack_.top();
+    if_cluster->AddChildCluster(if_cond_block);
+    if_cluster->AddChildCluster(if_body_block);
+    if_cluster->AddChildCluster(else_body_block);
     cluster_stack_.pop();
+    assert(!cluster_stack_.empty());
+    Cluster* outer_cluster = cluster_stack_.top();
+    outer_cluster->AddChildCluster(if_cluster);
   }
 }
 
+// todo: handle while stmt, where is the while_body_block!?
 void PSubsystem::CloseWhileBlock() {
   Block* lastStmt = dynamic_cast<Block*>(block_stack_.top());
-  block_stack_.pop(); // link the last stmt to the while_cond block, and pop it.
-  lastStmt->next_blocks_.insert(dynamic_cast<Block*>(block_stack_.top()));
-
+  block_stack_.pop(); // link the last stmt to the while_cond_block block, and pop it.
+  //todo: change from Block* to ConditionalBlock*
+  Block* while_cond_block = dynamic_cast<Block*>(block_stack_.top());
+  assert(while_cond_block);
+  lastStmt->next_blocks_.insert(while_cond_block);
   Block* block_while_exit = Block::GetNewExitBlock();
-  block_stack_.top()->GetNextBlocks().insert(block_while_exit);
-  block_stack_.pop(); //pop the while_cond block
+  while_cond_block->next_blocks_.insert(block_while_exit);
+//  block_stack_.top()->GetNextBlocks().insert(block_while_exit);
+  block_stack_.pop(); //pop the while_cond_block block
   block_stack_.push(block_while_exit);
   bool is_currently_in_nested_cluster = cluster_stack_.size() > 1;
   assert(is_currently_in_nested_cluster);
+  // add to cluster here:
+  Cluster* while_cluster = cluster_stack_.top();
+  while_cluster->AddChildCluster(while_cond_block);
+//  while_cluster->AddChildCluster(while) // todo: add while body block as child
   cluster_stack_.pop();
+
+  assert(!cluster_stack_.empty());
+  Cluster* outer_cluster = cluster_stack_.top();
+  outer_cluster->AddChildCluster(while_cluster);
 }
 
 void PSubsystem::ProcessOuterParentNode() {
@@ -224,8 +253,9 @@ void PSubsystem::HandleCloseBrace() {
  */
 void PSubsystem::InitRootClusterAndBlock(Procedure* procedure) {
   Cluster* cluster_root = new Cluster(); // the outer procedure
+  cluster_root->SetParentCluster(nullptr);
   Block* block_root = new Block();
-  cluster_root->AddChildCluster(block_root);
+//  cluster_root->AddChildCluster(block_root);
   block_stack_.push(block_root);
   cluster_stack_.push(cluster_root);
   procedure->SetBlockRoot(block_root);
@@ -323,7 +353,9 @@ void PSubsystem::HandleIfStmt(Entity* entity) {
   BodyBlock* block_if_body = CreateBodyBlock(block_if_cond);
   // todo: make it into add control var + const later
   AddControlVariableRelationships(if_entity->GetControlVariables());
-  CreateNewNestedCluster(block_if_cond, block_if_body);
+//  CreateNewNestedCluster(block_if_cond, block_if_body);
+  Cluster* if_cluster = new Cluster();
+  cluster_stack_.push(if_cluster);
 }
 
 /**
@@ -343,7 +375,7 @@ void PSubsystem::HandleElseStmt(Entity* entity) {
   current_node_type_ = NodeType::kElse;
   current_node_ = if_entity;
   BodyBlock* block_else_body = CreateBodyBlock();
-  UpdateClusterWithElseBlock(block_else_body);
+//  UpdateClusterWithElseBlock(block_else_body);
 }
 
 void PSubsystem::HandleWhileStmt(Entity* entity) {
@@ -359,7 +391,7 @@ void PSubsystem::HandleWhileStmt(Entity* entity) {
   block_while_cond->isWhile = true;
   BodyBlock* block_while_body = CreateBodyBlock(block_while_cond);
   AddControlVariableRelationships(while_entity->GetControlVariables());
-  CreateNewNestedCluster(block_while_cond, block_while_body);
+//  CreateNewNestedCluster(block_while_cond, block_while_body);
 }
 
 /**
@@ -507,33 +539,8 @@ void PSubsystem::CheckForExistingProcedure() {
 Deliverable* PSubsystem::GetDeliverables() {
   CheckForIfElseValidity(); //TODO: to put it within main handling if possible.
   CheckForExistingProcedure();
-
   valid_state = false; //to prevent further processsing.
   return deliverable_;
-}
-
-/**
- * Creates a new nested cluster, adds it as a nested cluster within the existing parent cluster and pushes to cluster_stack
- * @param conditional_block
- * @param body_block
- */
-void PSubsystem::CreateNewNestedCluster(ConditionalBlock* conditional_block, BodyBlock* body_block) {
-  assert(!cluster_stack_.empty()); // can only be called from within a cluster
-  Cluster* new_cluster = new Cluster();
-  Cluster* existing_parent_cluster = cluster_stack_.top();
-  existing_parent_cluster->AddChildCluster(new_cluster);
-  new_cluster->AddChildCluster(conditional_block);
-  new_cluster->AddChildCluster(body_block);
-  cluster_stack_.push(new_cluster);
-}
-
-/**
- * Since we're already in a If Cluster, add the else block as a nested child.
- * @param block_else_body
- */
-void PSubsystem::UpdateClusterWithElseBlock(BodyBlock* block_else_body) {
-  Cluster* if_cluster = cluster_stack_.top();
-  if_cluster->AddChildCluster(block_else_body);
 }
 
 
