@@ -22,8 +22,7 @@ UnformattedQueryResult QueryEvaluator::EvaluateQuery(const std::vector<Group>& l
       QueryEvaluatorTable *table = new QueryEvaluatorTable(&first_target_synonym);
       DesignEntity de = first_target_synonym.GetType();
 
-      // TODO:
-      //      table->AddTargetSynonymValues(pkb->GetDesignEntity(de));
+      table->AddTargetSynonymValues(pkb->GetDesignEntities(de));
       ProcessGroup(table, current_group);
       unformatted_result.AddTable(table);
     } else {
@@ -48,9 +47,8 @@ UnformattedQueryResult QueryEvaluator::EvaluateQuery(const std::vector<Group>& l
  * @param group
  */
 void QueryEvaluator::ProcessGroup(QueryEvaluatorTable *table, Group group) {
-//  ClauseCommandInvoker clause_command_invoker = ClauseCommandInvoker();
-//  ClauseCommandExecutor *clause_command_executor = new ClauseCommandExecutor(table, pkb);
 
+//  ClauseCommandExecutor *clause_command_executor = new ClauseCommandExecutor(table, pkb);
 //  for (Clause* current_clause: group.GetClauses()) {
 //    ClauseContext context = ClauseContext(table);
 //    if (typeid(* current_clause) == typeid(SuchThat)) {
