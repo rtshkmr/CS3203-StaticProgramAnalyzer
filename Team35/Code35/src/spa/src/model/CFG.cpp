@@ -156,13 +156,16 @@ BodyBlock::~BodyBlock() = default;
 Block* Block::GetNewExitBlock() {
   // to differentiate ExitBlocks from others.
   Block* exit_block = new Block();
-  exit_block->start_ = -INT32_MAX;
-  exit_block->end_ = -INT32_MAX;
+//  exit_block->start_ = -INT32_MAX;
+  exit_block->start_ = -1;
+  exit_block->end_ = -1;
+//  exit_block->end_ = -INT32_MAX;
   return exit_block;
 }
 bool Block::IsExitBlock(Block* block) {
   std::pair<int, int> range = block->GetStartEndRange();
-  return std::get<0>(range) == -INT32_MAX && std::get<1>(range) == -INT32_MAX;
+//  return std::get<0>(range) == -INT32_MAX && std::get<1>(range) == -INT32_MAX;
+  return std::get<0>(range) == -1 && std::get<1>(range) == -1;
 }
 
 
