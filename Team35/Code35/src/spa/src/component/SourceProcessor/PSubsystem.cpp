@@ -105,26 +105,28 @@ void PSubsystem::CloseProcedureBlock() {
     current_node_ = nullptr;
     current_procedure_ = nullptr;
     block_stack_.pop();
-    assert(block_stack_.empty());
+    assert(block_stack_.empty()); // FIXME this is the failing assertion now
     bool is_currently_in_outermost_cluster = cluster_stack_.size() == 1;
     assert(is_currently_in_outermost_cluster);
-    cluster_stack_.pop();
+    cluster_stack_.pop(); // cluster_stack is now empty since the Procedure has been closed.
   }
 }
 
 void PSubsystem::CloseElseBlock() {
-  parent_stack_.pop();
-  follow_stack_.pop();
-  Block* block_end_else = new Block(); // exit block, QQ: is this really needed!?
-  block_stack_.top()->GetNextBlocks().insert(block_end_else);
-  block_stack_.pop(); //pop the else block
-  block_stack_.top()->GetNextBlocks().insert(block_end_else);
-  block_stack_.pop(); //pop the if_body block
-  block_stack_.pop(); //pop the if_cond block
-  block_stack_.push(block_end_else);
-  bool is_currently_in_nested_cluster = cluster_stack_.size() > 1;
-  assert(is_currently_in_nested_cluster);
-  cluster_stack_.pop();
+  if (current_node_type_ == NodeType::kElse) {
+    parent_stack_.pop();
+    follow_stack_.pop();
+    Block* block_end_else = new Block(); // exit block, QQ: is this really needed!?
+    block_stack_.top()->GetNextBlocks().insert(block_end_else);
+    block_stack_.pop(); //pop the else block
+    block_stack_.top()->GetNextBlocks().insert(block_end_else);
+    block_stack_.pop(); //pop the if_body block
+    block_stack_.pop(); //pop the if_cond block
+    block_stack_.push(block_end_else);
+    bool is_currently_in_nested_cluster = cluster_stack_.size() > 1;
+    assert(is_currently_in_nested_cluster);
+    cluster_stack_.pop();
+  }
 }
 
 void PSubsystem::CloseWhileBlock() {
@@ -199,6 +201,7 @@ void PSubsystem::HandleCloseBrace() {
   if (current_node_type_ == NodeType::kProcedure && parent_stack_.empty()) {
     CloseProcedureBlock();
   } else {
+    parent_stack_.pop();
     if (current_node_type_ == NodeType::kElse) { //double pop for else clause
       CloseElseBlock();
     } else if (current_node_type_ == NodeType::kWhile) {
@@ -374,7 +377,8 @@ ConditionalBlock* PSubsystem::CreateConditionalBlock(Statement* conditional_stat
     conditional_block = new ConditionalBlock();
     conditional_block->AddStmt(StatementNumber(statement_num));
     block_stack_.top()->GetNextBlocks().insert(conditional_block);
-    if (!dynamic_cast<Block*>(block_stack_.top())->isWhile) {
+    bool block_is_not_while = !dynamic_cast<Block*>(block_stack_.top())->isWhile;
+    if (block_is_not_while) {
       block_stack_.pop(); // pop the previous progline if it isnt while (no loopback to care)
     }
     block_stack_.push(static_cast<Block* const>(conditional_block));
