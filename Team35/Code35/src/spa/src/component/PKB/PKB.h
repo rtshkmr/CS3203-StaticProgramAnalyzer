@@ -61,41 +61,72 @@ class PKB {
 
 
   // TO BE DEPRECATED FROM HERE
+  [[deprecated]]
   std::vector<AssignEntity> GetPatternByAssign(std::string stmtRef);
+  [[deprecated]]
   std::vector<AssignEntity> GetPatternByVariable(std::string varName);
 
+  [[deprecated]]
   std::list<std::string> GetDesignEntity(DesignEntity de);
+  [[deprecated]]
   std::list<std::tuple<DesignEntity, std::string>> GetFollows(std::string stmt);
+  [[deprecated]]
   std::list<std::tuple<DesignEntity, std::string>> GetPrevious(std::string stmt);
+  [[deprecated]]
   std::list<std::tuple<DesignEntity, std::string>> GetParent(std::string stmt);
+  [[deprecated]]
   std::list<std::tuple<DesignEntity, std::string>> GetChild(std::string stmt);
 
+  [[deprecated]]
   std::list<std::tuple<DesignEntity, std::string>> GetUses(std::string stmt);
+  [[deprecated]]
   std::list<std::tuple<DesignEntity, std::string>> GetUsedBy(std::string var);
+  [[deprecated]]
   std::list<std::tuple<DesignEntity, std::string>> GetModifies(std::string stmt);
+  [[deprecated]]
   std::list<std::tuple<DesignEntity, std::string>> GetModifiedBy(std::string var);
 
+  [[deprecated]]
   std::list<std::tuple<DesignEntity, std::string>> GetUsesP(std::string procedure);
+  [[deprecated]]
   std::list<std::tuple<DesignEntity, std::string>> GetUsedByP(std::string var);
+  [[deprecated]]
   std::list<std::tuple<DesignEntity, std::string>> GetModifiesP(std::string procedure);
+  [[deprecated]]
   std::list<std::tuple<DesignEntity, std::string>> GetModifiedByP(std::string var);
 
+  [[deprecated]]
   std::list<std::tuple<DesignEntity, std::string>> GetFollowsT(std::string stmt);
+  [[deprecated]]
   std::list<std::tuple<DesignEntity, std::string>> GetPreviousT(std::string stmt);
+  [[deprecated]]
   std::list<std::tuple<DesignEntity, std::string>> GetParentT(std::string stmt);
+  [[deprecated]]
   std::list<std::tuple<DesignEntity, std::string>> GetChildT(std::string stmt);
 
+  [[deprecated]]
   bool HasFollows();
+  [[deprecated]]
   bool HasPrevious();
+  [[deprecated]]
   bool HasParent();
+  [[deprecated]]
   bool HasChild();
+  [[deprecated]]
   bool HasFollowsT();
+  [[deprecated]]
   bool HasPreviousT();
+  [[deprecated]]
   bool HasParentT();
+  [[deprecated]]
   bool HasChildT();
+  [[deprecated]]
   bool HasUses();
+  [[deprecated]]
   bool HasUsedBy();
+  [[deprecated]]
   bool HasModifies();
+  [[deprecated]]
   bool HasModifiedBy();
   // TO HERE
 
