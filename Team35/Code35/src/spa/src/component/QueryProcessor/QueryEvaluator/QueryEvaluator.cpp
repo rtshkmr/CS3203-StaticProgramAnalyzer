@@ -19,7 +19,8 @@ UnformattedQueryResult QueryEvaluator::EvaluateQuery(const std::vector<Group>& l
       // Evaluate non-boolean group
       Synonym first_target_synonym = current_group.GetTargetSynonyms()[0];
       // TODO: Check if this table creation is correct??
-      QueryEvaluatorTable *table = new QueryEvaluatorTable(&first_target_synonym);
+//      QueryEvaluatorTable *table = new QueryEvaluatorTable(&first_target_synonym);
+      QueryEvaluatorTable *table = new QueryEvaluatorTable("Temp");
       DesignEntity de = first_target_synonym.GetType();
 
       // TODO:
@@ -48,34 +49,35 @@ UnformattedQueryResult QueryEvaluator::EvaluateQuery(const std::vector<Group>& l
  * @param group
  */
 void QueryEvaluator::ProcessGroup(QueryEvaluatorTable *table, Group group) {
-  ClauseCommandInvoker clause_command_invoker = ClauseCommandInvoker();
-  ClauseCommandExecutor *clause_command_executor = new ClauseCommandExecutor(table, pkb);
+//  ClauseCommandInvoker clause_command_invoker = ClauseCommandInvoker();
+//  ClauseCommandExecutor *clause_command_executor = new ClauseCommandExecutor(table, pkb);
 
-  for (Clause* current_clause: group.GetClauses()) {
-    ClauseContext context = ClauseContext(table);
-    if (typeid(* current_clause) == typeid(SuchThat)) {
-      context.SetClauseStrategy(new SuchThatStrategy());
-    } else {
-      context.SetClauseStrategy(new PatternStrategy());
-    }
-    std::tuple<ClauseInformation, ClauseParameters> tuple = context.ProcessClause(current_clause);
-    ClauseInformation clause_information = std::get<0>(tuple);
-    ClauseParameters clause_parameters = std::get<1>(tuple);
-    clause_information.clause_command->SetExecutor(clause_command_executor);
-    clause_command_invoker.SetCommand(clause_information.clause_command);
-
-    // TODO: Param passed to invokeCommand might not always be the same...
-    clause_command_invoker.InvokeCommand(clause_parameters,
-                                         clause_information.pkb_query_command, current_clause, &context);
-  }
+//  for (Clause* current_clause: group.GetClauses()) {
+//    ClauseContext context = ClauseContext(table);
+//    if (typeid(* current_clause) == typeid(SuchThat)) {
+//      context.SetClauseStrategy(new SuchThatStrategy());
+//    } else {
+//      context.SetClauseStrategy(new PatternStrategy());
+//    }
+//    std::tuple<ClauseInformation, ClauseParameters> tuple = context.ProcessClause(current_clause);
+//    ClauseInformation clause_information = std::get<0>(tuple);
+//    ClauseParameters clause_parameters = std::get<1>(tuple);
+//    clause_information.clause_command->SetExecutor(clause_command_executor);
+//    clause_command_invoker.SetCommand(clause_information.clause_command);
+//
+//    // TODO: Param passed to invokeCommand might not always be the same...
+//    clause_command_invoker.InvokeCommand(clause_parameters,
+//                                         clause_information.pkb_query_command, current_clause, &context);
+//  }
   return;
 }
 
 bool QueryEvaluator::ProcessSingleClauseBooleanGroup(Group group) {
-  Clause *clause = group.GetClauses()[0];
-  auto *such_that_clause = dynamic_cast<SuchThat *>(clause);
-  PKBQueryReceiver receiver = PKBQueryReceiver(pkb);
-  return receiver.QueryPkbForRelationshipExistence(such_that_clause);
+//  Clause *clause = group.GetClauses()[0];
+//  auto *such_that_clause = dynamic_cast<SuchThat *>(clause);
+//  PKBQueryReceiver receiver = PKBQueryReceiver(pkb);
+//  return receiver.QueryPkbForRelationshipExistence(such_that_clause);
+  return true;
 }
 
 /**
@@ -88,9 +90,9 @@ void QueryEvaluator::PreprocessBooleanGroup(Group group) {
   if (typeid(* firstClause) == typeid(SuchThat)) {
     auto* st = dynamic_cast<SuchThat*>(firstClause);
     if (st->left_is_synonym) {
-      main_synonym = &st->first_synonym;
+      main_synonym = st->first_synonym;
     } else if (st->right_is_synonym) {
-      main_synonym = &st->second_synonym;
+      main_synonym = st->second_synonym;
     } else {
       // If no synonym, no need for a table. Also, should be in a group of size 1.
       // TODO: add function for no syn
@@ -99,19 +101,19 @@ void QueryEvaluator::PreprocessBooleanGroup(Group group) {
     }
   } else if (typeid(* firstClause) == typeid(Pattern)) {
     auto* pattern = dynamic_cast<Pattern*>(firstClause);
-    main_synonym = &pattern->first_synonym;
+    main_synonym = pattern->first_synonym;
   } else {
     // No code should run here for iter 1 since there is only such that and pattern clause.
   }
 
-  if (main_synonym != nullptr) {
-    QueryEvaluatorTable current_table(main_synonym);
-    //TODO:
-    //    current_table.AddTargetSynonymValues(pkb->GetDesignEntity(main_synonym->GetType()));
-    ProcessGroup(&current_table, group);
-    if (current_table.GetResults().empty()) {
-      boolean_result = false;
-    }
-  }
+//  if (main_synonym != nullptr) {
+//    QueryEvaluatorTable current_table(main_synonym);
+//    //TODO:
+//    //    current_table.AddTargetSynonymValues(pkb->GetDesignEntity(main_synonym->GetType()));
+//    ProcessGroup(&current_table, group);
+//    if (current_table.GetResults().empty()) {
+//      boolean_result = false;
+//    }
+//  }
   return;
 }

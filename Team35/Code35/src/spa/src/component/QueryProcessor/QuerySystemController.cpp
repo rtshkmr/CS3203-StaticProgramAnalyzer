@@ -17,10 +17,13 @@ std::vector<std::string> QuerySystemController::Evaluate(std::string* query, PKB
   } catch (const std::runtime_error& error) {
     return {};
   }
-  auto query_evaluator = QueryEvaluator(* pkb);
+  auto query_evaluator = QueryEvaluator(pkb);
 
   L("[ENTER] Query Evaluator Evaluate Query");
-  UnformattedQueryResult unformatted_results = query_evaluator.EvaluateQuery();
+  // TODO: change this
+//  UnformattedQueryResult unformatted_results = query_evaluator.EvaluateQuery(query_extractor.GetGroupsList());
+  UnformattedQueryResult unformatted_results = query_evaluator.EvaluateQuery(std::vector<Group> ());
+
   L("[EXIT] Query Evaluator Evaluate Query ");
 
   QueryProjector query_projector = QueryProjector(query_extractor.GetTargetSynonymsList());

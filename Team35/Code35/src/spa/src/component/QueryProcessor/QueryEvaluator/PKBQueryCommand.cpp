@@ -84,19 +84,21 @@ IntermediateTable *PKBQueryReceiver::QueryDesignEntity(DesignEntity design_entit
 
 IntermediateTable *PKBQueryReceiver::QueryPatternByValue(DesignEntity design_entity, std::string value) {
   IntermediateTable *table = new IntermediateTable();
-  switch(design_entity) {
-    case DesignEntity::kAssign:
-      table->InsertData(pkb->GetAssignEntityByVariable(value));
-      break;
-      case DesignEntity::kWhile:
-        table->InsertData(pkb->GetWhileEntityByVariable(value));
-        break;
-        case DesignEntity::kIf:
-          table->InsertData(pkb->GetIfEntityByVariable(value));
-          break;
-          default:
-            break;
-  }
+
+  // TODO: Wait for PKB update
+//  switch(design_entity) {
+//    case DesignEntity::kAssign:
+//      table->InsertData(pkb->GetAssignEntityByVariable(value));
+//      break;
+//      case DesignEntity::kWhile:
+//        table->InsertData(pkb->GetWhileEntityByVariable(value));
+//        break;
+//        case DesignEntity::kIf:
+//          table->InsertData(pkb->GetIfEntityByVariable(value));
+//          break;
+//          default:
+//            break;
+//  }
   return table;
 }
 
