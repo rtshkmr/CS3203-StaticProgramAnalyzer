@@ -91,10 +91,16 @@ int QueryEvaluatorTable::GetRowSize() {
   return search->second.size();
 }
 
-std::vector<Entity *> QueryEvaluatorTable::GetResults() {
-  auto search = synonym_to_entity_map.find(target_synonym);
-  //assert search != synonym_to_entity_map.end()
-  return search->second;
+std::vector<std::tuple<Synonym *, std::vector<Entity *>>> QueryEvaluatorTable::GetResults() {
+  std::vector<std::tuple<Synonym *, std::vector<Entity *>>> output;
+  for (auto synonym : target_synonym_list) {
+    auto search = synonym_to_entity_map.find(synonym);
+    //assert search != synonym_to_entity_map.end()
+    auto current_result = std::make_tuple(search->first, search->second);
+    output.push_back(current_result);
+  }
+
+  return output;
 }
 
 QueryEvaluatorTable::QueryEvaluatorTable(Synonym *target) {
