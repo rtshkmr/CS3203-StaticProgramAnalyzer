@@ -32,6 +32,7 @@ Token QueryParser::Eat(TokenTag token_type) {
  * @return a Synonym object with the corresponding information, or a dummy Synonym with invalid fields if not exists.
  */
 Synonym QueryParser::GetSynonymInfo(std::string syn_name, std::list<Synonym>* synonyms) {
+  // Todo: Optimize.
   for (Synonym& t: * synonyms) {
     if (t.GetName().compare(syn_name) == 0) {
       return Synonym(syn_name, t.GetType());
@@ -234,7 +235,14 @@ std::pair<Clause*, bool> QueryParser::ParseRelRef() {
     throw PQLValidationException("Received semantically invalid " + rel_type + " cl.");
   }
 
+  // create clause object
   Clause* cl = new SuchThat(lhs, rhs, GetRelRef(rel_type), is_lhs_syn, is_rhs_syn);
+  if (is_lhs_syn) {
+    cl->first_synonym = QueryParser::GetSynonymInfo(lhs, &synonyms);
+  }
+  if (is_rhs_syn) {
+    cl->second_synonym = QueryParser::GetSynonymInfo(rhs, &synonyms);
+  }
   return std::make_pair(cl, is_lhs_tgt_syn || is_rhs_tgt_syn);
 }
 
@@ -404,7 +412,12 @@ void QueryParser::ParsePattern() {
   std::pair<std::string, bool> rhs_info = ParseExpressionSpec();
   Eat(TokenTag::kCloseBracket);
 
+  // create clause object
   Clause* cl = new Pattern(lhs, rhs_info.first, assn_tok.GetTokenString(), lhs_is_syn, rhs_info.second);
+  cl->first_synonym = QueryParser::GetSynonymInfo(assn_tok.GetTokenString(), &synonyms);
+  if (lhs_is_syn) {
+    cl->second_synonym = QueryParser::GetSynonymInfo(lhs, &synonyms);
+  }
   clauses.emplace_back(cl);
 }
 
