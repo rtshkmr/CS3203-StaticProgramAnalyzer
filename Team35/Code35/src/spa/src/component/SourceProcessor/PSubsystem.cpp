@@ -198,10 +198,11 @@ void PSubsystem::HandleCloseBrace() {
 
   follow_stack_.pop(); //this is allowed because any stmtList must be 1..* statements. so no condition for if (...) { }
 
-  if (current_node_type_ == NodeType::kProcedure && parent_stack_.empty()) {
+  if (current_node_type_ == NodeType::kProcedure) {
+    assert(parent_stack_.empty());
     CloseProcedureBlock();
   } else {
-    parent_stack_.pop();
+    // parent_stack_.pop();
     if (current_node_type_ == NodeType::kElse) { //double pop for else clause
       CloseElseBlock();
     } else if (current_node_type_ == NodeType::kWhile) {
