@@ -43,10 +43,10 @@ void PKB::PopulateDataStructures(Deliverable d) {
       PKBRelRefs::kUsesC,
       PKBRelRefs::kUsedByS,
       PKBRelRefs::kUsedByC,
-      PKBRelRefs::kModifiesS,
-      PKBRelRefs::kModifiesC,
-      PKBRelRefs::kModifiedByS,
-      PKBRelRefs::kModifiedByC
+      PKBRelRefs::kModifiesStatement,
+      PKBRelRefs::kModifiesContainer,
+      PKBRelRefs::kModifiedByStatement,
+      PKBRelRefs::kModifiedByContainer
   };
 
   std::vector<std::unordered_map<Entity*, std::list<Entity*>*>*> hashes;

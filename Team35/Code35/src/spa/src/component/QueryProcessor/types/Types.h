@@ -74,10 +74,10 @@ enum class PKBRelRefs {
   kUsesC,
   kUsedByS,
   kUsedByC,
-  kModifiesS,
-  kModifiesC,
-  kModifiedByS,
-  kModifiedByC,
+  kModifiesStatement,
+  kModifiesContainer,
+  kModifiedByStatement,
+  kModifiedByContainer,
   kCalls
 };
 
@@ -94,10 +94,10 @@ const std::array<PKBRelRefs, 16> pkb_rel_refs = {
     PKBRelRefs::kUsesC,
     PKBRelRefs::kUsedByS,
     PKBRelRefs::kUsedByC,
-    PKBRelRefs::kModifiesS,
-    PKBRelRefs::kModifiesC,
-    PKBRelRefs::kModifiedByS,
-    PKBRelRefs::kModifiedByC
+    PKBRelRefs::kModifiesStatement,
+    PKBRelRefs::kModifiesContainer,
+    PKBRelRefs::kModifiedByStatement,
+    PKBRelRefs::kModifiedByContainer
 };
 
 enum class RelRef {
