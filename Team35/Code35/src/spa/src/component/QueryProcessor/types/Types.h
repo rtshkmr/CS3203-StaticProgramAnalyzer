@@ -120,6 +120,7 @@ class Synonym {
   Synonym(std::string name, DesignEntity type) : name(name), type(type) {};
   std::string GetName() { return name; };
   DesignEntity GetType() { return type; };
+  bool Synonym::operator==(const Synonym& other);
 };
 
 struct Clause {
