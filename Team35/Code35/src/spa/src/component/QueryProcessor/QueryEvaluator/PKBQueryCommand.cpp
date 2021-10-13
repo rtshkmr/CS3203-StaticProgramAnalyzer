@@ -41,7 +41,9 @@ PKBRelRefs PKBQueryCommand::GetPKBRelRef(RelRef relation) {
 
 //Works for Two synonyms
 IntermediateTable* PKBQueryReceiver::QueryPKBTwoSynonyms(PKBRelRefs rel, DesignEntity first_synonym, DesignEntity second_synonym) {
-  std::vector<std::tuple<Entity *, Entity *>> output = pkb->GetRelationshipByTypes(rel, first_synonym, second_synonym);
+  // TODO: Waiting for PKB implementation then just uncomment.
+//  std::vector<std::tuple<Entity *, Entity *>> output = pkb->GetRelationshipByTypes(rel, first_synonym, second_synonym);
+  std::vector<std::tuple<Entity *, Entity *>> output;
   IntermediateTable *table = new IntermediateTable();
   table->InsertData(output);
   return table;
