@@ -46,7 +46,9 @@ class PSubsystem {
   NodeType current_node_type_ = NodeType::kNone; // -1 => no current node; 0 = procedure; 1 = while; 2 = if; 3 = else;
   std::stack<Container*> parent_stack_;
   std::stack<Statement*> follow_stack_;
+  /// ISSUE 1: Trying to add Cluster as a Block.
   std::stack<Block*> block_stack_;
+  std::stack<Cluster*> cluster_stack_;
   int program_counter_ = 0;
 
   // private methods for selfcall
@@ -61,14 +63,21 @@ class PSubsystem {
   void HandleCallStmt(Entity* entity);
   void HandleReadStmt(Entity* entity);
   void HandlePrintStmt(Entity* entity);
-  Block* CreateConditionalBlock(Entity* entity, NodeType node_type);
-  Block* CreateConditionalBlock(Statement* conditional_statement);
-  void CreateBodyBlock(Block* conditional_block);
-  void CreateBodyBlock();
+  ConditionalBlock* CreateConditionalBlock(Statement* conditional_statement);
+  BodyBlock* CreateBodyBlock(ConditionalBlock* conditional_block);
+  BodyBlock* CreateBodyBlock(); // for else body
   void AddControlVariableRelationships(const std::vector<Variable*>& control_variables);
   void CheckForIfElseValidity();
   void CheckForExistingProcedure();
-
+  void CloseIfBlock();
+  void CloseProcedureBlock();
+  void CloseElseBlock();
+  void CloseWhileBlock();
+  void ProcessOuterNodeAsProcedure();
+  void ProcessOuterParentNode();
+  void ProcessOuterNodeType(Container* current_nest);
+  std::vector<Token> GetValidatedTokens(const std::string& statement);
+  void InitRootClusterAndBlock(Procedure* procedure);
  public:
   PSubsystem() = default;
 
@@ -77,6 +86,11 @@ class PSubsystem {
   void ProcessStatement(const std::string& statement);
 
   Deliverable* GetDeliverables();
+
+  void ProcessEntityAsNewProcedure(Entity* entity);
+  void ProcessEntityAsStatement(Entity* entity);
+  void CreateNewNestedCluster(ConditionalBlock* conditional_block, BodyBlock* body_block);
+  void UpdateClusterWithElseBlock(BodyBlock* block_else_body);
 };
 }
 

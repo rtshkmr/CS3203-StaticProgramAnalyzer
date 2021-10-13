@@ -29,7 +29,7 @@ class Entity {
   EntityEnum type;
  public:
   virtual ~Entity() {};
-  EntityEnum getEntityEnum();
+  EntityEnum GetEntityEnum();
 };
 
 class Container;
@@ -73,6 +73,8 @@ class Container {
   std::list<Statement*>* GetStatementList();
 };
 
+class Cluster;
+class Block;
 /**
  * Procedure is a derived class of Entity and Container. This class contains the name and the list of statement
  *   within this procedure. The list of statement is defined in the inherited Container abstract class.
@@ -80,14 +82,16 @@ class Container {
 class Procedure : public Entity, public Container {
  private:
   const ProcedureName* procedure_name_;
+  const Cluster* cluster_root_ = nullptr;
   const Block* block_root_ = nullptr;
  public:
   Procedure(ProcedureName* procedureName);
 
   const ProcedureName* GetName();
 
-  const void SetBlockRoot(Block* block);
-
+  const void SetClusterRoot(Cluster* cluster);
+  const void SetBlockRoot(Block* block_root);
+  const Cluster* GetClusterRoot();
   const Block* GetBlockRoot();
 };
 
