@@ -249,11 +249,18 @@ std::pair<Clause*, bool> QueryParser::ParseRelRef() {
 /**
  * Parses a such that clause.
  */
+// suchthat-cl : ‘such that’ relCond
+// relCond: relRef (‘and’ relRef)*
 void QueryParser::ParseSuchThat() {
-  // TODO: add support for multiple relRefs (separated by and)
   Eat(TokenTag::kSuchThat);
   std::pair<Clause*, bool> clause_info = ParseRelRef();
   clauses.emplace_back(clause_info.first);
+  // check for multiple relRefs (separated by 'and')
+  while (lookahead.GetTokenTag() == TokenTag::kName && lookahead.GetTokenString().compare("and") == 0) {
+    Eat(TokenTag::kName);
+    clause_info = ParseRelRef();
+    clauses.emplace_back(clause_info.first);
+  }
 }
 
 /**
@@ -398,15 +405,13 @@ bool QueryParser::IsValidSynonym(Token token, DesignEntity de) {
 }
 
 /**
- * Parses the pattern clause.
+ * Parses the PatternCond section of a pattern clause.
  */
-void QueryParser::ParsePattern() {
-  Eat(TokenTag::kName); // eat 'pattern' keyword
+void QueryParser::ParsePatternCond() {
   // check if syn-assign valid
   if (!IsValidSynonym(lookahead, DesignEntity::kAssign)) {
     throw PQLParseException("Expected valid syn-assign for pattern cl, instead got " + lookahead.GetTokenString());
   }
-
   Token assn_tok = Token(lookahead.GetTokenString(), lookahead.GetTokenTag());
 
   Eat(TokenTag::kName); // eat 'syn-assign'
@@ -427,6 +432,21 @@ void QueryParser::ParsePattern() {
     cl->second_synonym = QueryParser::GetSynonymInfo(lhs, &synonyms);
   }
   clauses.emplace_back(cl);
+}
+
+/**
+ * Parses the pattern clause.
+ */
+// pattern-cl : ‘pattern’ patternCond
+// patternCond : pattern ( ‘and’ pattern )*
+void QueryParser::ParsePattern() {
+  Eat(TokenTag::kName); // eat 'pattern' keyword
+  ParsePatternCond();
+  // check for multiple relRefs (separated by 'and')
+  while (lookahead.GetTokenTag() == TokenTag::kName && lookahead.GetTokenString().compare("and") == 0) {
+    Eat(TokenTag::kName);
+    ParsePatternCond();
+  }
 }
 
 /**
