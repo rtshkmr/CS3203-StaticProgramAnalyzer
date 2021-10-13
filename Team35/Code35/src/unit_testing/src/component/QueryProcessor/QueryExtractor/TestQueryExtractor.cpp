@@ -638,3 +638,38 @@ TEST_CASE("3.QueryExtractor.Single well-formed pattern with correct syn-assign a
     delete cl;
   }
 }
+
+// negative testing for 'and' operator between multiple clauses
+TEST_CASE("3.QueryExtractor.And operator between different clause types; should FAIL") {
+  SECTION("And between relCond and rel") { // because pql grammar only supports 'and' between relCond and relCond.
+    std::string query = "assign a; while w;"
+                        "Select a such that Parent* (w, a) and Modifies (a, \"x\") and such that Uses (a, \"x\")";
+    auto query_extractor = QueryExtractor(& query);
+    REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
+                        Catch::Contains("Invalid relRef in such that clause."));
+  }
+
+  SECTION("And between relCond and pattern") {
+    std::string query = "assign a; while w;"
+                        "Select a such that Parent* (w, a) and pattern a (\"x\", _) such that Uses (a, \"x\")";
+    auto query_extractor = QueryExtractor(& query);
+    REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
+                        Catch::Contains("Invalid relRef in such that clause."));
+  }
+
+  SECTION("And between patternCond and relCond") {
+    std::string query = "assign a; while w;"
+                        "Select a such that Parent* (w, a) pattern a (\"x\", _) and Uses (a, \"x\")";
+    auto query_extractor = QueryExtractor(& query);
+    REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
+                        Catch::Contains("Expected valid syn-assign for pattern cl, instead got"));
+  }
+
+  SECTION("And between patternCond and pattern") {
+    std::string query = "assign a, a2; while w;"
+                        "Select a such that Parent* (w, a) pattern a (\"x\", _) and pattern a2 (\"x\", _)";
+    auto query_extractor = QueryExtractor(& query);
+    REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
+                        Catch::Contains("Expected valid syn-assign for pattern cl, instead got"));
+  }
+}

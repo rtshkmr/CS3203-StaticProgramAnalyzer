@@ -58,7 +58,7 @@ TEST_CASE("3.QueryGrouper.No and + multiple queries + common target & non-target
   REQUIRE(g2->ContainsTargetSynonym() == false);
 }
 
-TEST_CASE("3.QueryGrouper.And keyword + multiple queries rel") {
+TEST_CASE("3.QueryGrouper.And keyword + multiple queries rel & pattern") {
   std::string query = "assign a1, a2; while w1, w2; Select a2 "
                       "pattern a1 (\"x\", _) and a2 (\"x\",_\"x\"_) "
                       "such that Parent* (w2, a2) and Parent* (w1, w2)";
@@ -73,12 +73,4 @@ TEST_CASE("3.QueryGrouper.And keyword + multiple queries rel") {
   REQUIRE(g1->ContainsTargetSynonym());
   REQUIRE(g2->GetClauses().size() == 1);
   REQUIRE(g2->ContainsTargetSynonym() == false);
-}
-
-TEST_CASE("3.QueryGrouper.And keyword + multiple queries pattern") {
-
-}
-
-TEST_CASE("3.QueryGrouper.And keyword + multiple queries rel & pattern") {
-
 }
