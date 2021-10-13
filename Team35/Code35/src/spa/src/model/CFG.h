@@ -52,11 +52,7 @@ class Block : public Cluster {
   bool IsExitBlock(Block* block);
 
   bool isWhile = false;
-  // std::set<Block*, Block::BlockComparator> next_blocks_ = {};
   std::set<Block*> next_blocks_ = {};
-  std::set<Block*> GetNextBlocks() {
-    return next_blocks_;
-  }
 
 };
 
