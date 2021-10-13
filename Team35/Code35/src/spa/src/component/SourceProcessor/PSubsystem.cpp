@@ -391,6 +391,8 @@ void PSubsystem::HandleWhileStmt(Entity* entity) {
   block_while_cond->isWhile = true;
   BodyBlock* block_while_body = CreateBodyBlock(block_while_cond);
   AddControlVariableRelationships(while_entity->GetControlVariables());
+  Cluster* while_cluster = new Cluster();
+  cluster_stack_.push(while_cluster);
 //  CreateNewNestedCluster(block_while_cond, block_while_body);
 }
 
