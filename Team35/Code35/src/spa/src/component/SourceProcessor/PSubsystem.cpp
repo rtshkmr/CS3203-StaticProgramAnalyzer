@@ -434,14 +434,15 @@ ConditionalBlock* PSubsystem::CreateConditionalBlock(Statement* conditional_stat
   // HANDLE THE CONDITION
   ConditionalBlock* conditional_block;
   // remove the stmtNumber from previous block and add it to the cond block if size > 1
-  if (block_stack_.top()->size() > 1) {
-    block_stack_.top()->RemoveStmt(StatementNumber(statement_num));
+  Block* block_before_cond = block_stack_.top();
+  if (block_before_cond->size() > 1) {
+    block_before_cond->RemoveStmt(StatementNumber(statement_num));
     conditional_block = new ConditionalBlock();
     conditional_block->AddStmt(StatementNumber(statement_num));
-//    block_stack_.top()->GetNextBlocks().insert(conditional_block);
-    block_stack_.top()->next_blocks_.insert(conditional_block);
-    bool block_is_not_while = !dynamic_cast<Block*>(block_stack_.top())->isWhile;
-    if (block_is_not_while) {
+    block_before_cond->next_blocks_.insert(conditional_block);
+    bool prior_block_is_not_while = !dynamic_cast<Block*>(block_before_cond)->isWhile;
+    if (prior_block_is_not_while) {
+      cluster_stack_.top()->AddChildCluster(block_before_cond);
       block_stack_.pop(); // pop the previous progline if it isnt while (no loopback to care)
     }
     block_stack_.push(static_cast<Block* const>(conditional_block));
