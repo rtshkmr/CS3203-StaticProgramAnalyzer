@@ -6,7 +6,11 @@
 
 ClauseContext::ClauseContext(QueryEvaluatorTable *table) : group_table(table){}
 
-
+/**
+ * Determines the type of the clause and calls the corresponding strategy to create the commands.
+ * @param clause Current clause being evaluated.
+ * @return PKBQueryCommand and ClauseCommand.
+ */
 std::tuple<PKBQueryCommand *, ClauseCommand *> ClauseContext::ProcessClause(Clause *clause) {
   ClauseStrategy *strategy;
   if (typeid(clause) == typeid(SuchThat*)) {
@@ -17,6 +21,12 @@ std::tuple<PKBQueryCommand *, ClauseCommand *> ClauseContext::ProcessClause(Clau
   return strategy->DetermineClauseCommand(clause, group_table);
 }
 
+/**
+ * Determines the commands to be used during the pipeline of the clause evaluation.
+ * @param clause The clause to be evaluated.
+ * @param table
+ * @return
+ */
 std::tuple<PKBQueryCommand *, ClauseCommand *>
 SuchThatStrategy::DetermineClauseCommand(Clause *clause, QueryEvaluatorTable *table) {
   auto* such_that_clause = dynamic_cast<SuchThat*>(clause);
