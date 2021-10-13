@@ -17,7 +17,7 @@ QueryProjector::QueryProjector(std::vector<Synonym> target_synonyms_list) : targ
 std::vector<std::string> QueryProjector::FormatQuery(UnformattedQueryResult unformatted_results) {
   std::vector<QueryEvaluatorTable*> table_references = unformatted_results.GetTables();
 
-  if (!unformatted_results.GetBooleanResult()) {
+  if (!unformatted_results.GetBooleanResult() && !target_synonym_list.empty()) {
     return std::vector<std::string>{};
   }
   // boolean synonym
@@ -31,11 +31,13 @@ std::vector<std::string> QueryProjector::FormatQuery(UnformattedQueryResult unfo
   std::vector<std::vector<std::vector<std::string>>> unordered_results = {};  // vector of tables of columns
   // For each synonym in the synonym_list
   // Get the unique list of results for that column
-  for (auto current_synonym : target_synonym_list) {
+  // TODO use target_synonym_list as vector<Synonyms*> to look up table column
+  //for (auto current_synonym : target_synonym_list) {
+  for (auto current_synonym: fake_list) {
     for (QueryEvaluatorTable* table : table_references) {
       // don't have to check for synonyms that are not current synonym but has been collected, since a synonym will only
       // appear once in all the tables
-      if (table->ContainsColumn(&current_synonym)) {
+      if (table->ContainsColumn(current_synonym)) {
         std::vector<Synonym*> table_target_list = table->GetTargetSynonymList();
         result_synonym_order.insert(result_synonym_order.end(), table_target_list.begin(), table_target_list.end());
 

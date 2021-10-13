@@ -12,6 +12,7 @@ class QueryProjector {
     std::vector<std::string> FormatQuery(UnformattedQueryResult unformatted_results);
 
     // made public purely for testing
+    std::vector<Synonym*> fake_list;
     static std::vector<std::vector<std::string>> StringifyTable(std::vector<Synonym*> synonyms,
                                                          std::vector<std::vector<Entity*>> entity_table);
     static std::vector<std::vector<std::string>> CrossProductTables(std::vector<std::vector<std::string>> t1,

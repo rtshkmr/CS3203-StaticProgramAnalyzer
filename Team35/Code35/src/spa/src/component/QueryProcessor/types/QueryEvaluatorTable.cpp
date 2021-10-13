@@ -100,8 +100,10 @@ int QueryEvaluatorTable::GetRowSize() {
 std::vector<std::vector<Entity*>> QueryEvaluatorTable::GetResults() {
   std::vector<std::vector<Entity *>> target_table;
   for (auto synonym : target_synonym_list) {
-    std::vector<Entity*> column = synonym_to_entity_map.find(synonym)->second;
-    target_table.push_back(column);
+    if (synonym_to_entity_map.count(synonym) > 0) {
+      std::vector<Entity*> column = synonym_to_entity_map.find(synonym)->second;
+      target_table.push_back(column);
+    }
   }
 
   return target_table;
