@@ -33,6 +33,9 @@ class Cluster {
   Cluster* GetNextSiblingCluster();
   void SetParentCluster(Cluster* parent_cluster);
   virtual ~Cluster();
+  int GetStart();
+  int GetEnd();
+
   std::list<Cluster*> nested_clusters_;
 };
 

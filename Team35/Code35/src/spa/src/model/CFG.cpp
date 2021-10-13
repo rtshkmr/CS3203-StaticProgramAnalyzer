@@ -153,6 +153,13 @@ void Cluster::UpdateClusterRange() {
   }
 }
 
+int Cluster::GetStart() {
+  return start_;
+}
+int Cluster::GetEnd() {
+  return end_;
+}
+
 // default destructors:
 Cluster::~Cluster() = default;
 Block::~Block() = default;
