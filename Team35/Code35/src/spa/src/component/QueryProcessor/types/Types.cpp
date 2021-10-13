@@ -67,7 +67,7 @@ bool Synonym::operator==(const Synonym& other) const{
   return this->name == other.name && this->type == other.type;
 }
 
-bool Group::AddClauseToVector(Clause* clause) {
+void Group::AddClauseToVector(Clause* clause) {
   clauses.push_back(clause);
 }
 
