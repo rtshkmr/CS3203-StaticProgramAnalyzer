@@ -120,9 +120,9 @@ void Cluster::AddSiblingCluster(Cluster* new_sibling_cluster) {
 void Cluster::UpdateClusterRangeViaNestedCluster(Cluster* nested_cluster) {
   int new_cluster_start = nested_cluster->start_;
   int new_cluster_end = nested_cluster->end_;
-  assert(new_cluster_start <= new_cluster_end
-             && new_cluster_start >= -1 && new_cluster_end >= -1);
-  if(this->start_ == new_cluster_start && this->end_ == new_cluster_end) return;
+  bool is_valid_new_cluster_range = new_cluster_start <= new_cluster_end
+      && new_cluster_start >= -1 && new_cluster_end >= -1;
+  assert(is_valid_new_cluster_range);
   bool this_cluster_range_is_unassigned = this->start_ == end_ && this->start_ == -1;
   if (this_cluster_range_is_unassigned) {
     bool this_has_nested_clusters = !this->nested_clusters_.empty();
@@ -151,13 +151,15 @@ std::pair<int, int> Cluster::GetStartEndRange() {
   return std::pair<int, int>(this->start_, this->end_);
 }
 void Cluster::UpdateClusterRange() {
-  if(nested_clusters_.size() == 0) return;
-  Cluster* finalised_parent_cluster = this;
-  for(auto nested_cluster : finalised_parent_cluster->nested_clusters_) {
+  if(nested_clusters_.size() == 0) {
+    return;
+  }
+  // FIXME: what if there's no nesting, then the range doesn't get updated!
+  for(auto nested_cluster : this->nested_clusters_) {
     nested_cluster->UpdateClusterRange();
     bool nested_cluster_range_already_considered = this->start_ <= nested_cluster->start_ && this->end_ >= nested_cluster->end_;
     if(!nested_cluster_range_already_considered) {
-      finalised_parent_cluster->UpdateClusterRangeViaNestedCluster(nested_cluster);
+      this->UpdateClusterRangeViaNestedCluster(nested_cluster);
     }
   }
 }

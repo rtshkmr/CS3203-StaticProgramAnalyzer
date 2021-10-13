@@ -109,17 +109,19 @@ void PSubsystem::CloseProcedureBlock() {
     current_node_type_ = NodeType::kNone;
     current_node_ = nullptr;
     current_procedure_ = nullptr;
+    Block* procedure_block = block_stack_.top();
     block_stack_.pop();
     assert(block_stack_.empty()); // FIXME this is the failing assertion now
     bool is_currently_in_outermost_cluster = cluster_stack_.size() == 1;
     assert(is_currently_in_outermost_cluster);
 
     // put the block root into the
-    Cluster* ready_cluster = cluster_stack_.top();
+    Cluster*outermost_cluster = cluster_stack_.top();
+    outermost_cluster->AddChildCluster(procedure_block);
     cluster_stack_.pop(); // cluster_stack is now empty since the Procedure has been closed.
-    bool last_popped_equals_cluster_root = ready_cluster == assigned_cluster_root;
+    bool last_popped_equals_cluster_root = outermost_cluster == assigned_cluster_root;
     assert(last_popped_equals_cluster_root);
-    ready_cluster->UpdateClusterRange();
+    outermost_cluster->UpdateClusterRange();
   }
 }
 
@@ -128,7 +130,7 @@ void PSubsystem::CloseElseBlock() {
     parent_stack_.pop();
     follow_stack_.pop();
     Block* block_if_else_exit = Block::GetNewExitBlock(); // exit block, QQ: is this really needed!?
-    Block* else_body_block = block_stack_.top();
+    Block* else_body_block = block_stack_.top(); // FIXME:
     else_body_block->next_blocks_.insert(block_if_else_exit); // else body block
     block_stack_.pop(); //pop the else body block
     Block* if_body_block = block_stack_.top();
@@ -164,14 +166,14 @@ void PSubsystem::CloseElseBlock() {
 
 // todo: handle while stmt, where is the while_body_block!?
 void PSubsystem::CloseWhileBlock() {
-  Block* lastStmt = dynamic_cast<Block*>(block_stack_.top());
+  Block* while_body_block = dynamic_cast<Block*>(block_stack_.top()); //QQ is this a statement or is this the whole while block's body?
   block_stack_.pop(); // link the last stmt to the while_cond_block block, and pop it.
   //todo: change from Block* to ConditionalBlock*
   Block* while_cond_block = dynamic_cast<Block*>(block_stack_.top());
   assert(while_cond_block);
-  lastStmt->next_blocks_.insert(while_cond_block);
+  while_body_block->next_blocks_.insert(while_cond_block); // loop back to cond
   Block* block_while_exit = Block::GetNewExitBlock();
-  while_cond_block->next_blocks_.insert(block_while_exit);
+  while_cond_block->next_blocks_.insert(block_while_exit); // cond point to exit
   block_stack_.pop(); //pop the while_cond_block block
   block_stack_.push(block_while_exit);
   bool is_currently_in_nested_cluster = cluster_stack_.size() > 1;
@@ -179,9 +181,8 @@ void PSubsystem::CloseWhileBlock() {
   // add to cluster here:
   Cluster* while_cluster = cluster_stack_.top();
   while_cluster->AddChildCluster(while_cond_block);
-//  while_cluster->AddChildCluster(while) // todo: add while body block as child
+  while_cluster->AddChildCluster(while_body_block);
   cluster_stack_.pop();
-
   assert(!cluster_stack_.empty());
   Cluster* outer_cluster = cluster_stack_.top();
   outer_cluster->AddChildCluster(while_cluster);
@@ -367,6 +368,7 @@ void PSubsystem::HandleIfStmt(Entity* entity) {
   AddControlVariableRelationships(if_entity->GetControlVariables());
 //  CreateNewNestedCluster(block_if_cond, block_if_body);
   Cluster* if_cluster = new Cluster();
+  // fixme: suggestion: push nest the current statement into cluster because it's a condition block
   cluster_stack_.push(if_cluster);
 }
 
