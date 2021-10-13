@@ -4,6 +4,12 @@
 #include "component/QueryProcessor/QueryProjector.h"
 #include "../../../utils/EntityUtils.h"
 
+void AddColumn(QueryEvaluatorTable* table, Synonym* syn, std::vector<Entity*> entities) {
+  for (int i = 0; i < entities.size(); ++i) {
+    table->AddRow(syn, i, entities[i]);
+  }
+}
+
 TEST_CASE("3.QueryProjector.Stringify tables") {
   SECTION("all statements") {
     AssignEntity* a1 = entity_utils::GetAssign1();
@@ -194,9 +200,6 @@ TEST_CASE("3.QueryProjector.1 target synonym") {
 
     std::vector<Synonym> syn_list = std::vector<Synonym>{*target_syn1};
     QueryProjector qp = QueryProjector(syn_list);
-    // TODO: remove this when synonym pointers implemented
-    std::vector<Synonym*> fake_list = std::vector<Synonym*>{target_syn1};
-    qp.fake_list = fake_list;
 
     std::vector<std::string> expected_values = std::vector<std::string>{};
     std::vector<std::string> actual_values = qp.FormatQuery(uqr);
@@ -237,13 +240,13 @@ TEST_CASE("3.QueryProjector.1 target synonym") {
 
     Synonym* syn1 = new Synonym("a", DesignEntity::kAssign);
     QueryEvaluatorTable* table1 = new QueryEvaluatorTable(syn1);
-    table1->AddTargetSynonymValues(col1);
+    AddColumn(table1, syn1, col1);
     Synonym* syn2 = new Synonym("b", DesignEntity::kVariable);
     QueryEvaluatorTable* table2 = new QueryEvaluatorTable(syn2);
-    table2->AddTargetSynonymValues(col1);
+    AddColumn(table2, syn2, col2);
     Synonym* syn3 = new Synonym("c", DesignEntity::kAssign);
     QueryEvaluatorTable* table3 = new QueryEvaluatorTable(syn3);
-    table3->AddTargetSynonymValues(col3);
+    AddColumn(table3, syn3, col3);
 
     UnformattedQueryResult uqr = UnformattedQueryResult(true);
     uqr.AddTable(table1);
@@ -252,9 +255,6 @@ TEST_CASE("3.QueryProjector.1 target synonym") {
 
     std::vector<Synonym> target_syn_list = std::vector<Synonym>{*syn1};
     QueryProjector qp = QueryProjector(target_syn_list);
-    // TODO: remove this when synonym pointers implemented
-    std::vector<Synonym*> fake_list = std::vector<Synonym*>{syn1};
-    qp.fake_list = fake_list;
 
     std::vector<std::string> expected_values = std::vector<std::string>{"1", "2", "3"};
     std::vector<std::string> actual_values = qp.FormatQuery(uqr);
@@ -316,13 +316,6 @@ TEST_CASE("3.QueryProjector.multiple target synonym") {
     IfEntity* i6 = entity_utils::GetIf3();
     i6->SetStatementNumber(new StatementNumber(6));
 
-    AssignEntity* a7 = entity_utils::GetAssign7();
-    a7->SetStatementNumber(new StatementNumber(7));
-    AssignEntity* a8 = entity_utils::GetAssign8();
-    a8->SetStatementNumber(new StatementNumber(8));
-    AssignEntity* a9 = entity_utils::GetAssign9();
-    a9->SetStatementNumber(new StatementNumber(9));
-
     std::vector<Entity*> col1 = std::vector<Entity*>{
         a1, a2, a3
     };
@@ -332,30 +325,20 @@ TEST_CASE("3.QueryProjector.multiple target synonym") {
     std::vector<Entity*> col3 = std::vector<Entity*>{
         i4, i5, i6
     };
-    std::vector<Entity*> col4 = std::vector<Entity*>{
-        a7, a8, a9
-    };
 
     Synonym* syn1 = new Synonym("a", DesignEntity::kAssign);
     Synonym* syn2 = new Synonym("b", DesignEntity::kVariable);
     Synonym* syn3 = new Synonym("c", DesignEntity::kIf);
-    QueryEvaluatorTable* table1 = new QueryEvaluatorTable(std::vector<Synonym*>{syn1, syn2, syn3});
-    table1->AddTargetSynonymValues(col1);
-    table1->AddTargetSynonymValues(col2);
-    table1->AddTargetSynonymValues(col3);
-    Synonym* syn4 = new Synonym("d", DesignEntity::kAssign);
-    QueryEvaluatorTable* table2 = new QueryEvaluatorTable(syn4);
-    table2->AddTargetSynonymValues(col4);
+    QueryEvaluatorTable* table1 = new QueryEvaluatorTable(std::vector<Synonym*>{syn2, syn3});
+    AddColumn(table1, syn1, col1);
+    AddColumn(table1, syn2, col2);
+    AddColumn(table1, syn3, col3);
 
     UnformattedQueryResult uqr = UnformattedQueryResult(true);
     uqr.AddTable(table1);
-    uqr.AddTable(table2);
 
     std::vector<Synonym> syn_list = std::vector<Synonym>{*syn2, *syn3};
     QueryProjector qp = QueryProjector(syn_list);
-    // TODO: remove this when synonym pointers implemented
-    std::vector<Synonym*> fake_list = std::vector<Synonym*>{syn2, syn3};
-    qp.fake_list = fake_list;
 
     std::vector<std::string> expected_values = std::vector<std::string>{"x 4", "y 5", "z 6"};
     std::vector<std::string> actual_values = qp.FormatQuery(uqr);
@@ -404,15 +387,17 @@ TEST_CASE("3.QueryProjector.multiple target synonym") {
 
     Synonym* syn1 = new Synonym("a", DesignEntity::kAssign);
     Synonym* syn2 = new Synonym("b", DesignEntity::kVariable);
-    QueryEvaluatorTable* table1 = new QueryEvaluatorTable(std::vector<Synonym*>{syn1, syn2});
-    table1->AddTargetSynonymValues(col1);
-    table1->AddTargetSynonymValues(col2);
+    QueryEvaluatorTable* table1 = new QueryEvaluatorTable(std::vector<Synonym*>{syn2});
+    AddColumn(table1, syn1, col1);
+    AddColumn(table1, syn2, col2);
+
     Synonym* syn3 = new Synonym("c", DesignEntity::kIf);
     QueryEvaluatorTable* table2 = new QueryEvaluatorTable(syn3);
-    table1->AddTargetSynonymValues(col3);
+    AddColumn(table2, syn3, col3);
+
     Synonym* syn4 = new Synonym("d", DesignEntity::kAssign);
     QueryEvaluatorTable* table3 = new QueryEvaluatorTable(syn4);
-    table2->AddTargetSynonymValues(col4);
+    AddColumn(table3, syn4, col4);
 
     UnformattedQueryResult uqr = UnformattedQueryResult(true);
     uqr.AddTable(table1);
@@ -421,14 +406,11 @@ TEST_CASE("3.QueryProjector.multiple target synonym") {
 
     std::vector<Synonym> syn_list = std::vector<Synonym>{*syn4, *syn2, *syn3};
     QueryProjector qp = QueryProjector(syn_list);
-    // TODO: remove this when synonym pointers implemented
-    std::vector<Synonym*> fake_list = std::vector<Synonym*>{syn4, syn2, syn3};
-    qp.fake_list = fake_list;
 
     std::vector<std::string> expected_values = std::vector<std::string>{
       "7 x 4", "8 x 4", "9 x 4", "7 x 5", "8 x 5", "9 x 5", "7 x 6", "8 x 6", "9 x 6",
-      "7 Y 4", "8 Y 4", "9 Y 4", "7 Y 5", "8 Y 5", "9 Y 5", "7 Y 6", "8 Y 6", "9 Y 6",
-      "7 Z 4", "8 Z 4", "9 Z 4", "7 Z 5", "8 Z 5", "9 Z 5", "7 Z 6", "8 Z 6", "9 Z 6",
+      "7 y 4", "8 y 4", "9 y 4", "7 y 5", "8 y 5", "9 y 5", "7 y 6", "8 y 6", "9 y 6",
+      "7 z 4", "8 z 4", "9 z 4", "7 z 5", "8 z 5", "9 z 5", "7 z 6", "8 z 6", "9 z 6",
     };
     std::vector<std::string> actual_values = qp.FormatQuery(uqr);
 
@@ -477,13 +459,13 @@ TEST_CASE("3.QueryProjector.multiple target synonym") {
     Synonym* syn1 = new Synonym("a", DesignEntity::kAssign);
     Synonym* syn2 = new Synonym("b", DesignEntity::kVariable);
     Synonym* syn3 = new Synonym("c", DesignEntity::kIf);
-    QueryEvaluatorTable* table1 = new QueryEvaluatorTable(std::vector<Synonym*>{syn1, syn2, syn3});
-    table1->AddTargetSynonymValues(col1);
-    table1->AddTargetSynonymValues(col2);
-    table1->AddTargetSynonymValues(col3);
+    QueryEvaluatorTable* table1 = new QueryEvaluatorTable(std::vector<Synonym*>{syn3});
+    AddColumn(table1, syn1, col1);
+    AddColumn(table1, syn2, col2);
+    AddColumn(table1, syn3, col3);
     Synonym* syn4 = new Synonym("d", DesignEntity::kAssign);
     QueryEvaluatorTable* table2 = new QueryEvaluatorTable(syn4);
-    table2->AddTargetSynonymValues(col4);
+    AddColumn(table2, syn4, col4);
 
     UnformattedQueryResult uqr = UnformattedQueryResult(true);
     uqr.AddTable(table1);
@@ -491,9 +473,6 @@ TEST_CASE("3.QueryProjector.multiple target synonym") {
 
     std::vector<Synonym> syn_list = std::vector<Synonym>{*syn4, *syn3};
     QueryProjector qp = QueryProjector(syn_list);
-    // TODO: remove this when synonym pointers implemented
-    std::vector<Synonym*> fake_list = std::vector<Synonym*>{syn4, syn3};
-    qp.fake_list = fake_list;
 
     std::vector<std::string> expected_values = std::vector<std::string>{
       "7 4", "8 4", "9 4", "7 5", "8 5", "9 5", "7 6", "8 6", "9 6"

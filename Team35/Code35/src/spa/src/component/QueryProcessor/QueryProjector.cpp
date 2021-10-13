@@ -11,6 +11,8 @@ QueryProjector::QueryProjector(std::vector<Synonym> target_synonyms_list) : targ
  * Then gets results from all QueryEvaluatorTables in UnformattedQueryResult.
  * Then stringifies each table, cross product, reorder, and join into tuples for all tables if there is more than 1 table.
  *
+ * Assumes that every Table has at least 1 target synonym, and can return the columns of target synonyms it contains.
+ *
  * @param unformatted_results
  * @return Strings that the TestWrapper expects.
  */
@@ -29,23 +31,14 @@ std::vector<std::string> QueryProjector::FormatQuery(UnformattedQueryResult unfo
 
   std::list<Synonym*> result_synonym_order = {}; // order of synonyms within results before cross product
   std::vector<std::vector<std::vector<std::string>>> unordered_results = {};  // vector of tables of columns
-  // For each synonym in the synonym_list
-  // Get the unique list of results for that column
-  // TODO use target_synonym_list as vector<Synonyms*> to look up table column
-  //for (auto current_synonym : target_synonym_list) {
-  for (auto current_synonym: fake_list) {
-    for (QueryEvaluatorTable* table : table_references) {
-      // don't have to check for synonyms that are not current synonym but has been collected, since a synonym will only
-      // appear once in all the tables
-      if (table->ContainsColumn(current_synonym)) {
-        std::vector<Synonym*> table_target_list = table->GetTargetSynonymList();
-        result_synonym_order.insert(result_synonym_order.end(), table_target_list.begin(), table_target_list.end());
+  for (QueryEvaluatorTable* table : table_references) {
+    // Get the unique list of results for that table
+    std::vector<Synonym*> table_target_list = table->GetTargetSynonymList();
+    result_synonym_order.insert(result_synonym_order.end(), table_target_list.begin(), table_target_list.end());
 
-        std::vector<std::vector<Entity*>> entity_table = table->GetResults();
-        std::vector<std::vector<std::string>> stringified_table = StringifyTable(table_target_list, entity_table);
-        unordered_results.push_back(stringified_table);
-      }
-    }
+    std::vector<std::vector<Entity*>> entity_table = table->GetResults();
+    std::vector<std::vector<std::string>> stringified_table = StringifyTable(table_target_list, entity_table);
+    unordered_results.push_back(stringified_table);
   }
 
   if (target_synonym_list.size() == 1) {
