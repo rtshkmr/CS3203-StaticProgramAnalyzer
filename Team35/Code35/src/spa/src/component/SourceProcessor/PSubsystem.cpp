@@ -137,7 +137,6 @@ void PSubsystem::CloseElseBlock() {
       if_cluster->AddChildCluster(else_body_block); // this is ok because there is at least 1 stmt
       if_cluster->UpdateClusterRange();
     } else {
-//      if_cluster->AddChildCluster(if_cond_block);
       if_cluster->nested_clusters_.push_front(if_cond_block);
       if (else_body_block->size() > 0) {
         if_cluster->AddChildCluster(else_body_block); //append anything else
@@ -223,8 +222,6 @@ void PSubsystem::ProcessParentNodeType(Container* current_nest) {
 /**
  * Handles the effects of encountering a close brace character. Here are the following cases based on the current node: \n
  * IF node: do nothing (compensate when handling else block) \n
- * Procedure node and Empty parent stack (ready to close off the procedure block)\n
- * Close
  *
  *
  * Precondition: If it's a close brace for an entire procedure, the parent stack should be empty  else for other node
