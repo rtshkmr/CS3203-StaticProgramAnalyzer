@@ -69,7 +69,6 @@ class PSubsystem {
   void AddControlVariableRelationships(const std::vector<Variable*>& control_variables);
   void CheckForIfElseValidity();
   void CheckForExistingProcedure();
-  void CloseIfBlock();
   void CloseProcedureBlock();
   void CloseElseBlock();
   void CloseWhileBlock();

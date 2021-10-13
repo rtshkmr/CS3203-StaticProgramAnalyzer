@@ -87,22 +87,6 @@ void PSubsystem::ProcessStatement(const std::string& statement) {
          : ProcessEntityAsStatement(entity);
 }
 
-/**
- * Handles the closing of if-blocks. Currently has no effects, method has been abstracted out to keep abstraction levels
- * in the caller function equal.
- */
-void PSubsystem::CloseIfBlock() {
-  if (current_node_type_ == NodeType::kIf) {
-    // todo: probably have to update cluster's fields
-    int x =
-        1; // todo: get the if-body from the top of block stack, if cond from 2nd pos of block stack and the outer cluster from the cluster stack top
-//    BodyBlock* if_body = block_stack_.top();
-//    block_stack_.pop();
-//    ConditionalBlock* if_cond = block_stack_.top();
-    return;// do not pop anything in if-close brace. pop 2 when finishing else.
-  }
-}
-
 void PSubsystem::CloseProcedureBlock() {
   if (current_node_type_ == NodeType::kProcedure && parent_stack_.empty()) {
     const Cluster* assigned_cluster_root = current_procedure_->GetClusterRoot();
@@ -111,7 +95,7 @@ void PSubsystem::CloseProcedureBlock() {
     current_procedure_ = nullptr;
     Block* procedure_block = block_stack_.top();
     block_stack_.pop();
-    assert(block_stack_.empty()); // FIXME this is the failing assertion now
+    assert(block_stack_.empty());
     bool is_currently_in_outermost_cluster = cluster_stack_.size() == 1;
     assert(is_currently_in_outermost_cluster);
 
@@ -131,8 +115,8 @@ void PSubsystem::CloseElseBlock() {
   if (current_node_type_ == NodeType::kElse) {
     parent_stack_.pop();
     follow_stack_.pop();
-    Block* block_if_else_exit = Block::GetNewExitBlock(); // exit block, QQ: is this really needed!?
-    Block* else_body_block = block_stack_.top(); // FIXME:
+    Block* block_if_else_exit = Block::GetNewExitBlock(); // exit block
+    Block* else_body_block = block_stack_.top();
     else_body_block->next_blocks_.insert(block_if_else_exit); // else body block
     block_stack_.pop(); //pop the else body block
     Block* if_body_block = block_stack_.top();
@@ -156,7 +140,7 @@ void PSubsystem::CloseElseBlock() {
 //      if_cluster->AddChildCluster(if_cond_block);
       if_cluster->nested_clusters_.push_front(if_cond_block);
       if (else_body_block->size() > 0) {
-        if_cluster->AddChildCluster(else_body_block); //append anything else FIXME -> bug might occur in w{ aaa if{} a if{} a } where middle a is missing.
+        if_cluster->AddChildCluster(else_body_block); //append anything else
       }
       if_cond_block->SetParentCluster(if_cluster);
       if_cluster->UpdateClusterRange();
@@ -169,9 +153,8 @@ void PSubsystem::CloseElseBlock() {
   }
 }
 
-// todo: handle while stmt, where is the while_body_block!?
 void PSubsystem::CloseWhileBlock() {
-  Block* while_body_block = dynamic_cast<Block*>(block_stack_.top()); //QQ is this a statement or is this the whole while block's body?
+  Block* while_body_block = dynamic_cast<Block*>(block_stack_.top());
   block_stack_.pop(); // link the last stmt to the while_cond_block block, and pop it.
   //todo: change from Block* to ConditionalBlock*
   Block* while_cond_block = dynamic_cast<Block*>(block_stack_.top());
@@ -186,7 +169,7 @@ void PSubsystem::CloseWhileBlock() {
   if (while_body_block->size() > 0) {
     while_cluster->AddChildCluster(while_body_block); //add only non empty tails
   }
-  while_cluster->UpdateClusterRange(); //FIXME bug - w(cond) { .. not_accounted .. if() .. not_accounted .. if() ..}
+  while_cluster->UpdateClusterRange();
 
   cluster_stack_.pop();
   assert(!cluster_stack_.empty());
@@ -202,9 +185,8 @@ void PSubsystem::CloseWhileBlock() {
 }
 
 void PSubsystem::ProcessOuterParentNode() {
-  /// FOR ISSUE 3 -> current_next PLACEMENT IS CRUCIAL FOR IF-STATEMENT, because it pops the else first
   Container* current_nest = parent_stack_.top();
-  parent_stack_.pop(); // QQ: pops out the if block?
+  parent_stack_.pop();
   // get to outer node and process:
   current_node_ = dynamic_cast<Statement*>(current_nest)->GetParentNode();
   parent_stack_.empty() ? ProcessOuterNodeAsProcedure() : ProcessOuterNodeType(current_nest);
@@ -250,7 +232,6 @@ void PSubsystem::HandleCloseBrace() {
       current_node_type_ == NodeType::kProcedure && parent_stack_.empty());
 
   if (current_node_type_ == NodeType::kIf) {
-    CloseIfBlock();
     return; // do not pop anything in if-close brace. pop 2 when finishing else.
   }
 
@@ -324,7 +305,7 @@ void PSubsystem::SetStatementObject(Statement* statement) {
   deliverable_->AddStatement(statement);
   block_stack_.top()->AddStmt(StatementNumber(program_counter_));
 
-  bool new_else = false; // QQ: what does "new_else" mean?
+  bool new_else = false;
   //to check if adding stmt to Else block
   if (current_node_type_ == NodeType::kElse) {
     IfEntity* if_entity = dynamic_cast<IfEntity*>(current_node_);
@@ -376,11 +357,8 @@ void PSubsystem::HandleIfStmt(Entity* entity) {
   Statement* conditional_statement = dynamic_cast<Statement*>(entity);
   ConditionalBlock* block_if_cond = CreateConditionalBlock(conditional_statement);
   BodyBlock* block_if_body = CreateBodyBlock(block_if_cond);
-  // todo: make it into add control var + const later
   AddControlVariableRelationships(if_entity->GetControlVariables());
-//  CreateNewNestedCluster(block_if_cond, block_if_body);
   Cluster* if_cluster = new Cluster();
-  // fixme: suggestion: push nest the current statement into cluster because it's a condition block
   cluster_stack_.push(if_cluster);
 }
 
@@ -478,7 +456,6 @@ BodyBlock* PSubsystem::CreateBodyBlock() {
   return block_else_body;
 }
 
-// todo: double check that only control variables are being handled here and not variables within the body
 void PSubsystem::AddControlVariableRelationships(const std::vector<Variable*>& control_variables) {
   for (Variable* v: control_variables) {
     deliverable_->AddUsesRelationship(current_procedure_, v); //procedure level
@@ -516,7 +493,6 @@ void PSubsystem::HandlePrintStmt(Entity* entity) {
   PrintEntity* print_entity = dynamic_cast<PrintEntity*>(entity);
   assert(print_entity);
   deliverable_->AddPrintEntity(print_entity);
-  // todo: consider adding to the cluster/block sets
   deliverable_->AddUsesRelationship(print_entity, print_entity->GetVariable());
   deliverable_->AddUsesRelationship(current_procedure_, print_entity->GetVariable()); //procedure level
   if (current_procedure_ != current_node_)
@@ -526,7 +502,6 @@ void PSubsystem::HandlePrintStmt(Entity* entity) {
 void PSubsystem::HandleReadStmt(Entity* entity) {
   ReadEntity* read_entity = dynamic_cast<ReadEntity*>(entity);
   assert(read_entity);
-  // todo: consider adding to the cluster/block sets
   deliverable_->AddReadEntity(read_entity);
   deliverable_->AddModifiesRelationship(read_entity, read_entity->GetVariable());
   deliverable_->AddUsesRelationship(current_procedure_, read_entity->GetVariable()); //procedure level

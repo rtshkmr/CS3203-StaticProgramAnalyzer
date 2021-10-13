@@ -70,37 +70,27 @@ void Cluster::SetParentCluster(Cluster* parent_cluster) {
  * @return
  */
 Cluster* Cluster::GetNextSiblingCluster() {
-  // get the parent cluster if it exists
-  Cluster* sibling = nullptr;
   Cluster* parent_cluster = this->GetParentCluster();
   if (parent_cluster != nullptr) { // i.e. not outmost cluster:
     std::list<Cluster*> siblings = parent_cluster->GetNestedClusters();
     std::list<Cluster*>::iterator itr = std::find(siblings.begin(), siblings.end(), this);
     if (itr != end(siblings)) { // i.e. this exists, i can find myself using my parent
-      int next_sibling_idx = std::distance(siblings.begin(), itr) + 1; // todo: check if 0 or 1 idx
+      int next_sibling_idx = std::distance(siblings.begin(), itr) + 1;
       if (next_sibling_idx >= siblings.size()) {
-        // there is no sibling to myself, this is not an error.
         return nullptr;
       } else {
         std::advance(itr, 1);
         return * itr;
       }
     } else {
-      // todo: throw exception for this, not possible to have asituation where I'm looking for my next sibling but I can't find myself in my parent's list
-      return nullptr;
+      assert(false);
     }
   } else {
-    // todo: not sure if i need to throw an exception here
     return nullptr;
   }
-//  Cluster* next
-
-
-  // if doesn't exist, it means we are in outermost cluster, todo: not sure if do nothing or throw exception
-
   return nullptr;
 }
-std::list<Cluster*> Cluster::GetNestedClusters() {
+std::list<Cluster*> Cluster::GetNestedClusters() const {
   return this->nested_clusters_;
 }
 
@@ -153,10 +143,9 @@ std::pair<int, int> Cluster::GetStartEndRange() {
   return std::pair<int, int>(this->start_, this->end_);
 }
 void Cluster::UpdateClusterRange() {
-  if(nested_clusters_.size() == 0) {
+  if(nested_clusters_.empty()) {
     return;
   }
-  // FIXME: what if there's no nesting, then the range doesn't get updated!
   for(auto nested_cluster : this->nested_clusters_) {
     nested_cluster->UpdateClusterRange();
     bool nested_cluster_range_already_considered = this->start_ <= nested_cluster->start_ && this->end_ >= nested_cluster->end_;

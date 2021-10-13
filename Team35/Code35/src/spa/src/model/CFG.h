@@ -29,7 +29,7 @@ class Cluster {
   void RemoveStmt(StatementNumber statement_number);
   bool CheckIfStatementInRange(StatementNumber sn) const;
   Cluster* GetParentCluster();
-  std::list<Cluster*> GetNestedClusters();
+  std::list<Cluster*> GetNestedClusters() const;
   Cluster* GetNextSiblingCluster();
   void SetParentCluster(Cluster* parent_cluster);
   /// ISSUE 2: to use dynamic_cast, need a virtual method; suggesstion -> create a virtual destructor (good practice too)
