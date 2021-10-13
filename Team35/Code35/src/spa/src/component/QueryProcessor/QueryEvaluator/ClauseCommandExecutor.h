@@ -30,6 +30,7 @@ class ClauseCommandExecutor {
     void PatternTwoSynonymOneInTable(Clause *clause, bool first_syn_in);
     void SuchThatOneSynonym(Clause *clause, bool first_syn_in);
     void PatternOneSynonym(Clause *clause);
+    void SuchThatNoSynonym(Clause *clause);
 };
 
 #endif //AUTOTESTER_CLAUSECOMMANDEXECUTOR_H

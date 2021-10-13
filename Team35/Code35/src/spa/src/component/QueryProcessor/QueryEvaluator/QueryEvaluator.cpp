@@ -2,6 +2,8 @@
 
 #include <utility>
 #include "QueryEvaluator.h"
+#include "ClauseCommandExecutor.h"
+#include "ClauseStrategy.h"
 
 /**
  * Processes the group list containing the information of the query. This method will then make the relevant calls to
@@ -48,32 +50,26 @@ UnformattedQueryResult QueryEvaluator::EvaluateQuery(const std::vector<Group>& l
  */
 void QueryEvaluator::ProcessGroup(QueryEvaluatorTable *table, Group group) {
 
-//  ClauseCommandExecutor *clause_command_executor = new ClauseCommandExecutor(table, pkb);
-//  for (Clause* current_clause: group.GetClauses()) {
-//    ClauseContext context = ClauseContext(table);
-//    if (typeid(* current_clause) == typeid(SuchThat)) {
-//      context.SetClauseStrategy(new SuchThatStrategy());
-//    } else {
-//      context.SetClauseStrategy(new PatternStrategy());
-//    }
-//    std::tuple<ClauseInformation, ClauseParameters> tuple = context.ProcessClause(current_clause);
-//    ClauseInformation clause_information = std::get<0>(tuple);
-//    ClauseParameters clause_parameters = std::get<1>(tuple);
-//    clause_information.clause_command->SetExecutor(clause_command_executor);
-//    clause_command_invoker.SetCommand(clause_information.clause_command);
-//
-//    // TODO: Param passed to invokeCommand might not always be the same...
-//    clause_command_invoker.InvokeCommand(clause_parameters,
-//                                         clause_information.pkb_query_command, current_clause, &context);
-//  }
+  for (Clause* current_clause: group.GetClauses()) {
+    ClauseContext clause_context = ClauseContext(table);
+    std::tuple<PKBQueryCommand*, ClauseCommand*> commands = clause_context.ProcessClause(current_clause);
+    PKBQueryCommand *query_command = std::get<0>(commands);
+    ClauseCommand *clause_command = std::get<1>(commands);
+    IntermediateTable *intermediate_table = query_command->ExecuteQuery(current_clause);
+
+    ClauseCommandExecutor clause_executor = ClauseCommandExecutor(table, intermediate_table);
+    clause_command->SetExecutor(&clause_executor);
+    clause_command->Execute(current_clause);
+  }
   return;
 }
 
 bool QueryEvaluator::ProcessSingleClauseBooleanGroup(Group group) {
-//  Clause *clause = group.GetClauses()[0];
-//  auto *such_that_clause = dynamic_cast<SuchThat *>(clause);
-//  PKBQueryReceiver receiver = PKBQueryReceiver(pkb);
-//  return receiver.QueryPkbForRelationshipExistence(such_that_clause);
+  Clause *clause = group.GetClauses()[0];
+  auto *such_that_clause = dynamic_cast<SuchThat *>(clause);
+  QuerySuchThatNoSynonymCommand query_command = QuerySuchThatNoSynonymCommand(clause);
+  // TODO: NOT SURE HOW TO QUERY PKB
+
   return true;
 }
 
@@ -103,14 +99,13 @@ void QueryEvaluator::PreprocessBooleanGroup(Group group) {
     // No code should run here for iter 1 since there is only such that and pattern clause.
   }
 
-//  if (main_synonym != nullptr) {
-//    QueryEvaluatorTable current_table(main_synonym);
-//    //TODO:
-//    //    current_table.AddTargetSynonymValues(pkb->GetDesignEntity(main_synonym->GetType()));
-//    ProcessGroup(&current_table, group);
-//    if (current_table.GetResults().empty()) {
-//      boolean_result = false;
-//    }
-//  }
+  if (main_synonym != nullptr) {
+    QueryEvaluatorTable current_table(main_synonym);
+    current_table.AddTargetSynonymValues(pkb->GetDesignEntities(main_synonym->GetType()));
+    ProcessGroup(&current_table, group);
+    if (current_table.GetResults().empty()) {
+      boolean_result = false;
+    }
+  }
   return;
 }

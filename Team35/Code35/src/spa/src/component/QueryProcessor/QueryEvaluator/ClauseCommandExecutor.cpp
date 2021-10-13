@@ -196,6 +196,34 @@ void ClauseCommandExecutor::PatternOneSynonym(Clause *clause) {
   }
 }
 
+void ClauseCommandExecutor::SuchThatNoSynonym(Clause *clause) {
+  auto *such_that_clause = dynamic_cast<SuchThat *>(clause);
+  std::string firstParam = such_that_clause->left_hand_side;
+  std::string secondParam = such_that_clause->right_hand_side;
+//  if (firstParam == "_" && secondParam == "_") {
+//    // Query the PKB for the existence of this relationship
+//    return QueryPkbForRelationshipExistence(pkb, st.rel_ref);
+//  } else if (firstParam == "_") {
+//    std::list<std::tuple<DesignEntity, std::string>>
+//    result = QueryPKBSuchThat(pkb, st.rel_ref, st.right_hand_side, false);
+//    return !result.empty();    // Return true if there is some value being returned.
+//  } else if (secondParam == "_") {
+//    std::list<std::tuple<DesignEntity, std::string>>
+//    result = QueryPKBSuchThat(pkb, st.rel_ref, st.left_hand_side, true);
+//    return !result.empty();    // Return true if there is some value being returned.
+//  } else {
+//    std::list<std::tuple<DesignEntity, std::string>>
+//    result = QueryPKBSuchThat(pkb, st.rel_ref, st.left_hand_side, true);
+//    for (auto iter: result) {
+//      // Check if second synonym in list
+//      if (std::get<1>(iter) == st.right_hand_side) {
+//        return true;
+//      }
+//    }
+//    return false;
+//  }
+}
+
 
 bool ClauseCommandExecutor::HasExpressionMatch(Pattern *pattern, AssignEntity *assign_entity) {
   std::string expression = pattern->right_hand_side;
