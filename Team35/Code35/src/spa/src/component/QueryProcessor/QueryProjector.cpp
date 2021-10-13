@@ -174,7 +174,7 @@ std::vector<std::vector<std::string>> QueryProjector::ReorderTable(std::vector<S
     if (desired_order[i] == *syn) {
       reordered_table[i] = table[i];
     } else {
-      auto iter = std::find(desired_order.begin(), desired_order.end(), syn);
+      auto iter = std::find(desired_order.begin(), desired_order.end(), *syn);
       assert(iter != desired_order.end());
       int desired_index = iter - desired_order.begin();
       reordered_table[desired_index] = table[i];

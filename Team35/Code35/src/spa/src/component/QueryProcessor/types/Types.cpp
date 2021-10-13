@@ -59,7 +59,7 @@ DesignEntity GetDesignEntity(std::string reference) {
   return DesignEntity::kInvalid;
 }
 
-bool Synonym::operator==(const Synonym& other) {
+bool Synonym::operator==(const Synonym& other) const{
   return this->name == other.name && this->type == other.type;
 }
 
