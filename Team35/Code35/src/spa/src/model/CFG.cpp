@@ -95,7 +95,6 @@ std::list<Cluster*> Cluster::GetNestedClusters() const {
 }
 
 void Cluster::AddSiblingCluster(Cluster* new_sibling_cluster) {
-  Cluster* existing_parent_cluster = parent_cluster_;
   if (parent_cluster_ == nullptr) { // the outermost cluster can't have any siblings
     throw std::invalid_argument("The outermost cluster (representing a procedure) should never have any siblings");
   }
@@ -107,7 +106,7 @@ void Cluster::AddSiblingCluster(Cluster* new_sibling_cluster) {
  * needs to be updated with logic similar to AddSmt to reflect the range expanded by the child.
  * @param nested_cluster
  */
-void Cluster::UpdateClusterRangeViaNestedCluster(Cluster* nested_cluster) {
+void Cluster::UpdateRange(Cluster* nested_cluster) {
   int new_cluster_start = nested_cluster->start_;
   int new_cluster_end = nested_cluster->end_;
   bool is_valid_new_cluster_range = new_cluster_start <= new_cluster_end
@@ -126,8 +125,6 @@ void Cluster::UpdateClusterRangeViaNestedCluster(Cluster* nested_cluster) {
       this->end_ = new_cluster_end;
     }
   } else { // there are nested clusters within, assume the start and end range already updated
-    //bool new_cluster_appears_before_this = new_cluster_end == this->start_ - 1; //INVALID ASSERTION: middle blocks (of 0 nest) are missing
-    //bool new_cluster_appears_after_this = new_cluster_start == this->end_ + 1;
     bool new_cluster_appears_before_this = new_cluster_end < this->start_;
     bool new_cluster_appears_after_this = new_cluster_start > this->end_;
     if(new_cluster_appears_before_this){
@@ -142,6 +139,7 @@ void Cluster::UpdateClusterRangeViaNestedCluster(Cluster* nested_cluster) {
 std::pair<int, int> Cluster::GetStartEndRange() {
   return std::pair<int, int>(this->start_, this->end_);
 }
+
 void Cluster::UpdateClusterRange() {
   if(nested_clusters_.empty()) {
     return;
@@ -150,7 +148,7 @@ void Cluster::UpdateClusterRange() {
     nested_cluster->UpdateClusterRange();
     bool nested_cluster_range_already_considered = this->start_ <= nested_cluster->start_ && this->end_ >= nested_cluster->end_;
     if(!nested_cluster_range_already_considered) {
-      this->UpdateClusterRangeViaNestedCluster(nested_cluster);
+      this->UpdateRange(nested_cluster);
     }
   }
 }
@@ -165,17 +163,14 @@ BodyBlock::~BodyBlock() = default;
  * @return
  */
 Block* Block::GetNewExitBlock() {
-  // to differentiate ExitBlocks from others.
   Block* exit_block = new Block();
-//  exit_block->start_ = -INT32_MAX;
   exit_block->start_ = -1;
   exit_block->end_ = -1;
-//  exit_block->end_ = -INT32_MAX;
   return exit_block;
 }
+
 bool Block::IsExitBlock(Block* block) {
   std::pair<int, int> range = block->GetStartEndRange();
-//  return std::get<0>(range) == -INT32_MAX && std::get<1>(range) == -INT32_MAX;
   return std::get<0>(range) == -1 && std::get<1>(range) == -1;
 }
 

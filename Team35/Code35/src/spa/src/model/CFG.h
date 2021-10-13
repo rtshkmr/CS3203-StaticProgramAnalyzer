@@ -22,7 +22,7 @@ class Cluster {
   int size() const;
   std::pair<int, int> GetStartEndRange();
   void AddChildCluster(Cluster* new_nested_cluster);
-  void UpdateClusterRangeViaNestedCluster(Cluster* nested_cluster);
+  void UpdateRange(Cluster* nested_cluster);
   void UpdateClusterRange();
   void AddSiblingCluster(Cluster* new_sibling_cluster);
   void AddStmt(StatementNumber statement_number);
@@ -32,19 +32,11 @@ class Cluster {
   std::list<Cluster*> GetNestedClusters() const;
   Cluster* GetNextSiblingCluster();
   void SetParentCluster(Cluster* parent_cluster);
-  /// ISSUE 2: to use dynamic_cast, need a virtual method; suggesstion -> create a virtual destructor (good practice too)
   virtual ~Cluster();
   std::list<Cluster*> nested_clusters_;
 };
 
 class Block : public Cluster {
-  /// EXTRA THINGS TO ADD SINCE FOR SET (since set is sorting pointers)
-  struct BlockComparator {
-    bool operator()(const Block* lhs, const Block* rhs) const {
-      return lhs->start_ < rhs->start_;
-    }
-  };
-
  public:
   Block() {};
   ~Block();
@@ -57,8 +49,8 @@ class Block : public Cluster {
 };
 
 class ConditionalBlock : public Block {
- private:
-  std::set<VariableName*> control_variables_;
+  // todo: as an optimisation strat, see what can be kept in condi block to and body block
+  //       to act as a negative list instead
 
  public:
   ~ConditionalBlock();

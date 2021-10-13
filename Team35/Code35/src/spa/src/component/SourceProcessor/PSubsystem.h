@@ -72,11 +72,11 @@ class PSubsystem {
   void CloseProcedureBlock();
   void CloseElseBlock();
   void CloseWhileBlock();
-  void ProcessOuterNodeAsProcedure();
-  void ProcessOuterParentNode();
-  void ProcessOuterNodeType(Container* current_nest);
+  void ProcessParentNodeAsProcedure();
+  void ProcessParentNode();
+  void ProcessParentNodeType(Container* current_nest);
   std::vector<Token> GetValidatedTokens(const std::string& statement);
-  void InitRootClusterAndBlock(Procedure* procedure);
+  void InitInternalState(Procedure* procedure);
  public:
   PSubsystem() = default;
 
