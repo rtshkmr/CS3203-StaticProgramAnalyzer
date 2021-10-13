@@ -1,7 +1,7 @@
 #include <list>
 #include "QueryProjector.h"
 
-QueryProjector::QueryProjector(std::vector<Synonym> target_synonyms_list) : target_synonym_list(target_synonyms_list) {}
+QueryProjector::QueryProjector(std::vector<Synonym*> target_synonyms_list) : target_synonym_list(target_synonyms_list) {}
 
 std::vector<std::string> QueryProjector::FormatQuery(UnformattedQueryResult unformatted_results) {
   // For each synonym in the synonym_list
@@ -15,9 +15,9 @@ std::vector<std::string> QueryProjector::FormatQuery(UnformattedQueryResult unfo
   }
 
   for (int i = 0; i < target_synonym_list.size(); i++ ) {
-    Synonym current_synonym = target_synonym_list[i];
+    Synonym* current_synonym = target_synonym_list[i];
     for (QueryEvaluatorTable* table : table_references) {
-      if (table->ContainsColumn(current_synonym.GetName())) {
+      if (table->ContainsColumn(current_synonym->GetName())) {
         // need to change : Need to change this code for BOOLEAN and tuple cases.
         results = table->GetResults();
       }

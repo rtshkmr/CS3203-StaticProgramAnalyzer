@@ -6,19 +6,19 @@
  * Groups multiple queries that should be evaluated together, based on existence of common synonyms.
  */
 void QueryGrouper::GroupClauses(std::vector<Clause*>* clauses, std::list<Group*>* groups,
-                                    std::vector<Synonym>* target_synonyms,
+                                    std::vector<Synonym*>* target_synonyms,
                                     std::unordered_map<std::string, DesignEntity>* target_synonyms_map,
                                     std::unordered_map<std::string, std::vector<int>>* map_of_syn_to_clause_indices) {
   // First create groups for clauses containing target synonyms (and their 'neighbouring' synonyms).
   std::unordered_set<int> visited_clauses;
   std::unordered_set<std::string> visited_target_synonyms;
   std::unordered_set<std::string> visited_synonyms;
-  for (Synonym tgt_syn : *target_synonyms) {
-    if (visited_target_synonyms.find(tgt_syn.GetName()) != visited_target_synonyms.end()) {
+  for (Synonym* tgt_syn : *target_synonyms) {
+    if (visited_target_synonyms.find(tgt_syn->GetName()) != visited_target_synonyms.end()) {
       continue;
     }
     // dfs starting from this target synonym
-    QueryGrouper::DfsFromSynonym(target_synonyms_map, clauses, groups, tgt_syn.GetName(), &visited_clauses,
+    QueryGrouper::DfsFromSynonym(target_synonyms_map, clauses, groups, tgt_syn->GetName(), &visited_clauses,
                                    &visited_target_synonyms, &visited_synonyms, map_of_syn_to_clause_indices);
   }
   // create groups for unvisited clauses

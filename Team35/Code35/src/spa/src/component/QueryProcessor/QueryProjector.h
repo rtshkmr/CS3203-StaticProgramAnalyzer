@@ -8,9 +8,9 @@
 
 class QueryProjector {
   private:
-    std::vector<Synonym> target_synonym_list;
+    std::vector<Synonym*> target_synonym_list;
   public:
-    QueryProjector(std::vector<Synonym> target_synonym_list);
+    QueryProjector(std::vector<Synonym*> target_synonym_list);
     std::vector<std::string> FormatQuery(UnformattedQueryResult unformatted_results);
 };
 

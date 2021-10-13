@@ -20,7 +20,7 @@ class QueryGrouper {
                                   std::unordered_map<std::string, DesignEntity>* tgt_synonyms_map);
  public:
   static void GroupClauses(std::vector<Clause*>* clauses, std::list<Group*>* groups,
-                           std::vector<Synonym>* target_synonyms,
+                           std::vector<Synonym*>* target_synonyms,
                            std::unordered_map<std::string, DesignEntity>* target_synonyms_map,
                            std::unordered_map<std::string, std::vector<int>>* map_of_syn_to_clause_indices);
 };

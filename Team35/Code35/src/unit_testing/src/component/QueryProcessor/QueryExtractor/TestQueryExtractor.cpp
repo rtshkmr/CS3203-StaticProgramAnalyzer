@@ -86,7 +86,7 @@ TEST_CASE("3.QueryExtractor.Extract multiple unique synonym + select declared sy
   auto query_extractor = QueryExtractor(& query);
   query_extractor.ExtractQuery();
   std::list<Synonym*> synonyms = query_extractor.GetSynonymsList();
-  Synonym target = &query_extractor.GetTargetSynonymsList().at(0);
+  Synonym target = *query_extractor.GetTargetSynonymsList().at(0);
   std::list<Group*> groups = query_extractor.GetGroupsList();
 
   std::list<Synonym> expected_synonyms = {Synonym("a1", DesignEntity::kAssign),

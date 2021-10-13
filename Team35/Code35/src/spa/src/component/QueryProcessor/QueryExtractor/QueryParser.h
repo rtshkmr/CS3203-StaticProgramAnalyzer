@@ -21,7 +21,6 @@ class QueryParser {
   std::list<Synonym*>& synonyms;
   std::vector<Synonym*>& target_synonyms_list;
   std::unordered_map<std::string, DesignEntity>& target_synonyms_map;
-  std::unordered_set<std::string> target_synonyms_name_set;
 
   Token lookahead = Token("", TokenTag::kInvalid);
   QueryTokenizer tokenizer;

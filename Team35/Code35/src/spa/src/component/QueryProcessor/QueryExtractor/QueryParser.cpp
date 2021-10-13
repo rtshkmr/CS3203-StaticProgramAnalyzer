@@ -102,7 +102,7 @@ void QueryParser::ParseTarget() {
   }
   Synonym* s = QueryParser::GetSynonymInfo(target, &synonyms);
   this->target_synonyms_list.push_back(s);
-  this->target_synonyms_name_set.emplace(s->GetName());
+  this->target_synonyms_map.emplace(std::make_pair(s->GetName(), s->GetType()));
 }
 
 // stmtRef: synonym | ‘_’ | INTEGER
