@@ -94,7 +94,8 @@ void PSubsystem::ProcessStatement(const std::string& statement) {
 void PSubsystem::CloseIfBlock() {
   if (current_node_type_ == NodeType::kIf) {
     // todo: probably have to update cluster's fields
-    int x = 1; // todo: get the if-body from the top of block stack, if cond from 2nd pos of block stack and the outer cluster from the cluster stack top
+    int x =
+        1; // todo: get the if-body from the top of block stack, if cond from 2nd pos of block stack and the outer cluster from the cluster stack top
 //    BodyBlock* if_body = block_stack_.top();
 //    block_stack_.pop();
 //    ConditionalBlock* if_cond = block_stack_.top();
@@ -138,12 +139,16 @@ void PSubsystem::CloseElseBlock() {
     block_stack_.push(block_if_else_exit);
     bool is_currently_in_nested_cluster = cluster_stack_.size() > 1;
     assert(is_currently_in_nested_cluster);
-    // add to cluster here:
     Cluster* if_cluster = cluster_stack_.top();
-    if_cluster->AddChildCluster(if_cond_block);
-    if_cluster->AddChildCluster(if_body_block);
-    if_cluster->AddChildCluster(else_body_block);
-    cluster_stack_.pop();
+    ///  add to if_cluster only if the if_cluster is currently empty.
+    /// guarantee: There will be at most be 3 nested clusters in if cluster (ifcond, ifbody, elsebody):
+    if(if_cluster->GetNestedClusters().empty()) {
+      if_cluster->AddChildCluster(if_cond_block);
+      if_cluster->AddChildCluster(if_body_block);
+      if_cluster->AddChildCluster(else_body_block);
+    }
+
+    cluster_stack_.pop(); // pops out the if_cluster
     assert(!cluster_stack_.empty());
     Cluster* outer_cluster = cluster_stack_.top();
     outer_cluster->AddChildCluster(if_cluster);
@@ -160,7 +165,6 @@ void PSubsystem::CloseWhileBlock() {
   lastStmt->next_blocks_.insert(while_cond_block);
   Block* block_while_exit = Block::GetNewExitBlock();
   while_cond_block->next_blocks_.insert(block_while_exit);
-//  block_stack_.top()->GetNextBlocks().insert(block_while_exit);
   block_stack_.pop(); //pop the while_cond_block block
   block_stack_.push(block_while_exit);
   bool is_currently_in_nested_cluster = cluster_stack_.size() > 1;
@@ -444,8 +448,8 @@ BodyBlock* PSubsystem::CreateBodyBlock() {
   Block* block_if_body = dynamic_cast<Block*>(block_stack_.top());
   block_stack_.pop(); //pop so that the if_cond can perform next_block map to else block
   BodyBlock* block_else_body = new BodyBlock();
-//  block_stack_.top()->GetNextBlocks().insert(block_else_body);
-  block_stack_.top()->next_blocks_.insert(block_else_body);
+  Block* block_if_cond = block_stack_.top();
+//  block_if_cond->next_blocks_.insert(block_else_body);
   block_stack_.push(block_if_body);
   block_stack_.push(block_else_body);
   return block_else_body;
