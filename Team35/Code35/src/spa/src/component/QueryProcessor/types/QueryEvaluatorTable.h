@@ -32,8 +32,9 @@ class QueryEvaluatorTable {
     int GetRowSize();
 
     // Return vector of target synonym results
-    std::vector<Entity *> GetResults();
-    //
+    std::vector<std::vector<Entity*>> GetResults();
+    std::vector<Synonym*> GetTargetSynonymList();
+
     //    // Empty column but keep the synonym (header) in the table
     //    bool RemoveColumn(std::string synonym);
     //
