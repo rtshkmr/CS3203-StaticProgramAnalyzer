@@ -49,11 +49,7 @@ class Block : public Cluster {
   ~Block();
 
   bool isWhile = false;
-  // std::set<Block*, Block::BlockComparator> next_blocks_ = {};
   std::set<Block*> next_blocks_ = {};
-  std::set<Block*> GetNextBlocks() {
-    return next_blocks_;
-  }
 
 };
 
