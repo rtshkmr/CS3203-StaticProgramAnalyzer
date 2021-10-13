@@ -28,17 +28,17 @@ Token QueryParser::Eat(TokenTag token_type) {
 /**
  * Helper function to obtain synonym info (ie type) given it exists in list of synonyms.
  * @param syn_name is a string representing the name of the synonym.
- * @param synonyms is a reference to a list of synonyms.
+ * @param synonyms is a reference to a list of synonym pointers.
  * @return a Synonym object with the corresponding information, or a dummy Synonym with invalid fields if not exists.
  */
-Synonym QueryParser::GetSynonymInfo(std::string syn_name, std::list<Synonym>* synonyms) {
+Synonym* QueryParser::GetSynonymInfo(std::string syn_name, std::list<Synonym*>* synonyms) {
   // Todo: Optimize.
-  for (Synonym& t: * synonyms) {
-    if (t.GetName().compare(syn_name) == 0) {
-      return Synonym(syn_name, t.GetType());
+  for (auto t: * synonyms) {
+    if (t->GetName().compare(syn_name) == 0) {
+      return t;
     }
   }
-  return Synonym("", DesignEntity::kInvalid);
+  return new Synonym("", DesignEntity::kInvalid);
 };
 
 /**
@@ -72,7 +72,7 @@ void QueryParser::ParseDeclaration() {
     if (synonyms_name_set.find(t.GetTokenString()) != synonyms_name_set.end()) {
       throw PQLValidationException("Duplicate synonym was declared.");
     }
-    this->synonyms.emplace_back(t.GetTokenString(), de);
+    this->synonyms.emplace_back(new Synonym(t.GetTokenString(), de));
     this->synonyms_name_set.emplace(t.GetTokenString());
   }
 }
@@ -100,9 +100,9 @@ void QueryParser::ParseTarget() {
   if (synonyms_name_set.find(target) == synonyms_name_set.end()) {
     throw PQLParseException("Incorrect target synonym for \'Select\' query.");
   }
-  DesignEntity de = QueryParser::GetSynonymInfo(target, &synonyms).GetType();
-  this->target_synonyms_list.push_back(Synonym(target, de));
-  this->target_synonyms_map.insert(std::make_pair(target, de));
+  Synonym* s = QueryParser::GetSynonymInfo(target, &synonyms);
+  this->target_synonyms_list.push_back(s);
+  this->target_synonyms_name_set.emplace(s->GetName());
 }
 
 // stmtRef: synonym | ‘_’ | INTEGER
@@ -153,7 +153,7 @@ std::tuple<std::string, bool, bool, bool> QueryParser::ParseStmtOrEntRef() {
     if (synonyms_name_set.find(curr_lookahead) == synonyms_name_set.end()) {
       throw PQLParseException("Unknown synonym supplied in clause.");
     }
-    DesignEntity de = QueryParser::GetSynonymInfo(curr_lookahead, &synonyms).GetType();
+    DesignEntity de = QueryParser::GetSynonymInfo(curr_lookahead, &synonyms)->GetType();
     is_uses_or_modifies_p = de == DesignEntity::kProcedure || de == DesignEntity::kCall;
   }
 
@@ -385,8 +385,8 @@ bool QueryParser::IsValidSynonym(Token token, DesignEntity de) {
   std::string syn_name = token.GetTokenString();
   // syn_name must be a known synonym, and of permitted type.
   bool is_valid = false;
-  for (Synonym& s: synonyms) {
-    if (s.GetName() == syn_name && s.GetType() == de) {
+  for (auto s: synonyms) {
+    if (s->GetName() == syn_name && s->GetType() == de) {
       is_valid = true;
       break;
     }
