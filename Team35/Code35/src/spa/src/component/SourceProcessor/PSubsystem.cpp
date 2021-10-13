@@ -150,11 +150,14 @@ void PSubsystem::CloseElseBlock() {
     if(if_cluster->GetNestedClusters().empty()) {
       if_cluster->AddChildCluster(if_cond_block);
       if_cluster->AddChildCluster(if_body_block);
-      if_cluster->AddChildCluster(else_body_block);
+      if_cluster->AddChildCluster(else_body_block); // this is ok because there is at least 1 stmt
       if_cluster->UpdateClusterRange();
     } else {
 //      if_cluster->AddChildCluster(if_cond_block);
       if_cluster->nested_clusters_.push_front(if_cond_block);
+      if (else_body_block->size() > 0) {
+        if_cluster->AddChildCluster(else_body_block); //append anything else FIXME -> bug might occur in w{ aaa if{} a if{} a } where middle a is missing.
+      }
       if_cond_block->SetParentCluster(if_cluster);
       if_cluster->UpdateClusterRange();
       int x = 1;
@@ -173,22 +176,29 @@ void PSubsystem::CloseWhileBlock() {
   //todo: change from Block* to ConditionalBlock*
   Block* while_cond_block = dynamic_cast<Block*>(block_stack_.top());
   assert(while_cond_block);
-  while_body_block->next_blocks_.insert(while_cond_block); // loop back to cond
-  Block* block_while_exit = Block::GetNewExitBlock();
-  while_cond_block->next_blocks_.insert(block_while_exit); // cond point to exit
-  block_stack_.pop(); //pop the while_cond_block block
-  block_stack_.push(block_while_exit);
+
   bool is_currently_in_nested_cluster = cluster_stack_.size() > 1;
   assert(is_currently_in_nested_cluster);
   // add to cluster here:
   Cluster* while_cluster = cluster_stack_.top();
-  while_cluster->AddChildCluster(while_cond_block);
-  while_cluster->AddChildCluster(while_body_block);
+  while_cluster->nested_clusters_.push_front(while_cond_block);
+
+  if (while_body_block->size() > 0) {
+    while_cluster->AddChildCluster(while_body_block); //add only non empty tails
+  }
+  while_cluster->UpdateClusterRange(); //FIXME bug - w(cond) { .. not_accounted .. if() .. not_accounted .. if() ..}
+
   cluster_stack_.pop();
   assert(!cluster_stack_.empty());
   Cluster* outer_cluster = cluster_stack_.top();
   outer_cluster->AddChildCluster(while_cluster);
   outer_cluster->UpdateClusterRange();
+
+  while_body_block->next_blocks_.insert(while_cond_block); // loop back to cond
+  Block* block_while_exit = Block::GetNewExitBlock();
+  while_cond_block->next_blocks_.insert(block_while_exit); // cond point to exit
+  block_stack_.pop(); //pop the while_cond_block block
+  block_stack_.push(block_while_exit);
 }
 
 void PSubsystem::ProcessOuterParentNode() {
@@ -424,14 +434,15 @@ ConditionalBlock* PSubsystem::CreateConditionalBlock(Statement* conditional_stat
   // HANDLE THE CONDITION
   ConditionalBlock* conditional_block;
   // remove the stmtNumber from previous block and add it to the cond block if size > 1
-  if (block_stack_.top()->size() > 1) {
-    block_stack_.top()->RemoveStmt(StatementNumber(statement_num));
+  Block* block_before_cond = block_stack_.top();
+  if (block_before_cond->size() > 1) {
+    block_before_cond->RemoveStmt(StatementNumber(statement_num));
     conditional_block = new ConditionalBlock();
     conditional_block->AddStmt(StatementNumber(statement_num));
-//    block_stack_.top()->GetNextBlocks().insert(conditional_block);
-    block_stack_.top()->next_blocks_.insert(conditional_block);
-    bool block_is_not_while = !dynamic_cast<Block*>(block_stack_.top())->isWhile;
-    if (block_is_not_while) {
+    block_before_cond->next_blocks_.insert(conditional_block);
+    bool prior_block_is_not_while = !dynamic_cast<Block*>(block_before_cond)->isWhile;
+    if (prior_block_is_not_while) {
+      cluster_stack_.top()->AddChildCluster(block_before_cond);
       block_stack_.pop(); // pop the previous progline if it isnt while (no loopback to care)
     }
     block_stack_.push(static_cast<Block* const>(conditional_block));

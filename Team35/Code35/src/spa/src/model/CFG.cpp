@@ -136,8 +136,10 @@ void Cluster::UpdateClusterRangeViaNestedCluster(Cluster* nested_cluster) {
       this->end_ = new_cluster_end;
     }
   } else { // there are nested clusters within, assume the start and end range already updated
-    bool new_cluster_appears_before_this = new_cluster_end == this->start_ - 1;
-    bool new_cluster_appears_after_this = new_cluster_start == this->end_ + 1;
+    //bool new_cluster_appears_before_this = new_cluster_end == this->start_ - 1; //INVALID ASSERTION: middle blocks (of 0 nest) are missing
+    //bool new_cluster_appears_after_this = new_cluster_start == this->end_ + 1;
+    bool new_cluster_appears_before_this = new_cluster_end < this->start_;
+    bool new_cluster_appears_after_this = new_cluster_start > this->end_;
     if(new_cluster_appears_before_this){
       this->start_ = new_cluster_start;
     } else if (new_cluster_appears_after_this) {
