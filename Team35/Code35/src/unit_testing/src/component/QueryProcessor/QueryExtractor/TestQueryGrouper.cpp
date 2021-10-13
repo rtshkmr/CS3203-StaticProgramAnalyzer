@@ -57,3 +57,28 @@ TEST_CASE("3.QueryGrouper.No and + multiple queries + common target & non-target
   REQUIRE(g2->GetClauses().size() == 2);
   REQUIRE(g2->ContainsTargetSynonym() == false);
 }
+
+TEST_CASE("3.QueryGrouper.And keyword + multiple queries rel") {
+  std::string query = "assign a1, a2; while w1, w2; Select a2 "
+                      "pattern a1 (\"x\", _) and a2 (\"x\",_\"x\"_) "
+                      "such that Parent* (w2, a2) and Parent* (w1, w2)";
+  auto query_extractor = QueryExtractor(& query);
+  query_extractor.ExtractQuery();
+  std::list<Group*> groups = query_extractor.GetGroupsList();
+  // expecting 2 groups with 1 and 3 clauses respectively.
+  REQUIRE(groups.size() == 2);
+  Group* g1 = Get(&groups, 0);
+  Group* g2 = Get(&groups, 1);
+  REQUIRE(g1->GetClauses().size() == 3);
+  REQUIRE(g1->ContainsTargetSynonym());
+  REQUIRE(g2->GetClauses().size() == 1);
+  REQUIRE(g2->ContainsTargetSynonym() == false);
+}
+
+TEST_CASE("3.QueryGrouper.And keyword + multiple queries pattern") {
+
+}
+
+TEST_CASE("3.QueryGrouper.And keyword + multiple queries rel & pattern") {
+
+}
