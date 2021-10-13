@@ -1,39 +1,71 @@
 #include "QueryEvaluatorTable.h"
 
-QueryEvaluatorTable::QueryEvaluatorTable(std::string target) {
-  target_synonym = target;
+bool QueryEvaluatorTable::AddTargetSynonymValues(std::vector<Entity *> entity_list) {
+  synonym_to_entity_map[target_synonym] = entity_list;
+  return true;
 }
 
-// Add column to table
-bool QueryEvaluatorTable::AddColumn(std::string synonym) {
-  if (um.find(synonym) == um.end()) {
-    std::vector<std::string> synonym_list;
-    um.insert(std::make_pair(synonym, synonym_list));
+
+bool QueryEvaluatorTable::AddColumn(Synonym *synonym) {
+  if (synonym_to_entity_map.find(synonym) == synonym_to_entity_map.end()) {
+    std::vector<Entity *> synonym_list;
+    synonym_to_entity_map.insert(std::make_pair(synonym, synonym_list));
     return true;
   } else {
     return false;
   }
 }
 
-// Add target synonym column with values to table
-bool QueryEvaluatorTable::AddTargetSynonym(std::list<std::string> synonym_list) {
-  std::vector<std::string> synonym_vector;
-  // TODO: Change internal pql API input to be a vector instead of a list to avoid this.
-  for (std::string const& value: synonym_list) {
-    synonym_vector.push_back(value);
-  }
-  um[target_synonym] = synonym_vector;
-  return true;
-
+bool QueryEvaluatorTable::ContainsColumn(Synonym *synonym) {
+  auto search = synonym_to_entity_map.find(synonym);
+  return search != synonym_to_entity_map.end();
 }
 
-// Delete row
-bool QueryEvaluatorTable::DeleteRow(int index) {
-  if (um[target_synonym].size() - 1 < index) {
+bool QueryEvaluatorTable::AddRow(Synonym *synonym, int index, Entity *entity) {
+  // assert that index == size
+  if (index != synonym_to_entity_map[synonym].size()) {
     return false;
   }
-  for (auto iter = um.begin(); iter != um.end(); ++iter) {
-    std::vector<std::string> current_column = iter->second;
+  synonym_to_entity_map[synonym].push_back(entity);
+  return true;
+}
+
+/**
+ * The first time a row is added (i.e repeat_count = 0), the value is added to the column under 'synonym'.
+ * Each subsequent time a row is added (i.e repeat_count > 0), the value for all other rows are copied, and the value
+ * is added to the column under 'synonym'.
+ *
+ * @param synonym
+ * @param index
+ * @param entity
+ * @param count
+ * @return
+ */
+bool QueryEvaluatorTable::AddMultipleRowForAllColumn(Synonym *synonym, int index, Entity *entity, int repeat_count) {
+  if (!ContainsColumn(synonym)) {
+    return false;
+  }
+
+  for (auto tableIterator = synonym_to_entity_map.begin(); tableIterator != synonym_to_entity_map.end(); tableIterator++) {
+    if (tableIterator->first == synonym) {
+      AddRow(synonym, index + repeat_count, entity);
+    } else {
+      if (repeat_count > 0) {
+        std::vector<Entity *> currList = tableIterator->second;
+        currList.insert(currList.begin() + index + repeat_count, currList[index]);
+        tableIterator->second = currList;
+      }
+    }
+  }
+  return true;
+}
+
+bool QueryEvaluatorTable::DeleteRow(int index) {
+  if (synonym_to_entity_map[target_synonym].size() - 1 < index) {
+    return false;
+  }
+  for (auto iter = synonym_to_entity_map.begin(); iter != synonym_to_entity_map.end(); ++iter) {
+    std::vector<Entity *> current_column = iter->second;
     unsigned long size = current_column.size();
     if (index < size) {
       current_column.erase(current_column.begin() + index);
@@ -43,122 +75,36 @@ bool QueryEvaluatorTable::DeleteRow(int index) {
   return true;
 }
 
-// Add row (and new col)
-bool QueryEvaluatorTable::AddRow(std::string synonym, int index, std::string value) {
-  // assert that index == size
-  if (index != um[synonym].size()) {
-    return false;
-  }
-  um[synonym].push_back(value);
-  return true;
-}
-
-bool QueryEvaluatorTable::AddRowForAllColumn(std::string synonym, int index, std::string value) {
-  for (auto tableIterator = um.begin(); tableIterator != um.end(); tableIterator++) {
-    if (tableIterator->first == synonym) {
-      AddRow(synonym, index, value);
-    } else {
-      std::vector<std::string> currList = tableIterator->second;
-      currList.insert(currList.begin() + index, currList[index]);
-      tableIterator->second = currList;
-    }
-  }
-  return true;
-}
-
-/**
- * The first time a row is added (i.e repeat_count = 0), the value is added to the column under 'synonym'.
- * Each subsequent time a row is added (i.e repeat_count > 0), the value for all other rows are copied, and the value
- * is added to the column under 'synonym'.
- *
- * @param synonym The name of the synonym which acts as the column header.
- * @param index The position to insert the row in the table. This should be the same across repeated rows.
- * @param value The value to be inserted into the column.
- * @param repeat_count The number of times this call has been repeated for the same values in all other columns.
- * @return false if there is an error with adding values into the table or if the synonym column does not exist.
- * True otherwise.
- */
-bool QueryEvaluatorTable::AddMultipleRowForAllColumn(std::string synonym,
-                                                     int index,
-                                                     std::string value,
-                                                     int repeat_count) {
-  if (!ContainsColumn(synonym)) {
-    return false;
-  }
-
-  for (auto tableIterator = um.begin(); tableIterator != um.end(); tableIterator++) {
-    if (tableIterator->first == synonym) {
-      AddRow(synonym, index + repeat_count, value);
-    } else {
-      if (repeat_count > 0) {
-        std::vector<std::string> currList = tableIterator->second;
-        currList.insert(currList.begin() + index + repeat_count, currList[index]);
-        tableIterator->second = currList;
-      }
-    }
-  }
-  return true;
-}
-
-// Return vector of target synonym
-std::vector<std::string> QueryEvaluatorTable::GetResults() {
-  auto search = um.find(target_synonym);
-  //assert search != um.end()
+std::vector<Entity *> QueryEvaluatorTable::GetColumn(Synonym *synonym) {
+  auto search = synonym_to_entity_map.find(synonym);
+  //assert search != synonym_to_entity_map.end()
   return search->second;
 }
 
-// Return vector of specified synonym
-std::vector<std::string> QueryEvaluatorTable::GetColumn(std::string synonym) {
-  auto search = um.find(synonym);
-  //assert search != um.end()
-  return search->second;
-}
-
-// Empty column
-bool QueryEvaluatorTable::RemoveColumn(std::string synonym) {
-  auto search = um.find(synonym);
-  if (search == um.end()) {
-    return false;
-  } else {
-    search->second.clear();
-    return true;
-  }
-}
-
-bool QueryEvaluatorTable::ContainsColumn(std::string synonym) {
-  auto search = um.find(synonym);
-  return search != um.end();
-}
-
-int QueryEvaluatorTable::GetSize() {
-  return um.size();
+int QueryEvaluatorTable::GetColumnSize() {
+  return synonym_to_entity_map.size();
 }
 
 int QueryEvaluatorTable::GetRowSize() {
-  auto search = um.find(target_synonym);
-  //assert search != um.end()
+  auto search = synonym_to_entity_map.find(target_synonym);
+  //assert search != synonym_to_entity_map.end()
   return search->second.size();
 }
 
-std::string QueryEvaluatorTable::GetStatementSynonym(std::unordered_map<std::string,
-                                                                        DesignEntity> synonym_design_entity_map) {
-  bool is_statement = false;
-  for (auto tableIterator = um.begin(); tableIterator != um.end(); tableIterator++) {
-    DesignEntity current_design_entity = synonym_design_entity_map[tableIterator->first];
-    switch (current_design_entity) {
-      case DesignEntity::kStmt:
-      case DesignEntity::kAssign:
-      case DesignEntity::kCall:
-      case DesignEntity::kPrint:
-      case DesignEntity::kRead:
-      case DesignEntity::kIf:
-      case DesignEntity::kWhile:is_statement = true;
-        break;
-      default:break;
-    }
-    if (is_statement) {
-      return tableIterator->first;
-    }
-  }
-  return "";
+std::vector<Entity *> QueryEvaluatorTable::GetResults() {
+  auto search = synonym_to_entity_map.find(target_synonym);
+  //assert search != synonym_to_entity_map.end()
+  return search->second;
 }
+
+QueryEvaluatorTable::QueryEvaluatorTable(Synonym *target) {
+  target_synonym = target;
+  std::vector<Synonym *> list = {target};
+  target_synonym_list = list;
+}
+
+QueryEvaluatorTable::QueryEvaluatorTable(std::vector<Synonym *> target_list) {
+  target_synonym = target_list[0];
+  target_synonym_list = target_list;
+}
+
