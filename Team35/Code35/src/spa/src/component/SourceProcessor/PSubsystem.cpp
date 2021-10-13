@@ -150,12 +150,14 @@ void PSubsystem::CloseElseBlock() {
     if(if_cluster->GetNestedClusters().empty()) {
       if_cluster->AddChildCluster(if_cond_block);
       if_cluster->AddChildCluster(if_body_block);
-      if_cluster->AddChildCluster(else_body_block);
+      if_cluster->AddChildCluster(else_body_block); // this is ok because there is at least 1 stmt
       if_cluster->UpdateClusterRange();
     } else {
 //      if_cluster->AddChildCluster(if_cond_block);
       if_cluster->nested_clusters_.push_front(if_cond_block);
-      if_cluster->AddChildCluster(else_body_block); //append anything else FIXME -> bug might occur in w{ aaa if{} a if{} a } where middle a is missing.
+      if (else_body_block->size() > 0) {
+        if_cluster->AddChildCluster(else_body_block); //append anything else FIXME -> bug might occur in w{ aaa if{} a if{} a } where middle a is missing.
+      }
       if_cond_block->SetParentCluster(if_cluster);
       if_cluster->UpdateClusterRange();
       int x = 1;
