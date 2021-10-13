@@ -55,6 +55,9 @@ void QueryEvaluator::ProcessGroup(QueryEvaluatorTable *table, Group group) {
     std::tuple<PKBQueryCommand*, ClauseCommand*> commands = clause_context.ProcessClause(current_clause);
     PKBQueryCommand *query_command = std::get<0>(commands);
     ClauseCommand *clause_command = std::get<1>(commands);
+
+    PKBQueryReceiver query_receiver = PKBQueryReceiver(pkb);
+    query_command->SetReceiver(&query_receiver);
     IntermediateTable *intermediate_table = query_command->ExecuteQuery(current_clause);
 
     ClauseCommandExecutor clause_executor = ClauseCommandExecutor(table, intermediate_table);

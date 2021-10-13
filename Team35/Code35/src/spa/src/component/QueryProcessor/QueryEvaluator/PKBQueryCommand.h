@@ -6,15 +6,6 @@
 #include "model/Entity.h"
 #include "component/QueryProcessor/types/Types.h"
 
-class PKBQueryCommand {
-  public:
-    virtual ~PKBQueryCommand();
-
-    virtual IntermediateTable * ExecuteQuery(Clause *clause) = 0;
-
-    PKBRelRefs GetPKBRelRef(RelRef relation);
-};
-
 class PKBQueryReceiver {
   private:
     PKB *pkb;
@@ -28,6 +19,15 @@ class PKBQueryReceiver {
     IntermediateTable *QueryRelRefExistence(PKBRelRefs rel);
     IntermediateTable *QueryDesignEntity(DesignEntity design_entity);
     IntermediateTable *QueryPatternByValue(DesignEntity design_entity, std::string value);
+};
+
+class PKBQueryCommand {
+  public:
+    virtual ~PKBQueryCommand() = default;
+    virtual void SetReceiver(PKBQueryReceiver *receiver) = 0;
+    virtual IntermediateTable * ExecuteQuery(Clause *clause) = 0;
+
+    PKBRelRefs GetPKBRelRef(RelRef relation);
 };
 
 class QuerySuchThatTwoSynonymCommand : public PKBQueryCommand {
