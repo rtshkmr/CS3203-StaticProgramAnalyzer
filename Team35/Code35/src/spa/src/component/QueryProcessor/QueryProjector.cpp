@@ -32,7 +32,6 @@ std::vector<std::string> QueryProjector::FormatQuery(UnformattedQueryResult unfo
   // For each synonym in the synonym_list
   // Get the unique list of results for that column
   for (auto current_synonym : target_synonym_list) {
-    // todo qn: will target synonym list always correspond to the number of tables?
     for (QueryEvaluatorTable* table : table_references) {
       // don't have to check for synonyms that are not current synonym but has been collected, since a synonym will only
       // appear once in all the tables
@@ -139,17 +138,14 @@ std::vector<std::string> QueryProjector::FormatMultipleTables(std::vector<std::v
 std::vector<std::vector<std::string>> QueryProjector::CrossProductTables(std::vector<std::vector<std::string>> t1,
                                                                          std::vector<std::vector<std::string>> t2) {
   std::vector<std::vector<std::string>> crossed_table(t1.size() + t2.size());
-  for (int l = 0; l < t1.size() + t2.size(); ++l) {
-    crossed_table.push_back(std::vector<std::string>{});
-  }
 
   for (int t1row = 0; t1row < t1[0].size(); ++t1row) {
-    for (int t1col = 0; t1col < t1.size(); ++t1col) {
-      crossed_table[t1col].push_back(t1[t1col][t1row]);
-    }
     for (int t2row = 0; t2row < t2[0].size(); ++t2row) {
+      for (int t1col = 0; t1col < t1.size(); ++t1col) {
+        crossed_table[t1col].push_back(t1[t1col][t1row]);
+      }
       for (int t2col = 0; t2col < t2.size(); ++t2col) {
-        crossed_table[t1[0].size() + t2col].push_back(t2[t2col][t2row]);
+        crossed_table[t1.size() + t2col].push_back(t2[t2col][t2row]);
       }
     }
   }
