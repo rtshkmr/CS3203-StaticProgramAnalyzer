@@ -59,6 +59,10 @@ DesignEntity GetDesignEntity(std::string reference) {
   return DesignEntity::kInvalid;
 }
 
+bool Synonym::operator==(const Synonym& other) const{
+  return this->name == other.name && this->type == other.type;
+}
+
 bool Group::AddClauseToVector(Clause* clause) {
   auto initialSize = clauses.size();
   clauses.push_back(clause);
@@ -76,5 +80,3 @@ bool Group::ContainsTargetSynonym() {
 std::vector<Synonym> Group::GetTargetSynonyms() {
   return target_synonyms;
 }
-
-

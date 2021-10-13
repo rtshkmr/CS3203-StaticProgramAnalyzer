@@ -91,10 +91,26 @@ int QueryEvaluatorTable::GetRowSize() {
   return search->second.size();
 }
 
-std::vector<Entity *> QueryEvaluatorTable::GetResults() {
-  auto search = synonym_to_entity_map.find(target_synonym);
-  //assert search != synonym_to_entity_map.end()
-  return search->second;
+/**
+ * Gets a vector of columns in this table, whose column headers(synonyms) are in the target synonym list.
+ * Order of columns will be kept the same as the target synonym list.
+ *
+ * @return Vector of columns which are vectors of Entity*
+ */
+std::vector<std::vector<Entity*>> QueryEvaluatorTable::GetResults() {
+  std::vector<std::vector<Entity *>> target_table;
+  for (auto synonym : target_synonym_list) {
+    if (synonym_to_entity_map.count(synonym) > 0) {
+      std::vector<Entity*> column = synonym_to_entity_map.find(synonym)->second;
+      target_table.push_back(column);
+    }
+  }
+
+  return target_table;
+}
+
+std::vector<Synonym*> QueryEvaluatorTable::GetTargetSynonymList() {
+  return target_synonym_list;
 }
 
 QueryEvaluatorTable::QueryEvaluatorTable(Synonym *target) {
@@ -107,4 +123,3 @@ QueryEvaluatorTable::QueryEvaluatorTable(std::vector<Synonym *> target_list) {
   target_synonym = target_list[0];
   target_synonym_list = target_list;
 }
-

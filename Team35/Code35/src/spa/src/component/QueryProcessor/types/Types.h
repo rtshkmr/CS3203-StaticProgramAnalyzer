@@ -123,6 +123,7 @@ class Synonym {
   DesignEntity GetType() { return type; };
   Attribute GetAttribute() { return return_attribute; };
   void SetAttribute(Attribute attr) { return_attribute = attr; };
+  bool operator==(const Synonym& other) const;
 };
 
 struct Clause {
