@@ -114,20 +114,24 @@ class Synonym {
  private:
   std::string name;
   DesignEntity type;
-  // Attribute return_attribute;
+  Attribute return_attribute = Attribute::kStmtNumber;
  public:
   Synonym() {};
   Synonym(std::string name, DesignEntity type) : name(name), type(type) {};
+  Synonym(std::string name, DesignEntity type, Attribute attr) : name(name), type(type), return_attribute(attr) {};
   std::string GetName() { return name; };
   DesignEntity GetType() { return type; };
+  Attribute GetAttribute() { return return_attribute; };
+  void SetAttribute(Attribute attr) { return_attribute = attr; };
   bool operator==(const Synonym& other) const;
 };
 
 struct Clause {
   std::string left_hand_side;
   std::string right_hand_side;
-  Synonym *first_synonym;
-  Synonym *second_synonym;
+  virtual std::vector<std::string> GetAllSynonymNamesOfClause() { return {}; };
+  Synonym first_synonym;
+  Synonym second_synonym;
   virtual std::string getType() { return ""; };
   virtual bool isEqual(Clause toObj) { return 1; };
   virtual ~Clause() {};
