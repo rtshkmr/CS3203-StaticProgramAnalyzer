@@ -49,7 +49,7 @@ class Block : public Cluster {
   Block() {};
   ~Block();
   static Block* GetNewExitBlock();
-  bool IsExitBlock(Block* block);
+  static bool IsExitBlock(Block* block);
 
   bool isWhile = false;
   std::set<Block*> next_blocks_ = {};

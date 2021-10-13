@@ -117,7 +117,9 @@ void PSubsystem::CloseProcedureBlock() {
 
     // put the block root into the
     Cluster*outermost_cluster = cluster_stack_.top();
-    outermost_cluster->AddChildCluster(procedure_block);
+    if(!Block::IsExitBlock(procedure_block)) {
+      outermost_cluster->AddChildCluster(procedure_block);
+    }
     cluster_stack_.pop(); // cluster_stack is now empty since the Procedure has been closed.
     bool last_popped_equals_cluster_root = outermost_cluster == assigned_cluster_root;
     assert(last_popped_equals_cluster_root);
