@@ -119,6 +119,7 @@ void PSubsystem::CloseProcedureBlock() {
     cluster_stack_.pop(); // cluster_stack is now empty since the Procedure has been closed.
     bool last_popped_equals_cluster_root = ready_cluster == assigned_cluster_root;
     assert(last_popped_equals_cluster_root);
+    ready_cluster->UpdateClusterRange();
   }
 }
 
@@ -146,8 +147,14 @@ void PSubsystem::CloseElseBlock() {
       if_cluster->AddChildCluster(if_cond_block);
       if_cluster->AddChildCluster(if_body_block);
       if_cluster->AddChildCluster(else_body_block);
+      if_cluster->UpdateClusterRange();
+    } else {
+//      if_cluster->AddChildCluster(if_cond_block);
+      if_cluster->nested_clusters_.push_front(if_cond_block);
+      if_cond_block->SetParentCluster(if_cluster);
+      if_cluster->UpdateClusterRange();
+      int x = 1;
     }
-
     cluster_stack_.pop(); // pops out the if_cluster
     assert(!cluster_stack_.empty());
     Cluster* outer_cluster = cluster_stack_.top();
@@ -178,6 +185,7 @@ void PSubsystem::CloseWhileBlock() {
   assert(!cluster_stack_.empty());
   Cluster* outer_cluster = cluster_stack_.top();
   outer_cluster->AddChildCluster(while_cluster);
+  outer_cluster->UpdateClusterRange();
 }
 
 void PSubsystem::ProcessOuterParentNode() {

@@ -17,8 +17,6 @@ int Cluster::size() const {
 void Cluster::AddChildCluster(Cluster* new_nested_cluster) {
   this->nested_clusters_.push_back(new_nested_cluster);
   new_nested_cluster->SetParentCluster(this);
-//  this->UpdateParentClusterRange(new_nested_cluster);
-
 }
 
 void Cluster::AddStmt(StatementNumber statement_number) {
@@ -115,19 +113,28 @@ void Cluster::AddSiblingCluster(Cluster* new_sibling_cluster) {
 }
 
 /**
- * When a new_nested_cluster is added to a parent cluster, the parent cluster's range of values for statements, [start_, end_]
+ * When a nested_cluster is added to a parent cluster, the parent cluster's range of values for statements, [start_, end_]
  * needs to be updated with logic similar to AddSmt to reflect the range expanded by the child.
- * @param new_nested_cluster
+ * @param nested_cluster
  */
-void Cluster::UpdateParentClusterRange(Cluster* new_nested_cluster) {
-  int new_cluster_start = new_nested_cluster->start_;
-  int new_cluster_end = new_nested_cluster->end_;
+void Cluster::UpdateClusterRangeViaNestedCluster(Cluster* nested_cluster) {
+  int new_cluster_start = nested_cluster->start_;
+  int new_cluster_end = nested_cluster->end_;
   assert(new_cluster_start <= new_cluster_end
              && new_cluster_start >= -1 && new_cluster_end >= -1);
   if(this->start_ == new_cluster_start && this->end_ == new_cluster_end) return;
-  if (this->start_ == end_ && this->start_ == -1) { //new cluster, doesn't have any nested clusters yet
-    this->start_ = new_cluster_start;
-    this->end_ = new_cluster_end;
+  bool this_cluster_range_is_unassigned = this->start_ == end_ && this->start_ == -1;
+  if (this_cluster_range_is_unassigned) {
+    bool this_has_nested_clusters = !this->nested_clusters_.empty();
+    if(this_has_nested_clusters){
+      int start_of_first_nested_cluster = this->nested_clusters_.front()->start_;
+      int end_of_last_nested_cluster = this->nested_clusters_.back()->end_;
+      this->start_ = start_of_first_nested_cluster;
+      this->end_ = end_of_last_nested_cluster;
+    } else { // set the range to be same as the incoming:
+      this->start_ = new_cluster_start;
+      this->end_ = new_cluster_end;
+    }
   } else { // there are nested clusters within, assume the start and end range already updated
     bool new_cluster_appears_before_this = new_cluster_end == this->start_ - 1;
     bool new_cluster_appears_after_this = new_cluster_start == this->end_ + 1;
@@ -136,12 +143,23 @@ void Cluster::UpdateParentClusterRange(Cluster* new_nested_cluster) {
     } else if (new_cluster_appears_after_this) {
       this->end_ = new_cluster_end;
     } else {
-      throw std::invalid_argument("[UpdateParentClusterRange] An input is only valid if statement numbers are continuous with existing ones");
+      throw std::invalid_argument("[UpdateClusterRange] An input is only valid if statement numbers are continuous with existing ones");
     }
   }
 }
 std::pair<int, int> Cluster::GetStartEndRange() {
   return std::pair<int, int>(this->start_, this->end_);
+}
+void Cluster::UpdateClusterRange() {
+  if(nested_clusters_.size() == 0) return;
+  Cluster* finalised_parent_cluster = this;
+  for(auto nested_cluster : finalised_parent_cluster->nested_clusters_) {
+    nested_cluster->UpdateClusterRange();
+    bool nested_cluster_range_already_considered = this->start_ <= nested_cluster->start_ && this->end_ >= nested_cluster->end_;
+    if(!nested_cluster_range_already_considered) {
+      finalised_parent_cluster->UpdateClusterRangeViaNestedCluster(nested_cluster);
+    }
+  }
 }
 
 // default destructors:

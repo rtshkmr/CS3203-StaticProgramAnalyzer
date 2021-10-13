@@ -13,8 +13,6 @@ class Block;
 
 class Cluster {
 
- private:
-  std::list<Cluster*> nested_clusters_;
  protected:
   int start_ = -1;
   int end_ = -1;
@@ -24,7 +22,8 @@ class Cluster {
   int size() const;
   std::pair<int, int> GetStartEndRange();
   void AddChildCluster(Cluster* new_nested_cluster);
-  void UpdateParentClusterRange(Cluster* new_nested_cluster);
+  void UpdateClusterRangeViaNestedCluster(Cluster* nested_cluster);
+  void UpdateClusterRange();
   void AddSiblingCluster(Cluster* new_sibling_cluster);
   void AddStmt(StatementNumber statement_number);
   void RemoveStmt(StatementNumber statement_number);
@@ -35,6 +34,7 @@ class Cluster {
   void SetParentCluster(Cluster* parent_cluster);
   /// ISSUE 2: to use dynamic_cast, need a virtual method; suggesstion -> create a virtual destructor (good practice too)
   virtual ~Cluster();
+  std::list<Cluster*> nested_clusters_;
 };
 
 class Block : public Cluster {
