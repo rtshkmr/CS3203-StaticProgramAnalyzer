@@ -17,9 +17,9 @@ std::vector<std::string> QueryProjector::FormatQuery(UnformattedQueryResult unfo
   for (int i = 0; i < target_synonym_list.size(); i++ ) {
     Synonym* current_synonym = target_synonym_list[i];
     for (QueryEvaluatorTable* table : table_references) {
-      if (table->ContainsColumn(current_synonym->GetName())) {
-        // need to change : Need to change this code for BOOLEAN and tuple cases.
-        results = table->GetResults();
+      if (table->ContainsColumn(current_synonym)) {
+        // TODO: need to retrieve string values from the table to be formatted from Entity * to string
+        // results = table->GetResults();
       }
     }
   }

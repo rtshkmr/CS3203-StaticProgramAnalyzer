@@ -19,12 +19,10 @@ UnformattedQueryResult QueryEvaluator::EvaluateQuery(const std::vector<Group>& l
       // Evaluate non-boolean group
       Synonym first_target_synonym = current_group.GetTargetSynonyms()[0];
       // TODO: Check if this table creation is correct??
-//      QueryEvaluatorTable *table = new QueryEvaluatorTable(&first_target_synonym);
-      QueryEvaluatorTable *table = new QueryEvaluatorTable("Temp");
+      QueryEvaluatorTable *table = new QueryEvaluatorTable(&first_target_synonym);
       DesignEntity de = first_target_synonym.GetType();
 
-      // TODO:
-      //      table->AddTargetSynonymValues(pkb->GetDesignEntity(de));
+      table->AddTargetSynonymValues(pkb->GetDesignEntities(de));
       ProcessGroup(table, current_group);
       unformatted_result.AddTable(table);
     } else {
@@ -49,9 +47,8 @@ UnformattedQueryResult QueryEvaluator::EvaluateQuery(const std::vector<Group>& l
  * @param group
  */
 void QueryEvaluator::ProcessGroup(QueryEvaluatorTable *table, Group group) {
-//  ClauseCommandInvoker clause_command_invoker = ClauseCommandInvoker();
-//  ClauseCommandExecutor *clause_command_executor = new ClauseCommandExecutor(table, pkb);
 
+//  ClauseCommandExecutor *clause_command_executor = new ClauseCommandExecutor(table, pkb);
 //  for (Clause* current_clause: group.GetClauses()) {
 //    ClauseContext context = ClauseContext(table);
 //    if (typeid(* current_clause) == typeid(SuchThat)) {
@@ -90,9 +87,9 @@ void QueryEvaluator::PreprocessBooleanGroup(Group group) {
   if (typeid(* firstClause) == typeid(SuchThat)) {
     auto* st = dynamic_cast<SuchThat*>(firstClause);
     if (st->left_is_synonym) {
-      main_synonym = st->first_synonym;
+      main_synonym = &st->first_synonym;
     } else if (st->right_is_synonym) {
-      main_synonym = st->second_synonym;
+      main_synonym = &st->second_synonym;
     } else {
       // If no synonym, no need for a table. Also, should be in a group of size 1.
       // TODO: add function for no syn
@@ -101,7 +98,7 @@ void QueryEvaluator::PreprocessBooleanGroup(Group group) {
     }
   } else if (typeid(* firstClause) == typeid(Pattern)) {
     auto* pattern = dynamic_cast<Pattern*>(firstClause);
-    main_synonym = pattern->first_synonym;
+    main_synonym = &pattern->first_synonym;
   } else {
     // No code should run here for iter 1 since there is only such that and pattern clause.
   }
