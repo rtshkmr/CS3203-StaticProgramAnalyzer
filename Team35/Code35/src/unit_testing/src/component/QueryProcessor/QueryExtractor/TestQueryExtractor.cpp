@@ -26,7 +26,6 @@ bool AreGroupsEqual(Group* g1, Group* g2) {
 }
 
 // Queries without 'such that' and 'pattern'
-
 TEST_CASE("3.QueryExtractor.Extract single synonym + select declared synonym; should PASS") {
   std::string query = "assign a1; Select a1";
 
@@ -119,19 +118,56 @@ TEST_CASE("3.QueryExtractor.Extract multiple unique synonym + select undeclared 
   REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(), Catch::Contains("Incorrect target synonym"));
 }
 
-// Temporarily commented out due to change in QueryParser.cpp (lines 183 to 188)
-//// Queries with 1 'such that'
-//TEST_CASE("3.QueryExtractor.Single malformed such that with typo; should FAIL") {
-//  std::string query = "assign a; while w; Select a Such that Follows (w, a)";
-//  auto query_extractor = QueryExtractor(&query);
-//  REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(), Catch::Contains("Incorrect query."));
-//}
-//
-//TEST_CASE("3.QueryExtractor.Single malformed such that with extra delimiters; should FAIL") {
-//  std::string query = "assign a; while w; Select a such  that Follows (w, a)";
-//  auto query_extractor = QueryExtractor(&query);
-//  REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(), Catch::Contains("Incorrect query."));
-//}
+TEST_CASE("3.QueryExtractor.Extract multiple synonyms + select BOOLEAN; should PASS") {
+  std::string query = "assign a1, a2, a3, a4, a5; Select BOOLEAN";
+
+  auto query_extractor = QueryExtractor(& query);
+  query_extractor.ExtractQuery();
+  std::list<Synonym*> synonyms = query_extractor.GetSynonymsList();
+  std::vector<Group*> groups = query_extractor.GetGroupsList();
+  std::vector<Synonym*> target_synonyms = query_extractor.GetTargetSynonymsList();
+
+  // we have already tested that parsing of declaration synonyms works, so focus on checking target_synonyms_list
+  REQUIRE(synonyms.size() == 5);
+  REQUIRE(groups.size() == 0);
+  REQUIRE(target_synonyms.size() == 0);
+}
+
+TEST_CASE("3.QueryExtractor.Extract multiple synonyms + select tuple of declared synonyms; should PASS") {
+  std::string query = "assign a1, a2, a3, a4, a5; Select <a2, a1, a3, a4, a5>";
+
+  auto query_extractor = QueryExtractor(& query);
+  query_extractor.ExtractQuery();
+  std::list<Synonym*> synonyms = query_extractor.GetSynonymsList();
+  std::vector<Group*> groups = query_extractor.GetGroupsList();
+  std::vector<Synonym*> target_synonyms = query_extractor.GetTargetSynonymsList();
+
+  // we have already tested that parsing of declaration synonyms works, so focus on checking target_synonyms_list
+  REQUIRE(synonyms.size() == 5);
+  REQUIRE(groups.size() == 0);
+
+  std::vector<Synonym*> expected_target_synonyms = {new Synonym("a2", DesignEntity::kAssign),
+                                                    new Synonym("a1", DesignEntity::kAssign),
+                                                    new Synonym("a3", DesignEntity::kAssign),
+                                                    new Synonym("a4", DesignEntity::kAssign),
+                                                    new Synonym("a5", DesignEntity::kAssign)};
+  REQUIRE(target_synonyms.size() == 5);
+  for (int i = 0; i < expected_target_synonyms.size(); i++) {
+    REQUIRE(AreSynonymsEqual(*target_synonyms[i], *expected_target_synonyms[i]));
+  }
+}
+
+TEST_CASE("3.QueryExtractor.Single malformed such that with typo; should FAIL") {
+  std::string query = "assign a; while w; Select a Such that Follows (w, a)";
+  auto query_extractor = QueryExtractor(&query);
+  REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(), Catch::Contains("Incorrect query."));
+}
+
+TEST_CASE("3.QueryExtractor.Single malformed such that with extra delimiters; should FAIL") {
+  std::string query = "assign a; while w; Select a such  that Follows (w, a)";
+  auto query_extractor = QueryExtractor(&query);
+  REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(), Catch::Contains("Incorrect query."));
+}
 
 TEST_CASE("3.QueryExtractor.Single well-formed such that with incorrect relRef; should FAIL") {
   std::string query = "assign a; while w; Select a such that Foll0ws (w, a)";
