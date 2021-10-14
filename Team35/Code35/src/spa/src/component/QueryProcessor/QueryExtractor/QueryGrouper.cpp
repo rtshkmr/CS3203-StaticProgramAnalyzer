@@ -92,9 +92,7 @@ void QueryGrouper::DfsFromSynonym(std::unordered_map<std::string, Synonym*>* tgt
       g->AddClauseToVector(clauses->at(cl_idx));
     }
   }
-  if (g->GetClauses().size() > 0) {
-    groups->push_back(g);
-  }
+  groups->push_back(g);
   // populate group's metadata
   QueryGrouper::UpdateGroupMetadata(g, &tgt_synonyms_in_this_group, tgt_synonyms_map);
 }

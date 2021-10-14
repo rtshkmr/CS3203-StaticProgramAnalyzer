@@ -39,6 +39,9 @@ TEST_CASE("3.QueryExtractor.Extract single synonym + select declared synonym; sh
   std::list<Synonym> expected_synonyms = {Synonym("a1", DesignEntity::kAssign)};
   Synonym expected_target = Synonym("a1", DesignEntity::kAssign);
   std::vector<Group*> expected_groups;
+  std::vector<Clause*> no_clauses;
+  Group g = Group(no_clauses, true);
+  expected_groups.push_back(&g);
   REQUIRE(AreSynonymsEqual(expected_target, target));
   REQUIRE(expected_groups.size() == groups.size());
   auto it1 = expected_synonyms.begin();
@@ -63,6 +66,9 @@ TEST_CASE("3.QueryExtractor.Extract multiple synonym + select declared synonym; 
                                           Synonym("c", DesignEntity::kAssign)};
   Synonym expected_target = Synonym("a", DesignEntity::kAssign);
   std::vector<Group*> expected_groups;
+  std::vector<Clause*> no_clauses;
+  Group g = Group(no_clauses, true);
+  expected_groups.push_back(&g);
   REQUIRE(AreSynonymsEqual(expected_target, target));
   REQUIRE(expected_groups.size() == groups.size());
   auto it1 = expected_synonyms.begin();
@@ -93,6 +99,9 @@ TEST_CASE("3.QueryExtractor.Extract multiple unique synonym + select declared sy
                                           Synonym("p1", DesignEntity::kProcedure)};
   Synonym expected_target = Synonym("a1", DesignEntity::kAssign);
   std::vector<Group*> expected_groups;
+  std::vector<Clause*> no_clauses;
+  Group g = Group(no_clauses, true);
+  expected_groups.push_back(&g);
   REQUIRE(AreSynonymsEqual(expected_target, target));
   REQUIRE(expected_groups.size() == groups.size());
   auto it1 = expected_synonyms.begin();
@@ -365,10 +374,13 @@ TEST_CASE("3.QueryExtractor.Single well-formed UsesP or ModifiesP; should PASS")
     Synonym expected_target = Synonym("a", DesignEntity::kAssign);
     Clause* cl = new SuchThat("main", "x", RelRef::kUsesP, false, false);
     std::vector<Clause*> clauses;
+    std::vector<Clause*> empty_clauses;
     clauses.push_back(cl);
     std::vector<Group*> expected_groups;
-    Group expected_group = Group(clauses, false);
-    expected_groups.push_back(& expected_group);
+    Group expected_group_1 = Group(empty_clauses, true);
+    Group expected_group_2 = Group(clauses, false);
+    expected_groups.push_back(& expected_group_1);
+    expected_groups.push_back(& expected_group_2);
 
     // validate target
     REQUIRE(AreSynonymsEqual(expected_target, target));

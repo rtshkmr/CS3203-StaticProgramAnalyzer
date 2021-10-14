@@ -33,11 +33,14 @@ TEST_CASE("3.QueryGrouper.No and + multiple queries + common non-target synonym"
   auto query_extractor = QueryExtractor(& query);
   query_extractor.ExtractQuery();
   std::vector<Group*> groups = query_extractor.GetGroupsList();
-  // expecting 1 group with 4 clauses
-  REQUIRE(groups.size() == 1);
-  Group* g = Get(&groups, 0);
-  REQUIRE(g->GetClauses().size() == 4);
-  REQUIRE(g->ContainsTargetSynonym() == false);
+  // expecting 2 groups, 1 is an empty group for tgt syn a2, the other is the boolean group with 4 clauses
+  REQUIRE(groups.size() == 2);
+  Group* g1 = Get(&groups, 0);
+  Group* g2 = Get(&groups, 1);
+  REQUIRE(g1->GetClauses().size() == 0);
+  REQUIRE(g1->ContainsTargetSynonym());
+  REQUIRE(g2->GetClauses().size() == 4);
+  REQUIRE(g2->ContainsTargetSynonym() == false);
 }
 
 TEST_CASE("3.QueryGrouper.No and + multiple queries + common target & non-target synonym") {
