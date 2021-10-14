@@ -14,8 +14,13 @@ int Cluster::size() const {
  * Adds a new cluster to list of clusters within it.
  * @param new_nested_cluster
  */
-void Cluster::AddChildCluster(Cluster* new_nested_cluster) {
+void Cluster::AddChildClusterToBack(Cluster* new_nested_cluster) {
   this->nested_clusters_.push_back(new_nested_cluster);
+  new_nested_cluster->SetParentCluster(this);
+}
+
+void Cluster::AddChildClusterToFront(Cluster* new_nested_cluster) {
+  this->nested_clusters_.push_front(new_nested_cluster);
   new_nested_cluster->SetParentCluster(this);
 }
 
@@ -98,7 +103,7 @@ void Cluster::AddSiblingCluster(Cluster* new_sibling_cluster) {
   if (parent_cluster_ == nullptr) { // the outermost cluster can't have any siblings
     throw std::invalid_argument("The outermost cluster (representing a procedure) should never have any siblings");
   }
-  parent_cluster_->AddChildCluster(new_sibling_cluster);
+  parent_cluster_->AddChildClusterToBack(new_sibling_cluster);
 }
 
 /**
@@ -152,6 +157,7 @@ void Cluster::UpdateClusterRange() {
     }
   }
 }
+
 
 // default destructors:
 Cluster::~Cluster() = default;

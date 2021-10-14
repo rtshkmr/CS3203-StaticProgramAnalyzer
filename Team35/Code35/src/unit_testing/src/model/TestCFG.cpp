@@ -63,11 +63,11 @@ TEST_CASE("1.CFG.Block.Linkage") {
 
 TEST_CASE("1.CFG.Cluster") {
   SECTION("Basic class hierarchies") {
-    SECTION("AddChildCluster and AddSiblingCluster functions"){
+    SECTION("AddChildClusterToBack and AddSiblingCluster functions"){
       Cluster* outer_cluster = new Cluster();
       Cluster* child_cluster = new Cluster();
       Cluster* sibling_cluster = new Cluster();
-      outer_cluster->AddChildCluster(child_cluster);
+      outer_cluster->AddChildClusterToBack(child_cluster);
       REQUIRE(child_cluster->GetParentCluster() == outer_cluster); // auto links to parent
       child_cluster->AddSiblingCluster(sibling_cluster);
       REQUIRE(sibling_cluster->GetParentCluster() == outer_cluster); // auto links to parent
