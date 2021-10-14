@@ -7,9 +7,6 @@ class ClauseCommand {
   protected:
     ClauseCommandExecutor *executor;
   public:
-    virtual ~ClauseCommand() {
-      delete this->executor;
-    };
     virtual void SetExecutor(ClauseCommandExecutor *executor) = 0;
     virtual void Execute(Clause *clause) = 0;
 };

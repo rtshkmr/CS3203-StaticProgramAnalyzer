@@ -18,7 +18,7 @@ class QueryEvaluatorTable {
     QueryEvaluatorTable(std::vector<Synonym *> target_list);
 
     // Add target synonym column with values to table
-    bool AddTargetSynonymValues(std::vector<Entity *> entity_list);
+    bool AddTargetSynonymValues(Synonym *target, std::vector<Entity *> entity_list);
     // Add column to table
     bool AddColumn(Synonym *synonym);
     bool ContainsColumn(Synonym *synonym);
@@ -47,7 +47,6 @@ class QueryEvaluatorTable {
 
   private:
     std::unordered_map<Synonym *, std::vector<Entity *>> synonym_to_entity_map;
-    Synonym *target_synonym;
     std::vector<Synonym *> target_synonym_list;
 
 };

@@ -19,13 +19,13 @@ UnformattedQueryResult QueryEvaluator::EvaluateQuery(std::vector<Group *> list_o
   for (Group *current_group : list_of_groups) {
     if (current_group->ContainsTargetSynonym()) {
       // Evaluate non-boolean group
-      Synonym first_target_synonym = *current_group->GetTargetSynonyms()[0];
+      Synonym *first_target_synonym = current_group->GetTargetSynonyms()[0];
       // TODO: Check if this table creation is correct??
-      QueryEvaluatorTable *table = new QueryEvaluatorTable(&first_target_synonym);
-      DesignEntity de = first_target_synonym.GetType();
+      QueryEvaluatorTable *table = new QueryEvaluatorTable(first_target_synonym);
+      DesignEntity de = first_target_synonym->GetType();
 
-      table->AddTargetSynonymValues(pkb->GetDesignEntities(de));
-      ProcessGroup(table, *current_group);
+      table->AddTargetSynonymValues(first_target_synonym, pkb->GetDesignEntities(de));
+      ProcessGroup(table, current_group);
       unformatted_result.AddTable(table);
     } else {
       // Evaluate boolean group
@@ -48,9 +48,9 @@ UnformattedQueryResult QueryEvaluator::EvaluateQuery(std::vector<Group *> list_o
  * @param table
  * @param group
  */
-void QueryEvaluator::ProcessGroup(QueryEvaluatorTable *table, Group group) {
+void QueryEvaluator::ProcessGroup(QueryEvaluatorTable *table, Group *group) {
 
-  for (Clause* current_clause: group.GetClauses()) {
+  for (Clause* current_clause: group->GetClauses()) {
     ClauseContext clause_context = ClauseContext(table);
     std::tuple<PKBQueryCommand*, ClauseCommand*> commands = clause_context.ProcessClause(current_clause);
     PKBQueryCommand *query_command = std::get<0>(commands);
@@ -104,8 +104,8 @@ void QueryEvaluator::PreprocessBooleanGroup(Group group) {
 
   if (main_synonym != nullptr) {
     QueryEvaluatorTable current_table(main_synonym);
-    current_table.AddTargetSynonymValues(pkb->GetDesignEntities(main_synonym->GetType()));
-    ProcessGroup(&current_table, group);
+    current_table.AddTargetSynonymValues(main_synonym, pkb->GetDesignEntities(main_synonym->GetType()));
+    ProcessGroup(&current_table, &group);
     if (current_table.GetResults().empty()) {
       boolean_result = false;
     }

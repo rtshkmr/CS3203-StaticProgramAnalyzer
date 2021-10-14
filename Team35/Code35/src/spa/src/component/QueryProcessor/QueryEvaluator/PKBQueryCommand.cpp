@@ -137,15 +137,42 @@ IntermediateTable *PKBQueryReceiver::QueryPKBByValueForBoolean(PKBRelRefs rel, s
 }
 
 // Returns true if the relationship holds for the 2 given values (no wildcards)
+// Such that uses(3, "x")
+// Follows stmt
+/// Follows* stmt
 IntermediateTable *
 PKBQueryReceiver::QueryPKBByValueForBoolean(PKBRelRefs rel, std::string first_value, std::string second_value) {
   IntermediateTable *table = new IntermediateTable();
   std::vector<Entity *> list = pkb->GetRelationship(rel, first_value);
+
   bool has_value;
   // TODO: Need PKB support
-//  for (auto entity : list) {
-//    if en
-//  }
+  for (auto entity : list) {
+    if (auto statement = dynamic_cast<Statement *>(entity)) {
+      int curr_stmt_number = statement->GetStatementNumber()->GetNum();
+      has_value = std::to_string(curr_stmt_number) == second_value;
+      if (has_value) break;
+    } else if (auto variable = dynamic_cast<Variable *>(entity)) {
+      std::string value = const_cast<VariableName*>(variable->GetName())->getName();
+      if (value == second_value) {
+        has_value = true;
+        break;
+      }
+    } else if (auto constant = dynamic_cast<Constant *>(entity)) {
+      int const_value = const_cast<ConstantValue*>(constant->GetValue())->Get();
+      if (std::to_string(const_value) == second_value) {
+        has_value = true;
+        break;
+      }
+    } else if (auto procedure = dynamic_cast<Procedure *>(entity)) {
+      std::string procedure_value = const_cast<ProcedureName *>(procedure->GetName())->getName();
+      if (procedure_value == second_value) {
+        has_value = true;
+        break;
+      }
+    }
+  }
+  table->InsertData(has_value);
   return table;
 }
 

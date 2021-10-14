@@ -17,9 +17,6 @@ class ClauseContext {
   private:
     QueryEvaluatorTable *group_table;
   public:
-    ~ ClauseContext() {
-      delete this->group_table;
-    }
     ClauseContext(QueryEvaluatorTable *table);
     std::tuple<PKBQueryCommand *, ClauseCommand *> ProcessClause(Clause *clause);
 };

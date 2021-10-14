@@ -23,7 +23,7 @@ class QueryEvaluator {
     PKB *pkb;
     bool boolean_result;
 
-    void ProcessGroup(QueryEvaluatorTable *table, Group group);
+    void ProcessGroup(QueryEvaluatorTable *table, Group *group);
     void PreprocessBooleanGroup(Group group);
     bool ProcessSingleClauseBooleanGroup(Group group);
 };

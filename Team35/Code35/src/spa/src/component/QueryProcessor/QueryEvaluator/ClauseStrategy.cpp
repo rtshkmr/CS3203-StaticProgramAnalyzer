@@ -13,7 +13,7 @@ ClauseContext::ClauseContext(QueryEvaluatorTable *table) : group_table(table){}
  */
 std::tuple<PKBQueryCommand *, ClauseCommand *> ClauseContext::ProcessClause(Clause *clause) {
   ClauseStrategy *strategy;
-  if (typeid(clause) == typeid(SuchThat*)) {
+  if (typeid(*clause) == typeid(SuchThat)) {
     strategy = new SuchThatStrategy();
   } else {
     strategy = new PatternStrategy();

@@ -49,7 +49,7 @@ class PKB {
 
   // Check if relationship exists
   bool HasRelationship(PKBRelRefs);
-  // todo: implement HasRelationship with entity specification
+  // todo: implement HasRelationship with entity specification; Max's comment: I might not need this...
   bool HasRelationship(PKBRelRefs, DesignEntity, DesignEntity);
 
   // Constructor

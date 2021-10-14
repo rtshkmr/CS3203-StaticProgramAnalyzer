@@ -21,9 +21,6 @@ class ClauseCommandExecutor {
     bool HasExpressionMatch(Pattern *pattern , AssignEntity *assign_entity);
   public:
     ClauseCommandExecutor(QueryEvaluatorTable *table, IntermediateTable *intermediate_table);
-    ~ClauseCommandExecutor() {
-      delete this->group_table;
-    }
     void SuchThatTwoSynonym(Clause *clause);
     void PatternTwoSynonym(Clause *clause);
     void SuchThatTwoSynonymOneInTable(Clause *clause, bool first_syn_in);
