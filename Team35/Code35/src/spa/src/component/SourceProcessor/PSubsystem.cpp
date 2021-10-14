@@ -121,10 +121,12 @@ void PSubsystem::CloseElseBlock() {
     Block* if_body_block = block_stack_.top();
     block_stack_.pop(); //pop the if_body block
 
+    Block* if_cond_block = block_stack_.top();
+
     if (Block::IsExitBlock(else_body_block)) {
       Block* toInsert = nullptr;
-      Block* left = *block_stack_.top()->next_blocks_.begin();
-      Block* right = *block_stack_.top()->next_blocks_.rbegin();
+      Block* left = *if_cond_block->next_blocks_.begin();
+      Block* right = *if_cond_block->next_blocks_.rbegin();
       if (left->GetStartEndRange().first > right->GetStartEndRange().first) {
         toInsert = left;
       } else {
@@ -136,16 +138,18 @@ void PSubsystem::CloseElseBlock() {
         bb->next_blocks_.erase(else_body_block);
         bb->next_blocks_.insert(block_if_else_exit);
       }
-      else_body_block = toInsert;
+
+      if_cond_block->next_blocks_.insert(toInsert);
+
     } else {
       else_body_block->next_blocks_.insert(block_if_else_exit);
+      if_cond_block->next_blocks_.insert(else_body_block);
     }
-
 
     if (Block::IsExitBlock(if_body_block)) {
       Block* toInsert = nullptr;
-      Block* left = *block_stack_.top()->next_blocks_.begin();
-      Block* right = *block_stack_.top()->next_blocks_.rbegin();
+      Block* left = *if_cond_block->next_blocks_.begin();
+      Block* right = *if_cond_block->next_blocks_.rbegin();
       if (left->GetStartEndRange().first < right->GetStartEndRange().first) {
         toInsert = left;
       } else {
@@ -161,8 +165,9 @@ void PSubsystem::CloseElseBlock() {
       if_body_block->next_blocks_.insert(block_if_else_exit);
     }
 
-    Block* if_cond_block = block_stack_.top();
-    if_cond_block->next_blocks_.insert(else_body_block);
+
+    if_cond_block->UpdateClusterRange();
+
     block_stack_.pop(); //pop the if_cond block
     block_stack_.push(block_if_else_exit);
     bool is_currently_in_nested_cluster = cluster_stack_.size() > 1;
