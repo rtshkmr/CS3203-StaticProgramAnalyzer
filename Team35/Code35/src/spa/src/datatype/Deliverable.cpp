@@ -2,7 +2,6 @@
 
 void Deliverable::AddStatement(Statement* stmt) {
   stmt_list_.push_back(stmt);
-  stmt_num_hash_.insert({stmt->GetStatementNumber()->GetNum(), stmt});
 }
 
 void Deliverable::AddIfEntity(IfEntity* if_entity) {
