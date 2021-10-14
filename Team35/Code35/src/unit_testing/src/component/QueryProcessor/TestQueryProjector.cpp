@@ -4,7 +4,6 @@
 #include "component/QueryProcessor/QueryProjector.h"
 #include "../../../utils/EntityUtils.h"
 
-
 void AddColumn(QueryEvaluatorTable* table, Synonym* syn, std::vector<Entity*> entities) {
   for (int i = 0; i < entities.size(); ++i) {
     table->AddRow(syn, i, entities[i]);
@@ -135,13 +134,13 @@ TEST_CASE("3.QueryProjector.Cross product tables") {
 }
 
 TEST_CASE("3.QueryProjector.Reorder tables") {
-  std::vector<Synonym> desired_order = std::vector<Synonym>{
-      Synonym("b", DesignEntity::kVariable),
-      Synonym("f", DesignEntity::kVariable),
-      Synonym("a", DesignEntity::kAssign),
-      Synonym("d", DesignEntity::kIf),
-      Synonym("e", DesignEntity::kWhile),
-      Synonym("c", DesignEntity::kProcedure),
+  std::vector<Synonym*> desired_order = std::vector<Synonym*>{
+      new Synonym("b", DesignEntity::kVariable),
+      new Synonym("f", DesignEntity::kVariable),
+      new Synonym("a", DesignEntity::kAssign),
+      new Synonym("d", DesignEntity::kIf),
+      new Synonym("e", DesignEntity::kWhile),
+      new Synonym("c", DesignEntity::kProcedure),
   };
   std::list<Synonym*> current_order = std::list<Synonym*>{
       new Synonym("a", DesignEntity::kAssign),
@@ -199,7 +198,7 @@ TEST_CASE("3.QueryProjector.1 target synonym") {
     UnformattedQueryResult uqr = UnformattedQueryResult(true);
     uqr.AddTable(table1);
 
-    std::vector<Synonym> syn_list = std::vector<Synonym>{*target_syn1};
+    std::vector<Synonym*> syn_list = std::vector<Synonym*>{target_syn1};
     QueryProjector qp = QueryProjector(syn_list);
 
     std::vector<std::string> expected_values = std::vector<std::string>{};
@@ -254,7 +253,7 @@ TEST_CASE("3.QueryProjector.1 target synonym") {
     uqr.AddTable(table2);
     uqr.AddTable(table3);
 
-    std::vector<Synonym> target_syn_list = std::vector<Synonym>{*syn1};
+    std::vector<Synonym*> target_syn_list = std::vector<Synonym*>{syn1};
     QueryProjector qp = QueryProjector(target_syn_list);
 
     std::vector<std::string> expected_values = std::vector<std::string>{"1", "2", "3"};
@@ -268,7 +267,7 @@ TEST_CASE("3.QueryProjector.no target synonym") {
   SECTION("boolean false") {
     UnformattedQueryResult uqr = UnformattedQueryResult(false);
     Synonym* target_syn1 = new Synonym("a", DesignEntity::kIf);
-    std::vector<Synonym> syn_list = std::vector<Synonym>{*target_syn1};
+    std::vector<Synonym*> syn_list = std::vector<Synonym*>{target_syn1};
     QueryProjector qp = QueryProjector(syn_list);
 
     std::vector<std::string> expected_list = std::vector<std::string>{};
@@ -278,7 +277,7 @@ TEST_CASE("3.QueryProjector.no target synonym") {
 
   SECTION("BOOLEAN false") {
     UnformattedQueryResult uqr = UnformattedQueryResult(false);
-    std::vector<Synonym> syn_list = std::vector<Synonym>{};
+    std::vector<Synonym*> syn_list = std::vector<Synonym*>{};
     QueryProjector qp = QueryProjector(syn_list);
 
     std::vector<std::string> expected_list = std::vector<std::string>{"FALSE"};
@@ -288,7 +287,7 @@ TEST_CASE("3.QueryProjector.no target synonym") {
 
   SECTION("BOOLEAN true") {
     UnformattedQueryResult uqr = UnformattedQueryResult(true);
-    std::vector<Synonym> syn_list = std::vector<Synonym>{};
+    std::vector<Synonym*> syn_list = std::vector<Synonym*>{};
     QueryProjector qp = QueryProjector(syn_list);
 
     std::vector<std::string> expected_list = std::vector<std::string>{"TRUE"};
@@ -338,7 +337,7 @@ TEST_CASE("3.QueryProjector.multiple target synonym") {
     UnformattedQueryResult uqr = UnformattedQueryResult(true);
     uqr.AddTable(table1);
 
-    std::vector<Synonym> syn_list = std::vector<Synonym>{*syn2, *syn3};
+    std::vector<Synonym*> syn_list = std::vector<Synonym*>{syn2, syn3};
     QueryProjector qp = QueryProjector(syn_list);
 
     std::vector<std::string> expected_values = std::vector<std::string>{"x 4", "y 5", "z 6"};
@@ -405,7 +404,7 @@ TEST_CASE("3.QueryProjector.multiple target synonym") {
     uqr.AddTable(table2);
     uqr.AddTable(table3);
 
-    std::vector<Synonym> syn_list = std::vector<Synonym>{*syn4, *syn2, *syn3};
+    std::vector<Synonym*> syn_list = std::vector<Synonym*>{syn4, syn2, syn3};
     QueryProjector qp = QueryProjector(syn_list);
 
     std::vector<std::string> expected_values = std::vector<std::string>{
@@ -472,7 +471,7 @@ TEST_CASE("3.QueryProjector.multiple target synonym") {
     uqr.AddTable(table1);
     uqr.AddTable(table2);
 
-    std::vector<Synonym> syn_list = std::vector<Synonym>{*syn4, *syn3};
+    std::vector<Synonym*> syn_list = std::vector<Synonym*>{syn4, syn3};
     QueryProjector qp = QueryProjector(syn_list);
 
     std::vector<std::string> expected_values = std::vector<std::string>{
