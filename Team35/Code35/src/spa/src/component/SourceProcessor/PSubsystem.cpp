@@ -122,11 +122,45 @@ void PSubsystem::CloseElseBlock() {
     block_stack_.pop(); //pop the if_body block
 
     if (Block::IsExitBlock(else_body_block)) {
-      else_body_block = *block_stack_.top()->next_blocks_.rbegin();
+      Block* toInsert = nullptr;
+      Block* left = *block_stack_.top()->next_blocks_.begin();
+      Block* right = *block_stack_.top()->next_blocks_.rbegin();
+      if (left->GetStartEndRange().first > right->GetStartEndRange().first) {
+        toInsert = left;
+      } else {
+        toInsert = right;
+      }
+
+      //if it is empty, map it outwards.
+      for (auto* bb : toInsert->next_blocks_) {
+        bb->next_blocks_.erase(else_body_block);
+        bb->next_blocks_.insert(block_if_else_exit);
+      }
+      else_body_block = toInsert;
+    } else {
+      else_body_block->next_blocks_.insert(block_if_else_exit);
     }
 
-    else_body_block->next_blocks_.insert(block_if_else_exit); // else body block
-    if_body_block->next_blocks_.insert(block_if_else_exit);
+
+    if (Block::IsExitBlock(if_body_block)) {
+      Block* toInsert = nullptr;
+      Block* left = *block_stack_.top()->next_blocks_.begin();
+      Block* right = *block_stack_.top()->next_blocks_.rbegin();
+      if (left->GetStartEndRange().first < right->GetStartEndRange().first) {
+        toInsert = left;
+      } else {
+        toInsert = right;
+      }
+
+      //if it is empty, map it outwards.
+      for (auto* bb : toInsert->next_blocks_) {
+        bb->next_blocks_.erase(if_body_block);
+        bb->next_blocks_.insert(block_if_else_exit);
+      }
+    } else {
+      if_body_block->next_blocks_.insert(block_if_else_exit);
+    }
+
     Block* if_cond_block = block_stack_.top();
     if_cond_block->next_blocks_.insert(else_body_block);
     block_stack_.pop(); //pop the if_cond block
@@ -448,11 +482,6 @@ BodyBlock* PSubsystem::CreateBodyBlock(ConditionalBlock* conditional_block) {
 BodyBlock* PSubsystem::CreateBodyBlock() {
   Block* block_if_body = dynamic_cast<Block*>(block_stack_.top());
   block_stack_.pop(); //pop so that the if_cond can perform next_block map to else block
-
-  if (Block::IsExitBlock(block_if_body)) {
-    block_if_body = *block_stack_.top()->next_blocks_.begin();
-  }
-
   BodyBlock* block_else_body = new BodyBlock();
   Block* block_if_cond = block_stack_.top();
   block_if_cond->next_blocks_.insert(block_else_body);
