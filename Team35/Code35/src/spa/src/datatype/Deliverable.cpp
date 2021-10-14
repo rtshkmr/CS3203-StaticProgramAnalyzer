@@ -284,7 +284,7 @@ std::list<ConstantValue*>* Deliverable::GetConstantValueList() {
   return & const_list_;
 }
 
-std::list<Statement*>* Deliverable::GetStatementList() {
+std::vector<Statement*>* Deliverable::GetStatementList() {
   return & stmt_list_;
 }
 

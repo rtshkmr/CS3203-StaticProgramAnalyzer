@@ -41,7 +41,7 @@ class Deliverable {
   std::list<Procedure*>* GetProcList();
   std::list<Variable*>* GetVariableList();
   std::list<ConstantValue*>* GetConstantValueList();
-  std::list<Statement*>* GetStatementList();
+  std::vector<Statement*>* GetStatementList();
   std::list<IfEntity*>* GetIfList();
   std::list<WhileEntity*>* GetWhileList();
   std::list<AssignEntity*>* GetAssignList();
@@ -56,7 +56,7 @@ class Deliverable {
   std::list<Procedure*> proc_list_;
   std::list<Variable*> var_list_;
   std::list<ConstantValue*> const_list_;
-  std::list<Statement*> stmt_list_;
+  std::vector<Statement*> stmt_list_;
   std::list<IfEntity*> if_list_;
   std::list<WhileEntity*> while_list_;
   std::list<AssignEntity*> assign_list_;

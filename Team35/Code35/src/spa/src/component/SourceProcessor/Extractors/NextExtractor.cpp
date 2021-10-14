@@ -39,7 +39,7 @@ void NextExtractor::ExtractBlock(Block* block, std::vector<int>* visited_blocks)
   int start = range.first;
   if ((*visited_blocks)[start - 1] == 1) return;
 
-  std::list<Statement*> stmt_list = deliverable_->stmt_list_;
+  std::vector<Statement*> stmt_list = deliverable_->stmt_list_;
 
   Statement* start_statement = stmt_list[start - 1];
   for (int i = start + 1; i < range.second; ++i) {

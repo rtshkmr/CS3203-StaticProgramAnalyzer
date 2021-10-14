@@ -91,7 +91,7 @@ class PKB {
   void PopulateProcList(const std::list<Procedure*>& proc_list);
   void PopulateVarList(const std::list<Variable*>& var_list);
   void PopulateConstList(const std::list<ConstantValue*>& const_list);
-  void PopulateStmtList(const std::list<Statement*>& stmt_list);
+  void PopulateStmtList(const std::vector<Statement*> &stmt_list);
   void PopulateIfList(const std::list<IfEntity*>& if_list);
   void PopulateWhileList(const std::list<WhileEntity*>& while_list);
   void PopulateAssignList(const std::list<AssignEntity*>& assign_list);

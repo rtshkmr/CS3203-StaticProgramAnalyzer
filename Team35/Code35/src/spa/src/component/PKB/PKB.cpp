@@ -569,7 +569,7 @@ void PKB::PopulateConstList(const std::list<ConstantValue*>& const_list) {
  * @param stmt_list is a list of Statement pointers
  * @return
  */
-void PKB::PopulateStmtList(const std::list<Statement*>& stmt_list) {
+void PKB::PopulateStmtList(const std::vector<Statement*> &stmt_list) {
   stmt_table_ = std::list<std::string>();
   for (auto const& i: stmt_list) {
     auto* s_number = const_cast<StatementNumber*>(i->GetStatementNumber());
