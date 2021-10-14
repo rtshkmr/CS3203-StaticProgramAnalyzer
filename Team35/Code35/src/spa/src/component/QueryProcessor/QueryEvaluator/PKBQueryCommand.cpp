@@ -162,7 +162,7 @@ void QuerySuchThatTwoSynonymCommand::SetReceiver(PKBQueryReceiver *receiver) {
 IntermediateTable * QuerySuchThatTwoSynonymCommand::ExecuteQuery(Clause *clause) {
   auto* such_that = dynamic_cast<SuchThat *>(clause);
   PKBRelRefs pkb_rel= GetPKBRelRef(such_that->rel_ref, true);
-  return this->receiver->QueryPKBTwoSynonyms(pkb_rel, such_that->first_synonym.GetType(), such_that->second_synonym.GetType());
+  return this->receiver->QueryPKBTwoSynonyms(pkb_rel, such_that->first_synonym->GetType(), such_that->second_synonym->GetType());
 }
 
 

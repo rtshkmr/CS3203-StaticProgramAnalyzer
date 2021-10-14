@@ -2,7 +2,7 @@
 #include "component/QueryProcessor/QueryExtractor/QueryExtractor.h"
 #include "component/QueryProcessor/types/Types.h"
 
-Group* Get(std::list<Group*>* list, int index){
+Group* Get(std::vector<Group*>* list, int index){
   auto it = list->begin();
   for(int i=0; i<index; i++){
     ++it;
@@ -17,7 +17,7 @@ TEST_CASE("3.QueryGrouper.No and + multiple queries + common target synonym") {
 
   auto query_extractor = QueryExtractor(& query);
   query_extractor.ExtractQuery();
-  std::list<Group*> groups = query_extractor.GetGroupsList();
+  std::vector<Group*> groups = query_extractor.GetGroupsList();
   // expecting 1 group with 4 clauses
   REQUIRE(groups.size() == 1);
   Group* g = Get(&groups, 0);
@@ -32,7 +32,7 @@ TEST_CASE("3.QueryGrouper.No and + multiple queries + common non-target synonym"
 
   auto query_extractor = QueryExtractor(& query);
   query_extractor.ExtractQuery();
-  std::list<Group*> groups = query_extractor.GetGroupsList();
+  std::vector<Group*> groups = query_extractor.GetGroupsList();
   // expecting 1 group with 4 clauses
   REQUIRE(groups.size() == 1);
   Group* g = Get(&groups, 0);
@@ -47,7 +47,7 @@ TEST_CASE("3.QueryGrouper.No and + multiple queries + common target & non-target
 
   auto query_extractor = QueryExtractor(& query);
   query_extractor.ExtractQuery();
-  std::list<Group*> groups = query_extractor.GetGroupsList();
+  std::vector<Group*> groups = query_extractor.GetGroupsList();
   // expecting 2 groups with 2 clauses each
   REQUIRE(groups.size() == 2);
   Group* g1 = Get(&groups, 0);
@@ -64,7 +64,7 @@ TEST_CASE("3.QueryGrouper.And keyword + multiple queries rel & pattern") {
                       "such that Parent* (w2, a2) and Parent* (w1, w2)";
   auto query_extractor = QueryExtractor(& query);
   query_extractor.ExtractQuery();
-  std::list<Group*> groups = query_extractor.GetGroupsList();
+  std::vector<Group*> groups = query_extractor.GetGroupsList();
   // expecting 2 groups with 1 and 3 clauses respectively.
   REQUIRE(groups.size() == 2);
   Group* g1 = Get(&groups, 0);

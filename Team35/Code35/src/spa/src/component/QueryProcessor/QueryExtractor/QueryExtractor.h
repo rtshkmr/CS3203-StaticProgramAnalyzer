@@ -14,7 +14,7 @@
 class QueryExtractor {
  private:
   std::string query;
-  std::list<Group*> groups;
+  std::vector<Group*> groups;
   std::list<Synonym*> synonyms;
   std::vector<Synonym*> target_synonyms;
   std::unordered_map<std::string, DesignEntity> target_synonyms_map;
@@ -24,7 +24,7 @@ class QueryExtractor {
  public:
   explicit QueryExtractor(std::string* query) : query(* query) {};
   void ExtractQuery();
-  std::list<Group*> GetGroupsList() { return groups; };
+  std::vector<Group*> GetGroupsList() { return groups; };
   std::list<Synonym*> GetSynonymsList() { return synonyms; }; // TODO: deprecate or convert to private.
   std::vector<Synonym*> GetTargetSynonymsList() { return target_synonyms; };
 };

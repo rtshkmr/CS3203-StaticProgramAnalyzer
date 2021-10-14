@@ -35,8 +35,8 @@ SuchThatStrategy::DetermineClauseCommand(Clause *clause, QueryEvaluatorTable *ta
 
   if (such_that_clause->left_is_synonym && such_that_clause->right_is_synonym) {
     // Both are synonyms
-    Synonym *first_synonym = &such_that_clause->first_synonym;
-    Synonym *second_synonym = &such_that_clause->second_synonym;
+    Synonym *first_synonym = such_that_clause->first_synonym;
+    Synonym *second_synonym = such_that_clause->second_synonym;
     query_command = new QuerySuchThatTwoSynonymCommand(clause);
     if (table->ContainsColumn(first_synonym) && table->ContainsColumn(second_synonym)) {
       clause_command = new DoubleSynonymBothPresentCommand();
@@ -69,21 +69,21 @@ SuchThatStrategy::DetermineClauseCommand(Clause *clause, QueryEvaluatorTable *ta
 std::tuple<PKBQueryCommand *, ClauseCommand *>
 PatternStrategy::DetermineClauseCommand(Clause *clause, QueryEvaluatorTable *table) {
   auto* pattern_clause = dynamic_cast<Pattern*>(clause);
-  Synonym assign_synonym = pattern_clause->first_synonym;
+  Synonym* assign_synonym = pattern_clause->first_synonym;
   PKBQueryCommand *query_command = nullptr;
   ClauseCommand *clause_command = nullptr;
 
   if (pattern_clause->left_is_synonym) {
     // Case for 2 synonyms
-    Synonym variable_synonym = pattern_clause->second_synonym;
+    Synonym* variable_synonym = pattern_clause->second_synonym;
     query_command = new QueryPatternTwoSynonymCommand(clause);
-    if (table->ContainsColumn(&assign_synonym) && table->ContainsColumn(&variable_synonym)) {
+    if (table->ContainsColumn(assign_synonym) && table->ContainsColumn(variable_synonym)) {
       // Both synonym in table
       clause_command = new DoubleSynonymBothPresentCommand();
-    } else if (table->ContainsColumn(&assign_synonym)) {
+    } else if (table->ContainsColumn(assign_synonym)) {
       // Table only contains assign synonym
       clause_command = new DoubleSynonymSinglePresentCommand(true);
-    } else if (table->ContainsColumn(&variable_synonym)) {
+    } else if (table->ContainsColumn(variable_synonym)) {
       // Table only contains variable synonym
       clause_command = new DoubleSynonymSinglePresentCommand(false);
     } else {
@@ -92,7 +92,7 @@ PatternStrategy::DetermineClauseCommand(Clause *clause, QueryEvaluatorTable *tab
     }
   } else {
     query_command = new QueryPatternOneSynonymCommand(clause);
-    if (table->ContainsColumn(&assign_synonym)) {
+    if (table->ContainsColumn(assign_synonym)) {
       clause_command = new SingleSynonymPresentCommand(true);
     } else {
       // Technically this should never run
