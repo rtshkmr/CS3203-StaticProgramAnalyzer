@@ -13,8 +13,8 @@ void ClauseCommandExecutor::SuchThatTwoSynonym(Clause *clause) {
   auto *such_that_clause = dynamic_cast<SuchThat *>(clause);
   int delete_count = 0;
 
-  std::vector<Entity *> first_stmt_list = group_table->GetColumn(&such_that_clause->first_synonym);
-  std::vector<Entity *> second_stmt_list = group_table->GetColumn(&such_that_clause->second_synonym);
+  std::vector<Entity *> first_stmt_list = group_table->GetColumn(such_that_clause->first_synonym);
+  std::vector<Entity *> second_stmt_list = group_table->GetColumn(such_that_clause->second_synonym);
   std::vector<std::tuple<Entity *, Entity *>> intermediate_table = table->GetRelationshipsByType();
 
   for (int i = 0; i < first_stmt_list.size(); i++) {
@@ -43,8 +43,8 @@ void ClauseCommandExecutor::SuchThatTwoSynonym(Clause *clause) {
  */
 void ClauseCommandExecutor::PatternTwoSynonym(Clause *clause) {
   auto *pattern_clause = dynamic_cast<Pattern *>(clause);
-  Synonym *first_clause = &pattern_clause->first_synonym;
-  Synonym *second_clause = &pattern_clause->second_synonym;
+  Synonym *first_clause = pattern_clause->first_synonym;
+  Synonym *second_clause = pattern_clause->second_synonym;
 
   std::vector<Entity *> assign_stmt_list = group_table->GetColumn(first_clause);
   std::vector<Entity *> variable_list = group_table->GetColumn(second_clause);
@@ -74,8 +74,8 @@ void ClauseCommandExecutor::PatternTwoSynonym(Clause *clause) {
 
 void ClauseCommandExecutor::SuchThatTwoSynonymOneInTable(Clause *clause, bool first_syn_in) {
   auto *such_that_clause = dynamic_cast<SuchThat *>(clause);
-  Synonym *synonym_in_table = first_syn_in ? &such_that_clause->first_synonym : &such_that_clause->second_synonym;
-  Synonym *new_synonym = first_syn_in ? &such_that_clause->second_synonym : &such_that_clause->first_synonym;
+  Synonym *synonym_in_table = first_syn_in ? such_that_clause->first_synonym : such_that_clause->second_synonym;
+  Synonym *new_synonym = first_syn_in ? such_that_clause->second_synonym : such_that_clause->first_synonym;
 
   group_table->AddColumn(new_synonym); // Add a new column in the group_table first
 
@@ -124,8 +124,8 @@ void ClauseCommandExecutor::SuchThatTwoSynonymOneInTable(Clause *clause, bool fi
  */
 void ClauseCommandExecutor::PatternTwoSynonymOneInTable(Clause *clause, bool first_syn_in) {
   auto *pattern_clause = dynamic_cast<Pattern *>(clause);
-  Synonym *synonym_in_table = first_syn_in ? &pattern_clause->first_synonym : &pattern_clause->second_synonym;
-  Synonym *new_synonym = first_syn_in ? &pattern_clause->second_synonym : &pattern_clause->first_synonym;
+  Synonym *synonym_in_table = first_syn_in ? pattern_clause->first_synonym : pattern_clause->second_synonym;
+  Synonym *new_synonym = first_syn_in ? pattern_clause->second_synonym : pattern_clause->first_synonym;
 
   std::vector<Entity *> entity_list_in_table = group_table->GetColumn(synonym_in_table);
   std::vector<Entity *> intermediate_table = table->GetRelationships();
@@ -161,7 +161,7 @@ void ClauseCommandExecutor::PatternTwoSynonymOneInTable(Clause *clause, bool fir
 void ClauseCommandExecutor::SuchThatOneSynonym(Clause *clause, bool first_syn_in) {
   auto *such_that_clause = dynamic_cast<SuchThat *>(clause);
   std::vector<Entity *> entity_list_to_compare = table->GetRelationships();
-  Synonym *syn_in_table = first_syn_in ? &such_that_clause->first_synonym : &such_that_clause->second_synonym;
+  Synonym *syn_in_table = first_syn_in ? such_that_clause->first_synonym : such_that_clause->second_synonym;
   std::vector<Entity *> list_of_entity_in_table = group_table->GetColumn(syn_in_table);
   int delete_count = 0;
 
@@ -186,7 +186,7 @@ void ClauseCommandExecutor::SuchThatOneSynonym(Clause *clause, bool first_syn_in
 
 void ClauseCommandExecutor::PatternOneSynonym(Clause *clause) {
   auto *pattern_clause = dynamic_cast<Pattern *>(clause);
-  std::vector<Entity *> assign_entity_in_table = group_table->GetColumn(&pattern_clause->first_synonym);
+  std::vector<Entity *> assign_entity_in_table = group_table->GetColumn(pattern_clause->first_synonym);
   std::vector<Entity *> assign_entity_retrieved = table->GetRelationships();
   unsigned long table_size = assign_entity_in_table.size();
   int delete_count = 0;

@@ -124,14 +124,15 @@ class Synonym {
   DesignEntity GetType() { return type; };
   Attribute GetAttribute() { return return_attribute; };
   void SetAttribute(Attribute attr) { return_attribute = attr; };
+  bool operator==(const Synonym& other) const;
 };
 
 struct Clause {
   std::string left_hand_side;
   std::string right_hand_side;
   virtual std::vector<std::string> GetAllSynonymNamesOfClause() { return {}; };
-  Synonym first_synonym;
-  Synonym second_synonym;
+  Synonym* first_synonym;
+  Synonym* second_synonym;
   virtual std::string getType() { return ""; };
   virtual bool isEqual(Clause toObj) { return 1; };
   virtual ~Clause() {};
@@ -149,6 +150,12 @@ struct SuchThat : Clause {
     left_is_synonym = lhs_is_syn;
     right_is_synonym = rhs_is_syn;
   }
+  std::vector<std::string> GetAllSynonymNamesOfClause() {
+    std::vector<std::string> v;
+    if (left_is_synonym) v.push_back(left_hand_side);
+    if (right_is_synonym) v.push_back(right_hand_side);
+    return v;
+  };
   std::string getType() const { return typeid(this).name(); }
   bool isEqual(Clause* toObj) {
     if (this->getType() == toObj->getType()) {
@@ -171,13 +178,19 @@ struct Pattern : Clause {
   bool left_is_synonym;
   bool is_exact = false;
   Pattern() {};
-  Pattern(std::string lhs, std::string rhs, std::string assn_syn, bool lhs_is_syn, bool is_exact) {
+  Pattern(std::string lhs, std::string rhs, std::string assn_syn, bool lhs_is_syn, bool is_ext) {
     left_hand_side = lhs;
     right_hand_side = rhs;
     assign_synonym = assn_syn;
     left_is_synonym = lhs_is_syn;
-    is_exact = is_exact;
+    is_exact = is_ext;
   }
+  std::vector<std::string> GetAllSynonymNamesOfClause() {
+    std::vector<std::string> v;
+    if (left_is_synonym) v.push_back(left_hand_side);
+    v.push_back(assign_synonym);
+    return v;
+  };
   std::string getType() const { return typeid(this).name(); }
   bool isEqual(Clause* toObj) {
     if (this->getType() == toObj->getType()) {
@@ -199,16 +212,19 @@ class Group {
  private:
   std::vector<Synonym> target_synonyms;
   std::vector<Clause*> clauses;
-  bool has_target_synonym;
+  bool has_target_synonym = false;
  public:
+  Group() {};
   Group(std::vector<Clause*> clauses, bool has_target_synonym) :
       has_target_synonym(has_target_synonym), clauses(clauses) {};
   Group(std::vector<Clause*> clauses, bool has_target_synonym, std::vector<Synonym> target_synonyms) :
   has_target_synonym(has_target_synonym), clauses(clauses), target_synonyms(target_synonyms) {};
-  bool AddClauseToVector(Clause* clause);
+  void AddSynToTargetSyns(Synonym s);
+  void AddClauseToVector(Clause* clause);
   std::vector<Clause*> GetClauses();
   bool ContainsTargetSynonym();
   std::vector<Synonym> GetTargetSynonyms();
+  void UpdateHasTargetSynonymAttr();
 };
 
 #endif //AUTOTESTER_TYPES_H
