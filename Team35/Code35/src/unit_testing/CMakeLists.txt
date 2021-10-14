@@ -16,7 +16,7 @@ add_executable(unit_testing ${srcs}
         src/datatype/TestDeliverable.cpp utils/EntityUtils.h
         src/component/SourceProcessor/Extractors/TestUsesExtractor.cpp src/component/SourceProcessor/Extractors/TestModifiesExtractor.cpp
         src/component/SourceProcessor/Extractors/TestFollowsTExtractor.cpp src/component/SourceProcessor/Extractors/TestParentTExtractor.cpp
-        ../spa/src/exception/SyntaxException.h utils/EntityUtils.h src/util/TestCommonUtils.cpp src/model/TestEntity.cpp src/model/TestStatement.cpp src/datatype/TestConditionalExpression.cpp src/model/TestCFG.cpp)
+        ../spa/src/exception/SyntaxException.h utils/EntityUtils.h src/util/TestCommonUtils.cpp src/model/TestEntity.cpp src/model/TestStatement.cpp src/datatype/TestConditionalExpression.cpp src/model/TestCFG.cpp src/component/SourceProcessor/TestParser.cpp)
 
 target_link_libraries(unit_testing spa)
 SET(CMAKE_BUILD_TYPE Debug)
