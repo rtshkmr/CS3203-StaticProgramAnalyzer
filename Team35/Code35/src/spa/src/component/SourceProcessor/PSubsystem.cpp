@@ -100,7 +100,7 @@ void PSubsystem::CloseProcedureBlock() {
     assert(is_currently_in_outermost_cluster);
 
     // put the block root into the
-    Cluster*outermost_cluster = cluster_stack_.top();
+    Cluster* outermost_cluster = cluster_stack_.top();
     if(!Block::IsExitBlock(procedure_block)) {
       outermost_cluster->AddChildCluster(procedure_block);
     }
@@ -237,7 +237,7 @@ void PSubsystem::HandleCloseBrace() {
     return; // do not pop anything in if-close brace. pop 2 when finishing else.
   }
 
-  follow_stack_.pop();
+  follow_stack_.pop(); //this is allowed because any stmtList must be 1..* statements. so no condition for if (...) { }
 
   if (current_node_type_ == NodeType::kProcedure) {
     assert(parent_stack_.empty());
