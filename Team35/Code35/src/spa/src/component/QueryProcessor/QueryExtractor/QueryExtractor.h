@@ -17,7 +17,7 @@ class QueryExtractor {
   std::vector<Group*> groups;
   std::list<Synonym*> synonyms;
   std::vector<Synonym*> target_synonyms;
-  std::unordered_map<std::string, DesignEntity> target_synonyms_map;
+  std::unordered_map<std::string, Synonym*> target_synonyms_map;
   std::unordered_map<std::string, std::vector<int>> map_of_syn_to_clause_indices;
   static void PopulateSynAdjacencyList(std::unordered_map<std::string, std::vector<int>>* map_of_syn_to_clause_indices,
                                        std::vector<Clause*>* clauses);

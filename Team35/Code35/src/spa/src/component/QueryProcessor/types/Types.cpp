@@ -59,7 +59,7 @@ DesignEntity GetDesignEntity(std::string reference) {
   return DesignEntity::kInvalid;
 }
 
-void Group::AddSynToTargetSyns(Synonym s) {
+void Group::AddSynToTargetSyns(Synonym* s) {
   target_synonyms.push_back(s);
 }
 
@@ -79,7 +79,7 @@ bool Group::ContainsTargetSynonym() {
   return has_target_synonym;
 }
 
-std::vector<Synonym> Group::GetTargetSynonyms() {
+std::vector<Synonym*> Group::GetTargetSynonyms() {
   return target_synonyms;
 }
 

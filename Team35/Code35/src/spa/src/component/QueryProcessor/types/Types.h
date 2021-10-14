@@ -210,20 +210,20 @@ struct Pattern : Clause {
 
 class Group {
  private:
-  std::vector<Synonym> target_synonyms;
+  std::vector<Synonym*> target_synonyms;
   std::vector<Clause*> clauses;
   bool has_target_synonym = false;
  public:
   Group() {};
   Group(std::vector<Clause*> clauses, bool has_target_synonym) :
       has_target_synonym(has_target_synonym), clauses(clauses) {};
-  Group(std::vector<Clause*> clauses, bool has_target_synonym, std::vector<Synonym> target_synonyms) :
+  Group(std::vector<Clause*> clauses, bool has_target_synonym, std::vector<Synonym*> target_synonyms) :
   has_target_synonym(has_target_synonym), clauses(clauses), target_synonyms(target_synonyms) {};
-  void AddSynToTargetSyns(Synonym s);
+  void AddSynToTargetSyns(Synonym* s);
   void AddClauseToVector(Clause* clause);
   std::vector<Clause*> GetClauses();
   bool ContainsTargetSynonym();
-  std::vector<Synonym> GetTargetSynonyms();
+  std::vector<Synonym*> GetTargetSynonyms();
   void UpdateHasTargetSynonymAttr();
 };
 

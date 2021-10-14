@@ -19,7 +19,7 @@ UnformattedQueryResult QueryEvaluator::EvaluateQuery(std::vector<Group *> list_o
   for (Group *current_group : list_of_groups) {
     if (current_group->ContainsTargetSynonym()) {
       // Evaluate non-boolean group
-      Synonym first_target_synonym = current_group->GetTargetSynonyms()[0];
+      Synonym first_target_synonym = *current_group->GetTargetSynonyms()[0];
       // TODO: Check if this table creation is correct??
       QueryEvaluatorTable *table = new QueryEvaluatorTable(&first_target_synonym);
       DesignEntity de = first_target_synonym.GetType();

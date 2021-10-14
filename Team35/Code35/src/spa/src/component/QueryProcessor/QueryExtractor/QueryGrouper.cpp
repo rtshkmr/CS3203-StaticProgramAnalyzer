@@ -7,7 +7,7 @@
  */
 void QueryGrouper::GroupClauses(std::vector<Clause*>* clauses, std::vector<Group*>* groups,
                                     std::vector<Synonym*>* target_synonyms,
-                                    std::unordered_map<std::string, DesignEntity>* target_synonyms_map,
+                                    std::unordered_map<std::string, Synonym*>* target_synonyms_map,
                                     std::unordered_map<std::string, std::vector<int>>* map_of_syn_to_clause_indices) {
   // First create groups for clauses containing target synonyms (and their 'neighbouring' synonyms).
   std::unordered_set<int> visited_clauses;
@@ -41,7 +41,7 @@ void QueryGrouper::GroupClauses(std::vector<Clause*>* clauses, std::vector<Group
   }
 }
 
-void QueryGrouper::DfsFromSynonym(std::unordered_map<std::string, DesignEntity>* tgt_synonyms_map,
+void QueryGrouper::DfsFromSynonym(std::unordered_map<std::string, Synonym*>* tgt_synonyms_map,
                                     std::vector<Clause*>* clauses, std::vector<Group*>* groups, std::string tgt_syn,
                                     std::unordered_set<int>* visited_clauses,
                                     std::unordered_set<std::string>* visited_tgt_synonyms,
@@ -100,9 +100,9 @@ void QueryGrouper::DfsFromSynonym(std::unordered_map<std::string, DesignEntity>*
 }
 
 void QueryGrouper::UpdateGroupMetadata(Group* group, std::unordered_set<std::string>* tgt_synonyms_in_grp,
-                                         std::unordered_map<std::string, DesignEntity>* tgt_syns_map) {
+                                         std::unordered_map<std::string, Synonym*>* tgt_syns_map) {
   for (auto item : *tgt_synonyms_in_grp) {
-    group->AddSynToTargetSyns(Synonym(item, tgt_syns_map->at(item)));
+    group->AddSynToTargetSyns(tgt_syns_map->at(item));
   }
   group->UpdateHasTargetSynonymAttr();
 }
