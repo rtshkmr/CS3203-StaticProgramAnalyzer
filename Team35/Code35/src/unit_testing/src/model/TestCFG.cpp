@@ -76,7 +76,10 @@ TEST_CASE("1.CFG.Cluster") {
       REQUIRE(nested_clusters.front() == child_cluster);
       REQUIRE(nested_clusters.back() == sibling_cluster);
       Cluster* next_sibling = child_cluster->GetNextSiblingCluster();
+      Cluster* prev_sibling = next_sibling->GetPrevSiblingCluster();
       REQUIRE(next_sibling == sibling_cluster);
+      REQUIRE(prev_sibling == child_cluster);
+
     }
   }
 }

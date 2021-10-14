@@ -95,6 +95,28 @@ Cluster* Cluster::GetNextSiblingCluster() {
   }
   return nullptr;
 }
+
+Cluster* Cluster::GetPrevSiblingCluster() {
+  Cluster* parent_cluster = this->GetParentCluster();
+  if (parent_cluster != nullptr) { // i.e. not outmost cluster:
+    std::list<Cluster*> siblings = parent_cluster->GetNestedClusters();
+    std::list<Cluster*>::iterator itr = std::find(siblings.begin(), siblings.end(), this);
+    if (itr != end(siblings)) { // i.e. this exists, i can find myself using my parent
+      int prev_sibling_idx = std::distance(siblings.begin(), itr) - 1;
+      if (prev_sibling_idx < 0) {
+        return nullptr; // no previous sibling exists:
+      } else {
+        return * (--itr);
+      }
+    } else {
+      assert(false);
+    }
+  } else {
+    return nullptr;
+  }
+  return nullptr;
+}
+
 std::list<Cluster*> Cluster::GetNestedClusters() const {
   return this->nested_clusters_;
 }
@@ -130,8 +152,8 @@ void Cluster::UpdateRange(Cluster* nested_cluster) {
       this->end_ = new_cluster_end;
     }
   } else { // there are nested clusters within, assume the start and end range already updated
-    bool new_cluster_appears_before_this = new_cluster_end < this->start_;
-    bool new_cluster_appears_after_this = new_cluster_start > this->end_;
+    bool new_cluster_appears_before_this = new_cluster_end + 1 == this->start_;
+    bool new_cluster_appears_after_this = new_cluster_start == this->end_ + 1;
     if(new_cluster_appears_before_this){
       this->start_ = new_cluster_start;
     } else if (new_cluster_appears_after_this) {
