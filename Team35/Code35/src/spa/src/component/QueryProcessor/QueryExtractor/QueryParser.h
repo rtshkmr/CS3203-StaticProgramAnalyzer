@@ -32,6 +32,8 @@ class QueryParser {
   void ParsePattern();
   void ParseWith();
   void ParseDeclarations();
+  void ParseElem();
+  void ParseTuple();
   void ParseTarget();
   void ParseDeclaration();
 

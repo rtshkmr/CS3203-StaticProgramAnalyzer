@@ -90,10 +90,9 @@ void QueryParser::ParseDeclarations() {
   }
 }
 
-/**
- * Parses the target synonym.
- */
-void QueryParser::ParseTarget() {
+// elem : synonym | attrRef
+void QueryParser::ParseElem() {
+  // TODO: add support for attrRef
   Token target_synonym = Eat(TokenTag::kName);
   std::string target = target_synonym.GetTokenString();
   // target must be a known synonym
@@ -103,6 +102,35 @@ void QueryParser::ParseTarget() {
   Synonym* s = QueryParser::GetSynonymInfo(target, &synonyms);
   this->target_synonyms_list.push_back(s);
   this->target_synonyms_map.emplace(std::make_pair(s->GetName(), s));
+}
+
+// tuple: elem | ‘<’ elem ( ‘,’ elem )* ‘>’
+void QueryParser::ParseTuple() {
+  // parse a single element
+  if (lookahead.GetTokenTag() == TokenTag::kName) {
+    ParseElem();
+  } else {
+    // parse multiple elems within karat notation
+    Eat(TokenTag::kOpenKarat);
+    ParseElem();
+    while (lookahead.GetTokenTag() != TokenTag::kCloseKarat) {
+      Eat(TokenTag::kComma);
+      ParseElem();
+    }
+    Eat(TokenTag::kCloseKarat);
+  }
+}
+
+/**
+ * Parses the target synonyms.
+ */
+void QueryParser::ParseTarget() {
+  if (lookahead.GetTokenTag() == TokenTag::kName && lookahead.GetTokenString().compare("BOOLEAN") == 0) {
+    // parse boolean
+    Eat(TokenTag::kName);
+  } else {
+    ParseTuple();
+  }
 }
 
 // stmtRef: synonym | ‘_’ | INTEGER
