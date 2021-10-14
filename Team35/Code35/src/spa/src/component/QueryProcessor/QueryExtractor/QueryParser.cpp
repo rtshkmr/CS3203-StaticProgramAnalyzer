@@ -91,7 +91,7 @@ void QueryParser::ParseDeclarations() {
 }
 
 // attrName : ‘procName’| ‘varName’ | ‘value’ | ‘stmt#’
-Attribute QueryParser::ParseAttrName(Synonym* s) {
+void QueryParser::ParseAttrName(Synonym* s) {
   // determine the attribute type.
   Attribute attr;
   if (lookahead.GetTokenTag() == TokenTag::kStmtHash) {
