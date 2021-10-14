@@ -6,8 +6,8 @@
 #include <datatype/RegexPatterns.h>
 
 // note: order of regex evaluation matters! always retrieve key-values based on defined insertion_order.
-std::vector<std::string> insertion_order = {"+", "-", "%", "*", "/", "STRING_QUOTE", "INTEGER", "SUCH_THAT",
-                                            "IDENT", ";", "SPACINGS", "(", ")", ",", "_", "<", ">", ".", "stmt#"};
+std::vector<std::string> insertion_order = {"+", "-", "%", "*", "/", "STRING_QUOTE", "INTEGER", "SUCH_THAT", "stmt#",
+                                            "IDENT", ";", "SPACINGS", "(", ")", ",", "_", "<", ">", "."};
 static std::map<std::string, std::regex> spec_table{
     // TODO: for performance optimization, group (+, -) and (%, *, /) together if separate regex is not required.
     {"+", std::regex("^[+]")},
@@ -18,6 +18,7 @@ static std::map<std::string, std::regex> spec_table{
     {"STRING_QUOTE", std::regex("^\"")},
     {"INTEGER", RegexPatterns::GetIntegerPatternNonTerminating()},
     {"SUCH_THAT", std::regex("^such that")},
+    {"stmt#", std::regex("^stmt#")},
     {"IDENT", RegexPatterns::GetNamePattern()}, // IDENT is TokenTag:kName
     {";", std::regex("^;")},
     {"SPACINGS", std::regex(R"(^[\n\r\s\t]+)")},
@@ -28,7 +29,6 @@ static std::map<std::string, std::regex> spec_table{
     {"<", std::regex("^[<]")},
     {">", std::regex("^[>]")},
     {".", std::regex("^[.]")},
-    {"stmt#", std::regex("^stmt#")}
 };
 
 /* Gets correct TokenTag specific to PQL applications. Allowed alphabet of TokenTags corresponds to specTable.
@@ -36,6 +36,7 @@ static std::map<std::string, std::regex> spec_table{
  */
 TokenTag QueryTokenizer::GetPqlTokenType(std::string type) {
   // TODO: optimise this using a lookup table.
+  if (type.compare("stmt#") == 0) { return TokenTag::kStmtHash; }
   if (type.compare("+") == 0) { return TokenTag::kPlus; }
   if (type.compare("-") == 0) { return TokenTag::kMinus; }
   if (type.compare("%") == 0) { return TokenTag::kModulo; }
@@ -53,7 +54,6 @@ TokenTag QueryTokenizer::GetPqlTokenType(std::string type) {
   if (type.compare("<") == 0) { return TokenTag::kOpenKarat; }
   if (type.compare(">") == 0) { return TokenTag::kCloseKarat; }
   if (type.compare(".") == 0) { return TokenTag::kDot; }
-  if (type.compare("stmt#") == 0) { return TokenTag::kStmtHash; }
 
   return TokenTag::kInvalid;
 }

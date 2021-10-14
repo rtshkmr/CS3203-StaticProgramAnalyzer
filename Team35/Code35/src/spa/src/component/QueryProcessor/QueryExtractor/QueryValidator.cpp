@@ -1,6 +1,23 @@
 #include "QueryParser.h"
 #include "QueryValidator.h"
+#include <component/QueryProcessor/types/Exceptions.h>
 #include <unordered_set>
+#include <unordered_map>
+#include <set>
+
+std::set<std::pair<DesignEntity, Attribute>> valid_attrRefs = {{DesignEntity::kProcedure, Attribute::kProcName},
+                                                               {DesignEntity::kCall, Attribute::kProcName},
+                                                               {DesignEntity::kVariable, Attribute::kVarName},
+                                                               {DesignEntity::kRead, Attribute::kVarName},
+                                                               {DesignEntity::kPrint, Attribute::kVarName},
+                                                               {DesignEntity::kConstant, Attribute::kValue},
+                                                               {DesignEntity::kStmt, Attribute::kStmtNumber},
+                                                               {DesignEntity::kRead, Attribute::kStmtNumber},
+                                                               {DesignEntity::kPrint, Attribute::kStmtNumber},
+                                                               {DesignEntity::kCall, Attribute::kStmtNumber},
+                                                               {DesignEntity::kWhile, Attribute::kStmtNumber},
+                                                               {DesignEntity::kIf, Attribute::kStmtNumber},
+                                                               {DesignEntity::kAssign, Attribute::kStmtNumber}};
 
 std::unordered_set<DesignEntity> valid_lhs_UsesS = {DesignEntity::kAssign, DesignEntity::kPrint,
                                                     DesignEntity::kIf, DesignEntity::kWhile, DesignEntity::kStmt};
@@ -106,4 +123,15 @@ bool QueryValidator::Is_Semantically_Valid_RelRef(std::string lhs, std::string r
     return QueryValidator::IsValid_LhsStmt_RhsStmt(lhs, rhs, lhs_is_syn, rhs_is_syn, synonyms);
   }
   return true;
+}
+
+/**
+ * Checks for semantic validity of a AttrRef.
+ * @param s is a pointer to the syonym in the AttrRef.
+ * @param attr_name is of type Attribute and represents the AttrName in the AttrRef.
+ * @return true if Attrref is semanticaly valid for the synonym type, false otherwise.
+ */
+bool QueryValidator::Is_Semantically_Valid_AttrRef(Synonym* s, Attribute attr_name) {
+  auto candidate = std::make_pair(s->GetType(), attr_name);
+  return valid_attrRefs.find(candidate) != valid_attrRefs.end() ? true : false;
 }

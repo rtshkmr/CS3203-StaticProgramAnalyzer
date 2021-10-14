@@ -144,7 +144,7 @@ TEST_CASE("3.QueryExtractor.Extract multiple synonyms + select tuple of declared
 
   // we have already tested that parsing of declaration synonyms works, so focus on checking target_synonyms_list
   REQUIRE(synonyms.size() == 5);
-  REQUIRE(groups.size() == 0);
+  REQUIRE(groups.size() == 5);
 
   std::vector<Synonym*> expected_target_synonyms = {new Synonym("a2", DesignEntity::kAssign),
                                                     new Synonym("a1", DesignEntity::kAssign),
