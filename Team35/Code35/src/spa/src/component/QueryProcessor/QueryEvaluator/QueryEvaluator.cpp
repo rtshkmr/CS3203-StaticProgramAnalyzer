@@ -12,24 +12,24 @@
  */
 QueryEvaluator::QueryEvaluator(PKB *pkb) : pkb{pkb}, boolean_result{true} {}
 
-UnformattedQueryResult QueryEvaluator::EvaluateQuery(const std::vector<Group>& list_of_groups) {
+UnformattedQueryResult QueryEvaluator::EvaluateQuery(std::vector<Group *> list_of_groups) {
   UnformattedQueryResult unformatted_result = UnformattedQueryResult(true);
 
   // REFACTORING IN PROGRESS: new code below
-  for (Group current_group : list_of_groups) {
-    if (current_group.ContainsTargetSynonym()) {
+  for (Group *current_group : list_of_groups) {
+    if (current_group->ContainsTargetSynonym()) {
       // Evaluate non-boolean group
-      Synonym first_target_synonym = current_group.GetTargetSynonyms()[0];
+      Synonym first_target_synonym = current_group->GetTargetSynonyms()[0];
       // TODO: Check if this table creation is correct??
       QueryEvaluatorTable *table = new QueryEvaluatorTable(&first_target_synonym);
       DesignEntity de = first_target_synonym.GetType();
 
       table->AddTargetSynonymValues(pkb->GetDesignEntities(de));
-      ProcessGroup(table, current_group);
+      ProcessGroup(table, *current_group);
       unformatted_result.AddTable(table);
     } else {
       // Evaluate boolean group
-      PreprocessBooleanGroup(current_group);
+      PreprocessBooleanGroup(*current_group);
       if (boolean_result) {
         continue;
       }

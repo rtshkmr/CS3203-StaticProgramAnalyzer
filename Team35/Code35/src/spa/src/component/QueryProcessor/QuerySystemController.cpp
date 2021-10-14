@@ -20,6 +20,7 @@ std::vector<std::string> QuerySystemController::Evaluate(std::string* query, PKB
   auto query_evaluator = QueryEvaluator(pkb);
 
   L("[ENTER] Query Evaluator Evaluate Query");
+  // TODO: change this
   UnformattedQueryResult unformatted_results = query_evaluator.EvaluateQuery(query_extractor.GetGroupsList());
 
   L("[EXIT] Query Evaluator Evaluate Query ");

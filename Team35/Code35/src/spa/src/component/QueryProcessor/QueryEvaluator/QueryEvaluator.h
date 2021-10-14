@@ -18,7 +18,7 @@
 class QueryEvaluator {
   public:
     QueryEvaluator(PKB *pkb);
-    UnformattedQueryResult EvaluateQuery(const std::vector<Group>&);
+    UnformattedQueryResult EvaluateQuery(std::vector<Group *>);
   private:
     PKB *pkb;
     bool boolean_result;

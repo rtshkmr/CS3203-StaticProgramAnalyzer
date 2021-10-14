@@ -69,13 +69,13 @@ SuchThatStrategy::DetermineClauseCommand(Clause *clause, QueryEvaluatorTable *ta
 std::tuple<PKBQueryCommand *, ClauseCommand *>
 PatternStrategy::DetermineClauseCommand(Clause *clause, QueryEvaluatorTable *table) {
   auto* pattern_clause = dynamic_cast<Pattern*>(clause);
-  Synonym* assign_synonym = pattern_clause->first_synonym;
+  Synonym *assign_synonym = pattern_clause->first_synonym;
   PKBQueryCommand *query_command = nullptr;
   ClauseCommand *clause_command = nullptr;
 
   if (pattern_clause->left_is_synonym) {
     // Case for 2 synonyms
-    Synonym* variable_synonym = pattern_clause->second_synonym;
+    Synonym *variable_synonym = pattern_clause->second_synonym;
     query_command = new QueryPatternTwoSynonymCommand(clause);
     if (table->ContainsColumn(assign_synonym) && table->ContainsColumn(variable_synonym)) {
       // Both synonym in table
