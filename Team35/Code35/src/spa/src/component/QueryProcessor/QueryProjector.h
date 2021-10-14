@@ -8,7 +8,7 @@
 
 class QueryProjector {
   public:
-    QueryProjector(std::vector<Synonym> target_synonym_list);
+    QueryProjector(std::vector<Synonym*> target_synonym_list);
     std::vector<std::string> FormatQuery(UnformattedQueryResult unformatted_results);
 
     // made public purely for testing
@@ -21,7 +21,7 @@ class QueryProjector {
                                                        std::vector<std::vector<std::string>> table);
     static std::vector<std::string> JoinTuples(std::vector<std::vector<std::string>> table);
   private:
-    std::vector<Synonym> target_synonym_list;
+    std::vector<Synonym*> target_synonym_list;
     static std::vector<std::string> FormatMultipleTables(std::vector<std::vector<std::vector<std::string>>> tables,
                                                          std::list<Synonym*> table_synonym_order,
                                                          std::vector<Synonym> target_synonym_list);

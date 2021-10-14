@@ -2,7 +2,7 @@
 #include <cassert>
 #include "QueryProjector.h"
 
-QueryProjector::QueryProjector(std::vector<Synonym> target_synonyms_list) : target_synonym_list(target_synonyms_list) {}
+QueryProjector::QueryProjector(std::vector<Synonym*> target_synonyms_list) : target_synonym_list(target_synonyms_list) {}
 
 /**
  * Formats the UnformattedQueryResult into the requirements for the TestWrapper.
