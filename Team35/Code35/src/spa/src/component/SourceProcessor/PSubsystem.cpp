@@ -117,11 +117,16 @@ void PSubsystem::CloseElseBlock() {
     follow_stack_.pop();
     Block* block_if_else_exit = Block::GetNewExitBlock(); // exit block
     Block* else_body_block = block_stack_.top();
-    else_body_block->next_blocks_.insert(block_if_else_exit); // else body block
     block_stack_.pop(); //pop the else body block
     Block* if_body_block = block_stack_.top();
-    if_body_block->next_blocks_.insert(block_if_else_exit);
     block_stack_.pop(); //pop the if_body block
+
+    if (Block::IsExitBlock(else_body_block)) {
+      else_body_block = *block_stack_.top()->next_blocks_.rbegin();
+    }
+
+    else_body_block->next_blocks_.insert(block_if_else_exit); // else body block
+    if_body_block->next_blocks_.insert(block_if_else_exit);
     Block* if_cond_block = block_stack_.top();
     if_cond_block->next_blocks_.insert(else_body_block);
     block_stack_.pop(); //pop the if_cond block
@@ -152,6 +157,7 @@ void PSubsystem::CloseElseBlock() {
     assert(!cluster_stack_.empty());
     Cluster* outer_cluster = cluster_stack_.top();
     outer_cluster->AddChildCluster(if_cluster);
+    outer_cluster->UpdateClusterRange();
   }
 }
 
@@ -445,8 +451,14 @@ BodyBlock* PSubsystem::CreateBodyBlock(ConditionalBlock* conditional_block) {
 BodyBlock* PSubsystem::CreateBodyBlock() {
   Block* block_if_body = dynamic_cast<Block*>(block_stack_.top());
   block_stack_.pop(); //pop so that the if_cond can perform next_block map to else block
+
+  if (Block::IsExitBlock(block_if_body)) {
+    block_if_body = *block_stack_.top()->next_blocks_.begin();
+  }
+
   BodyBlock* block_else_body = new BodyBlock();
   Block* block_if_cond = block_stack_.top();
+  block_if_cond->next_blocks_.insert(block_else_body);
   block_stack_.push(block_if_body);
   block_stack_.push(block_else_body);
   return block_else_body;
