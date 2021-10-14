@@ -16,7 +16,9 @@ enum class EntityEnum {
   kPrintEntity = 5,
   kReadEntity = 6,
   kElseEntity = 7,
-  kProcedureEntity = 8
+  kProcedureEntity = 8,
+  kVariableEntity = 9,
+  kConstantEntity = 10
 };
 
 /**

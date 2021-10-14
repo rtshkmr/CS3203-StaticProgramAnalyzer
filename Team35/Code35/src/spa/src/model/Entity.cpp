@@ -27,7 +27,7 @@ const ProcedureName* Procedure::GetName() {
 }
 
 Variable::Variable(VariableName* vName) {
-  type = EntityEnum::kNone;
+  type = EntityEnum::kVariableEntity;
   variable_name_ = vName;
 }
 
@@ -48,7 +48,7 @@ std::vector<Variable*> Variable::SortVariableVector(std::vector<Variable*> var_l
 }
 
 Constant::Constant(ConstantValue* cv) {
-    type = EntityEnum::kNone;
+    type = EntityEnum::kConstantEntity;
     constant_value_ = cv;
 }
 
