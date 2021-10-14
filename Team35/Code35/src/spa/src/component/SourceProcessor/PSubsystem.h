@@ -69,15 +69,14 @@ class PSubsystem {
   void AddControlVariableRelationships(const std::vector<Variable*>& control_variables);
   void CheckForIfElseValidity();
   void CheckForExistingProcedure();
-  void CloseIfBlock();
   void CloseProcedureBlock();
   void CloseElseBlock();
   void CloseWhileBlock();
-  void ProcessOuterNodeAsProcedure();
-  void ProcessOuterParentNode();
-  void ProcessOuterNodeType(Container* current_nest);
+  void ProcessParentNodeAsProcedure();
+  void ProcessParentNode();
+  void ProcessParentNodeType(Container* current_nest);
   std::vector<Token> GetValidatedTokens(const std::string& statement);
-  void InitRootClusterAndBlock(Procedure* procedure);
+  void InitInternalState(Procedure* procedure);
  public:
   PSubsystem() = default;
 
@@ -89,8 +88,6 @@ class PSubsystem {
 
   void ProcessEntityAsNewProcedure(Entity* entity);
   void ProcessEntityAsStatement(Entity* entity);
-  void CreateNewNestedCluster(ConditionalBlock* conditional_block, BodyBlock* body_block);
-  void UpdateClusterWithElseBlock(BodyBlock* block_else_body);
 };
 }
 

@@ -58,6 +58,7 @@ TEST_CASE("SP to PKB basic retrieval") {
 }
 
 TEST_CASE("SP to PKB relationships tests") {
+
   PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/mixed_loops_source.txt");
 
   std::vector<std::tuple<DesignEntity, std::string>> source_tuples = {
