@@ -7,7 +7,7 @@
 
 // note: order of regex evaluation matters! always retrieve key-values based on defined insertion_order.
 std::vector<std::string> insertion_order = {"+", "-", "%", "*", "/", "STRING_QUOTE", "INTEGER", "SUCH_THAT",
-                                            "IDENT", ";", "SPACINGS", "(", ")", ",", "_", "<", ">"};
+                                            "IDENT", ";", "SPACINGS", "(", ")", ",", "_", "<", ">", ".", "stmt#"};
 static std::map<std::string, std::regex> spec_table{
     // TODO: for performance optimization, group (+, -) and (%, *, /) together if separate regex is not required.
     {"+", std::regex("^[+]")},
@@ -27,6 +27,8 @@ static std::map<std::string, std::regex> spec_table{
     {"_", std::regex("^_")},
     {"<", std::regex("^[<]")},
     {">", std::regex("^[>]")},
+    {".", std::regex("^[.]")},
+    {"stmt#", std::regex("^stmt#")}
 };
 
 /* Gets correct TokenTag specific to PQL applications. Allowed alphabet of TokenTags corresponds to specTable.
@@ -50,6 +52,8 @@ TokenTag QueryTokenizer::GetPqlTokenType(std::string type) {
   if (type.compare("_") == 0) { return TokenTag::kUnderscore; }
   if (type.compare("<") == 0) { return TokenTag::kOpenKarat; }
   if (type.compare(">") == 0) { return TokenTag::kCloseKarat; }
+  if (type.compare(".") == 0) { return TokenTag::kDot; }
+  if (type.compare("stmt#") == 0) { return TokenTag::kStmtHash; }
 
   return TokenTag::kInvalid;
 }

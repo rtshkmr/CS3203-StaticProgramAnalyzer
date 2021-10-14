@@ -90,18 +90,48 @@ void QueryParser::ParseDeclarations() {
   }
 }
 
+// attrName : ‘procName’| ‘varName’ | ‘value’ | ‘stmt#’
+Attribute QueryParser::ParseAttrName(Synonym* s) {
+  // determine the attribute type.
+  Attribute attr;
+  if (lookahead.GetTokenTag() == TokenTag::kStmtHash) {
+    attr = Attribute::kStmtNumber;
+    Eat(TokenTag::kStmtHash);
+  } else if (lookahead.GetTokenTag() == TokenTag::kName) {
+      attr = GetAttribute(lookahead.GetTokenString());
+      if (attr == Attribute::kInvalid) {
+        throw PQLParseException("Received unknown attrName: " + lookahead.GetTokenString());
+      }
+      Eat(TokenTag::kName);
+  } else {
+    throw PQLParseException("Received unknown attrName: " + lookahead.GetTokenString());
+  }
+  if (!QueryValidator::Is_Semantically_Valid_AttrRef(s, attr)) {
+    throw PQLValidationException("Received semantically invalid AttrRef");
+  }
+  s->SetAttribute(attr);
+}
+
 // elem : synonym | attrRef
+// attrRef : synonym ‘.’ attrName
 void QueryParser::ParseElem() {
-  // TODO: add support for attrRef
+  // parse synonym portion
   Token target_synonym = Eat(TokenTag::kName);
   std::string target = target_synonym.GetTokenString();
   // target must be a known synonym
   if (synonyms_name_set.find(target) == synonyms_name_set.end()) {
     throw PQLParseException("Incorrect target synonym for \'Select\' query.");
   }
+
   Synonym* s = QueryParser::GetSynonymInfo(target, &synonyms);
   this->target_synonyms_list.push_back(s);
   this->target_synonyms_map.emplace(std::make_pair(s->GetName(), s));
+
+  // handle case where we need to parse attrRef
+  if (lookahead.GetTokenTag() == TokenTag::kDot) {
+    Eat(TokenTag::kDot);
+    ParseAttrName(s);
+  }
 }
 
 // tuple: elem | ‘<’ elem ( ‘,’ elem )* ‘>’

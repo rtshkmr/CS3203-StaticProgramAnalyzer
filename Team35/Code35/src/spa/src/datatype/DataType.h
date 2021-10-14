@@ -138,7 +138,9 @@ enum class TokenTag {
   kTimes,
   kDivide,
   kOpenKarat,
-  kCloseKarat
+  kCloseKarat,
+  kDot,
+  kStmtHash
 };
 
 /**

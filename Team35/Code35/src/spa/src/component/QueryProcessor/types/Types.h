@@ -103,8 +103,11 @@ enum class Attribute {
   kStmtNumber,
   kProcName,
   kVarName,
-  kValue
+  kValue,
+  kInvalid
 };
+
+Attribute GetAttribute(std::string attr_string);
 
 struct QueryInfo {
   bool all_boolean_true;

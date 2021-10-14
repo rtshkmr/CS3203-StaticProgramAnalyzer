@@ -20,6 +20,7 @@ class QueryValidator {
  public:
   static bool Is_Semantically_Valid_RelRef(std::string lhs, std::string rhs, RelRef rf,
                                            bool lhs_is_syn, bool rhs_is_syn, std::list<Synonym*>* synonyms);
+  static bool Is_Semantically_Valid_AttrRef(Synonym* s, Attribute attr_name);
 };
 
 #endif //AUTOTESTER_QUERYVALIDATOR_H

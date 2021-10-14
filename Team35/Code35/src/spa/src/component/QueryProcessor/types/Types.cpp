@@ -1,4 +1,5 @@
 #include "Types.h"
+#include <unordered_map>
 
 RelRef GetRelRef(std::string reference) {
   if (reference == "ModifiesP") {
@@ -31,6 +32,18 @@ RelRef GetRelRef(std::string reference) {
     return RelRef::kAffectsT;
   }
   return RelRef::kInvalid;
+}
+
+static std::unordered_map<std::string, Attribute> _attribute_map = {{"procName", Attribute::kProcName},
+                                                                   {"varName", Attribute::kProcName},
+                                                                   {"value", Attribute::kProcName},
+                                                                   {"stmt#", Attribute::kStmtNumber}};
+Attribute GetAttribute(std::string attr_string) {
+  std::unordered_map<std::string, Attribute>::const_iterator iter = _attribute_map.find(attr_string);
+  if (iter != _attribute_map.end()) {
+    return iter->second;
+  }
+  return Attribute::kInvalid;
 }
 
 DesignEntity GetDesignEntity(std::string reference) {
