@@ -142,14 +142,11 @@ void PSubsystem::CloseElseBlock() {
       if_cluster->AddChildCluster(else_body_block); // this is ok because there is at least 1 stmt
       if_cluster->UpdateClusterRange();
     } else {
-      if_cluster->nested_clusters_.push_front(if_body_block);
       if_cluster->nested_clusters_.push_front(if_cond_block);
       if (else_body_block->size() > 0) {
         if_cluster->AddChildCluster(else_body_block); //append anything else
       }
       if_cond_block->SetParentCluster(if_cluster);
-      if_body_block->SetParentCluster(if_cluster);
-      else_body_block->SetParentCluster(if_cluster);
       if_cluster->UpdateClusterRange();
       int x = 1;
     }
