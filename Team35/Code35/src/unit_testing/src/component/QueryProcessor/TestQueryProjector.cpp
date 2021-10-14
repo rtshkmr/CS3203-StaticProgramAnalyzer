@@ -4,6 +4,7 @@
 #include "component/QueryProcessor/QueryProjector.h"
 #include "../../../utils/EntityUtils.h"
 
+
 void AddColumn(QueryEvaluatorTable* table, Synonym* syn, std::vector<Entity*> entities) {
   for (int i = 0; i < entities.size(); ++i) {
     table->AddRow(syn, i, entities[i]);

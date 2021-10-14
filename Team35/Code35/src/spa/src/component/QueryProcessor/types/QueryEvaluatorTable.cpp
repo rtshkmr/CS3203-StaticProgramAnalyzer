@@ -87,7 +87,8 @@ int QueryEvaluatorTable::GetColumnSize() {
 
 int QueryEvaluatorTable::GetRowSize() {
   auto search = synonym_to_entity_map.find(target_synonym);
-  //assert search != synonym_to_entity_map.end()
+
+  if(search == synonym_to_entity_map.end()) return 0;
   return search->second.size();
 }
 

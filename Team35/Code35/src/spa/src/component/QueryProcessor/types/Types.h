@@ -20,6 +20,7 @@ enum class DesignEntity : unsigned int {
   kConstant = 8,
   kProcedure = 9,
   kInvalid = 10,
+  kWildcard = 11,
 };
 
 const std::array<DesignEntity, 11> all_design_entities = {
