@@ -18,3 +18,20 @@ std::vector<std::string> TestUtils::GetBasicSourceLines() {
   };
   return lines;
 }
+
+/**
+ * Checks if the contents of 2 lists are equal, which may not be in the same order.
+ */
+bool TestUtils::AreListsEqual(std::list<Statement*> as, std::list<Statement*> bs) {
+  for (Statement* a: as) {
+    bool found_a = false;
+    for (Statement* b: bs) {
+      found_a = found_a || a == b;
+    }
+    if (!found_a) {
+      return false;
+    }
+  }
+
+  return as.size() == bs.size();
+}

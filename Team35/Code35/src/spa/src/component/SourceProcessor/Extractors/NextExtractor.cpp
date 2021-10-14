@@ -17,12 +17,16 @@
 void NextExtractor::Extract(Deliverable* deliverable) {
   this->deliverable_ = deliverable;
 
+  int total_num_of_stmts = 0;
   for (Procedure* proc: deliverable_->proc_list_) {
     Cluster* proc_cluster = const_cast<Cluster*>(proc->GetClusterRoot());
     std::pair<int, int> range = proc_cluster->GetStartEndRange();
     int num_of_stmts = range.second - range.first + 1;
-    std::vector<int>* visited_blocks = new std::vector<int>(num_of_stmts, 0);
-    ExtractBlock(const_cast<Block*>(proc->GetBlockRoot()), visited_blocks);
+    total_num_of_stmts += num_of_stmts;
+  }
+  for (Procedure* proc: deliverable_->proc_list_) {
+    visited_blocks_ = new std::vector<int>(total_num_of_stmts, 0);
+    ExtractBlock(const_cast<Block*>(proc->GetBlockRoot()));
   }
 }
 
@@ -30,24 +34,25 @@ void NextExtractor::Extract(Deliverable* deliverable) {
  * Extracts next relationships from within the block and outward bound next relationships.
  *
  * @param block
- * @param visited_blocks
+ * @param visited_blocks_
  * @throws out_of_range exception when index of block is not in stmt_list
  */
-void NextExtractor::ExtractBlock(Block* block, std::vector<int>* visited_blocks) {
+void NextExtractor::ExtractBlock(Block* block) {
   if (block == nullptr) return;
   std::pair<int, int> range = block->GetStartEndRange();
   int start = range.first;
-  if ((*visited_blocks)[start - 1] == 1) return;
+  if ((*visited_blocks_)[start - 1] == 1) return;
 
   std::vector<Statement*> stmt_list = deliverable_->stmt_list_;
 
-  Statement* start_statement = stmt_list[start - 1];
-  for (int i = start + 1; i < range.second; ++i) {
+  Statement* prev_statement = stmt_list[start - 1];
+  for (int i = start + 1; i <= range.second; ++i) {
     Statement* next_statement = stmt_list[i - 1];
-    deliverable_->AddNextRelationship(start_statement, next_statement);
+    deliverable_->AddNextRelationship(prev_statement, next_statement);
+    prev_statement = next_statement;
   }
 
-  (*visited_blocks)[start - 1] = 1;
+  (*visited_blocks_)[start - 1] = 1;
 
   int end = range.second;
   Statement* end_statement = stmt_list[end - 1];
@@ -55,12 +60,10 @@ void NextExtractor::ExtractBlock(Block* block, std::vector<int>* visited_blocks)
   for (Block* next_block: block->next_blocks_) {
     int next = next_block->GetStartEndRange().first;
 
-    if (next == -1) {
-      continue;
-    }
+    assert(next != -1); // uninitialized block
 
     Statement* next_block_statement = stmt_list[next - 1];
     deliverable_->AddNextRelationship(end_statement, next_block_statement);
-    ExtractBlock(next_block, visited_blocks);
+    ExtractBlock(next_block);
   }
 }

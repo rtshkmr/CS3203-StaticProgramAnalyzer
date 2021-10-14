@@ -9,8 +9,9 @@ class NextExtractor {
   void Extract(Deliverable* deliverable);
  private:
   Deliverable* deliverable_;
+  std::vector<int>* visited_blocks_;
 
-  void ExtractBlock(Block* block, std::vector<int>* visited_blocks);
+  void ExtractBlock(Block* block);
 };
 
 #endif //AUTOTESTER_CODE35_SRC_SPA_SRC_COMPONENT_SOURCEPROCESSOR_EXTRACTORS_NEXTEXTRACTOR_H_
