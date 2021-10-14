@@ -64,6 +64,8 @@ class Deliverable {
   std::list<PrintEntity*> print_list_;
   std::list<ReadEntity*> read_list_;
 
+  std::unordered_map<int, Statement*> stmt_num_hash_; // maps stmt num to stmt
+
   // RelationshipTables
   std::unordered_map<Statement*, Statement*> follow_hash_;
   std::unordered_map<Statement*, std::list<Statement*>*> follows_T_hash_; // to store Follows*
