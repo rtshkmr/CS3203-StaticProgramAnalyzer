@@ -124,7 +124,7 @@ TEST_CASE("1.Parser.Cluster") {
 
     // if8
     std::list<Cluster*> if8_clusters = if8->GetNestedClusters();
-    CHECK(if8_clusters.size() == 4);  // todo should be 5?
+    CHECK(if8_clusters.size() == 5);
     Cluster* if8_cond = if8_clusters.front();
     CHECK(IsCorrectRange(if8_cond->GetStartEndRange(), 8, 8));
 
@@ -137,9 +137,9 @@ TEST_CASE("1.Parser.Cluster") {
     Cluster* if11 = *iter4_start;
     CHECK(IsCorrectRange(if11->GetStartEndRange(), 11, 15));
 
-//    std::advance(iter4_start, 1);
-//    Cluster* c16 = *iter4_start;
-//    CHECK(IsCorrectRange(c16->GetStartEndRange(), 16, 16));
+    std::advance(iter4_start, 1);
+    Cluster* c16 = *iter4_start;
+    CHECK(IsCorrectRange(c16->GetStartEndRange(), 16, 16));
 
     std::advance(iter4_start, 1);
     Cluster* if8_else = *iter4_start;

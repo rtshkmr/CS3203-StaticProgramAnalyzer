@@ -492,6 +492,12 @@ BodyBlock* PSubsystem::CreateBodyBlock() {
   block_if_cond->next_blocks_.insert(block_else_body);
   block_stack_.push(block_if_body);
   block_stack_.push(block_else_body);
+
+  if(block_if_body->size() > 0) {
+    cluster_stack_.top()->AddChildCluster(block_if_body);
+    cluster_stack_.top()->UpdateClusterRange();
+  }
+
   return block_else_body;
 }
 
