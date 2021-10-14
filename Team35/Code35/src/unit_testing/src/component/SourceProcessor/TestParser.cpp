@@ -88,6 +88,7 @@ TEST_CASE("1.Parser.Cluster") {
     Cluster* c22 = * iter1_start;
     CHECK(IsCorrectRange(c22->GetStartEndRange(), 22, 23));
 
+    // if3
     std::list<Cluster*> if3_clusters = if3->GetNestedClusters();
     CHECK(if3_clusters.size() == 4);
     Cluster* if3_cond = if3_clusters.front();
@@ -95,25 +96,69 @@ TEST_CASE("1.Parser.Cluster") {
 
     auto iter2_start = if3_clusters.begin();
     std::advance(iter2_start, 1);
-    Cluster* if3_body_1 = * iter2_start;
-    CHECK(IsCorrectRange(if3_body_1->GetStartEndRange(), 4, 5));
+    Cluster* c4 = * iter2_start;
+    CHECK(IsCorrectRange(c4->GetStartEndRange(), 4, 5));
 
     std::advance(iter2_start, 1);
-    Cluster* while6_cluster = * iter2_start;
-    CHECK(IsCorrectRange(while6_cluster->GetStartEndRange(), 6, 17));
-    int while_6_nested_blocks_size = while6_cluster->GetNestedClusters().size();
-    CHECK(while_6_nested_blocks_size == 3);
-    Cluster* if8_cluster = while6_cluster->GetNestedClusters().back();
-    int if8_cluster_nested_blocks_size = if8_cluster->GetNestedClusters().size();
-    CHECK(IsCorrectRange(if8_cluster->GetStartEndRange(), 8, 17));
-    CHECK(if8_cluster_nested_blocks_size == 4);
-    auto if8_nested_iter = if8_cluster->GetNestedClusters().begin();
-//    std::advance(if8_nested_iter, 3);
-//    Cluster* if11_cluster = * if8_nested_iter;
-//    CHECK(IsCorrectRange(if11_cluster->GetStartEndRange(), 11, 15));
-//    CHECK(if11_cluster->GetNestedClusters().size() == 3);
-//    std::advance(if8_nested_iter, 1);
-    // todo: complete test case, there's likely a bug because 16 doesn't exist;
+    Cluster* w6 = *iter2_start;
+    CHECK(IsCorrectRange(w6->GetStartEndRange(), 6, 17));
+
+    std::advance(iter2_start, 1);
+    Cluster* if3_else = *iter2_start;
+    CHECK(IsCorrectRange(if3_else->GetStartEndRange(), 18, 18));
+
+    // while 6
+    std::list<Cluster*> w6_clusters = w6->GetNestedClusters();
+    CHECK(w6_clusters.size() == 3);
+    Cluster* w6_cond = w6_clusters.front();
+    CHECK(IsCorrectRange(w6_cond->GetStartEndRange(), 6, 6));
+
+    auto iter3_start = w6_clusters.begin();
+    std::advance(iter3_start, 1);
+    Cluster* c7 = * iter3_start;
+    CHECK(IsCorrectRange(c7->GetStartEndRange(), 7, 7));
+
+    std::advance(iter3_start, 1);
+    Cluster* if8 = *iter3_start;
+    CHECK(IsCorrectRange(if8->GetStartEndRange(), 8, 17));
+
+    // if8
+    std::list<Cluster*> if8_clusters = if8->GetNestedClusters();
+    CHECK(if8_clusters.size() == 4);  // todo should be 5?
+    Cluster* if8_cond = if8_clusters.front();
+    CHECK(IsCorrectRange(if8_cond->GetStartEndRange(), 8, 8));
+
+    auto iter4_start = if8_clusters.begin();
+    std::advance(iter4_start, 1);
+    Cluster* c9 = * iter4_start;
+    CHECK(IsCorrectRange(c9->GetStartEndRange(), 9, 10));
+
+    std::advance(iter4_start, 1);
+    Cluster* if11 = *iter4_start;
+    CHECK(IsCorrectRange(if11->GetStartEndRange(), 11, 15));
+
+//    std::advance(iter4_start, 1);
+//    Cluster* c16 = *iter4_start;
+//    CHECK(IsCorrectRange(c16->GetStartEndRange(), 16, 16));
+
+    std::advance(iter4_start, 1);
+    Cluster* if8_else = *iter4_start;
+    CHECK(IsCorrectRange(if8_else->GetStartEndRange(), 17, 17));
+
+    // if11
+    std::list<Cluster*> if11_clusters = if11->GetNestedClusters();
+    CHECK(if11_clusters.size() == 3);
+    Cluster* if11_cond = if11_clusters.front();
+    CHECK(IsCorrectRange(if11_cond->GetStartEndRange(), 11, 11));
+
+    auto iter5_start = if11_clusters.begin();
+    std::advance(iter5_start, 1);
+    Cluster* c12 = * iter5_start;
+    CHECK(IsCorrectRange(c12->GetStartEndRange(), 12, 14));
+
+    std::advance(iter5_start, 1);
+    Cluster* c15 = *iter5_start;
+    CHECK(IsCorrectRange(c15->GetStartEndRange(), 15, 15));
   }
 }
 
