@@ -117,13 +117,57 @@ void PSubsystem::CloseElseBlock() {
     follow_stack_.pop();
     Block* block_if_else_exit = Block::GetNewExitBlock(); // exit block
     Block* else_body_block = block_stack_.top();
-    else_body_block->next_blocks_.insert(block_if_else_exit); // else body block
     block_stack_.pop(); //pop the else body block
     Block* if_body_block = block_stack_.top();
-    if_body_block->next_blocks_.insert(block_if_else_exit);
     block_stack_.pop(); //pop the if_body block
+
     Block* if_cond_block = block_stack_.top();
-    if_cond_block->next_blocks_.insert(else_body_block);
+
+    if (Block::IsExitBlock(else_body_block)) {
+      Block* toInsert = nullptr;
+      Block* left = *if_cond_block->next_blocks_.begin();
+      Block* right = *if_cond_block->next_blocks_.rbegin();
+      if (left->GetStartEndRange().first > right->GetStartEndRange().first) {
+        toInsert = left;
+      } else {
+        toInsert = right;
+      }
+
+      //if it is empty, map it outwards.
+      for (auto* bb : toInsert->next_blocks_) {
+        bb->next_blocks_.erase(else_body_block);
+        bb->next_blocks_.insert(block_if_else_exit);
+      }
+
+      if_cond_block->next_blocks_.insert(toInsert);
+
+    } else {
+      else_body_block->next_blocks_.insert(block_if_else_exit);
+      if_cond_block->next_blocks_.insert(else_body_block);
+    }
+
+    if (Block::IsExitBlock(if_body_block)) {
+      Block* toInsert = nullptr;
+      Block* left = *if_cond_block->next_blocks_.begin();
+      Block* right = *if_cond_block->next_blocks_.rbegin();
+      if (left->GetStartEndRange().first < right->GetStartEndRange().first) {
+        toInsert = left;
+      } else {
+        toInsert = right;
+      }
+
+      //if it is empty, map it outwards.
+      for (auto* bb : toInsert->next_blocks_) {
+        bb->next_blocks_.erase(if_body_block);
+        bb->next_blocks_.insert(block_if_else_exit);
+      }
+    } else {
+      if_body_block->next_blocks_.insert(block_if_else_exit);
+    }
+
+
+    if_cond_block->UpdateClusterRange();
+
     block_stack_.pop(); //pop the if_cond block
     block_stack_.push(block_if_else_exit);
     bool is_currently_in_nested_cluster = cluster_stack_.size() > 1;
@@ -137,14 +181,11 @@ void PSubsystem::CloseElseBlock() {
       if_cluster->AddChildCluster(else_body_block); // this is ok because there is at least 1 stmt
       if_cluster->UpdateClusterRange();
     } else {
-      if_cluster->nested_clusters_.push_front(if_body_block);
       if_cluster->nested_clusters_.push_front(if_cond_block);
       if (else_body_block->size() > 0) {
         if_cluster->AddChildCluster(else_body_block); //append anything else
       }
       if_cond_block->SetParentCluster(if_cluster);
-      if_body_block->SetParentCluster(if_cluster);
-      else_body_block->SetParentCluster(if_cluster);
       if_cluster->UpdateClusterRange();
       int x = 1;
     }
@@ -152,6 +193,7 @@ void PSubsystem::CloseElseBlock() {
     assert(!cluster_stack_.empty());
     Cluster* outer_cluster = cluster_stack_.top();
     outer_cluster->AddChildCluster(if_cluster);
+    outer_cluster->UpdateClusterRange();
   }
 }
 
@@ -447,8 +489,15 @@ BodyBlock* PSubsystem::CreateBodyBlock() {
   block_stack_.pop(); //pop so that the if_cond can perform next_block map to else block
   BodyBlock* block_else_body = new BodyBlock();
   Block* block_if_cond = block_stack_.top();
+  block_if_cond->next_blocks_.insert(block_else_body);
   block_stack_.push(block_if_body);
   block_stack_.push(block_else_body);
+
+  if(block_if_body->size() > 0) {
+    cluster_stack_.top()->AddChildCluster(block_if_body);
+    cluster_stack_.top()->UpdateClusterRange();
+  }
+
   return block_else_body;
 }
 
