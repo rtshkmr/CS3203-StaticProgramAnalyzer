@@ -140,7 +140,8 @@ enum class TokenTag {
   kOpenKarat,
   kCloseKarat,
   kDot,
-  kStmtHash
+  kStmtHash,
+  kProgLine
 };
 
 /**
