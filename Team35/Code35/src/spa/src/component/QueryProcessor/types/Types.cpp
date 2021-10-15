@@ -36,29 +36,23 @@ Attribute GetAttribute(std::string attr_string) {
   return Attribute::kInvalid;
 }
 
-DesignEntity GetDesignEntity(std::string reference) {
-  if (reference == "stmt") {
-    return DesignEntity::kStmt;
-  } else if (reference == "read") {
-    return DesignEntity::kRead;
-  } else if (reference == "print") {
-    return DesignEntity::kPrint;
-  } else if (reference == "call") {
-    return DesignEntity::kCall;
-  } else if (reference == "while") {
-    return DesignEntity::kWhile;
-  } else if (reference == "if") {
-    return DesignEntity::kIf;
-  } else if (reference == "assign") {
-    return DesignEntity::kAssign;
-  } else if (reference == "variable") {
-    return DesignEntity::kVariable;
-  } else if (reference == "constant") {
-    return DesignEntity::kConstant;
-  } else if (reference == "procedure") {
-    return DesignEntity::kProcedure;
-  }
+static std::unordered_map<std::string, DesignEntity> _de_map = {{"stmt", DesignEntity::kStmt},
+                                                          {"read", DesignEntity::kRead},
+                                                          {"print", DesignEntity::kPrint},
+                                                          {"call", DesignEntity::kCall},
+                                                          {"while", DesignEntity::kWhile},
+                                                          {"if", DesignEntity::kIf},
+                                                          {"assign", DesignEntity::kAssign},
+                                                          {"variable", DesignEntity::kVariable},
+                                                          {"constant", DesignEntity::kConstant},
+                                                          {"procedure", DesignEntity::kProcedure},
+                                                          {"prog_line", DesignEntity::kProgLine}};
 
+DesignEntity GetDesignEntity(std::string reference) {
+  std::unordered_map<std::string, DesignEntity>::const_iterator iter = _de_map.find(reference);
+  if (iter != _de_map.end()) {
+    return iter->second;
+  }
   return DesignEntity::kInvalid;
 }
 
