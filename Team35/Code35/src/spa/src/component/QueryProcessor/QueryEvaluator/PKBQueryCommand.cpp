@@ -11,9 +11,9 @@ PKBRelRefs PKBQueryCommand::GetPKBRelRef(RelRef relation, bool order_of_values_u
         case RelRef::kParent:
           return order_of_values_unchanged_from_clause ? PKBRelRefs::kParent : PKBRelRefs::kChild;
           case RelRef::kModifiesP:
-            return order_of_values_unchanged_from_clause ? PKBRelRefs::kModifiedByContainer : PKBRelRefs::kModifiesContainer; // TODO: Check w oliver
+            return order_of_values_unchanged_from_clause ? PKBRelRefs::kModifiesContainer : PKBRelRefs::kModifiedByContainer; // TODO: Check w oliver
             case RelRef::kModifiesS:
-              return order_of_values_unchanged_from_clause ? PKBRelRefs::kModifiedByStatement : PKBRelRefs::kModifiesStatement; // TODO: Check w oliver
+              return order_of_values_unchanged_from_clause ? PKBRelRefs::kModifiesStatement : PKBRelRefs::kModifiedByStatement; // TODO: Check w oliver
               case RelRef::kUsesS:
                 return order_of_values_unchanged_from_clause ? PKBRelRefs::kUsesS : PKBRelRefs::kUsedByS;
                 case RelRef::kUsesP:
@@ -48,9 +48,7 @@ PKBRelRefs PKBQueryCommand::GetPKBRelRef(RelRef relation, bool order_of_values_u
  * @return The intermediate table with the results.
  */
 IntermediateTable* PKBQueryReceiver::QueryPKBTwoSynonyms(PKBRelRefs rel, DesignEntity first_synonym, DesignEntity second_synonym) {
-  // TODO: Waiting for PKB implementation then just uncomment.
-//  std::vector<std::tuple<Entity *, Entity *>> output = pkb->GetRelationshipByTypes(rel, first_synonym, second_synonym);
-  std::vector<std::tuple<Entity *, Entity *>> output;
+  std::vector<std::tuple<Entity *, Entity *>> output = pkb->GetRelationshipByTypes(rel, first_synonym, second_synonym);
   IntermediateTable *table = new IntermediateTable();
   table->InsertData(output);
   return table;
