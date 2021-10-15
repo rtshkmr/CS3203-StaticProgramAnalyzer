@@ -39,15 +39,20 @@ class Cluster {
 };
 
 class Block : public Cluster {
+ private:
+  std::set<Block*> next_blocks_ = {};
+  std::set<Block*> prev_blocks_ = {};
+
  public:
   Block() {};
   ~Block();
   static Block* GetNewExitBlock();
   static bool IsExitBlock(Block* block);
+  static void PatchEmptyBlocks(Block* redundant, Block* to);
+  void AddNextBlock(Block* next_block);
+  std::set<Block*> GetNextBlocks() const;
 
   bool isWhile = false;
-  std::set<Block*> next_blocks_ = {};
-
 };
 
 class ConditionalBlock : public Block {
