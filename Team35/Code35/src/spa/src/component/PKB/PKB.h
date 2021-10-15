@@ -50,6 +50,8 @@ class PKB {
 
   DesignEntity EntityToDesignEntity(Entity* entity);
 
+  static std::string GetNameFromEntity(Entity* entity);
+
   // Constructor
   PKB() = default;
 
@@ -115,6 +117,4 @@ class PKB {
   void PopulateUsedBy();
   void PopulateModifies();
   void PopulateModifiedBy();
-
-  std::string GetNameFromEntity(Entity* entity);
 };
