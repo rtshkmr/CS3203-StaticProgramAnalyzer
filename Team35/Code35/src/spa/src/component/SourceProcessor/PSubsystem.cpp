@@ -127,7 +127,6 @@ void PSubsystem::CloseElseBlock() {
       Block::PatchEmptyBlocks(else_body_block, block_if_else_exit);
     } else {
       else_body_block->AddNextBlock(block_if_else_exit);
-      if_cond_block->AddNextBlock(else_body_block);
     }
 
     if (Block::IsExitBlock(if_body_block)) {
