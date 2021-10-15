@@ -25,6 +25,7 @@ do echo "[NOTE] Running Exception Test $i";
 	if [ "$?" == 0 ] 
 	then
 	    RESULT="1";
+		echo "$i did not throw any error." 
 	fi
 done
 
