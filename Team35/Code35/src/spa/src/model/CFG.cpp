@@ -202,4 +202,23 @@ bool Block::IsExitBlock(Block* block) {
   return std::get<0>(range) == -1 && std::get<1>(range) == -1;
 }
 
+void Block::PatchEmptyBlocks(Block* redundant, Block* to) {
+  if (!Block::IsExitBlock(redundant)) {
+    throw std::invalid_argument("Redundant block is non empty");
+  }
+
+  for (auto* block : redundant->prev_blocks_) {
+    block->next_blocks_.erase(redundant);
+    block->AddNextBlock(to);
+  }
+}
+
+void Block::AddNextBlock(Block* next_block) {
+  this->next_blocks_.insert(next_block);
+  next_block->prev_blocks_.insert(this);
+}
+
+std::set<Block*> Block::GetNextBlocks() const {
+  return this->next_blocks_;
+}
 

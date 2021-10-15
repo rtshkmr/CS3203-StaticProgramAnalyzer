@@ -173,11 +173,11 @@ TEST_CASE("1.Parser.Blocks") {
     CHECK(range.first == 1);
     CHECK(range.second == 1);
 
-    std::set<Block*> if1_blocks = root_block->next_blocks_;
+    std::set<Block*> if1_blocks = root_block->GetNextBlocks();
     CHECK(if1_blocks.size() == 2);
 
     for (Block* block: if1_blocks) {
-      std::set<Block*> if_blocks = block->next_blocks_;
+      std::set<Block*> if_blocks = block->GetNextBlocks();
       CHECK(if_blocks.size() == 2);
     }
   }
