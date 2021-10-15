@@ -114,7 +114,7 @@ std::vector<Entity*> PKB::GetRelationshipByType(PKBRelRefs ref, DesignEntity d) 
     std::vector<std::tuple<DesignEntity, DesignEntity>> combos = first_param_map_[d];
     std::vector<Entity*> entities;
     for (auto combo : combos) {
-        std::vector<std::tuple<Entity*, Entity*>> pairs = relationship_by_type_table_[ref][{std::get<0>(combo), std::get<0>(combo)}];
+        std::vector<std::tuple<Entity*, Entity*>> pairs = relationship_by_type_table_[ref][{std::get<0>(combo), std::get<1>(combo)}];
         for (auto pair : pairs) {
             entities.push_back(std::get<0>(pair));
         }
