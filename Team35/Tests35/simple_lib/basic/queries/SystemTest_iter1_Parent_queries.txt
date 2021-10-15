@@ -1,0 +1,215 @@
+1 - Parent 2 wildcards
+read r;
+Select r such that Parent(_, _)
+2, 6, 9, 12, 15, 18, 20, 24, 26, 30, 33
+5000
+2 - Parent left wildcard with stmtNo
+while w;
+Select w such that Parent(_, 12)
+4, 5, 17, 29
+5000
+3 - Parent right wildcard with stmtNo
+if ifs;
+Select ifs such that Parent(5, _)
+10, 14, 22
+5000
+4 - Parent left wildcard with syn
+assign a;
+Select a such that Parent(_, a)
+8, 11, 16, 23, 28, 32
+5000
+5 - Parent right wildcard with syn
+stmt s;
+Select s such that Parent(s, _)
+4, 5, 10, 14, 17, 22, 29
+5000
+6 - Parent both stmtNo
+constant c;
+Select c such that Parent(14, 16)
+10
+5000
+7 - Parent both syns get from left
+if ifs; while w;
+Select ifs such that Parent(ifs, w)
+10, 14
+5000
+8 - Parent both syns get from right
+while w; print pr;
+Select pr such that Parent(w, pr)
+7, 19, 31
+5000
+9 - Parent mix stmtNo syn
+stmt s;
+Select s such that Parent(14, s)
+15, 16, 17, 20, 21, 22
+5000
+10 - Parent mix syn stmtNo
+while w;
+Select w such that Parent(w, 16)
+none
+5000
+11 - Follows stmtNo syn
+stmt s;
+Select s such that Follows(2, s)
+3
+5000
+12 - Follows syn syn
+print pr; read r;
+Select pr such that Follows(r, pr)
+3, 7, 13, 19, 21, 25, 31
+5000
+13 - Follows syn wildcard
+assign a;
+Select a such that Follows(a, _)
+1, 8, 11, 16, 28
+5000
+14 - Uses syn syn
+variable v; while w;
+Select v such that Uses(w, v)
+a, b, c, d
+5000
+15 - Uses + pattern
+while w; assign a;
+Select w such that Uses(w, "b") pattern a (_, _"b"_)
+4, 29, 17
+5000
+16 - Uses stmtNo syn
+variable v;
+Select v such that Uses(22, v)
+b,c
+5000
+17 - Modifies stmtNo syn
+variable v; assign a;
+Select v such that Modifies(17, v)
+b
+5000
+18 - modifies + ident
+assign a;
+Select a such that Modifies(a, "c")
+16,32
+5000
+19 - Modifies stmtNo wildcard
+variable v; while w;
+Select w such that Modifies(19, _)
+none
+5000
+20 - Parent* 2 wildcards
+variable v;
+Select v such that Parent*(_, _)
+a, b, c, d
+5000
+21 - Parent* left wildcard with stmtNo
+print pr;
+Select pr such that Parent*(_, 25)
+3, 7, 13, 19, 21, 25, 27, 31
+5000
+22 - Parent* right wildcard with stmtNo
+read r;
+Select r such that Parent*(1, _)
+none
+5000
+23 - Parent* left wildcard with syn
+while w;
+Select w such that Parent*(_, w)
+5, 17, 29
+5000
+24 - Parent* right wildcard with syn
+if ifs;
+Select ifs such that Parent*(ifs, _)
+10, 14, 22
+5000
+25 - Parent* both stmtNo
+variable v;
+Select v such that Parent*(10, 23)
+a, b, c, d
+5000
+26 - Parent* both syns get from left
+if ifs; while w;
+Select ifs such that Parent*(ifs, w)
+10, 14
+5000
+27 - Parent* both syns get from right
+if ifs; while w;
+Select w such that Parent*(ifs, w)
+17, 29
+5000
+28 - Parent* mix stmtNo syn
+if ifs;
+Select ifs such that Parent*(4, ifs)
+10, 14, 22
+5000
+29 - Parent* mix syn stmtNo
+while w;
+Select w such that Parent*(w, 19)
+4, 17
+5000
+30 - Follows* syn stmtNo
+stmt s;
+Select s such that Follows*(s, 10)
+5,8,9
+5000
+31 - Follows* syn syn
+assign a; print pr;
+Select a such that Follows*(a, pr)
+1, 11
+5000
+32 - Follows* syn wildcard
+assign a;
+Select a such that Follows*(a, _)
+1, 8, 11, 16, 28
+5000
+33 - Mix Parent and pattern
+assign a; while w;
+Select a such that Parent(w, a) pattern a(_, _"b"_)
+32
+5000
+34 - Mix Parent and pattern
+assign a;
+Select a such that Parent(_, a) pattern a("b", _)
+8,11, 23
+5000
+35 - Mix Parent and pattern
+assign a;
+Select a such that Parent(5, 6) pattern a(_, _"d"_)
+1, 8, 11, 16, 32
+5000
+36 - Mix Parent* and pattern
+assign a; if ifs;
+Select a such that Parent*(ifs, a) pattern a(_, _"b"_)
+16, 28, 32
+5000
+37 - Mix Parent* and pattern
+assign a; if ifs;
+Select ifs such that Parent*(4, 23) pattern a(_ , _"d"_)
+10, 14, 22
+5000
+38 - Mix Follow and pattern
+assign a; read r;
+Select a such that Follows(a, r) pattern a("b", _)
+8, 11
+5000
+39 - Mix Follow* and pattern
+assign a; if ifs;
+Select a such that Follows*(a, ifs) pattern a(_ , _"d"_)
+8,11
+5000
+40 - Mix Uses and pattern
+assign a; variable v;
+Select a such that Uses(a, v) pattern a(v, _)
+none
+5000
+41 - Mix Modifies and pattern
+assign a; variable v;
+Select a such that Modifies(a, v) pattern a("a", _"b"_)
+1
+5000
+42 - same Parent
+stmt s;
+Select s such that Parent(s, s)
+none
+5000
+43 - same Parent* invalid
+read r;
+Select r such that Parent*(s, s)
+none
+5000

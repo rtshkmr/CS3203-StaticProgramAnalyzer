@@ -1,0 +1,10 @@
+procedure invalidExpressionTest {
+	read a;
+	x = 20;
+	while (b99 == 49) {
+		read bb;
+		a = 9 * x % (4 * a + 1)); //unmatching brackets
+		x = a;
+		print x;
+	}
+}

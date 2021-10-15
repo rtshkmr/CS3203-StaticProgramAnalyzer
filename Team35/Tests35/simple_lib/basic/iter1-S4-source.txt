@@ -1,0 +1,42 @@
+procedure test {
+	read a;
+	b = 2;
+	if (( a * b ) > 7 ) then {
+		read x;
+		print x;
+		if (x < 10) then {
+			read m;
+			x = m + a * b - x;
+		} else {
+			f = 8;
+			x = f % a;
+		}
+	} else {
+		while (count < 10) {
+			count = a + f;
+			j = a * count;
+			b = j * a / count - b;
+		}
+		x = b + 9;
+		print y;
+	}
+	read v;
+	while(v <= (b - a)) {
+		c = ( a + b ) / 20;
+		s = x * c + y - c / 2 * c;
+		if (s > 0) then {
+			read s;
+			a = s;
+			count = count + 1;
+		} else {
+			b = s;
+		}
+		while(x > a) {
+			d = 10;
+			d = a * b + c / d % count - x;
+			a = a + 2;
+			read t;
+			print d;
+		}
+	}
+}

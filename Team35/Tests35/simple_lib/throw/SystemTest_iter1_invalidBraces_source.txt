@@ -1,0 +1,16 @@
+procedure invalidBracesTest {
+	a = 20;
+	if (a == a) then {
+		print a;
+		read x;
+		b = 0;
+		while (b != 0) {
+			aa = b;
+			a = 1;
+			print b;
+			while (bb == 20) {  //no closing braces
+				print a;
+				aa = 9;
+		}
+	}
+}

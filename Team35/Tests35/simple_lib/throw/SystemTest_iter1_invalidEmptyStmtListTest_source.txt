@@ -1,0 +1,11 @@
+procedure invalidEmptyStmtListTest {
+	a = 10;
+	hello = 99;
+	bbc = hello * a + 20;
+	read if;
+	ifs = a;
+	while (bbc == 0) {  //empty stmtList
+	}
+	read x;
+	print hello;
+}

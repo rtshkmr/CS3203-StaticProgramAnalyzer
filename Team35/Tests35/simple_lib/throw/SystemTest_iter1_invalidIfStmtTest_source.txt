@@ -1,0 +1,11 @@
+procedure invalidIfStmtTest {
+	read x;
+	a = 20 + x;
+	h91a = a;
+	if (a == h91a) then {   //no else branch
+		print x;
+		b = a;
+		a = 99 + b;
+	}
+	print a;
+}
