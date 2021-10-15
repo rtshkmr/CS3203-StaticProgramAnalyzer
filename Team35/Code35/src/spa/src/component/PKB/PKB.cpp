@@ -299,6 +299,11 @@ void PKB::PopulateFollows(std::unordered_map<Statement*, Statement*>& follow_has
         auto* k_number = const_cast<StatementNumber*>(kv.first->GetStatementNumber());
         std::string k_string = std::to_string(k_number->GetNum());
         relationship_table_[PKBRelRefs::kFollows][k_string].push_back(kv.second);
+        DesignEntity first_type = EntityToDesignEntity(kv.first);
+        DesignEntity second_type = EntityToDesignEntity(kv.second);
+        relationship_by_type_table_[PKBRelRefs::kFollows][{first_type, second_type}].push_back(
+            {kv.first, kv.second}
+        );
     }
 }
 
@@ -307,6 +312,11 @@ void PKB::PopulateFollowedBy(std::unordered_map<Statement*, Statement*>& followe
         auto* k_number = const_cast<StatementNumber*>(kv.first->GetStatementNumber());
         std::string k_string = std::to_string(k_number->GetNum());
         relationship_table_[PKBRelRefs::kFollowedBy][k_string].push_back(kv.second);
+        DesignEntity first_type = EntityToDesignEntity(kv.first);
+        DesignEntity second_type = EntityToDesignEntity(kv.second);
+        relationship_by_type_table_[PKBRelRefs::kFollowedBy][{first_type, second_type}].push_back(
+            {kv.first, kv.second}
+        );
     }
 }
 
@@ -315,6 +325,11 @@ void PKB::PopulateChild(std::unordered_map<Statement*, Statement*>& child_to_par
         auto* k_number = const_cast<StatementNumber*>(kv.first->GetStatementNumber());
         std::string k_string = std::to_string(k_number->GetNum());
         relationship_table_[PKBRelRefs::kChild][k_string].push_back(kv.second);
+        DesignEntity first_type = EntityToDesignEntity(kv.first);
+        DesignEntity second_type = EntityToDesignEntity(kv.second);
+        relationship_by_type_table_[PKBRelRefs::kChild][{first_type, second_type}].push_back(
+            {kv.first, kv.second}
+        );
     }
 }
 
