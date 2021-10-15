@@ -1,0 +1,6 @@
+procedure NoElseBr {
+	zer0 = 0; 
+	if (zer0 == 0) {
+		zer0 = 1;
+	}
+}

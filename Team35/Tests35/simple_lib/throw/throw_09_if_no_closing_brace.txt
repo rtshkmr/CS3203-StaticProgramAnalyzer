@@ -1,0 +1,12 @@
+procedure IfNoClosingBrace {
+	if (hello == bye) {
+		do = smth;
+	} else {
+		do = nth; 
+		
+	if (bye == hello) {
+		do = smth;
+	else
+		do = nth;
+	}
+}

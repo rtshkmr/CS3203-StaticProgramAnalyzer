@@ -1,0 +1,4 @@
+procedure IfNoBrace {
+	print x; 
+	if (x ==x) x = 1; else x = y; 
+}

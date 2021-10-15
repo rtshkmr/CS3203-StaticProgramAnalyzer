@@ -1,0 +1,11 @@
+procedure A {
+	call B; 
+}
+
+procedure B {
+	call C; 
+}
+
+procedure C {
+	call A; 
+}
