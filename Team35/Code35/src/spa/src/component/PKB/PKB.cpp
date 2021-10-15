@@ -681,6 +681,8 @@ std::string PKB::GetNameFromEntity(Entity* entity) {
         Constant* constant = dynamic_cast<Constant*>(entity);
         ConstantValue* cv = const_cast<ConstantValue*>(constant->GetValue());
         return "c" + std::to_string(cv->Get());
+    } else {
+      return "";
     }
 }
 
@@ -706,5 +708,9 @@ DesignEntity PKB::EntityToDesignEntity(Entity* entity) {
             return DesignEntity::kVariable;
         case (EntityEnum::kConstantEntity):
             return DesignEntity::kConstant;
+        case (EntityEnum::kElseEntity):
+            return DesignEntity::kInvalid;
+        case (EntityEnum::kNone):
+            return DesignEntity::kInvalid;
     }
 }
