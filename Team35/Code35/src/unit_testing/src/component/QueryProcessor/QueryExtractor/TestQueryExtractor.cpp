@@ -908,3 +908,127 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that Affects; should pass") 
     REQUIRE(AreGroupsEqual(expected_group, actual_group));
   }
 }
+
+// advanced variations of pattern; if-pattern and while-pattern
+TEST_CASE("3.QueryExtractor.Single well-formed if-pattern") {
+  SECTION("if-syn + entref is variable syn") {
+    std::string query = "if ifs; variable v; Select ifs pattern ifs(v,_,_)";
+    auto query_extractor = QueryExtractor(& query);
+    query_extractor.ExtractQuery();
+    std::vector<Group*> actual_groups = query_extractor.GetGroupsList();
+    REQUIRE(actual_groups.size() == 1);
+    Group* actual_group = actual_groups[0];
+    Clause* expected_cl = new Pattern("ifs", "v", DesignEntity::kIf, true, false);
+    std::vector<Clause*> clauses;
+    clauses.push_back(expected_cl);
+    Group* expected_group = new Group(clauses, true);
+
+    REQUIRE(AreGroupsEqual(expected_group, actual_group));
+  }
+
+  SECTION("if-syn + entref is syn but not variable") {
+    std::string query = "if ifs; while w; Select ifs pattern ifs(w,_,_)";
+    auto query_extractor = QueryExtractor(& query);
+    REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
+                        Catch::Contains("Unknown synonym received as entRef in lhs of pattern cl."));
+  }
+
+  SECTION("if-syn + entref is underscore") {
+    std::string query = "if ifs; while w; Select ifs pattern ifs(_,_,_)";
+    auto query_extractor = QueryExtractor(& query);
+    query_extractor.ExtractQuery();
+    std::vector<Group*> actual_groups = query_extractor.GetGroupsList();
+    REQUIRE(actual_groups.size() == 1);
+    Group* actual_group = actual_groups[0];
+    Clause* expected_cl = new Pattern("ifs", "_", DesignEntity::kIf, true, false);
+    std::vector<Clause*> clauses;
+    clauses.push_back(expected_cl);
+    Group* expected_group = new Group(clauses, true);
+
+    REQUIRE(AreGroupsEqual(expected_group, actual_group));
+  }
+  SECTION("if-syn + entref is IDENT string") {
+    std::string query = "if ifs; while w; Select ifs pattern ifs(\"v\",_,_)";
+    auto query_extractor = QueryExtractor(& query);
+    query_extractor.ExtractQuery();
+    std::vector<Group*> actual_groups = query_extractor.GetGroupsList();
+    REQUIRE(actual_groups.size() == 1);
+    Group* actual_group = actual_groups[0];
+    Clause* expected_cl = new Pattern("ifs", "v", DesignEntity::kIf, true, false);
+    std::vector<Clause*> clauses;
+    clauses.push_back(expected_cl);
+    Group* expected_group = new Group(clauses, true);
+
+    REQUIRE(AreGroupsEqual(expected_group, actual_group));
+  }
+  SECTION("if-syn + entref + rhs is not underscore") {
+    std::string query = "if ifs; while w; Select ifs pattern ifs(\"v\",_,\"v\")";
+    auto query_extractor = QueryExtractor(& query);
+    REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
+                        Catch::Contains("Unexpected token"));
+  }
+  SECTION("not if-syn + entref") {
+    std::string query = "if ifs; while w; Select ifs pattern w(\"v\",_,\"v\")";
+    auto query_extractor = QueryExtractor(& query);
+    REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
+                        Catch::Contains("Unexpected token"));
+  };
+}
+
+TEST_CASE("3.QueryExtractor.Single well-formed while-pattern") {
+  SECTION("while-syn + entref is variable syn") {
+    std::string query = "if ifs; while w; variable v; Select <w, v> pattern w(v,_)";
+    auto query_extractor = QueryExtractor(& query);
+    query_extractor.ExtractQuery();
+    std::vector<Group*> actual_groups = query_extractor.GetGroupsList();
+    REQUIRE(actual_groups.size() == 1);
+    Group* actual_group = actual_groups[0];
+    Clause* expected_cl = new Pattern("w", "v", DesignEntity::kWhile, true, false);
+    std::vector<Clause*> clauses;
+    clauses.push_back(expected_cl);
+    Group* expected_group = new Group(clauses, true);
+
+    REQUIRE(AreGroupsEqual(expected_group, actual_group));
+  }
+  SECTION("while-syn + entref is syn but not variable") {
+    std::string query = "if ifs; while w; variable v; Select <w, v> pattern w(ifs,_)";
+    auto query_extractor = QueryExtractor(& query);
+    REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
+                        Catch::Contains("Unknown synonym received as entRef in lhs of pattern cl."));
+  }
+  SECTION("while-syn + entref is underscore") {
+    std::string query = "if ifs; while w; variable v; Select <w, v> pattern w(_,_)";
+    auto query_extractor = QueryExtractor(& query);
+    query_extractor.ExtractQuery();
+    std::vector<Group*> actual_groups = query_extractor.GetGroupsList();
+    REQUIRE(actual_groups.size() == 2);
+    Group* actual_group = actual_groups[0];
+    Clause* expected_cl = new Pattern("_", "_", DesignEntity::kWhile, false, false);
+    std::vector<Clause*> clauses;
+    clauses.push_back(expected_cl);
+    Group* expected_group = new Group(clauses, true);
+
+    REQUIRE(AreGroupsEqual(expected_group, actual_group));
+  }
+  SECTION("while-syn + entref is IDENT string") {
+    std::string query = "if ifs; while w; variable v; Select <w, v> pattern w(\"x\",_)";
+    auto query_extractor = QueryExtractor(& query);
+    query_extractor.ExtractQuery();
+    std::vector<Group*> actual_groups = query_extractor.GetGroupsList();
+    REQUIRE(actual_groups.size() == 2);
+    Group* actual_group = actual_groups[0];
+    Clause* expected_cl = new Pattern("w", "x", DesignEntity::kWhile, false, false);
+    std::vector<Clause*> clauses;
+    clauses.push_back(expected_cl);
+    Group* expected_group = new Group(clauses, true);
+
+    REQUIRE(AreGroupsEqual(expected_group, actual_group));
+  }
+
+  SECTION("while-syn + entref + rhs arg is not underscore") {
+    std::string query = "if ifs; while w; variable v; Select <w, v> pattern w(\"x\",ifs)";
+    auto query_extractor = QueryExtractor(& query);
+    REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
+                        Catch::Contains("Unexpected token"));
+  }
+}

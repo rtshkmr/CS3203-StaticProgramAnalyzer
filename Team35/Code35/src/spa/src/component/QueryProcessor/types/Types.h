@@ -180,6 +180,7 @@ struct SuchThat : Clause {
 
 struct Pattern : Clause {
   std::string assign_synonym;
+  DesignEntity pattern_type;
   bool left_is_synonym;
   bool is_exact = false;
   Pattern() {};
@@ -190,10 +191,17 @@ struct Pattern : Clause {
     left_is_synonym = lhs_is_syn;
     is_exact = is_ext;
   }
+  Pattern(std::string lhs, std::string rhs, DesignEntity de, bool lhs_is_syn, bool is_ext) {
+    left_hand_side = lhs;
+    right_hand_side = rhs;
+    pattern_type = de;
+    left_is_synonym = lhs_is_syn;
+    is_exact = is_ext;
+  }
   std::vector<std::string> GetAllSynonymNamesOfClause() {
     std::vector<std::string> v;
     if (left_is_synonym) v.push_back(left_hand_side);
-    v.push_back(assign_synonym);
+    v.push_back(first_synonym->GetName());
     return v;
   };
   std::string getType() const { return typeid(this).name(); }
@@ -205,7 +213,8 @@ struct Pattern : Clause {
               this->right_hand_side == obj->right_hand_side &&
               this->assign_synonym == obj->assign_synonym &&
               this->left_is_synonym == obj->left_is_synonym &&
-              this->is_exact == obj->is_exact
+              this->is_exact == obj->is_exact &&
+              this->pattern_type == obj->pattern_type
       );
     } else {
       return false;

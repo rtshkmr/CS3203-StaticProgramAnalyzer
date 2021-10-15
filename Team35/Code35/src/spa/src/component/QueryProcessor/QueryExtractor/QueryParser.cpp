@@ -457,10 +457,31 @@ bool QueryParser::IsValidSynonym(Token token, DesignEntity de) {
   return 1;
 }
 
+// while : syn-while ‘(’ entRef ‘,’ ‘_’ ‘)’
 void QueryParser::ParseWhilePattern() {
+  Token while_tok = Token(lookahead.GetTokenString(), lookahead.GetTokenTag());
 
+  Eat(TokenTag::kName); // eat 'syn-while'
+  Eat(TokenTag::kOpenBracket);
+  // parse_lhs
+  Token lhs_token = ParseEntRef(true);
+  Eat(TokenTag::kComma);
+  std::string lhs = lhs_token.GetTokenString();
+  bool lhs_is_syn = IsValidSynonym(lhs_token, DesignEntity::kVariable);
+  //parse_rhs
+  Eat(TokenTag::kUnderscore);
+  Eat(TokenTag::kCloseBracket);
+
+  // create clause object
+  Clause* cl = new Pattern(lhs, "_", DesignEntity::kWhile, lhs_is_syn, false);
+  cl->first_synonym = QueryParser::GetSynonymInfo(while_tok.GetTokenString(), &synonyms);
+  if (lhs_is_syn) {
+    cl->second_synonym = QueryParser::GetSynonymInfo(lhs, &synonyms);
+  }
+  clauses.emplace_back(cl);
 };
 
+// assign : syn-assign ‘(‘ entRef ‘,’ expression-spec ‘)’
 void QueryParser::ParseAssignPattern() {
   Token assn_tok = Token(lookahead.GetTokenString(), lookahead.GetTokenTag());
 
@@ -476,7 +497,7 @@ void QueryParser::ParseAssignPattern() {
   Eat(TokenTag::kCloseBracket);
 
   // create clause object
-  Clause* cl = new Pattern(lhs, rhs_info.first, assn_tok.GetTokenString(), lhs_is_syn, rhs_info.second);
+  Clause* cl = new Pattern(lhs, rhs_info.first, DesignEntity::kAssign, lhs_is_syn, rhs_info.second);
   cl->first_synonym = QueryParser::GetSynonymInfo(assn_tok.GetTokenString(), &synonyms);
   if (lhs_is_syn) {
     cl->second_synonym = QueryParser::GetSynonymInfo(lhs, &synonyms);
@@ -484,8 +505,30 @@ void QueryParser::ParseAssignPattern() {
   clauses.emplace_back(cl);
 };
 
+// if : syn-if ‘(’ entRef ‘,’ ‘_’ ‘,’ ‘_’ ‘)’
 void QueryParser::ParseIfPattern() {
+  Token if_tok = Token(lookahead.GetTokenString(), lookahead.GetTokenTag());
 
+  Eat(TokenTag::kName); // eat 'syn-if'
+  Eat(TokenTag::kOpenBracket);
+  // parse_lhs
+  Token lhs_token = ParseEntRef(true);
+  Eat(TokenTag::kComma);
+  std::string lhs = lhs_token.GetTokenString();
+  bool lhs_is_syn = IsValidSynonym(lhs_token, DesignEntity::kVariable);
+  //parse mid and rhs
+  Eat(TokenTag::kUnderscore);
+  Eat(TokenTag::kComma);
+  Eat(TokenTag::kUnderscore);
+  Eat(TokenTag::kCloseBracket);
+
+  // create clause object
+  Clause* cl = new Pattern(lhs, "_", DesignEntity::kIf, lhs_is_syn, false);
+  cl->first_synonym = QueryParser::GetSynonymInfo(if_tok.GetTokenString(), &synonyms);
+  if (lhs_is_syn) {
+    cl->second_synonym = QueryParser::GetSynonymInfo(lhs, &synonyms);
+  }
+  clauses.emplace_back(cl);
 };
 
 /**
@@ -511,8 +554,10 @@ void QueryParser::ParsePatternCond() {
       ParseAssignPattern();
       break;
     case DesignEntity::kIf:
+      ParseIfPattern();
       break;
     case DesignEntity::kWhile:
+      ParseWhilePattern();
       break;
     default:
       return;
