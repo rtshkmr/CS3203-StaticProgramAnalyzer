@@ -541,3 +541,4 @@ void QueryParser::Parse() {
   lookahead = tokenizer.GetNextToken();
   ParseQuery();
 }
+

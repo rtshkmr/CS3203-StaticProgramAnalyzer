@@ -9,7 +9,7 @@ static std::unordered_map<std::string, RelRef> _relref_map = {{"ModifiesP", RelR
                                                               {"Calls*", RelRef::kCallsT},
                                                               {"Parent", RelRef::kParent},
                                                               {"Parent*", RelRef::kParentT},
-                                                              {"Follows", RelRef::kModifiesP},
+                                                              {"Follows", RelRef::kFollows},
                                                               {"Follows*", RelRef::kFollowsT},
                                                               {"Next", RelRef::kNext},
                                                               {"Next*", RelRef::kNextT},
