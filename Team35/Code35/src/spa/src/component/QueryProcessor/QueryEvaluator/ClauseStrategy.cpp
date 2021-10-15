@@ -98,4 +98,6 @@ PatternStrategy::DetermineClauseCommand(Clause *clause, QueryEvaluatorTable *tab
       // Technically this should never run
     }
   }
+
+  return std::make_tuple(query_command, clause_command);
 }

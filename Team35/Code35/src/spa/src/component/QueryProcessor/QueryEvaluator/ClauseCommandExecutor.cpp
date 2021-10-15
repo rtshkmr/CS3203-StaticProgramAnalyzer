@@ -136,6 +136,7 @@ void ClauseCommandExecutor::PatternTwoSynonymOneInTable(Clause *clause, bool fir
   for (int table_index = 0; table_index < table_size; table_index++) {
     Entity *entity_in_table = entity_list_in_table[group_table_row_pointer];
     int repeat_count = 0;
+    bool has_relation = false;
 
     // Entity could be assign or variable
     for (auto entity : intermediate_table) {
@@ -144,15 +145,17 @@ void ClauseCommandExecutor::PatternTwoSynonymOneInTable(Clause *clause, bool fir
       Entity *entity_to_compare = first_syn_in ? entity : dynamic_cast<Entity*>(variable_entity);
 
       if ((entity_to_compare != entity_in_table) || (!HasExpressionMatch(pattern_clause, assign_entity))) {
-        group_table->DeleteRow(table_index);
-        table_index--;
-        table_size--;
         continue;
       }
-
+      has_relation = true;
       Entity *entity_to_be_added = first_syn_in ? dynamic_cast<Entity *>(variable_entity) : entity;
-      group_table->AddMultipleRowForAllColumn(synonym_in_table, table_index, entity_to_be_added, repeat_count);
+      group_table->AddMultipleRowForAllColumn(new_synonym, table_index, entity_to_be_added, repeat_count);
       repeat_count++;
+    }
+    if (!has_relation) {
+      group_table->DeleteRow(table_index);
+      table_index--;
+      table_size--;
     }
     group_table_row_pointer++;
   }

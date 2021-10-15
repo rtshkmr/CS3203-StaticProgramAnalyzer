@@ -27,7 +27,6 @@ class PKBQueryReceiver {
 
 class PKBQueryCommand {
   public:
-    virtual ~PKBQueryCommand() = default;
     virtual void SetReceiver(PKBQueryReceiver *receiver) = 0;
     virtual IntermediateTable * ExecuteQuery(Clause *clause) = 0;
 
