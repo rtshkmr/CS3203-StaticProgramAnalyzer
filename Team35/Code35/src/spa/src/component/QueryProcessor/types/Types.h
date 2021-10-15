@@ -6,6 +6,7 @@
 #include <array>
 #include <set>
 #include <datatype/DataType.h>
+//#include <component/QueryProcessor/types/QueryEvaluatorTable.h>
 #include <typeinfo>
 
 enum class DesignEntity : unsigned int {
@@ -20,6 +21,7 @@ enum class DesignEntity : unsigned int {
   kConstant = 8,
   kProcedure = 9,
   kInvalid = 10,
+  kWildcard = 11,
 };
 
 const std::array<DesignEntity, 11> all_design_entities = {
@@ -36,33 +38,7 @@ const std::array<DesignEntity, 11> all_design_entities = {
     DesignEntity:: kInvalid,
 };
 
-
-
-static DesignEntity GetDesignEntity(std::string reference) {
-  if (reference == "stmt") {
-    return DesignEntity::kStmt;
-  } else if (reference == "read") {
-    return DesignEntity::kRead;
-  } else if (reference == "print") {
-    return DesignEntity::kPrint;
-  } else if (reference == "call") {
-    return DesignEntity::kCall;
-  } else if (reference == "while") {
-    return DesignEntity::kWhile;
-  } else if (reference == "if") {
-    return DesignEntity::kIf;
-  } else if (reference == "assign") {
-    return DesignEntity::kAssign;
-  } else if (reference == "variable") {
-    return DesignEntity::kVariable;
-  } else if (reference == "constant") {
-    return DesignEntity::kConstant;
-  } else if (reference == "procedure") {
-    return DesignEntity::kProcedure;
-  }
-
-  return DesignEntity::kInvalid;
-}
+DesignEntity GetDesignEntity(std::string reference);
 
 enum class PKBRelRefs {
   kFollows,
@@ -122,54 +98,42 @@ enum class RelRef {
   kInvalid,
 };
 
-static RelRef GetRelRef(std::string reference) {
-  if (reference == "ModifiesP") {
-    return RelRef::kModifiesP;
-  } else if (reference == "ModifiesS") {
-    return RelRef::kModifiesS;
-  } else if (reference == "UsesP") {
-    return RelRef::kUsesP;
-  } else if (reference == "UsesS") {
-    return RelRef::kUsesS;
-  } else if (reference == "Calls") {
-    return RelRef::kCalls;
-  } else if (reference == "Calls*") {
-    return RelRef::kCallsT;
-  } else if (reference == "Parent") {
-    return RelRef::kParent;
-  } else if (reference == "Parent*") {
-    return RelRef::kParentT;
-  } else if (reference == "Follows") {
-    return RelRef::kFollows;
-  } else if (reference == "Follows*") {
-    return RelRef::kFollowsT;
-  } else if (reference == "Next") {
-    return RelRef::kNext;
-  } else if (reference == "Next*") {
-    return RelRef::kNextT;
-  } else if (reference == "Affects") {
-    return RelRef::kAffects;
-  } else if (reference == "Affects*") {
-    return RelRef::kAffectsT;
-  }
-  // TODO: Throw an error if this line is reached.
-  return RelRef::kInvalid;
-}
+RelRef GetRelRef(std::string reference);
+
+enum class Attribute {
+  kStmtNumber,
+  kProcName,
+  kVarName,
+  kValue
+};
+
+struct QueryInfo {
+  bool all_boolean_true;
+  // std::vector<*QueryEvaluatorTable> table_list;
+};
 
 class Synonym {
  private:
   std::string name;
   DesignEntity type;
+  Attribute return_attribute = Attribute::kStmtNumber;
  public:
   Synonym() {};
   Synonym(std::string name, DesignEntity type) : name(name), type(type) {};
+  Synonym(std::string name, DesignEntity type, Attribute attr) : name(name), type(type), return_attribute(attr) {};
   std::string GetName() { return name; };
   DesignEntity GetType() { return type; };
+  Attribute GetAttribute() { return return_attribute; };
+  void SetAttribute(Attribute attr) { return_attribute = attr; };
+  bool operator==(const Synonym& other) const;
 };
 
 struct Clause {
   std::string left_hand_side;
   std::string right_hand_side;
+  virtual std::vector<std::string> GetAllSynonymNamesOfClause() { return {}; };
+  Synonym* first_synonym;
+  Synonym* second_synonym;
   virtual std::string getType() { return ""; };
   virtual bool isEqual(Clause toObj) { return 1; };
   virtual ~Clause() {};
@@ -187,6 +151,12 @@ struct SuchThat : Clause {
     left_is_synonym = lhs_is_syn;
     right_is_synonym = rhs_is_syn;
   }
+  std::vector<std::string> GetAllSynonymNamesOfClause() {
+    std::vector<std::string> v;
+    if (left_is_synonym) v.push_back(left_hand_side);
+    if (right_is_synonym) v.push_back(right_hand_side);
+    return v;
+  };
   std::string getType() const { return typeid(this).name(); }
   bool isEqual(Clause* toObj) {
     if (this->getType() == toObj->getType()) {
@@ -209,13 +179,19 @@ struct Pattern : Clause {
   bool left_is_synonym;
   bool is_exact = false;
   Pattern() {};
-  Pattern(std::string lhs, std::string rhs, std::string assn_syn, bool lhs_is_syn, bool is_exact) {
+  Pattern(std::string lhs, std::string rhs, std::string assn_syn, bool lhs_is_syn, bool is_ext) {
     left_hand_side = lhs;
     right_hand_side = rhs;
     assign_synonym = assn_syn;
     left_is_synonym = lhs_is_syn;
-    is_exact = is_exact;
+    is_exact = is_ext;
   }
+  std::vector<std::string> GetAllSynonymNamesOfClause() {
+    std::vector<std::string> v;
+    if (left_is_synonym) v.push_back(left_hand_side);
+    v.push_back(assign_synonym);
+    return v;
+  };
   std::string getType() const { return typeid(this).name(); }
   bool isEqual(Clause* toObj) {
     if (this->getType() == toObj->getType()) {
@@ -235,14 +211,21 @@ struct Pattern : Clause {
 
 class Group {
  private:
+  std::vector<Synonym*> target_synonyms;
   std::vector<Clause*> clauses;
-  bool has_target_synonym;
+  bool has_target_synonym = false;
  public:
+  Group() {};
   Group(std::vector<Clause*> clauses, bool has_target_synonym) :
       has_target_synonym(has_target_synonym), clauses(clauses) {};
-  bool AddClauseToVector(Clause* clause);
+  Group(std::vector<Clause*> clauses, bool has_target_synonym, std::vector<Synonym*> target_synonyms) :
+  has_target_synonym(has_target_synonym), clauses(clauses), target_synonyms(target_synonyms) {};
+  void AddSynToTargetSyns(Synonym* s);
+  void AddClauseToVector(Clause* clause);
   std::vector<Clause*> GetClauses();
   bool ContainsTargetSynonym();
+  std::vector<Synonym*> GetTargetSynonyms();
+  void UpdateHasTargetSynonymAttr();
 };
 
 #endif //AUTOTESTER_TYPES_H
