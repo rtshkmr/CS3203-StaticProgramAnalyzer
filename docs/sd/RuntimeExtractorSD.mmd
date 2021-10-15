@@ -1,0 +1,31 @@
+sequenceDiagram
+    autonumber
+    participant QueryEvaluator
+    participant PKB
+    participant RuntimeExtractor
+    participant NextTExtractor
+
+    QueryEvaluator ->>+ PKB: GetRelationship(PKBRelRef, string)
+    PKB ->>+ RuntimeExtractor: GetRelationship(PKBRelRef, string)
+
+    alt forward relationship
+        RuntimeExtractor ->>+ NextTExtractor: GetForwardRelationship(string)
+        NextTExtractor -->>- RuntimeExtractor: vector<Entity*>
+    else backward relationship
+        RuntimeExtractor ->>+ NextTExtractor: GetBackwardRelationship(string)
+        NextTExtractor -->>- RuntimeExtractor: vector<Entity*>
+    end
+    %% Will process string and<br/>query existing data from PKB
+
+    RuntimeExtractor -->>- PKB: vector<Entity*>
+    PKB -->>- QueryEvaluator: vector<Entity*>
+
+    QueryEvaluator ->>+ PKB: HasRelationship(PKBRelRef)
+    PKB ->>+ RuntimeExtractor: HasRelationship(PKBRelRef)
+
+        RuntimeExtractor ->>+ NextTExtractor: Extract()
+        NextTExtractor -->>- RuntimeExtractor: bool
+        %% Must do a complete <br/>extraction to prove false
+
+    RuntimeExtractor -->>- PKB: bool
+    PKB -->>- QueryEvaluator: bool
