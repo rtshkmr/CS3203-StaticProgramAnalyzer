@@ -68,36 +68,36 @@ void PKB::PopulateDataStructures(Deliverable d) {
   PopulateContainerModifiedBy(d.container_modified_by_hash_);
 
   // TO BE DEPRECATED FROM HERE
-  PopulateProcList(d.proc_list_);
-  PopulateVarList(d.var_list_);
-  PopulateConstList(d.const_list_);
-  PopulateIfList(d.if_list_);
-  PopulateWhileList(d.while_list_);
-  PopulateAssignList(d.assign_list_);
-  PopulateCallList(d.call_list_);
-  PopulatePrintList(d.print_list_);
-  PopulateReadList(d.read_list_);
-  PopulateStmtList(d.stmt_list_);
-
-  PopulateFollowsMap(d.follow_hash_);
-  PopulatePreviousMap(d.followed_by_hash_);
-
-  PopulateParentMap(d.parent_to_child_hash_);
-  PopulateChildMap(d.child_to_parent_hash_);
-
-  PopulateFollowsTMap(d.follows_T_hash_);
-  PopulatePreviousTMap(d.followed_by_T_hash_);
-  PopulateParentTMap(d.parent_to_child_T_hash_);
-  PopulateChildTMap(d.child_to_parent_T_hash_);
-
-  PopulateUseSMap(d.use_hash_);
-  PopulateUsedBySMap(d.used_by_hash_);
-  PopulateUseCMap(d.container_use_hash_);
-  PopulateUsedByCMap(d.container_used_by_hash_);
-  PopulateModifiesSMap(d.modifies_hash_);
-  PopulateModifiedBySMap(d.modified_by_hash_);
-  PopulateModifiesCMap(d.container_modifies_hash_);
-  PopulateModifiedByCMap(d.container_modified_by_hash_);
+//  PopulateProcList(d.proc_list_);
+//  PopulateVarList(d.var_list_);
+//  PopulateConstList(d.const_list_);
+//  PopulateIfList(d.if_list_);
+//  PopulateWhileList(d.while_list_);
+//  PopulateAssignList(d.assign_list_);
+//  PopulateCallList(d.call_list_);
+//  PopulatePrintList(d.print_list_);
+//  PopulateReadList(d.read_list_);
+//  PopulateStmtList(d.stmt_list_);
+//
+//  PopulateFollowsMap(d.follow_hash_);
+//  PopulatePreviousMap(d.followed_by_hash_);
+//
+//  PopulateParentMap(d.parent_to_child_hash_);
+//  PopulateChildMap(d.child_to_parent_hash_);
+//
+//  PopulateFollowsTMap(d.follows_T_hash_);
+//  PopulatePreviousTMap(d.followed_by_T_hash_);
+//  PopulateParentTMap(d.parent_to_child_T_hash_);
+//  PopulateChildTMap(d.child_to_parent_T_hash_);
+//
+//  PopulateUseSMap(d.use_hash_);
+//  PopulateUsedBySMap(d.used_by_hash_);
+//  PopulateUseCMap(d.container_use_hash_);
+//  PopulateUsedByCMap(d.container_used_by_hash_);
+//  PopulateModifiesSMap(d.modifies_hash_);
+//  PopulateModifiedBySMap(d.modified_by_hash_);
+//  PopulateModifiesCMap(d.container_modifies_hash_);
+//  PopulateModifiedByCMap(d.container_modified_by_hash_);
   // UNTIL HERE
 
   L("[DONE] PKB POPULATED WITHOUT ERROR\n");
@@ -111,7 +111,18 @@ std::vector<std::tuple<Entity*, Entity*>> PKB::GetRelationshipByTypes(PKBRelRefs
     return relationship_by_type_table_[ref][{d1, d2}];
 }
 
-
+std::vector<Entity*> PKB::GetRelationshipByType(PKBRelRefs ref, DesignEntity d) {
+//    todo: optimize this
+    std::vector<std::tuple<DesignEntity, DesignEntity>> combos = first_param_map_[d];
+    std::vector<Entity*> entities;
+    for (auto combo : combos) {
+        std::vector<std::tuple<Entity*, Entity*>> pairs = relationship_by_type_table_[ref][{std::get<0>(combo), std::get<0>(combo)}];
+        for (auto pair : pairs) {
+            entities.push_back(std::get<0>(pair));
+        }
+    }
+    return entities;
+}
 
 void PKB::InitializeDataStructures() {
     for (DesignEntity param1 : all_design_entities) {
