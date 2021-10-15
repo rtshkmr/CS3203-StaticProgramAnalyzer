@@ -214,9 +214,9 @@ void Block::PatchEmptyBlocks(Block* redundant, Block* to) {
 }
 
 void Block::AddNextBlock(Block* next_block) {
-  assert(this->next_blocks_.size() < 2);
   this->next_blocks_.insert(next_block);
   next_block->prev_blocks_.insert(this);
+  assert(this->next_blocks_.size() <= 2);
 }
 
 std::set<Block*> Block::GetNextBlocks() const {
