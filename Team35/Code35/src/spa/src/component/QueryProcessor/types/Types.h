@@ -57,7 +57,8 @@ enum class PKBRelRefs {
   kModifiesContainer,
   kModifiedByStatement,
   kModifiedByContainer,
-  kCalls
+  kCalls,
+  kCalledBy
 };
 
 const std::array<PKBRelRefs, 16> pkb_rel_refs = {

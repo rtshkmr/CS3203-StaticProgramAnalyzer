@@ -11,9 +11,9 @@ PKBRelRefs PKBQueryCommand::GetPKBRelRef(RelRef relation, bool order_of_values_u
         case RelRef::kParent:
           return order_of_values_unchanged_from_clause ? PKBRelRefs::kParent : PKBRelRefs::kChild;
           case RelRef::kModifiesP:
-            return order_of_values_unchanged_from_clause ? PKBRelRefs::kModifiesContainer : PKBRelRefs::kModifiedByContainer; // TODO: Check w oliver
+            return order_of_values_unchanged_from_clause ? PKBRelRefs::kModifiesContainer : PKBRelRefs::kModifiedByContainer;
             case RelRef::kModifiesS:
-              return order_of_values_unchanged_from_clause ? PKBRelRefs::kModifiesStatement : PKBRelRefs::kModifiedByStatement; // TODO: Check w oliver
+              return order_of_values_unchanged_from_clause ? PKBRelRefs::kModifiesStatement : PKBRelRefs::kModifiedByStatement;
               case RelRef::kUsesS:
                 return order_of_values_unchanged_from_clause ? PKBRelRefs::kUsesS : PKBRelRefs::kUsedByS;
                 case RelRef::kUsesP:
@@ -21,7 +21,7 @@ PKBRelRefs PKBQueryCommand::GetPKBRelRef(RelRef relation, bool order_of_values_u
                   case RelRef::kFollowsT:
                     return order_of_values_unchanged_from_clause ? PKBRelRefs::kFollowsT : PKBRelRefs::kFollowedByT;
                     case RelRef::kCalls:
-                      return order_of_values_unchanged_from_clause ? PKBRelRefs::kCalls : PKBRelRefs::kCalls;  // TODO: Check if there is no backwards call?
+                      return order_of_values_unchanged_from_clause ? PKBRelRefs::kCalls : PKBRelRefs::kCalledBy;
 //                      case RelRef::kCallsT:
 //                        return PKBRelRefs::kCallsT;
 //                        case RelRef::kNext:
