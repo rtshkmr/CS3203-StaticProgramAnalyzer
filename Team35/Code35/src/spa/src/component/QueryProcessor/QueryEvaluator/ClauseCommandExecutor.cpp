@@ -152,7 +152,7 @@ void ClauseCommandExecutor::PatternTwoSynonymOneInTable(Clause *clause, bool fir
       group_table->AddMultipleRowForAllColumn(new_synonym, group_table_pointer, entity_to_be_added, repeat_count);
       repeat_count++;
     }
-    group_table_pointer += repeat_count;
+    if (repeat_count > 0) group_table_pointer += repeat_count - 1;
     if (!has_relation) {
       group_table->DeleteRow(group_table_pointer);
       group_table_pointer--;
