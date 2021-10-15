@@ -237,7 +237,7 @@ std::tuple<std::string, bool, bool, bool> QueryParser::ParseStmtOrEntRef() {
  * @returns a tuple of values corresponding to Clause object, bool isTargetSynonym.
  */
 std::pair<Clause*, bool> QueryParser::ParseRelRef() {
-  std::unordered_set<std::string> relRefs = {"Follows", "Parent", "Uses", "Modifies"};
+  std::unordered_set<std::string> relRefs = {"Follows", "Parent", "Uses", "Modifies", "Calls", "Next", "Affects"};
   std::unordered_set<std::string>::const_iterator got = relRefs.find(lookahead.GetTokenString());
   if (got == relRefs.end()) {
     throw PQLParseException("Invalid relRef in such that clause.");
@@ -257,22 +257,31 @@ std::pair<Clause*, bool> QueryParser::ParseRelRef() {
   bool is_lhs_tgt_syn;
   bool is_uses_or_modifies_p = false;
 
-  if (rel_type.compare("Uses") == 0 || rel_type.compare("Modifies") == 0) {
+  // 3 cases for parsing lhs of relref
+  if (rel_type.find("Calls") == 0) {
+    Token tok = ParseEntRef(false);
+    lhs = tok.GetTokenString();
+    is_lhs_syn = IsValidSynonym(tok);
+    is_lhs_tgt_syn = target_synonyms_map.find(tok.GetTokenString()) != target_synonyms_map.end();
+  }
+  else if (rel_type == "Uses" || rel_type == "Modifies") {
     std::tie(lhs, is_lhs_syn, is_lhs_tgt_syn, is_uses_or_modifies_p) = ParseStmtOrEntRef();
-  } else {
+  }
+  else {
     std::tie(lhs, is_lhs_syn, is_lhs_tgt_syn) = ParseStmtRef();
   }
 
-  if (lhs.compare("_") == 0 && (rel_type.compare("Modifies") == 0 || rel_type.compare("Uses") == 0)) {
+  if (lhs == "_" && (rel_type == "Modifies" || rel_type == "Uses")) {
     throw PQLValidationException("Semantically invalid to have _ as first argument for " + rel_type);
   }
 
   Eat(TokenTag::kComma);
+
   // parse right-hand side
   std::string rhs;
   bool is_rhs_syn = false;
   bool is_rhs_tgt_syn = false;
-  if (rel_type.compare("Uses") == 0 || rel_type.compare("Modifies") == 0) {
+  if (rel_type == "Uses" || rel_type == "Modifies" || rel_type.find("Calls") == 0) {
     Token tok = ParseEntRef(false);
     rhs = tok.GetTokenString();
     is_rhs_syn = IsValidSynonym(tok);

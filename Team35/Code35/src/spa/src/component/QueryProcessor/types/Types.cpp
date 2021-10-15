@@ -1,43 +1,33 @@
 #include "Types.h"
 #include <unordered_map>
 
+static std::unordered_map<std::string, RelRef> _relref_map = {{"ModifiesP", RelRef::kModifiesP},
+                                                              {"ModifiesS", RelRef::kModifiesS},
+                                                              {"UsesP", RelRef::kUsesP},
+                                                              {"UsesS", RelRef::kUsesS},
+                                                              {"Calls", RelRef::kCalls},
+                                                              {"Calls*", RelRef::kCallsT},
+                                                              {"Parent", RelRef::kParent},
+                                                              {"Parent*", RelRef::kParentT},
+                                                              {"Follows", RelRef::kModifiesP},
+                                                              {"Follows*", RelRef::kFollowsT},
+                                                              {"Next", RelRef::kNext},
+                                                              {"Next*", RelRef::kNextT},
+                                                              {"Affects", RelRef::kAffects},
+                                                              {"Affects*", RelRef::kAffectsT}};
+
 RelRef GetRelRef(std::string reference) {
-  if (reference == "ModifiesP") {
-    return RelRef::kModifiesP;
-  } else if (reference == "ModifiesS") {
-    return RelRef::kModifiesS;
-  } else if (reference == "UsesP") {
-    return RelRef::kUsesP;
-  } else if (reference == "UsesS") {
-    return RelRef::kUsesS;
-  } else if (reference == "Calls") {
-    return RelRef::kCalls;
-  } else if (reference == "Calls*") {
-    return RelRef::kCallsT;
-  } else if (reference == "Parent") {
-    return RelRef::kParent;
-  } else if (reference == "Parent*") {
-    return RelRef::kParentT;
-  } else if (reference == "Follows") {
-    return RelRef::kFollows;
-  } else if (reference == "Follows*") {
-    return RelRef::kFollowsT;
-  } else if (reference == "Next") {
-    return RelRef::kNext;
-  } else if (reference == "Next*") {
-    return RelRef::kNextT;
-  } else if (reference == "Affects") {
-    return RelRef::kAffects;
-  } else if (reference == "Affects*") {
-    return RelRef::kAffectsT;
+  std::unordered_map<std::string, RelRef>::const_iterator iter = _relref_map.find(reference);
+  if (iter != _relref_map.end()) {
+    return iter->second;
   }
   return RelRef::kInvalid;
 }
 
 static std::unordered_map<std::string, Attribute> _attribute_map = {{"procName", Attribute::kProcName},
-                                                                   {"varName", Attribute::kProcName},
-                                                                   {"value", Attribute::kProcName},
-                                                                   {"stmt#", Attribute::kStmtNumber}};
+                                                                    {"varName", Attribute::kProcName},
+                                                                    {"value", Attribute::kProcName},
+                                                                    {"stmt#", Attribute::kStmtNumber}};
 Attribute GetAttribute(std::string attr_string) {
   std::unordered_map<std::string, Attribute>::const_iterator iter = _attribute_map.find(attr_string);
   if (iter != _attribute_map.end()) {
