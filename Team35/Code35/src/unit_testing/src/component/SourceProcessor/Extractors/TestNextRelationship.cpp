@@ -1,9 +1,11 @@
 #include "catch.hpp"
 #include "component/SourceProcessor/Extractors/NextExtractor.h"
+#include "component/SourceProcessor/PSubsystem.h"
 #include "../../../../utils/EntityUtils.h"
 #include "../../../../utils/TestUtils.h"
 
 using namespace entity_utils;
+using psub::PSubsystem;
 
 TEST_CASE("1.NextExtractor.basic conditions") {
   Deliverable deliverable;
@@ -311,8 +313,141 @@ TEST_CASE("1.NextExtractor.basic conditions") {
 }
 
 TEST_CASE("1.NextExtractor.nested containers") {
-  SECTION("if x3") {}
-  SECTION("while x3") {}
+  Deliverable deliverable;
+  Block* b1 = new Block();
+  Block* b2 = new Block();
+  Block* b3 = new Block();
+  Block* b4 = new Block();
+  Block* b5 = new Block();
+  Block* b6 = new Block();
+  Block* b7 = new Block();
+  Block* b8 = new Block();
+  Cluster* c1 = new Cluster();
+  Statement* s1 = CreateStatement(GetAssign1(), 1);
+  Statement* s2 = CreateStatement(GetAssign1(), 2);
+  Statement* s3 = CreateStatement(GetAssign1(), 3);
+  Statement* s4 = CreateStatement(GetAssign1(), 4);
+  Statement* s5 = CreateStatement(GetAssign1(), 5);
+  Statement* s6 = CreateStatement(GetAssign1(), 6);
+  Statement* s7 = CreateStatement(GetAssign1(), 7);
+  Statement* s8 = CreateStatement(GetAssign1(), 8);
+
+  SECTION("if x3") {
+    /*
+     * if1
+     *  if2
+     *    s3
+     *  else
+     *    if4
+     *      s5
+     *    else
+     *      s6
+     * else
+     *  s7
+     * s8
+     */
+    b1->AddStmt(StatementNumber(1));
+    b2->AddStmt(StatementNumber(2));
+    b3->AddStmt(StatementNumber(3));
+    b4->AddStmt(StatementNumber(4));
+    b5->AddStmt(StatementNumber(5));
+    b6->AddStmt(StatementNumber(6));
+    b7->AddStmt(StatementNumber(7));
+    b8->AddStmt(StatementNumber(8));
+    c1->SetStartEnd(1, 8);
+    b1->next_blocks_.insert(b2);
+    b1->next_blocks_.insert(b7);
+    b2->next_blocks_.insert(b3);
+    b2->next_blocks_.insert(b4);
+    b3->next_blocks_.insert(b8);
+    b4->next_blocks_.insert(b5);
+    b4->next_blocks_.insert(b6);
+    b5->next_blocks_.insert(b8);
+    b6->next_blocks_.insert(b8);
+    b7->next_blocks_.insert(b8);
+    Procedure* proc1 = GetProc1();
+    proc1->SetBlockRoot(b1);
+    proc1->SetClusterRoot(c1);
+    deliverable.proc_list_.push_back(proc1);
+
+    deliverable.AddStatement(s1);
+    deliverable.AddStatement(s2);
+    deliverable.AddStatement(s3);
+    deliverable.AddStatement(s4);
+    deliverable.AddStatement(s5);
+    deliverable.AddStatement(s6);
+    deliverable.AddStatement(s7);
+    deliverable.AddStatement(s8);
+    NextExtractor next_extractor{};
+    next_extractor.Extract(&deliverable);
+
+    CHECK(deliverable.next_hash_.size() == 7);
+    CHECK(TestUtils::AreListsEqual(
+        *deliverable.next_hash_.find(s1)->second, {s2, s7}));
+    CHECK(TestUtils::AreListsEqual(
+        *deliverable.next_hash_.find(s2)->second, {s3, s4}));
+    CHECK(TestUtils::AreListsEqual(
+        *deliverable.next_hash_.find(s3)->second, {s8}));
+    CHECK(TestUtils::AreListsEqual(
+        *deliverable.next_hash_.find(s4)->second, {s5, s6}));
+    CHECK(TestUtils::AreListsEqual(
+        *deliverable.next_hash_.find(s5)->second, {s8}));
+    CHECK(TestUtils::AreListsEqual(
+        *deliverable.next_hash_.find(s6)->second, {s8}));
+    CHECK(TestUtils::AreListsEqual(
+        *deliverable.next_hash_.find(s7)->second, {s8}));
+  }
+
+  SECTION("while x3") {
+    /*
+     * w1
+     *  w2
+     *    s3
+     *    w4
+     *      s5
+     * s6
+     */
+    b1->AddStmt(StatementNumber(1));
+    b2->AddStmt(StatementNumber(2));
+    b3->AddStmt(StatementNumber(3));
+    b4->AddStmt(StatementNumber(4));
+    b5->AddStmt(StatementNumber(5));
+    b6->AddStmt(StatementNumber(6));
+    c1->SetStartEnd(1, 6);
+    b1->next_blocks_.insert(b2);
+    b1->next_blocks_.insert(b6);
+    b2->next_blocks_.insert(b3);
+    b2->next_blocks_.insert(b1);
+    b3->next_blocks_.insert(b4);
+    b4->next_blocks_.insert(b5);
+    b4->next_blocks_.insert(b2);
+    b5->next_blocks_.insert(b4);
+    Procedure* proc1 = GetProc1();
+    proc1->SetBlockRoot(b1);
+    proc1->SetClusterRoot(c1);
+    deliverable.proc_list_.push_back(proc1);
+
+    deliverable.AddStatement(s1);
+    deliverable.AddStatement(s2);
+    deliverable.AddStatement(s3);
+    deliverable.AddStatement(s4);
+    deliverable.AddStatement(s5);
+    deliverable.AddStatement(s6);
+    NextExtractor next_extractor{};
+    next_extractor.Extract(&deliverable);
+
+    CHECK(deliverable.next_hash_.size() == 5);
+    CHECK(TestUtils::AreListsEqual(
+        *deliverable.next_hash_.find(s1)->second, {s2, s6}));
+    CHECK(TestUtils::AreListsEqual(
+        *deliverable.next_hash_.find(s2)->second, {s3, s1}));
+    CHECK(TestUtils::AreListsEqual(
+        *deliverable.next_hash_.find(s3)->second, {s4}));
+    CHECK(TestUtils::AreListsEqual(
+        *deliverable.next_hash_.find(s4)->second, {s5, s2}));
+    CHECK(TestUtils::AreListsEqual(
+        *deliverable.next_hash_.find(s5)->second, {s4}));
+  }
   SECTION("if and while") {}
   SECTION("multiple nesting of if and while") {}
 }
