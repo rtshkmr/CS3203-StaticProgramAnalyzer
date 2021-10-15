@@ -29,6 +29,7 @@ class Cluster {
   void AddStmt(StatementNumber statement_number);
   void RemoveStmt(StatementNumber statement_number);
   bool CheckIfStatementInRange(StatementNumber sn) const;
+  bool CheckIfStmtNumInRange(int num);
   Cluster* GetParentCluster();
   std::list<Cluster*> GetNestedClusters() const;
   Cluster* GetNextSiblingCluster();
