@@ -129,12 +129,12 @@ void ClauseCommandExecutor::PatternTwoSynonymOneInTable(Clause *clause, bool fir
 
   std::vector<Entity *> entity_list_in_table = group_table->GetColumn(synonym_in_table);
   std::vector<Entity *> intermediate_table = table->GetRelationships();
-  int group_table_row_pointer = 0;
   unsigned long table_size = entity_list_in_table.size();
   group_table->AddColumn(new_synonym);
+  int group_table_pointer = 0;
 
   for (int table_index = 0; table_index < table_size; table_index++) {
-    Entity *entity_in_table = entity_list_in_table[group_table_row_pointer];
+    Entity *entity_in_table = entity_list_in_table[table_index];
     int repeat_count = 0;
     bool has_relation = false;
 
@@ -149,15 +149,15 @@ void ClauseCommandExecutor::PatternTwoSynonymOneInTable(Clause *clause, bool fir
       }
       has_relation = true;
       Entity *entity_to_be_added = first_syn_in ? dynamic_cast<Entity *>(variable_entity) : entity;
-      group_table->AddMultipleRowForAllColumn(new_synonym, table_index, entity_to_be_added, repeat_count);
+      group_table->AddMultipleRowForAllColumn(new_synonym, group_table_pointer, entity_to_be_added, repeat_count);
       repeat_count++;
     }
+    group_table_pointer += repeat_count;
     if (!has_relation) {
-      group_table->DeleteRow(table_index);
-      table_index--;
-      table_size--;
+      group_table->DeleteRow(group_table_pointer);
+      group_table_pointer--;
     }
-    group_table_row_pointer++;
+    group_table_pointer++;
   }
 }
 

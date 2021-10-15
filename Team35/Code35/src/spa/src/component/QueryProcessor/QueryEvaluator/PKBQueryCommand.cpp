@@ -58,6 +58,7 @@ IntermediateTable* PKBQueryReceiver::QueryPKBTwoSynonyms(PKBRelRefs rel, DesignE
 /**
  * Works for Such that single synonym or no synonyms.
  * Note that the PKBRelRefs has to be decided during the Command creation.
+ * E.g Uses(a1, "i") should be kUsedBy instead of kUses
  * @param rel The PKBRelRef to be decided during Command creation.
  * @param value The value of the Non-synonym.
  * @return The intermediate table with the results.
@@ -69,6 +70,7 @@ IntermediateTable *PKBQueryReceiver::QueryPKBByValue(PKBRelRefs rel, std::string
   return table;
 }
 
+// E.g Uses(a1, _) should be kUsedBy instead of kUses
 IntermediateTable *PKBQueryReceiver::QueryPKBForSynonymWithWildCard(PKBRelRefs rel, DesignEntity entity) {
   std::vector<Entity *> output = pkb->GetRelationshipByType(rel, entity);
   IntermediateTable *table = new IntermediateTable();
@@ -197,11 +199,12 @@ IntermediateTable * QuerySuchThatOneSynonymCommand::ExecuteQuery(Clause *clause)
   std::string second = such_that->right_hand_side;
   std::string query_value = synonym_is_first_param ? second : first;
   Synonym* query_synonym = synonym_is_first_param ? such_that->first_synonym : such_that->second_synonym;
-  PKBRelRefs pkb_rel = GetPKBRelRef(such_that->rel_ref, synonym_is_first_param);
 
   if (query_value == "_") {
+    PKBRelRefs pkb_rel = GetPKBRelRef(such_that->rel_ref, synonym_is_first_param);
     return this->receiver->QueryPKBForSynonymWithWildCard(pkb_rel, query_synonym->GetType());
   } else {
+    PKBRelRefs pkb_rel = GetPKBRelRef(such_that->rel_ref, !synonym_is_first_param);
     return this->receiver->QueryPKBByValue(pkb_rel, query_value);
   }
 

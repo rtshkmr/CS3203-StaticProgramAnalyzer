@@ -194,7 +194,7 @@ TEST_CASE("3.QueryProjector.1 target synonym") {
     std::vector<Entity*> col1 = std::vector<Entity*>{};
     Synonym* target_syn1 = new Synonym("a", DesignEntity::kAssign);
     QueryEvaluatorTable* table1 = new QueryEvaluatorTable(target_syn1);
-    table1->AddTargetSynonymValues(col1);
+    table1->AddTargetSynonymValues(target_syn1, col1);
     UnformattedQueryResult uqr = UnformattedQueryResult(true);
     uqr.AddTable(table1);
 
