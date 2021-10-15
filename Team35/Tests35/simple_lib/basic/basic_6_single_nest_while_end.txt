@@ -7,7 +7,7 @@ procedure sixx {
 	while (abcd != ABCD) {
 		Abcd = abcd; 
 		ABcd = Abcd; 
-		ABCd = ABcd
+		ABCd = ABcd;
 		ABCD = Abcd % ABcd % ABCd;
 	}
 }
