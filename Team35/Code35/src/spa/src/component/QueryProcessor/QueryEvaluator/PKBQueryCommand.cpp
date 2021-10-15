@@ -109,20 +109,26 @@ IntermediateTable *PKBQueryReceiver::QueryDesignEntity(DesignEntity design_entit
 IntermediateTable *PKBQueryReceiver::QueryPatternByValue(DesignEntity design_entity, std::string value) {
   IntermediateTable *table = new IntermediateTable();
 
-  // TODO: Wait for PKB update
-//  switch(design_entity) {
-//    case DesignEntity::kAssign:
-//      table->InsertData(pkb->GetAssignEntityByVariable(value));
-//      break;
-//      case DesignEntity::kWhile:
-//        table->InsertData(pkb->GetWhileEntityByVariable(value));
-//        break;
-//        case DesignEntity::kIf:
-//          table->InsertData(pkb->GetIfEntityByVariable(value));
-//          break;
-//          default:
-//            break;
-//  }
+  if (value == "_") {
+    // Returns std::vector<Entity*>
+    table->InsertData(pkb->GetDesignEntities(design_entity));
+    return table;
+  }
+
+  // Returns std::vector<Entity*>
+  switch(design_entity) {
+    case DesignEntity::kAssign:
+      table->InsertData(pkb->GetAssignEntityByVariable(value));
+      break;
+      case DesignEntity::kWhile:
+        table->InsertData(pkb->GetWhileEntityByVariable(value));
+        break;
+        case DesignEntity::kIf:
+          table->InsertData(pkb->GetIfEntityByVariable(value));
+          break;
+          default:
+            break;
+  }
   return table;
 }
 
@@ -249,6 +255,7 @@ IntermediateTable * QuerySuchThatNoSynonymCommand::ExecuteQuery(Clause *clause) 
   } else {
     PKBRelRefs pkb_rel = GetPKBRelRef(such_that->rel_ref, true);
     return this->receiver->QueryPKBByValueForBoolean(pkb_rel, such_that->left_hand_side, such_that->right_hand_side);
+    // TODO: Need a new Receiver method
   }
 }
 
