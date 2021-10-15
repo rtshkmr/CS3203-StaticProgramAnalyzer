@@ -178,6 +178,9 @@ class PKB {
     >
   > relationship_by_type_table_;
 
+  std::set<DesignEntity> stmt_design_entities_;
+  std::set<relationship> relationship_set_;
+
   void InitializeDataStructures();
 
   void PopulateProcEntities(const std::list<Procedure*>& proc_list);
@@ -201,12 +204,12 @@ class PKB {
   void PopulateContainerModifies(std::unordered_map<Container*, std::list<Variable*>*> container_modifies_hash_);
   void PopulateContainerModifiedBy(std::unordered_map<Variable*, std::list<Container*>*> container_modified_by_hash_);
 
-
+  void PopulateUses();
+  void PopulateUsedBy();
+  void PopulateModifies();
+  void PopulateModifiedBy();
 
   std::string GetNameFromEntity(Entity* entity);
-
-  std::set<DesignEntity> stmt_design_entities_;
-  std::set<relationship> relationship_set_;
 
 //  // TO BE DEPRECATED FROM HERE
 //

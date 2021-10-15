@@ -65,6 +65,11 @@ void PKB::PopulateDataStructures(Deliverable d) {
   PopulateContainerModifies(d.container_modifies_hash_);
   PopulateContainerModifiedBy(d.container_modified_by_hash_);
 
+  PopulateUses();
+  PopulateModifies();
+  PopulateUsedBy();
+  PopulateModifiedBy();
+
   // TO BE DEPRECATED FROM HERE
 //  PopulateProcList(d.proc_list_);
 //  PopulateVarList(d.var_list_);
@@ -496,6 +501,184 @@ void PKB::PopulateContainerModifiedBy(std::unordered_map<Variable*, std::list<Co
                 relationship_by_type_table_[PKBRelRefs::kModifiedByContainer][{first_type, DesignEntity::kStmt}].push_back({first_entity, entity});
             }
         }
+    }
+}
+
+void PKB::PopulateUses() {
+    std::unordered_map<std::string, std::vector<Entity*>> usesS = relationship_table_[PKBRelRefs::kUsesS];
+    std::unordered_map<std::string, std::vector<Entity*>> usesC = relationship_table_[PKBRelRefs::kUsesC];
+    for (auto pair : usesS) {
+        relationship_table_[PKBRelRefs::kUses].insert(pair);
+        for (auto second_param : pair.second) {
+            relationship_set_.insert({PKBRelRefs::kUses, pair.first, GetNameFromEntity(second_param)});
+        }
+    }
+    for (auto pair : usesC) {
+        if (isdigit(pair.first[0])) {
+            relationship_table_[PKBRelRefs::kUses].insert(pair);
+            for (auto second_param : pair.second) {
+                relationship_set_.insert({PKBRelRefs::kUses, pair.first, GetNameFromEntity(second_param)});
+            }
+        }
+    }
+
+    std::unordered_map<type_combo, std::vector<std::tuple<Entity*, Entity*>>, type_combo_hash>
+        s_combo_map = relationship_by_type_table_[PKBRelRefs::kUsesS];
+
+    std::unordered_map<type_combo, std::vector<std::tuple<Entity*, Entity*>>, type_combo_hash>
+        c_combo_map = relationship_by_type_table_[PKBRelRefs::kUsesC];
+
+    for (auto pair : s_combo_map) {
+        relationship_by_type_table_[PKBRelRefs::kUses][pair.first].insert(
+            std::end(relationship_by_type_table_[PKBRelRefs::kUses][pair.first]),
+            std::begin(pair.second),
+            std::end(pair.second)
+        );
+    }
+
+    for (auto pair : c_combo_map) {
+        if (std::get<0>(pair.first) == DesignEntity::kProcedure) {
+            continue;
+        }
+        relationship_by_type_table_[PKBRelRefs::kUses][pair.first].insert(
+            std::end(relationship_by_type_table_[PKBRelRefs::kUses][pair.first]),
+            std::begin(pair.second),
+            std::end(pair.second)
+        );
+    }
+}
+
+void PKB::PopulateModifies() {
+    std::unordered_map<std::string, std::vector<Entity*>> modifiesS = relationship_table_[PKBRelRefs::kModifiesStatement];
+    std::unordered_map<std::string, std::vector<Entity*>> modifiesC = relationship_table_[PKBRelRefs::kModifiesContainer];
+    for (auto pair : modifiesS) {
+        relationship_table_[PKBRelRefs::kModifies].insert(pair);
+        for (auto second_param : pair.second) {
+            relationship_set_.insert({PKBRelRefs::kModifies, pair.first, GetNameFromEntity(second_param)});
+        }
+    }
+    for (auto pair : modifiesC) {
+        if (isdigit(pair.first[0])) {
+            relationship_table_[PKBRelRefs::kModifies].insert(pair);
+            for (auto second_param : pair.second) {
+                relationship_set_.insert({PKBRelRefs::kModifies, pair.first, GetNameFromEntity(second_param)});
+            }
+        }
+    }
+
+    std::unordered_map<type_combo, std::vector<std::tuple<Entity*, Entity*>>, type_combo_hash>
+    s_combo_map = relationship_by_type_table_[PKBRelRefs::kModifiesStatement];
+
+    std::unordered_map<type_combo, std::vector<std::tuple<Entity*, Entity*>>, type_combo_hash>
+    c_combo_map = relationship_by_type_table_[PKBRelRefs::kModifiesContainer];
+
+    for (auto pair : s_combo_map) {
+        relationship_by_type_table_[PKBRelRefs::kModifies][pair.first].insert(
+            std::end(relationship_by_type_table_[PKBRelRefs::kModifies][pair.first]),
+            std::begin(pair.second),
+            std::end(pair.second)
+        );
+    }
+
+    for (auto pair : c_combo_map) {
+        if (std::get<0>(pair.first) == DesignEntity::kProcedure) {
+            continue;
+        }
+        relationship_by_type_table_[PKBRelRefs::kModifies][pair.first].insert(
+            std::end(relationship_by_type_table_[PKBRelRefs::kModifies][pair.first]),
+            std::begin(pair.second),
+            std::end(pair.second)
+        );
+    }
+}
+
+void PKB::PopulateUsedBy() {
+    std::unordered_map<std::string, std::vector<Entity*>> usedByS = relationship_table_[PKBRelRefs::kUsedByS];
+    std::unordered_map<std::string, std::vector<Entity*>> usedByC = relationship_table_[PKBRelRefs::kUsedByC];
+    for (auto pair : usedByS) {
+        relationship_table_[PKBRelRefs::kUsedBy].insert(pair);
+        for (auto second_param : pair.second) {
+            relationship_set_.insert({PKBRelRefs::kUsedBy, pair.first, GetNameFromEntity(second_param)});
+        }
+    }
+    for (auto pair : usedByC) {
+        for (auto second_param : pair.second) {
+            if (dynamic_cast<Procedure*>(second_param) != nullptr) {
+                continue;
+            }
+            relationship_table_[PKBRelRefs::kUsedBy][pair.first].push_back(second_param);
+            relationship_set_.insert({PKBRelRefs::kUsedBy, pair.first, GetNameFromEntity(second_param)});
+        }
+    }
+
+    std::unordered_map<type_combo, std::vector<std::tuple<Entity*, Entity*>>, type_combo_hash>
+    s_combo_map = relationship_by_type_table_[PKBRelRefs::kUsedByS];
+
+    std::unordered_map<type_combo, std::vector<std::tuple<Entity*, Entity*>>, type_combo_hash>
+    c_combo_map = relationship_by_type_table_[PKBRelRefs::kUsedByC];
+
+    for (auto pair : s_combo_map) {
+        relationship_by_type_table_[PKBRelRefs::kUsedBy][pair.first].insert(
+            std::end(relationship_by_type_table_[PKBRelRefs::kUsedBy][pair.first]),
+            std::begin(pair.second),
+            std::end(pair.second)
+        );
+    }
+
+    for (auto pair : c_combo_map) {
+        if (std::get<1>(pair.first) == DesignEntity::kProcedure) {
+            continue;
+        }
+        relationship_by_type_table_[PKBRelRefs::kUsedBy][pair.first].insert(
+            std::end(relationship_by_type_table_[PKBRelRefs::kUsedBy][pair.first]),
+            std::begin(pair.second),
+            std::end(pair.second)
+        );
+    }
+}
+
+void PKB::PopulateModifiedBy() {
+    std::unordered_map<std::string, std::vector<Entity*>> modifiedByS = relationship_table_[PKBRelRefs::kModifiedByStatement];
+    std::unordered_map<std::string, std::vector<Entity*>> modifiedByC = relationship_table_[PKBRelRefs::kModifiedByContainer];
+    for (auto pair : modifiedByS) {
+        relationship_table_[PKBRelRefs::kModifiedBy].insert(pair);
+        for (auto second_param : pair.second) {
+            relationship_set_.insert({PKBRelRefs::kModifiedBy, pair.first, GetNameFromEntity(second_param)});
+        }
+    }
+    for (auto pair : modifiedByC) {
+        for (auto second_param : pair.second) {
+            if (dynamic_cast<Procedure*>(second_param) != nullptr) {
+                continue;
+            }
+            relationship_table_[PKBRelRefs::kModifiedBy][pair.first].push_back(second_param);
+            relationship_set_.insert({PKBRelRefs::kModifiedBy, pair.first, GetNameFromEntity(second_param)});
+        }
+    }
+
+    std::unordered_map<type_combo, std::vector<std::tuple<Entity*, Entity*>>, type_combo_hash>
+    s_combo_map = relationship_by_type_table_[PKBRelRefs::kModifiedByStatement];
+
+    std::unordered_map<type_combo, std::vector<std::tuple<Entity*, Entity*>>, type_combo_hash>
+    c_combo_map = relationship_by_type_table_[PKBRelRefs::kModifiedByContainer];
+
+    for (auto pair : s_combo_map) {
+        relationship_by_type_table_[PKBRelRefs::kModifiedBy][pair.first].insert(
+            std::end(relationship_by_type_table_[PKBRelRefs::kModifiedBy][pair.first]),
+            std::begin(pair.second),
+            std::end(pair.second)
+        );
+    }
+
+    for (auto pair : c_combo_map) {
+        if (std::get<1>(pair.first) == DesignEntity::kProcedure) {
+            continue;
+        }
+        relationship_by_type_table_[PKBRelRefs::kModifiedBy][pair.first].insert(
+            std::end(relationship_by_type_table_[PKBRelRefs::kModifiedBy][pair.first]),
+            std::begin(pair.second),
+            std::end(pair.second)
+        );
     }
 }
 
