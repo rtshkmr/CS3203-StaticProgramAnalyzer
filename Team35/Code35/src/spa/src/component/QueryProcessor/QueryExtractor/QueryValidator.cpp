@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <set>
 
+// note: kProgLine does not have attrs based on PQL grammar.
 std::set<std::pair<DesignEntity, Attribute>> valid_attrRefs = {{DesignEntity::kProcedure, Attribute::kProcName},
                                                                {DesignEntity::kCall, Attribute::kProcName},
                                                                {DesignEntity::kVariable, Attribute::kVarName},
