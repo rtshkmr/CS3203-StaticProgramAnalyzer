@@ -321,6 +321,11 @@ void PKB::PopulateFollows(std::unordered_map<Statement*, Statement*>& follow_has
         relationship_by_type_table_[PKBRelRefs::kFollows][{DesignEntity::kStmt, DesignEntity::kStmt}].push_back(
             {kv.first, kv.second}
         );
+        relationship_set_.insert({
+            PKBRelRefs::kFollows,
+            std::to_string(kv.first->GetStatementNumber()->GetNum()),
+            std::to_string(kv.second->GetStatementNumber()->GetNum())
+        });
     }
 }
 
@@ -343,6 +348,11 @@ void PKB::PopulateFollowedBy(std::unordered_map<Statement*, Statement*>& followe
         relationship_by_type_table_[PKBRelRefs::kFollowedBy][{DesignEntity::kStmt, DesignEntity::kStmt}].push_back(
             {kv.first, kv.second}
         );
+        relationship_set_.insert({
+            PKBRelRefs::kFollowedBy,
+            std::to_string(kv.first->GetStatementNumber()->GetNum()),
+            std::to_string(kv.second->GetStatementNumber()->GetNum())
+        });
     }
 }
 
@@ -365,6 +375,11 @@ void PKB::PopulateChild(std::unordered_map<Statement*, Statement*>& child_to_par
         relationship_by_type_table_[PKBRelRefs::kChild][{DesignEntity::kStmt, DesignEntity::kStmt}].push_back(
             {kv.first, kv.second}
         );
+        relationship_set_.insert({
+            PKBRelRefs::kChild,
+            std::to_string(kv.first->GetStatementNumber()->GetNum()),
+            std::to_string(kv.second->GetStatementNumber()->GetNum())
+        });
     }
 }
 
