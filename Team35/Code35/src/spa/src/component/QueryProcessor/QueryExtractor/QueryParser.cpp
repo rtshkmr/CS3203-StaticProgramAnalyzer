@@ -64,8 +64,13 @@ void QueryParser::ParseDeclaration() {
   if (!regex_match(design_entity, RegexPatterns::GetDesignEntityPattern())) {
     throw PQLParseException("A synonym of unknown Design Entity type " + design_entity + " was declared.");
   }
-  Eat(TokenTag::kName); // advance lookahead after parsing designEntity.
+  // advance lookahead after parsing designEntity.
   DesignEntity de = GetDesignEntity(design_entity);
+  if (de == DesignEntity::kProgLine) {
+    Eat(TokenTag::kProgLine);
+  } else {
+    Eat(TokenTag::kName);
+  }
   std::vector<Token> s = ParseSynonyms();
   // populate synonyms list with Synonym objects.
   for (Token& t: s) {
