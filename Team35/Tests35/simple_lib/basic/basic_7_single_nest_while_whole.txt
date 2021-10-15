@@ -1,0 +1,5 @@
+procedure Seven {
+	while (((1 == 1) || (true == true)) && (true != false)) {
+		thisCode = WithinWhile; 
+	}
+}

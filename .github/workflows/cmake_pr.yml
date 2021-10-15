@@ -57,6 +57,12 @@ jobs:
         ./run_autotester_suite.sh
         zip -v results.zip log_*.txt output_*.xml Team35_SPA_*.log analysis.xsl
         
+    - name: Test SP Parser
+      run: | 
+        cd ${{env.working-directory}}/build/src/autotester/Tests35/simple_lib
+        chmod +x ./run_autotester_suite.sh
+        ./run_autotester_suite.sh
+        
     - uses: actions/upload-artifact@v2
       with: 
         name: output_final
