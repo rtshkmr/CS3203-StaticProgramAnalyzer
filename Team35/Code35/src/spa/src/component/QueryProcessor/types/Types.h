@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <array>
+#include <set>
 #include <datatype/DataType.h>
 #include <typeinfo>
 
@@ -34,6 +35,8 @@ const std::array<DesignEntity, 11> all_design_entities = {
     DesignEntity:: kProcedure,
     DesignEntity:: kInvalid,
 };
+
+
 
 static DesignEntity GetDesignEntity(std::string reference) {
   if (reference == "stmt") {
