@@ -363,25 +363,6 @@ Token QueryParser::ParseEntRef(bool isPatternCl) {
   return Token(token_name, token_type);
 }
 
-// iteration 1: factor: var_name | const_value
-/**
- * Parses a factor.
- * @return a string corresponding to the factor.
- */
-std::string QueryParser::ParseFactor() {
-  std::stringstream ss;
-  if (lookahead.GetTokenTag() == TokenTag::kInteger) {
-    // parse as constant
-    ss << Eat(TokenTag::kInteger).GetTokenString();
-  } else if (lookahead.GetTokenTag() == TokenTag::kName) {
-    // parse as var_name
-    ss << Eat(TokenTag::kName).GetTokenString();
-  } else {
-    throw PQLParseException("Received invalid factor in rhs of pattern cl.");
-  }
-  return ss.str();
-}
-
 // expression-spec : ‘"‘ expr’"’ | ‘_’ ‘"’ expr ‘"’ ‘_’ | ‘_’
 /**
  * Parses an expression-spec.

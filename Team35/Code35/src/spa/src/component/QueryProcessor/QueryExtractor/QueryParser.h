@@ -42,7 +42,6 @@ class QueryParser {
   std::tuple<std::string, bool, bool, bool> ParseStmtOrEntRef();
   std::pair<Clause*, bool> ParseRelRef();
   std::pair<std::string, bool> ParseExpressionSpec();
-  std::string ParseFactor();
   std::vector<Token> ParseSynonyms();
 
   bool IsValidSynonym(Token token);
