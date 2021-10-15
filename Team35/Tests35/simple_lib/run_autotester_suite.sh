@@ -7,7 +7,6 @@ do echo "[NOTE] Running Basic Test $i";
 	if [ "$?" != 0 ] 
 	then
 	    RESULT="1";
-	else
 	fi
 done
 
@@ -17,7 +16,6 @@ do echo "[NOTE] Running Advanced Test $i";
 	if [ "$?" != 0 ] 
 	then
 	    RESULT="1";
-	else
 	fi
 done
 
@@ -27,7 +25,6 @@ do echo "[NOTE] Running Exception Test $i";
 	if [ "$?" == 0 ] 
 	then
 	    RESULT="1";
-	else
 	fi
 done
 
