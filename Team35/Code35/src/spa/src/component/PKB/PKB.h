@@ -32,8 +32,6 @@ class PKB {
 
   std::vector<std::tuple<Entity*, Entity*>> GetRelationshipByTypes(PKBRelRefs, DesignEntity, DesignEntity);
 
-  std::vector<Entity*> GetRelationshipByType(PKBRelRefs, DesignEntity);
-
   // Getting entities from PKB by type
   std::vector<Entity*> GetDesignEntities(DesignEntity de);
 
