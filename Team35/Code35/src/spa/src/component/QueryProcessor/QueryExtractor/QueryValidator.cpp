@@ -123,6 +123,9 @@ bool QueryValidator::Is_Semantically_Valid_RelRef(std::string l, std::string r, 
   std::unordered_set<RelRef> whitelisted = {RelRef::kCalls, RelRef::kCallsT, RelRef::kAffects, RelRef::kAffectsT,
                                                     RelRef::kUsesS, RelRef::kUsesP, RelRef::kModifiesS, RelRef::kModifiesP};
   if (whitelisted.find(rf) != whitelisted.end()) {
+    // for the purposes of pql grammar, prog_line has the same behavior as stmt
+    if (lhs == DesignEntity::kProgLine) lhs = DesignEntity::kStmt;
+    if (rhs == DesignEntity::kProgLine) rhs = DesignEntity::kStmt;
     auto t = std::make_tuple(rf, lhs, rhs);
     return valid_relref_args.find(t) != valid_relref_args.end();
   }

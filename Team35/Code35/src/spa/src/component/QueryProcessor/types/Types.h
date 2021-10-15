@@ -21,9 +21,10 @@ enum class DesignEntity : unsigned int {
   kProcedure = 9,
   kInvalid = 10,
   kWildcard = 11,
+  kProgLine = 12
 };
 
-const std::array<DesignEntity, 11> all_design_entities = {
+const std::array<DesignEntity, 12> all_design_entities = {
     DesignEntity:: kStmt,
     DesignEntity:: kRead,
     DesignEntity:: kPrint,
@@ -35,6 +36,7 @@ const std::array<DesignEntity, 11> all_design_entities = {
     DesignEntity:: kConstant,
     DesignEntity:: kProcedure,
     DesignEntity:: kInvalid,
+    DesignEntity:: kProgLine,
 };
 
 DesignEntity GetDesignEntity(std::string reference);
