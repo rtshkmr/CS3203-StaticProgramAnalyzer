@@ -19,6 +19,7 @@ QueryProjector::QueryProjector(std::vector<Synonym*> target_synonyms_list) : tar
 std::vector<std::string> QueryProjector::FormatQuery(UnformattedQueryResult unformatted_results) {
   std::vector<QueryEvaluatorTable*> table_references = unformatted_results.GetTables();
 
+
   if (!unformatted_results.GetBooleanResult() && !target_synonym_list.empty()) {
     return std::vector<std::string>{};
   }

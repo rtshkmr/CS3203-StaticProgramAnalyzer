@@ -69,11 +69,13 @@ void QueryEvaluator::ProcessGroup(QueryEvaluatorTable *table, Group *group) {
 
 bool QueryEvaluator::ProcessSingleClauseBooleanGroup(Group group) {
   Clause *clause = group.GetClauses()[0];
+  // Only such that clause can have a single boolean group.
   auto *such_that_clause = dynamic_cast<SuchThat *>(clause);
   QuerySuchThatNoSynonymCommand query_command = QuerySuchThatNoSynonymCommand(clause);
-  // TODO: NOT SURE HOW TO QUERY PKB
-
-  return true;
+  PKBQueryReceiver query_receiver = PKBQueryReceiver(pkb);
+  query_command.SetReceiver(&query_receiver);
+  IntermediateTable *table = query_command.ExecuteQuery(clause);
+  return table->GetExistenceResult();
 }
 
 /**

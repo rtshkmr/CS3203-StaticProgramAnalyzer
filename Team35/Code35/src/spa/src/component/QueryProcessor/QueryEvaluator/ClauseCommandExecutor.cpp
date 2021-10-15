@@ -187,29 +187,23 @@ void ClauseCommandExecutor::SuchThatOneSynonym(Clause *clause, bool first_syn_in
   }
 }
 
+// For Pattern query with assign synonym and variable value or wildcard
 void ClauseCommandExecutor::PatternOneSynonym(Clause *clause) {
   auto *pattern_clause = dynamic_cast<Pattern *>(clause);
-  std::vector<Entity *> assign_entity_in_table = group_table->GetColumn(pattern_clause->first_synonym);
-  std::vector<Entity *> assign_entity_retrieved = table->GetRelationships();
-  unsigned long table_size = assign_entity_in_table.size();
+  std::vector<Entity *> assign_entity_in_table_list = group_table->GetColumn(pattern_clause->first_synonym);\
+  std::string left_side_value = pattern_clause->left_hand_side;
+  unsigned long table_size = assign_entity_in_table_list.size();
   int delete_count = 0;
 
   for (int i = 0; i < table_size; i++) {
-    Entity *current_assign_stmt = assign_entity_in_table[i];
-    bool has_relationship = false;
-    // Assert that size of assign_entity_list should be 1.
-    for (auto assign_entity_to_compare : assign_entity_retrieved) {
-      if (assign_entity_to_compare == current_assign_stmt) {
-        has_relationship = true;
-        break;
-      }
-    }
-    if (has_relationship) {
-      continue;
-    }
+    Entity *current_assign_stmt = assign_entity_in_table_list[i];
+    AssignEntity *assign_entity_in_table = dynamic_cast<AssignEntity *>(current_assign_stmt);
+    std::string variable_value_in_table = const_cast<VariableName*>(assign_entity_in_table->GetVariable()->GetName())->getName();
 
-    group_table->DeleteRow(i - delete_count);
-    delete_count++;
+    if ((left_side_value != "_" && variable_value_in_table != left_side_value) || !HasExpressionMatch(pattern_clause, assign_entity_in_table)) {
+      group_table->DeleteRow(i - delete_count);
+      delete_count++;
+    }
   }
 }
 
