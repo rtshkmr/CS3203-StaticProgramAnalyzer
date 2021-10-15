@@ -11,7 +11,7 @@ RESULT="0";
 
 for i in $(ls basic/basic_*.txt);
 do echo "[NOTE] Running Test $i"; 
-	./../autotester $i.txt blank.txt blank.xml > res_$i.txt;
+	./../../autotester $i blank.txt blank.xml > res.txt;
 	if [ "$?" != 0 ] 
 	then
 	    RESULT="1";
