@@ -29,6 +29,9 @@ class QueryParser {
   void ParseSelect();
   void ParseSuchThat();
   void ParsePatternCond();
+  void ParseAssignPattern();
+  void ParseWhilePattern();
+  void ParseIfPattern();
   void ParsePattern();
   void ParseWith();
   void ParseDeclarations();

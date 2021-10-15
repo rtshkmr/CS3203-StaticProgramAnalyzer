@@ -457,14 +457,11 @@ bool QueryParser::IsValidSynonym(Token token, DesignEntity de) {
   return 1;
 }
 
-/**
- * Parses the PatternCond section of a pattern clause.
- */
-void QueryParser::ParsePatternCond() {
-  // check if syn-assign valid
-  if (!IsValidSynonym(lookahead, DesignEntity::kAssign)) {
-    throw PQLParseException("Expected valid syn-assign for pattern cl, instead got " + lookahead.GetTokenString());
-  }
+void QueryParser::ParseWhilePattern() {
+
+};
+
+void QueryParser::ParseAssignPattern() {
   Token assn_tok = Token(lookahead.GetTokenString(), lookahead.GetTokenTag());
 
   Eat(TokenTag::kName); // eat 'syn-assign'
@@ -485,6 +482,41 @@ void QueryParser::ParsePatternCond() {
     cl->second_synonym = QueryParser::GetSynonymInfo(lhs, &synonyms);
   }
   clauses.emplace_back(cl);
+};
+
+void QueryParser::ParseIfPattern() {
+
+};
+
+/**
+ * Parses the PatternCond section of a pattern clause.
+ */
+void QueryParser::ParsePatternCond() {
+  // ensure that lookahead is either matching kAssign, kIf or kWhile.
+  DesignEntity pattern_syn = DesignEntity::kInvalid;
+  std::vector<DesignEntity> pattern_syn_whitelist = {DesignEntity::kAssign, DesignEntity::kIf, DesignEntity::kWhile};
+  for (DesignEntity _de : pattern_syn_whitelist) {
+    if (IsValidSynonym(lookahead, _de)) {
+      pattern_syn = _de;
+      break;
+    }
+  }
+  if (pattern_syn == DesignEntity::kInvalid) {
+    throw PQLParseException("Expected valid syn for pattern cl, instead got " + lookahead.GetTokenString());
+  }
+
+  // happy path: dispatch pattern parsing based on pattern type
+  switch (pattern_syn) {
+    case DesignEntity::kAssign:
+      ParseAssignPattern();
+      break;
+    case DesignEntity::kIf:
+      break;
+    case DesignEntity::kWhile:
+      break;
+    default:
+      return;
+  }
 }
 
 /**
@@ -525,7 +557,7 @@ void QueryParser::ParseSelect() {
       ParseWith();
       continue;
     }
-    throw PQLParseException("Incorrect query. Expected at most 1 such that and 1 pattern for iteration 1.");
+    throw PQLParseException("Received clause that is not such that, pattern or with.");
   }
 }
 

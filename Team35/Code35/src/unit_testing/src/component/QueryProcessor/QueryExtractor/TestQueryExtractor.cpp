@@ -160,13 +160,15 @@ TEST_CASE("3.QueryExtractor.Extract multiple synonyms + select tuple of declared
 TEST_CASE("3.QueryExtractor.Single malformed such that with typo; should FAIL") {
   std::string query = "assign a; while w; Select a Such that Follows (w, a)";
   auto query_extractor = QueryExtractor(&query);
-  REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(), Catch::Contains("Incorrect query."));
+  REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
+                      Catch::Contains("Received clause that is not such that, pattern or with."));
 }
 
 TEST_CASE("3.QueryExtractor.Single malformed such that with extra delimiters; should FAIL") {
   std::string query = "assign a; while w; Select a such  that Follows (w, a)";
   auto query_extractor = QueryExtractor(&query);
-  REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(), Catch::Contains("Incorrect query."));
+  REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
+                      Catch::Contains("Received clause that is not such that, pattern or with."));
 }
 
 TEST_CASE("3.QueryExtractor.Single well-formed such that with incorrect relRef; should FAIL") {
@@ -445,14 +447,15 @@ TEST_CASE("3.QueryExtractor.Single well-formed UsesP or ModifiesP; should PASS")
 TEST_CASE("3.QueryExtractor.Single malformed pattern with typo; should FAIL") {
   std::string query = "assign a1; Select a1 pAttern a ( _ , _)";
   auto query_extractor = QueryExtractor(& query);
-  REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(), Catch::Contains("Incorrect query"));
+  REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
+                      Catch::Contains("Received clause that is not such that, pattern or with."));
 }
 
 TEST_CASE("3.QueryExtractor.Single well-formed pattern with unknown syn-assign; should FAIL") {
   std::string query = "assign a1; Select a1 pattern a ( _ , _)";
   auto query_extractor = QueryExtractor(& query);
   REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
-                      Catch::Contains("Expected valid syn-assign for pattern cl, instead got"));
+                      Catch::Contains("Expected valid syn for pattern cl, instead got a"));
 }
 
 TEST_CASE("3.QueryExtractor.Single well-formed pattern with correct syn-assign but incorrect lhs; should FAIL") {
@@ -710,7 +713,7 @@ TEST_CASE("3.QueryExtractor.And operator between different clause types; should 
                         "Select a such that Parent* (w, a) pattern a (\"x\", _) and Uses (a, \"x\")";
     auto query_extractor = QueryExtractor(& query);
     REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
-                        Catch::Contains("Expected valid syn-assign for pattern cl, instead got"));
+                        Catch::Contains("Expected valid syn for pattern cl, instead got Uses"));
   }
 
   SECTION("And between patternCond and pattern") {
@@ -718,7 +721,7 @@ TEST_CASE("3.QueryExtractor.And operator between different clause types; should 
                         "Select a such that Parent* (w, a) pattern a (\"x\", _) and pattern a2 (\"x\", _)";
     auto query_extractor = QueryExtractor(& query);
     REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
-                        Catch::Contains("Expected valid syn-assign for pattern cl, instead got"));
+                        Catch::Contains("Expected valid syn for pattern cl, instead got pattern"));
   }
 }
 
