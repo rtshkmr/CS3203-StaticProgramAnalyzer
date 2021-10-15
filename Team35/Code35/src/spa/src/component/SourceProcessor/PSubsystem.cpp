@@ -183,8 +183,7 @@ void PSubsystem::CloseWhileBlock() {
   if (while_body_block->size() > 0) {
     while_cluster->AddChildClusterToBack(while_body_block); //add only non empty tails
   }
-
-
+  while_cluster->UpdateClusterRange();
 
   cluster_stack_.pop();
   assert(!cluster_stack_.empty());
@@ -203,7 +202,7 @@ void PSubsystem::CloseWhileBlock() {
   while_cond_block->AddNextBlock(block_while_exit); // cond point to exit
   block_stack_.pop(); //pop the while_cond_block block
   block_stack_.push(block_while_exit);
-  while_cluster->UpdateClusterRange();
+
 }
 
 /**
