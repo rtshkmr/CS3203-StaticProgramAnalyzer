@@ -56,11 +56,14 @@ void ClauseCommandExecutor::PatternTwoSynonym(Clause *clause) {
   // For each row in the group table
   for (int i = 0; i < assign_stmt_list.size(); i++) {
     AssignEntity *assign_entity_in_table = dynamic_cast<AssignEntity *>(assign_stmt_list[i]);
+    Variable *variable_entity = dynamic_cast<Variable*>(variable_list[i]);
     bool has_relationship = false;
 
     for (auto assign_entity: intermediate_table) {
       AssignEntity *current_assign_entity = dynamic_cast<AssignEntity *>(assign_entity);
-      if (current_assign_entity == assign_entity_in_table && HasExpressionMatch(pattern_clause, current_assign_entity)) {
+      Variable *current_variable_entity = current_assign_entity->GetVariable();
+      if (current_assign_entity == assign_entity_in_table && variable_entity == current_variable_entity
+      && HasExpressionMatch(pattern_clause, current_assign_entity)) {
         has_relationship = true;
       }
     }
