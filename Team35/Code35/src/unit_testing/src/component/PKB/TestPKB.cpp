@@ -62,43 +62,58 @@ TEST_CASE("2.PKB.PKB population and retrieval") {
   SECTION("Get DesignEntity") {
 
     SECTION("Procedure") {
-      std::list<std::string> proc_list{"p1"};
-      REQUIRE(proc_list == pkb.GetDesignEntity(DesignEntity::kProcedure));
+      std::vector<Entity*> proc_list;
+      proc_list.push_back(p1_);
+      REQUIRE(proc_list == pkb.GetDesignEntities(DesignEntity::kProcedure));
     }
 
     SECTION("Variable") {
-      std::list<std::string> var_list{"v1", "v2"};
-      REQUIRE(var_list == pkb.GetDesignEntity(DesignEntity::kVariable));
+      std::vector<Entity*> var_list;
+      var_list.push_back(v1_);
+      var_list.push_back(v2_);
+      REQUIRE(var_list == pkb.GetDesignEntities(DesignEntity::kVariable));
     }
 
     SECTION("Constant") {
-      std::list<std::string> const_list{"1", "2"};
-      REQUIRE(const_list == pkb.GetDesignEntity(DesignEntity::kConstant));
+      std::vector<Entity*> pkb_const = pkb.GetDesignEntities(DesignEntity::kConstant);
+      REQUIRE(pkb_const.size() == 2);
+      Constant* const1 = (Constant*) pkb_const.at(0);
+      REQUIRE(const1->GetValue() == const1_);
+      Constant* const2 = (Constant*) pkb_const.at(1);
+      REQUIRE(const2->GetValue() == const2_);
     }
 
     SECTION("Statement") {
-      std::list<std::string> stmt_list{"1", "2", "3", "4"};
-      REQUIRE(stmt_list == pkb.GetDesignEntity(DesignEntity::kStmt));
+      std::vector<Entity*> stmt_list;
+      stmt_list.push_back(read1_);
+      stmt_list.push_back(a1_);
+      stmt_list.push_back(call1_);
+      stmt_list.push_back(print1_);
+      REQUIRE(stmt_list == pkb.GetDesignEntities(DesignEntity::kStmt));
     }
 
     SECTION("Read") {
-      std::list<std::string> read_list{"1"};
-      REQUIRE(read_list == pkb.GetDesignEntity(DesignEntity::kRead));
+      std::vector<Entity*> read_list;
+      read_list.push_back(read1_);
+      REQUIRE(read_list == pkb.GetDesignEntities(DesignEntity::kRead));
     }
 
     SECTION("Assign") {
-      std::list<std::string> assign_list{"2"};
-      REQUIRE(assign_list == pkb.GetDesignEntity(DesignEntity::kAssign));
+      std::vector<Entity*> assign_list;
+      assign_list.push_back(a1_);
+      REQUIRE(assign_list == pkb.GetDesignEntities(DesignEntity::kAssign));
     }
 
     SECTION("Call") {
-      std::list<std::string> call_list{"3"};
-      REQUIRE(call_list == pkb.GetDesignEntity(DesignEntity::kCall));
+      std::vector<Entity*> call_list;
+      call_list.push_back(call1_);
+      REQUIRE(call_list == pkb.GetDesignEntities(DesignEntity::kCall));
     }
 
     SECTION("Print") {
-      std::list<std::string> print_list{"4"};
-      REQUIRE(print_list == pkb.GetDesignEntity(DesignEntity::kPrint));
+      std::vector<Entity*> print_list;
+      print_list.push_back(print1_);
+      REQUIRE(print_list == pkb.GetDesignEntities(DesignEntity::kPrint));
     }
 
   }
@@ -106,85 +121,90 @@ TEST_CASE("2.PKB.PKB population and retrieval") {
   // Check if PKB can store and retrieve relationships
   SECTION("Get Relationship") {
     SECTION("Follows") {
-      std::list<std::tuple<DesignEntity, std::string>> follows_list{std::make_tuple(DesignEntity::kAssign, "2")};
-      REQUIRE(follows_list == pkb.GetFollows("1"));
+      std::vector<Entity*> follows_list;
+      follows_list.push_back(a1_);
+      REQUIRE(follows_list == pkb.GetRelationship(PKBRelRefs::kFollows, "1"));
     }
 
     SECTION("FollowedBy") {
-      std::list<std::tuple<DesignEntity, std::string>> previous_list{std::make_tuple(DesignEntity::kRead, "1")};
-      REQUIRE(previous_list == pkb.GetPrevious("2"));
+        std::vector<Entity*> followed_by_list;
+        followed_by_list.push_back(read1_);
+        REQUIRE(followed_by_list == pkb.GetRelationship(PKBRelRefs::kFollowedBy, "2"));
     }
 
-    SECTION("Uses") {
-      std::list<std::tuple<DesignEntity, std::string>> uses_list{std::make_tuple(DesignEntity::kVariable, "v1")};
-      REQUIRE(uses_list == pkb.GetUses("4"));
+    SECTION("UsesS") {
+        std::vector<Entity*> uses_list;
+        uses_list.push_back(v1_);
+        REQUIRE(uses_list == pkb.GetRelationship(PKBRelRefs::kUsesS, "4"));
     }
 
-    SECTION("UsedBy") {
-      std::list<std::tuple<DesignEntity, std::string>> used_by_list{std::make_tuple(DesignEntity::kAssign, "2")};
-      REQUIRE(used_by_list == pkb.GetUsedBy("v2"));
+    SECTION("UsedByS") {
+        std::vector<Entity*> used_by_list;
+        used_by_list.push_back(a1_);
+        REQUIRE(used_by_list == pkb.GetRelationship(PKBRelRefs::kUsedByS, "v2"));
     }
 
-    SECTION("Modifies") {
-      std::list<std::tuple<DesignEntity, std::string>> modifies_list{std::make_tuple(DesignEntity::kVariable, "v1")};
-      REQUIRE(modifies_list == pkb.GetModifies("1"));
+    SECTION("ModifiesS") {
+      std::vector<Entity*> modifies_list;
+      modifies_list.push_back(v1_);
+      REQUIRE(modifies_list == pkb.GetRelationship(PKBRelRefs::kModifiesStatement, "1"));
     }
 
-    SECTION("ModifiedBy") {
-      std::list<std::tuple<DesignEntity, std::string>> modified_by_list{};
-      modified_by_list.push_back(std::make_tuple(DesignEntity::kRead, "1"));
-      modified_by_list.push_back(std::make_tuple(DesignEntity::kAssign, "2"));
-      REQUIRE(modified_by_list == pkb.GetModifiedBy("v1"));
+    SECTION("ModifiedByS") {
+        std::vector<Entity*> modified_by_list;
+        modified_by_list.push_back(read1_);
+        modified_by_list.push_back(a1_);
+        REQUIRE(modified_by_list == pkb.GetRelationship(PKBRelRefs::kModifiedByStatement, "v1"));
     }
   }
 
   // Check if PKB can store and retrieve the existence of any relationship
   SECTION("Has Relationship") {
     SECTION("Follows") {
-      REQUIRE(pkb.HasFollows());
+      REQUIRE(pkb.HasRelationship(PKBRelRefs::kFollows));
     }
 
     SECTION("Previous") {
-      REQUIRE(pkb.HasPrevious());
+      REQUIRE(pkb.HasRelationship(PKBRelRefs::kFollowedBy));
     }
 
     SECTION("Parent") {
-      REQUIRE(!pkb.HasParent());
+      REQUIRE(!pkb.HasRelationship(PKBRelRefs::kParent));
     }
 
     SECTION("Child") {
-      REQUIRE(!pkb.HasChild());
+      REQUIRE(!pkb.HasRelationship(PKBRelRefs::kChild));
     }
 
-    SECTION("Uses") {
-      REQUIRE(pkb.HasUses());
+    SECTION("UsesS") {
+      REQUIRE(pkb.HasRelationship(PKBRelRefs::kUsesS));
     }
 
-    SECTION("UsedBy") {
-      REQUIRE(pkb.HasUsedBy());
+    SECTION("UsedByS") {
+      REQUIRE(pkb.HasRelationship(PKBRelRefs::kUsedByS));
     }
 
-    SECTION("Modifies") {
-      REQUIRE(pkb.HasModifies());
+    SECTION("ModifiesS") {
+      REQUIRE(pkb.HasRelationship(PKBRelRefs::kModifiesStatement));
     }
 
-    SECTION("ModifiedBy") {
-      REQUIRE(pkb.HasModifiedBy());
+    SECTION("ModifiedByS") {
+      REQUIRE(pkb.HasRelationship(PKBRelRefs::kModifiedByStatement));
     }
   }
 
   // Check if PKB can store and retrieve assign expressions given either variable name or statement number
   SECTION("Assignment Expressions") {
     SECTION("Get pattern by assignment statement number") {
-      std::vector<AssignEntity> assign_vector = pkb.GetPatternByAssign("2");
+      std::vector<Entity*> assign_vector = pkb.GetAssignEntityByStmtRef("2");
       REQUIRE(assign_vector.size() == 1);
-      REQUIRE(assign_vector[0].GetAssignmentExpr()->GetExpressionString() == "v1=1 2 + v2 +");
+      REQUIRE(assign_vector[0] == a1_);
     }
 
-    SECTION("Get pattern by variable namebu") {
-      std::vector<AssignEntity> assign_vector = pkb.GetPatternByVariable("v1");
+    SECTION("Get pattern by variable name") {
+      std::vector<Entity*> assign_vector = pkb.GetAssignEntityByVariable("v1");
       REQUIRE(assign_vector.size() == 1);
-      REQUIRE(assign_vector[0].GetAssignmentExpr()->GetExpressionString() == "v1=1 2 + v2 +");
+      REQUIRE(assign_vector[0] == a1_);
     }
   }
 }
