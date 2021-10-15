@@ -21,7 +21,8 @@ class Cluster {
   Cluster() {};
   int size() const;
   std::pair<int, int> GetStartEndRange();
-  void AddChildCluster(Cluster* new_nested_cluster);
+  void AddChildClusterToBack(Cluster* new_nested_cluster);
+  void AddChildClusterToFront(Cluster* new_nested_cluster);
   void UpdateRange(Cluster* nested_cluster);
   void UpdateClusterRange();
   void AddSiblingCluster(Cluster* new_sibling_cluster);
@@ -31,6 +32,7 @@ class Cluster {
   Cluster* GetParentCluster();
   std::list<Cluster*> GetNestedClusters() const;
   Cluster* GetNextSiblingCluster();
+  Cluster* GetPrevSiblingCluster();
   void SetParentCluster(Cluster* parent_cluster);
   virtual ~Cluster();
 

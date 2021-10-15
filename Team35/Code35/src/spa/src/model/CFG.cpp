@@ -14,8 +14,13 @@ int Cluster::size() const {
  * Adds a new cluster to list of clusters within it.
  * @param new_nested_cluster
  */
-void Cluster::AddChildCluster(Cluster* new_nested_cluster) {
+void Cluster::AddChildClusterToBack(Cluster* new_nested_cluster) {
   this->nested_clusters_.push_back(new_nested_cluster);
+  new_nested_cluster->SetParentCluster(this);
+}
+
+void Cluster::AddChildClusterToFront(Cluster* new_nested_cluster) {
+  this->nested_clusters_.push_front(new_nested_cluster);
   new_nested_cluster->SetParentCluster(this);
 }
 
@@ -90,6 +95,28 @@ Cluster* Cluster::GetNextSiblingCluster() {
   }
   return nullptr;
 }
+
+Cluster* Cluster::GetPrevSiblingCluster() {
+  Cluster* parent_cluster = this->GetParentCluster();
+  if (parent_cluster != nullptr) { // i.e. not outmost cluster:
+    std::list<Cluster*> siblings = parent_cluster->GetNestedClusters();
+    std::list<Cluster*>::iterator itr = std::find(siblings.begin(), siblings.end(), this);
+    if (itr != end(siblings)) { // i.e. this exists, i can find myself using my parent
+      int prev_sibling_idx = std::distance(siblings.begin(), itr) - 1;
+      if (prev_sibling_idx < 0) {
+        return nullptr; // no previous sibling exists:
+      } else {
+        return * (--itr);
+      }
+    } else {
+      assert(false);
+    }
+  } else {
+    return nullptr;
+  }
+  return nullptr;
+}
+
 std::list<Cluster*> Cluster::GetNestedClusters() const {
   return this->nested_clusters_;
 }
@@ -98,7 +125,7 @@ void Cluster::AddSiblingCluster(Cluster* new_sibling_cluster) {
   if (parent_cluster_ == nullptr) { // the outermost cluster can't have any siblings
     throw std::invalid_argument("The outermost cluster (representing a procedure) should never have any siblings");
   }
-  parent_cluster_->AddChildCluster(new_sibling_cluster);
+  parent_cluster_->AddChildClusterToBack(new_sibling_cluster);
 }
 
 /**
@@ -125,8 +152,8 @@ void Cluster::UpdateRange(Cluster* nested_cluster) {
       this->end_ = new_cluster_end;
     }
   } else { // there are nested clusters within, assume the start and end range already updated
-    bool new_cluster_appears_before_this = new_cluster_end < this->start_;
-    bool new_cluster_appears_after_this = new_cluster_start > this->end_;
+    bool new_cluster_appears_before_this = new_cluster_end + 1 == this->start_;
+    bool new_cluster_appears_after_this = new_cluster_start == this->end_ + 1;
     if(new_cluster_appears_before_this){
       this->start_ = new_cluster_start;
     } else if (new_cluster_appears_after_this) {
@@ -152,6 +179,7 @@ void Cluster::UpdateClusterRange() {
     }
   }
 }
+
 
 // default destructors:
 Cluster::~Cluster() = default;
