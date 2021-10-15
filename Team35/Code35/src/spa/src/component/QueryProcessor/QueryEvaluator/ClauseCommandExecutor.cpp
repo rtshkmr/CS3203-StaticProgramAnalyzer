@@ -90,11 +90,13 @@ void ClauseCommandExecutor::SuchThatTwoSynonymOneInTable(Clause *clause, bool fi
     bool hasValidRelationship = false;
     int number_of_repeats = 0;
 
+    //
     for (auto iter: intermediate_table) {
       Entity *entity_to_be_compared = first_syn_in ? std::get<0>(iter) : std::get<1>(iter);
+      Entity *entity_to_be_added = first_syn_in ? std::get<1>(iter) : std::get<0>(iter);
       if (curr_entity == entity_to_be_compared) {
         // Add new row for each col in table
-        group_table->AddMultipleRowForAllColumn(new_synonym, i, std::get<1>(iter), number_of_repeats);
+        group_table->AddMultipleRowForAllColumn(new_synonym, i, entity_to_be_added, number_of_repeats);
 
         hasValidRelationship = true;
         number_of_repeats++;
@@ -190,7 +192,7 @@ void ClauseCommandExecutor::SuchThatOneSynonym(Clause *clause, bool first_syn_in
 // For Pattern query with assign synonym and variable value or wildcard
 void ClauseCommandExecutor::PatternOneSynonym(Clause *clause) {
   auto *pattern_clause = dynamic_cast<Pattern *>(clause);
-  std::vector<Entity *> assign_entity_in_table_list = group_table->GetColumn(pattern_clause->first_synonym);\
+  std::vector<Entity *> assign_entity_in_table_list = group_table->GetColumn(pattern_clause->first_synonym);
   std::string left_side_value = pattern_clause->left_hand_side;
   unsigned long table_size = assign_entity_in_table_list.size();
   int delete_count = 0;
