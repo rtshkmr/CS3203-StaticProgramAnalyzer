@@ -1,23 +1,33 @@
-# This shell executor will run all the test files in this folder. 
-# How it works? 
-# All test should have a "test_source_x" and "test_queries_x" where x is the same number, and in increasing order
-# Do ensure the test case number are in increasing order. 
-# At the end of the run, it will zip all the .xml file
-# Written by: WeiJie (14/09/2021) 
-
-
-echo "[NOTE] Running parser"; 
+echo "[NOTE] Testing SP Parsing"; 
 RESULT="0";
 
-for i in $(ls basic/basic_*.txt);
-do echo "[NOTE] Running Test $i"; 
-	./../../autotester $i blank.txt blank.xml > res.txt;
+for i in $(ls basic/*.txt);
+do echo "[NOTE] Running Basic Test $i"; 
+	./../../autotester $i blank.txt blank.xml > /dev/null;
 	if [ "$?" != 0 ] 
 	then
 	    RESULT="1";
-		echo "[NOTE] $i failed."; 
 	else
-		echo "[NOTE] $i passed."; 
+	fi
+done
+
+for i in $(ls adv/*.txt);
+do echo "[NOTE] Running Advanced Test $i"; 
+	./../../autotester $i blank.txt blank.xml > /dev/null;
+	if [ "$?" != 0 ] 
+	then
+	    RESULT="1";
+	else
+	fi
+done
+
+for i in $(ls throw/*.txt);
+do echo "[NOTE] Running Exception Test $i"; 
+	./../../autotester $i blank.txt blank.xml &> /dev/null;
+	if [ "$?" == 0 ] 
+	then
+	    RESULT="1";
+	else
 	fi
 done
 

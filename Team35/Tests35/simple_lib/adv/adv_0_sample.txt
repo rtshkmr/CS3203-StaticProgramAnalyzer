@@ -1,0 +1,9 @@
+procedure sample1 {
+    call sample2;
+}
+procedure sample2 {
+    call sample3;
+}
+procedure sample3 {
+    x = 1;
+}
