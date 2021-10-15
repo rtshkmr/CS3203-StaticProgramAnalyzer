@@ -6,5 +6,5 @@ procedure Two {
 	VariableOne = vArIaBlE2; 
 	vArIaBlE2 = some3rdVariable; 
 	print some3rdVariable;
-	SomeL0000ngASSignment = VariableOne + (vArIaBlE2 - some3rdVariable) * vArIaBlE2 / VariableOne
+	SomeL0000ngASSignment = VariableOne + (vArIaBlE2 - some3rdVariable) * vArIaBlE2 / VariableOne;
 }
