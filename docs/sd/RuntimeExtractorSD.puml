@@ -1,0 +1,47 @@
+@startuml rte
+  skinparam shadowing false
+  skinparam sequence {
+    ArrowColor black
+    LifeLineBorderColor grey
+    LifeLineBackgroundColor lightgray
+    ParticipantBorderColor lavender
+    ParticipantBackgroundColor lavender
+  }
+
+  participant PKBQueryReceiver
+  participant RuntimeExtractor
+  participant NextTExtractor
+  participant AffectsExtractor
+  participant AffectsTExtractor
+
+  create RuntimeExtractor
+  PKBQueryReceiver -> RuntimeExtractor: RuntimeExtractor(PKB*)
+
+  PKBQueryReceiver -> RuntimeExtractor ++: GetRelationship(RelRef, string)
+  alt next relationship
+    RuntimeExtractor -> NextTExtractor ++: GetNextT(DS..., string)
+    NextTExtractor --> RuntimeExtractor --: vector<Entity*>
+  else previous
+    RuntimeExtractor -> NextTExtractor ++: GetPreviousT(DS..., string)
+    NextTExtractor --> RuntimeExtractor --: vector<Entity*>
+  else affects
+    RuntimeExtractor -> AffectsExtractor ++: GetAffects(DS..., string)
+    AffectsExtractor --> RuntimeExtractor --: vector<Entity*>
+  else affectedby
+    RuntimeExtractor -> AffectsExtractor ++: GetAffectedBy(DS..., string)
+    AffectsExtractor --> RuntimeExtractor --: vector<Entity*>
+  else affectsT
+    RuntimeExtractor -> AffectsTExtractor ++: GetAffectsT(DS..., string)
+    AffectsTExtractor --> RuntimeExtractor --: vector<Entity*>
+  else affectedbyT
+    RuntimeExtractor -> AffectsTExtractor ++: GetAffectedByT(DS..., string)
+    AffectsTExtractor --> RuntimeExtractor --: vector<Entity*>
+  end
+  RuntimeExtractor --> PKBQueryReceiver --: vector<Entity*>
+
+  PKBQueryReceiver -> RuntimeExtractor ++: HasAffectsRelationship()
+  RuntimeExtractor --> PKBQueryReceiver --: bool
+  PKBQueryReceiver -> RuntimeExtractor ++: HasAffectsTRelationship()
+  RuntimeExtractor --> PKBQueryReceiver --: bool
+
+@enduml
