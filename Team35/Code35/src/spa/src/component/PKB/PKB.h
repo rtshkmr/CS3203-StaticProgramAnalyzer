@@ -18,6 +18,8 @@ struct type_combo_hash {
   }
 };
 
+typedef std::tuple<PKBRelRefs, std::string, std::string> relationship;
+
 class PKB {
  public:
   // Population of PKB
@@ -25,7 +27,6 @@ class PKB {
 
   // Getting relationships from PKB
   std::vector<Entity*> GetRelationship(PKBRelRefs ref, std::string entity);
-  // todo: implement GetRelationshipByTypes
   std::vector<std::tuple<Entity*, Entity*>> GetRelationshipByTypes(PKBRelRefs, DesignEntity, DesignEntity);
 
   // Getting entities from PKB by type
@@ -40,17 +41,19 @@ class PKB {
   DesignEntity GetTypeFromEntity(Entity* entity);
 
   // Getting entities for pattern matching
-  std::vector<AssignEntity*> GetAssignEntityByStmtRef(std::string stmtRef);
-  std::vector<AssignEntity*> GetAssignEntityByVariable(std::string variable);
-  std::vector<WhileEntity*> GetWhileEntityByStmtRef(std::string stmtRef);
-  std::vector<WhileEntity*> GetWhileEntityByVariable(std::string variable);
-  std::vector<IfEntity*> GetIfEntityByStmtRef(std::string stmtRef);
-  std::vector<IfEntity*> GetIfEntityByVariable(std::string variable);
+  std::vector<Entity*> GetAssignEntityByStmtRef(std::string stmtRef);
+  std::vector<Entity*> GetAssignEntityByVariable(std::string variable);
+  std::vector<Entity*> GetWhileEntityByStmtRef(std::string stmtRef);
+  std::vector<Entity*> GetWhileEntityByVariable(std::string variable);
+  std::vector<Entity*> GetIfEntityByStmtRef(std::string stmtRef);
+  std::vector<Entity*> GetIfEntityByVariable(std::string variable);
 
   // Check if relationship exists
   bool HasRelationship(PKBRelRefs);
-  // todo: implement HasRelationship with entity specification; Max's comment: I might not need this...
   bool HasRelationship(PKBRelRefs, DesignEntity, DesignEntity);
+  bool HasRelationship(PKBRelRefs, std::string, std::string);
+
+  DesignEntity EntityToDesignEntity(Entity* entity);
 
   // Constructor
   PKB() = default;
@@ -149,9 +152,9 @@ class PKB {
   std::unordered_map<std::string, DesignEntity> entity_string_to_type_map_;
   std::unordered_map<Entity*, DesignEntity> entity_object_to_type_map_;
 
-  std::unordered_map<std::string, std::vector<AssignEntity*>> assign_map_;
-  std::unordered_map<std::string, std::vector<WhileEntity*>> while_map_;
-  std::unordered_map<std::string, std::vector<IfEntity*>> if_map_;
+  std::unordered_map<std::string, std::vector<Entity*>> assign_map_;
+  std::unordered_map<std::string, std::vector<Entity*>> while_map_;
+  std::unordered_map<std::string, std::vector<Entity*>> if_map_;
 
   std::unordered_map<
     PKBRelRefs,
@@ -161,7 +164,6 @@ class PKB {
     >
   > relationship_table_;
 
-//  todo: create relationship by type table, populate it and enable retrieval from it
   std::unordered_map<
     PKBRelRefs,
     std::unordered_map<
@@ -191,8 +193,17 @@ class PKB {
   void PopulateFollows(std::unordered_map<Statement*, Statement*>& follow_hash);
   void PopulateFollowedBy(std::unordered_map<Statement*, Statement*>& followed_by_hash);
   void PopulateChild(std::unordered_map<Statement*, Statement*>& child_to_parent_hash);
+  void PopulateContainerUse(std::unordered_map<Container*, std::list<Variable*>*> container_use_hash_);
+  void PopulateContainerUsedBy(std::unordered_map<Variable*, std::list<Container*>*> container_used_by_hash_);
+  void PopulateContainerModifies(std::unordered_map<Container*, std::list<Variable*>*> container_modifies_hash_);
+  void PopulateContainerModifiedBy(std::unordered_map<Variable*, std::list<Container*>*> container_modified_by_hash_);
 
 
+
+  std::string GetNameFromEntity(Entity* entity);
+
+  std::set<DesignEntity> stmt_design_entities_;
+  std::set<relationship> relationship_set_;
 
   // TO BE DEPRECATED FROM HERE
 

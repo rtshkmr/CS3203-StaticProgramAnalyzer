@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <array>
+#include <set>
 #include <datatype/DataType.h>
 //#include <component/QueryProcessor/types/QueryEvaluatorTable.h>
 #include <typeinfo>
