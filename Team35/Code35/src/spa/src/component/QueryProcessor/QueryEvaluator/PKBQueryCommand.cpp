@@ -69,6 +69,13 @@ IntermediateTable *PKBQueryReceiver::QueryPKBByValue(PKBRelRefs rel, std::string
   return table;
 }
 
+IntermediateTable *PKBQueryReceiver::QueryPKBForSynonymWithWildCard(PKBRelRefs rel, DesignEntity entity) {
+  std::vector<Entity *> output = pkb->GetRelationshipByType(rel, entity);
+  IntermediateTable *table = new IntermediateTable();
+  table->InsertData(output);
+  return table;
+}
+
 /**
  * This should only be called for such that wildcards.
  * Note: This might be used for with clauses.
@@ -143,41 +150,11 @@ IntermediateTable *PKBQueryReceiver::QueryPKBByValueForBoolean(PKBRelRefs rel, s
 
 // Returns true if the relationship holds for the 2 given values (no wildcards)
 // Such that uses(3, "x")
-// Follows stmt
-/// Follows* stmt
 IntermediateTable *
 PKBQueryReceiver::QueryPKBByValueForBoolean(PKBRelRefs rel, std::string first_value, std::string second_value) {
   IntermediateTable *table = new IntermediateTable();
-  std::vector<Entity *> list = pkb->GetRelationship(rel, first_value);
-
-  bool has_value;
-  // TODO: Need PKB support
-  for (auto entity : list) {
-    if (auto statement = dynamic_cast<Statement *>(entity)) {
-      int curr_stmt_number = statement->GetStatementNumber()->GetNum();
-      has_value = std::to_string(curr_stmt_number) == second_value;
-      if (has_value) break;
-    } else if (auto variable = dynamic_cast<Variable *>(entity)) {
-      std::string value = const_cast<VariableName*>(variable->GetName())->getName();
-      if (value == second_value) {
-        has_value = true;
-        break;
-      }
-    } else if (auto constant = dynamic_cast<Constant *>(entity)) {
-      int const_value = const_cast<ConstantValue*>(constant->GetValue())->Get();
-      if (std::to_string(const_value) == second_value) {
-        has_value = true;
-        break;
-      }
-    } else if (auto procedure = dynamic_cast<Procedure *>(entity)) {
-      std::string procedure_value = const_cast<ProcedureName *>(procedure->GetName())->getName();
-      if (procedure_value == second_value) {
-        has_value = true;
-        break;
-      }
-    }
-  }
-  table->InsertData(has_value);
+  bool has_result = pkb->HasRelationship(rel, first_value, second_value);
+  table->InsertData(has_result);
   return table;
 }
 
@@ -223,8 +200,7 @@ IntermediateTable * QuerySuchThatOneSynonymCommand::ExecuteQuery(Clause *clause)
   PKBRelRefs pkb_rel = GetPKBRelRef(such_that->rel_ref, synonym_is_first_param);
 
   if (query_value == "_") {
-    // TODO: need a new receiver method
-//    this->receiver->GetRelationshipByType(pkb_rel, query_synonym->GetType());
+    return this->receiver->QueryPKBForSynonymWithWildCard(pkb_rel, query_synonym->GetType());
   } else {
     return this->receiver->QueryPKBByValue(pkb_rel, query_value);
   }
@@ -255,7 +231,6 @@ IntermediateTable * QuerySuchThatNoSynonymCommand::ExecuteQuery(Clause *clause) 
   } else {
     PKBRelRefs pkb_rel = GetPKBRelRef(such_that->rel_ref, true);
     return this->receiver->QueryPKBByValueForBoolean(pkb_rel, such_that->left_hand_side, such_that->right_hand_side);
-    // TODO: Need a new Receiver method
   }
 }
 

@@ -14,11 +14,10 @@ class PKBQueryReceiver {
     PKB *pkb;
   public:
     PKBQueryReceiver(PKB *pkb);
-    //    std::vector<Entity *> QueryPKBSuchThat(RelRef r, const std::string& stmt, bool is_first_param);
-    //    bool QueryPkbForRelationshipExistence(SuchThat *such_that_clause);
-    //    std::vector<Entity *> QueryPkbPattern(bool is_assign_synonym, const std::string& value);
+
     IntermediateTable *QueryPKBTwoSynonyms(PKBRelRefs rel, DesignEntity first_synonym, DesignEntity second_synonym);
     IntermediateTable *QueryPKBByValue(PKBRelRefs rel, std::string value);
+    IntermediateTable *QueryPKBForSynonymWithWildCard(PKBRelRefs rel, DesignEntity entity);
     IntermediateTable *QueryPKBByValueForBoolean(PKBRelRefs rel, std::string value);
     IntermediateTable *QueryPKBByValueForBoolean(PKBRelRefs rel, std::string first_value, std::string second_value);
     IntermediateTable *QueryRelRefExistence(PKBRelRefs rel);
