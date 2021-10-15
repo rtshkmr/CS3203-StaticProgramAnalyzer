@@ -221,7 +221,7 @@ Select a1 such that Follows(w1, if1) pattern a1 (_,_)
 45 - Only such that is boolean
 stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; variable v1;
 Select v1 such that Follows*(w1, a1) pattern a1 (v1,_)
-y, z, x, i
+y
 5000
 46 - Only such that is boolean
 stmt s1, s2; assign a1; print p1; read r1; while w1; if if1; variable v1;
