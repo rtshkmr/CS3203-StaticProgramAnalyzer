@@ -46,6 +46,7 @@ class QuerySuchThatTwoSynonymCommand : public PKBQueryCommand {
     IntermediateTable * ExecuteQuery(Clause *clause) override;
 };
 
+
 class QuerySuchThatOneSynonymCommand : public PKBQueryCommand {
   private:
     Clause *clause;

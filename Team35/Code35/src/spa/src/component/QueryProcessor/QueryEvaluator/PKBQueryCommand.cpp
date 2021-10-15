@@ -50,6 +50,7 @@ PKBRelRefs PKBQueryCommand::GetPKBRelRef(RelRef relation, bool order_of_values_u
 IntermediateTable* PKBQueryReceiver::QueryPKBTwoSynonyms(PKBRelRefs rel, DesignEntity first_synonym, DesignEntity second_synonym) {
   std::vector<std::tuple<Entity *, Entity *>> output = pkb->GetRelationshipByTypes(rel, first_synonym, second_synonym);
   IntermediateTable *table = new IntermediateTable();
+
   table->InsertData(output);
   return table;
 }
@@ -212,9 +213,16 @@ IntermediateTable * QuerySuchThatOneSynonymCommand::ExecuteQuery(Clause *clause)
   std::string first = such_that->left_hand_side;
   std::string second = such_that->right_hand_side;
   std::string query_value = synonym_is_first_param ? second : first;
+  Synonym* query_synonym = synonym_is_first_param ? such_that->first_synonym : such_that->second_synonym;
   PKBRelRefs pkb_rel = GetPKBRelRef(such_that->rel_ref, synonym_is_first_param);
 
-  return this->receiver->QueryPKBByValue(pkb_rel, query_value);
+  if (query_value == "_") {
+    // TODO: need a new receiver method
+//    this->receiver->GetRelationshipByType(pkb_rel, query_synonym->GetType());
+  } else {
+    return this->receiver->QueryPKBByValue(pkb_rel, query_value);
+  }
+
 }
 
 QuerySuchThatNoSynonymCommand::QuerySuchThatNoSynonymCommand(Clause *clause) : clause(clause), receiver(nullptr) {}
