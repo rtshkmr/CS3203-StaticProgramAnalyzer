@@ -38,14 +38,15 @@ TEST_CASE("3.QueryEvaluatorTable.Target synonym is statement") {
     bool outcome = table.DeleteRow(1);
     REQUIRE(outcome);
     REQUIRE(table.GetColumnSize() == 1);
-    REQUIRE(table.GetResults().size() == 2);
+
+    REQUIRE(table.GetResults()[0].size() == 2);
     REQUIRE(table.GetResults()[0][1] == stmt3);
   }
 
   SECTION("Remove an invalid row") {
     bool outcome = table.DeleteRow(3);
     REQUIRE_FALSE(outcome);
-    REQUIRE(table.GetResults().size() == 3);
+    REQUIRE(table.GetResults()[0].size() == 3);
   }
 
   SECTION("Add synonym column and values") {
