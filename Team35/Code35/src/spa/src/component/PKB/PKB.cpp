@@ -114,6 +114,9 @@ std::vector<Entity*> PKB::GetRelationshipByType(PKBRelRefs ref, DesignEntity d) 
     std::vector<std::tuple<DesignEntity, DesignEntity>> combos = first_param_map_[d];
     std::vector<Entity*> entities;
     for (auto combo : combos) {
+        if (std::get<1>(combo) == DesignEntity::kStmt) {
+            continue;
+        }
         std::vector<std::tuple<Entity*, Entity*>> pairs = relationship_by_type_table_[ref][{std::get<0>(combo), std::get<1>(combo)}];
         for (auto pair : pairs) {
             entities.push_back(std::get<0>(pair));
@@ -304,6 +307,15 @@ void PKB::PopulateFollows(std::unordered_map<Statement*, Statement*>& follow_has
         relationship_by_type_table_[PKBRelRefs::kFollows][{first_type, second_type}].push_back(
             {kv.first, kv.second}
         );
+        relationship_by_type_table_[PKBRelRefs::kFollows][{DesignEntity::kStmt, second_type}].push_back(
+            {kv.first, kv.second}
+        );
+        relationship_by_type_table_[PKBRelRefs::kFollows][{first_type, DesignEntity::kStmt}].push_back(
+            {kv.first, kv.second}
+        );
+        relationship_by_type_table_[PKBRelRefs::kFollows][{DesignEntity::kStmt, DesignEntity::kStmt}].push_back(
+            {kv.first, kv.second}
+        );
     }
 }
 
@@ -317,6 +329,15 @@ void PKB::PopulateFollowedBy(std::unordered_map<Statement*, Statement*>& followe
         relationship_by_type_table_[PKBRelRefs::kFollowedBy][{first_type, second_type}].push_back(
             {kv.first, kv.second}
         );
+        relationship_by_type_table_[PKBRelRefs::kFollowedBy][{DesignEntity::kStmt, second_type}].push_back(
+            {kv.first, kv.second}
+        );
+        relationship_by_type_table_[PKBRelRefs::kFollowedBy][{first_type, DesignEntity::kStmt}].push_back(
+            {kv.first, kv.second}
+        );
+        relationship_by_type_table_[PKBRelRefs::kFollowedBy][{DesignEntity::kStmt, DesignEntity::kStmt}].push_back(
+            {kv.first, kv.second}
+        );
     }
 }
 
@@ -328,6 +349,15 @@ void PKB::PopulateChild(std::unordered_map<Statement*, Statement*>& child_to_par
         DesignEntity first_type = EntityToDesignEntity(kv.first);
         DesignEntity second_type = EntityToDesignEntity(kv.second);
         relationship_by_type_table_[PKBRelRefs::kChild][{first_type, second_type}].push_back(
+            {kv.first, kv.second}
+        );
+        relationship_by_type_table_[PKBRelRefs::kChild][{DesignEntity::kStmt, second_type}].push_back(
+            {kv.first, kv.second}
+        );
+        relationship_by_type_table_[PKBRelRefs::kChild][{first_type, DesignEntity::kStmt}].push_back(
+            {kv.first, kv.second}
+        );
+        relationship_by_type_table_[PKBRelRefs::kChild][{DesignEntity::kStmt, DesignEntity::kStmt}].push_back(
             {kv.first, kv.second}
         );
     }
