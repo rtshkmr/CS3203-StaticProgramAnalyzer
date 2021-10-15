@@ -108,7 +108,7 @@ void QueryEvaluator::PreprocessBooleanGroup(Group group) {
     QueryEvaluatorTable current_table(main_synonym);
     current_table.AddTargetSynonymValues(main_synonym, pkb->GetDesignEntities(main_synonym->GetType()));
     ProcessGroup(&current_table, &group);
-    if (current_table.GetResults().empty()) {
+    if (current_table.GetResults()[0].empty()) {
       boolean_result = false;
     }
   }

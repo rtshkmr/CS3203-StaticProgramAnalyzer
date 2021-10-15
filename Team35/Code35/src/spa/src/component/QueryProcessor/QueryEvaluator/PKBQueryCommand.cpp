@@ -13,9 +13,9 @@ PKBRelRefs PKBQueryCommand::GetPKBRelRef(RelRef relation, bool order_of_values_u
           case RelRef::kModifiesP:
             return order_of_values_unchanged_from_clause ? PKBRelRefs::kModifiesContainer : PKBRelRefs::kModifiedByContainer;
             case RelRef::kModifiesS:
-              return order_of_values_unchanged_from_clause ? PKBRelRefs::kModifiesStatement : PKBRelRefs::kModifiedByStatement;
+              return order_of_values_unchanged_from_clause ? PKBRelRefs::kModifies : PKBRelRefs::kModifiedBy;
               case RelRef::kUsesS:
-                return order_of_values_unchanged_from_clause ? PKBRelRefs::kUsesS : PKBRelRefs::kUsedByS;
+                return order_of_values_unchanged_from_clause ? PKBRelRefs::kUses : PKBRelRefs::kUsedBy;
                 case RelRef::kUsesP:
                   return order_of_values_unchanged_from_clause ? PKBRelRefs::kUsesC : PKBRelRefs::kUsedByC;
                   case RelRef::kFollowsT:
