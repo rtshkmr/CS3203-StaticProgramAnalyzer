@@ -57,7 +57,7 @@ void NextExtractor::ExtractBlock(Block* block) {
   int end = range.second;
   Statement* end_statement = stmt_list[end - 1];
 
-  for (Block* next_block: block->next_blocks_) {
+  for (Block* next_block: block->GetNextBlocks()) {
     int next = next_block->GetStartEndRange().first;
 
     assert(next != -1); // uninitialized block
