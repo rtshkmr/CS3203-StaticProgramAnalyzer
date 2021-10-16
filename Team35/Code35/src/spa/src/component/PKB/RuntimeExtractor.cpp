@@ -7,11 +7,16 @@ RuntimeExtractor::RuntimeExtractor(PKB* pkb) {
 
 std::vector<Entity*> RuntimeExtractor::GetRelationships(RelRef ref, std::string target) {
   switch (ref) {
-    case RelRef::kNextT:return NextTExtractor::GetNextT(target);
+    case RelRef::kNextT: {
+      NextTExtractor next_t_extractor{};
+      return next_t_extractor.GetNextT(target,
+                                       std::vector<Procedure*>{},
+                                       std::vector<Statement*>{});  // todo update with pkb api
+    }
     case RelRef::kAffects: break;
     case RelRef::kAffectsT: break;
   }
-  return std::vector<Entity*>();
+  return std::vector<Entity*>{};
 }
 
 bool RuntimeExtractor::HasAffects() {
