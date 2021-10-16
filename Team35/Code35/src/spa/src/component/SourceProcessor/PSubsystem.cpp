@@ -124,47 +124,16 @@ void PSubsystem::CloseElseBlock() {
     Block* if_cond_block = block_stack_.top();
 
     if (Block::IsExitBlock(else_body_block)) {
-      Block* toInsert = nullptr;
-      Block* left = *if_cond_block->next_blocks_.begin();
-      Block* right = *if_cond_block->next_blocks_.rbegin();
-      if (left->GetStartEndRange().first > right->GetStartEndRange().first) {
-        toInsert = left;
-      } else {
-        toInsert = right;
-      }
-
-      //if it is empty, map it outwards.
-      for (auto* bb : toInsert->next_blocks_) {
-        bb->next_blocks_.erase(else_body_block);
-        bb->next_blocks_.insert(block_if_else_exit);
-      }
-
-      if_cond_block->next_blocks_.insert(toInsert);
-
+      Block::PatchEmptyBlocks(else_body_block, block_if_else_exit);
     } else {
-      else_body_block->next_blocks_.insert(block_if_else_exit);
-      if_cond_block->next_blocks_.insert(else_body_block);
+      else_body_block->AddNextBlock(block_if_else_exit);
     }
 
     if (Block::IsExitBlock(if_body_block)) {
-      Block* toInsert = nullptr;
-      Block* left = *if_cond_block->next_blocks_.begin();
-      Block* right = *if_cond_block->next_blocks_.rbegin();
-      if (left->GetStartEndRange().first < right->GetStartEndRange().first) {
-        toInsert = left;
-      } else {
-        toInsert = right;
-      }
-
-      //if it is empty, map it outwards.
-      for (auto* bb : toInsert->next_blocks_) {
-        bb->next_blocks_.erase(if_body_block);
-        bb->next_blocks_.insert(block_if_else_exit);
-      }
+      Block::PatchEmptyBlocks(if_body_block, block_if_else_exit);
     } else {
-      if_body_block->next_blocks_.insert(block_if_else_exit);
+      if_body_block->AddNextBlock(block_if_else_exit);
     }
-
 
     if_cond_block->UpdateClusterRange();
 
@@ -221,11 +190,18 @@ void PSubsystem::CloseWhileBlock() {
   outer_cluster->AddChildClusterToBack(while_cluster);
   outer_cluster->UpdateClusterRange();
 
-  while_body_block->next_blocks_.insert(while_cond_block); // loop back to cond
   Block* block_while_exit = Block::GetNewExitBlock();
-  while_cond_block->next_blocks_.insert(block_while_exit); // cond point to exit
+
+  if (Block::IsExitBlock(while_body_block)) {
+    Block::PatchEmptyBlocks(while_body_block, while_cond_block);
+  } else {
+    while_body_block->AddNextBlock(while_cond_block); // loop back to cond
+  }
+
+  while_cond_block->AddNextBlock(block_while_exit); // cond point to exit
   block_stack_.pop(); //pop the while_cond_block block
   block_stack_.push(block_while_exit);
+
 }
 
 /**
@@ -456,7 +432,7 @@ ConditionalBlock* PSubsystem::CreateConditionalBlock(Statement* conditional_stat
     block_before_cond->RemoveStmt(StatementNumber(statement_num));
     conditional_block = new ConditionalBlock();
     conditional_block->AddStmt(StatementNumber(statement_num));
-    block_before_cond->next_blocks_.insert(conditional_block);
+    block_before_cond->AddNextBlock(conditional_block);
     bool prior_block_is_not_while = !dynamic_cast<Block*>(block_before_cond)->isWhile;
     if (prior_block_is_not_while) {
       cluster_stack_.top()->AddChildClusterToBack(block_before_cond);
@@ -476,7 +452,7 @@ ConditionalBlock* PSubsystem::CreateConditionalBlock(Statement* conditional_stat
  */
 BodyBlock* PSubsystem::CreateBodyBlock(ConditionalBlock* conditional_block) {
   BodyBlock* body_block = new BodyBlock();
-  conditional_block->next_blocks_.insert(dynamic_cast<Block*>(body_block));
+  conditional_block->AddNextBlock(dynamic_cast<Block*>(body_block));
   block_stack_.push(dynamic_cast<Block*>(body_block));
   return body_block;
 }
@@ -489,7 +465,7 @@ BodyBlock* PSubsystem::CreateBodyBlock() {
   block_stack_.pop(); //pop so that the if_cond can perform next_block map to else block
   BodyBlock* block_else_body = new BodyBlock();
   Block* block_if_cond = block_stack_.top();
-  block_if_cond->next_blocks_.insert(block_else_body);
+  block_if_cond->AddNextBlock(block_else_body);
   block_stack_.push(block_if_body);
   block_stack_.push(block_else_body);
 

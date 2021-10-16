@@ -54,8 +54,8 @@ TEST_CASE("1.CFG.Block.StatementRange") {
 TEST_CASE("1.CFG.Block.Linkage") {
   SECTION ("Self-Linkage") {
     Block b;
-    b.next_blocks_ = {&b}; //self-loop block
-    Block* nextBlock = *b.next_blocks_.begin();
+    b.AddNextBlock(&b); //self-loop block
+    Block* nextBlock = *b.GetNextBlocks().begin();
 
     REQUIRE(&b == nextBlock);
   }
