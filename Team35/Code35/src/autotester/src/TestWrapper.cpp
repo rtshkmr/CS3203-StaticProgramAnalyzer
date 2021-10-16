@@ -49,7 +49,7 @@ void TestWrapper::parse(std::string file_name) {
 void TestWrapper::evaluate(std::string query, std::list<std::string>& results) {
   L("[BEFORE] EVALUATING  QUERY ");
 // call your evaluator to evaluate the query here
-  std::optional<std::list<std::string>> populated_result_list = QuerySystemController::Evaluate(& query, pkb);
+  std::optional<std::vector<std::string>> populated_result_list = QuerySystemController::Evaluate(& query, pkb);
   L("... Query System controller has evaluated the query");
   if (populated_result_list) {
     for (const auto& elem: populated_result_list.value()) {

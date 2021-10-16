@@ -27,7 +27,7 @@ const ProcedureName* Procedure::GetName() {
 }
 
 Variable::Variable(VariableName* vName) {
-  type = EntityEnum::kNone;
+  type = EntityEnum::kVariableEntity;
   variable_name_ = vName;
 }
 
@@ -55,6 +55,15 @@ std::vector<Variable*> Variable::SortVariableVector(std::vector<Variable*> var_l
   std::sort(var_list_copy.begin(), var_list_copy.end(),
             [](Variable* a, Variable* b) { return *a->GetName() < *b->GetName(); });
   return var_list_copy;
+}
+
+Constant::Constant(ConstantValue* cv) {
+    type = EntityEnum::kConstantEntity;
+    constant_value_ = cv;
+}
+
+const ConstantValue* Constant::GetValue() {
+    return constant_value_;
 }
 
 Program::Program(Procedure* p) {
