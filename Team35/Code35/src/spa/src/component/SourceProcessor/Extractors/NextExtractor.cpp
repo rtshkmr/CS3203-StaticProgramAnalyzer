@@ -60,7 +60,10 @@ void NextExtractor::ExtractBlock(Block* block) {
   for (Block* next_block: block->GetNextBlocks()) {
     int next = next_block->GetStartEndRange().first;
 
-    assert(next != -1); // uninitialized block
+    if (next == -1) { // exit block
+      assert(next_block->GetNextBlocks().empty());
+      continue;
+    }
 
     Statement* next_block_statement = stmt_list[next - 1];
     deliverable_->AddNextRelationship(end_statement, next_block_statement);
