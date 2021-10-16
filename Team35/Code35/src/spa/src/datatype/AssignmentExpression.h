@@ -11,7 +11,7 @@ class AssignmentExpression {
  private:
   std::string expression_;
 
-  std::string ParseInfixToPostfix(std::string infix);
+  static std::string ParseInfixToPostfix(std::string infix);
 
  public:
   AssignmentExpression(std::string infix);
