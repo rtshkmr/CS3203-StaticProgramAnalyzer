@@ -23,7 +23,7 @@ std::vector<Entity*> NextTExtractor::GetNextT(std::string target,
     Cluster* proc_cluster = const_cast<Cluster*>(proc->GetClusterRoot());
     if (proc_cluster->CheckIfStmtNumInRange(target_num)) {
       Cluster* t_cluster = GetTargetCluster(proc_cluster, target_num);
-      return GetNextTFromCluster(t_cluster, target_num);
+      return ltov(GetNextTFromCluster(t_cluster, target_num));
     }
   }
   return std::vector<Entity*>{};
@@ -48,7 +48,7 @@ Cluster* NextTExtractor::GetTargetCluster(Cluster* p_cluster, int target_num) {
 /**
  * Go to innermost target block and start traversal. If any while loop is met, process from while.
  */
-std::vector<Entity*> NextTExtractor::GetNextTFromCluster(Cluster* cluster, int target_num) {
+std::list<Statement*> NextTExtractor::GetNextTFromCluster(Cluster* cluster, int target_num) {
   std::list<Cluster*> nested_clusters = cluster->GetNestedClusters();
   if (nested_clusters.empty()) {
     GetNextTByTraversal(dynamic_cast<Block*>(cluster), target_num);
@@ -63,9 +63,9 @@ std::vector<Entity*> NextTExtractor::GetNextTFromCluster(Cluster* cluster, int t
     }
   }
   if (next_t_map_.count(stmt_list_[target_num-1]) == 0) {
-    return std::vector<Entity*>{};
+    return std::list<Statement*>{};
   }
-  return ltov(*next_t_map_[stmt_list_[target_num-1]]);
+  return *next_t_map_[stmt_list_[target_num-1]];
 }
 
 /**
@@ -73,7 +73,7 @@ std::vector<Entity*> NextTExtractor::GetNextTFromCluster(Cluster* cluster, int t
  * while loop.
  *
  * @param w_cluster Cluster representing the while loop
- * @return List of Entities that are Next* of the top of w_cluster
+ * @return List of Statements that are Next* of the top of w_cluster
  */
 std::list<Statement*> NextTExtractor::GetNextTFromWhile(Cluster* w_cluster, int target_num) {
   Block* w_block = dynamic_cast<Block*>(w_cluster->GetNestedClusters().front());
@@ -84,12 +84,13 @@ std::list<Statement*> NextTExtractor::GetNextTFromWhile(Cluster* w_cluster, int 
     }
   }
   assert(bigger_block->GetStartEndRange().first != -1);
-  std::list<Entity*> next_t = GetNextTByTraversal(bigger_block, target_num);
+  GetNextTByTraversal(bigger_block, target_num);
 
   std::pair<int, int> range = w_cluster->GetStartEndRange();
+  int count = range.second - range.first + 1;
   for (int i = range.first - 1; i < range.second; ++i) {
-    std::vector<Statement*> w_statements;
-    std::copy(stmt_list_[range.first - 1], stmt_list_[range.second - 1], std::back_inserter(w_statements));
+    std::vector<Statement*> w_statements(count);
+    std::copy(&stmt_list_[range.first - 1], &stmt_list_[range.second - 1], w_statements.begin());
     w_statements.erase(w_statements.begin() + i);
     AddVectorOfNextTRelationship(stmt_list_[i], w_statements);
   }
@@ -99,12 +100,12 @@ std::list<Statement*> NextTExtractor::GetNextTFromWhile(Cluster* w_cluster, int 
 /**
  * Start recursive traversal
  *
- * @return List of Entities that Next* the Statement at the top of this block, or the target Statement.
+ * @return List of Statements that Next* the Statement at the top of this block, or the target Statement.
  */
 std::list<Statement*> NextTExtractor::GetNextTByTraversal(Block* block, int target_num) {
   std::list<Statement*> next_t;
   for (Block* next_block: block->GetNextBlocks()) {
-    std::list<Statement*> next_block_next_t = GetNextTByTraversal(next_block, target_num);
+    std::list<Statement*> next_block_next_t = GetNextTFromCluster(next_block, target_num);
     next_t.insert(next_t.end(), next_block_next_t.begin(), next_block_next_t.end());
   }
 
@@ -114,7 +115,7 @@ std::list<Statement*> NextTExtractor::GetNextTByTraversal(Block* block, int targ
   }
 
   for (int i = range.second; i <= target_num; --i) {
-    std::vector<Statement*> b_statements(stmt_list_[i - 1], stmt_list_[range.second - 1]);
+    std::vector<Statement*> b_statements(&stmt_list_[i - 1], &stmt_list_[range.second - 1]);
 
     AddListOfNextTRelationship(stmt_list_[i-1], next_t);
     AddVectorOfNextTRelationship(stmt_list_[i-1], b_statements);
