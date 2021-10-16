@@ -4,7 +4,11 @@
 
 #include <regex>
 #include <stack>
+#include <utility>
 #include "AssignmentExpression.h"
+
+#define CLOSE_BRACKET 7
+#define OPEN_BRACKET -1
 
 /**
  * This is the constructor for AssignmentExpression.
@@ -13,35 +17,36 @@
  * @param infix The infix assignment to be stored.
  */
 AssignmentExpression::AssignmentExpression(std::string infix) {
-  expression_ = ParseInfixToPostfix(infix);
+  expression_ = ParseInfixToPostfix(std::move(infix));
 }
 
 /**
- * Check if the given character is an operator.
- * An operator character refers to ( ) + - * / % ^
- * @param c The character to check
- * @return true if it is one of the character; false otherwise.
+ * Gets the rank of the character. This rank is used to compare the level of precedence.
+ * This function only returns odd numbers as the even numbers are reserved for operators within the stack (left-associative)
+ * @param c Character to be evaluated
+ * @return An odd integer which represents the rank, -INT32_MAX if it is not an operator.
  */
-bool IsOperator(char& c) {
-  if (c == '+' || c == '-' || c == '*' || c == '/' || c == '%' || c == '^' || c == '(' || c == ')')
-    return true;
-  else
-    return false;
-}
-
-// Operator Rank only returns the input value rank.
-// lower rank = push
-// always return an odd number so stack value is even.
 int OperatorRank(char& c) {
-  if (c == ')') return 7;
-  if (c == '(') return -1;
-  if (c == '+' || c == '-') return 1;
-  if (c == '*' || c == '/' || c == '%') return 3;
-  if (c == '^') return 5;
-  return -INT32_MAX;
+  switch (c) {
+    case ')': return 7;
+    case '^': return 5;
+    case '*':
+    case '/':
+    case '%': return 3;
+    case '+':
+    case '-': return 1;
+    case '(': return -1;
+    default: return -INT32_MAX;
+  }
 }
 
-std::string ConvertToStringAndClearBuffer(std::vector<char>* chara) {
+/**
+ * Convert the input vector<char> into a String, and clear vector<chara>.
+ * Insert this string into vector<string>
+ * @param chara The array of char to be converted into String.
+ * @param tokens The vector to push the converted String.
+ */
+void ConvertToStringAndClearBuffer(std::vector<char>* chara, std::vector<std::string>* tokens) {
   std::string s(chara->begin(), chara->end());
   chara->clear();
 
@@ -49,93 +54,78 @@ std::string ConvertToStringAndClearBuffer(std::vector<char>* chara) {
     if (s.back() != ' ') {
       s.push_back(' '); /// IMPORTANT: separate variable 'a' and 'b' with 'ab'
     }
+    tokens->push_back(s);
   }
-
-  return s;
 }
 
+/**
+ * Given the operator_stack and token_list, it will take the top-most operator from the operator_stack, and append it
+ *      to the token_list.
+ */
+void PushTopOperatorToTokenStack(std::stack<char>* operator_stack, std::vector<std::string>* tokens) {
+  std::string s2 = std::string() + operator_stack->top() + ' ';
+  operator_stack->pop();
+  tokens->push_back(s2);
+}
+
+/**
+ * This function handles a close bracket encounter in infix.
+ * This function will pop all of the operators in the operator stack (and append it to token_list), until a open_bracket
+ *     is found.
+ */
+void HandleCloseBracket(std::stack<char>* operator_stack, std::vector<std::string>* tokens) {
+  int op_rank = OperatorRank(operator_stack->top());
+  while (op_rank != OPEN_BRACKET) {
+    PushTopOperatorToTokenStack(operator_stack, tokens);
+    op_rank = OperatorRank(operator_stack->top());
+  }
+  operator_stack->pop(); // this is a (used) open bracket.
+}
+
+/**
+ * This method will split the infix equation into a list of tokens, which are in postfix order.
+ */
 std::vector<std::string> ConvertEquationIntoTokens(std::string eqn) {
   std::vector<char> chara;
   std::vector<std::string> tokens;
-  std::string space;
-  space.push_back(' ');
-  tokens.push_back(space); // Insert a space in front of variable -- so that CheckExist does not match partial var
-
   std::stack<char> operator_stack;
 
-  for (char& c: eqn) {
-    if (IsOperator(c)) {
-      std::string s = ConvertToStringAndClearBuffer(& chara);
-      if (!s.empty()) {
-        tokens.push_back(s);
-      }
-
-      int rank = OperatorRank(c);
-      if (rank == -1) {
-        operator_stack.push(c);
-        continue;
-      }
-      if (!operator_stack.empty()) {
-        int stack_rank = OperatorRank(operator_stack.top()) + 1; //stack rank always higher, due to left-associativity
-
-        if (rank == 7) { //close bracket --> force pop to stack's (
-          int op_rank = 0;
-          do {
-            char op = operator_stack.top();
-            operator_stack.pop();
-            std::string s2;
-            s2.push_back(op);
-            s2.push_back(' '); // add a space for every operator push.
-
-            op_rank = OperatorRank(op);
-            if (op_rank != -1) {
-              tokens.push_back(s2);
-            } else {
-              break;
-            }
-          } while (op_rank != -1);
-
-        } else if (rank < stack_rank) {
-          while (rank < stack_rank) {
-            char op = operator_stack.top();
-            operator_stack.pop();
-            std::string s2;
-            s2.push_back(op);
-            s2.push_back(' ');
-            tokens.push_back(s2);
-
-            if (!operator_stack.empty())
-              stack_rank = OperatorRank(operator_stack.top()) + 1;
-            else break;
-          }
-          operator_stack.push(c);
-        } else {
-          operator_stack.push(c);
-        }
-      } else {
-        operator_stack.push(c);
-      }
-    } else if (!(c == ' ')) {
-      chara.push_back(c);
-    } else if (c == '0') {
-      if (!chara.empty()) {
+  for (char &c: eqn) {
+    if (OperatorRank(c) == -INT32_MAX) {
+      if (c != ' ') {
         chara.push_back(c);
       }
+      continue;
     }
+
+    // Handle Operator type
+    ConvertToStringAndClearBuffer(&chara, &tokens);
+
+    int rank = OperatorRank(c);
+
+    if (rank == OPEN_BRACKET || operator_stack.empty()) { // ( found or no operator to pop --> Push and leave
+      operator_stack.push(c);
+      continue;
+    }
+
+    int stack_rank = OperatorRank(operator_stack.top()) + 1; //stack rank always higher, due to left-associativity
+
+    if (rank == CLOSE_BRACKET) { // ) found; Pop everything until Open Bracket, and leave.
+      HandleCloseBracket(&operator_stack, &tokens);
+      continue;
+    }
+
+    while (rank < stack_rank) { // Perform any bigger operators, then push this op to stack
+      PushTopOperatorToTokenStack(&operator_stack, &tokens);
+      stack_rank = (operator_stack.empty()) ? -INT32_MAX : OperatorRank(operator_stack.top()) + 1;
+    }
+    operator_stack.push(c);
   }
 
-  std::string s = ConvertToStringAndClearBuffer(& chara);
-  if (!s.empty()) {
-    tokens.push_back(s);
-  }
+  ConvertToStringAndClearBuffer(&chara, &tokens);
 
   while (!operator_stack.empty()) {
-    char op = operator_stack.top();
-    operator_stack.pop();
-    std::string s2;
-    s2.push_back(op);
-    s2.push_back(' '); // add a space for every operator push.
-    tokens.push_back(s2);
+    PushTopOperatorToTokenStack(&operator_stack, &tokens);
   }
 
   return tokens;
@@ -150,11 +140,9 @@ std::string AssignmentExpression::ParseInfixToPostfix(std::string infix) {
 
   ///Assumption: equation has been checked, and in correct format.
 
-  std::vector<std::string> tokens = ConvertEquationIntoTokens(infix);
-
-  std::string combine;
-
-  for (std::string s: tokens) {
+  std::vector<std::string> tokens = ConvertEquationIntoTokens(std::move(infix));
+  std::string combine = " "; // Insert a space in front of variable -- so that CheckExist does not match partial var
+  for (const std::string& s: tokens) {
     combine.append(s);
   }
 
@@ -177,13 +165,9 @@ std::string AssignmentExpression::GetExpressionString() {
  * @return true if exist; false otherwise.
  */
 bool AssignmentExpression::CheckExist(std::string pattern) {
-  std::string queryPostfix = ParseInfixToPostfix(pattern);
+  std::string queryPostfix = ParseInfixToPostfix(std::move(pattern));
 
-  if (expression_.find(queryPostfix) != std::string::npos) {
-    return true;
-  } else {
-    return false;
-  }
+  return (expression_.find(queryPostfix) != std::string::npos);
 }
 
 /**
@@ -193,7 +177,7 @@ bool AssignmentExpression::CheckExist(std::string pattern) {
  * @return true if exist; false otherwise.
  */
 bool AssignmentExpression::CheckExact(std::string pattern) {
-  std::string queryPostfix = ParseInfixToPostfix(pattern);
+  std::string queryPostfix = ParseInfixToPostfix(std::move(pattern));
 
   return expression_ == queryPostfix;
 }

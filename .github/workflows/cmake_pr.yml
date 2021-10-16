@@ -1,8 +1,6 @@
-name: CMake
+name: CMake_PR
 
 on:
-  push:
-    branches: [ master ]
   pull_request:
     branches:
      - '**' #run for all PR
@@ -40,7 +38,7 @@ jobs:
         ./unit_testing
 
     - name: Build Integration Test
-      run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target integration_testing -- -j 4
+      run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target integration_testing -- -j 2
 
     - name: Run Integration Test
       run: |
@@ -49,7 +47,7 @@ jobs:
         ./integration_testing
   
     - name: Build AutoTester # GUI is excluded
-      run:  cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target autotester -- -j 4
+      run:  cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target autotester -- -j 2
     
     - name: Run AutoTester 
       run: | 
@@ -57,15 +55,12 @@ jobs:
         cd ${{env.working-directory}}/build/src/autotester/Tests35
         chmod +x ./run_autotester_suite.sh
         ./run_autotester_suite.sh
+        zip -v results.zip log_*.txt output_*.xml Team35_SPA_*.log analysis.xsl
         
     - uses: actions/upload-artifact@v2
       with: 
         name: output_final
-        path: |
-          ${{env.working-directory}}/build/src/autotester/Tests35/log_*.txt
-          ${{env.working-directory}}/build/src/autotester/Tests35/output_*.xml
-          ${{env.working-directory}}/build/src/autotester/Tests35/Team35_SPA_*.log
-          ${{env.working-directory}}/build/src/autotester/Tests35/analysis.xsl
+        path: ${{env.working-directory}}/build/src/autotester/Tests35/results.zip
 
     - name: Build All # Take all previous build and build autotester_gui for completeness
       run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target all
