@@ -144,7 +144,7 @@ void PKB::PopulateConstEntities(const std::list<ConstantValue*>& const_list) {
     }
 }
 
-void PKB::PopulateStmtEntities(const std::list<Statement*>& stmt_list) {
+void PKB::PopulateStmtEntities(const std::vector<Statement*> &stmt_list) {
     for (Statement* stmt : stmt_list) {
         type_to_entity_map_[DesignEntity::kStmt].push_back(stmt);
         StatementNumber stmt_number = *stmt->GetStatementNumber();
