@@ -73,3 +73,22 @@ Token QueryTokenizer::GetNextToken() {
 
   throw PQLTokenizeException("No patterns matched. Error in tokenizing pql.");
 }
+
+/**
+ * Allows caller to skip the tokenizing of the substring from the current cursor till
+ * the first string quote delimiter "\"" is found.
+ * @return the substring up till and excluding the delimiter, that the tokenizer skipped.
+ */
+std::string QueryTokenizer::SkipTokenizerTillStringQuoteDelimiter() {
+  if (!HasMoreTokens()) {
+    throw PQLTokenizeException("reached end of query stream before string quote delimiter was reached.");
+  }
+  std::string curr_string = query.substr(cursor);
+  std::smatch match;
+  if (!std::regex_search(curr_string, match, std::regex("^[^\"]*"))) {
+    throw PQLTokenizeException("could not find string quote delimiter in query stream.");
+  }
+  std::string matched_str = match[0].str();
+  cursor += matched_str.size();
+  return matched_str;
+}
