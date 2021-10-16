@@ -39,6 +39,10 @@ const void Procedure::SetBlockRoot(Block* block_root) {
   this->block_root_ = block_root;
 }
 
+const void Procedure::SetBlockTail(Block* block_tail) {
+  this->block_tail_ = block_tail;
+}
+
 Variable::Variable(VariableName* vName) {
   type = EntityEnum::kNone;
   variable_name_ = vName;

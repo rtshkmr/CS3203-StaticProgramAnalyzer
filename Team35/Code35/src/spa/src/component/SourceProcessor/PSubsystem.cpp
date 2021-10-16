@@ -90,10 +90,13 @@ void PSubsystem::ProcessStatement(const std::string& statement) {
 void PSubsystem::CloseProcedureBlock() {
   if (current_node_type_ == NodeType::kProcedure && parent_stack_.empty()) {
     const Cluster* assigned_cluster_root = current_procedure_->GetClusterRoot();
+    Block* proc_tail = Block::GetNewExitBlock();
+    current_procedure_->SetBlockTail(proc_tail);
+
     current_node_type_ = NodeType::kNone;
     current_node_ = nullptr;
     current_procedure_ = nullptr;
-    Block* procedure_block = block_stack_.top();
+    Block* last_block = block_stack_.top();
     block_stack_.pop();
     assert(block_stack_.empty());
     bool is_currently_in_outermost_cluster = cluster_stack_.size() == 1;
@@ -101,13 +104,18 @@ void PSubsystem::CloseProcedureBlock() {
 
     // put the block root into the
     Cluster* outermost_cluster = cluster_stack_.top();
-    if(!Block::IsExitBlock(procedure_block)) {
-      outermost_cluster->AddChildClusterToBack(procedure_block);
+    if(!Block::IsExitBlock(last_block)) {
+      outermost_cluster->AddChildClusterToBack(last_block);
+      outermost_cluster->UpdateClusterRange();
+
+      last_block->AddNextBlock(proc_tail);
+    } else {
+      Block::PatchEmptyBlocks(last_block, proc_tail);
     }
+
     cluster_stack_.pop(); // cluster_stack is now empty since the Procedure has been closed.
     bool last_popped_equals_cluster_root = outermost_cluster == assigned_cluster_root;
     assert(last_popped_equals_cluster_root);
-    outermost_cluster->UpdateClusterRange();
   }
 }
 
