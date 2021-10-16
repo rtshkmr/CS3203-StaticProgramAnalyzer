@@ -84,6 +84,7 @@ class Procedure : public Entity, public Container {
   const ProcedureName* procedure_name_;
   const Cluster* cluster_root_ = nullptr;
   const Block* block_root_ = nullptr;
+  const Block* block_tail_ = nullptr;
  public:
   Procedure(ProcedureName* procedureName);
 
@@ -91,6 +92,7 @@ class Procedure : public Entity, public Container {
 
   const void SetClusterRoot(Cluster* cluster);
   const void SetBlockRoot(Block* block_root);
+  const void SetBlockTail(Block* block_tail);
   const Cluster* GetClusterRoot();
   const Block* GetBlockRoot();
 };
