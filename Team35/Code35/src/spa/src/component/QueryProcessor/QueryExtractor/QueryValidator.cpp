@@ -1,5 +1,6 @@
 #include "QueryParser.h"
 #include "QueryValidator.h"
+#include <component/QueryProcessor/types/Exceptions.h>
 #include <unordered_set>
 #include <set>
 
@@ -17,9 +18,11 @@ std::set<std::pair<DesignEntity, Attribute>> valid_attrRefs = {
         {DesignEntity::kCall, Attribute::kStmtNumber},
         {DesignEntity::kWhile, Attribute::kStmtNumber},
         {DesignEntity::kIf, Attribute::kStmtNumber},
-        {DesignEntity::kAssign, Attribute::kStmtNumber}
+        {DesignEntity::kAssign, Attribute::kStmtNumber},
+        {DesignEntity::kConstant, Attribute::kValue},
 };
 
+// first DesignEntity is for lhs, second is for rhs of relref
 std::set<std::tuple<RelRef, DesignEntity, DesignEntity>> valid_relref_args = {
         // 1 synonym
         {RelRef::kCalls, DesignEntity::kProcedure, DesignEntity::kInvalid},
@@ -143,4 +146,58 @@ bool QueryValidator::Is_Semantically_Valid_RelRef(std::string l, std::string r, 
 bool QueryValidator::Is_Semantically_Valid_AttrRef(Synonym* s, Attribute attr_name) {
   auto candidate = std::make_pair(s->GetType(), attr_name);
   return valid_attrRefs.find(candidate) != valid_attrRefs.end() ? true : false;
+}
+
+/**
+ * Checks for semantic validity of the left and right arguments in an AttrCompare in with-clause.
+ * @param lhs_syn is a pointer to the left hand side synonym in the AttrRef, which could be a nullptr.
+ * @param lhs_attr is of type Attribute and represents the Attribute type of the left hand side argument.
+ * @param lhs_return_type is a string that is either "INTEGER", "STRING", or "SYNONYM" based on left argument type.
+ * @param rhs_syn is a pointer to the right hand side synonym in the AttrRef, which could be a nullptr.
+ * @param rhs_attr is of type Attribute and represents the Attribute type of the right hand side argument.
+ * @param rhs_return_type is a string that is either "INTEGER", "STRING", or "SYNONYM" based on right argument type.
+ * @return true if AttrCompare is semantically valid, false otherwise.
+ */
+bool QueryValidator::Is_Semantically_Valid_AttrCompare(Synonym* lhs_syn, Attribute lhs_attr,
+                                                       std::string lhs_return_type, Synonym* rhs_syn,
+                                                       Attribute rhs_attr, std::string rhs_return_type) {
+  bool lhs_is_syn = lhs_syn != nullptr;
+  bool rhs_is_syn = rhs_syn != nullptr;
+  bool lhs_has_attr = lhs_attr != Attribute::kInvalid;
+  bool rhs_has_attr = rhs_attr != Attribute::kInvalid;
+  bool lhs_is_pl = lhs_is_syn && lhs_syn->GetType() == DesignEntity::kProgLine;
+  bool rhs_is_pl = lhs_is_syn && lhs_syn->GetType() == DesignEntity::kProgLine;
+
+  // conceptually, at least one lhs or rhs of with-cl must involve an attribute (or a prog_line with no attributes);
+  bool one_side_is_prog_line = lhs_is_pl || rhs_is_pl;
+  bool one_side_has_attr = lhs_has_attr || rhs_has_attr;
+  if (!(one_side_is_prog_line || one_side_has_attr)) return false;
+
+  // for all synonyms (on either side), it must always have an attribute (or a prog_line with no attribute).
+  bool is_lhs_syn_illegal = lhs_is_syn && !lhs_has_attr && !lhs_is_pl;
+  bool is_rhs_syn_illegal = rhs_is_syn && !rhs_has_attr && !rhs_is_pl;
+  if (is_lhs_syn_illegal || is_rhs_syn_illegal) return false;
+
+  // check that the "type" on both lhs and rhs are the same (ie NAME or INTEGER)
+  std::string lhs_type = QueryValidator::GetAttrCompareType(lhs_return_type, lhs_syn, lhs_attr);
+  std::string rhs_type = QueryValidator::GetAttrCompareType(rhs_return_type, rhs_syn, rhs_attr);
+  return lhs_type == rhs_type;
+}
+
+std::string QueryValidator::GetAttrCompareType(std::string return_type, Synonym* syn, Attribute attr_type) {
+  std::string type1 = "NAME";
+  std::string type2 = "INTEGER";
+  // argument in AttrCompare was a string
+  if (return_type == "STRING") return type1;
+  // argument in AttrCompare was a integer
+  if (return_type == "INTEGER") return type2;
+  // argument in AttrCompare was a synonym (with its attribute).
+  if (return_type == "SYNONYM") {
+    DesignEntity de = syn->GetType();
+    if (de == DesignEntity::kProgLine) return type2;
+    if (attr_type == Attribute::kStmtNumber || attr_type == Attribute::kValue) return type2;
+    if (attr_type == Attribute::kProcName || attr_type == Attribute::kVarName) return type1;
+  }
+
+  throw PQLValidationException("Received unexpected argument in with clause.");
 }

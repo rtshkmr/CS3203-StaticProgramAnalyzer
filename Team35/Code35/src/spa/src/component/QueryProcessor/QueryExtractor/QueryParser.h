@@ -33,13 +33,15 @@ class QueryParser {
   void ParseWhilePattern();
   void ParseIfPattern();
   void ParsePattern();
+  void ParseAttrCompare();
   void ParseWith();
   void ParseDeclarations();
-  void ParseElem();
   void ParseTuple();
   void ParseTarget();
   void ParseDeclaration();
-  void ParseAttrName(Synonym* s);
+  std::pair<Synonym*, Attribute> ParseElem(bool is_first_pass);
+  std::tuple<std::string, std::string, Synonym*, Attribute> ParseRef();
+  Attribute ParseAttrName(Synonym* s);
   std::tuple<std::string, bool, bool> ParseStmtRef();
   Token ParseEntRef(bool isPatternCl);
   std::tuple<std::string, bool, bool, bool> ParseStmtOrEntRef();
