@@ -10,7 +10,7 @@ void DoubleSynonymBothPresentCommand::SetExecutor(ClauseCommandExecutor *executo
 }
 
 void DoubleSynonymBothPresentCommand::Execute(Clause *clause) {
-  if (typeid(clause) == typeid(Pattern *)) {
+  if (typeid(*clause) == typeid(Pattern)) {
     this->executor->PatternTwoSynonym(clause);
   } else {
     this->executor->SuchThatTwoSynonym(clause);
@@ -26,7 +26,7 @@ void DoubleSynonymSinglePresentCommand::SetExecutor(ClauseCommandExecutor *execu
 }
 
 void DoubleSynonymSinglePresentCommand::Execute(Clause *clause) {
-  if (typeid(clause) == typeid(Pattern *)) {
+  if (typeid(*clause) == typeid(Pattern)) {
     this->executor->PatternTwoSynonymOneInTable(clause, first_synonym_given);
   } else {
     this->executor->SuchThatTwoSynonymOneInTable(clause, first_synonym_given);
@@ -42,7 +42,7 @@ void SingleSynonymPresentCommand::SetExecutor(ClauseCommandExecutor *executor) {
 }
 
 void SingleSynonymPresentCommand::Execute(Clause *clause) {
-  if (typeid(clause) == typeid(Pattern *)) {
+  if (typeid(*clause) == typeid(Pattern)) {
     this->executor->PatternOneSynonym(clause);
   } else {
     this->executor->SuchThatOneSynonym(clause, synonym_is_first_param);

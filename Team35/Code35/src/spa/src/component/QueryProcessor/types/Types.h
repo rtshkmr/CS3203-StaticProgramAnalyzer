@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <array>
+#include <set>
 #include <datatype/DataType.h>
 //#include <component/QueryProcessor/types/QueryEvaluatorTable.h>
 #include <typeinfo>
@@ -58,7 +59,12 @@ enum class PKBRelRefs {
   kModifiesContainer,
   kModifiedByStatement,
   kModifiedByContainer,
-  kCalls
+  kCalls,
+  kCalledBy,
+  kUses,
+  kUsedBy,
+  kModifies,
+  kModifiedBy
 };
 
 const std::array<PKBRelRefs, 16> pkb_rel_refs = {

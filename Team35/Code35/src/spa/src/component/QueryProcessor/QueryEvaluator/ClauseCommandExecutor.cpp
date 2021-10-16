@@ -56,11 +56,14 @@ void ClauseCommandExecutor::PatternTwoSynonym(Clause *clause) {
   // For each row in the group table
   for (int i = 0; i < assign_stmt_list.size(); i++) {
     AssignEntity *assign_entity_in_table = dynamic_cast<AssignEntity *>(assign_stmt_list[i]);
+    Variable *variable_entity = dynamic_cast<Variable*>(variable_list[i]);
     bool has_relationship = false;
 
     for (auto assign_entity: intermediate_table) {
       AssignEntity *current_assign_entity = dynamic_cast<AssignEntity *>(assign_entity);
-      if (current_assign_entity == assign_entity_in_table && HasExpressionMatch(pattern_clause, current_assign_entity)) {
+      Variable *current_variable_entity = current_assign_entity->GetVariable();
+      if (current_assign_entity == assign_entity_in_table && variable_entity == current_variable_entity
+      && HasExpressionMatch(pattern_clause, current_assign_entity)) {
         has_relationship = true;
       }
     }
@@ -90,11 +93,13 @@ void ClauseCommandExecutor::SuchThatTwoSynonymOneInTable(Clause *clause, bool fi
     bool hasValidRelationship = false;
     int number_of_repeats = 0;
 
+    //
     for (auto iter: intermediate_table) {
       Entity *entity_to_be_compared = first_syn_in ? std::get<0>(iter) : std::get<1>(iter);
+      Entity *entity_to_be_added = first_syn_in ? std::get<1>(iter) : std::get<0>(iter);
       if (curr_entity == entity_to_be_compared) {
         // Add new row for each col in table
-        group_table->AddMultipleRowForAllColumn(new_synonym, i, std::get<1>(iter), number_of_repeats);
+        group_table->AddMultipleRowForAllColumn(new_synonym, i, entity_to_be_added, number_of_repeats);
 
         hasValidRelationship = true;
         number_of_repeats++;
@@ -129,13 +134,14 @@ void ClauseCommandExecutor::PatternTwoSynonymOneInTable(Clause *clause, bool fir
 
   std::vector<Entity *> entity_list_in_table = group_table->GetColumn(synonym_in_table);
   std::vector<Entity *> intermediate_table = table->GetRelationships();
-  int group_table_row_pointer = 0;
   unsigned long table_size = entity_list_in_table.size();
   group_table->AddColumn(new_synonym);
+  int group_table_pointer = 0;
 
   for (int table_index = 0; table_index < table_size; table_index++) {
-    Entity *entity_in_table = entity_list_in_table[group_table_row_pointer];
+    Entity *entity_in_table = entity_list_in_table[table_index];
     int repeat_count = 0;
+    bool has_relation = false;
 
     // Entity could be assign or variable
     for (auto entity : intermediate_table) {
@@ -144,17 +150,19 @@ void ClauseCommandExecutor::PatternTwoSynonymOneInTable(Clause *clause, bool fir
       Entity *entity_to_compare = first_syn_in ? entity : dynamic_cast<Entity*>(variable_entity);
 
       if ((entity_to_compare != entity_in_table) || (!HasExpressionMatch(pattern_clause, assign_entity))) {
-        group_table->DeleteRow(table_index);
-        table_index--;
-        table_size--;
         continue;
       }
-
+      has_relation = true;
       Entity *entity_to_be_added = first_syn_in ? dynamic_cast<Entity *>(variable_entity) : entity;
-      group_table->AddMultipleRowForAllColumn(synonym_in_table, table_index, entity_to_be_added, repeat_count);
+      group_table->AddMultipleRowForAllColumn(new_synonym, group_table_pointer, entity_to_be_added, repeat_count);
       repeat_count++;
     }
-    group_table_row_pointer++;
+    if (repeat_count > 0) group_table_pointer += repeat_count - 1;
+    if (!has_relation) {
+      group_table->DeleteRow(group_table_pointer);
+      group_table_pointer--;
+    }
+    group_table_pointer++;
   }
 }
 
@@ -184,29 +192,23 @@ void ClauseCommandExecutor::SuchThatOneSynonym(Clause *clause, bool first_syn_in
   }
 }
 
+// For Pattern query with assign synonym and variable value or wildcard
 void ClauseCommandExecutor::PatternOneSynonym(Clause *clause) {
   auto *pattern_clause = dynamic_cast<Pattern *>(clause);
-  std::vector<Entity *> assign_entity_in_table = group_table->GetColumn(pattern_clause->first_synonym);
-  std::vector<Entity *> assign_entity_retrieved = table->GetRelationships();
-  unsigned long table_size = assign_entity_in_table.size();
+  std::vector<Entity *> assign_entity_in_table_list = group_table->GetColumn(pattern_clause->first_synonym);
+  std::string left_side_value = pattern_clause->left_hand_side;
+  unsigned long table_size = assign_entity_in_table_list.size();
   int delete_count = 0;
 
   for (int i = 0; i < table_size; i++) {
-    Entity *current_assign_stmt = assign_entity_in_table[i];
-    bool has_relationship = false;
-    // Assert that size of assign_entity_list should be 1.
-    for (auto assign_entity_to_compare : assign_entity_retrieved) {
-      if (assign_entity_to_compare == current_assign_stmt) {
-        has_relationship = true;
-        break;
-      }
-    }
-    if (has_relationship) {
-      continue;
-    }
+    Entity *current_assign_stmt = assign_entity_in_table_list[i];
+    AssignEntity *assign_entity_in_table = dynamic_cast<AssignEntity *>(current_assign_stmt);
+    std::string variable_value_in_table = const_cast<VariableName*>(assign_entity_in_table->GetVariable()->GetName())->getName();
 
-    group_table->DeleteRow(i - delete_count);
-    delete_count++;
+    if ((left_side_value != "_" && variable_value_in_table != left_side_value) || !HasExpressionMatch(pattern_clause, assign_entity_in_table)) {
+      group_table->DeleteRow(i - delete_count);
+      delete_count++;
+    }
   }
 }
 

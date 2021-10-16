@@ -8,7 +8,6 @@
 
 class ClauseStrategy {
   public:
-    virtual ~ClauseStrategy() {};
     virtual std::tuple<PKBQueryCommand *, ClauseCommand *>
     DetermineClauseCommand(Clause *clause, QueryEvaluatorTable *table) = 0;
 };

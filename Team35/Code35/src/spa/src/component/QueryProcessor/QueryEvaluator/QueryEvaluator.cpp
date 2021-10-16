@@ -69,11 +69,13 @@ void QueryEvaluator::ProcessGroup(QueryEvaluatorTable *table, Group *group) {
 
 bool QueryEvaluator::ProcessSingleClauseBooleanGroup(Group group) {
   Clause *clause = group.GetClauses()[0];
+  // Only such that clause can have a single boolean group.
   auto *such_that_clause = dynamic_cast<SuchThat *>(clause);
   QuerySuchThatNoSynonymCommand query_command = QuerySuchThatNoSynonymCommand(clause);
-  // TODO: NOT SURE HOW TO QUERY PKB
-
-  return true;
+  PKBQueryReceiver query_receiver = PKBQueryReceiver(pkb);
+  query_command.SetReceiver(&query_receiver);
+  IntermediateTable *table = query_command.ExecuteQuery(clause);
+  return table->GetExistenceResult();
 }
 
 /**
@@ -106,7 +108,7 @@ void QueryEvaluator::PreprocessBooleanGroup(Group group) {
     QueryEvaluatorTable current_table(main_synonym);
     current_table.AddTargetSynonymValues(main_synonym, pkb->GetDesignEntities(main_synonym->GetType()));
     ProcessGroup(&current_table, &group);
-    if (current_table.GetResults().empty()) {
+    if (current_table.GetResults()[0].empty()) {
       boolean_result = false;
     }
   }
