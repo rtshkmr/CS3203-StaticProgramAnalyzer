@@ -1,85 +1,99 @@
 #include "QueryParser.h"
 #include "QueryValidator.h"
 #include <unordered_set>
+#include <set>
 
-std::unordered_set<DesignEntity> valid_lhs_UsesS = {DesignEntity::kAssign, DesignEntity::kPrint,
-                                                    DesignEntity::kIf, DesignEntity::kWhile, DesignEntity::kStmt};
+// note: kProgLine does not have attrs based on PQL grammar.
+std::set<std::pair<DesignEntity, Attribute>> valid_attrRefs = {
+        {DesignEntity::kProcedure, Attribute::kProcName},
+        {DesignEntity::kCall, Attribute::kProcName},
+        {DesignEntity::kVariable, Attribute::kVarName},
+        {DesignEntity::kRead, Attribute::kVarName},
+        {DesignEntity::kPrint, Attribute::kVarName},
+        {DesignEntity::kConstant, Attribute::kValue},
+        {DesignEntity::kStmt, Attribute::kStmtNumber},
+        {DesignEntity::kRead, Attribute::kStmtNumber},
+        {DesignEntity::kPrint, Attribute::kStmtNumber},
+        {DesignEntity::kCall, Attribute::kStmtNumber},
+        {DesignEntity::kWhile, Attribute::kStmtNumber},
+        {DesignEntity::kIf, Attribute::kStmtNumber},
+        {DesignEntity::kAssign, Attribute::kStmtNumber}
+};
 
-std::unordered_set<DesignEntity> valid_lhs_UsesP_ModifiesP = {DesignEntity::kProcedure, DesignEntity::kCall};
-
-std::unordered_set<DesignEntity> valid_lhs_ModifiesS = {DesignEntity::kAssign, DesignEntity::kRead,
-                                                        DesignEntity::kIf, DesignEntity::kWhile, DesignEntity::kStmt};
-
-bool QueryValidator::IsValid_LhsStmt_RhsEnt(std::string l, std::string r, bool lhs_is_syn,
-                                             bool rhs_is_syn, std::list<Synonym*>* synonyms, RelRef rf) {
-  DesignEntity lhs = QueryParser::GetSynonymInfo(l, synonyms)->GetType();
-  DesignEntity rhs = QueryParser::GetSynonymInfo(r, synonyms)->GetType();
-  // if both are not synonyms, no semantic validation is needed.
-  if (lhs == DesignEntity::kInvalid && rhs == DesignEntity::kInvalid) {
-    return true;
-  }
-
-  std::unordered_set<DesignEntity>* valid_lhs = (rf == RelRef::kUsesS) ? & valid_lhs_UsesS : & valid_lhs_ModifiesS;
-
-  // if both are synonyms
-  if (lhs != DesignEntity::kInvalid && rhs != DesignEntity::kInvalid) {
-    // lhs must be assign, print, if, while, procedure, call
-    bool lhs_is_valid = (valid_lhs->find(lhs) != valid_lhs->end()) ? true : false;
-    // rhs must be a variable
-    bool rhs_is_valid = (rhs == DesignEntity::kVariable) ? true : false;
-    return lhs_is_valid && rhs_is_valid;
-  }
-
-  // if one is synonym
-  if (rhs != DesignEntity::kInvalid) {
-    return (rhs == DesignEntity::kVariable) ? true : false;
-  }
-  if (lhs != DesignEntity::kInvalid) {
-    return (valid_lhs->find(lhs) != valid_lhs->end()) ? true : false;
-  }
-  return true;
-}
-
-bool QueryValidator::IsValid_LhsEnt_RhsEnt(std::string l, std::string r, bool lhs_is_syn,
-                                             bool rhs_is_syn, std::list<Synonym*>* synonyms, RelRef rf) {
-  DesignEntity lhs = QueryParser::GetSynonymInfo(l, synonyms)->GetType();
-  DesignEntity rhs = QueryParser::GetSynonymInfo(r, synonyms)->GetType();
-  // if both are not synonyms, no semantic validation is needed
-  if (lhs == DesignEntity::kInvalid && rhs == DesignEntity::kInvalid) {
-    return true;
-  }
-
-  // if both are synonyms
-  if (lhs != DesignEntity::kInvalid && rhs != DesignEntity::kInvalid) {
-    // lhs must be proc or call
-    bool lhs_is_valid = (valid_lhs_UsesP_ModifiesP.find(lhs) != valid_lhs_UsesP_ModifiesP.end()) ? true : false;
-    // rhs must be a variable
-    bool rhs_is_valid = (rhs == DesignEntity::kVariable) ? true : false;
-    return lhs_is_valid && rhs_is_valid;
-  }
-
-  // if one is synonym
-  if (rhs != DesignEntity::kInvalid) {
-    return (rhs == DesignEntity::kVariable) ? true : false;
-  }
-  if (lhs != DesignEntity::kInvalid) {
-    return (valid_lhs_UsesP_ModifiesP.find(lhs) != valid_lhs_UsesP_ModifiesP.end()) ? true : false;
-  }
-  return true;
-}
+std::set<std::tuple<RelRef, DesignEntity, DesignEntity>> valid_relref_args = {
+        // 1 synonym
+        {RelRef::kCalls, DesignEntity::kProcedure, DesignEntity::kInvalid},
+        {RelRef::kCalls, DesignEntity::kInvalid, DesignEntity::kProcedure},
+        {RelRef::kCallsT, DesignEntity::kProcedure, DesignEntity::kInvalid},
+        {RelRef::kCallsT, DesignEntity::kInvalid, DesignEntity::kProcedure},
+        {RelRef::kUsesS, DesignEntity::kAssign, DesignEntity::kInvalid},
+        {RelRef::kUsesS, DesignEntity::kPrint, DesignEntity::kInvalid},
+        {RelRef::kUsesS, DesignEntity::kIf, DesignEntity::kInvalid},
+        {RelRef::kUsesS, DesignEntity::kWhile, DesignEntity::kInvalid},
+        {RelRef::kUsesS, DesignEntity::kStmt, DesignEntity::kInvalid},
+        {RelRef::kUsesS, DesignEntity::kInvalid, DesignEntity::kVariable},
+        {RelRef::kUsesP, DesignEntity::kProcedure, DesignEntity::kInvalid},
+        {RelRef::kUsesP, DesignEntity::kCall, DesignEntity::kInvalid},
+        {RelRef::kUsesP, DesignEntity::kInvalid, DesignEntity::kVariable},
+        {RelRef::kModifiesS, DesignEntity::kAssign, DesignEntity::kInvalid},
+        {RelRef::kModifiesS, DesignEntity::kRead, DesignEntity::kInvalid},
+        {RelRef::kModifiesS, DesignEntity::kIf, DesignEntity::kInvalid},
+        {RelRef::kModifiesS, DesignEntity::kWhile, DesignEntity::kInvalid},
+        {RelRef::kModifiesS, DesignEntity::kStmt, DesignEntity::kInvalid},
+        {RelRef::kModifiesS, DesignEntity::kInvalid, DesignEntity::kVariable},
+        {RelRef::kModifiesP, DesignEntity::kProcedure, DesignEntity::kInvalid},
+        {RelRef::kModifiesP, DesignEntity::kCall, DesignEntity::kInvalid},
+        {RelRef::kModifiesP, DesignEntity::kInvalid, DesignEntity::kVariable},
+        {RelRef::kAffects, DesignEntity::kStmt, DesignEntity::kInvalid},
+        {RelRef::kAffects, DesignEntity::kAssign, DesignEntity::kInvalid},
+        {RelRef::kAffects, DesignEntity::kInvalid, DesignEntity::kStmt},
+        {RelRef::kAffects, DesignEntity::kInvalid, DesignEntity::kAssign},
+        {RelRef::kAffectsT, DesignEntity::kStmt, DesignEntity::kInvalid},
+        {RelRef::kAffectsT, DesignEntity::kAssign, DesignEntity::kInvalid},
+        {RelRef::kAffectsT, DesignEntity::kInvalid, DesignEntity::kStmt},
+        {RelRef::kAffectsT, DesignEntity::kInvalid, DesignEntity::kAssign},
+        // 2 synonyms
+        {RelRef::kCalls, DesignEntity::kProcedure, DesignEntity::kProcedure},
+        {RelRef::kCallsT, DesignEntity::kProcedure, DesignEntity::kProcedure},
+        {RelRef::kUsesS, DesignEntity::kAssign, DesignEntity::kVariable},
+        {RelRef::kUsesS, DesignEntity::kPrint, DesignEntity::kVariable},
+        {RelRef::kUsesS, DesignEntity::kIf, DesignEntity::kVariable},
+        {RelRef::kUsesS, DesignEntity::kWhile, DesignEntity::kVariable},
+        {RelRef::kUsesS, DesignEntity::kStmt, DesignEntity::kVariable},
+        {RelRef::kUsesP, DesignEntity::kProcedure, DesignEntity::kVariable},
+        {RelRef::kUsesP, DesignEntity::kCall, DesignEntity::kVariable},
+        {RelRef::kModifiesS, DesignEntity::kAssign, DesignEntity::kVariable},
+        {RelRef::kModifiesS, DesignEntity::kRead, DesignEntity::kVariable},
+        {RelRef::kModifiesS, DesignEntity::kIf, DesignEntity::kVariable},
+        {RelRef::kModifiesS, DesignEntity::kWhile, DesignEntity::kVariable},
+        {RelRef::kModifiesS, DesignEntity::kStmt, DesignEntity::kVariable},
+        {RelRef::kModifiesP, DesignEntity::kProcedure, DesignEntity::kVariable},
+        {RelRef::kModifiesP, DesignEntity::kCall, DesignEntity::kVariable},
+        {RelRef::kAffects, DesignEntity::kStmt, DesignEntity::kStmt},
+        {RelRef::kAffects, DesignEntity::kStmt, DesignEntity::kAssign},
+        {RelRef::kAffects, DesignEntity::kAssign, DesignEntity::kStmt},
+        {RelRef::kAffects, DesignEntity::kAssign, DesignEntity::kAssign},
+        {RelRef::kAffectsT, DesignEntity::kStmt, DesignEntity::kStmt},
+        {RelRef::kAffectsT, DesignEntity::kStmt, DesignEntity::kAssign},
+        {RelRef::kAffectsT, DesignEntity::kAssign, DesignEntity::kStmt},
+        {RelRef::kAffectsT, DesignEntity::kAssign, DesignEntity::kAssign},
+};
 
 bool QueryValidator::IsValid_LhsStmt_RhsStmt(std::string l, std::string r, bool lhs_is_syn,
                                              bool rhs_is_syn, std::list<Synonym*>* synonyms) {
-  // Synonyms involved in relationships between statements cannot be variable or procedure.
+  // Synonyms involved in relationships between statements cannot be variable, procedure, or constant.
+  std::unordered_set<DesignEntity> stmt_blacklist = {DesignEntity::kVariable,
+                                                     DesignEntity::kProcedure,
+                                                     DesignEntity::kConstant};
   if (lhs_is_syn) {
     Synonym* lhs = QueryParser::GetSynonymInfo(l, synonyms);
-    if (lhs->GetType() == DesignEntity::kVariable || lhs->GetType() == DesignEntity::kProcedure) {
+    if (stmt_blacklist.find(lhs->GetType()) != stmt_blacklist.end()) {
       return false;
     }
   }
   if (rhs_is_syn) {
     Synonym* rhs = QueryParser::GetSynonymInfo(r, synonyms);
-    if (rhs->GetType() == DesignEntity::kVariable || rhs->GetType() == DesignEntity::kProcedure) {
+    if (stmt_blacklist.find(rhs->GetType()) != stmt_blacklist.end()) {
       return false;
     }
   }
@@ -96,14 +110,37 @@ bool QueryValidator::IsValid_LhsStmt_RhsStmt(std::string l, std::string r, bool 
  * @param synonyms is a reference to the list of synonyms.
  * @return true if RelRef has semantically valid left and right arguments, false otherwise.
  */
-bool QueryValidator::Is_Semantically_Valid_RelRef(std::string lhs, std::string rhs, RelRef rf, bool lhs_is_syn,
+bool QueryValidator::Is_Semantically_Valid_RelRef(std::string l, std::string r, RelRef rf, bool lhs_is_syn,
                                                   bool rhs_is_syn, std::list<Synonym*>* synonyms) {
-  if (rf == RelRef::kUsesS || rf == RelRef::kModifiesS) {
-    return QueryValidator::IsValid_LhsStmt_RhsEnt(lhs, rhs, lhs_is_syn, rhs_is_syn, synonyms, rf);
-  } if (rf == RelRef::kUsesP || rf == RelRef::kModifiesP) {
-    return QueryValidator::IsValid_LhsEnt_RhsEnt(lhs, rhs, lhs_is_syn, rhs_is_syn, synonyms, rf);
-  } else {
-    return QueryValidator::IsValid_LhsStmt_RhsStmt(lhs, rhs, lhs_is_syn, rhs_is_syn, synonyms);
+  // if neither lhs nor rhs is a synonym, no semantic validation is needed
+  DesignEntity lhs = QueryParser::GetSynonymInfo(l, synonyms)->GetType();
+  DesignEntity rhs = QueryParser::GetSynonymInfo(r, synonyms)->GetType();
+  if (lhs == DesignEntity::kInvalid && rhs == DesignEntity::kInvalid) {
+    return true;
   }
-  return true;
+
+  // RelRefs with little permutations of arguments will use whitelist table.
+  std::unordered_set<RelRef> whitelisted = {RelRef::kCalls, RelRef::kCallsT, RelRef::kAffects, RelRef::kAffectsT,
+                                                    RelRef::kUsesS, RelRef::kUsesP, RelRef::kModifiesS, RelRef::kModifiesP};
+  if (whitelisted.find(rf) != whitelisted.end()) {
+    // for the purposes of pql grammar, prog_line has the same behavior as stmt
+    if (lhs == DesignEntity::kProgLine) lhs = DesignEntity::kStmt;
+    if (rhs == DesignEntity::kProgLine) rhs = DesignEntity::kStmt;
+    auto t = std::make_tuple(rf, lhs, rhs);
+    return valid_relref_args.find(t) != valid_relref_args.end();
+  }
+
+  // RelRefs with many permutations of arguments will use a blacklist approach instead.
+  return QueryValidator::IsValid_LhsStmt_RhsStmt(l, r, lhs_is_syn, rhs_is_syn, synonyms);
+}
+
+/**
+ * Checks for semantic validity of a AttrRef.
+ * @param s is a pointer to the syonym in the AttrRef.
+ * @param attr_name is of type Attribute and represents the AttrName in the AttrRef.
+ * @return true if Attrref is semanticaly valid for the synonym type, false otherwise.
+ */
+bool QueryValidator::Is_Semantically_Valid_AttrRef(Synonym* s, Attribute attr_name) {
+  auto candidate = std::make_pair(s->GetType(), attr_name);
+  return valid_attrRefs.find(candidate) != valid_attrRefs.end() ? true : false;
 }
