@@ -2,6 +2,13 @@
 #include "NextTExtractor.h"
 
 /**
+ * @return size of next_t_map
+ */
+int NextTExtractor::GetNextTSize() {
+  return next_t_map_.size();
+}
+
+/**
  * Extracts list of Next* of the target from the CFG. Caches Next* relationships for blocks traversed.
  *
  * @param target String of the statement number to look for.
@@ -47,8 +54,14 @@ Cluster* NextTExtractor::GetTargetCluster(Cluster* p_cluster, int target_num) {
 
 /**
  * Go to innermost target block and start traversal. If any while loop is met, process from while.
+ * Assumes that map is only updated once.
  */
 std::list<Statement*> NextTExtractor::GetNextTFromCluster(Cluster* cluster, int target_num) {
+  Statement* first_stmt = stmt_list_[cluster->GetStartEndRange().first - 1];
+  if (next_t_map_.count(first_stmt) == 1) {
+    return *next_t_map_.find(stmt_list_[target_num - 1])->second;
+  }
+
   std::list<Cluster*> nested_clusters = cluster->GetNestedClusters();
   if (nested_clusters.empty()) {
     GetNextTByTraversal(dynamic_cast<Block*>(cluster), target_num);
@@ -62,10 +75,11 @@ std::list<Statement*> NextTExtractor::GetNextTFromCluster(Cluster* cluster, int 
       return GetNextTFromCluster(t_cluster, target_num);
     }
   }
-  if (next_t_map_.count(stmt_list_[target_num-1]) == 0) {
+  if (next_t_map_.count(stmt_list_[target_num - 1]) == 0) {
     return std::list<Statement*>{};
+  } else {
+    return *next_t_map_.find(stmt_list_[target_num - 1])->second;
   }
-  return *next_t_map_[stmt_list_[target_num-1]];
 }
 
 /**
@@ -92,9 +106,13 @@ std::list<Statement*> NextTExtractor::GetNextTFromWhile(Cluster* w_cluster, int 
     std::vector<Statement*> w_statements(count);
     std::copy(&stmt_list_[range.first - 1], &stmt_list_[range.second - 1], w_statements.begin());
     w_statements.erase(w_statements.begin() + i);
-    AddVectorOfNextTRelationship(stmt_list_[i], w_statements);
+    AddNextTRelationship(stmt_list_[i], w_statements);
   }
-  return *next_t_map_[stmt_list_[w_block->GetStartEndRange().first-1]];
+  if (next_t_map_.count(stmt_list_[w_block->GetStartEndRange().first - 1]) == 0) {
+    return std::list<Statement*>{};
+  } else {
+    return *next_t_map_.find(stmt_list_[w_block->GetStartEndRange().first - 1])->second;
+  }
 }
 
 /**
@@ -114,13 +132,21 @@ std::list<Statement*> NextTExtractor::GetNextTByTraversal(Block* block, int targ
     target_num = range.first;
   }
 
-  for (int i = range.second; i <= target_num; --i) {
-    std::vector<Statement*> b_statements(&stmt_list_[i - 1], &stmt_list_[range.second - 1]);
-
-    AddListOfNextTRelationship(stmt_list_[i-1], next_t);
-    AddVectorOfNextTRelationship(stmt_list_[i-1], b_statements);
+  for (int i = range.second; i >= target_num; --i) {
+    if (i > range.second - 1) {
+      AddNextTRelationship(stmt_list_[i - 1], next_t);
+      continue;
+    } else {
+      next_t.push_back(stmt_list_[i]);
+      AddNextTRelationship(stmt_list_[i - 1], next_t);
+    }
   }
-  return *next_t_map_[stmt_list_[target_num-1]];
+
+  if (next_t_map_.count(stmt_list_[target_num - 1]) == 0) {
+    return std::list<Statement*>{};
+  } else {
+    return *next_t_map_.find(stmt_list_[target_num - 1])->second;
+  }
 }
 
 void NextTExtractor::AddNextTRelationship(Statement* s1, Statement* s2) {
@@ -150,14 +176,20 @@ void NextTExtractor::AddNextTRelationship(Statement* s1, Statement* s2) {
   }
 }
 
-void NextTExtractor::AddVectorOfNextTRelationship(Statement* s1, std::vector<Statement*> s2) {
+void NextTExtractor::AddNextTRelationship(Statement* s1, std::vector<Statement*> s2) {
   assert(next_t_map_.count(s1) == 0);
-  next_t_map_[s1]->insert(next_t_map_[s1]->begin(), s2.begin(), s2.end());
+  if (s2.empty()) return;
+  auto* list = new std::list<Statement*>();
+  list->insert(list->begin(), s2.begin(), s2.end());
+  next_t_map_.insert({s1, list});
 }
 
-void NextTExtractor::AddListOfNextTRelationship(Statement* s1, std::list<Statement*> s2) {
+void NextTExtractor::AddNextTRelationship(Statement* s1, std::list<Statement*> s2) {
   assert(next_t_map_.count(s1) == 0);
-  next_t_map_[s1]->insert(next_t_map_[s1]->begin(), s2.begin(), s2.end());
+  if (s2.empty()) return;
+  auto* list = new std::list<Statement*>();
+  list->insert(list->begin(), s2.begin(), s2.end());
+  next_t_map_.insert({s1, list});
 }
 
 std::vector<Entity*> NextTExtractor::ltov(std::list<Statement*> l) {

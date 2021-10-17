@@ -14,6 +14,7 @@ class TestUtils {
   std::vector<std::string> GetBasicSourceLines();
 
   static bool AreListsEqual(std::list<Statement*> as, std::list<Statement*> bs);
+  static bool AreVectorsEqual(std::vector<Entity*> as, std::vector<Entity*> bs);
 };
 
 #endif //AUTOTESTER_TEAM00_CODE00_SRC_UNIT_TESTING_UTILS_TESTUTILS_H_
