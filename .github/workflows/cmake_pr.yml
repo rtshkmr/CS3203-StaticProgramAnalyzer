@@ -79,6 +79,7 @@ jobs:
         zip -v adv.zip adv/log_*.txt adv/output_*.xml adv/Team35_SPA_*.log analysis.xsl
         
     - uses: actions/upload-artifact@v2
+      if: always()
       with: 
         name: output_final
         path: |
