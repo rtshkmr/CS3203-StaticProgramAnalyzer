@@ -2,6 +2,7 @@
 #include <component/SourceProcessor/Extractors/ModifiesExtractor.h>
 #include <component/SourceProcessor/Extractors/ParentTExtractor.h>
 #include <component/SourceProcessor/Extractors/FollowsTExtractor.h>
+#include <component/SourceProcessor/Extractors/CallsTExtractor.h>
 #include "DesignExtractor.h"
 
 DesignExtractor::DesignExtractor(Deliverable* deliverable) {
@@ -10,9 +11,12 @@ DesignExtractor::DesignExtractor(Deliverable* deliverable) {
 
 /**
  * Extracts transitive relationships using the lists and tables from the deliverable,
- * namely Uses, Modifies, Parent* and Follow* and their reverse relationships.
+ * namely Calls, Uses, Modifies, Parent* and Follow* and their reverse relationships.
  */
 void DesignExtractor::ExtractDesignAbstractions() {
+  CallsTExtractor calls_t_extractor{};
+  calls_t_extractor.Extract(deliverable_);
+
   UsesExtractor uses_extractor{};
   uses_extractor.Extract(deliverable_);
 

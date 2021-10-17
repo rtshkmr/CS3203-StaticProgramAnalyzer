@@ -130,6 +130,9 @@ void ModifiesExtractor::ExtractModifiesInCallContainer(CallEntity* call_entity,
   //  }
 
   deliverable_->AddModifiesRelationship(container, var_list);
+  for (Variable* var: * var_list) {
+    deliverable_->AddModifiesRelationship(call_entity, var);
+  }
 }
 
 /**

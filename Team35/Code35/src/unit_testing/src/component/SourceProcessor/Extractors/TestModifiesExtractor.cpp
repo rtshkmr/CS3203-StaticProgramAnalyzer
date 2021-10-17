@@ -71,8 +71,9 @@ TEST_CASE("1.ModifiesExtractor.Extract Modifies basic conditions") {
      */
     Procedure* proc1 = new Procedure(new ProcedureName("proc1"));
     Procedure* proc2 = new Procedure(new ProcedureName("proc2"));
+    CallEntity* call2 = new CallEntity(proc2);
     proc2->AddStatement(new PrintEntity(var_x_));
-    proc1->AddStatement(new CallEntity(proc2));
+    proc1->AddStatement(call2);
 
     deliverable.proc_list_.push_back(proc1);
     deliverable.proc_list_.push_back(proc2);
@@ -82,6 +83,7 @@ TEST_CASE("1.ModifiesExtractor.Extract Modifies basic conditions") {
 
     CHECK(deliverable.container_modifies_hash_.count(proc1) == 0);
     CHECK(deliverable.container_modifies_hash_.count(proc2) == 0);
+    CHECK(deliverable.modifies_hash_.count(call2) == 0);
   }
 
   SECTION("Procedure with 1 if container") {
@@ -194,8 +196,9 @@ TEST_CASE("1.ModifiesExtractor.Extract Modifies basic conditions") {
      */
     Procedure* proc3 = new Procedure(new ProcedureName("proc3"));
     Procedure* proc4 = new Procedure(new ProcedureName("proc4"));
+    CallEntity* call4 = new CallEntity(proc4);
     proc3->AddStatement(assign_4_);
-    proc3->AddStatement(new CallEntity(proc4));
+    proc3->AddStatement(call4);
     proc4->AddStatement(assign_5_);
 
     deliverable.proc_list_.push_back(proc3);
@@ -214,9 +217,13 @@ TEST_CASE("1.ModifiesExtractor.Extract Modifies basic conditions") {
 
     std::list<Variable*> actual_var_list = *deliverable.container_modifies_hash_.find(proc3)->second;
     std::list<Variable*> expected_var_list = {var_y_, var_z_};
+    CHECK(actual_var_list == expected_var_list);
 
     CHECK(*deliverable.container_modifies_hash_.find(proc4)->second == proc4_var_list); // no change to inner container
-    CHECK(actual_var_list == expected_var_list);
+
+    // call stmt
+    std::list<Variable*> actual_var_list2 = *deliverable.modifies_hash_.find(call4)->second;
+    CHECK(actual_var_list2 == proc4_var_list);
   }
 }
 
@@ -383,10 +390,12 @@ TEST_CASE("1.ModifiesExtractor.Extract Modifies nested containers") {
     Procedure* proc3 = new Procedure(new ProcedureName("proc3"));
     Procedure* proc4 = new Procedure(new ProcedureName("proc4"));
     Procedure* proc2 = new Procedure(new ProcedureName("proc2"));
+    CallEntity* call4 = new CallEntity(proc4);
+    CallEntity* call2 = new CallEntity(proc2);
     proc3->AddStatement(assign_4_);
-    proc3->AddStatement(new CallEntity(proc4));
+    proc3->AddStatement(call4);
     proc4->AddStatement(assign_3_);
-    proc4->AddStatement(new CallEntity(proc2));
+    proc4->AddStatement(call2);
     proc2->AddStatement(assign_8_);
 
     deliverable.proc_list_.push_back(proc3);
@@ -410,12 +419,17 @@ TEST_CASE("1.ModifiesExtractor.Extract Modifies nested containers") {
 
     std::list<Variable*> actual_var_list = *deliverable.container_modifies_hash_.find(proc3)->second;
     std::list<Variable*> expected_var_list = {var_y_, var_z_, var_x_};
-
-    CHECK(*deliverable.container_modifies_hash_.find(proc2)->second == proc2_var_list); // no change to inner container
     CHECK(actual_var_list == expected_var_list);
 
+    CHECK(*deliverable.container_modifies_hash_.find(proc2)->second == proc2_var_list); // no change to inner container
+
     // intermediate change to secondary container
-    CHECK(*deliverable.container_modifies_hash_.find(proc4)->second == std::list<Variable*>{var_z_, var_x_});
+    std::list<Variable*> secondary_var_list = {var_z_, var_x_};
+    CHECK(*deliverable.container_modifies_hash_.find(proc4)->second == secondary_var_list);
+
+    // call stmts
+    CHECK(*deliverable.modifies_hash_.find(call4)->second == secondary_var_list);
+    CHECK(*deliverable.modifies_hash_.find(call2)->second == proc2_var_list);
   }
 
   SECTION("Procedure with multiple container") {
@@ -511,20 +525,24 @@ TEST_CASE("1.ModifiesExtractor.Extract modifies nested calls") {
   Procedure* proc3 = new Procedure(new ProcedureName("proc3"));
   Procedure* proc4 = new Procedure(new ProcedureName("proc4"));
   Procedure* proc5 = new Procedure(new ProcedureName("proc5"));
+  CallEntity* call2 = new CallEntity(proc2);
+  CallEntity* call3 = new CallEntity(proc3);
+  CallEntity* call4 = new CallEntity(proc4);
+  CallEntity* call5 = new CallEntity(proc5);
 
-  while_1->AddStatement(new CallEntity(proc2));
+  while_1->AddStatement(call2);
   while_1->AddStatement(assign_4_);
   if_1->AddStatement(while_1);
-  while_2->AddStatement(new CallEntity(proc3));
+  while_2->AddStatement(call3);
   else_1->AddStatement(while_2);
   if_1->SetElseEntity(else_1);
 
-  proc1->AddStatement(new CallEntity(proc4));
+  proc1->AddStatement(call4);
   proc1->AddStatement(if_1);
-  proc1->AddStatement(new CallEntity(proc5));
+  proc1->AddStatement(call5);
 
   if_2->AddStatement(read_m);
-  else_2->AddStatement(new CallEntity(proc4));
+  else_2->AddStatement(call4);
   else_2->AddStatement(print_n);
   if_2->SetElseEntity(else_2);
   proc2->AddStatement(if_2);
@@ -590,6 +608,12 @@ TEST_CASE("1.ModifiesExtractor.Extract modifies nested calls") {
 
     std::list<Variable*> var_list5 = {var_y_, var_i_, var_z_, var_m_, var_n_};
     CHECK(*deliverable.container_modifies_hash_.find(proc1)->second == var_list5);
+
+    // call stmts
+    CHECK(*deliverable.modifies_hash_.find(call2)->second == var_list1);
+    CHECK(*deliverable.modifies_hash_.find(call3)->second == proc3_var_list);
+    CHECK(*deliverable.modifies_hash_.find(call4)->second == proc4_var_list);
+    CHECK(*deliverable.modifies_hash_.find(call5)->second == proc5_var_list);
   }
 
   SECTION("Called procedures parsed first") {
@@ -620,5 +644,11 @@ TEST_CASE("1.ModifiesExtractor.Extract modifies nested calls") {
 
     std::list<Variable*> var_list5 = {var_y_, var_i_, var_z_, var_m_, var_n_};
     CHECK(*deliverable.container_modifies_hash_.find(proc1)->second == var_list5);
+
+    // call stmts
+    CHECK(*deliverable.modifies_hash_.find(call2)->second == var_list1);
+    CHECK(*deliverable.modifies_hash_.find(call3)->second == proc3_var_list);
+    CHECK(*deliverable.modifies_hash_.find(call4)->second == proc4_var_list);
+    CHECK(*deliverable.modifies_hash_.find(call5)->second == proc5_var_list);
   }
 }

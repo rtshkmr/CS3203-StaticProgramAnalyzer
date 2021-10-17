@@ -256,7 +256,7 @@ void PSubsystem::HandleCallStmt(Entity* entity) {
   CallEntity* call_entity = dynamic_cast<CallEntity*>(entity);
   assert(call_entity);
   deliverable_->AddCallEntity(call_entity);
-  //TODO: cater for cross procedure call modifies and uses
+  deliverable_->AddCallsRelationship(current_procedure_, call_entity->GetProcedure());
 }
 
 void PSubsystem::HandlePrintStmt(Entity* entity) {
