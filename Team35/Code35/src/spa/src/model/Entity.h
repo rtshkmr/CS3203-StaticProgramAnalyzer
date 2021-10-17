@@ -6,6 +6,7 @@
 
 #include <list>
 #include <datatype/DataType.h>
+#include <set>
 
 enum class EntityEnum {
   kNone = 0,
@@ -92,10 +93,15 @@ class Procedure : public Entity, public Container {
 class Variable : public Entity {
  private:
   const VariableName* variable_name_;
+  std::vector<std::set<Statement*>> var_to_statement = { {}, {}, {}, {}, {}, {} }; //If, While, Assign, Call (empty), Print, Read
  public:
   Variable(VariableName* variableName);
 
   const VariableName* GetName();
+
+  void AddStatement(Statement* stmt);
+
+  std::vector<std::set<Statement*>> GetStatementTable();
 
   static std::vector<Variable*> SortVariableVector(std::vector<Variable*> var_list);
 };

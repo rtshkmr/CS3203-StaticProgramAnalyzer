@@ -12,6 +12,10 @@ IfEntity::IfEntity(std::string condition, vector<Variable*> expr_variables, vect
   cond_expr_ = new ConditionalExpression(condition, expr_variables);
   this->control_variables = std::move(expr_variables);
   this->control_constants = std::move(expr_constants);
+
+  for(auto* variable : control_variables) {
+    variable->AddStatement(this);
+  }
 }
 
 ConditionalExpression* IfEntity::GetCondExpr() {
@@ -49,6 +53,10 @@ WhileEntity::WhileEntity(std::string condition,
   cond_expr_ = new ConditionalExpression(condition, expr_variables);
   this->control_variables = std::move(expr_variables);
   this->control_constants = std::move(expr_constants);
+
+  for(auto* variable : control_variables) {
+    variable->AddStatement(this);
+  }
 }
 
 ConditionalExpression* WhileEntity::GetCondExpr() {
@@ -72,6 +80,11 @@ AssignEntity::AssignEntity(Variable* var,
   expr_ = new AssignmentExpression(expression);
   this->expr_variables = std::move(expr_variables);
   this->expr_constants = std::move(expr_constants);
+
+  var->AddStatement(this);
+  for(auto* variable : this->expr_variables) {
+    variable->AddStatement(this);
+  }
 }
 
 Variable* AssignEntity::GetVariable() {
@@ -102,6 +115,7 @@ Procedure* CallEntity::GetProcedure() {
 PrintEntity::PrintEntity(Variable* var_name) {
   type = EntityEnum::kPrintEntity;
   var_name_ = var_name;
+  var_name_->AddStatement(this);
 }
 
 Variable* PrintEntity::GetVariable() {
@@ -111,6 +125,7 @@ Variable* PrintEntity::GetVariable() {
 ReadEntity::ReadEntity(Variable* var_name) {
   type = EntityEnum::kReadEntity;
   var_name_ = var_name;
+  var_name_->AddStatement(this);
 }
 
 Variable* ReadEntity::GetVariable() {
