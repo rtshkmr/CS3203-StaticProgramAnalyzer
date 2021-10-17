@@ -5,11 +5,6 @@
 # At the end of the run, it will zip all the .xml file
 # Written by: WeiJie (14/09/2021) 
 
-#Perform cleanup
-rm output_*.xml; 
-rm log_*.txt;
-rm Team35_SPA*.log;
-
 TOTAL=$(ls *.txt | wc -l);
 echo "[NOTE] Running a grand total of $TOTAL tests..."; 
 RESULT="0";
@@ -22,7 +17,7 @@ do echo "[NOTE] Running Test $i";
 	if [ "$?" == 0 ]
 	then
 	    RESULT="1";
-		echo "$i did not throw any error.";
+		echo "[ERROR] $i did not throw any error.";
 	fi
 done
 
