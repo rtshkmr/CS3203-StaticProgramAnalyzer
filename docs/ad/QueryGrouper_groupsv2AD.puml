@@ -23,8 +23,8 @@ start
 repeat
   :choose an unvisited target synonym;
   #khaki:perform BFS traversal subroutine \n from target synonym;
-->no;
 repeat while (has unvisited target synonyms?) is (yes)
+->no;
 repeat
   :choose an unvisited clause;
 if (clause has at least 1 synonym) is (yes) then
