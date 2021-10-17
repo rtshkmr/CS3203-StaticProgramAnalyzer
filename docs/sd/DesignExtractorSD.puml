@@ -15,6 +15,7 @@
   participant ModifiesExtractor
   participant ParentTExtractor
   participant FollowsTExtractor
+  participant NextExtractor
 
   create DesignExtractor
   SourceProcessor -> DesignExtractor: DesignExtractor(deliverable)
@@ -45,6 +46,11 @@
   activate FollowsTExtractor
   FollowsTExtractor --> DesignExtractor
   deactivate FollowsTExtractor
+
+  DesignExtractor -> NextExtractor: Extract(deliverable)
+  activate NextExtractor
+  NextExtractor --> DesignExtractor
+  deactivate NextExtractor
 
   DesignExtractor --> SourceProcessor
   deactivate DesignExtractor

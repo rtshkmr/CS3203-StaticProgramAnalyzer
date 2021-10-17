@@ -32,7 +32,7 @@
     class PSubsystem {
         -deliverable_: Deliverable*
         -syntax_validator_: SyntaxValidator
-        -EntityFactory: entity_factory_
+        -entity_factory_: EntityFactory
         -parent_stack_: stack<Container*>
         -follow_stack_: stack<Statement*>
         -valid_state: bool
