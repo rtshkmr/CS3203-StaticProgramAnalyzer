@@ -21,7 +21,7 @@ class ClauseCommandExecutor {
     bool HasExpressionMatch(Pattern *pattern , AssignEntity *assign_entity);
     bool HasAssignPatternRelationship(Entity * assign_entity, Entity *variable_entity, Pattern *pattern);
     bool HasWhileOrIfPatternRelationship(Entity * assign_entity, Entity *variable_entity);
-    std::tuple<bool, int>PatternRowAdditionForStmt(int index, Synonym *synonym_column_to_add, Entity* entity_in_table);
+    std::tuple<bool, int>PatternRowAdditionForStmt(int index, Synonym *synonym_column_to_add, Entity* entity_in_table, Pattern *pattern);
     std::tuple<bool, int>PatternRowAdditionForVariable(int index, Synonym *synonym_column_to_add, Entity* entity_in_table);
     bool HasPatternValueMatch(Entity *stmt_entity_in_table, std::string value, Pattern *pattern);
     std::vector<Variable*> RetrieveVariablesFromStmt(Entity *stmt_entity);

@@ -73,8 +73,8 @@ bool ClauseCommandExecutor::HasAssignPatternRelationship(Entity *assign_entity, 
   std::vector<Entity *> intermediate_table = table->GetRelationships();
   bool has_relationship = false;
 
-  for (auto assign_entity: intermediate_table) {
-    AssignEntity *current_assign_entity = dynamic_cast<AssignEntity *>(assign_entity);
+  for (auto current_entity: intermediate_table) {
+    AssignEntity *current_assign_entity = dynamic_cast<AssignEntity *>(current_entity);
     Variable *current_variable_entity = current_assign_entity->GetVariable();
     if (current_assign_entity == assign_entity && variable_entity == current_variable_entity &&
         HasExpressionMatch(pattern, current_assign_entity)) {
@@ -184,7 +184,7 @@ void ClauseCommandExecutor::PatternTwoSynonymOneInTable(Clause *clause, bool fir
       has_relation = std::get<0>(tuple);
       repeat_count = std::get<1>(tuple);
     } else {
-      std::tuple<bool, int> tuple = PatternRowAdditionForStmt(group_table_pointer, new_synonym, entity_in_table);
+      std::tuple<bool, int> tuple = PatternRowAdditionForStmt(group_table_pointer, new_synonym, entity_in_table, pattern_clause);
       has_relation = std::get<0>(tuple);
       repeat_count = std::get<1>(tuple);
     }
@@ -200,14 +200,14 @@ void ClauseCommandExecutor::PatternTwoSynonymOneInTable(Clause *clause, bool fir
 
 /**
  * Iterate through the stmt entity in the intermediate table to compare all Variables associated with the stmt, then add
- * it if there is a match.
+ * it if there is a match. The expression for assign entities must be matched.
  * @param index The index to start adding the new rows.
  * @param synonym_column_to_add The stmt Synonym column to add new values to.
  * @param entity_in_table The Variable entity in the group table to be compared to.
  * @return
  */
 std::tuple<bool, int>
-ClauseCommandExecutor::PatternRowAdditionForStmt(int index, Synonym *synonym_column_to_add, Entity *entity_in_table) {
+ClauseCommandExecutor::PatternRowAdditionForStmt(int index, Synonym *synonym_column_to_add, Entity *entity_in_table, Pattern *pattern) {
   std::vector<Entity *> intermediate_table = table->GetRelationships();
   int repeat_count = 0;
   bool has_relation = false;
@@ -217,7 +217,14 @@ ClauseCommandExecutor::PatternRowAdditionForStmt(int index, Synonym *synonym_col
     std::vector<Variable *> variable_to_check = RetrieveVariablesFromStmt(stmt_entity);
 
     for (auto variable : variable_to_check) {
-      if (variable == entity_in_table) {
+      // Need to check that the variable and expression matches
+      bool match_found = false;
+      if (typeid(*stmt_entity) == typeid(AssignEntity)) {
+        match_found = variable == entity_in_table && HasExpressionMatch(pattern, dynamic_cast<AssignEntity *>(stmt_entity));
+      } else {
+        match_found = variable == entity_in_table;
+      }
+      if (match_found) {
         stmt_contains_variable = true;
         has_relation = true;
 
@@ -257,6 +264,7 @@ ClauseCommandExecutor::PatternRowAdditionForVariable(int index, Synonym *synonym
       repeat_count++;
     }
 
+    has_relation = true;
     break;
   }
   return std::make_tuple(has_relation, repeat_count);
@@ -302,7 +310,7 @@ void ClauseCommandExecutor::PatternOneSynonym(Clause *clause) {
   for (int i = 0; i < table_size; i++) {
     Entity *current_assign_stmt = assign_entity_in_table_list[i];
 
-    if (HasPatternValueMatch(current_assign_stmt, left_side_value, pattern_clause)) {
+    if (!HasPatternValueMatch(current_assign_stmt, left_side_value, pattern_clause)) {
       group_table->DeleteRow(i - delete_count);
       delete_count++;
     }
