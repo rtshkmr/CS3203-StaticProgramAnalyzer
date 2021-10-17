@@ -49,6 +49,7 @@ add_library(spa ${srcs} ${headers}
         src/util/PKBStub.cpp src/util/PKBStub.h src/model/CFG.cpp src/model/CFG.h
         src/component/PKB/RuntimeExtractor.cpp src/component/PKB/RuntimeExtractor.h
         src/component/PKB/NextTExtractor.cpp src/component/PKB/NextTExtractor.h
+        src/component/SourceProcessor/Extractors/NextExtractor.cpp src/component/SourceProcessor/Extractors/NextExtractor.h
         )
 
 

@@ -344,4 +344,36 @@ TEST_CASE("1.Deliverable.Add relationships") {
     REQUIRE(deliverable.container_modified_by_hash_.count(var_z_));
     REQUIRE(* deliverable.container_modified_by_hash_.find(var_z_)->second == expected_varz_cont_list);
   }
+
+  SECTION ("AddNextRelationship") {
+    deliverable.AddNextRelationship(if_1, rx);
+    deliverable.AddNextRelationship(if_1, rx);  // duplicate check
+    std::list<Statement*> stmt_list1 = {rx};
+    REQUIRE(deliverable.next_hash_.count(if_1));
+    REQUIRE(* deliverable.next_hash_.find(if_1)->second == stmt_list1);
+
+    // adding more var to existing entry
+    std::list<Statement*> stmt_list2 = {rx, a1};
+    deliverable.AddNextRelationship(if_1, a1);
+    REQUIRE(* deliverable.next_hash_.find(if_1)->second == stmt_list2);
+
+    deliverable.AddNextRelationship(while_1, if_1);
+    deliverable.AddNextRelationship(while_1, if_1);  // duplicate check
+    REQUIRE(deliverable.next_hash_.count(while_1));
+    std::list<Statement*> stmt_list3 = {if_1};
+    REQUIRE(* deliverable.next_hash_.find(while_1)->second == stmt_list3);
+
+    // adding more var to existing entry
+    deliverable.AddNextRelationship(while_1, a1);
+    std::list<Statement*> stmt_list4 = {if_1, a1};
+    REQUIRE(* deliverable.next_hash_.find(while_1)->second == stmt_list4);
+
+    // reverse check
+    std::list<Statement*> expected_stmt_list5 = {if_1, while_1};
+    REQUIRE(deliverable.previous_hash_.count(a1));
+    REQUIRE(* deliverable.previous_hash_.find(a1)->second == expected_stmt_list5);
+    std::list<Statement*> expected_stmt_list6 = {while_1};
+    REQUIRE(deliverable.previous_hash_.count(if_1));
+    REQUIRE(* deliverable.previous_hash_.find(if_1)->second == expected_stmt_list6);
+  }
 }
