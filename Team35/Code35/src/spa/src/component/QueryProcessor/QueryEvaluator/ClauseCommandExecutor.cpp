@@ -93,10 +93,10 @@ bool ClauseCommandExecutor::HasWhileOrIfPatternRelationship(Entity *left_entity,
     std::vector<Variable*> control_variables;
     if (typeid(*left_entity) == typeid(WhileEntity)) {
       WhileEntity *current_entity = dynamic_cast<WhileEntity *>(first_entity);
-      control_variables = current_entity->GetExpressionVariables();
+      control_variables = current_entity->GetControlVariables();
     } else {
       IfEntity *current_entity = dynamic_cast<IfEntity *>(first_entity);
-      control_variables = current_entity->GetExpressionVariables();
+      control_variables = current_entity->GetControlVariables();
     }
 
     for (auto current_variable_entity : control_variables) {
@@ -346,12 +346,12 @@ std::vector<Variable *> ClauseCommandExecutor::RetrieveVariablesFromStmt(Entity 
     variable_to_check.push_back(assign_entity->GetVariable());
   } else if (typeid(*stmt_entity) == typeid(IfEntity)) {
     IfEntity *if_entity = dynamic_cast<IfEntity *>(stmt_entity);
-    for (auto variable : if_entity->GetExpressionVariables()) {
+    for (auto variable : if_entity->GetControlVariables()) {
       variable_to_check.push_back(variable);
     }
   } else {
     WhileEntity *if_entity = dynamic_cast<WhileEntity *>(stmt_entity);
-    for (auto variable : if_entity->GetExpressionVariables()) {
+    for (auto variable : if_entity->GetControlVariables()) {
       variable_to_check.push_back(variable);
     }
   }
