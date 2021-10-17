@@ -160,7 +160,7 @@ void PKB::PopulateIfEntities(const std::list<IfEntity*>& if_list) {
         entity_string_to_type_map_[name_string] = DesignEntity::kIf;
         entity_object_to_type_map_[ifs] = DesignEntity::kIf;
         if_map_[name_string].push_back(ifs);
-        for (Variable* var : ifs->GetExpressionVariables()) {
+        for (Variable* var : ifs->GetControlVariables()) {
             VariableName* variable_name = const_cast<VariableName*>(var->GetName());
             std::string variable_string = variable_name->getName();
             if_map_[variable_string].push_back(ifs);
@@ -176,7 +176,7 @@ void PKB::PopulateWhileEntities(const std::list<WhileEntity*>& while_list) {
         entity_string_to_type_map_[name_string] = DesignEntity::kWhile;
         entity_object_to_type_map_[while_stmt] = DesignEntity::kWhile;
         while_map_[name_string].push_back(while_stmt);
-        for (Variable* var : while_stmt->GetExpressionVariables()) {
+        for (Variable* var : while_stmt->GetControlVariables()) {
             VariableName* variable_name = const_cast<VariableName*>(var->GetName());
             std::string variable_string = variable_name->getName();
             while_map_[variable_string].push_back(while_stmt);
@@ -688,7 +688,7 @@ std::string PKB::GetNameFromEntity(Entity* entity) {
 
 
 DesignEntity PKB::EntityToDesignEntity(Entity* entity) {
-    EntityEnum entity_enum = entity->getEntityEnum();
+    EntityEnum entity_enum = entity->GetEntityEnum();
     switch (entity_enum) {
         case (EntityEnum::kIfEntity):
             return DesignEntity::kIf;

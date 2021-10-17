@@ -4,16 +4,18 @@
 
 #include "Statement.h"
 
+#include <utility>
+
 using std::string;
 using std::vector;
 
-IfEntity::IfEntity(std::string condition, vector<Variable*> expr_variables, vector<ConstantValue*> expr_constants) {
+IfEntity::IfEntity(std::string condition, vector<Variable*> control_variables,
+                   vector<ConstantValue*> control_constants) {
   type = EntityEnum::kIfEntity;
-  cond_expr_ = new ConditionalExpression(condition, expr_variables);
-  this->control_variables = std::move(expr_variables);
-  this->control_constants = std::move(expr_constants);
-
-  for(auto* variable : control_variables) {
+  cond_expr_ = new ConditionalExpression(std::move(condition), control_variables);
+  this->control_variables = std::move(control_variables);
+  this->control_constants = std::move(control_constants);
+  for(auto* variable : this->control_variables) {
     variable->AddStatement(this);
   }
 }
@@ -22,11 +24,11 @@ ConditionalExpression* IfEntity::GetCondExpr() {
   return cond_expr_;
 }
 
-vector<Variable*> IfEntity::GetExpressionVariables() {
+vector<Variable*> IfEntity::GetControlVariables() {
   return control_variables;
 }
 
-vector<ConstantValue*> IfEntity::GetExpressionConstants() {
+vector<ConstantValue*> IfEntity::GetControlConstants() {
   return control_constants;
 }
 
@@ -47,14 +49,13 @@ ElseEntity::ElseEntity() {
 }
 
 WhileEntity::WhileEntity(std::string condition,
-                         vector<Variable*> expr_variables,
-                         vector<ConstantValue*> expr_constants) {
+                         vector<Variable*> control_variables,
+                         vector<ConstantValue*> control_constants) {
   type = EntityEnum::kWhileEntity;
-  cond_expr_ = new ConditionalExpression(condition, expr_variables);
-  this->control_variables = std::move(expr_variables);
-  this->control_constants = std::move(expr_constants);
-
-  for(auto* variable : control_variables) {
+  cond_expr_ = new ConditionalExpression(std::move(condition), control_variables);
+  this->control_variables = std::move(control_variables);
+  this->control_constants = std::move(control_constants);
+  for(auto* variable : this->control_variables) {
     variable->AddStatement(this);
   }
 }
@@ -63,11 +64,11 @@ ConditionalExpression* WhileEntity::GetCondExpr() {
   return cond_expr_;
 }
 
-vector<Variable*> WhileEntity::GetExpressionVariables() {
+vector<Variable*> WhileEntity::GetControlVariables() {
   return control_variables;
 }
 
-vector<ConstantValue*> WhileEntity::GetExpressionConstants() {
+vector<ConstantValue*> WhileEntity::GetControlConstants() {
   return control_constants;
 }
 

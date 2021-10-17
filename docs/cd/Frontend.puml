@@ -55,7 +55,7 @@
         -var_list_: std::list<Variable*>*
         -const_list_: std::list<ConstantValue*>*
 
-        +CreateEntities(vector<Token>): Entity*
+        +CreateEntity(vector<Token>): Entity*
     }
 
     SourceProcessor --> Parser
