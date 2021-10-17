@@ -21,6 +21,7 @@ std::set<std::pair<DesignEntity, Attribute>> valid_attrRefs = {
         {DesignEntity::kConstant, Attribute::kValue},
 };
 
+// note: here, kInvalid refers to the absense of a synonym
 std::set<std::tuple<RelRef, DesignEntity, DesignEntity>> valid_relref_args = {
         // 1 synonym
         {RelRef::kCalls, DesignEntity::kProcedure, DesignEntity::kInvalid},
