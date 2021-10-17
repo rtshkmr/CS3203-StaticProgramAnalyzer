@@ -96,7 +96,7 @@ AssignmentExpression* AssignEntity::GetAssignmentExpr() {
   return expr_;
 }
 
-vector<Variable*> AssignEntity::GetExpressionVariables() {
+vector<Variable*> AssignEntity::GetControlVariables() {
   return expr_variables;
 }
 
