@@ -20,6 +20,7 @@ class QueryTokenizer {
   void SetQueryString(std::string* query) { this->query = * query; };
   bool HasMoreTokens();
   Token GetNextToken();
+  std::string SkipTokenizerTillStringQuoteDelimiter();
 };
 
 #endif //AUTOTESTER_QUERYTOKENIZER_H

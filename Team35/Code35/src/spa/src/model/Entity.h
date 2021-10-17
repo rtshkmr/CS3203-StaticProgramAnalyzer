@@ -18,7 +18,9 @@ enum class EntityEnum {
   kPrintEntity = 5,
   kReadEntity = 6,
   kElseEntity = 7,
-  kProcedureEntity = 8
+  kProcedureEntity = 8,
+  kVariableEntity = 9,
+  kConstantEntity = 10
 };
 
 /**
@@ -84,6 +86,7 @@ class Procedure : public Entity, public Container {
   const ProcedureName* procedure_name_;
   const Cluster* cluster_root_ = nullptr;
   const Block* block_root_ = nullptr;
+  const Block* block_tail_ = nullptr;
  public:
   Procedure(ProcedureName* procedureName);
 
@@ -91,6 +94,7 @@ class Procedure : public Entity, public Container {
 
   const void SetClusterRoot(Cluster* cluster);
   const void SetBlockRoot(Block* block_root);
+  const void SetBlockTail(Block* block_tail);
   const Cluster* GetClusterRoot();
   const Block* GetBlockRoot();
 };
@@ -108,6 +112,19 @@ class Variable : public Entity {
 
   static std::vector<Variable*> SortVariableVector(std::vector<Variable*> var_list);
 };
+
+/**
+ * Constant is a derived class of Entity. This class contains the value of the constant.
+ */
+class Constant : public Entity {
+ private:
+  const ConstantValue* constant_value_;
+ public:
+  Constant(ConstantValue* constantValue);
+
+  const ConstantValue* GetValue();
+};
+
 
 /**
  * Program is the root node of the AST. It contains the different Procedures found within the SIMPLE source code.
