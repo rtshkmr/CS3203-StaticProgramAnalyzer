@@ -33,13 +33,13 @@ class IfEntity : public Statement, public Container {
   ElseEntity* else_entity_ = nullptr; //TODO: check if keeping ELSE as object or merge ELSE object into IF object
 
  public:
-  IfEntity(std::string condition, std::vector<Variable*> expr_variables, std::vector<ConstantValue*> expr_constants);
+  IfEntity(std::string condition, std::vector<Variable*> control_variables, std::vector<ConstantValue*> control_constants);
 
   ConditionalExpression* GetCondExpr();
 
-  std::vector<Variable*> GetExpressionVariables();
+  std::vector<Variable*> GetControlVariables();
 
-  std::vector<ConstantValue*> GetExpressionConstants();
+  std::vector<ConstantValue*> GetControlConstants();
 
   ElseEntity* GetElseEntity();
 
@@ -72,13 +72,13 @@ class WhileEntity : public Statement, public Container {
   std::vector<Variable*> control_variables;
   std::vector<ConstantValue*> control_constants;
  public:
-  WhileEntity(std::string condition, std::vector<Variable*> expr_variables, std::vector<ConstantValue*> expr_constants);
+  WhileEntity(std::string condition, std::vector<Variable*> control_variables, std::vector<ConstantValue*> control_constants);
 
   ConditionalExpression* GetCondExpr();
 
-  std::vector<Variable*> GetExpressionVariables();
+  std::vector<Variable*> GetControlVariables();
 
-  std::vector<ConstantValue*> GetExpressionConstants();
+  std::vector<ConstantValue*> GetControlConstants();
 };
 
 /**

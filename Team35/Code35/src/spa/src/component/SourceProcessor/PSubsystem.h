@@ -4,6 +4,7 @@
 #include <string>
 #include <stack>
 #include <datatype/Deliverable.h>
+#include <model/CFG.h>
 #include "SyntaxValidator.h"
 #include "EntityFactory.h"
 
@@ -28,13 +29,13 @@ enum class NodeType {
  * created and added to the AST, relationships are added.
  */
 class PSubsystem {
-  typedef void (PSubsystem::*HandleStatement)(Entity*);
+  typedef void (PSubsystem::*StatementHandler)(Entity*);
 
  private:
-  std::vector<HandleStatement> statement_pointer_ = {&PSubsystem::HandleError, &PSubsystem::HandleIfStmt,
-                                                     &PSubsystem::HandleWhileStmt, &PSubsystem::HandleAssignStmt,
-                                                     &PSubsystem::HandleCallStmt, &PSubsystem::HandlePrintStmt,
-                                                     &PSubsystem::HandleReadStmt, &PSubsystem::HandleElseStmt};
+  std::vector<StatementHandler> statement_handlers_ = {& PSubsystem::HandleError, & PSubsystem::HandleIfStmt,
+                                                       & PSubsystem::HandleWhileStmt, & PSubsystem::HandleAssignStmt,
+                                                       & PSubsystem::HandleCallStmt, & PSubsystem::HandlePrintStmt,
+                                                       & PSubsystem::HandleReadStmt, & PSubsystem::HandleElseStmt};
   Procedure* current_procedure_;
   Deliverable* deliverable_;
   SyntaxValidator syntax_validator_;
@@ -45,6 +46,8 @@ class PSubsystem {
   NodeType current_node_type_ = NodeType::kNone; // -1 => no current node; 0 = procedure; 1 = while; 2 = if; 3 = else;
   std::stack<Container*> parent_stack_;
   std::stack<Statement*> follow_stack_;
+  std::stack<Block*> block_stack_;
+  std::stack<Cluster*> cluster_stack_;
   int program_counter_ = 0;
 
   // private methods for selfcall
@@ -59,18 +62,31 @@ class PSubsystem {
   void HandleCallStmt(Entity* entity);
   void HandleReadStmt(Entity* entity);
   void HandlePrintStmt(Entity* entity);
-
+  ConditionalBlock* CreateConditionalBlock(Statement* conditional_statement);
+  BodyBlock* CreateBodyBlock(ConditionalBlock* conditional_block);
+  BodyBlock* CreateBodyBlock(); // for else body
+  void AddControlVariableRelationships(const std::vector<Variable*>& control_variables);
   void CheckForIfElseValidity();
   void CheckForExistingProcedure();
-
+  void CloseProcedureBlock();
+  void CloseElseBlock();
+  void CloseWhileBlock();
+  void ProcessParentNodeAsProcedure();
+  void ProcessParentNode();
+  void ProcessParentNodeType(Container* current_nest);
+  std::vector<Token> GetValidatedTokens(const std::string& statement);
+  void InitInternalState(Procedure* procedure);
+  void ProcessEntityAsNewProcedure(Entity* entity);
+  void ProcessEntityAsStatement(Entity* entity);
  public:
   PSubsystem() = default;
 
   void InitDataStructures();
 
-  void ProcessStatement(std::string statement);
+  void ProcessStatement(const std::string& statement);
 
   Deliverable* GetDeliverables();
+
 };
 }
 

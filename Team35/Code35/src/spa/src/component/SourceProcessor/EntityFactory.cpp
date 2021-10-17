@@ -20,7 +20,7 @@ EntityFactory::EntityFactory(std::list<Procedure*>* proc_list,
  * Must assume that the tokens are in the form of a statement e.g. the 1st word is the keyword
  * and that the tokenized statement is syntactically correct
  */
-Entity* EntityFactory::CreateEntities(vector<Token> tokens) {
+Entity* EntityFactory::CreateEntity(vector<Token> tokens) {
   Token first_token = tokens.front();
   switch (first_token.GetTokenTag()) {
     case TokenTag::kProcedureKeyword: {

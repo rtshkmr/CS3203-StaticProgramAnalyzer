@@ -2,143 +2,114 @@
 
 #include <utility>
 #include "QueryEvaluator.h"
+#include "ClauseCommandExecutor.h"
+#include "ClauseStrategy.h"
 
 /**
  * Processes the group list containing the information of the query. This method will then make the relevant calls to
  * various methods to further process each group of queries.
- * @param syn_list The list of synonyms declared in the query declaration.
- * @param target The target synonym of the Select clause.
- * @param groups The list of groups extracted from the query provided.
  * @param pkb The populated PKB database.
  */
-QueryEvaluator::QueryEvaluator(std::list<Synonym> syn_list, Synonym target, std::list<Group*> groups, PKB pkb)
-    : synonym_list{std::move(syn_list)},
-      target_synonym{std::move(target)},
-      group_list{std::move(groups)},
-      pkb{std::move(pkb)},
-      boolean_result{true},
-      map_of_synonym_values{},
-      synonym_design_entity_map() {}
+QueryEvaluator::QueryEvaluator(PKB *pkb) : pkb{pkb}, boolean_result{true} {}
 
-std::vector<std::string> QueryEvaluator::EvaluateQuery() {
+UnformattedQueryResult QueryEvaluator::EvaluateQuery(std::vector<Group *> list_of_groups) {
+  UnformattedQueryResult unformatted_result = UnformattedQueryResult(true);
 
-  QueryEvaluatorTable target_synonym_table(target_synonym.GetName());
+  // REFACTORING IN PROGRESS: new code below
+  for (Group *current_group : list_of_groups) {
+    if (current_group->ContainsTargetSynonym()) {
+      // Evaluate non-boolean group
+      Synonym *first_target_synonym = current_group->GetTargetSynonyms()[0];
+      QueryEvaluatorTable *table = new QueryEvaluatorTable(first_target_synonym);
+      DesignEntity de = first_target_synonym->GetType();
 
-  PopulateSynonymValues(& target_synonym_table);
-  EvaluateAllGroups(& target_synonym_table);
-
-  // Check the boolean conditions and return the final results
-  return GetResult(& target_synonym_table);
-}
-
-/**
- * Stores the information for each synonym declared in an unordered map by storing all of its values and it's design
- * entity.
- * @param table The QueryEvaluatorTable that will be storing the target synonym.
- */
-void QueryEvaluator::PopulateSynonymValues(QueryEvaluatorTable* table) {
-  // Query all the design entities and add them to an unordered_map.
-  for (auto iter: synonym_list) {
-    DesignEntity synonym_design_entity = iter.GetType();
-    std::string synonym_name = iter.GetName();
-    synonym_design_entity_map[synonym_name] = synonym_design_entity;
-    std::list<std::string> list_of_synonym_values = pkb.GetDesignEntity(synonym_design_entity);
-    map_of_synonym_values[synonym_name] = list_of_synonym_values;
-
-    if (iter.GetName() == target_synonym.GetName()) {
-      table->AddTargetSynonym(list_of_synonym_values);
-    }
-  }
-}
-
-/**
- * For each group, they may be boolean or not; each group will be processed according to whether they are boolean or not.
- * @param table The current table in question for the boolean or non-boolean group.
- */
-void QueryEvaluator::EvaluateAllGroups(QueryEvaluatorTable* table) {
-  // For each group, evaluate the group with target synonym first if applicable
-  for (auto iter: group_list) {
-    std::vector<Clause*> clause_list = (* iter).GetClauses();
-
-    if ((* iter).ContainsTargetSynonym()) {
-      // This Group contains the target synonym
-      ProcessGroup(clause_list, table);
+      table->AddTargetSynonymValues(first_target_synonym, pkb->GetDesignEntities(de));
+      ProcessGroup(table, current_group);
+      unformatted_result.AddTable(table);
     } else {
-      // This Group contains no target synonym and is treated as a boolean type group
-      // Each boolean group has their own table.
-      PreprocessBooleanGroup(clause_list);
+      // Evaluate boolean group
+      PreprocessBooleanGroup(*current_group);
+      if (boolean_result) {
+        continue;
+      }
+      unformatted_result.SetBooleanResult(false);
+      break;
     }
   }
+
+  return unformatted_result;
+  // REFACTORING IN PROGRESS: end ^
 }
 
 /**
- * Determing the result of the query by factoring in the result of the boolean groups.
- * @param table The table containing the target synonym.
- * @return a list of strings representing the final correct values.
+ * Determines the type of strategy for each clause and calls the respective clause executor to compute the new
+ * intermediate table.
+ * @param table
+ * @param group
  */
-std::vector<std::string> QueryEvaluator::GetResult(QueryEvaluatorTable* table) const {
-  if (!boolean_result) {
-    std::vector<std::string> empty_list = {};
-    return empty_list;
-  } else {
-    return table->GetResults();
+void QueryEvaluator::ProcessGroup(QueryEvaluatorTable *table, Group *group) {
+
+  for (Clause* current_clause: group->GetClauses()) {
+    ClauseContext clause_context = ClauseContext(table);
+    std::tuple<PKBQueryCommand*, ClauseCommand*> commands = clause_context.ProcessClause(current_clause);
+    PKBQueryCommand *query_command = std::get<0>(commands);
+    ClauseCommand *clause_command = std::get<1>(commands);
+
+    PKBQueryReceiver query_receiver = PKBQueryReceiver(pkb);
+    query_command->SetReceiver(&query_receiver);
+    IntermediateTable *intermediate_table = query_command->ExecuteQuery(current_clause);
+
+    ClauseCommandExecutor clause_executor = ClauseCommandExecutor(table, intermediate_table);
+    clause_command->SetExecutor(&clause_executor);
+    clause_command->Execute(current_clause);
   }
+  return;
 }
 
-/**
- * Process each group based on whether the contain the target synonym or not.
- * @param clause_list The list of clauses for a particular group.
- * @param table The table representing a particular group.
- */
-void QueryEvaluator::ProcessGroup(const std::vector<Clause*>& clause_list, QueryEvaluatorTable* table) {
-
-  for (Clause* current_clause: clause_list) {
-
-    if (typeid(* current_clause) == typeid(SuchThat)) {
-      // Evaluate such that clause here
-      auto* st = dynamic_cast<SuchThat*>(current_clause);
-      EvaluateSuchThatClause(* st, table, pkb, synonym_list);
-    } else {
-      // Evaluate pattern clause here
-      auto* p = dynamic_cast<Pattern*>(current_clause);
-      ProcessPatternClause(* p, table, pkb, synonym_design_entity_map);
-    }
-  }
+bool QueryEvaluator::ProcessSingleClauseBooleanGroup(Group group) {
+  Clause *clause = group.GetClauses()[0];
+  // Only such that clause can have a single boolean group.
+  auto *such_that_clause = dynamic_cast<SuchThat *>(clause);
+  QuerySuchThatNoSynonymCommand query_command = QuerySuchThatNoSynonymCommand(clause);
+  PKBQueryReceiver query_receiver = PKBQueryReceiver(pkb);
+  query_command.SetReceiver(&query_receiver);
+  IntermediateTable *table = query_command.ExecuteQuery(clause);
+  return table->GetExistenceResult();
 }
 
 /**
  * Finds the main synonym for a boolean group and adding it to the table representing the current boolean group.
  * @param clause_list The list of clause in the current group.
  */
-void QueryEvaluator::PreprocessBooleanGroup(std::vector<Clause*> clause_list) {
-  Clause* firstClause = clause_list[0];
-  std::string synonym_name;
+void QueryEvaluator::PreprocessBooleanGroup(Group group) {
+  Clause* firstClause = group.GetClauses()[0];
+  Synonym *main_synonym = nullptr;
   if (typeid(* firstClause) == typeid(SuchThat)) {
     auto* st = dynamic_cast<SuchThat*>(firstClause);
     if (st->left_is_synonym) {
-      synonym_name = st->left_hand_side;
+      main_synonym = st->first_synonym;
     } else if (st->right_is_synonym) {
-      synonym_name = st->right_hand_side;
+      main_synonym = st->second_synonym;
     } else {
       // If no synonym, no need for a table. Also, should be in a group of size 1.
-      bool result = EvaluateNoSynonym(* st, pkb);
-      if (!result) {
-        boolean_result = false;        // Call to the class variable directly
-      }
+      // TODO: add function for no syn
+      boolean_result = ProcessSingleClauseBooleanGroup(group);
+      return;
     }
   } else if (typeid(* firstClause) == typeid(Pattern)) {
     auto* pattern = dynamic_cast<Pattern*>(firstClause);
-    synonym_name = pattern->assign_synonym;
+    main_synonym = pattern->first_synonym;
   } else {
     // No code should run here for iter 1 since there is only such that and pattern clause.
   }
 
-  if (!synonym_name.empty()) {
-    QueryEvaluatorTable current_table(synonym_name);
-    current_table.AddTargetSynonym(map_of_synonym_values[synonym_name]);
-    ProcessGroup(clause_list, & current_table);
-    if (current_table.GetResults().empty()) {
+  if (main_synonym != nullptr) {
+    QueryEvaluatorTable current_table(main_synonym);
+    current_table.AddTargetSynonymValues(main_synonym, pkb->GetDesignEntities(main_synonym->GetType()));
+    ProcessGroup(&current_table, &group);
+    if (current_table.GetResults()[0].empty()) {
       boolean_result = false;
     }
   }
+  return;
 }
