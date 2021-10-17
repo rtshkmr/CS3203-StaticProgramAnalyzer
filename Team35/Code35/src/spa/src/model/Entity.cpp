@@ -53,7 +53,7 @@ const VariableName* Variable::GetName() {
 }
 
 void Variable::AddStatement(Statement* stmt) {
-  EntityEnum ent = stmt->getEntityEnum();
+  EntityEnum ent = stmt->GetEntityEnum();
   int lot = static_cast<int>(ent) - 1; // remove procedure from 0.
   var_to_statement.at(lot).insert(stmt);
 }
