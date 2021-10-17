@@ -49,24 +49,36 @@ jobs:
     - name: Build AutoTester # GUI is excluded
       run:  cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target autotester -- -j 8
     
-    - name: Run AutoTester 
+    - name: Run AutoTester - Basic
       run: | 
-        cp -r ${{github.workspace}}/Team35/Tests35 ${{env.working-directory}}/build/src/autotester
-        cd ${{env.working-directory}}/build/src/autotester/Tests35
+        cd ${{env.working-directory}}/build/src/autotester/Tests35/simple_lib/basic
         chmod +x ./run_autotester_suite.sh
         ./run_autotester_suite.sh
-        zip -v results.zip log_*.txt output_*.xml Team35_SPA_*.log analysis.xsl
+    
+    - name: Run AutoTester - Advanced
+      run: | 
+        cd ${{env.working-directory}}/build/src/autotester/Tests35/simple_lib/adv
+        chmod +x ./run_autotester_suite.sh
+        ./run_autotester_suite.sh
         
-    - name: Test SP Parser
+    - name: Run AutoTester - Throws
+      run: | 
+        cd ${{env.working-directory}}/build/src/autotester/Tests35/simple_lib/throw
+        chmod +x ./run_autotester_suite.sh
+        ./run_autotester_suite.sh
+        
+    - name: Zip result logs
       run: | 
         cd ${{env.working-directory}}/build/src/autotester/Tests35/simple_lib
-        chmod +x ./run_autotester_suite.sh
-        ./run_autotester_suite.sh
+        zip -v basic.zip basic/log_*.txt basic/output_*.xml basic/Team35_SPA_*.log analysis.xsl
+        zip -v adv.zip adv/log_*.txt adv/output_*.xml adv/Team35_SPA_*.log analysis.xsl
         
     - uses: actions/upload-artifact@v2
       with: 
         name: output_final
-        path: ${{env.working-directory}}/build/src/autotester/Tests35/results.zip
+        path: |
+            ${{env.working-directory}}/build/src/autotester/Tests35/simple_lib/basic.zip 
+            ${{env.working-directory}}/build/src/autotester/Tests35/simple_lib/adv.zip 
 
     - name: Build All # Take all previous build and build autotester_gui for completeness
       run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target all
