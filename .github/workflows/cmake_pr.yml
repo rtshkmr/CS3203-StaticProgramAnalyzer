@@ -72,6 +72,7 @@ jobs:
         ./run_autotester_suite.sh
         
     - name: Zip result logs
+      if: always()
       run: | 
         cd ${{env.working-directory}}/build/src/autotester/Tests35/simple_lib
         zip -v basic.zip basic/log_*.txt basic/output_*.xml basic/Team35_SPA_*.log analysis.xsl
