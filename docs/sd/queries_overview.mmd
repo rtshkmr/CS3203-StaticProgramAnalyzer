@@ -11,7 +11,7 @@ sequenceDiagram
     QuerySystemController ->>+ QueryExtractor: ExtractQuery()
     Note right of QueryExtractor: Ref <br/> SD_Extract_Query
     QueryExtractor-->>-QuerySystemController: Populate query objects
-    QuerySystemController->>+QueryEvaluator: EvaluateQuery()
+    QuerySystemController->>+QueryEvaluator: EvaluateQuery(vector<Group*> groups)
     Note right of QueryEvaluator: Ref <br/> SD_Evaluate_Query
     QueryEvaluator-->>-QuerySystemController: UnformattedResultList result_list
     QuerySystemController->>+QueryProjector: FormatQuery(UnformattedResultList)
