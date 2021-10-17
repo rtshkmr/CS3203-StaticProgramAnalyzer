@@ -26,10 +26,10 @@ jobs:
 
     - name: Build SPA
       # Build your program with the given configuration
-      run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target spa -- -j 4
+      run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target spa -- -j 8
       
     - name: Build Unit Test
-      run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target unit_testing -- -j 4
+      run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target unit_testing -- -j 8
 
     - name: Run Unit Test
       #Running Catch2 natively on terminal
@@ -38,7 +38,7 @@ jobs:
         ./unit_testing
 
     - name: Build Integration Test
-      run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target integration_testing -- -j 2
+      run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target integration_testing -- -j 8
 
     - name: Run Integration Test
       run: |
@@ -47,7 +47,7 @@ jobs:
         ./integration_testing
   
     - name: Build AutoTester # GUI is excluded
-      run:  cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target autotester -- -j 2
+      run:  cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target autotester -- -j 8
     
     - name: Run AutoTester 
       run: | 
