@@ -1,0 +1,33 @@
+@startuml
+<Style>
+activityDiagram {
+  BackgroundColor lavender
+  BorderColor lavender
+  FontName arial
+  FontSize 13
+LineColor Black
+}
+document {
+   BackgroundColor transparent
+}
+</style>
+skinparam sequence {
+  ArrowColor black
+  BorderColor black
+  ActivityBorderColor black
+}
+
+@startuml
+start
+:create empty group;
+:initialize queue with starting synonym;
+repeat
+  :pop synonym at head of queue;
+  :add all unvisited clauses containing \n this synonym into 'subgroup';
+  :for each clause in 'subgroup' \n push all unvisited synonyms into queue;
+  :add subgroup into group;
+repeat while (queue contains synonyms?) is (yes)
+->no;
+:add group into groups list;
+stop
+@enduml
