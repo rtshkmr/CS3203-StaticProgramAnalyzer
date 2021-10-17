@@ -1,0 +1,23 @@
+stateDiagram-v2
+
+    state "Possible Happy Paths between Helper Functions" as Helper functions {
+    IsFactor --> IsExpr
+    IsFactor --> IsFactor
+
+    IsTerm --> IsFactor
+    IsTerm --> IsTerm
+
+    IsExpr --> IsTerm 
+    IsExpr --> IsExpr
+
+    IsCondExpr --> IsCondExpr 
+    IsCondExpr --> IsRelExpr
+
+    IsRelExpr --> IsRelFactor
+
+    IsRelFactor --> IsFactor
+    IsRelFactor --> IsExpr
+    IsRelFactor --> IsRelExpr
+
+
+    }
