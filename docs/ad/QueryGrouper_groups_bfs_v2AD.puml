@@ -5,7 +5,10 @@ activityDiagram {
   BorderColor lavender
   FontName arial
   FontSize 13
-LineColor Black
+  LineColor Black
+  note {
+    BackgroundColor #khaki
+  }
 }
 document {
    BackgroundColor transparent
@@ -18,6 +21,7 @@ skinparam sequence {
 }
 
 @startuml
+floating note left: BFS traversal subroutine \n from a given synonyn \n to form a group
 start
 :create empty group;
 :initialize queue with starting synonym;
