@@ -15,7 +15,7 @@ IfEntity::IfEntity(std::string condition, vector<Variable*> control_variables,
   cond_expr_ = new ConditionalExpression(std::move(condition), control_variables);
   this->control_variables = std::move(control_variables);
   this->control_constants = std::move(control_constants);
-  for(auto* variable : control_variables) {
+  for(auto* variable : this->control_variables) {
     variable->AddStatement(this);
   }
 }
@@ -55,7 +55,7 @@ WhileEntity::WhileEntity(std::string condition,
   cond_expr_ = new ConditionalExpression(std::move(condition), control_variables);
   this->control_variables = std::move(control_variables);
   this->control_constants = std::move(control_constants);
-  for(auto* variable : control_variables) {
+  for(auto* variable : this->control_variables) {
     variable->AddStatement(this);
   }
 }
