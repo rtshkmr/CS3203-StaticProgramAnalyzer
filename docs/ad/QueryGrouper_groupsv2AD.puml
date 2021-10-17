@@ -22,14 +22,14 @@ start
 
 repeat
   :choose an unvisited target synonym;
-  #khaki:perform DFS traversal subroutine \n from target synonym;
+  #khaki:perform BFS traversal subroutine \n from target synonym;
 ->no;
 repeat while (has unvisited target synonyms?) is (yes)
 repeat
   :choose an unvisited clause;
 if (clause has at least 1 synonym) is (yes) then
   -[#black]->
-  #khaki:perform DFS traversal subroutine \n from any one of its synonyms;
+  #khaki:perform BFS traversal subroutine \n from any one of its synonyms;
 else
   -[#black,dotted]->
   :add clause to its own group;
