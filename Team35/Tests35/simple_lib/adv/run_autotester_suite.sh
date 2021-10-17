@@ -27,6 +27,7 @@ do echo "[NOTE] Running Test $i";
 	if [ "$?" != 0 ]
 	then
 	    RESULT="1";
+		echo "[ERROR] $i has exception errors."; 
 	else
 		head -1 log_$i.txt;
 		FILENAME=output_$i.xml;
@@ -39,6 +40,7 @@ do echo "[NOTE] Running Test $i";
 		if [ "$QUERIES" != "$PASSES" ]
 		then
 			RESULT="2";
+			echo "[ERROR] $i has failing cases."; 
 		fi
 	fi
 done
