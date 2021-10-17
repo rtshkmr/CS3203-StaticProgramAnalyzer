@@ -1,5 +1,5 @@
 #include "QueryParser.h"
-#include "QueryValidator.h"
+#include "QuerySemanticValidator.h"
 #include <component/QueryProcessor/types/Exceptions.h>
 #include <component/SourceProcessor/Tokenizer.h>
 #include <component/SourceProcessor/SyntaxValidator.h>
@@ -111,7 +111,7 @@ void QueryParser::ParseAttrName(Synonym* s) {
   } else {
     throw PQLParseException("Received unknown attrName: " + lookahead.GetTokenString());
   }
-  if (!QueryValidator::Is_Semantically_Valid_AttrRef(s, attr)) {
+  if (!QuerySemanticValidator::Is_Semantically_Valid_AttrRef(s, attr)) {
     throw PQLValidationException("Received semantically invalid AttrRef");
   }
   s->SetAttribute(attr);
@@ -302,7 +302,7 @@ std::pair<Clause*, bool> QueryParser::ParseRelRef() {
   Eat(TokenTag::kCloseBracket);
 
   // semantic validation of relRef.
-  if (!QueryValidator::Is_Semantically_Valid_RelRef(lhs, rhs, GetRelRef(rel_type),
+  if (!QuerySemanticValidator::Is_Semantically_Valid_RelRef(lhs, rhs, GetRelRef(rel_type),
                                                     is_lhs_syn, is_rhs_syn, & synonyms)) {
     throw PQLValidationException("Received semantically invalid " + rel_type + " cl.");
   }

@@ -1,5 +1,5 @@
 #include "QueryParser.h"
-#include "QueryValidator.h"
+#include "QuerySemanticValidator.h"
 #include <unordered_set>
 #include <set>
 
@@ -80,7 +80,7 @@ std::set<std::tuple<RelRef, DesignEntity, DesignEntity>> valid_relref_args = {
         {RelRef::kAffectsT, DesignEntity::kAssign, DesignEntity::kAssign},
 };
 
-bool QueryValidator::IsValid_LhsStmt_RhsStmt(std::string l, std::string r, bool lhs_is_syn,
+bool QuerySemanticValidator::IsValid_LhsStmt_RhsStmt(std::string l, std::string r, bool lhs_is_syn,
                                              bool rhs_is_syn, std::list<Synonym*>* synonyms) {
   // Synonyms involved in relationships between statements cannot be variable, procedure, or constant.
   std::unordered_set<DesignEntity> stmt_blacklist = {DesignEntity::kVariable,
@@ -111,7 +111,7 @@ bool QueryValidator::IsValid_LhsStmt_RhsStmt(std::string l, std::string r, bool 
  * @param synonyms is a reference to the list of synonyms.
  * @return true if RelRef has semantically valid left and right arguments, false otherwise.
  */
-bool QueryValidator::Is_Semantically_Valid_RelRef(std::string l, std::string r, RelRef rf, bool lhs_is_syn,
+bool QuerySemanticValidator::Is_Semantically_Valid_RelRef(std::string l, std::string r, RelRef rf, bool lhs_is_syn,
                                                   bool rhs_is_syn, std::list<Synonym*>* synonyms) {
   // if neither lhs nor rhs is a synonym, no semantic validation is needed
   DesignEntity lhs = QueryParser::GetSynonymInfo(l, synonyms)->GetType();
@@ -132,7 +132,7 @@ bool QueryValidator::Is_Semantically_Valid_RelRef(std::string l, std::string r, 
   }
 
   // RelRefs with many permutations of arguments will use a blacklist approach instead.
-  return QueryValidator::IsValid_LhsStmt_RhsStmt(l, r, lhs_is_syn, rhs_is_syn, synonyms);
+  return QuerySemanticValidator::IsValid_LhsStmt_RhsStmt(l, r, lhs_is_syn, rhs_is_syn, synonyms);
 }
 
 /**
@@ -141,7 +141,7 @@ bool QueryValidator::Is_Semantically_Valid_RelRef(std::string l, std::string r, 
  * @param attr_name is of type Attribute and represents the AttrName in the AttrRef.
  * @return true if Attrref is semanticaly valid for the synonym type, false otherwise.
  */
-bool QueryValidator::Is_Semantically_Valid_AttrRef(Synonym* s, Attribute attr_name) {
+bool QuerySemanticValidator::Is_Semantically_Valid_AttrRef(Synonym* s, Attribute attr_name) {
   auto candidate = std::make_pair(s->GetType(), attr_name);
   return valid_attrRefs.find(candidate) != valid_attrRefs.end() ? true : false;
 }
