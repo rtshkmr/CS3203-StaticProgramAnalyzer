@@ -52,6 +52,16 @@ const VariableName* Variable::GetName() {
   return variable_name_;
 }
 
+void Variable::AddStatement(Statement* stmt) {
+  EntityEnum ent = stmt->GetEntityEnum();
+  int lot = static_cast<int>(ent) - 1; // remove procedure from 0.
+  var_to_statement.at(lot).insert(stmt);
+}
+
+std::vector<std::set<Statement*>> Variable::GetStatementTable() {
+  return var_to_statement;
+}
+
 /**
 * This function contains the algorithm to sort a vector<Variable*>.
 * @param var_list The vector<Variable*> to be sorted.

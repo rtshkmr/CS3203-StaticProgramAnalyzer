@@ -9,8 +9,6 @@
 #include <datatype/DataType.h>
 #include "Entity.h"
 
-class Block;
-
 class Cluster {
 
  protected:

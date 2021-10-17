@@ -46,7 +46,6 @@ class PSubsystem {
   NodeType current_node_type_ = NodeType::kNone; // -1 => no current node; 0 = procedure; 1 = while; 2 = if; 3 = else;
   std::stack<Container*> parent_stack_;
   std::stack<Statement*> follow_stack_;
-  /// ISSUE 1: Trying to add Cluster as a Block.
   std::stack<Block*> block_stack_;
   std::stack<Cluster*> cluster_stack_;
   int program_counter_ = 0;
@@ -77,6 +76,8 @@ class PSubsystem {
   void ProcessParentNodeType(Container* current_nest);
   std::vector<Token> GetValidatedTokens(const std::string& statement);
   void InitInternalState(Procedure* procedure);
+  void ProcessEntityAsNewProcedure(Entity* entity);
+  void ProcessEntityAsStatement(Entity* entity);
  public:
   PSubsystem() = default;
 
@@ -86,8 +87,6 @@ class PSubsystem {
 
   Deliverable* GetDeliverables();
 
-  void ProcessEntityAsNewProcedure(Entity* entity);
-  void ProcessEntityAsStatement(Entity* entity);
 };
 }
 

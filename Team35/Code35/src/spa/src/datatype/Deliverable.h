@@ -34,6 +34,9 @@ class Deliverable {
   void AddModifiesRelationship(Statement* m1, Variable* m2);
   void AddModifiesRelationship(Container* m1, Variable* m2);
   void AddModifiesRelationship(Container* container, std::list<Variable*>* var_list);
+  void AddCallsRelationship(Procedure* p1, Procedure* p2);
+  void AddCallsTransitiveRelationship(Procedure* p1, Procedure* p2);
+  void AddCallsTransitiveRelationshipForList(Procedure* p1, std::list<Procedure*>* proc_list);
   void AddNextRelationship(Statement* s1, Statement* s2);
 
   void SetProgram(Program* program);
@@ -75,6 +78,8 @@ class Deliverable {
   std::unordered_map<Statement*, std::list<Variable*>*> modifies_hash_; //to store Modifies(x,_), where x is stmt
   std::unordered_map<Container*, std::list<Variable*>*>
       container_modifies_hash_; //to store Modifies(x,_), where x is if, while, procedure
+  std::unordered_map<Procedure*, std::list<Procedure*>*> calls_hash_; // represents a Calls(x, y) where x -> y
+  std::unordered_map<Procedure*, std::list<Procedure*>*> calls_T_hash_; // represents a Calls*(x, y) where y -> x
   std::unordered_map<Statement*, std::list<Statement*>*> next_hash_;
 
   //Relationship (Reverse) Tables
@@ -88,6 +93,8 @@ class Deliverable {
   std::unordered_map<Variable*, std::list<Statement*>*> modified_by_hash_; //to store Modifies(x,_), where x is stmt
   std::unordered_map<Variable*, std::list<Container*>*>
       container_modified_by_hash_; //to store Modifies(x,_), where x is if, while, procedure
+  std::unordered_map<Procedure*, std::list<Procedure*>*> called_by_hash_; // represents a Calls(x, y) where y -> x
+  std::unordered_map<Procedure*, std::list<Procedure*>*> called_by_T_hash_; // represents a Calls*(x, y) where y -> x
   std::unordered_map<Statement*, std::list<Statement*>*> previous_hash_;  // reverse of next
 
 };

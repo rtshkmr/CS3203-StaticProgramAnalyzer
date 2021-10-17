@@ -131,6 +131,9 @@ void UsesExtractor::ExtractUsesInCallContainer(CallEntity* call_entity,
   }
 
   deliverable_->AddUsesRelationship(container, var_list);
+  for (Variable* var: * var_list) {
+    deliverable_->AddUsesRelationship(call_entity, var);
+  }
   // todo: use this when Calls relationship table is set up and the current_procedure of a call stmt can be found
   // if this call stmt is nested, add the relationships inside this call stmt to the current procedure too, because
   // 1st level containers of procedures will not add to the procedure.
