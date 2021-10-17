@@ -92,7 +92,7 @@ IntermediateTable *PKBQueryReceiver::QueryRelRefExistence(PKBRelRefs rel) {
 }
 
 /**
- * Querying Pattern clause with Assign synonym in the group table and the variable clause.
+ * Querying Pattern clause with [Assign, If, While] synonym in the group table and the variable clause.
  * @param design_entity The type of design entity in the pattern clause.
  * @return The intermediate table with the results.
  */
@@ -162,9 +162,6 @@ PKBQueryReceiver::QueryPKBByValueForBoolean(PKBRelRefs rel, std::string first_va
 
 QuerySuchThatTwoSynonymCommand::QuerySuchThatTwoSynonymCommand(Clause *clause) : clause(clause), receiver(nullptr) {}
 
-QuerySuchThatTwoSynonymCommand::QuerySuchThatTwoSynonymCommand(PKBQueryReceiver *receiver, Clause *clause) :
-clause(clause), receiver(receiver) {};
-
 void QuerySuchThatTwoSynonymCommand::SetReceiver(PKBQueryReceiver *receiver) {
   delete this->receiver;
   this->receiver = receiver;
@@ -178,9 +175,6 @@ IntermediateTable * QuerySuchThatTwoSynonymCommand::ExecuteQuery(Clause *clause)
 
 
 QuerySuchThatOneSynonymCommand::QuerySuchThatOneSynonymCommand(Clause *clause) : clause(clause), receiver(nullptr) {}
-
-QuerySuchThatOneSynonymCommand::QuerySuchThatOneSynonymCommand(PKBQueryReceiver *receiver, Clause *clause) :
-clause(clause), receiver(receiver) {};
 
 void QuerySuchThatOneSynonymCommand::SetReceiver(PKBQueryReceiver *receiver) {
   delete this->receiver;
@@ -212,9 +206,6 @@ IntermediateTable * QuerySuchThatOneSynonymCommand::ExecuteQuery(Clause *clause)
 
 QuerySuchThatNoSynonymCommand::QuerySuchThatNoSynonymCommand(Clause *clause) : clause(clause), receiver(nullptr) {}
 
-QuerySuchThatNoSynonymCommand::QuerySuchThatNoSynonymCommand(PKBQueryReceiver *receiver, Clause *clause) :
-clause(clause), receiver(receiver) {};
-
 void QuerySuchThatNoSynonymCommand::SetReceiver(PKBQueryReceiver *receiver) {
   delete this->receiver;
   this->receiver = receiver;
@@ -239,9 +230,6 @@ IntermediateTable * QuerySuchThatNoSynonymCommand::ExecuteQuery(Clause *clause) 
 
 QueryPatternTwoSynonymCommand::QueryPatternTwoSynonymCommand(Clause *clause) : clause(clause), receiver(nullptr) {}
 
-QueryPatternTwoSynonymCommand::QueryPatternTwoSynonymCommand(PKBQueryReceiver *receiver, Clause *clause) :
-clause(clause), receiver(receiver) {};
-
 void QueryPatternTwoSynonymCommand::SetReceiver(PKBQueryReceiver *receiver) {
   delete this->receiver;
   this->receiver = receiver;
@@ -249,14 +237,11 @@ void QueryPatternTwoSynonymCommand::SetReceiver(PKBQueryReceiver *receiver) {
 
 IntermediateTable * QueryPatternTwoSynonymCommand::ExecuteQuery(Clause *clause) {
   auto* pattern = dynamic_cast<Pattern *>(clause);
-  // TODO: CHANGE here for while and if support
-  return this->receiver->QueryDesignEntity(DesignEntity::kAssign);
+  DesignEntity pattern_design_entity = pattern->first_synonym->GetType();
+  return this->receiver->QueryDesignEntity(pattern_design_entity);
 }
 
 QueryPatternOneSynonymCommand::QueryPatternOneSynonymCommand(Clause *clause) : clause(clause), receiver(nullptr) {}
-
-QueryPatternOneSynonymCommand::QueryPatternOneSynonymCommand(PKBQueryReceiver *receiver, Clause *clause) :
-clause(clause), receiver(receiver) {};
 
 void QueryPatternOneSynonymCommand::SetReceiver(PKBQueryReceiver *receiver) {
   delete this->receiver;
@@ -265,6 +250,6 @@ void QueryPatternOneSynonymCommand::SetReceiver(PKBQueryReceiver *receiver) {
 
 IntermediateTable * QueryPatternOneSynonymCommand::ExecuteQuery(Clause *clause) {
   auto* pattern = dynamic_cast<Pattern *>(clause);
-  // TODO: CHANGE here for while and if support
-  return this->receiver->QueryPatternByValue(DesignEntity::kAssign, pattern->left_hand_side);
+  DesignEntity pattern_design_entity = pattern->first_synonym->GetType();
+  return this->receiver->QueryPatternByValue(pattern_design_entity, pattern->left_hand_side);
 }
