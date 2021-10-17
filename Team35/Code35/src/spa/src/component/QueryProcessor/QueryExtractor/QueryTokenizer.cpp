@@ -6,8 +6,8 @@
 #include <datatype/RegexPatterns.h>
 
 // note: order of regex evaluation matters! always retrieve key-values based on defined insertion_order.
-std::vector<std::string> insertion_order = {"+", "-", "%", "*", "/", "STRING_QUOTE", "INTEGER", "SUCH_THAT",
-                                            "IDENT", ";", "SPACINGS", "(", ")", ",", "_"};
+std::vector<std::string> insertion_order = {"+", "-", "%", "*", "/", "STRING_QUOTE", "INTEGER", "SUCH_THAT", "PROG_LINE",
+                                            "stmt#", "IDENT", ";", "SPACINGS", "(", ")", ",", "_", "<", ">", "."};
 static std::map<std::string, std::regex> spec_table{
     // TODO: for performance optimization, group (+, -) and (%, *, /) together if separate regex is not required.
     {"+", std::regex("^[+]")},
@@ -18,6 +18,8 @@ static std::map<std::string, std::regex> spec_table{
     {"STRING_QUOTE", std::regex("^\"")},
     {"INTEGER", RegexPatterns::GetIntegerPatternNonTerminating()},
     {"SUCH_THAT", std::regex("^such that")},
+    {"PROG_LINE", std::regex("^prog_line")},
+    {"stmt#", std::regex("^stmt#")},
     {"IDENT", RegexPatterns::GetNamePattern()}, // IDENT is TokenTag:kName
     {";", std::regex("^;")},
     {"SPACINGS", std::regex(R"(^[\n\r\s\t]+)")},
@@ -25,12 +27,17 @@ static std::map<std::string, std::regex> spec_table{
     {")", std::regex("^[)]")},
     {",", std::regex("^,")},
     {"_", std::regex("^_")},
+    {"<", std::regex("^[<]")},
+    {">", std::regex("^[>]")},
+    {".", std::regex("^[.]")},
 };
 
 /* Gets correct TokenTag specific to PQL applications. Allowed alphabet of TokenTags corresponds to specTable.
  * Note that this function does not check that the token is of SPACINGS type, as such tokens have already been dropped.
  */
 TokenTag QueryTokenizer::GetPqlTokenType(std::string type) {
+  // TODO: optimise this using a lookup table.
+  if (type.compare("stmt#") == 0) { return TokenTag::kStmtHash; }
   if (type.compare("+") == 0) { return TokenTag::kPlus; }
   if (type.compare("-") == 0) { return TokenTag::kMinus; }
   if (type.compare("%") == 0) { return TokenTag::kModulo; }
@@ -38,6 +45,7 @@ TokenTag QueryTokenizer::GetPqlTokenType(std::string type) {
   if (type.compare("/") == 0) { return TokenTag::kDivide; }
   if (type.compare("STRING_QUOTE") == 0) { return TokenTag::kStringQuote; }
   if (type.compare("INTEGER") == 0) { return TokenTag::kInteger; }
+  if (type.compare("PROG_LINE") == 0) { return TokenTag::kProgLine; }
   if (type.compare("SUCH_THAT") == 0) { return TokenTag::kSuchThat; }
   if (type.compare("IDENT") == 0) { return TokenTag::kName; }
   if (type.compare(";") == 0) { return TokenTag::kSemicolon; }
@@ -45,6 +53,9 @@ TokenTag QueryTokenizer::GetPqlTokenType(std::string type) {
   if (type.compare(")") == 0) { return TokenTag::kCloseBracket; }
   if (type.compare(",") == 0) { return TokenTag::kComma; }
   if (type.compare("_") == 0) { return TokenTag::kUnderscore; }
+  if (type.compare("<") == 0) { return TokenTag::kOpenKarat; }
+  if (type.compare(">") == 0) { return TokenTag::kCloseKarat; }
+  if (type.compare(".") == 0) { return TokenTag::kDot; }
 
   return TokenTag::kInvalid;
 }
