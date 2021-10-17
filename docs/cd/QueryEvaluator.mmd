@@ -1,0 +1,52 @@
+classDiagram
+    class Table {
+        -unordered_map um
+        -Synonym target_synonym
+    }
+    class QueryEvaluator {
+
+    }
+    class ClauseCommand { }
+    <<Interface>> ClauseCommand
+    class ClauseCommandInvoker
+    class ClauseCommandExecuter
+    class DoubleSynonymInTableCommand
+    class DoubleSynonymOnlyOneInTableCommand
+    class ClauseStrategy
+    <<Interface>> ClauseStrategy
+    class SuchThatStrategy
+    class PatternStrategy
+    class WithStrategy
+    class PKBQueryCommand
+    <<Interface>> PKBQueryCommand
+    class PKBQueryInvoker
+    class PKBQueryReceiver
+    class QuerySuchThatCommand
+    class QueryPatternCommand
+
+
+    QueryEvaluator --> ClauseCommandInvoker
+    QueryEvaluator --> ClauseCommandExecuter
+    QueryEvaluator --> ClauseContext
+    QueryEvaluator --> Table
+    QueryEvaluator --> PKBQueryReceiver
+
+    ClauseCommandExecuter --> Table
+    ClauseCommandInvoker --> ClauseCommand
+    DoubleSynonymInTableCommand o-- ClauseCommandExecuter
+    DoubleSynonymOnlyOneInTableCommand o-- ClauseCommandExecuter
+    SingleSynonymCommand o-- ClauseCommandExecuter
+    ClauseCommand <|-- DoubleSynonymInTableCommand
+    ClauseCommand <|-- DoubleSynonymOnlyOneInTableCommand
+    ClauseCommand <|-- SingleSynonymCommand
+    SuchThatStrategy ..|> ClauseStrategy
+    PatternStrategy ..|> ClauseStrategy
+    WithStrategy ..|> ClauseStrategy
+    ClauseContext --> ClauseStrategy
+
+    QueryEvaluator --> PKBQueryInvoker
+    PKBQueryInvoker -->PKBQueryCommand
+    QuerySuchThatCommand ..|> PKBQueryCommand
+    QueryPatternCommand ..|> PKBQueryCommand
+    QuerySuchThatCommand o-- PKBQueryReceiver
+    QueryPatternCommand o-- PKBQueryReceiver

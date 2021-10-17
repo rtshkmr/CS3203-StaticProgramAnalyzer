@@ -1,84 +1,22 @@
 sequenceDiagram
-    participant QueryController
+    autonumber
     participant QueryEvaluator
+    participant ClauseStrategy
+    participant PKBQueryExecutor
     participant PKB
-    participant SuchThatEvaluator
-    participant PatternEvaluator
+    participant ClauseCommandExecutor
 
-    % synList - all syn declared
-    % e.g assign a; variable v;
-    % Select v such that Parent (a, 1) pattern a ("x", "1 + 2")
-    QueryController->>+QueryEvaluator: EvaluateQuery(synonym_list, target, groups, pkb)
+    loop Each Group
+    QueryEvaluator->>+ClauseStrategy: ProcessClause(Clause *)
+    ClauseStrategy->>-QueryEvaluator: PKBQueryCommand, ClauseCommand
+    QueryEvaluator->>+PKBQueryExecutor: ExecutePKBQueryCommand()
 
-    %QueryEvaluator->>+PKB: getProcTable()
-    %PKB-->>-QueryEvaluator: PROC[]
-    % querying smts or var is not put into an alt else to illustrate extension for procedure and call queries later on
-    loop Every valid synonym declaration
-        QueryEvaluator->>+PKB: GetDesignEntity(DesignEntity)
-        PKB-->>-QueryEvaluator: String[] list_of_values
-    end
+    PKBQueryExecutor->>+PKB:
+    PKB->>-PKBQueryExecutor:
 
-    % For each such that or pattern
-    loop Every clause
-        alt is SuchThat
-            QueryEvaluator->>+SuchThatEvaluator: EvaluateSuchThatClause(clause, table, pkb, synonym_list)
-            opt Select s, Follows (stmt1, s)
-                SuchThatEvaluator->>+PKB: getFollows (STMT stmt1)
-            end
-            opt Select s, Follows (s, stmt1)
-                SuchThatEvaluator->>+PKB: getPrevious (STMT stmt1)
-            end
-            Note left of SuchThatEvaluator: There are many other RelRef types omited for brevity
-
-            Note left of SuchThatEvaluator: This includes Follows*, Parent, Parent*, Uses
-
-            %opt Select s, Follows* (stmt1, s)
-            %    SuchThatEvaluator->>+PKB: getFollowsStar (STMT stmt1)
-            %end
-            %opt Select s, Follows* (s, stmt1)
-            %    SuchThatEvaluator->>+PKB: getPreviousStar (STMT stmt1)
-            %end
-            %opt Select s, Parent (s, stmt1)
-            %    SuchThatEvaluator->>+PKB: getParent (STMT stmt1)
-            %end
-            %opt Select s, Parent* (s, stmt1)
-            %    SuchThatEvaluator->>+PKB: getParentStar (STMT stmt1)
-            %end
-            %opt Select s, Parent (stmt1, s)
-            %    SuchThatEvaluator->>+PKB: getChild (STMT stmt1)
-            %end
-            %opt Select s, Parent*(stmt1, s)
-            %    SuchThatEvaluator->>+PKB: getChildStar (STMT stmt1)
-            %end
-            %opt Select v, Uses(s1, v)
-            %    SuchThatEvaluator->>+PKB: getVarUsed (STMT stmt1)
-            %end
-            %opt Select s, Uses (s, v1)
-            %    SuchThatEvaluator->>+PKB: getStmtUsing (VAR var1)
-            %end
-            opt Select v, Modifies(s1, v)
-                SuchThatEvaluator->>+PKB: getVarModified (STMT stmt1)
-            end
-            opt Select s,Modifies(s, v1)
-                SuchThatEvaluator->>+PKB: getStmtModifying (VAR var1)
-            end
-            SuchThatEvaluator-->>-QueryEvaluator:
-        else is Pattern
-            QueryEvaluator->>PatternEvaluator: EvaluatePatternClause(clause, table, pkb, synonym_design_entity_map)
-
-            alt given Assignment Statement
-                PatternEvaluator->>+PKB: getPatternByAssign()
-            else given Variable
-                PatternEvaluator->>+PKB: getAllAssignStmt()
-            end
-
-        end
+    PKBQueryExecutor->>-QueryEvaluator: IntermediateTable
+    QueryEvaluator->>+ClauseCommandExecutor: ExecuteClauseCommand(IntermediateTable, Clause *)
 
     end
-
-    % Consider extracting the work of combining clauses to another
-    % component.
-
-    QueryEvaluator->>QueryController: String[] RESULT
 
 
