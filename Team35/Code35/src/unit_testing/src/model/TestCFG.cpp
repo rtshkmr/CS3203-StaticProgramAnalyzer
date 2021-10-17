@@ -44,7 +44,7 @@ TEST_CASE("1.CFG.Block.StatementRange") {
     REQUIRE_FALSE(b.CheckIfStatementInRange(StatementNumber(2)));
   }
 
-  SECTION("Remove tail stmt twice - success") {
+  SECTION("Remove head stmt twice - success") {
     b.RemoveStmt(2);
     b.RemoveStmt(3);
     REQUIRE_FALSE(b.CheckIfStatementInRange(StatementNumber(3)));
