@@ -32,6 +32,18 @@ inline ConstantValue* const_3_ = new ConstantValue("3");
 inline Procedure* GetProc1() {
   return new Procedure(new ProcedureName("proc1"));
 }
+inline Procedure* GetProc2() {
+  return new Procedure(new ProcedureName("proc2"));
+}
+inline Procedure* GetProc3() {
+  return new Procedure(new ProcedureName("proc3"));
+}
+inline Procedure* GetProc4() {
+  return new Procedure(new ProcedureName("proc4"));
+}
+inline Procedure* GetProc5() {
+  return new Procedure(new ProcedureName("proc5"));
+}
 
 // read
 inline ReadEntity* GetReadX() {
@@ -273,6 +285,11 @@ inline Statement* CreateStatement(Entity* entity, int stmt_num) {
 
 // For copying
 //
+//Procedure* proc1 = GetProc1();
+//Procedure* proc2 = GetProc2();
+//Procedure* proc3 = GetProc3();
+//Procedure* proc4 = GetProc4();
+//Procedure* proc5 = GetProc5();
 //ReadEntity* read_x = GetReadX();
 //ReadEntity* read_y = GetReadY();
 //ReadEntity* read_z = GetReadZ();

@@ -136,7 +136,12 @@ enum class TokenTag {
   kMinus,
   kModulo,
   kTimes,
-  kDivide
+  kDivide,
+  kOpenKarat,
+  kCloseKarat,
+  kDot,
+  kStmtHash,
+  kProgLine
 };
 
 /**

@@ -1,6 +1,6 @@
-
 #include "TestUtils.h"
 #include <vector>
+#include <unordered_set>
 
 std::vector<std::string> TestUtils::GetBasicSourceLines() {
   std::vector<std::string> lines = {
@@ -32,7 +32,6 @@ bool TestUtils::AreListsEqual(std::list<Statement*> as, std::list<Statement*> bs
       return false;
     }
   }
-
   return as.size() == bs.size();
 }
 
@@ -46,6 +45,18 @@ bool TestUtils::AreVectorsEqual(std::vector<Entity*> as, std::vector<Entity*> bs
       return false;
     }
   }
-
   return as.size() == bs.size();
+}
+
+bool TestUtils::AreListsEqual(std::list<Procedure*> a, std::list<Procedure*> b) {
+  for (Procedure* a_proc: a) {
+    bool found_a = false;
+    for (Procedure* b_proc: b) {
+      found_a = found_a || *a_proc->GetName() == *b_proc->GetName();
+    }
+    if (!found_a) {
+      return false;
+    }
+  }
+  return a.size() == b.size();
 }

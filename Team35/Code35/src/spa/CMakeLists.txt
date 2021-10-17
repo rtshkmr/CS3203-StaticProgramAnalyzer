@@ -31,7 +31,7 @@ add_library(spa ${srcs} ${headers}
         src/component/QueryProcessor/QueryExtractor/QueryParser.h src/component/QueryProcessor/QueryExtractor/QueryParser.cpp
         src/component/QueryProcessor/QueryExtractor/QueryExtractor.h src/component/QueryProcessor/QueryExtractor/QueryExtractor.cpp
         src/component/QueryProcessor/QueryExtractor/QueryGrouper.h src/component/QueryProcessor/QueryExtractor/QueryGrouper.cpp
-        src/component/QueryProcessor/QueryExtractor/QueryValidator.h src/component/QueryProcessor/QueryExtractor/QueryValidator.cpp
+        src/component/QueryProcessor/QueryExtractor/QuerySemanticValidator.h src/component/QueryProcessor/QueryExtractor/QuerySemanticValidator.cpp
         src/component/QueryProcessor/QueryEvaluator/QueryEvaluator.h src/component/QueryProcessor/QueryEvaluator/QueryEvaluator.cpp
         src/component/QueryProcessor/QueryEvaluator/PKBQueryCommand.h src/component/QueryProcessor/QueryEvaluator/PKBQueryCommand.cpp
         src/component/QueryProcessor/QueryEvaluator/ClauseCommand.h src/component/QueryProcessor/QueryEvaluator/ClauseCommand.cpp
@@ -49,7 +49,9 @@ add_library(spa ${srcs} ${headers}
         src/util/PKBStub.cpp src/util/PKBStub.h src/model/CFG.cpp src/model/CFG.h
         src/component/PKB/RuntimeExtractor.cpp src/component/PKB/RuntimeExtractor.h
         src/component/PKB/NextTExtractor.cpp src/component/PKB/NextTExtractor.h
-        src/component/SourceProcessor/Extractors/NextExtractor.cpp src/component/SourceProcessor/Extractors/NextExtractor.h
+        src/component/SourceProcessor/Extractors/NextExtractor.cpp src/component/SourceProcessor/Extractors/NextExtractor
+        src/component/SourceProcessor/Extractors/CallsTExtractor.cpp 
+        src/component/SourceProcessor/Extractors/CallsTExtractor.h
         )
 
 

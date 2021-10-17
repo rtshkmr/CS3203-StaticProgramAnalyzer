@@ -1,61 +1,58 @@
 #include "Types.h"
+#include <unordered_map>
+
+static std::unordered_map<std::string, RelRef> _relref_map = {{"ModifiesP", RelRef::kModifiesP},
+                                                              {"ModifiesS", RelRef::kModifiesS},
+                                                              {"UsesP", RelRef::kUsesP},
+                                                              {"UsesS", RelRef::kUsesS},
+                                                              {"Calls", RelRef::kCalls},
+                                                              {"Calls*", RelRef::kCallsT},
+                                                              {"Parent", RelRef::kParent},
+                                                              {"Parent*", RelRef::kParentT},
+                                                              {"Follows", RelRef::kFollows},
+                                                              {"Follows*", RelRef::kFollowsT},
+                                                              {"Next", RelRef::kNext},
+                                                              {"Next*", RelRef::kNextT},
+                                                              {"Affects", RelRef::kAffects},
+                                                              {"Affects*", RelRef::kAffectsT}};
 
 RelRef GetRelRef(std::string reference) {
-  if (reference == "ModifiesP") {
-    return RelRef::kModifiesP;
-  } else if (reference == "ModifiesS") {
-    return RelRef::kModifiesS;
-  } else if (reference == "UsesP") {
-    return RelRef::kUsesP;
-  } else if (reference == "UsesS") {
-    return RelRef::kUsesS;
-  } else if (reference == "Calls") {
-    return RelRef::kCalls;
-  } else if (reference == "Calls*") {
-    return RelRef::kCallsT;
-  } else if (reference == "Parent") {
-    return RelRef::kParent;
-  } else if (reference == "Parent*") {
-    return RelRef::kParentT;
-  } else if (reference == "Follows") {
-    return RelRef::kFollows;
-  } else if (reference == "Follows*") {
-    return RelRef::kFollowsT;
-  } else if (reference == "Next") {
-    return RelRef::kNext;
-  } else if (reference == "Next*") {
-    return RelRef::kNextT;
-  } else if (reference == "Affects") {
-    return RelRef::kAffects;
-  } else if (reference == "Affects*") {
-    return RelRef::kAffectsT;
+  std::unordered_map<std::string, RelRef>::const_iterator iter = _relref_map.find(reference);
+  if (iter != _relref_map.end()) {
+    return iter->second;
   }
   return RelRef::kInvalid;
 }
 
-DesignEntity GetDesignEntity(std::string reference) {
-  if (reference == "stmt") {
-    return DesignEntity::kStmt;
-  } else if (reference == "read") {
-    return DesignEntity::kRead;
-  } else if (reference == "print") {
-    return DesignEntity::kPrint;
-  } else if (reference == "call") {
-    return DesignEntity::kCall;
-  } else if (reference == "while") {
-    return DesignEntity::kWhile;
-  } else if (reference == "if") {
-    return DesignEntity::kIf;
-  } else if (reference == "assign") {
-    return DesignEntity::kAssign;
-  } else if (reference == "variable") {
-    return DesignEntity::kVariable;
-  } else if (reference == "constant") {
-    return DesignEntity::kConstant;
-  } else if (reference == "procedure") {
-    return DesignEntity::kProcedure;
+static std::unordered_map<std::string, Attribute> _attribute_map = {{"procName", Attribute::kProcName},
+                                                                    {"varName", Attribute::kProcName},
+                                                                    {"value", Attribute::kProcName},
+                                                                    {"stmt#", Attribute::kStmtNumber}};
+Attribute GetAttribute(std::string attr_string) {
+  std::unordered_map<std::string, Attribute>::const_iterator iter = _attribute_map.find(attr_string);
+  if (iter != _attribute_map.end()) {
+    return iter->second;
   }
+  return Attribute::kInvalid;
+}
 
+static std::unordered_map<std::string, DesignEntity> _de_map = {{"stmt", DesignEntity::kStmt},
+                                                          {"read", DesignEntity::kRead},
+                                                          {"print", DesignEntity::kPrint},
+                                                          {"call", DesignEntity::kCall},
+                                                          {"while", DesignEntity::kWhile},
+                                                          {"if", DesignEntity::kIf},
+                                                          {"assign", DesignEntity::kAssign},
+                                                          {"variable", DesignEntity::kVariable},
+                                                          {"constant", DesignEntity::kConstant},
+                                                          {"procedure", DesignEntity::kProcedure},
+                                                          {"prog_line", DesignEntity::kProgLine}};
+
+DesignEntity GetDesignEntity(std::string reference) {
+  std::unordered_map<std::string, DesignEntity>::const_iterator iter = _de_map.find(reference);
+  if (iter != _de_map.end()) {
+    return iter->second;
+  }
   return DesignEntity::kInvalid;
 }
 

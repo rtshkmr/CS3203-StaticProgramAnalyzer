@@ -104,7 +104,7 @@ class AssignEntity : public Statement {
 
   AssignmentExpression* GetAssignmentExpr();
 
-  std::vector<Variable*> GetExpressionVariables();
+  std::vector<Variable*> GetControlVariables();
 
   std::vector<ConstantValue*> GetExpressionConstants();
 };

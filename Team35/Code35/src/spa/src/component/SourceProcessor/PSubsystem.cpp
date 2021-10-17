@@ -503,7 +503,7 @@ void PSubsystem::HandleAssignStmt(Entity* entity) {
     deliverable_->AddModifiesRelationship(current_node_, assign_entity->GetVariable());  //container level
 
   // todo: add these variables into the respective sets in cluster/block
-  for (Variable* v: assign_entity->GetExpressionVariables()) {
+  for (Variable* v: assign_entity->GetControlVariables()) {
     deliverable_->AddUsesRelationship(assign_entity, v);
     deliverable_->AddUsesRelationship(current_procedure_, v); //procedure level
     if (current_procedure_ != current_node_)
@@ -515,7 +515,7 @@ void PSubsystem::HandleCallStmt(Entity* entity) {
   CallEntity* call_entity = dynamic_cast<CallEntity*>(entity);
   assert(call_entity);
   deliverable_->AddCallEntity(call_entity);
-  //TODO: cater for cross procedure call modifies and uses
+  deliverable_->AddCallsRelationship(current_procedure_, call_entity->GetProcedure());
 }
 
 void PSubsystem::HandlePrintStmt(Entity* entity) {
