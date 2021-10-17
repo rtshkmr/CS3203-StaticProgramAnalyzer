@@ -50,6 +50,7 @@ jobs:
       run:  cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target autotester -- -j 8
     
     - name: Run AutoTester - Basic
+      if: always()
       run: | 
         cp -r ${{github.workspace}}/Team35/Tests35 ${{env.working-directory}}/build/src/autotester
         cd ${{env.working-directory}}/build/src/autotester/Tests35/simple_lib/basic
@@ -57,12 +58,14 @@ jobs:
         ./run_autotester_suite.sh
     
     - name: Run AutoTester - Advanced
+      if: always()
       run: | 
         cd ${{env.working-directory}}/build/src/autotester/Tests35/simple_lib/adv
         chmod +x ./run_autotester_suite.sh
         ./run_autotester_suite.sh
         
     - name: Run AutoTester - Throws
+      if: always()
       run: | 
         cd ${{env.working-directory}}/build/src/autotester/Tests35/simple_lib/throw
         chmod +x ./run_autotester_suite.sh
