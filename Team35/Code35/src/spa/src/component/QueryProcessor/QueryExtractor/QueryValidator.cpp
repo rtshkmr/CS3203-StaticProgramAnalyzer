@@ -17,7 +17,8 @@ std::set<std::pair<DesignEntity, Attribute>> valid_attrRefs = {
         {DesignEntity::kCall, Attribute::kStmtNumber},
         {DesignEntity::kWhile, Attribute::kStmtNumber},
         {DesignEntity::kIf, Attribute::kStmtNumber},
-        {DesignEntity::kAssign, Attribute::kStmtNumber}
+        {DesignEntity::kAssign, Attribute::kStmtNumber},
+        {DesignEntity::kConstant, Attribute::kValue},
 };
 
 std::set<std::tuple<RelRef, DesignEntity, DesignEntity>> valid_relref_args = {
