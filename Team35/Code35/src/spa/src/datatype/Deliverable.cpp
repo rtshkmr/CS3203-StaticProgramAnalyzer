@@ -297,6 +297,32 @@ void Deliverable::AddCallsTransitiveRelationshipForList(Procedure* p1, std::list
   }
 }
 
+void Deliverable::AddNextRelationship(Statement* s1, Statement* s2) {
+  if (next_hash_.count(s1)) {
+    std::list<Statement*>* nexts = next_hash_.find(s1)->second;
+    if (std::find(nexts->begin(), nexts->end(), s2) == nexts->end()) {
+      // add s2 if it does not exist in nexts
+      nexts->push_back(s2);
+    }
+  } else {
+    auto* list = new std::list<Statement*>();
+    list->push_back(s2);
+    next_hash_.insert(std::make_pair(s1, list));
+  }
+
+  if (previous_hash_.count(s2)) {
+    std::list<Statement*>* previous = previous_hash_.find(s2)->second;
+    if (std::find(previous->begin(), previous->end(), s1) == previous->end()) {
+      // add s1 if it does not exist in previous
+      previous->push_back(s1);
+    }
+  } else {
+    auto* list = new std::list<Statement*>();
+    list->push_back(s1);
+    previous_hash_.insert(std::make_pair(s2, list));
+  }
+}
+
 void Deliverable::SetProgram(Program* program) {
   this->program_ = program;
 }
@@ -316,7 +342,7 @@ std::list<ConstantValue*>* Deliverable::GetConstantValueList() {
   return & const_list_;
 }
 
-std::list<Statement*>* Deliverable::GetStatementList() {
+std::vector<Statement*>* Deliverable::GetStatementList() {
   return & stmt_list_;
 }
 

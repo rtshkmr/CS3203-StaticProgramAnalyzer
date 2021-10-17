@@ -13,6 +13,7 @@ class TestUtils {
  public:
   std::vector<std::string> GetBasicSourceLines();
 
+  static bool AreListsEqual(std::list<Statement*> as, std::list<Statement*> bs);
   static bool AreListsEqual(std::list<Procedure*> a, std::list<Procedure*> b);
 };
 

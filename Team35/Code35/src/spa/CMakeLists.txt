@@ -46,7 +46,7 @@ add_library(spa ${srcs} ${headers}
         src/util/Logger.cpp src/util/Logger.h
         src/util/util.h
         src/util/TimeUtil.cpp src/util/TimeUtil.h
-        src/util/PKBStub.cpp src/util/PKBStub.h src/model/CFG.cpp src/model/CFG.h
+        src/util/PKBStub.cpp src/util/PKBStub.h src/model/CFG.cpp src/model/CFG.h src/component/SourceProcessor/Extractors/NextExtractor.cpp src/component/SourceProcessor/Extractors/NextExtractor.h
         src/component/SourceProcessor/Extractors/CallsTExtractor.cpp 
         src/component/SourceProcessor/Extractors/CallsTExtractor.h
         )

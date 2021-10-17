@@ -37,13 +37,14 @@ class Deliverable {
   void AddCallsRelationship(Procedure* p1, Procedure* p2);
   void AddCallsTransitiveRelationship(Procedure* p1, Procedure* p2);
   void AddCallsTransitiveRelationshipForList(Procedure* p1, std::list<Procedure*>* proc_list);
+  void AddNextRelationship(Statement* s1, Statement* s2);
 
   void SetProgram(Program* program);
   Program* GetProgram();
   std::list<Procedure*>* GetProcList();
   std::list<Variable*>* GetVariableList();
   std::list<ConstantValue*>* GetConstantValueList();
-  std::list<Statement*>* GetStatementList();
+  std::vector<Statement*>* GetStatementList();
   std::list<IfEntity*>* GetIfList();
   std::list<WhileEntity*>* GetWhileList();
   std::list<AssignEntity*>* GetAssignList();
@@ -58,7 +59,7 @@ class Deliverable {
   std::list<Procedure*> proc_list_;
   std::list<Variable*> var_list_;
   std::list<ConstantValue*> const_list_;
-  std::list<Statement*> stmt_list_;
+  std::vector<Statement*> stmt_list_;
   std::list<IfEntity*> if_list_;
   std::list<WhileEntity*> while_list_;
   std::list<AssignEntity*> assign_list_;
@@ -79,6 +80,7 @@ class Deliverable {
       container_modifies_hash_; //to store Modifies(x,_), where x is if, while, procedure
   std::unordered_map<Procedure*, std::list<Procedure*>*> calls_hash_; // represents a Calls(x, y) where x -> y
   std::unordered_map<Procedure*, std::list<Procedure*>*> calls_T_hash_; // represents a Calls*(x, y) where y -> x
+  std::unordered_map<Statement*, std::list<Statement*>*> next_hash_;
 
   //Relationship (Reverse) Tables
   std::unordered_map<Statement*, Statement*> followed_by_hash_;
@@ -93,6 +95,7 @@ class Deliverable {
       container_modified_by_hash_; //to store Modifies(x,_), where x is if, while, procedure
   std::unordered_map<Procedure*, std::list<Procedure*>*> called_by_hash_; // represents a Calls(x, y) where y -> x
   std::unordered_map<Procedure*, std::list<Procedure*>*> called_by_T_hash_; // represents a Calls*(x, y) where y -> x
+  std::unordered_map<Statement*, std::list<Statement*>*> previous_hash_;  // reverse of next
 
 };
 

@@ -1,4 +1,3 @@
-
 #include "TestUtils.h"
 #include <vector>
 #include <unordered_set>
@@ -23,6 +22,19 @@ std::vector<std::string> TestUtils::GetBasicSourceLines() {
 /**
  * Checks if the contents of 2 lists are equal, which may not be in the same order.
  */
+bool TestUtils::AreListsEqual(std::list<Statement*> as, std::list<Statement*> bs) {
+  for (Statement* a: as) {
+    bool found_a = false;
+    for (Statement* b: bs) {
+      found_a = found_a || a == b;
+    }
+    if (!found_a) {
+      return false;
+    }
+  }
+  return as.size() == bs.size();
+}
+
 bool TestUtils::AreListsEqual(std::list<Procedure*> a, std::list<Procedure*> b) {
   for (Procedure* a_proc: a) {
     bool found_a = false;
@@ -33,6 +45,5 @@ bool TestUtils::AreListsEqual(std::list<Procedure*> a, std::list<Procedure*> b) 
       return false;
     }
   }
-
   return a.size() == b.size();
 }

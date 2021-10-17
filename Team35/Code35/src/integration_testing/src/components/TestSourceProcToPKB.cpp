@@ -799,3 +799,11 @@ TEST_CASE("SP to PKB relationships tests") {
       CHECK(pkb->GetNameFromEntity(ContainersModifying_lastByte[0]) == "Parser");
   }
 }
+
+TEST_CASE("CFG and Next relationship tests") {
+  PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/mixed_loops2_source.txt");
+
+  SECTION("Next relationships") {
+    
+  }
+}

@@ -2,6 +2,7 @@
 #include <component/SourceProcessor/Extractors/ModifiesExtractor.h>
 #include <component/SourceProcessor/Extractors/ParentTExtractor.h>
 #include <component/SourceProcessor/Extractors/FollowsTExtractor.h>
+#include <component/SourceProcessor/Extractors/NextExtractor.h>
 #include <component/SourceProcessor/Extractors/CallsTExtractor.h>
 #include "DesignExtractor.h"
 
@@ -28,4 +29,7 @@ void DesignExtractor::ExtractDesignAbstractions() {
 
   FollowsTExtractor follows_t_extractor{};
   follows_t_extractor.Extract(deliverable_);
+
+  NextExtractor next_extractor{};
+  next_extractor.Extract(deliverable_);
 }

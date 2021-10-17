@@ -33,6 +33,12 @@ class Cluster {
   Cluster* GetPrevSiblingCluster();
   void SetParentCluster(Cluster* parent_cluster);
   virtual ~Cluster();
+
+  // only for testing
+  void SetStartEnd(int start, int end) {
+    start_ = start;
+    end_ = end;
+  };
   std::list<Cluster*> nested_clusters_;
 };
 
