@@ -75,8 +75,10 @@ jobs:
       if: always()
       run: | 
         cd ${{env.working-directory}}/build/src/autotester/Tests35/simple_lib
-        zip -v basic.zip basic/log_*.txt basic/output_*.xml basic/Team35_SPA_*.log analysis.xsl
-        zip -v adv.zip adv/log_*.txt adv/output_*.xml adv/Team35_SPA_*.log analysis.xsl
+        cp analysis.xsl basic/
+        cp analysis.xsl adv/
+        zip -v basic.zip basic/log_*.txt basic/output_*.xml basic/Team35_SPA_*.log basic/analysis.xsl
+        zip -v adv.zip adv/log_*.txt adv/output_*.xml adv/Team35_SPA_*.log adv/analysis.xsl
         
     - uses: actions/upload-artifact@v2
       if: always()
