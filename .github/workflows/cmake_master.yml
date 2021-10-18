@@ -40,9 +40,40 @@ jobs:
         cd ${{env.working-directory}}/build/src/integration_testing/
         ./integration_testing
 
-    - name: Run AutoTester 
+      
+    - name: Run AutoTester - Throws
       run: | 
         cp -r ${{github.workspace}}/Team35/Tests35 ${{env.working-directory}}/build/src/autotester
-        cd ${{env.working-directory}}/build/src/autotester/Tests35
+        cd ${{env.working-directory}}/build/src/autotester/Tests35/simple_lib/throw
+        chmod +x ./run_autotester_suite.sh
+        ./run_autotester_suite.sh
+        
+    - name: Run AutoTester - PQL_Single
+      run: | 
+        cd ${{env.working-directory}}/build/src/autotester/Tests35/simple_lib/pql_single
+        chmod +x ./run_autotester_suite.sh
+        ./run_autotester_suite.sh
+        
+    - name: Run AutoTester - PQL_Multiple
+      run: | 
+        cd ${{env.working-directory}}/build/src/autotester/Tests35/simple_lib/pql_multiple
+        chmod +x ./run_autotester_suite.sh
+        ./run_autotester_suite.sh
+    
+    - name: Run AutoTester - Basic
+      run: | 
+        cd ${{env.working-directory}}/build/src/autotester/Tests35/simple_lib/basic
+        chmod +x ./run_autotester_suite.sh
+        ./run_autotester_suite.sh
+    
+    - name: Run AutoTester - Advanced
+      run: | 
+        cd ${{env.working-directory}}/build/src/autotester/Tests35/simple_lib/adv
+        chmod +x ./run_autotester_suite.sh
+        ./run_autotester_suite.sh
+        
+    - name: Run AutoTester - Timed
+      run: | 
+        cd ${{env.working-directory}}/build/src/autotester/Tests35/simple_lib/timed
         chmod +x ./run_autotester_suite.sh
         ./run_autotester_suite.sh
