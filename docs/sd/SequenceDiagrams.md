@@ -221,39 +221,17 @@
 ### queries_overview.mmd
     sequenceDiagram
         autonumber
-        participant AutoTester
-        participant QuerySystemController
-        participant QueryExtractor
-        participant QueryEvaluator
-        participant QueryProjector
-
-        %% This sd is for per query (PQL statement) basis.
-        AutoTester ->>+ QuerySystemController: Evaluate(query, pkb)
-        QuerySystemController ->>+ QueryExtractor: ExtractQuery()
-        Note right of QueryExtractor: Ref <br/> SD_Extract_Query
-        QueryExtractor-->>-QuerySystemController: Populate query objects
-        QuerySystemController->>+QueryEvaluator: EvaluateQuery()
-        Note right of QueryEvaluator: Ref <br/> SD_Evaluate_Query
-        QueryEvaluator-->>-QuerySystemController: list<string> result_list
-        QuerySystemController->>+QueryProjector: FormatQuery(result_list)
-        QueryProjector-->>-QuerySystemController: list<string> populated_result_list
-        QuerySystemController-->>-AutoTester: list<string> populated_result_list
-        loop every item in populated_result_list
-            AutoTester->>AutoTester: add item to results
-        end
-        
-### query_extractor.mmd
-    sequenceDiagram
-        autonumber
         participant QueryExtractor
         participant QueryParser
         participant QueryTokenizer
-        participant QueryValidator
-        participant QueryOptimizer
+        participant QuerySemanticValidator
+        participant QueryGrouper
 
+        %% This sd is for per query (PQL statement) basis.
+        %% TODO: include initialiser
         QueryExtractor->>QueryTokenizer: init()
         QueryTokenizer-->>QueryExtractor: QueryTokenizer tokenizer
-        QueryExtractor->>QueryParser: init(list<Clause> clauses, list<Group> groups, list<Synonym> synonyms, Synonym target, tokenizer)
+        QueryExtractor->>QueryParser: init(vector<Clause*> clauses, list<Synonym*> synonyms, <br>vector<Synonym*> target_synonyms, tokenizer)
         QueryParser-->>QueryExtractor: QueryParser parser
         QueryExtractor->>QueryParser: parser.Parse()
         Note right of QueryParser: Calls multiple handlers according to <br> grammar rules (recursive descent)
@@ -263,15 +241,21 @@
             Note right of QueryParser: First layer of validations
             opt is relRef
                 Note right of QueryParser: Additional layer of validations
-                QueryParser->>QueryValidator: Is_Semantically_Valid_RelRef()
-                QueryValidator-->>QueryParser: Boolean b
+                QueryParser->>QuerySemanticValidator: Is_Semantically_Valid_RelRef()
+                QuerySemanticValidator-->>QueryParser: Boolean b
+            end
+            opt is attrRef
+                Note right of QueryParser: Additional layer of validations
+                QueryParser->>QuerySemanticValidator: Is_Semantically_Valid_AttrRef()
+                QuerySemanticValidator-->>QueryParser: Boolean b
             end
         end
         QueryParser-->>QueryExtractor: 
-        QueryExtractor->>QueryOptimizer: GroupClauses(clauses, groups, target)
-        QueryOptimizer-->>QueryExtractor: 
-
-### queries.mmd (deprecated)
+            QueryExtractor->>QueryExtractor: PopulateSynAdjacencyList(<br>Map<string, vector<int>* adj_list, <br>vector<Clause*> clauses)
+        Note right of QueryExtractor: Populates data structure for QueryGrouper
+        QueryExtractor->>QueryGrouper: GroupClauses(clauses, groups, target_synonyms, adj_list)
+        QueryGrouper-->>QueryExtractor: 
+    ### queries.mmd (deprecated)
 
     sequenceDiagram
         autonumber

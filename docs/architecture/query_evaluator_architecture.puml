@@ -1,0 +1,45 @@
+@startuml
+
+skinparam interface {
+  backgroundColor lavender
+  borderColor lavender
+}
+
+skinparam component {
+  FontSize 13
+  BackgroundColor<<Apache>> lavender
+  BorderColor<<Apache>> lavender
+  FontName Ariel
+  BorderColor black
+  BackgroundColor lavender
+  ArrowFontName Ariel
+  ArrowColor black
+  ArrowFontColor black
+}
+
+node "ClauseStrategy" {
+    [ClauseContext] --> [ConcreteClauseStrategy]
+}
+
+node "PKBQueryCommand" {
+    interface "PKBQueryCommand" as qc
+    qc - [ConcretePKBQueryCommands]
+    [ConcretePKBQueryCommands] --> [PKBQueryReceiver]
+}
+
+node "ClauseCommand" {
+    interface "ClauseCommand" as CC
+    CC - [ConcreteClauseCommands]
+    [ConcreteClauseCommands] --> [ClauseCommandExecutor]
+}
+
+database "PKB" {
+  [PKB_API]
+}
+
+[QueryEvaluator] <--> [ClauseContext]
+[QueryEvaluator] --> qc
+[QueryEvaluator] --> CC
+[PKBQueryReceiver] <--> [PKB_API]
+
+@enduml
