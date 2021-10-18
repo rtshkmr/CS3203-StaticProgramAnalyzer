@@ -1,28 +1,35 @@
-### queries_extractor.mmd
-    sequenceDiagram
-        autonumber
-        participant QueryExtractor
-        participant QueryParser
-        participant QueryTokenizer
-        participant QueryValidator
-        participant QueryOptimizer
+sequenceDiagram
+    autonumber
+    participant QueryExtractor
+    participant QueryParser
+    participant QueryTokenizer
+    participant QuerySemanticValidator
+    participant QueryGrouper
 
-        QueryExtractor->>QueryTokenizer: init()
-        QueryTokenizer-->>QueryExtractor: QueryTokenizer tokenizer
-        QueryExtractor->>QueryParser: init(list<Clause> clauses, list<Group> groups, list<Synonym> synonyms, Synonym target, tokenizer)
-        QueryParser-->>QueryExtractor: QueryParser parser
-        QueryExtractor->>QueryParser: parser.Parse()
-        Note right of QueryParser: Calls multiple handlers according to <br> grammar rules (recursive descent)
-        loop is expecting tokens based on grammar rules
-            QueryParser->>QueryTokenizer: GetNextToken()
-            QueryTokenizer-->>QueryParser: Token t
-            Note right of QueryParser: First layer of validations
-            opt is relRef
-                Note right of QueryParser: Additional layer of validations
-                QueryParser->>QueryValidator: Is_Semantically_Valid_RelRef()
-                QueryValidator-->>QueryParser: Boolean b
-            end
+    %% This sd is for per query (PQL statement) basis.
+    QueryExtractor->>QueryTokenizer: init()
+    QueryTokenizer-->>QueryExtractor: QueryTokenizer tokenizer
+    QueryExtractor->>QueryParser: init(vector<Clause*> clauses, list<Synonym*> synonyms, <br>vector<Synonym*> target_synonyms, tokenizer)
+    QueryParser-->>QueryExtractor: QueryParser parser
+    QueryExtractor->>QueryParser: parser.Parse()
+    Note right of QueryParser: Calls multiple handlers according to <br> grammar rules (recursive descent)
+    loop is expecting tokens based on grammar rules
+        QueryParser->>QueryTokenizer: GetNextToken()
+        QueryTokenizer-->>QueryParser: Token t
+        Note right of QueryParser: First layer of validations
+        opt is relRef
+            Note right of QueryParser: Additional layer of validations
+            QueryParser->>QuerySemanticValidator: Is_Semantically_Valid_RelRef()
+            QuerySemanticValidator-->>QueryParser: Boolean b
         end
-        QueryParser-->>QueryExtractor:
-        QueryExtractor->>QueryOptimizer: GroupClauses(clauses, groups, target)
-        QueryOptimizer-->>QueryExtractor:
+        opt is attrRef
+            Note right of QueryParser: Additional layer of validations
+            QueryParser->>QuerySemanticValidator: Is_Semantically_Valid_AttrRef()
+            QuerySemanticValidator-->>QueryParser: Boolean b
+        end
+    end
+    QueryParser-->>QueryExtractor:
+        QueryExtractor->>QueryExtractor: PopulateSynAdjacencyList(<br>Map<string, vector<int>* adj_list, <br>vector<Clause*> clauses)
+    Note right of QueryExtractor: Populates data structure for QueryGrouper
+    QueryExtractor->>QueryGrouper: GroupClauses(clauses, groups, target_synonyms, adj_list)
+    QueryGrouper-->>QueryExtractor:

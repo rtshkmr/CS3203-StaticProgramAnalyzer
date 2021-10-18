@@ -1,0 +1,17 @@
+procedure Niner {
+	niner = 999; 
+	index = 0; 
+	read index; 
+	
+	if (index < niner) then {
+		print index; 
+		read LO000OOOOO00OO0O0O0O0O0O0OOOOOOOONGMANNNNNNNNNNNNNNNNNNNN;
+		LO000OOOOO00OO0O0O0O0O0O0OOOOOOOONGMANNNNNNNNNNNNNNNNNNNN = LO000OOOOO00OO0O0O0O0O0O0OOOOOOOONGMANNNNNNNNNNNNNNNNNNNN; 
+	} else {
+		print niner; 
+		niner = Niner; 
+		Niner = Neither; 
+		read Either; 
+	}
+	Either = 1; 
+}

@@ -1,0 +1,10 @@
+procedure Two { 
+	read VariableOne;
+	print VariableOne; 
+	read vArIaBlE2; 
+	print vArIaBlE2; 
+	VariableOne = vArIaBlE2; 
+	vArIaBlE2 = some3rdVariable; 
+	print some3rdVariable;
+	SomeL0000ngASSignment = VariableOne + (vArIaBlE2 - some3rdVariable) * vArIaBlE2 / VariableOne;
+}

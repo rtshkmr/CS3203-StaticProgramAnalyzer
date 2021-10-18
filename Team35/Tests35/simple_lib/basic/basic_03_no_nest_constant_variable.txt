@@ -1,0 +1,12 @@
+procedure thRee {
+	zer0 = 0; 
+	One = 1; 
+	zer0 = One;
+	tw0 = 2; 
+	tw0 = tw0;
+	read thRee; 
+	print One; 
+	InfinityAndBeyond = 1 / 0;
+	amIinfinity = 1 / zer0; 
+	InfinityDivideInfinity = InfinityAndBeyond / amIinfinity;
+}

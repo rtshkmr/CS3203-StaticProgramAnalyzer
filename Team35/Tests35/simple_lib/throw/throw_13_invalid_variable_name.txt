@@ -1,0 +1,3 @@
+procedure InvalidVariableName {
+	x = $x; 
+}

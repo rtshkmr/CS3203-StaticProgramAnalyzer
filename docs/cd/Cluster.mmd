@@ -1,0 +1,22 @@
+classDiagram
+
+    class Cluster {
+        - start: int
+        - end: int
+    }
+
+    Cluster --> Cluster : parent_cluster
+    Cluster --> Cluster : nested_cluster
+    
+    class Block {
+        - isWhile:bool
+    }
+
+    Block --> Block : prev_block
+    Block --> Block : next_block
+
+    Cluster <|-- Block
+
+    Block <|-- ConditionalBlock
+    Block <|-- BodyBlock
+
