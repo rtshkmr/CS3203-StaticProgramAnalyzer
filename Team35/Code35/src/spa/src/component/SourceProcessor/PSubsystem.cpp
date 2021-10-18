@@ -256,6 +256,11 @@ void PSubsystem::ProcessParentNodeType(Container* current_nest) {
  * types, the parent stack should be non-empty (since we expect the statement to be nested within some kind of cluster.
  */
 void PSubsystem::HandleCloseBrace() {
+  //enforce that every stmtList must have at least 1 statement
+  if (current_node_->GetStatementList()->empty()) {
+    throw SyntaxException("Empty statement list found"); //TODO check for ELSE.empty_stmtList;
+  }
+  
   //assertion: case 1: close brace for procedure --> type = 0 & parent_stack = empty
   //           case 2: close brace for others    --> type > 0 & parent_stack ! empty
   assert((current_node_type_ != NodeType::kProcedure && !parent_stack_.empty()) ||
@@ -570,6 +575,10 @@ void PSubsystem::CheckForExistingProcedure() {
 }
 
 void PSubsystem::FiniStateChecker() {
+  if (deliverable_->stmt_list_.empty()) {
+    throw new SyntaxException("A blank simple file is encountered.");
+  }
+
   CheckForIfElseValidity(); //TODO: to put it within main handling if possible.
   CheckForExistingProcedure();
   if (!CheckForStacksEmpty()) {
