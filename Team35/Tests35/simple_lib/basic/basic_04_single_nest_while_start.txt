@@ -1,0 +1,13 @@
+procedure four {
+	while ( starting == 0 ) { 
+		Single = 1; 
+		Double = 1 + 1; 
+		Triple = 4 - 1; 
+		Quarter = 1 * 2 * 2; 
+		four = 4;
+	}
+	print Single; 
+	read Double; 
+	Fifth = print + Single / read % Double; 
+	four = Quarter;
+}

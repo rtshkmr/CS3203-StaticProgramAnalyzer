@@ -1,0 +1,37 @@
+procedure p {
+    p = p; 
+    p = p; 
+    if (p == p) then { 
+        p = p; 
+        while (p != p) { 
+            p = p; 
+            if (p == p) then { 
+                p = p + a; 
+                while (p * p == p) { 
+                    p = p; 
+                    while (p * p == P) { 
+                        p = p; 
+                        while (p * p == p) { 
+                           p = p; 
+                        }
+                    }
+                    read p; 
+                }
+            } else {
+                p = p; 
+                while (p > p) { 
+                    if (p == p) then { 
+                        print p; 
+                        while (p == p) { 
+                            p = p; 
+                        }
+                    } else {
+                        p = p; 
+                    }
+                }
+            }
+        }
+    } else {
+        p = p; 
+    }
+}

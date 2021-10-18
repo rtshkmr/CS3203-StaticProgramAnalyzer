@@ -1,0 +1,13 @@
+procedure sixx { 
+	abCd = 1234; 
+	abcd = 9876;
+	AbCd = abCd + abcd * AbCd / ABCD * 100; 
+	print WhoIsAbCd; 
+	
+	while (abcd != ABCD) {
+		Abcd = abcd; 
+		ABcd = Abcd; 
+		ABCd = ABcd;
+		ABCD = Abcd % ABcd % ABCd;
+	}
+}
