@@ -26,6 +26,11 @@ void PSubsystem::InitDataStructures() {
                     deliverable_->GetConstantValueList());
 }
 
+bool PSubsystem::CheckForStacksEmpty() {
+  return parent_stack_.empty() && follow_stack_.empty()
+          && block_stack_.empty() && cluster_stack_.empty();
+}
+
 /**
  *  Tokenizes and validates tokens (syntax validation) in a statement-level.
  * @param statement string representation of a statement
@@ -98,10 +103,6 @@ void PSubsystem::CloseProcedureBlock() {
     current_procedure_ = nullptr;
     Block* last_block = block_stack_.top();
     block_stack_.pop();
-    assert(block_stack_.empty());
-    bool is_currently_in_outermost_cluster = cluster_stack_.size() == 1;
-    assert(is_currently_in_outermost_cluster);
-
     // put the block root into the
     Cluster* outermost_cluster = cluster_stack_.top();
     if(!Block::IsExitBlock(last_block)) {
@@ -114,8 +115,6 @@ void PSubsystem::CloseProcedureBlock() {
     }
 
     cluster_stack_.pop(); // cluster_stack is now empty since the Procedure has been closed.
-    bool last_popped_equals_cluster_root = outermost_cluster == assigned_cluster_root;
-    assert(last_popped_equals_cluster_root);
   }
 }
 
@@ -269,8 +268,10 @@ void PSubsystem::HandleCloseBrace() {
   follow_stack_.pop(); //this is allowed because any stmtList must be 1..* statements. so no condition for if (...) { }
 
   if (current_node_type_ == NodeType::kProcedure) {
-    assert(parent_stack_.empty());
     CloseProcedureBlock();
+    if (!CheckForStacksEmpty()) {
+      throw new SyntaxException("Difficulty in processing procedure. This could be caused by mismatch braces.");
+    }
   } else {
     if (current_node_type_ == NodeType::kElse) { //double pop for else clause
       CloseElseBlock();
@@ -568,9 +569,16 @@ void PSubsystem::CheckForExistingProcedure() {
   }
 }
 
-Deliverable* PSubsystem::GetDeliverables() {
+void PSubsystem::FiniStateChecker() {
   CheckForIfElseValidity(); //TODO: to put it within main handling if possible.
   CheckForExistingProcedure();
+  if (!CheckForStacksEmpty()) {
+    throw new SyntaxException("Difficulty in processing simple file. This could be caused by mismatch braces.");
+  }
+}
+
+Deliverable* PSubsystem::GetDeliverables() {
+  FiniStateChecker();
   valid_state = false; //to prevent further processsing.
   return deliverable_;
 }
