@@ -65,7 +65,7 @@ Deliverable* SetUpDeliverable_Week4() {
   deliverable->AddAssignEntity(stmt3);
   deliverable->AddModifiesRelationship(stmt3, stmt3->GetVariable());
 
-  for (Variable* v: stmt3->GetExpressionVariables()) {
+  for (Variable* v: stmt3->GetControlVariables()) {
     deliverable->AddUsesRelationship(stmt3, v);
   }
 
@@ -88,7 +88,7 @@ Deliverable* SetUpDeliverable_Week4() {
   deliverable->AddAssignEntity(stmt4);
   deliverable->AddModifiesRelationship(stmt4, stmt4->GetVariable());
 
-  for (Variable* v: stmt4->GetExpressionVariables()) {
+  for (Variable* v: stmt4->GetControlVariables()) {
     deliverable->AddUsesRelationship(stmt4, v);
   }
 
@@ -111,7 +111,7 @@ Deliverable* SetUpDeliverable_Week4() {
   deliverable->AddAssignEntity(stmt5);
   deliverable->AddModifiesRelationship(stmt5, stmt5->GetVariable());
 
-  for (Variable* v: stmt5->GetExpressionVariables()) {
+  for (Variable* v: stmt5->GetControlVariables()) {
     deliverable->AddUsesRelationship(stmt5, v);
   }
 
@@ -163,7 +163,7 @@ TEST_CASE("5. Miscellaneous entity and relationship retrievals") {
 //            "read r; print p; assign a; Select p such that Follows(p, r) such that Follows(p, a)", // should get "", Get "2 instead
   };
 
-  std::vector<std::list<std::string>> answer_list = {
+  std::vector<std::vector<std::string>> answer_list = {
       {"x", "y", "z"},
       {"3", "4", "5"},
       {"1"},
@@ -179,7 +179,7 @@ TEST_CASE("5. Miscellaneous entity and relationship retrievals") {
   };
   for (int i = 0; i < query_list.size(); i++) {
     std::string* query = & query_list.at(i);
-    std::list<std::string> answer = QuerySystemController::Evaluate(query, & pkb);
+    std::vector<std::string> answer = QuerySystemController::Evaluate(query, & pkb);
     REQUIRE(answer == answer_list[i]);
   }
 }

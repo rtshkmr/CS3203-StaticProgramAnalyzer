@@ -5,7 +5,7 @@
 #include <list>
 #include "Entity.h"
 
-EntityEnum Entity::getEntityEnum() {
+EntityEnum Entity::GetEntityEnum() {
   return type;
 }
 
@@ -26,13 +26,40 @@ const ProcedureName* Procedure::GetName() {
   return procedure_name_;
 }
 
+const void Procedure::SetClusterRoot(Cluster* cluster) {
+  this->cluster_root_ = cluster;
+}
+const Cluster* Procedure::GetClusterRoot() {
+  return this->cluster_root_;
+}
+const Block* Procedure::GetBlockRoot() {
+  return this->block_root_;
+}
+const void Procedure::SetBlockRoot(Block* block_root) {
+  this->block_root_ = block_root;
+}
+
+const void Procedure::SetBlockTail(Block* block_tail) {
+  this->block_tail_ = block_tail;
+}
+
 Variable::Variable(VariableName* vName) {
-  type = EntityEnum::kNone;
+  type = EntityEnum::kVariableEntity;
   variable_name_ = vName;
 }
 
 const VariableName* Variable::GetName() {
   return variable_name_;
+}
+
+void Variable::AddStatement(Statement* stmt) {
+  EntityEnum ent = stmt->GetEntityEnum();
+  int lot = static_cast<int>(ent) - 1; // remove procedure from 0.
+  var_to_statement.at(lot).insert(stmt);
+}
+
+std::vector<std::set<Statement*>> Variable::GetStatementTable() {
+  return var_to_statement;
 }
 
 /**
@@ -45,6 +72,15 @@ std::vector<Variable*> Variable::SortVariableVector(std::vector<Variable*> var_l
   std::sort(var_list_copy.begin(), var_list_copy.end(),
             [](Variable* a, Variable* b) { return *a->GetName() < *b->GetName(); });
   return var_list_copy;
+}
+
+Constant::Constant(ConstantValue* cv) {
+    type = EntityEnum::kConstantEntity;
+    constant_value_ = cv;
+}
+
+const ConstantValue* Constant::GetValue() {
+    return constant_value_;
 }
 
 Program::Program(Procedure* p) {

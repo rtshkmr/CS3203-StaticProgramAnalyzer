@@ -6,6 +6,8 @@
 
 #include <list>
 #include <datatype/DataType.h>
+#include <set>
+#include "CFG.h"
 
 enum class EntityEnum {
   kNone = 0,
@@ -16,7 +18,9 @@ enum class EntityEnum {
   kPrintEntity = 5,
   kReadEntity = 6,
   kElseEntity = 7,
-  kProcedureEntity = 8
+  kProcedureEntity = 8,
+  kVariableEntity = 9,
+  kConstantEntity = 10
 };
 
 /**
@@ -27,7 +31,7 @@ class Entity {
   EntityEnum type;
  public:
   virtual ~Entity() {};
-  EntityEnum getEntityEnum();
+  EntityEnum GetEntityEnum();
 };
 
 class Container;
@@ -71,6 +75,8 @@ class Container {
   std::list<Statement*>* GetStatementList();
 };
 
+class Cluster;
+class Block;
 /**
  * Procedure is a derived class of Entity and Container. This class contains the name and the list of statement
  *   within this procedure. The list of statement is defined in the inherited Container abstract class.
@@ -78,10 +84,19 @@ class Container {
 class Procedure : public Entity, public Container {
  private:
   const ProcedureName* procedure_name_;
+  const Cluster* cluster_root_ = nullptr;
+  const Block* block_root_ = nullptr;
+  const Block* block_tail_ = nullptr;
  public:
   Procedure(ProcedureName* procedureName);
 
   const ProcedureName* GetName();
+
+  const void SetClusterRoot(Cluster* cluster);
+  const void SetBlockRoot(Block* block_root);
+  const void SetBlockTail(Block* block_tail);
+  const Cluster* GetClusterRoot();
+  const Block* GetBlockRoot();
 };
 
 /**
@@ -90,13 +105,31 @@ class Procedure : public Entity, public Container {
 class Variable : public Entity {
  private:
   const VariableName* variable_name_;
+  std::vector<std::set<Statement*>> var_to_statement = { {}, {}, {}, {}, {}, {} }; //If, While, Assign, Call (empty), Print, Read
  public:
   Variable(VariableName* variableName);
 
   const VariableName* GetName();
 
+  void AddStatement(Statement* stmt);
+
+  std::vector<std::set<Statement*>> GetStatementTable();
+
   static std::vector<Variable*> SortVariableVector(std::vector<Variable*> var_list);
 };
+
+/**
+ * Constant is a derived class of Entity. This class contains the value of the constant.
+ */
+class Constant : public Entity {
+ private:
+  const ConstantValue* constant_value_;
+ public:
+  Constant(ConstantValue* constantValue);
+
+  const ConstantValue* GetValue();
+};
+
 
 /**
  * Program is the root node of the AST. It contains the different Procedures found within the SIMPLE source code.

@@ -11,12 +11,12 @@ sequenceDiagram
     QuerySystemController ->>+ QueryExtractor: ExtractQuery()
     Note right of QueryExtractor: Ref <br/> SD_Extract_Query
     QueryExtractor-->>-QuerySystemController: Populate query objects
-    QuerySystemController->>+QueryEvaluator: EvaluateQuery()
+    QuerySystemController->>+QueryEvaluator: EvaluateQuery(vector<Group*> groups)
     Note right of QueryEvaluator: Ref <br/> SD_Evaluate_Query
-    QueryEvaluator-->>-QuerySystemController: list<string> result_list
-    QuerySystemController->>+QueryProjector: FormatQuery(result_list)
-    QueryProjector-->>-QuerySystemController: list<string> populated_result_list
-    QuerySystemController-->>-AutoTester: list<string> populated_result_list
+    QueryEvaluator-->>-QuerySystemController: UnformattedResultList result_list
+    QuerySystemController->>+QueryProjector: FormatQuery(UnformattedResultList)
+    QueryProjector-->>-QuerySystemController: vector<string> populated_result_list
+    QuerySystemController-->>-AutoTester: populated_result_list
     loop every item in populated_result_list
         AutoTester->>AutoTester: add item to results
     end

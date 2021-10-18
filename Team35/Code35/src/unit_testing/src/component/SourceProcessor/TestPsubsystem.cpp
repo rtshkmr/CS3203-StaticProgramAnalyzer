@@ -3,7 +3,7 @@
 
 using psub::PSubsystem;
 
-/// These test is made with assumption that Tokenizer and CreateEntities are correct. (Higher level testing)
+/// These test is made with assumption that Tokenizer and CreateEntity are correct. (Higher level testing)
 
 TEST_CASE("1.PSubsystem.Basic Single Line Creation") {
   PSubsystem p_subsystem;

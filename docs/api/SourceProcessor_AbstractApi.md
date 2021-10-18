@@ -60,7 +60,7 @@ tokenized then its syntax is validated, entity objects are created and relations
 ### EntityFactory
 **Overview**: `EntityFactory` is responsible for creating the Entity objects from the tokenized statement provided. Entity is an Abstract class.
 #### API
-1. ENTITY* CreateEntities(VECTOR\<TOKENS\> tokens)
+1. ENTITY* CreateEntity(VECTOR\<TOKENS\> tokens)
    * Description: Creates Entities based on the statement represented by the vector of tokens passed in.
 
 ### DesignExtractor

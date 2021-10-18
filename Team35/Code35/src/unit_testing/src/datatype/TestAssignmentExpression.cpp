@@ -98,6 +98,8 @@ TEST_CASE("1.DataType.AssignmentExpression") {
     REQUIRE(AssignmentExpression("a+b").CheckExist("b"));
     REQUIRE(AssignmentExpression("a+b").CheckExist("a+b"));
     REQUIRE(AssignmentExpression("x + j + z").CheckExist("z"));
+    REQUIRE(AssignmentExpression("0 + 1 + y").CheckExist("0"));
+    REQUIRE(AssignmentExpression("0 + y + x").CheckExact("0+     y  +                 x"));
     REQUIRE_FALSE(AssignmentExpression("byte").CheckExist("0"));
     REQUIRE_FALSE(AssignmentExpression("a+b").CheckExist("ab")); // do not allow blurring of variable in postfix check
 

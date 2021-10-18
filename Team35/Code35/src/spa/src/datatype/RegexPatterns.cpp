@@ -49,7 +49,7 @@ std::regex RegexPatterns::GetIntegerPatternNonTerminating() {
 }
 
 std::regex RegexPatterns::GetDesignEntityPattern() {
-  return std::regex(R"(stmt|read|print|call|while|if|assign|variable|constant|procedure)");
+  return std::regex(R"(stmt|read|print|call|while|if|assign|variable|constant|procedure|prog_line)");
 };
 
 /**
