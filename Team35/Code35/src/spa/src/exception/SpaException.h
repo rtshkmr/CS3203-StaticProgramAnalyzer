@@ -38,6 +38,7 @@ class SyntaxException : public SpaException {
 };
 
 class SemanticException : public SpaException {
+ public:
   explicit SemanticException(char const* const message) : SpaException(message) {
     std::string prefix = "[SEMANTIC EXCEPTION RAISED]: ";
     E(prefix + message);

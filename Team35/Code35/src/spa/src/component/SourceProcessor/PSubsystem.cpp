@@ -321,7 +321,7 @@ void PSubsystem::PerformNewProcedureSteps(Procedure* procedure) {
     // throw error if this name is duplicated
     for (auto const& proc: * deliverable_->GetProgram()->GetProcedureList()) {
       if (* proc->GetName() == * procedure->GetName()) { // uses the overloaded ==
-        throw SyntaxException("Encountered 2 procedures with the same name.");
+        throw SemanticException("Encountered 2 procedures with the same name.");
       }
     }
     deliverable_->GetProgram()->AddProcedure(procedure);
@@ -570,7 +570,7 @@ void PSubsystem::CheckForExistingProcedure() {
       std::equal(program_proclist_dup.begin(), program_proclist_dup.end(), del_proclist->begin(), del_proclist->end());
 
   if (!equal) {
-    throw SyntaxException("A call is made to unreferenced procedure");
+    throw SemanticException("A call is made to unreferenced procedure");
   }
 }
 

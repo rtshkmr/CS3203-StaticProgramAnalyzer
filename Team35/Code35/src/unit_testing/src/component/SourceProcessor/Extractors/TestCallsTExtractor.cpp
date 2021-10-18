@@ -135,7 +135,7 @@ TEST_CASE("1.CallsTExtractor.Extract CallsT negative tests") {
     deliverable.AddCallsRelationship(proc1, proc2);
     deliverable.AddCallsRelationship(proc2, proc1);
     CallsTExtractor calls_t_extractor{};
-    CHECK_THROWS_AS(calls_t_extractor.Extract(&deliverable), SyntaxException);
+    CHECK_THROWS_AS(calls_t_extractor.Extract(&deliverable), SemanticException);
   }
 
   SECTION("Transitive cyclic Call 1") {
@@ -151,7 +151,7 @@ TEST_CASE("1.CallsTExtractor.Extract CallsT negative tests") {
     deliverable.AddCallsRelationship(proc2, proc3);
     deliverable.AddCallsRelationship(proc3, proc1);
     CallsTExtractor calls_t_extractor{};
-    CHECK_THROWS_AS(calls_t_extractor.Extract(&deliverable), SyntaxException);
+    CHECK_THROWS_AS(calls_t_extractor.Extract(&deliverable), SemanticException);
   }
 
   SECTION("Transitive cyclic Call 2") {
@@ -175,6 +175,6 @@ TEST_CASE("1.CallsTExtractor.Extract CallsT negative tests") {
     deliverable.AddCallsRelationship(proc4, proc3);
     deliverable.AddCallsRelationship(proc5, proc2);
     CallsTExtractor calls_t_extractor{};
-    CHECK_THROWS_AS(calls_t_extractor.Extract(&deliverable), SyntaxException);
+    CHECK_THROWS_AS(calls_t_extractor.Extract(&deliverable), SemanticException);
   }
 }
