@@ -2,7 +2,7 @@
 #include <cassert>
 #include "PSubsystem.h"
 #include "Tokenizer.h"
-#include "exception/SyntaxException.h"
+#include "exception/SpaException.h"
 
 using namespace psub;
 

@@ -1,4 +1,4 @@
-#include <exception/SyntaxException.h>
+#include <exception/SpaException.h>
 #include "catch.hpp"
 #include "component/SourceProcessor/Extractors/CallsTExtractor.h"
 #include "../../../../utils/EntityUtils.h"

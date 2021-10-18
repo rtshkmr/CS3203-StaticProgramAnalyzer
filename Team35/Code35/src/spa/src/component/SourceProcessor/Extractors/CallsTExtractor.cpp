@@ -1,4 +1,4 @@
-#include <exception/SyntaxException.h>
+#include <exception/SpaException.h>
 #include "CallsTExtractor.h"
 
 /**

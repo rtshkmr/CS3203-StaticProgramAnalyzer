@@ -1,5 +1,5 @@
 #include <util/Logger.h>
-#include <exception/SyntaxException.h>
+#include <exception/SpaException.h>
 #include "SourceProcessor.h"
 #include "Parser.h"
 #include "DesignExtractor.h"
