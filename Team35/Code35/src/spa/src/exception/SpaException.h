@@ -9,12 +9,10 @@
 #include <stdexcept>
 #include <util/Logger.h>
 
-
 constexpr auto E = [](auto msg) {
   LOG
-      (spa_logger << Logger::Prettify(msg));
+  (spa_logger << Logger::Prettify(msg));
 };
-
 
 /**
  * Base class for all SPA exceptions that happen at runtime.
@@ -45,24 +43,23 @@ class SemanticException : public SpaException {
   };
 };
 
-
 //! Represents an error that occurs during parsing of PQL tokens into a Query
 class PQLParseException : public SyntaxException {
  public:
-  explicit PQLParseException(const char* msg = "") : SyntaxException(msg) {}
+  explicit PQLParseException(const std::string& msg = "") : SyntaxException(msg.c_str()) {}
 };
 
 //! Represents an error that occurs during the creation of PQL tokens
 class PQLTokenizeException : public SyntaxException {
  public:
-  explicit PQLTokenizeException(const char* msg = "") : SyntaxException(msg) {}
+  explicit PQLTokenizeException(const std::string& msg = "") : SyntaxException(msg.c_str()) {}
 };
 
 //! Represents an error that occurs during the validation of a PQL query
 class PQLValidationException : public SyntaxException {
  public:
-  explicit PQLValidationException(const char* msg = "")
-      : SyntaxException(msg) {}
+  explicit PQLValidationException(const std::string& msg = "")
+      : SyntaxException(msg.c_str()) {}
 };
 
 #endif //AUTOTESTER_SRC_UNIT_TESTING_SRC_EXCEPTION_SYNTAXEXCEPTION_H_

@@ -2,8 +2,9 @@
 #include <utility>
 #include <map>
 #include <regex>
-#include <component/QueryProcessor/types/Exceptions.h>
+// #include <component/QueryProcessor/types/Exceptions.h>
 #include <datatype/RegexPatterns.h>
+#include <exception/SpaException.h>
 
 // note: order of regex evaluation matters! always retrieve key-values based on defined insertion_order.
 std::vector<std::string> insertion_order = {"+", "-", "%", "*", "/", "STRING_QUOTE", "INTEGER", "SUCH_THAT", "PROG_LINE",
