@@ -17,7 +17,7 @@ do echo "[NOTE] Running Test $i";
 	if [ "$?" != 1 ]
 	then
 	    RESULT="1";
-		echo "[ERROR] $i did not throw any error.";
+		echo "[ERROR] $i did not throw any error; or has unhandled exceptions";
 	fi
 done
 
