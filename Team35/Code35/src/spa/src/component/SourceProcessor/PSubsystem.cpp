@@ -275,7 +275,7 @@ void PSubsystem::HandleCloseBrace() {
   if (current_node_type_ == NodeType::kProcedure) {
     CloseProcedureBlock();
     if (!CheckForStacksEmpty()) {
-      throw new SyntaxException("Difficulty in processing procedure. This could be caused by mismatch braces.");
+      throw SyntaxException("Difficulty in processing procedure. This could be caused by mismatch braces.");
     }
   } else {
     if (current_node_type_ == NodeType::kElse) { //double pop for else clause
@@ -576,13 +576,13 @@ void PSubsystem::CheckForExistingProcedure() {
 
 void PSubsystem::FiniStateChecker() {
   if (deliverable_->stmt_list_.empty()) {
-    throw new SyntaxException("A blank simple file is encountered.");
+    throw SyntaxException("A blank simple file is encountered.");
   }
 
   CheckForIfElseValidity(); //TODO: to put it within main handling if possible.
   CheckForExistingProcedure();
   if (!CheckForStacksEmpty()) {
-    throw new SyntaxException("Difficulty in processing simple file. This could be caused by mismatch braces.");
+    throw SyntaxException("Difficulty in processing simple file. This could be caused by mismatch braces.");
   }
 }
 

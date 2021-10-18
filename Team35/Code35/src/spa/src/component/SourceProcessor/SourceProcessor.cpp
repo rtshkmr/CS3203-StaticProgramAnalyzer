@@ -24,8 +24,11 @@ PKB* SourceProcessor::ProcessSourceFile(std::string file_name) {
   L("... processing source file");
   par::Parser parser;
 
+  Deliverable* deliverable;
+
   try {
     parser.Parse(file_name);
+    deliverable = parser.GetDeliverables();
   } catch (SyntaxException s) {
     std::cerr << "Syntax Error\n";
     std::cerr << s.what() << std::endl;
@@ -36,7 +39,6 @@ PKB* SourceProcessor::ProcessSourceFile(std::string file_name) {
     Terminate(std::string("Unfortunately, there was an unknown exception thrown due to an invalid SIMPLE program."));
   }
 
-  Deliverable* deliverable = parser.GetDeliverables();
   DesignExtractor design_extractor = DesignExtractor(deliverable);
   design_extractor.ExtractDesignAbstractions();
 
