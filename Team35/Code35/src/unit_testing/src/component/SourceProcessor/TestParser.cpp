@@ -8,7 +8,7 @@ bool IsCorrectRange(std::pair<int, int> range, int start, int end) {
 TEST_CASE("1.Parser.Cluster") {
   SECTION("test source 7") {
     par::Parser p = par::Parser();
-    p.Parse("./../../../../Tests35/test_source_7.txt");
+    p.Parse("./../../../../Tests35/simple_lib/basic/test_7.txt");
     Deliverable* d = p.GetDeliverables();
     Procedure* p1 = d->proc_list_.front();
     Cluster* root_cluster = const_cast<Cluster*>(p1->GetClusterRoot());
@@ -165,7 +165,7 @@ TEST_CASE("1.Parser.Cluster") {
 TEST_CASE("1.Parser.Blocks") {
   SECTION("test source 7") {
     par::Parser p = par::Parser();
-    p.Parse("./../../../../Tests35/test_source_7.txt");
+    p.Parse("./../../../../Tests35/simple_lib/basic/test_7.txt");
     Deliverable* d = p.GetDeliverables();
     Procedure* p1 = d->proc_list_.front();
     Block* root_block = const_cast<Block*>(p1->GetBlockRoot());
