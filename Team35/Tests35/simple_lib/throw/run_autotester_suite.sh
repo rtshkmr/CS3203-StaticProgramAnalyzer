@@ -14,7 +14,7 @@ do echo "[NOTE] Running Test $i";
 
 	./../../../autotester $i ../blank.txt output_$i.xml &> /dev/null;
 
-	if [ "$?" == 0 ]
+	if [ "$?" != 1 ]
 	then
 	    RESULT="1";
 		echo "[ERROR] $i did not throw any error.";
