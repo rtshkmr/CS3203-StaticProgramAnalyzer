@@ -79,6 +79,11 @@ static vector<string> invalid_program_lines = {
     R"( y = 1 == 1;)", //  idx:26
     R"(z                                                                                                   = 3)",
     R"(z                                                                                                   = 3 > 1)",
+
+    // missing braces:
+    R"(while (a == b) x = 1; )", //  idx 29
+    R"(if (x ==x) x = 1;)",
+    R"(procedure procname if(x<1) then {)",
 };
 
 /**
@@ -561,6 +566,9 @@ TEST_CASE("1.SyntaxValidator.Validator handles statement validation:") {
     SECTION("negative cases") {
       REQUIRE(CheckAgainstSampleLines(18, 25, invalid_program_lines, false));
     }
+  }
+  SECTION("handles missing braces") {
+    REQUIRE(CheckAgainstSampleLines(29, 31, invalid_program_lines, false));
   }
 }
 

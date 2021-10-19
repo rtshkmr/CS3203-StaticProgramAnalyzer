@@ -1,11 +1,11 @@
 #include "QueryParser.h"
 #include "QuerySemanticValidator.h"
-#include <component/QueryProcessor/types/Exceptions.h>
 #include <component/SourceProcessor/Tokenizer.h>
 #include <component/SourceProcessor/SyntaxValidator.h>
 #include <datatype/RegexPatterns.h>
 #include <unordered_set>
 #include <sstream>
+#include <exception/SpaException.h>
 
 /**
  * Checks that current lookahead has the same expected type. If valid, advances tokenizer to next lookahead.

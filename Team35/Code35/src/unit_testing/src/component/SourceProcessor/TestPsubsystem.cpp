@@ -14,6 +14,7 @@ TEST_CASE("1.PSubsystem.Basic Single Line Creation") {
   SECTION("Procedure Test with 1 Assign") {
     p_subsystem.ProcessStatement("procedure firstProc {");
     p_subsystem.ProcessStatement("x = x + 100;");
+    p_subsystem.ProcessStatement("}");
     Deliverable* deliverable = p_subsystem.GetDeliverables();
 
     ProcedureName pname("firstProc");

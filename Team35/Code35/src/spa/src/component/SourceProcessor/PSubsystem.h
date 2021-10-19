@@ -78,6 +78,8 @@ class PSubsystem {
   void InitInternalState(Procedure* procedure);
   void ProcessEntityAsNewProcedure(Entity* entity);
   void ProcessEntityAsStatement(Entity* entity);
+  void FiniStateChecker();
+  bool CheckForStacksEmpty();
  public:
   PSubsystem() = default;
 
