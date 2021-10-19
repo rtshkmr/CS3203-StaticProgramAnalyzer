@@ -56,8 +56,8 @@ do echo -e "${lightblue}Running Test $i{$end}";
 				echo -e "${red}#Queries = $QUERIES; #Passes = $PASSES; #Fails = $FAILS${end}";
 			else
 				echo -e "${green}#Queries = $QUERIES; #Passes = $PASSES; #Fails = $FAILS${end}";
+			fi
 		fi
-
 	fi
 done
 
