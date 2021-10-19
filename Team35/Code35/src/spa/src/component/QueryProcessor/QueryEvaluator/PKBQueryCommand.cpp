@@ -221,7 +221,7 @@ IntermediateTable * QuerySuchThatNoSynonymCommand::ExecuteQuery(Clause *clause) 
     return this->receiver->QueryPKBByValueForBoolean(pkb_rel, such_that->right_hand_side);
   } else if (such_that->right_hand_side == "_") {
     PKBRelRefs pkb_rel = GetPKBRelRef(such_that->rel_ref, true);
-    return this->receiver->QueryPKBByValueForBoolean(pkb_rel, such_that->right_hand_side);
+    return this->receiver->QueryPKBByValueForBoolean(pkb_rel, such_that->left_hand_side);
   } else {
     PKBRelRefs pkb_rel = GetPKBRelRef(such_that->rel_ref, true);
     return this->receiver->QueryPKBByValueForBoolean(pkb_rel, such_that->left_hand_side, such_that->right_hand_side);
