@@ -19,11 +19,11 @@ purple="\033[0;35m"
 lightblue="\033[0;36m"
 
 TOTAL=$(ls *.txt | wc -l);
-echo "[NOTE] Running a grand total of $TOTAL tests..."; 
+echo "${purple}Running a grand total of $TOTAL tests...${end}"; 
 RESULT="0";
 
 for i in $(ls *.txt);
-do echo "[NOTE] Running Test $i"; 
+do echo "${lightblue}Running Test $i{$end}"; 
 
 	if [ -f "queries/$i" ]
 	then
@@ -43,20 +43,20 @@ do echo "[NOTE] Running Test $i";
 		PASSES=$(grep -o '<passed/>' $FILENAME | wc -l);
 		FAILS=$(grep -o '</failed>' $FILENAME | wc -l);
 		
+		mv Team35_SPA.log Team35_SPA_$i.log # to rename Logger file for each run.
+		
 		if [ "$QUERIES" == "0" ]
 		then
-			echo -e "${yellow}[NOTE] #Queries = $QUERIES; #Passes = $PASSES; #Fails = $FAILS${end}";
+			echo -e "${yellow}#Queries = $QUERIES; #Passes = $PASSES; #Fails = $FAILS${end}";
 		else
-			echo -e "${green}[NOTE] #Queries = $QUERIES; #Passes = $PASSES; #Fails = $FAILS${end}";
+			if [ "$QUERIES" != "$PASSES" ]
+			then
+				RESULT="2";
+				echo -e "${red}#Queries = $QUERIES; #Passes = $PASSES; #Fails = $FAILS${end}";
+			else
+				echo -e "${green}#Queries = $QUERIES; #Passes = $PASSES; #Fails = $FAILS${end}";
 		fi
-		
-		mv Team35_SPA.log Team35_SPA_$i.log # to rename Logger file for each run.
 
-		if [ "$QUERIES" != "$PASSES" ]
-		then
-			RESULT="2";
-			echo "[ERROR] $i has failing cases."; 
-		fi
 	fi
 done
 
