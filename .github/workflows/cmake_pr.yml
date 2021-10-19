@@ -38,7 +38,7 @@ jobs:
         ./unit_testing
 
     - name: Build Integration Test
-      run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target integration_testing -- -j 8
+      run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target integration_testing -- -j 4
 
     - name: Run Integration Test
       run: |
@@ -47,7 +47,7 @@ jobs:
         ./integration_testing
   
     - name: Build AutoTester # GUI is excluded
-      run:  cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target autotester -- -j 8
+      run:  cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target autotester -- -j 4
       
     - name: Run AutoTester - Throws
       if: always()
