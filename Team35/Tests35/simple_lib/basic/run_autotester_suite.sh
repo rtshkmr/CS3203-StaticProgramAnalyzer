@@ -10,6 +10,14 @@ rm output_*.xml;
 rm log_*.txt;
 rm Team35_SPA*.log;
 
+# Colors
+end="\033[0m"
+red="\033[0;31m"
+green="\033[0;32m"
+yellow="\033[0;33m"
+purple="\033[0;35m"
+lightblue="\033[0;36m"
+
 TOTAL=$(ls *.txt | wc -l);
 echo "[NOTE] Running a grand total of $TOTAL tests..."; 
 RESULT="0";
@@ -34,7 +42,14 @@ do echo "[NOTE] Running Test $i";
 		QUERIES=$(grep -o '</query>' $FILENAME | wc -l);
 		PASSES=$(grep -o '<passed/>' $FILENAME | wc -l);
 		FAILS=$(grep -o '</failed>' $FILENAME | wc -l);
-		echo "[NOTE] #Queries = $QUERIES; #Passes = $PASSES; #Fails = $FAILS" 
+		
+		if [ "$QUERIES" == "0" ]
+		then
+			echo -e "${yellow}[NOTE] #Queries = $QUERIES; #Passes = $PASSES; #Fails = $FAILS${end}";
+		else
+			echo -e "${green}[NOTE] #Queries = $QUERIES; #Passes = $PASSES; #Fails = $FAILS${end}";
+		fi
+		
 		mv Team35_SPA.log Team35_SPA_$i.log # to rename Logger file for each run.
 
 		if [ "$QUERIES" != "$PASSES" ]
