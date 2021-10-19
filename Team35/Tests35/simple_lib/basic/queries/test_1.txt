@@ -148,3 +148,28 @@ assign qwerty1; print printer;
 Select printer such that Uses(printer, "pr0cessSuccessfuI") pattern qwerty1(_, _"1"_)
 20
 5000
+31 - Errors from resubmission 
+assign a, a1; variable v; 
+Select a such that Uses (a1, v) pattern a (v, _)
+1,4,5,9,12,14,16,23
+5000
+32 - Errors from resubmission 
+read rd; variable v; assign a; 
+Select a such that Modifies(rd, v) pattern a(v,_)
+5, 16
+5000
+33 - Errors from resubmission 
+assign a, a1; variable v; 
+Select a such that Uses (a1, v) pattern a (v, _"byte"_)
+9
+5000
+34 - Errors from resubmission
+print pr; assign a; variable v; 
+Select v such that Follows(pr, a) pattern a(v, _)
+chara, psubsystem 
+5000
+35 - 33 but with none result
+assign a, a1; variable v; 
+Select a such that Uses (a1, v) pattern a (v, _"temp"_)
+none
+5000
