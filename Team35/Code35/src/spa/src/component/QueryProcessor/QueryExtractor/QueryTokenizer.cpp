@@ -2,7 +2,6 @@
 #include <utility>
 #include <map>
 #include <regex>
-// #include <component/QueryProcessor/types/Exceptions.h>
 #include <datatype/RegexPatterns.h>
 #include <exception/SpaException.h>
 

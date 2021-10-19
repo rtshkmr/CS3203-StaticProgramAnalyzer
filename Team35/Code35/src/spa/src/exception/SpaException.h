@@ -24,9 +24,6 @@ class SpaException : public std::runtime_error {
 
 };
 
-/**
- * TODO: derive Syntax and Semantic Exception classes from SpaException class
- */
 class SyntaxException : public SpaException {
  public:
   explicit SyntaxException(char const* const message) : SpaException(message) {
