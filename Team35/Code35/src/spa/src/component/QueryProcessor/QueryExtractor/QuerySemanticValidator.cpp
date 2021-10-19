@@ -121,7 +121,7 @@ bool QuerySemanticValidator::Is_Semantically_Valid_RelRef(std::string l, std::st
     lhs = QueryParser::GetSynonymInfo(l, synonyms)->GetType();
   }
   if (rhs_is_syn) {
-    rhs = QueryParser::GetSynonymInfo(l, synonyms)->GetType();
+    rhs = QueryParser::GetSynonymInfo(r, synonyms)->GetType();
   }
   if (lhs == DesignEntity::kInvalid && rhs == DesignEntity::kInvalid) {
     return true;
