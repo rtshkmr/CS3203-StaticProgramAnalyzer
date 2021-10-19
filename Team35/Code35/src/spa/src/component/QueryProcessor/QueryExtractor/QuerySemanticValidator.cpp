@@ -115,6 +115,7 @@ bool QuerySemanticValidator::IsValid_LhsStmt_RhsStmt(std::string l, std::string 
 bool QuerySemanticValidator::Is_Semantically_Valid_RelRef(std::string l, std::string r, RelRef rf, bool lhs_is_syn,
                                                   bool rhs_is_syn, std::list<Synonym*>* synonyms) {
   // if neither lhs nor rhs is a synonym, no semantic validation is needed
+// note that the same kInvalid enum is used differently by the front and the backend code. 
   DesignEntity lhs = DesignEntity::kInvalid;
   DesignEntity rhs = DesignEntity::kInvalid;
   if (lhs_is_syn) {
