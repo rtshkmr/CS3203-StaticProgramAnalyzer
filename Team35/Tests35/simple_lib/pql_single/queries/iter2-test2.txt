@@ -359,7 +359,7 @@ Select if1 pattern if1(pr1, _, _)
 none
 5000
 73 - If pattern, prog line as the control const, INVALID first arg
-stmt s1; if if1; variable v1; procedure pr1; prog_line pl; 
+stmt s1; if if1; variable v1; procedure pr1; prog_line pl;
 Select if1 pattern if1(pl, _, _)
 none
 5000
