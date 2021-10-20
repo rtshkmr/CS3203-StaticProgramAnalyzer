@@ -61,6 +61,8 @@ enum class PKBRelRefs {
   kModifiedByContainer,
   kCalls,
   kCalledBy,
+  kCallsT,
+  kCalledByT,
   kUses,
   kUsedBy,
   kModifies,

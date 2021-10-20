@@ -43,6 +43,10 @@ void PKB::PopulateDataStructures(Deliverable d) {
       PKBRelRefs::kUsedByS,
       PKBRelRefs::kModifiesStatement,
       PKBRelRefs::kModifiedByStatement,
+      PKBRelRefs::kCalls,
+      PKBRelRefs::kCalledBy,
+      PKBRelRefs::kCallsT,
+      PKBRelRefs::kCalledByT
   };
 
   std::vector<std::unordered_map<Entity*, std::list<Entity*>*>*> non_proc_hashes;
@@ -55,6 +59,11 @@ void PKB::PopulateDataStructures(Deliverable d) {
   non_proc_hashes.push_back(reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.used_by_hash_));
   non_proc_hashes.push_back(reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.modifies_hash_));
   non_proc_hashes.push_back(reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.modified_by_hash_));
+  non_proc_hashes.push_back(reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.calls_hash_));
+  non_proc_hashes.push_back(reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.called_by_hash_));
+  non_proc_hashes.push_back(reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.calls_T_hash_));
+  non_proc_hashes.push_back(reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.called_by_T_hash_));
+
 
   for (int i = 0; i < non_proc_hashes.size(); i++) {
       PopulateRelationship(non_proc_hashes.at(i), non_proc_refs_to_populate.at(i));

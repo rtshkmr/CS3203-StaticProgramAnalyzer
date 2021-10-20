@@ -1,38 +1,28 @@
-procedure procedure {
-    if = 0;
-    read while;
+procedure First {
+    read x;
+    read z;
+    call Second;
+}
 
-    if (while != 0) then {
-       chara = 0;
-       procedure = 0;
-
-       while (while > 1) {
-           read procedure;
-           if (procedure != 99) then {
-               chara = chara + procedure;
-               lastByte = procedure;
-               if (procedure == 88) then {
-                   if = if + 1;
-                   print ProcessStmtNow;
-                   chara = 0;
-               } else {
-                   print cont1nueREad1ng;
-               }
-               while = while - 1;
-           } else {
-               print print;
-           }
-       }
-    } else {
-        print InvalidFileName;
+procedure Second {
+    x = 0;
+    i = 5;
+    while (i != 0) {
+        x = x + 2 * y;
+        call Third;
+        i = i - 1;
     }
-
-    if (while == 1) then {
-        print pr0cessSuccessfuI;
+    if (x == 1) then {
+       x = x+1;
     } else {
-        print print;
+        z = 1;
     }
-
-    print if;
-    if = 0;
+    z = z + x + i;
+    y = z + 2;
+    x = x * y + z;
+}
+procedure Third {
+    z = 5;
+    v = z;
+    print v;
 }
