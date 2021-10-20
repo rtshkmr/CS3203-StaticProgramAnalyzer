@@ -1,0 +1,8 @@
+procedure WhileExprOnly{
+   if(y = y + 1) then {
+      x = 1;
+   } else {
+
+        y = 1;
+   }
+}
