@@ -1,160 +1,160 @@
 1 - Self call syntax error
-stmt s1; assign a1; calls c1; procedure pr1, pr2; prog_line pl;
+stmt s1; assign a1; call c1; procedure pr1, pr2; prog_line pl;
 Select pr1 such that Calls(pr1, pr1)
 none
 5000
 1 - Normal Call with first var returned
-stmt s1; assign a1; calls c1; procedure pr1, pr2;
+stmt s1; assign a1; call c1; procedure pr1, pr2;
 Select pr1 such that Calls(pr1, pr2)
 First, Second
 5000
 1 - Invalid call with assign in first var
-stmt s1; assign a1; calls c1; procedure pr1, pr2;
+stmt s1; assign a1; call c1; procedure pr1, pr2;
 Select pr1 such that Calls(a1, pr1)
 none
 5000
 1 - Invalid call with call stmt in first var
-stmt s1; assign a1; calls c1; procedure pr1, pr2;
+stmt s1; assign a1; call c1; procedure pr1, pr2;
 Select pr1 such that Calls(c1, pr1)
 none
 5000
 1 - Invalid call with pl not defined
-stmt s1; assign a1; calls c1; procedure pr1, pr2;
+stmt s1; assign a1; call c1; procedure pr1, pr2;
 Select pr1 such that Calls(pr1, pl)
 none
 5000
 1 - Double wildcard Call
-stmt s1; assign a1; calls c1; procedure pr1, pr2;
+stmt s1; assign a1; call c1; procedure pr1, pr2;
 Select pr1 such that Calls(_, _)
 First, Second, Third
 5000
 1 - Left wildcard, right syn call
-stmt s1; assign a1; calls c1; procedure pr1, pr2;
+stmt s1; assign a1; call c1; procedure pr1, pr2;
 Select pr1 such that Calls(_, pr1)
 Second, Third
 5000
 1 - Left syn, right wildcard call
-stmt s1; assign a1; calls c1; procedure pr1, pr2;
+stmt s1; assign a1; call c1; procedure pr1, pr2;
 Select pr1 such that Calls(pr1, _)
 First, Second
 5000
 1 - Left syn, right IDENT call
-stmt s1; assign a1; calls c1; procedure pr1, pr2;
+stmt s1; assign a1; call c1; procedure pr1, pr2;
 Select pr1 such that Calls(pr1, "Third")
 Second
 5000
 1 - Left IDENT, right syn call
-stmt s1; assign a1; calls c1; procedure pr1, pr2;
+stmt s1; assign a1; call c1; procedure pr1, pr2;
 Select pr1 such that Calls("Second", pr2)
 First, Second, Third
 5000
 1 - Left, Right IDENT call
-stmt s1; assign a1; calls c1; procedure pr1, pr2;
+stmt s1; assign a1; call c1; procedure pr1, pr2;
 Select pr1 such that Calls("First", "Second")
 First, Second, Third
 5000
 1 - Left syn, right IDENT non matching proc call
-stmt s1; assign a1; calls c1; procedure pr1, pr2;
+stmt s1; assign a1; call c1; procedure pr1, pr2;
 Select pr1 such that Calls(pr1, "9")
 none
 5000
 1 - Left syn, right invalid IDENT
-stmt s1; assign a1; calls c1; procedure pr1, pr2;
+stmt s1; assign a1; call c1; procedure pr1, pr2;
 Select pr1 such that Calls(pr1, "")
 none
 5000
 1 - Left syn, right IDENT, BOOLEAN call
-stmt s1; assign a1; calls c1; procedure pr1, pr2;
+stmt s1; assign a1; call c1; procedure pr1, pr2;
 Select pr1 such that Calls(pr2, "NotAProg")
 none
 5000
 1 - Left IDENT, right wildcard call
-stmt s1; assign a1; calls c1; procedure pr1, pr2;
+stmt s1; assign a1; call c1; procedure pr1, pr2;
 Select pr1 such that Calls("Second", _)
 First, Second, Third
 5000
 1 - Left wildcard, Right IDENT call for no incoming proc
-stmt s1; assign a1; calls c1; procedure pr1, pr2;
+stmt s1; assign a1; call c1; procedure pr1, pr2;
 Select pr1 such that Calls(_, "First")
 none
 5000
 1 - Self call syntax error
-stmt s1; assign a1; calls c1; procedure pr1, pr2; prog_line pl;
+stmt s1; assign a1; call c1; procedure pr1, pr2; prog_line pl;
 Select pr1 such that Calls*(pr1, pr1)
 none
 5000
 1 - Left, Right syn callT
-stmt s1; assign a1; calls c1; procedure pr1, pr2;
+stmt s1; assign a1; call c1; procedure pr1, pr2;
 Select pr1 such that Calls*(pr1, pr2)
 First, Second
 5000
 1 - Left invalid arg callT
-stmt s1; assign a1; calls c1; procedure pr1, pr2;
+stmt s1; assign a1; call c1; procedure pr1, pr2;
 Select pr1 such that Calls*(a1, pr1)
 none
 5000
 1 - Left invalid arg callT
-stmt s1; assign a1; calls c1; procedure pr1, pr2;
+stmt s1; assign a1; call c1; procedure pr1, pr2;
 Select pr2 such that Calls*(c1, pr1)
 none
 5000
 1 - Right non declared var
-stmt s1; assign a1; calls c1; procedure pr1, pr2;
+stmt s1; assign a1; call c1; procedure pr1, pr2;
 Select pr1 such that Calls*(pr1, pl)
 none
 5000
 1 - Double wildcard callT, BOOLEAN,
-stmt s1; assign a1; calls c1; procedure pr1, pr2;
+stmt s1; assign a1; call c1; procedure pr1, pr2;
 Select pr1 such that Calls*(_, _)
 First, Second, Third
 5000
 1 - Left wildcard, Right syn, callT
-stmt s1; assign a1; calls c1; procedure pr1, pr2;
+stmt s1; assign a1; call c1; procedure pr1, pr2;
 Select pr1 such that Calls*(_, pr1)
 Second, Third
 5000
 1 - Left syn, Right wildcard, callT
-stmt s1; assign a1; calls c1; procedure pr1, pr2;
+stmt s1; assign a1; call c1; procedure pr1, pr2;
 Select pr1 such that Calls*(pr1, _)
 First, Second
 5000
 1 - Left syn, Right IDENT, callT
-stmt s1; assign a1; calls c1; procedure pr1, pr2;
+stmt s1; assign a1; call c1; procedure pr1, pr2;
 Select pr1 such that Calls*(pr1, "Third")
 First, Second
 5000
 1 - Left IDENT, right syn, callT, BOOLEAN
-stmt s1; assign a1; calls c1; procedure pr1, pr2;
+stmt s1; assign a1; call c1; procedure pr1, pr2;
 Select pr1 such that Calls*("Second", pr2)
 First, Second, Third
 5000
 1 - Left, Right IDENT callT, BOOLEAN
-stmt s1; assign a1; calls c1; procedure pr1, pr2;
+stmt s1; assign a1; call c1; procedure pr1, pr2;
 Select pr1 such that Calls*("First", "Third")
 First, Second, Third
 5000
 1 - Left syn, Right IDENT no proc callT
-stmt s1; assign a1; calls c1; procedure pr1, pr2;
+stmt s1; assign a1; call c1; procedure pr1, pr2;
 Select pr1 such that Calls*(pr1, "9")
 none
 5000
 1 - Left syn, Right IDENT empty INVALID
-stmt s1; assign a1; calls c1; procedure pr1, pr2;
+stmt s1; assign a1; call c1; procedure pr1, pr2;
 Select pr1 such that Calls*(pr1, "")
 none
 5000
 1 - Left syn, Right IDENT no proc callT
-stmt s1; assign a1; calls c1; procedure pr1, pr2;
+stmt s1; assign a1; call c1; procedure pr1, pr2;
 Select pr2 such that Calls*(pr1, "NotAProg")
 none
 5000
 1 - Left IDENT, right wildcard, callT, BOOLEAN
-stmt s1; assign a1; calls c1; procedure pr1, pr2;
+stmt s1; assign a1; call c1; procedure pr1, pr2;
 Select pr1 such that Calls*("First", _)
 First, Second, Third
 5000
 1 - Left wildcard, Right IDENT, callT, BOOLEAN
-stmt s1; assign a1; calls c1; procedure pr1, pr2;
+stmt s1; assign a1; call c1; procedure pr1, pr2;
 Select pr1 such that Calls*(_, "Third")
 First, Second, Third
 5000
