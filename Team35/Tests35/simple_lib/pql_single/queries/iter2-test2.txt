@@ -278,128 +278,106 @@ stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2, call c
 Select s1 such that Next(n1, n2)
 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
 5000
-
 1 - Valid Next clause progline after statement returns all statments except last statements for each procedure
 stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2, call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(s1, n1)
 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17
 5000
-
 1 - Next as BOOLEAN (false), Wildcard for next of last statement in a procedure
 stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2, call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(3, _)
 none
 5000
-
 1 - Valid Next as BOOLEAN (false), wildcard before first statement in a procedure
 stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2, call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(_, 4)
 none
 5000
-
 1 - While statement with variable passed as control variable, valid input
 stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
 Select pr1 pattern w1(v1, _)
 Second
 5000
-
 1 - While pattern with statement passed as control variable returns none
 stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
 Select pr1 pattern w1(s1, _)
 none
 5000
-
 1 - Select while statement with proc name being passed as a variable name returns none
 stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
 Select pr1 pattern w1(pr1, _)
 none
 5000
-
 1 - Select while statement with control const being a valid prog_line
 stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
 Select pr1 pattern w1(pl, _)
 none
 5000
-
 1 -  While pattern wildcard, return respective procedure
 stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
 Select pr1 pattern w1(_, _)
 Second
 5000
-
 1 -  While pattern empty entRef returns none
 stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
 Select pr1 pattern w1("", _)
 none
 5000
-
 1 - While pattern non existing control constant returns none
 stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
 Select pr1 pattern w1("9", _)
 none
 5000
-
 1 - While pattern non existing control variable returns none
 stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
 Select pr1 pattern w1("x", _)
 none
 5000
-
 1 -  While pattern, non-existing control variable input returns none
 stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
 Select pr1 pattern w1("NoSuchVar", _)
 none
 5000
-
-
 1 - If pattern, existing variable as control variable
 stmt s1; if if1; variable v1; procedure pr1; prog_line pl;
 Select if1 pattern if1(v1, _, _)
 10
 5000
-
 1 - If pattern, statement as input to entRef returns none
 stmt s1; if if1; variable v1; procedure pr1; prog_line pl;
 Select if1 pattern if1(s1, _, _)
 none
 5000
-
 1 -  If pattern procedure as control variable returns none
 stmt s1; if if1; variable v1; procedure pr1; prog_line pl;
 Select if1 pattern if1(pr1, _, _)
 none
 5000
-
 1 - If pattern, prog line as the control const  #unsure
 stmt s1; if if1; variable v1; procedure pr1; prog_line pl;
 Select if1 pattern if1(pl, _, _)
 10
 5000
-
 1 - If pattern wildcard control variable returns all valid
 stmt s1; if if1; variable v1; procedure pr1; prog_line pl;
 Select if1 pattern if1(_, _, _)
 10
 5000
-
 1 - If Pattern empty IDENT returns none
 stmt s1; if if1; variable v1; procedure pr1; prog_line pl;
 Select if1 pattern if1("", _, _)
 none
 5000
-
 1 - If pattern searching for non-existing IDENT returns none
 stmt s1; if if1; variable v1; procedure pr1; prog_line pl;
 Select if1 pattern if1("9", _, _)
 none
 5000
-
 1 - If pattern check existing pattern variable
 stmt s1; if if1; variable v1; procedure pr1; prog_line pl;
 Select if1 pattern if1("x", _, _)
 10
 5000
-
 1 - If pattern checking for non-existent control variable
 stmt s1; if if1; variable v1; procedure pr1; prog_line pl;
 Select if1 pattern if1("NoSuchVar", _, _)
