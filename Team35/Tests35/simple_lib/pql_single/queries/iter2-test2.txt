@@ -171,12 +171,12 @@ Select s1 such that Next(s1, a1)
 1 - CFG Next from assign syn to stmt syn
 stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2; procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(a1, s1)
-5,6,8,13,14,15,17
+5,6,8,13,14,15,17,18
 5000
-1 - CFG Next from assign syn to assign syn, BOOLEAN
+1 - CFG Next from assign syn to assign syn (self), BOOLEAN
 stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2; procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(a1, a1)
-1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
+none
 5000
 1 - CFG Next stmt syn to read syn
 stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2; procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
@@ -296,7 +296,7 @@ none
 1 - While statement with variable passed as control variable, valid input
 stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
 Select pr1 pattern w1(v1, _)
-Second
+First,Second,Third
 5000
 1 - While pattern with statement passed as control variable returns none
 stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
@@ -353,10 +353,10 @@ stmt s1; if if1; variable v1; procedure pr1; prog_line pl;
 Select if1 pattern if1(pr1, _, _)
 none
 5000
-1 - If pattern, prog line as the control const  #unsure
-stmt s1; if if1; variable v1; procedure pr1; prog_line pl;
+1 - If pattern, prog line as the control const, INVALID first arg
+stmt s1; if if1; variable v1; procedure pr1; prog_line pl; 
 Select if1 pattern if1(pl, _, _)
-10
+none
 5000
 1 - If pattern wildcard control variable returns all valid
 stmt s1; if if1; variable v1; procedure pr1; prog_line pl;
