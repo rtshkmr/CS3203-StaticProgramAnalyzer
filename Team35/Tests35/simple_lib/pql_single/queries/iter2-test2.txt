@@ -159,137 +159,137 @@ Select pr1 such that Calls*(_, "Third")
 First, Second, Third
 5000
 1 - Self CFG Next not possible
-stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2, call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(s1, s1)
 none
 5000
 1 - CFG Next from stmt syn to assign syn
-stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2, call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(s1, a1)
 4,6,8,10,11,12,13,14,16
 5000
 1 - CFG Next from assign syn to stmt syn
-stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2, call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(a1, s1)
 5,6,8,13,14,15,17
 5000
 1 - CFG Next from assign syn to assign syn, BOOLEAN
-stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2, call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(a1, a1)
 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
 5000
 1 - CFG Next stmt syn to read syn
-stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2, call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(s1, r1)
 1
 5000
 1 - CFG Next stmt syn to print syn
-stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2, call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(s1, p1)
 17
 5000
 1 - CFG Next stmt syn to proc syn
-stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2, call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(s1, proc1)
 none
 5000
 1 - CFG Next stmt syn to call syn
-stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2, call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(s1, c1)
 2,7
 5000
 1 - CFG Next stmt syn to while syn
-stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2, call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(s1, w1)
 5,9
 5000
 1 - CFG Next stmt syn to if syn
-stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2, call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(s1, if1)
 6
 5000
 1 - CFG Next stmt syn to prog_line syn
-stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2, call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(s1, n1)
 1,2,4,5,6,7,8,9,10,11,12,13,14,16,17
 5000
 1 - CFG Next proc syn not valid to stmt syn
-stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2, call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(proc1, s1)
 none
 5000
 1 - CFG Next assign syn to read syn
-stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2, call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(a1, r1)
 none
 5000
 1 - CFG Next read syn to proc syn invalid
-stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2, call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(r1, proc1)
 none
 5000
 1 - CFG Next left wildcard to stmt syn
-stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2, call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(_, s1)
 2,3,5,6,7,8,9,10,11,12,13,14,15,17,18
 5000
 1 - CFG Next Double wildcard, BOOLEAN
-stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2, call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(_, _)
 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
 5000
 1 - CFG Next Left stmt syn to Right wildcard
-stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2, call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(s1, _)
 1,2,4,5,6,7,8,9,10,11,12,13,14,16,17
 5000
 1 - CFG Next Left stmt syn to right INVALID IDENT
-stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2, call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(s1, -1)
 none
 5000
 1 - CFG Next Left stmt syn to right INVALID IDENT
-stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2, call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(s1, 0)
 none
 5000
 1 - CFG Next Left IDENT to right stmt syn, no output
-stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2, call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(3, s1)
 none
 5000
 1 - CFG Next Left IDENT to right stmt syn, have output
-stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2, call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(1, s1)
 2
 5000
 1 - CFG Next Left IDENT to right IDENT, no output
-stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2, call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(3, 7)
 none
 5000
 1 - CFG Next Left IDENT to right IDENT, while output
-stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2, call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(9,6)
 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
 5000
 1 - Next clause as BOOLEAN (true)
-stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2, call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(n1, n2)
 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
 5000
 1 - Valid Next clause progline after statement returns all statments except last statements for each procedure
-stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2, call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(s1, n1)
 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17
 5000
 1 - Next as BOOLEAN (false), Wildcard for next of last statement in a procedure
-stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2, call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(3, _)
 none
 5000
 1 - Valid Next as BOOLEAN (false), wildcard before first statement in a procedure
-stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2, call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2, procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
 Select s1 such that Next(_, 4)
 none
 5000
