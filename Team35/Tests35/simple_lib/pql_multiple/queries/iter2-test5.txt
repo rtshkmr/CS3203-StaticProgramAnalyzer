@@ -51,7 +51,7 @@ Select a1 such that Uses(a1, v1) pattern a1(v1, _"i"_)
 11 - Mix: pattern and modifies
 stmt s1; assign a1; if if1; variable v1; procedure pr1;
 Select a1 pattern a1(v1, _"i"_) such that Modifies(a1, v1) pattern a1(v1, _"i"_)
-9
+9, 13
 5000
 12 - Mix while and uses as boolean, returns all assignments
 stmt s1; assign a1; while w1; if if1; variable v1; procedure pr1; prog_line pl;
