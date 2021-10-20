@@ -253,6 +253,9 @@ void PKB::PopulateReadEntities(const std::list<ReadEntity*>& read_list) {
 }
 
 std::vector<Entity*> PKB::GetDesignEntities(DesignEntity de) {
+    if (de == DesignEntity::kProgLine) {
+      de = DesignEntity::kStmt;
+    }
     return type_to_entity_map_[de];
 }
 
