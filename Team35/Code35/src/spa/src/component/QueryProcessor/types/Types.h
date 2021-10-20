@@ -66,7 +66,9 @@ enum class PKBRelRefs {
   kUses,
   kUsedBy,
   kModifies,
-  kModifiedBy
+  kModifiedBy,
+  kNext,
+  kPrevious
 };
 
 const std::array<PKBRelRefs, 16> pkb_rel_refs = {
