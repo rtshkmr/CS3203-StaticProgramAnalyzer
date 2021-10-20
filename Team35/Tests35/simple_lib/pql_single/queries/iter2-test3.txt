@@ -41,12 +41,12 @@ none
 9 - Select tuple (1) with target synonym in clause
 stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
 Select <w1, s1> such that Follows(s1, 2)
-6 2
+6 1
 5000
 10 - Select tuple (1) with target synonym in clause
 stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
 Select <s1, w1> such that Follows(s1, 2)
-2 6
+1 6
 5000
 11 - Select tuple (multiple) with target synonym in clause
 stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
