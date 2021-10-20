@@ -46,7 +46,9 @@ void PKB::PopulateDataStructures(Deliverable d) {
       PKBRelRefs::kCalls,
       PKBRelRefs::kCalledBy,
       PKBRelRefs::kCallsT,
-      PKBRelRefs::kCalledByT
+      PKBRelRefs::kCalledByT,
+      PKBRelRefs::kNext,
+      PKBRelRefs::kPrevious,
   };
 
   std::vector<std::unordered_map<Entity*, std::list<Entity*>*>*> non_proc_hashes;
@@ -63,6 +65,8 @@ void PKB::PopulateDataStructures(Deliverable d) {
   non_proc_hashes.push_back(reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.called_by_hash_));
   non_proc_hashes.push_back(reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.calls_T_hash_));
   non_proc_hashes.push_back(reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.called_by_T_hash_));
+  non_proc_hashes.push_back(reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.next_hash_));
+  non_proc_hashes.push_back(reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.previous_hash_));
 
 
   for (int i = 0; i < non_proc_hashes.size(); i++) {
