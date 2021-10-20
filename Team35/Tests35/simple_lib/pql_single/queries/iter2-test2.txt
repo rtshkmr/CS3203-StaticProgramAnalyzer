@@ -313,10 +313,10 @@ stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
 Select pr1 pattern w1(pl, _)
 none
 5000
-1 -  While pattern wildcard, return respective procedure
+1 -  While pattern wildcard, return BOOLEAN procedure
 stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
 Select pr1 pattern w1(_, _)
-Second
+First,Second,Third
 5000
 1 -  While pattern empty entRef returns none
 stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
