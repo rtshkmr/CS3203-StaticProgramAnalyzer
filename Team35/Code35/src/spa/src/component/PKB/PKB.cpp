@@ -91,11 +91,21 @@ std::vector<Entity*> PKB::GetRelationship(PKBRelRefs ref, std::string entity) {
 }
 
 std::vector<std::tuple<Entity*, Entity*>> PKB::GetRelationshipByTypes(PKBRelRefs ref, DesignEntity d1, DesignEntity d2) {
+    if (d1 == DesignEntity::kProgLine) {
+      d1 = DesignEntity::kStmt;
+    }
+    if (d2 == DesignEntity::kProgLine) {
+      d2 = DesignEntity::kStmt;
+    }
+
     return relationship_by_type_table_[ref][{d1, d2}];
 }
 
 std::vector<Entity*> PKB::GetRelationshipByType(PKBRelRefs ref, DesignEntity d) {
 //    todo: optimize this
+    if (d == DesignEntity::kProgLine) {
+      d = DesignEntity::kStmt;
+    }
     std::vector<std::tuple<DesignEntity, DesignEntity>> combos = first_param_map_[d];
     std::vector<Entity*> entities;
     for (auto combo : combos) {
