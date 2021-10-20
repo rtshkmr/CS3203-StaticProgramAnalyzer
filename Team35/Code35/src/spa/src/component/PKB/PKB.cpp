@@ -46,7 +46,9 @@ void PKB::PopulateDataStructures(Deliverable d) {
       PKBRelRefs::kCalls,
       PKBRelRefs::kCalledBy,
       PKBRelRefs::kCallsT,
-      PKBRelRefs::kCalledByT
+      PKBRelRefs::kCalledByT,
+      PKBRelRefs::kNext,
+      PKBRelRefs::kPrevious,
   };
 
   std::vector<std::unordered_map<Entity*, std::list<Entity*>*>*> non_proc_hashes;
@@ -63,6 +65,8 @@ void PKB::PopulateDataStructures(Deliverable d) {
   non_proc_hashes.push_back(reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.called_by_hash_));
   non_proc_hashes.push_back(reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.calls_T_hash_));
   non_proc_hashes.push_back(reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.called_by_T_hash_));
+  non_proc_hashes.push_back(reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.next_hash_));
+  non_proc_hashes.push_back(reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.previous_hash_));
 
 
   for (int i = 0; i < non_proc_hashes.size(); i++) {
@@ -87,11 +91,21 @@ std::vector<Entity*> PKB::GetRelationship(PKBRelRefs ref, std::string entity) {
 }
 
 std::vector<std::tuple<Entity*, Entity*>> PKB::GetRelationshipByTypes(PKBRelRefs ref, DesignEntity d1, DesignEntity d2) {
+    if (d1 == DesignEntity::kProgLine) {
+      d1 = DesignEntity::kStmt;
+    }
+    if (d2 == DesignEntity::kProgLine) {
+      d2 = DesignEntity::kStmt;
+    }
+
     return relationship_by_type_table_[ref][{d1, d2}];
 }
 
 std::vector<Entity*> PKB::GetRelationshipByType(PKBRelRefs ref, DesignEntity d) {
 //    todo: optimize this
+    if (d == DesignEntity::kProgLine) {
+      d = DesignEntity::kStmt;
+    }
     std::vector<std::tuple<DesignEntity, DesignEntity>> combos = first_param_map_[d];
     std::vector<Entity*> entities;
     for (auto combo : combos) {
@@ -239,6 +253,9 @@ void PKB::PopulateReadEntities(const std::list<ReadEntity*>& read_list) {
 }
 
 std::vector<Entity*> PKB::GetDesignEntities(DesignEntity de) {
+    if (de == DesignEntity::kProgLine) {
+      de = DesignEntity::kStmt;
+    }
     return type_to_entity_map_[de];
 }
 
