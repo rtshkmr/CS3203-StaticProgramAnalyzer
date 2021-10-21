@@ -10,6 +10,8 @@
 class DBManager {
  public:
   DBManager(PKB* pkb);
+  void Delete();
+  void TurnOffOptimization();
 
   // PKB API
   // Population of PKB
@@ -44,10 +46,10 @@ class DBManager {
 
   static std::string GetNameFromEntity(Entity* entity);
 
-  void Delete();
  private:
   PKB* pkb_;
   RuntimeExtractor* runtime_extractor_;
+  bool is_optimized_ = true;
 };
 
 #endif //AUTOTESTER_CODE35_SRC_SPA_SRC_COMPONENT_PKB_DBMANAGER_H_

@@ -5,6 +5,15 @@ DBManager::DBManager(PKB* pkb) {
   this->runtime_extractor_ = new RuntimeExtractor(pkb);
 }
 
+void DBManager::Delete() {
+  runtime_extractor_->Delete();
+  delete runtime_extractor_;
+}
+
+void DBManager::TurnOffOptimization() {
+  is_optimized_ = false;
+}
+
 void DBManager::PopulateDataStructures(Deliverable d) {
   pkb_->PopulateDataStructures(d);
 }
@@ -17,7 +26,12 @@ void DBManager::PopulateDataStructures(Deliverable d) {
  */
 std::vector<Entity*> DBManager::GetRelationship(PKBRelRefs ref, std::string entity) {
   switch (ref) {
-    case PKBRelRefs::kNext: // todo: add runtime cases
+    case PKBRelRefs::kNextT: return runtime_extractor_->GetNextT(entity);
+    case PKBRelRefs::kPreviousT: return runtime_extractor_->GetPrevT(entity);
+    case PKBRelRefs::kAffects: return runtime_extractor_->GetAffects(entity);
+    case PKBRelRefs::kAffectedBy: return runtime_extractor_->GetAffectedBy(entity);
+    case PKBRelRefs::kAffectsT: return runtime_extractor_->GetAffectsT(entity);
+    case PKBRelRefs::kAffectedByT: return runtime_extractor_->GetAffectedByT(entity);
     default: return pkb_->GetRelationship(ref, entity);
   }
 }
@@ -30,6 +44,12 @@ std::vector<Entity*> DBManager::GetRelationship(PKBRelRefs ref, std::string enti
  */
 std::vector<Entity*> DBManager::GetRelationshipByType(PKBRelRefs ref, DesignEntity de) {
   switch (ref) {
+    case PKBRelRefs::kNextT: return runtime_extractor_->GetNextT(de);
+    case PKBRelRefs::kPreviousT: return runtime_extractor_->GetPrevT(de);
+    case PKBRelRefs::kAffects: return runtime_extractor_->GetAffects(de);
+    case PKBRelRefs::kAffectedBy: return runtime_extractor_->GetAffectedBy(de);
+    case PKBRelRefs::kAffectsT: return runtime_extractor_->GetAffectsT(de);
+    case PKBRelRefs::kAffectedByT: return runtime_extractor_->GetAffectedByT(de);
     default: return pkb_->GetRelationshipByType(ref, de);
   }
 }
@@ -45,6 +65,12 @@ std::vector<std::tuple<Entity*, Entity*>> DBManager::GetRelationshipByTypes(PKBR
                                                                             DesignEntity first,
                                                                             DesignEntity second) {
   switch (ref) {
+    case PKBRelRefs::kNextT: return runtime_extractor_->GetNextT(first, second);
+    case PKBRelRefs::kPreviousT: return runtime_extractor_->GetPrevT(first, second);
+    case PKBRelRefs::kAffects: return runtime_extractor_->GetAffects(first, second);
+    case PKBRelRefs::kAffectedBy: return runtime_extractor_->GetAffectedBy(first, second);
+    case PKBRelRefs::kAffectsT: return runtime_extractor_->GetAffectsT(first, second);
+    case PKBRelRefs::kAffectedByT: return runtime_extractor_->GetAffectedByT(first, second);
     default: return pkb_->GetRelationshipByTypes(ref, first, second);
   }
 }
@@ -56,6 +82,12 @@ std::vector<std::tuple<Entity*, Entity*>> DBManager::GetRelationshipByTypes(PKBR
  */
 bool DBManager::HasRelationship(PKBRelRefs ref) {
   switch (ref) {
+    case PKBRelRefs::kNextT: return runtime_extractor_->HasNextT();
+    case PKBRelRefs::kPreviousT: return runtime_extractor_->HasPrevT();
+    case PKBRelRefs::kAffects: return runtime_extractor_->HasAffects();
+    case PKBRelRefs::kAffectedBy: return runtime_extractor_->HasAffectedBy();
+    case PKBRelRefs::kAffectsT: return runtime_extractor_->HasAffectsT();
+    case PKBRelRefs::kAffectedByT: return runtime_extractor_->HasAffectedByT();
     default: return pkb_->HasRelationship(ref);
   }
 }
@@ -69,6 +101,12 @@ bool DBManager::HasRelationship(PKBRelRefs ref) {
  */
 bool DBManager::HasRelationship(PKBRelRefs ref, DesignEntity first, DesignEntity second) {
   switch (ref) {
+    case PKBRelRefs::kNextT: return runtime_extractor_->HasNextT(first, second);
+    case PKBRelRefs::kPreviousT: return runtime_extractor_->HasPrevT(first, second);
+    case PKBRelRefs::kAffects: return runtime_extractor_->HasAffects(first, second);
+    case PKBRelRefs::kAffectedBy: return runtime_extractor_->HasAffectedBy(first, second);
+    case PKBRelRefs::kAffectsT: return runtime_extractor_->HasAffectsT(first, second);
+    case PKBRelRefs::kAffectedByT: return runtime_extractor_->HasAffectedByT(first, second);
     default: return pkb_->HasRelationship(ref, first, second);
   }
 }
@@ -82,6 +120,12 @@ bool DBManager::HasRelationship(PKBRelRefs ref, DesignEntity first, DesignEntity
  */
 bool DBManager::HasRelationship(PKBRelRefs ref, std::string first, std::string second) {
   switch (ref) {
+    case PKBRelRefs::kNextT: return runtime_extractor_->HasNextT(first, second);
+    case PKBRelRefs::kPreviousT: return runtime_extractor_->HasPrevT(first, second);
+    case PKBRelRefs::kAffects: return runtime_extractor_->HasAffects(first, second);
+    case PKBRelRefs::kAffectedBy: return runtime_extractor_->HasAffectedBy(first, second);
+    case PKBRelRefs::kAffectsT: return runtime_extractor_->HasAffectsT(first, second);
+    case PKBRelRefs::kAffectedByT: return runtime_extractor_->HasAffectedByT(first, second);
     default: return pkb_->HasRelationship(ref, first, second);
   }
 }
@@ -120,9 +164,4 @@ DesignEntity DBManager::EntityToDesignEntity(Entity* entity) {
 
 std::string DBManager::GetNameFromEntity(Entity* entity) {
   return PKB::GetNameFromEntity(entity);
-}
-
-void DBManager::Delete() {
-  runtime_extractor_->Delete();
-  delete runtime_extractor_;
 }
