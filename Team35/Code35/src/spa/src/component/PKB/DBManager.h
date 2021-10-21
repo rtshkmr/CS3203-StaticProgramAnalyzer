@@ -43,6 +43,8 @@ class DBManager {
   DesignEntity EntityToDesignEntity(Entity* entity);
 
   static std::string GetNameFromEntity(Entity* entity);
+
+  void Delete();
  private:
   PKB* pkb_;
   RuntimeExtractor* runtime_extractor_;

@@ -61,6 +61,8 @@ class RuntimeExtractor {
   bool HasAffectedBy(std::string first, std::string second);
   bool HasAffectsT(std::string first, std::string second);
   bool HasAffectedByT(std::string first, std::string second);
+
+  void Delete();
 };
 
 #endif //AUTOTESTER_CODE35_SRC_SPA_SRC_COMPONENT_PKB_RUNTIMEEXTRACTOR_H_

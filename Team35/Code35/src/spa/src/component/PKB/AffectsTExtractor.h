@@ -8,6 +8,7 @@ class AffectsTExtractor {
  public:
   std::vector<Entity*> GetAffectsT(std::string target);
   std::vector<Entity*> GetAffectedByT(std::string target);
+  void Delete();
  private:
   std::unordered_map<Statement*, std::list<Statement*>*> affects_t_map_;
   std::unordered_map<Statement*, std::list<Statement*>*> affected_by_t_map_;

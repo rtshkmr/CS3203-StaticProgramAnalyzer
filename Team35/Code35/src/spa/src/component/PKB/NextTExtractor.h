@@ -13,6 +13,7 @@ class NextTExtractor {
   std::vector<Entity*> GetPrevT(std::string target,
                                 std::vector<Procedure*> proc_list,
                                 std::vector<Statement*> stmt_list);
+  void Delete();
  private:
   std::unordered_map<Statement*, std::list<Statement*>*> next_t_map_;
   std::unordered_map<Statement*, std::list<Statement*>*> previous_t_map_;

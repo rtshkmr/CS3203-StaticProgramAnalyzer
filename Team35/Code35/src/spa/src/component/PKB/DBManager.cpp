@@ -121,3 +121,8 @@ DesignEntity DBManager::EntityToDesignEntity(Entity* entity) {
 std::string DBManager::GetNameFromEntity(Entity* entity) {
   return PKB::GetNameFromEntity(entity);
 }
+
+void DBManager::Delete() {
+  runtime_extractor_->Delete();
+  delete runtime_extractor_;
+}

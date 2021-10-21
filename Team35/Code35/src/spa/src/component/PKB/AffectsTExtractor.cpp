@@ -7,3 +7,7 @@ std::vector<Entity*> AffectsTExtractor::GetAffectsT(std::string target) {
 std::vector<Entity*> AffectsTExtractor::GetAffectedByT(std::string target) {
   return std::vector<Entity*>();
 }
+
+void AffectsTExtractor::Delete() {
+
+}

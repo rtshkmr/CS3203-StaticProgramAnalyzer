@@ -204,3 +204,7 @@ std::vector<Entity*> NextTExtractor::GetPrevT(std::string target,
                                               std::vector<Statement*> stmt_list) {
   return std::vector<Entity*>();
 }
+
+void NextTExtractor::Delete() {
+
+}
