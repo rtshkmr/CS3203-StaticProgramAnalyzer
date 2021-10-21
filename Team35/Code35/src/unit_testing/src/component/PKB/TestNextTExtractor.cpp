@@ -27,96 +27,96 @@ TEST_CASE("2.PKB.NextTExtractor basic conditions") {
   Statement* s6 = CreateStatement(GetAssign4(), 6);
   Statement* s7 = CreateStatement(GetReadI(), 7);
 
-//  SECTION("1 statement") {
-//    b1->AddStmt(StatementNumber(1));
-//    proc1->SetBlockRoot(b1);
-//    proc1->SetClusterRoot(b1);
-//
-//    proc_list.push_back(proc1);
-//    stmt_list.push_back(s1);
-//
-//    NextTExtractor next_t_extractor{};
-//    std::vector<Entity*> actual = next_t_extractor.GetNextT("1", proc_list, stmt_list);
-//    CHECK(actual.empty());
-//  }
+  SECTION("1 statement") {
+    b1->AddStmt(StatementNumber(1));
+    proc1->SetBlockRoot(b1);
+    proc1->SetClusterRoot(b1);
 
-//  SECTION("single level statement list") {
-//    b1->AddStmt(StatementNumber(1));
-//    b1->AddStmt(StatementNumber(2));
-//    b1->AddStmt(StatementNumber(3));
-//    proc1->SetBlockRoot(b1);
-//    proc1->SetClusterRoot(b1);
-//
-//    proc_list.push_back(proc1);
-//    stmt_list = {s1, s2, s3};
-//
-//    NextTExtractor next_t_extractor{};
-//    std::vector<Entity*> expected_s1 = {s2, s3};
-//    std::vector<Entity*> actual_s1 = next_t_extractor.GetNextT("1", proc_list, stmt_list);
-//    CHECK(next_t_extractor.GetNextTSize() == 2);
-//    CHECK(TestUtils::AreVectorsEqual(actual_s1, expected_s1));
-//    std::vector<Entity*> expected_s2 = {s3};
-//    std::vector<Entity*> actual_s2 = next_t_extractor.GetNextT("2", proc_list, stmt_list);
-//    CHECK(TestUtils::AreVectorsEqual(actual_s2, expected_s2));
-//  }
+    proc_list.push_back(proc1);
+    stmt_list.push_back(s1);
 
-//  SECTION("1 if") {
-//    /*
-//     * s1
-//     * if2
-//     *  s3
-//     *  s4
-//     * else
-//     *  s5
-//     *  s6
-//     * s7
-//     */
-//    b1->AddStmt(StatementNumber(1));
-//    b2->AddStmt(StatementNumber(2));
-//    b3->AddStmt(StatementNumber(3));
-//    b3->AddStmt(StatementNumber(4));
-//    b4->AddStmt(StatementNumber(5));
-//    b4->AddStmt(StatementNumber(6));
-//    b5->AddStmt(StatementNumber(7));
-//    c1->SetStartEnd(1, 7);
-//    b1->AddNextBlock(b2);
-//    b2->AddNextBlock(b3);
-//    b2->AddNextBlock(b4);
-//    b3->AddNextBlock(b5);
-//    b4->AddNextBlock(b5);
-//    c2->AddChildClusterToBack(b2);
-//    c2->AddChildClusterToBack(b3);
-//    c2->AddChildClusterToBack(b4);
-//    c1->AddChildClusterToBack(b1);
-//    c1->AddChildClusterToBack(c2);
-//    c1->AddChildClusterToBack(b3);
-//    proc1->SetBlockRoot(b1);
-//    proc1->SetClusterRoot(c1);
-//
-//    proc_list.push_back(proc1);
-//    stmt_list = {s1, s2, s3, s4, s5, s6, s7};
-//
-//    NextTExtractor next_t_extractor{};
-//    std::vector<Entity*> expected_s1 = {s2, s3, s4, s5, s6, s7};
-//    std::vector<Entity*> actual_s1 = next_t_extractor.GetNextT("1", proc_list, stmt_list);
-//    CHECK(next_t_extractor.GetNextTSize() == 6);
-//    CHECK(TestUtils::AreVectorsEqual(actual_s1, expected_s1));
-//    std::vector<Entity*> expected_s2 = {s3, s4, s5, s6, s7};
-//    std::vector<Entity*> actual_s2 = next_t_extractor.GetNextT("2", proc_list, stmt_list);
-//    CHECK(TestUtils::AreVectorsEqual(actual_s2, expected_s2));
-//    std::vector<Entity*> expected_s3 = {s4, s7};
-//    std::vector<Entity*> actual_s3 = next_t_extractor.GetNextT("2", proc_list, stmt_list);
-//    CHECK(TestUtils::AreVectorsEqual(actual_s3, expected_s3));
-//    std::vector<Entity*> expected_s4 = {s7};
-//    std::vector<Entity*> actual_s4 = next_t_extractor.GetNextT("2", proc_list, stmt_list);
-//    CHECK(TestUtils::AreVectorsEqual(actual_s4, expected_s4));
-//    std::vector<Entity*> expected_s5 = {s6, s7};
-//    std::vector<Entity*> actual_s5 = next_t_extractor.GetNextT("2", proc_list, stmt_list);
-//    CHECK(TestUtils::AreVectorsEqual(actual_s5, expected_s5));
-//    std::vector<Entity*> expected_s6 = {s7};
-//    std::vector<Entity*> actual_s6 = next_t_extractor.GetNextT("2", proc_list, stmt_list);
-//    CHECK(TestUtils::AreVectorsEqual(actual_s6, expected_s6));
-//  }
+    NextTExtractor next_t_extractor{};
+    std::vector<Entity*> actual = next_t_extractor.GetNextT("1", proc_list, stmt_list);
+    CHECK(actual.empty());
+  }
+
+  SECTION("single level statement list") {
+    b1->AddStmt(StatementNumber(1));
+    b1->AddStmt(StatementNumber(2));
+    b1->AddStmt(StatementNumber(3));
+    proc1->SetBlockRoot(b1);
+    proc1->SetClusterRoot(b1);
+
+    proc_list.push_back(proc1);
+    stmt_list = {s1, s2, s3};
+
+    NextTExtractor next_t_extractor{};
+    std::vector<Entity*> expected_s1 = {s2, s3};
+    std::vector<Entity*> actual_s1 = next_t_extractor.GetNextT("1", proc_list, stmt_list);
+    CHECK(next_t_extractor.GetNextTSize() == 2);
+    CHECK(TestUtils::AreVectorsEqual(actual_s1, expected_s1));
+    std::vector<Entity*> expected_s2 = {s3};
+    std::vector<Entity*> actual_s2 = next_t_extractor.GetNextT("2", proc_list, stmt_list);
+    CHECK(TestUtils::AreVectorsEqual(actual_s2, expected_s2));
+  }
+
+  SECTION("1 if") {
+    /*
+     * s1
+     * if2
+     *  s3
+     *  s4
+     * else
+     *  s5
+     *  s6
+     * s7
+     */
+    b1->AddStmt(StatementNumber(1));
+    b2->AddStmt(StatementNumber(2));
+    b3->AddStmt(StatementNumber(3));
+    b3->AddStmt(StatementNumber(4));
+    b4->AddStmt(StatementNumber(5));
+    b4->AddStmt(StatementNumber(6));
+    b5->AddStmt(StatementNumber(7));
+    b1->AddNextBlock(b2);
+    b2->AddNextBlock(b3);
+    b2->AddNextBlock(b4);
+    b3->AddNextBlock(b5);
+    b4->AddNextBlock(b5);
+    c2->AddChildClusterToBack(b2);
+    c2->AddChildClusterToBack(b3);
+    c2->AddChildClusterToBack(b4);
+    c1->AddChildClusterToBack(b1);
+    c1->AddChildClusterToBack(c2);
+    c1->AddChildClusterToBack(b5);
+    proc1->SetBlockRoot(b1);
+    proc1->SetClusterRoot(c1);
+    c1->UpdateClusterRange();
+    CHECK(c1->GetStartEndRange() == std::make_pair(1, 7));
+    proc_list.push_back(proc1);
+    stmt_list = {s1, s2, s3, s4, s5, s6, s7};
+
+    NextTExtractor next_t_extractor{};
+    std::vector<Entity*> expected_s1 = {s2, s3, s4, s5, s6, s7};
+    std::vector<Entity*> actual_s1 = next_t_extractor.GetNextT("1", proc_list, stmt_list);
+    CHECK(next_t_extractor.GetNextTSize() == 6);
+    CHECK(TestUtils::AreVectorsEqual(actual_s1, expected_s1));
+    std::vector<Entity*> expected_s2 = {s3, s4, s5, s6, s7};
+    std::vector<Entity*> actual_s2 = next_t_extractor.GetNextT("2", proc_list, stmt_list);
+    CHECK(TestUtils::AreVectorsEqual(actual_s2, expected_s2));
+    std::vector<Entity*> expected_s3 = {s4, s7};
+    std::vector<Entity*> actual_s3 = next_t_extractor.GetNextT("3", proc_list, stmt_list);
+    CHECK(TestUtils::AreVectorsEqual(actual_s3, expected_s3));
+    std::vector<Entity*> expected_s4 = {s7};
+    std::vector<Entity*> actual_s4 = next_t_extractor.GetNextT("4", proc_list, stmt_list);
+    CHECK(TestUtils::AreVectorsEqual(actual_s4, expected_s4));
+    std::vector<Entity*> expected_s5 = {s6, s7};
+    std::vector<Entity*> actual_s5 = next_t_extractor.GetNextT("5", proc_list, stmt_list);
+    CHECK(TestUtils::AreVectorsEqual(actual_s5, expected_s5));
+    std::vector<Entity*> expected_s6 = {s7};
+    std::vector<Entity*> actual_s6 = next_t_extractor.GetNextT("6", proc_list, stmt_list);
+    CHECK(TestUtils::AreVectorsEqual(actual_s6, expected_s6));
+  }
 
 //  SECTION("1 while with next") {
 //    /*
