@@ -18,7 +18,7 @@ add_executable(unit_testing ${srcs}
         src/component/SourceProcessor/Extractors/TestModifiesExtractor.cpp
         src/component/SourceProcessor/Extractors/TestFollowsTExtractor.cpp
         src/component/SourceProcessor/Extractors/TestParentTExtractor.cpp
-        ../spa/src/exception/SyntaxException.h utils/EntityUtils.h src/util/TestCommonUtils.cpp src/model/TestEntity.cpp
+        ../spa/src/exception/SpaException.h utils/EntityUtils.h src/util/TestCommonUtils.cpp src/model/TestEntity.cpp
         src/model/TestStatement.cpp src/datatype/TestConditionalExpression.cpp src/model/TestCFG.cpp
         src/component/SourceProcessor/Extractors/TestNextRelationship.cpp
         src/component/SourceProcessor/TestParser.cpp

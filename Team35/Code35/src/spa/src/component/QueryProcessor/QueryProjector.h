@@ -17,13 +17,13 @@ class QueryProjector {
     static std::vector<std::vector<std::string>> CrossProductTables(std::vector<std::vector<std::string>> t1,
                                                              std::vector<std::vector<std::string>> t2);
     static std::vector<std::vector<std::string>> ReorderTable(std::vector<Synonym*> desired_order,
-                                                       std::list<Synonym*> current_order,
-                                                       std::vector<std::vector<std::string>> table);
+                                                              std::vector<Synonym*> current_order,
+                                                              std::vector<std::vector<std::string>> table);
     static std::vector<std::string> JoinTuples(std::vector<std::vector<std::string>> table);
   private:
     std::vector<Synonym*> target_synonym_list;
     static std::vector<std::string> FormatMultipleTables(std::vector<std::vector<std::vector<std::string>>> tables,
-                                                         std::list<Synonym*> table_synonym_order,
+                                                         std::vector<Synonym*> table_synonym_order,
                                                          std::vector<Synonym*> target_synonym_list);
 };
 

@@ -2,7 +2,7 @@
 #include <cassert>
 #include "PSubsystem.h"
 #include "Tokenizer.h"
-#include "exception/SyntaxException.h"
+#include "exception/SpaException.h"
 
 using namespace psub;
 
@@ -24,6 +24,11 @@ void PSubsystem::InitDataStructures() {
   entity_factory_ =
       EntityFactory(deliverable_->GetProcList(), deliverable_->GetVariableList(),
                     deliverable_->GetConstantValueList());
+}
+
+bool PSubsystem::CheckForStacksEmpty() {
+  return parent_stack_.empty() && follow_stack_.empty()
+          && block_stack_.empty() && cluster_stack_.empty();
 }
 
 /**
@@ -98,10 +103,6 @@ void PSubsystem::CloseProcedureBlock() {
     current_procedure_ = nullptr;
     Block* last_block = block_stack_.top();
     block_stack_.pop();
-    assert(block_stack_.empty());
-    bool is_currently_in_outermost_cluster = cluster_stack_.size() == 1;
-    assert(is_currently_in_outermost_cluster);
-
     // put the block root into the
     Cluster* outermost_cluster = cluster_stack_.top();
     if(!Block::IsExitBlock(last_block)) {
@@ -114,8 +115,6 @@ void PSubsystem::CloseProcedureBlock() {
     }
 
     cluster_stack_.pop(); // cluster_stack is now empty since the Procedure has been closed.
-    bool last_popped_equals_cluster_root = outermost_cluster == assigned_cluster_root;
-    assert(last_popped_equals_cluster_root);
   }
 }
 
@@ -257,6 +256,11 @@ void PSubsystem::ProcessParentNodeType(Container* current_nest) {
  * types, the parent stack should be non-empty (since we expect the statement to be nested within some kind of cluster.
  */
 void PSubsystem::HandleCloseBrace() {
+  //enforce that every stmtList must have at least 1 statement
+  if (current_node_->GetStatementList()->empty()) {
+    throw SyntaxException("Empty statement list found"); //TODO check for ELSE.empty_stmtList;
+  }
+  
   //assertion: case 1: close brace for procedure --> type = 0 & parent_stack = empty
   //           case 2: close brace for others    --> type > 0 & parent_stack ! empty
   assert((current_node_type_ != NodeType::kProcedure && !parent_stack_.empty()) ||
@@ -269,8 +273,10 @@ void PSubsystem::HandleCloseBrace() {
   follow_stack_.pop(); //this is allowed because any stmtList must be 1..* statements. so no condition for if (...) { }
 
   if (current_node_type_ == NodeType::kProcedure) {
-    assert(parent_stack_.empty());
     CloseProcedureBlock();
+    if (!CheckForStacksEmpty()) {
+      throw SyntaxException("Difficulty in processing procedure. This could be caused by mismatch braces.");
+    }
   } else {
     if (current_node_type_ == NodeType::kElse) { //double pop for else clause
       CloseElseBlock();
@@ -315,7 +321,7 @@ void PSubsystem::PerformNewProcedureSteps(Procedure* procedure) {
     // throw error if this name is duplicated
     for (auto const& proc: * deliverable_->GetProgram()->GetProcedureList()) {
       if (* proc->GetName() == * procedure->GetName()) { // uses the overloaded ==
-        throw SyntaxException("Encountered 2 procedures with the same name.");
+        throw SemanticException("Encountered 2 procedures with the same name.");
       }
     }
     deliverable_->GetProgram()->AddProcedure(procedure);
@@ -564,13 +570,24 @@ void PSubsystem::CheckForExistingProcedure() {
       std::equal(program_proclist_dup.begin(), program_proclist_dup.end(), del_proclist->begin(), del_proclist->end());
 
   if (!equal) {
-    throw SyntaxException("A call is made to unreferenced procedure");
+    throw SemanticException("A call is made to unreferenced procedure");
+  }
+}
+
+void PSubsystem::FiniStateChecker() {
+  if (deliverable_->stmt_list_.empty()) {
+    throw SyntaxException("A blank simple file is encountered.");
+  }
+
+  CheckForIfElseValidity(); //TODO: to put it within main handling if possible.
+  CheckForExistingProcedure();
+  if (!CheckForStacksEmpty()) {
+    throw SyntaxException("Difficulty in processing simple file. This could be caused by mismatch braces.");
   }
 }
 
 Deliverable* PSubsystem::GetDeliverables() {
-  CheckForIfElseValidity(); //TODO: to put it within main handling if possible.
-  CheckForExistingProcedure();
+  FiniStateChecker();
   valid_state = false; //to prevent further processsing.
   return deliverable_;
 }

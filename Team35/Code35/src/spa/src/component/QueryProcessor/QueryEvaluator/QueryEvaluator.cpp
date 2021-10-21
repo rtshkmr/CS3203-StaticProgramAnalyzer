@@ -20,7 +20,7 @@ UnformattedQueryResult QueryEvaluator::EvaluateQuery(std::vector<Group *> list_o
     if (current_group->ContainsTargetSynonym()) {
       // Evaluate non-boolean group
       Synonym *first_target_synonym = current_group->GetTargetSynonyms()[0];
-      QueryEvaluatorTable *table = new QueryEvaluatorTable(first_target_synonym);
+      QueryEvaluatorTable *table = new QueryEvaluatorTable(current_group->GetTargetSynonyms());
       DesignEntity de = first_target_synonym->GetType();
 
       table->AddTargetSynonymValues(first_target_synonym, pkb->GetDesignEntities(de));
@@ -105,7 +105,8 @@ void QueryEvaluator::PreprocessBooleanGroup(Group group) {
 
   if (main_synonym != nullptr) {
     QueryEvaluatorTable current_table(main_synonym);
-    current_table.AddTargetSynonymValues(main_synonym, pkb->GetDesignEntities(main_synonym->GetType()));
+    auto entity_list_test = pkb->GetDesignEntities(main_synonym->GetType());
+    current_table.AddTargetSynonymValues(main_synonym, entity_list_test);
     ProcessGroup(&current_table, &group);
     if (current_table.GetResults()[0].empty()) {
       boolean_result = false;

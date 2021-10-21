@@ -1,5 +1,5 @@
 #include <util/Logger.h>
-#include <exception/SyntaxException.h>
+#include <exception/SpaException.h>
 #include "SourceProcessor.h"
 #include "Parser.h"
 #include "DesignExtractor.h"
@@ -24,8 +24,13 @@ PKB* SourceProcessor::ProcessSourceFile(std::string file_name) {
   L("... processing source file");
   par::Parser parser;
 
+  Deliverable* deliverable;
+
   try {
     parser.Parse(file_name);
+    deliverable = parser.GetDeliverables();
+    DesignExtractor design_extractor = DesignExtractor(deliverable);
+    design_extractor.ExtractDesignAbstractions();
   } catch (SyntaxException s) {
     std::cerr << "Syntax Error\n";
     std::cerr << s.what() << std::endl;
@@ -35,10 +40,6 @@ PKB* SourceProcessor::ProcessSourceFile(std::string file_name) {
     std::cerr << e.what() << std::endl;
     Terminate(std::string("Unfortunately, there was an unknown exception thrown due to an invalid SIMPLE program."));
   }
-
-  Deliverable* deliverable = parser.GetDeliverables();
-  DesignExtractor design_extractor = DesignExtractor(deliverable);
-  design_extractor.ExtractDesignAbstractions();
 
   PKB* new_pkb = new PKB();
   new_pkb->PopulateDataStructures(* deliverable);

@@ -1,0 +1,13 @@
+procedure ten10sale {
+	discount = (10 / ((100))); 
+	allItems = price * discount; 
+	FireSale = Everything * 0; 
+	
+	if ( (CostPrice - discount) < 0) then { 
+		CostPrice = CostPrice * 2; 
+		discount = CostPrice - oneCent; 
+	}	else {
+		discount = ((((0))));
+		TotalSales = 9; 
+	}
+}

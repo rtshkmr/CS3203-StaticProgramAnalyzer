@@ -1,4 +1,4 @@
-#include <exception/SyntaxException.h>
+#include <exception/SpaException.h>
 #include "CallsTExtractor.h"
 
 /**
@@ -68,7 +68,7 @@ std::list<Procedure*>* CallsTExtractor::ExtractCallsTFromProc(Procedure* calling
     std::list<Procedure*>* extracted_procedures = ExtractCallsTFromProc(called_proc, visited_procedures);
     for (Procedure* extracted_proc: *extracted_procedures) {
       if (extracted_proc->GetName() == calling_proc->GetName()) { // uses overloaded ==
-        throw SyntaxException("Cyclic call detected.");
+        throw SemanticException("Cyclic call detected.");
       }
       deliverable_->AddCallsTransitiveRelationship(calling_proc, extracted_proc);
     }

@@ -1,0 +1,200 @@
+1 - Uses syn wildcard
+print pn;
+Select pn such that Uses(pn, _)
+1,8
+5000
+2 - Uses stmtNo synonym
+variable v;
+Select v such that Uses(9, v)
+b
+5000
+3 - Uses stmtNo identifier
+while w;
+Select w such that Uses(2, "b")
+6
+5000
+4 - Uses synonym wildcard
+stmt s;
+Select s such that Uses(s, _)
+1,2,3,5,6,8,9
+5000
+5 - Uses synonym synonym
+if ifs; variable v;
+Select v such that Uses(ifs, v)
+a,b,c
+5000
+6 - Uses synonym identifier
+while w; if ifs;
+Select ifs such that Uses(w, "bb")
+none
+5000
+7 - Uses var identifier
+stmt s;
+Select s such that Uses(s, "a")
+2,5,6
+5000
+8 - Invalid Uses query: left param cannot be wildcard
+variable v;
+Select v such that Uses(_, v)
+none
+5000
+9 - Invalid Uses query: right param cannot be non-variable synonym
+stmt s; assign a;
+Select s such that Uses(s, a)
+none
+5000
+10 - follows stmtNo syn
+assign a;
+Select a such that Follows(4, a)
+none
+5000
+11 - follows syn syn
+while w; if ifs;
+Select w such that Follows(ifs, w)
+6
+5000
+12 - follows syn wildcard
+read re;
+Select re such that Follows(re, _)
+7
+5000
+13 - follows* stmtNo syn
+stmt s;
+Select s such that Follows*(1, s)
+2,6
+5000
+14 - follows* wildcard syn
+print pn;
+Select pn such that Follows*(_ ,pn)
+8
+5000
+15 - follows* stmtNo stmtNo
+assign a;
+Select a such that Follows*(7, 9)
+3,5,9
+5000
+16 - parent stmtNo stmtNo
+procedure p;
+Select p such that Parent(2, 5)
+testUseSUseP
+5000
+17 - parent syn wildcard
+stmt s;
+Select s such that Parent(s, _)
+2, 6
+5000
+18 - parent syn syn
+read re; if ifs;
+Select ifs such that Parent(ifs, re)
+2
+5000
+19 - parent* syn stmtNo
+stmt s;
+Select s such that Parent*(s, 9)
+6
+5000
+20 - parent* stmtNo wildcard
+read re;
+Select re such that Parent*(3, _)
+none
+5000
+21 - Invalid parent*: 3 arguments
+variable v; stmt s;
+Select s such that Parent*(s, v, _)
+none
+5000
+22 - Modifies syn wildcard
+read re;
+Select re such that Modifies(re, _)
+4,7
+5000
+23 - Modifies syn ident
+stmt s;
+Select s such that Modifies(s, "aa")
+2,6,5,9
+5000
+24 - Modifies invalid query
+if ifs;
+Select ifs such that Modifies(_, "bb")
+none
+5000
+24 - pattern wildcard, full
+assign a;
+Select a pattern a (_, "b")
+9
+5000
+25 - pattern ident, wildcard
+assign a;
+Select a pattern a ("bb", _)
+3
+5000
+26 - pattern ident, partial
+assign a;
+Select a pattern a ("aa", _"a"_)
+5
+5000
+27 - pattern + Uses
+assign a;
+Select a pattern a (_, _"10"_) such that Uses(a, "a")
+none
+5000
+28 - pattern + Uses
+assign a; while w;
+Select w pattern a ("aa", _) such that Uses(w, "a")
+6
+5000
+29 - pattern + Uses
+if ifs; assign a; variable v;
+Select v pattern a (_, _"c"_) such that Uses(ifs, v)
+b,c,a
+5000
+30 - pattern + Uses
+assign a;
+Select a pattern a ("c", _"10"_) such that Uses(2, _)
+none
+5000
+31 - pattern + Uses
+read re; assign a;
+Select re such that Uses(re, " d ") pattern a (" bb", _"c "_)
+none
+5000
+32 - pattern + Modifies + invalid IDENT
+assign a;
+Select a such that Modifies(a, "20") pattern a (_, _"a"_)
+none
+5000
+33 - pattern + follows
+assign a; if ifs;
+Select a such that Follows(ifs, _) pattern a (_, _)
+3,5,9
+5000
+34 - pattern + follows*
+assign a; print pn; while w;
+Select a such that Follows*(pn, w) pattern a ("aa", _)
+5,9
+5000
+35 - pattern + parent
+assign a; if ifs;
+Select a pattern a (_, "b") such that Parent(ifs, a)
+none
+5000
+36 - pattern + parent*
+assign b99; print pn;
+Select b99 pattern b99 ("bb", _"c"_) such that Parent*(_, pn)
+3
+5000
+37 - Triple dependency
+assign a; variable v;
+Select a such that Uses(a, v) pattern a(v, _"a"_)
+none
+5000
+38 - Triple dependency
+assign a; variable v;
+Select v such that Uses(a, v) pattern a(v, _)
+none
+5000
+39 - Invalid declaration missing ;
+stmt s
+Select s
+none
+5000

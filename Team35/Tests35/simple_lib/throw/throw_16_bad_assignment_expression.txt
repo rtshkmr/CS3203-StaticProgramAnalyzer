@@ -1,0 +1,3 @@
+procedure BadAssignmentBrackets {
+	assign = ((x)) + (y/0) + z);
+}

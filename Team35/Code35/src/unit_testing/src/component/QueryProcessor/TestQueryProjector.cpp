@@ -142,7 +142,7 @@ TEST_CASE("3.QueryProjector.Reorder tables") {
       new Synonym("e", DesignEntity::kWhile),
       new Synonym("c", DesignEntity::kProcedure),
   };
-  std::list<Synonym*> current_order = std::list<Synonym*>{
+  std::vector<Synonym*> current_order = std::vector<Synonym*>{
       new Synonym("a", DesignEntity::kAssign),
       new Synonym("b", DesignEntity::kVariable),
       new Synonym("c", DesignEntity::kProcedure),
@@ -169,6 +169,31 @@ TEST_CASE("3.QueryProjector.Reorder tables") {
   std::vector<std::vector<std::string>>
       actual_table = QueryProjector::ReorderTable(desired_order, current_order, input_table);
   CHECK(expected_table == actual_table);
+
+  // MULTIPLE SAME SYNONYM
+  std::vector<Synonym*> desired_order2 = std::vector<Synonym*>{
+      new Synonym("a", DesignEntity::kAssign),
+      new Synonym("a", DesignEntity::kAssign),
+      new Synonym("b", DesignEntity::kVariable),
+      new Synonym("c", DesignEntity::kProcedure),
+      new Synonym("d", DesignEntity::kIf),
+      new Synonym("e", DesignEntity::kWhile),
+      new Synonym("f", DesignEntity::kVariable),
+      new Synonym("d", DesignEntity::kIf),
+  };
+  std::vector<std::vector<std::string>> expected_table2 = std::vector<std::vector<std::string>>{
+      {"0", "0", "0", "2", "2", "2", "3", "3", "3", "4", "4", "4"},
+      {"0", "0", "0", "2", "2", "2", "3", "3", "3", "4", "4", "4"},
+      {"a", "a", "a", "b", "b", "b", "c", "c", "c", "d", "d", "d"},
+      {"def", "def", "def", "ghi", "ghi", "ghi", "jkl", "jkl", "jkl", "mno", "mno", "mno"},
+      {"7", "8", "9", "7", "8", "9", "7", "8", "9", "7", "8", "9"},
+      {"123", "456", "789", "123", "456", "789", "123", "456", "789", "123", "456", "789"},
+      {"x", "y", "z", "x", "y", "z", "x", "y", "z", "x", "y", "z"},
+      {"7", "8", "9", "7", "8", "9", "7", "8", "9", "7", "8", "9"},
+  };
+  std::vector<std::vector<std::string>>
+      actual_table2 = QueryProjector::ReorderTable(desired_order2, current_order, input_table);
+  CHECK(expected_table2 == actual_table2);
 }
 
 TEST_CASE("3.QueryProjector.Join tuples of tables") {
@@ -373,16 +398,16 @@ TEST_CASE("3.QueryProjector.multiple target synonym") {
     a9->SetStatementNumber(new StatementNumber(9));
 
     std::vector<Entity*> col1 = std::vector<Entity*>{
-      a1, a2, a3
+        a1, a2, a3
     };
     std::vector<Entity*> col2 = std::vector<Entity*>{
-      v1, v2, v3
+        v1, v2, v3
     };
     std::vector<Entity*> col3 = std::vector<Entity*>{
-      i4, i5, i6
+        i4, i5, i6
     };
     std::vector<Entity*> col4 = std::vector<Entity*>{
-      a7, a8, a9
+        a7, a8, a9
     };
 
     Synonym* syn1 = new Synonym("a", DesignEntity::kAssign);
@@ -408,9 +433,9 @@ TEST_CASE("3.QueryProjector.multiple target synonym") {
     QueryProjector qp = QueryProjector(syn_list);
 
     std::vector<std::string> expected_values = std::vector<std::string>{
-      "7 x 4", "8 x 4", "9 x 4", "7 x 5", "8 x 5", "9 x 5", "7 x 6", "8 x 6", "9 x 6",
-      "7 y 4", "8 y 4", "9 y 4", "7 y 5", "8 y 5", "9 y 5", "7 y 6", "8 y 6", "9 y 6",
-      "7 z 4", "8 z 4", "9 z 4", "7 z 5", "8 z 5", "9 z 5", "7 z 6", "8 z 6", "9 z 6",
+        "7 x 4", "8 x 4", "9 x 4", "7 x 5", "8 x 5", "9 x 5", "7 x 6", "8 x 6", "9 x 6",
+        "7 y 4", "8 y 4", "9 y 4", "7 y 5", "8 y 5", "9 y 5", "7 y 6", "8 y 6", "9 y 6",
+        "7 z 4", "8 z 4", "9 z 4", "7 z 5", "8 z 5", "9 z 5", "7 z 6", "8 z 6", "9 z 6",
     };
     std::vector<std::string> actual_values = qp.FormatQuery(uqr);
 
@@ -418,6 +443,71 @@ TEST_CASE("3.QueryProjector.multiple target synonym") {
   }
 
   SECTION("multiple targets across tables") {
+    AssignEntity* a1 = entity_utils::GetAssign1();
+    a1->SetStatementNumber(new StatementNumber(1));
+    AssignEntity* a2 = entity_utils::GetAssign2();
+    a2->SetStatementNumber(new StatementNumber(2));
+    AssignEntity* a3 = entity_utils::GetAssign3();
+    a3->SetStatementNumber(new StatementNumber(3));
+
+    Variable* v1 = entity_utils::var_x_;
+    Variable* v2 = entity_utils::var_y_;
+    Variable* v3 = entity_utils::var_z_;
+
+    IfEntity* i4 = entity_utils::GetIf1();
+    i4->SetStatementNumber(new StatementNumber(4));
+    IfEntity* i5 = entity_utils::GetIf2();
+    i5->SetStatementNumber(new StatementNumber(5));
+    IfEntity* i6 = entity_utils::GetIf3();
+    i6->SetStatementNumber(new StatementNumber(6));
+
+    AssignEntity* a7 = entity_utils::GetAssign7();
+    a7->SetStatementNumber(new StatementNumber(7));
+    AssignEntity* a8 = entity_utils::GetAssign8();
+    a8->SetStatementNumber(new StatementNumber(8));
+    AssignEntity* a9 = entity_utils::GetAssign9();
+    a9->SetStatementNumber(new StatementNumber(9));
+
+    std::vector<Entity*> col1 = std::vector<Entity*>{
+        a1, a2, a3
+    };
+    std::vector<Entity*> col2 = std::vector<Entity*>{
+        v1, v2, v3
+    };
+    std::vector<Entity*> col3 = std::vector<Entity*>{
+        i4, i5, i6
+    };
+    std::vector<Entity*> col4 = std::vector<Entity*>{
+        a7, a8, a9
+    };
+
+    Synonym* syn1 = new Synonym("a", DesignEntity::kAssign);
+    Synonym* syn2 = new Synonym("b", DesignEntity::kVariable);
+    Synonym* syn3 = new Synonym("c", DesignEntity::kIf);
+    QueryEvaluatorTable* table1 = new QueryEvaluatorTable(std::vector<Synonym*>{syn3});
+    AddColumn(table1, syn1, col1);
+    AddColumn(table1, syn2, col2);
+    AddColumn(table1, syn3, col3);
+    Synonym* syn4 = new Synonym("d", DesignEntity::kAssign);
+    QueryEvaluatorTable* table2 = new QueryEvaluatorTable(syn4);
+    AddColumn(table2, syn4, col4);
+
+    UnformattedQueryResult uqr = UnformattedQueryResult(true);
+    uqr.AddTable(table1);
+    uqr.AddTable(table2);
+
+    std::vector<Synonym*> syn_list = std::vector<Synonym*>{syn4, syn3};
+    QueryProjector qp = QueryProjector(syn_list);
+
+    std::vector<std::string> expected_values = std::vector<std::string>{
+        "7 4", "8 4", "9 4", "7 5", "8 5", "9 5", "7 6", "8 6", "9 6"
+    };
+    std::vector<std::string> actual_values = qp.FormatQuery(uqr);
+
+    CHECK(expected_values == actual_values);
+  }
+
+  SECTION("multiple similar targets") {
     AssignEntity* a1 = entity_utils::GetAssign1();
     a1->SetStatementNumber(new StatementNumber(1));
     AssignEntity* a2 = entity_utils::GetAssign2();
@@ -471,11 +561,11 @@ TEST_CASE("3.QueryProjector.multiple target synonym") {
     uqr.AddTable(table1);
     uqr.AddTable(table2);
 
-    std::vector<Synonym*> syn_list = std::vector<Synonym*>{syn4, syn3};
+    std::vector<Synonym*> syn_list = std::vector<Synonym*>{syn4, syn3, syn4, syn3};
     QueryProjector qp = QueryProjector(syn_list);
 
     std::vector<std::string> expected_values = std::vector<std::string>{
-      "7 4", "8 4", "9 4", "7 5", "8 5", "9 5", "7 6", "8 6", "9 6"
+      "7 4 7 4", "8 4 8 4", "9 4 9 4", "7 5 7 5", "8 5 8 5", "9 5 9 5", "7 6 7 6", "8 6 8 6", "9 6 9 6"
     };
     std::vector<std::string> actual_values = qp.FormatQuery(uqr);
 

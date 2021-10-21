@@ -1,0 +1,11 @@
+procedure huat {
+	if (huat == 888) then {
+		CaiShenYe = 8888; 
+	} else {
+		money = money * g0ne; 
+	}
+
+	IfBlock = 1 * stmt; 
+	ElseBlock = stmt * 1; 
+	huat = (IfBlock + ElseBlock) + RandomAssign; 
+}

@@ -1,0 +1,170 @@
+1 - modifies syn ident
+while w;
+Select w such that Modifies(w, "noLifeNoMoney")
+4
+5000
+2- modifies syn syn
+if ifs; stmt s; variable v;
+Select ifs such that Modifies(s, v)
+8
+5000
+3 - modifies syn wildcard
+read re;
+Select re such that Modifies(re, _)
+1,15,17,20,5
+5000
+4 - uses stmtNo ident
+print pn;
+Select pn such that Uses(7, "b")
+3,7,18,21,12,9
+5000
+5 - uses syn syn
+if ifs; variable v;
+Select v such that Uses(ifs, v)
+a,b,c,d,ILikeCoding007,noLifeNoMoney
+5000
+6 - uses syn wildcard
+read re;
+Select re such that Uses(re, _)
+none
+5000
+7 - follows stmtNo syn
+stmt s;
+Select s such that Follows(8, s)
+16
+5000
+8 - follows syn wildcard
+while w; print pn;
+Select pn such that Follows(w, _)
+3,7,18,21,12,9
+5000
+9 - follows wildcard stmtNo
+assign you;
+Select you such that Follows(_, 1)
+none
+5000
+10 - follows* syn syn
+while w, w1;
+Select w such that Follows*(w, w1)
+4
+5000
+11 - follows* stmtNo syn
+assign a;
+Select a such that Follows*(3, a)
+none
+5000
+12 - follows* syn syn
+print pn; if ifs;
+Select ifs such that Follows*(pn, ifs)
+8
+5000
+13 - parent syn stmtNo
+stmt s;
+Select s such that Parent(s, 3)
+none
+5000
+14 - parent syn syn
+assign a; while w;
+Select a such that Parent(w, a)
+6,19
+5000
+15 - parent wildcard syn
+read re;
+Select re such that Parent(_, re)
+5,15,17,20
+5000
+16 - parent* wildcard wildcard
+call cl;
+Select cl such that Parent*(_, _)
+11
+5000
+17 - parent* stmtNo stmtNo
+stmt s;
+Select s such that Parent*(8, 17)
+none
+5000
+18 - parent* syn syn
+call cl; stmt s;
+Select s such that Parent*(s, cl)
+8
+5000
+19 - pattern wildcard, partial
+assign a;
+Select a pattern a (_, _"a"_)
+2,6,19
+5000
+20 - pattern ident, wildcard
+assign what;
+Select what pattern what ("a", _)
+10,13,14
+5000
+21 - pattern ident, partial
+assign a;
+Select a pattern a ("thisIsLife996", _"10"_)
+none
+5000
+22 - pattern + modifies
+assign a;
+Select a pattern a ("thisIsLife996", _"e"_) such that Modifies(3, _)
+none
+5000
+23 - pattern + modifies
+assign a; variable v; if ifs;
+Select a such that Modifies(ifs, v) pattern a (_, _"30"_)
+6,19
+5000
+24 - pattern + uses
+assign a;
+Select a pattern a ("thisIsLife996", _"e"_) such that Uses(3, _)
+none
+5000
+25 - pattern + uses
+assign a; if ifs;
+Select ifs such that Uses(ifs, "b") pattern a (_, _)
+8
+5000
+26 - pattern + follows
+assign a;
+Select a pattern a (_, "30") such that Follows(1, a)
+none
+5000
+27 - pattern + follows
+assign a; while w; stmt s;
+Select s such that Follows(w, s) pattern a ("a", _"c"_)
+8
+5000
+28 - pattern + follows*
+assign a; print pn; read re; variable v;
+Select v pattern a (v, _"20"_) such that Follows*(pn, re)
+noLifeNoMoney, thisIsLife996
+5000
+29 - pattern + follows*
+assign a;
+Select a such that Follows*(a, 14) pattern a ("a", _)
+13
+5000
+30 - pattern + parent
+assign a; if ifs;
+Select a pattern a (_, _"a"_) such that Parent(ifs, 15)
+2,6,19
+5000
+31 - pattern + parent*
+assign a; variable v;
+Select v such that Parent*(_, 2) pattern a (v, _)
+none
+5000
+32 - Invalid pattern
+assign a;
+Select a pattern a (_, "a + b")
+none
+5000
+33 - Invalid pattern
+assign a;
+Select a pattern a ("a", "c")
+none
+5000
+
+
+
+
+

@@ -7,7 +7,7 @@
 #include "DataType.h"
 #include <datatype/RegexPatterns.h>
 #include <cassert>
-#include <exception/SyntaxException.h>
+#include <exception/SpaException.h>
 
 /**
  * This method checks if the given string as in the correct name syntax.

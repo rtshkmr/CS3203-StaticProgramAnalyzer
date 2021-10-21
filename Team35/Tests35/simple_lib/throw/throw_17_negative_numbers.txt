@@ -1,0 +1,3 @@
+procedure Neggy {
+   x = -1;
+}

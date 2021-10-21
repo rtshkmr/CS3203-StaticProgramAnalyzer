@@ -802,8 +802,80 @@ TEST_CASE("SP to PKB relationships tests") {
 
 TEST_CASE("CFG and Next relationship tests") {
   PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/mixed_loops2_source.txt");
+  std::vector<std::tuple<EntityEnum, std::string>> source_tuples = {
+      {EntityEnum::kAssignEntity, "-1000000"}, // placeholder
+      {EntityEnum::kAssignEntity, "1"},
+      {EntityEnum::kReadEntity, "2"},
+      {EntityEnum::kIfEntity, "3"},
+      {EntityEnum::kAssignEntity, "4"},
+      {EntityEnum::kAssignEntity, "5"},
+      {EntityEnum::kWhileEntity, "6"},
+      {EntityEnum::kWhileEntity, "7"},
+      {EntityEnum::kReadEntity, "8"},
+      {EntityEnum::kIfEntity, "9"},
+      {EntityEnum::kAssignEntity, "10"},
+      {EntityEnum::kAssignEntity, "11"},
+      {EntityEnum::kIfEntity, "12"},
+      {EntityEnum::kAssignEntity, "13"},
+      {EntityEnum::kPrintEntity, "14"},
+      {EntityEnum::kAssignEntity, "15"},
+      {EntityEnum::kPrintEntity, "16"},
+      {EntityEnum::kAssignEntity, "17"},
+      {EntityEnum::kPrintEntity, "18"},
+      {EntityEnum::kIfEntity, "19"},
+      {EntityEnum::kPrintEntity, "20"},
+      {EntityEnum::kPrintEntity, "21"},
+      {EntityEnum::kPrintEntity, "22"},
+      {EntityEnum::kAssignEntity, "23"}
+  };
 
   SECTION("Next relationships") {
-    
+    std::vector<std::vector<std::tuple<EntityEnum, std::string>>> expected_next_lists = {
+        {source_tuples[2]},//1
+        {source_tuples[3]},//2
+        {source_tuples[4], source_tuples[6]},//3
+        {source_tuples[5]},//4
+        {source_tuples[19]},//5
+        {source_tuples[7], source_tuples[19]},//6
+        {source_tuples[6], source_tuples[8]},//7
+        {source_tuples[9]},//8
+        {source_tuples[10], source_tuples[18]},//9
+        {source_tuples[11]},//10
+        {source_tuples[12]},//11
+        {source_tuples[13], source_tuples[16]},//12
+        {source_tuples[14]},//13
+        {source_tuples[15]},//14
+        {source_tuples[17]},//15
+        {source_tuples[17]},//16
+        {source_tuples[7]},//17
+        {source_tuples[7]},//18
+        {source_tuples[20], source_tuples[21]},//19
+        {source_tuples[22]},//20
+        {source_tuples[22]},//21
+        {source_tuples[23]},//22
+        {},//23
+    };
+
+    for (int i = 0; i < 23; ++i) {
+      std::vector<Entity*> next = pkb->GetRelationship(PKBRelRefs::kNext, std::to_string(i+1));
+      CHECK(next.size() == expected_next_lists[i].size());
+      if (next.size() == 1) {
+        CHECK(next[0]->GetEntityEnum() == std::get<0>(expected_next_lists[i][0]));
+        CHECK(dynamic_cast<Statement*>(next[0])->GetStatementNumber()->GetNum() == stoi(std::get<1>(expected_next_lists[i][0])));
+      } else if (next.size() == 2) {
+        bool one_enum_or_the_other1 = (next[0]->GetEntityEnum() == std::get<0>(expected_next_lists[i][1]))
+            || (next[0]->GetEntityEnum() == std::get<0>(expected_next_lists[i][0]));
+        CHECK(one_enum_or_the_other1);
+        bool one_num_or_the_other1 = dynamic_cast<Statement*>(next[0])->GetStatementNumber()->GetNum() == stoi(std::get<1>(expected_next_lists[i][0]))
+            || dynamic_cast<Statement*>(next[0])->GetStatementNumber()->GetNum() == stoi(std::get<1>(expected_next_lists[i][1]));
+        CHECK(one_num_or_the_other1);
+        bool one_enum_or_the_other2 = (next[1]->GetEntityEnum() == std::get<0>(expected_next_lists[i][1]))
+            || (next[1]->GetEntityEnum() == std::get<0>(expected_next_lists[i][0]));
+        CHECK(one_enum_or_the_other2);
+        bool one_num_or_the_other2 = dynamic_cast<Statement*>(next[1])->GetStatementNumber()->GetNum() == stoi(std::get<1>(expected_next_lists[i][0]))
+            || dynamic_cast<Statement*>(next[1])->GetStatementNumber()->GetNum() == stoi(std::get<1>(expected_next_lists[i][1]));
+        CHECK(one_num_or_the_other2);
+      }
+    }
   }
 }
