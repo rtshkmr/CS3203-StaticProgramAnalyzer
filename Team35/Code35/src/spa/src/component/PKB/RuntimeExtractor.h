@@ -48,13 +48,6 @@ class RuntimeExtractor {
   bool HasAffectsT();
   bool HasAffectedByT();
 
-  bool HasNextT(DesignEntity first, DesignEntity second);
-  bool HasPrevT(DesignEntity first, DesignEntity second);
-  bool HasAffects(DesignEntity first, DesignEntity second);
-  bool HasAffectedBy(DesignEntity first, DesignEntity second);
-  bool HasAffectsT(DesignEntity first, DesignEntity second);
-  bool HasAffectedByT(DesignEntity first, DesignEntity second);
-
   bool HasNextT(std::string first, std::string second);
   bool HasPrevT(std::string first, std::string second);
   bool HasAffects(std::string first, std::string second);

@@ -22,7 +22,7 @@ void DBManager::PopulateDataStructures(Deliverable d) {
  * Gets relationships for 1 specific entity, e.g. Uses(3, _)
  * @param ref Relationship type
  * @param entity String form of entity to query
- * @return Vector of entities that satisfy the query
+ * @return Entities that are on the RHS of the relationship with this entity.
  */
 std::vector<Entity*> DBManager::GetRelationship(PKBRelRefs ref, std::string entity) {
   switch (ref) {
@@ -40,7 +40,7 @@ std::vector<Entity*> DBManager::GetRelationship(PKBRelRefs ref, std::string enti
  * Gets relationships for 1 type-specified entity, e.g. Uses(s, _)
  * @param ref Relationship type
  * @param de Type of entity to query
- * @return Vector of entities that satisfy the query
+ * @return All entities that can be on the LHS of the relationship.
  */
 std::vector<Entity*> DBManager::GetRelationshipByType(PKBRelRefs ref, DesignEntity de) {
   switch (ref) {
@@ -59,7 +59,7 @@ std::vector<Entity*> DBManager::GetRelationshipByType(PKBRelRefs ref, DesignEnti
  * @param ref Relationship type
  * @param first Type of first entity
  * @param second Type of second entity
- * @return Vector of entities that satisfy the query
+ * @return All possible combinations of entities in the relationship.
  */
 std::vector<std::tuple<Entity*, Entity*>> DBManager::GetRelationshipByTypes(PKBRelRefs ref,
                                                                             DesignEntity first,
@@ -78,7 +78,7 @@ std::vector<std::tuple<Entity*, Entity*>> DBManager::GetRelationshipByTypes(PKBR
 /**
  * To query for existence of relationship, e.g. Parent(_, _)
  * @param ref Relationship type
- * @return true if relationship exists
+ * @return true if any relationship exists.
  */
 bool DBManager::HasRelationship(PKBRelRefs ref) {
   switch (ref) {
@@ -97,16 +97,16 @@ bool DBManager::HasRelationship(PKBRelRefs ref) {
  * @param ref Relationship type
  * @param first Type of first entity
  * @param second Type of second entity
- * @return true if relationship exists
+ * @return true if any relationship with the specified types exists.
  */
 bool DBManager::HasRelationship(PKBRelRefs ref, DesignEntity first, DesignEntity second) {
   switch (ref) {
-    case PKBRelRefs::kNextT: return runtime_extractor_->HasNextT(first, second);
-    case PKBRelRefs::kPreviousT: return runtime_extractor_->HasPrevT(first, second);
-    case PKBRelRefs::kAffects: return runtime_extractor_->HasAffects(first, second);
-    case PKBRelRefs::kAffectedBy: return runtime_extractor_->HasAffectedBy(first, second);
-    case PKBRelRefs::kAffectsT: return runtime_extractor_->HasAffectsT(first, second);
-    case PKBRelRefs::kAffectedByT: return runtime_extractor_->HasAffectedByT(first, second);
+    case PKBRelRefs::kNextT: return runtime_extractor_->HasNextT();
+    case PKBRelRefs::kPreviousT: return runtime_extractor_->HasPrevT();
+    case PKBRelRefs::kAffects: return runtime_extractor_->HasAffects();
+    case PKBRelRefs::kAffectedBy: return runtime_extractor_->HasAffectedBy();
+    case PKBRelRefs::kAffectsT: return runtime_extractor_->HasAffectsT();
+    case PKBRelRefs::kAffectedByT: return runtime_extractor_->HasAffectedByT();
     default: return pkb_->HasRelationship(ref, first, second);
   }
 }
@@ -116,7 +116,7 @@ bool DBManager::HasRelationship(PKBRelRefs ref, DesignEntity first, DesignEntity
  * @param ref Relationship type
  * @param first String of first entity
  * @param second String of second entity
- * @return true if relationship exists
+ * @return true if relationship between the entities exists.
  */
 bool DBManager::HasRelationship(PKBRelRefs ref, std::string first, std::string second) {
   switch (ref) {

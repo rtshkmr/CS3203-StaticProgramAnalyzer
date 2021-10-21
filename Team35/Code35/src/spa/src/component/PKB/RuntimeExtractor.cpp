@@ -65,13 +65,6 @@ bool RuntimeExtractor::HasAffectedBy() { return false; }
 bool RuntimeExtractor::HasAffectsT() { return false; }
 bool RuntimeExtractor::HasAffectedByT() { return false; }
 
-bool RuntimeExtractor::HasNextT(DesignEntity first, DesignEntity second) { return false; }
-bool RuntimeExtractor::HasPrevT(DesignEntity first, DesignEntity second) { return false; }
-bool RuntimeExtractor::HasAffects(DesignEntity first, DesignEntity second) { return false; }
-bool RuntimeExtractor::HasAffectedBy(DesignEntity first, DesignEntity second) { return false; }
-bool RuntimeExtractor::HasAffectsT(DesignEntity first, DesignEntity second) { return false; }
-bool RuntimeExtractor::HasAffectedByT(DesignEntity first, DesignEntity second) { return false; }
-
 bool RuntimeExtractor::HasNextT(std::string first, std::string second) { return false; }
 bool RuntimeExtractor::HasPrevT(std::string first, std::string second) { return false; }
 bool RuntimeExtractor::HasAffects(std::string first, std::string second) { return false; }
