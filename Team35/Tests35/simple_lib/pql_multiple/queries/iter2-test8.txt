@@ -31,17 +31,17 @@ Second, Third
 7 - Multiple chained such that + pattern clauses multiple common syns target
 stmt s1; assign a1; if if1; variable v1; procedure pr1, pr2; prog_line pl;
 Select <pr1, pr2> such that Uses(a1, v1) and Calls(pr1, pr2) and Next (2, 3) and Modifies(pr1, v1) pattern a1(v1, _"i"_) pattern if1(v1, _, _) and a1(_, _) and if1(_,_,_)
-First Second, First Third, Second Second, Second Third
+First Second, Second Third
 5000
 8 - Multiple chained such that + pattern clauses multiple common syns target
 stmt s1; assign a1; if if1; variable v1; procedure pr1, pr2; prog_line pl;
 Select <pr1, v1, pr2> such that Uses(a1, v1) and Calls(pr1, pr2) and Next (2, 3) and Modifies(pr1, v1) pattern a1(v1, _"i"_) pattern if1(v1, _, _) and a1(_, _) and if1(_,_,_)
-First i Second, First i Third, Second i Second, Second i Third
+First i Second, Second i Third
 5000
 9 - Multiple chained pattern + such that clauses multiple common syns target
 stmt s1; assign a1; if if1; variable v1; procedure pr1, pr2; prog_line pl;
 Select <a1, v1, pr1> pattern a1(v1, _"i"_) pattern if1(v1, _, _) and a1(_, _) and if1(_,_,_) such that Uses(a1, v1) and Calls(pr1, pr2) and Next (2, 3) and Modifies(pr1, v1)
-12 i Second, 12 i Third
+12 i First, 12 i Second
 5000
 10 - Multiple chained pattern + such that clauses multiple common & uncommon syns target
 stmt s1; assign a1; if if1; variable v1; procedure pr1, pr2; prog_line pl;
@@ -66,7 +66,7 @@ i
 14 - Multiple chained interleaving such that + pattern clauses one uncommon syn target
 stmt s1; assign a1; if if1; variable v1; procedure pr1, pr2; prog_line pl;
 Select <pr1> such that Uses(a1, v1) and Calls(pr1, pr2) and Next (2, 3) and Modifies(pr1, v1) pattern a1(v1, _"i"_) pattern if1(v1, _, _) and a1(_, _) and if1(_,_,_)
-First Second
+First, Second
 5000
 15 - Multiple chained interleaving such that + pattern clauses one uncommon syn target
 stmt s1; assign a1; if if1; variable v1; procedure pr1, pr2; prog_line pl;
