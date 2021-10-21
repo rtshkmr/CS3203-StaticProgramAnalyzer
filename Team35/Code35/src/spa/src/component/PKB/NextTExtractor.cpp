@@ -151,7 +151,7 @@ std::list<Statement*> NextTExtractor::GetNextTByTraversal(Block* block, int targ
   }
 
   if (block->GetNextBlocks().size() == 2) { // if block because while was handled separately
-    AddNextT(stmt_list_[range.second - 1], next_t);
+    AddNextTForIf(stmt_list_[range.second - 1], next_t);
   } else {
     AddNextT(stmt_list_[range.second - 1], next_t);
   }
@@ -195,7 +195,7 @@ void NextTExtractor::AddNextTRelationship(Statement* s1, Statement* s2) {
 }
 
 /**
- * Assumes that there are no duplicates.
+ * Assumes that there are no duplicates. Appending lists take O(1).
  */
 void NextTExtractor::AddNextT(Statement* s1, std::list<Statement*> s2) {
   assert(next_t_map_.count(s1) == 0);
@@ -206,13 +206,21 @@ void NextTExtractor::AddNextT(Statement* s1, std::list<Statement*> s2) {
 }
 
 /**
- * Adds Next* while checking for duplicates. Uses a array for tracking duplicates, taking O(n) time.
+ * Adds Next* while checking for duplicates. Uses an array for tracking duplicates, taking O(n) time.
  */
 void NextTExtractor::AddNextTForIf(Statement* s1, std::list<Statement*> s2) {
   assert(next_t_map_.count(s1) == 0);
   if (s2.empty()) return;
+
   auto* list = new std::list<Statement*>();
-  list->insert(list->begin(), s2.begin(), s2.end());
+  int s1_num = s1->GetStatementNumber()->GetNum();
+  for (Statement* s: s2) {
+    int s_num = s->GetStatementNumber()->GetNum();
+    if (next_t_array_[s1_num-1][s_num-1] == 0) {
+      next_t_array_[s1_num-1][s_num-1] = 1;
+      list->push_back(s);
+    }
+  }
   next_t_map_.insert({s1, list});
 }
 
@@ -239,7 +247,8 @@ void NextTExtractor::Init() {
   int total = 0;
   for (Procedure* proc: proc_list_) {
     Cluster* proc_cluster = const_cast<Cluster*>(proc->GetClusterRoot());
-    total += proc_cluster->GetStartEndRange().second - proc_cluster->GetStartEndRange().first;
+    int last_stmt = proc_cluster->GetStartEndRange().second;
+    total = last_stmt > total ? last_stmt : total;
   }
   for (int i = 0; i < total; ++i) {
     std::vector v(total, 0);
