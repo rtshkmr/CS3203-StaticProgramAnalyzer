@@ -20,7 +20,7 @@ UnformattedQueryResult QueryEvaluator::EvaluateQuery(std::vector<Group *> list_o
     if (current_group->ContainsTargetSynonym()) {
       // Evaluate non-boolean group
       Synonym *first_target_synonym = current_group->GetTargetSynonyms()[0];
-      QueryEvaluatorTable *table = new QueryEvaluatorTable(first_target_synonym);
+      QueryEvaluatorTable *table = new QueryEvaluatorTable(current_group->GetTargetSynonyms());
       DesignEntity de = first_target_synonym->GetType();
 
       table->AddTargetSynonymValues(first_target_synonym, pkb->GetDesignEntities(de));
