@@ -198,3 +198,9 @@ std::vector<Entity*> NextTExtractor::ltov(std::list<Statement*> l) {
   std::copy(std::begin(l), std::end(l), std::back_inserter(v));
   return v;
 }
+
+std::vector<Entity*> NextTExtractor::GetPrevT(std::string target,
+                                              std::vector<Procedure*> proc_list,
+                                              std::vector<Statement*> stmt_list) {
+  return std::vector<Entity*>();
+}

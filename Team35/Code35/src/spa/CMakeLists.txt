@@ -51,7 +51,10 @@ add_library(spa ${srcs} ${headers}
         src/component/SourceProcessor/Extractors/NextExtractor.cpp src/component/SourceProcessor/Extractors/NextExtractor
         src/component/SourceProcessor/Extractors/CallsTExtractor.cpp 
         src/component/SourceProcessor/Extractors/CallsTExtractor.h
-        src/component/PKB/DBManager.cpp src/component/PKB/DBManager.h)
+        src/component/PKB/DBManager.cpp src/component/PKB/DBManager.h
+        src/component/PKB/AffectsExtractor.cpp src/component/PKB/AffectsExtractor.h
+        src/component/PKB/AffectsTExtractor.cpp src/component/PKB/AffectsTExtractor.h
+        )
 
 
 # this makes the headers accessible for other projects which uses spa lib
