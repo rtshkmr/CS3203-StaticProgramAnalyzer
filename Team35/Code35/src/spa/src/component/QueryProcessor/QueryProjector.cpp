@@ -2,7 +2,8 @@
 #include <cassert>
 #include "QueryProjector.h"
 
-QueryProjector::QueryProjector(std::vector<Synonym*> target_synonyms_list) : target_synonym_list(target_synonyms_list) {}
+QueryProjector::QueryProjector(std::vector<Synonym*> target_synonyms_list)
+    : target_synonym_list(target_synonyms_list) {}
 
 /**
  * Formats the UnformattedQueryResult into the requirements for the TestWrapper.
@@ -18,7 +19,6 @@ QueryProjector::QueryProjector(std::vector<Synonym*> target_synonyms_list) : tar
  */
 std::vector<std::string> QueryProjector::FormatQuery(UnformattedQueryResult unformatted_results) {
   std::vector<QueryEvaluatorTable*> table_references = unformatted_results.GetTables();
-
 
   if (!unformatted_results.GetBooleanResult() && !target_synonym_list.empty()) {
     return std::vector<std::string>{};
@@ -76,6 +76,7 @@ std::vector<std::vector<std::string>> QueryProjector::StringifyTable(std::vector
       case DesignEntity::kWhile:
       case DesignEntity::kIf:
       case DesignEntity::kAssign:
+      case DesignEntity::kProgLine:
         for (Entity* entity: entity_column) {
           int statement_num = dynamic_cast<Statement*>(entity)->GetStatementNumber()->GetNum();
           stringified_column.push_back(std::to_string(statement_num));
