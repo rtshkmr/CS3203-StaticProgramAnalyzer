@@ -6,7 +6,7 @@
 #include "PKB.h"
 
 /**
- * This class acts as a facade for runtime extraction of relationships, for the QueryProcessor to query.
+ * This class acts as a facade for runtime extraction of relationships, for the DBManager to query.
  */
 class RuntimeExtractor {
  private:
