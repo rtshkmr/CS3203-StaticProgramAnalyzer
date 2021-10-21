@@ -43,11 +43,6 @@ stmt s1; assign a1; if if1; variable v1; procedure pr1, pr2; prog_line pl;
 Select <a1, v1, pr1> pattern a1(v1, _"i"_) pattern if1(v1, _, _) and a1(_, _) and if1(_,_,_) such that Uses(a1, v1) and Calls(pr1, pr2) and Next (2, 3) and Modifies(pr1, v1)
 12 i Second, 12 i Third
 5000
-10 - Multiple chained pattern + such that clauses multiple common & uncommon syns target
-stmt s1; assign a1; if if1; variable v1; procedure pr1, pr2; prog_line pl;
-Select <a1, v1, pl, pr1> pattern a1(v1, _"i"_) pattern if1(v1, _, _) and a1(_, _) and if1(_,_,_) such that Uses(a1, v1) and Calls(pr1, pr2) and Next (2, 3) and Modifies(pr1, v1)
-WHAT
-5000
 11 - Multiple chained interleaving such that + pattern clauses some duplicate syns target
 stmt s1; assign a1; if if1; variable v1; procedure pr1, pr2; prog_line pl;
 Select <a1, v1, v1> pattern a1(v1, _"i"_) pattern if1(v1, _, _) and a1(_, _) and if1(_,_,_) such that Uses(a1, v1) and Calls(pr1, pr2) and Next (2, 3) and Modifies(pr1, v1)
