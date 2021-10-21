@@ -1,0 +1,35 @@
+1 - Multiple chained such that + pattern clauses BOOLEAN target
+stmt s1; assign a1; if if1; variable v1; procedure pr1, pr2; prog_line pl;
+Select BOOLEAN such that Uses(a1, v1) and Calls(pr1, pr2) and Next (2, 3) and Modifies(pr1, v1) pattern a1(v1, _"i"_) pattern if1(v1, _, _) and a1(_, _) and if1(_,_,_)
+TRUE
+5000
+2 - Multiple chained pattern + such that clauses BOOLEAN target
+stmt s1; assign a1; if if1; variable v1; procedure pr1, pr2; prog_line pl;
+Select BOOLEAN pattern a1(v1, _"i"_) pattern if1(v1, _, _) and a1(_, _) and if1(_,_,_) such that Uses(a1, v1) and Calls(pr1, pr2) and Next (2, 3) and Modifies(pr1, v1)
+TRUE
+5000
+3 - Multiple chained interleaving such that + pattern clauses BOOLEAN target
+stmt s1; assign a1; if if1; variable v1; procedure pr1, pr2; prog_line pl;
+Select BOOLEAN such that Modifies(pr1, v1) pattern if1(v1, _, _) such that Uses(a1, v1) pattern a1(_, _) such that Calls(pr1, pr2) pattern if1(_,_,_) such that Next (2, 3)
+TRUE
+5000
+4 - Multiple chained interleaving pattern + such that clauses BOOLEAN target
+stmt s1; assign a1; if if1; variable v1; procedure pr1, pr2; prog_line pl;
+Select BOOLEAN such that Modifies(pr1, v1) pattern if1(v1, _, _) such that Uses(a1, v1)
+TRUE
+5000
+5 - Multiple chained such that + pattern clauses multiple common syn target
+stmt s1; assign a1; if if1; variable v1; procedure pr1, pr2; prog_line pl;
+Select <pr1> such that Uses(a1, v1) and Calls(pr1, pr2) and Next (2, 3) and Modifies(pr1, v1) pattern a1(v1, _"i"_) pattern if1(v1, _, _) and a1(_, _) and if1(_,_,_)
+First, Second
+5000
+6 - Multiple chained such that + pattern clauses multiple common syn target
+stmt s1; assign a1; if if1; variable v1; procedure pr1, pr2; prog_line pl;
+Select <v1> such that Uses(a1, v1) and Calls(pr1, pr2) and Next (2, 3) and Modifies(pr1, v1) pattern a1(v1, _"i"_) pattern if1(v1, _, _) and a1(_, _) and if1(_,_,_)
+Second, Third
+5000
+7 - Multiple chained such that + pattern clauses multiple common syn target
+stmt s1; assign a1; if if1; variable v1; procedure pr1, pr2; prog_line pl;
+Select <pr1, pr2> such that Uses(a1, v1) and Calls(pr1, pr2) and Next (2, 3) and Modifies(pr1, v1) pattern a1(v1, _"i"_) pattern if1(v1, _, _) and a1(_, _) and if1(_,_,_)
+First Second, First Third, Second Second, Second Third
+5000
