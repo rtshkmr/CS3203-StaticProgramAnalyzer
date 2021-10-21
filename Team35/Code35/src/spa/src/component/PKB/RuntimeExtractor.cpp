@@ -58,12 +58,8 @@ std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetAffectedByT(Desig
   return std::vector<std::tuple<Entity*, Entity*>>();
 }
 
-bool RuntimeExtractor::HasNextT() { return false; }
-bool RuntimeExtractor::HasPrevT() { return false; }
 bool RuntimeExtractor::HasAffects() { return false; }
 bool RuntimeExtractor::HasAffectedBy() { return false; }
-bool RuntimeExtractor::HasAffectsT() { return false; }
-bool RuntimeExtractor::HasAffectedByT() { return false; }
 
 bool RuntimeExtractor::HasNextT(std::string first, std::string second) { return false; }
 bool RuntimeExtractor::HasPrevT(std::string first, std::string second) { return false; }

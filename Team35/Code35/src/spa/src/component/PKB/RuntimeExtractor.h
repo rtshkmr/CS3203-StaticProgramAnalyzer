@@ -41,12 +41,8 @@ class RuntimeExtractor {
   std::vector<std::tuple<Entity*, Entity*>> GetAffectsT(DesignEntity first, DesignEntity second);
   std::vector<std::tuple<Entity*, Entity*>> GetAffectedByT(DesignEntity first, DesignEntity second);
 
-  bool HasNextT();
-  bool HasPrevT();
   bool HasAffects();
   bool HasAffectedBy();
-  bool HasAffectsT();
-  bool HasAffectedByT();
 
   bool HasNextT(std::string first, std::string second);
   bool HasPrevT(std::string first, std::string second);

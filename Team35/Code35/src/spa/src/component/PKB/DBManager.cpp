@@ -82,12 +82,12 @@ std::vector<std::tuple<Entity*, Entity*>> DBManager::GetRelationshipByTypes(PKBR
  */
 bool DBManager::HasRelationship(PKBRelRefs ref) {
   switch (ref) {
-    case PKBRelRefs::kNextT: return runtime_extractor_->HasNextT();
-    case PKBRelRefs::kPreviousT: return runtime_extractor_->HasPrevT();
+    case PKBRelRefs::kNextT:  // fallthrough
+    case PKBRelRefs::kPreviousT: return pkb_->HasRelationship(PKBRelRefs::kNext);
     case PKBRelRefs::kAffects: return runtime_extractor_->HasAffects();
     case PKBRelRefs::kAffectedBy: return runtime_extractor_->HasAffectedBy();
-    case PKBRelRefs::kAffectsT: return runtime_extractor_->HasAffectsT();
-    case PKBRelRefs::kAffectedByT: return runtime_extractor_->HasAffectedByT();
+    case PKBRelRefs::kAffectsT: return runtime_extractor_->HasAffects();
+    case PKBRelRefs::kAffectedByT: return runtime_extractor_->HasAffectedBy();
     default: return pkb_->HasRelationship(ref);
   }
 }
@@ -101,12 +101,12 @@ bool DBManager::HasRelationship(PKBRelRefs ref) {
  */
 bool DBManager::HasRelationship(PKBRelRefs ref, DesignEntity first, DesignEntity second) {
   switch (ref) {
-    case PKBRelRefs::kNextT: return runtime_extractor_->HasNextT();
-    case PKBRelRefs::kPreviousT: return runtime_extractor_->HasPrevT();
+    case PKBRelRefs::kNextT:  // fallthrough
+    case PKBRelRefs::kPreviousT: return pkb_->HasRelationship(PKBRelRefs::kNext);
     case PKBRelRefs::kAffects: return runtime_extractor_->HasAffects();
     case PKBRelRefs::kAffectedBy: return runtime_extractor_->HasAffectedBy();
-    case PKBRelRefs::kAffectsT: return runtime_extractor_->HasAffectsT();
-    case PKBRelRefs::kAffectedByT: return runtime_extractor_->HasAffectedByT();
+    case PKBRelRefs::kAffectsT: return runtime_extractor_->HasAffects();
+    case PKBRelRefs::kAffectedByT: return runtime_extractor_->HasAffectedBy();
     default: return pkb_->HasRelationship(ref, first, second);
   }
 }
