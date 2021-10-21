@@ -1,6 +1,5 @@
 #include <queue>
 #include "QueryGrouper.h"
-#include <component/QueryProcessor/types/Exceptions.h>
 
 /**
  * Groups multiple queries that should be evaluated together, based on existence of common synonyms.

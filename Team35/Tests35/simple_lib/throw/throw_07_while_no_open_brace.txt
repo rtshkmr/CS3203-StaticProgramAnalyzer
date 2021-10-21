@@ -1,0 +1,5 @@
+procedure WhileNoOpenBrace {
+	while (a == b) 
+		x = 1; 
+	}
+}

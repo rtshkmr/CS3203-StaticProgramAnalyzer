@@ -1,0 +1,65 @@
+1 - Select BOOLEAN with pattern checking for nonexistent while
+stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
+Select BOOLEAN pattern w1("NoSuchVar", _)
+FALSE
+5000
+2 - Select BOOLEAN with nonexistent wildcard
+stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
+Select BOOLEAN such that Follows(_, 1)
+FALSE
+5000
+3 - Select BOOLEAN with true wildcard clause
+stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
+Select BOOLEAN such that Follows(_, _)
+TRUE
+5000
+4 - Select BOOLEAN with true clause
+stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
+Select BOOLEAN such that Follows*(s1, w1)
+TRUE
+5000
+5 - Select tuple with boolean clause
+stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
+Select <w1> such that Follows(_, _)
+6
+5000
+6 - Incorrect tuple since theres no a1 declared
+stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
+Select <s1, a1> such that Follows(_, 1)
+none
+5000
+7 - Select tuple with false boolean clause
+stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
+Select <s1, w1> such that Follows(_, 1)
+none
+5000
+8 - Select tuple with false boolean clause
+stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
+Select <w1, pr1> such that Follows(w1, 1)
+none
+5000
+9 - Select tuple (1) with target synonym in clause
+stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
+Select <w1, s1> such that Follows(s1, 2)
+6 1
+5000
+10 - Select tuple (1) with target synonym in clause
+stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
+Select <s1, w1> such that Follows(s1, 2)
+1 6
+5000
+11 - Select tuple (multiple) with target synonym in clause
+stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
+Select <s1, v1> such that Follows(s1, 2)
+1 x, 1 z, 1 i, 1 y, 1 v
+5000
+12 - Select tuple with repeated synonym with target synonym not in clause
+stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
+Select <w1, w1> such that Follows(s1, 2)
+6 6
+5000
+13 - Select tuple with repeated synonym
+stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
+Select <w1, s1, w1> such that Follows*(s1, 3)
+6 1 6, 6 2 6
+5000

@@ -1,0 +1,7 @@
+procedure IfNoStmtList {
+	x = 1; 
+	if (if == else) {
+	} else {
+		else = if;
+	}
+}

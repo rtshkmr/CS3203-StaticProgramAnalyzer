@@ -1,0 +1,65 @@
+1 - Only such that clause, valid result
+stmt s1; assign a1; variable v1; procedure pr1; prog_line pl;
+Select s1 such that Follows(s1, a1) and Follows*(s1, a1) and Follows(s1, a1)
+4,8,10, 13, 14, 16
+5000
+2 - Only such that clause, invalid result
+stmt s1; assign a1; variable v1; procedure pr1; prog_line pl;
+Select a1 such that Follows(s1, a1) and Follows*(a1, s1) and Follows(s1, a1)
+none
+5000
+3 - Only such that clause, variable appears to the left and right of assignment operator
+stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
+Select s1 such that Uses(s1, v1) and Modifies(s1, v1)
+3, 6, 7, 8, 9,10, 11, 13, 15
+5000
+4 - Only such that clause, variable appears to the left and right of assignment operator
+stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
+Select v1 such that Modifies(s1, v1) and Uses(s1, v1)
+x, i, z, v, y
+5000
+5 - Only Pattern clause, valid
+stmt s1; assign a1; variable v1; procedure pr1; prog_line pl;
+Select a1 pattern a1(v1, _) and a1(v1, _"i"_)
+9, 13
+5000
+6 - Only Pattern clause, invalid because multiple exact matches
+stmt s1; assign a1; variable v1; procedure pr1; prog_line pl;
+Select a1 pattern a1(v1, "x") and a1(v1, "i")
+none
+5000
+7 - Only Pattern clause, valid because multiple partial matches
+stmt s1; assign a1; variable v1; procedure pr1; prog_line pl;
+Select a1 pattern a1(v1, "x") and a1(v1, "i")
+none
+5000
+8 - select while cluase, duplicated select
+stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
+Select w1 pattern w1(v1, _) and w1(v1, _)
+6
+5000
+9 - select if clause, same control variable duplicated
+stmt s1; if if1; variable v1; procedure pr1; prog_line pl;
+Select if1 pattern if1(v1, _, _) pattern if1(v1, _, _)
+10
+5000
+10 - Mix uses and ass pattern
+stmt s1; assign a1; if if1; variable v1; procedure pr1; prog_line pl;
+Select a1 such that Uses(a1, v1) pattern a1(v1, _"i"_)
+9, 13
+5000
+11 - Mix: pattern and modifies
+stmt s1; assign a1; if if1; variable v1; procedure pr1;
+Select a1 pattern a1(v1, _"i"_) such that Modifies(a1, v1) pattern a1(v1, _"i"_)
+9, 13
+5000
+12 - Mix while and uses as boolean, returns all assignments
+stmt s1; assign a1; while w1; if if1; variable v1; procedure pr1; prog_line pl;
+Select a1 pattern w1(v1, _) such that Uses(w1, v1)
+4,5,7,9,11,12,13,14,15,16,17
+5000
+13 - Mix with non double present
+stmt s1; assign a1, if if1; variable v1; procedure pr1; prog_line pl;
+Select a1 such that Uses(a1, v1) pattern a1(v1, _"i"_) and pattern if1(v1, _, _)
+none
+5000

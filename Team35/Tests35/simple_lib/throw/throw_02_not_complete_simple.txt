@@ -1,0 +1,5 @@
+procedure One { 
+	onlyC0nstant = 0; 
+	newConstant = 19304; 
+	onlyC0nstant = 2147483647;
+	twoBillion = 2000000000; 

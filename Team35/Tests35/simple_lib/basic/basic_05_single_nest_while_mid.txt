@@ -1,0 +1,16 @@
+procedure fiveer {
+	index = 1; 
+	index = 0; 
+	zeroooooo0 = 0;
+	
+	while (fiveer == index) {
+		imagine = APlus; 
+		reality = CPlusPlus; 
+		Hope = APlus - CPlusPlus; 
+		Despair = APlus * zeroooooo0 + CPlusPlus; 
+	}
+
+	Despair = CS3203 + CPlus; 
+	imagine = if % CS3203 + APlus; 
+	Reality = APlus * 0 + Despair; 
+}

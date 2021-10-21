@@ -1,11 +1,11 @@
 #include "QueryParser.h"
 #include "QuerySemanticValidator.h"
-#include <component/QueryProcessor/types/Exceptions.h>
 #include <component/SourceProcessor/Tokenizer.h>
 #include <component/SourceProcessor/SyntaxValidator.h>
 #include <datatype/RegexPatterns.h>
 #include <unordered_set>
 #include <sstream>
+#include <exception/SpaException.h>
 
 /**
  * Checks that current lookahead has the same expected type. If valid, advances tokenizer to next lookahead.
@@ -227,9 +227,11 @@ std::tuple<std::string, bool, bool, bool> QueryParser::ParseStmtOrEntRef() {
 
   // dispatch parsing to correct handler
   if (is_uses_or_modifies_p) {
-    Token tok = ParseEntRef(false);
-    is_synonym = IsValidSynonym(tok);
-    is_target_synonym = target_synonyms_map.find(tok.GetTokenString()) != target_synonyms_map.end();
+    Token tok = Token("", TokenTag::kInvalid);
+    bool is_case_syn;
+    std::tie(tok, is_case_syn) = ParseEntRef(false);
+    is_synonym = is_case_syn && IsValidSynonym(tok);
+    is_target_synonym = is_synonym && target_synonyms_map.find(tok.GetTokenString()) != target_synonyms_map.end();
   } else {
     std::tie(curr_lookahead, is_synonym, is_target_synonym) = ParseStmtRef();
   }
@@ -264,10 +266,12 @@ std::pair<Clause*, bool> QueryParser::ParseRelRef() {
 
   // 3 cases for parsing lhs of relref
   if (rel_type.find("Calls") == 0) {
-    Token tok = ParseEntRef(false);
+    Token tok = Token("", TokenTag::kInvalid);
+    bool is_case_syn;
+    std::tie(tok, is_case_syn) = ParseEntRef(false);
     lhs = tok.GetTokenString();
-    is_lhs_syn = IsValidSynonym(tok);
-    is_lhs_tgt_syn = target_synonyms_map.find(tok.GetTokenString()) != target_synonyms_map.end();
+    is_lhs_syn = is_case_syn && IsValidSynonym(tok);
+    is_lhs_tgt_syn = is_lhs_syn && target_synonyms_map.find(tok.GetTokenString()) != target_synonyms_map.end();
   }
   else if (rel_type == "Uses" || rel_type == "Modifies") {
     std::tie(lhs, is_lhs_syn, is_lhs_tgt_syn, is_uses_or_modifies_p) = ParseStmtOrEntRef();
@@ -287,10 +291,12 @@ std::pair<Clause*, bool> QueryParser::ParseRelRef() {
   bool is_rhs_syn = false;
   bool is_rhs_tgt_syn = false;
   if (rel_type == "Uses" || rel_type == "Modifies" || rel_type.find("Calls") == 0) {
-    Token tok = ParseEntRef(false);
+    Token tok = Token("", TokenTag::kInvalid);
+    bool is_case_syn;
+    std::tie(tok, is_case_syn) = ParseEntRef(false);
     rhs = tok.GetTokenString();
-    is_rhs_syn = IsValidSynonym(tok);
-    is_rhs_tgt_syn = target_synonyms_map.find(tok.GetTokenString()) != target_synonyms_map.end();
+    is_rhs_syn = is_case_syn && IsValidSynonym(tok);
+    is_rhs_tgt_syn = is_rhs_syn && target_synonyms_map.find(tok.GetTokenString()) != target_synonyms_map.end();
   } else {
     std::tie(rhs, is_rhs_syn, is_rhs_tgt_syn) = ParseStmtRef();
   }
@@ -347,11 +353,13 @@ void QueryParser::ParseWith() {
 /**
  * Parses a Entity Reference (EntRef).
  * @param isPatternCl is a bool that is true if EntRef to parse is for pattern clause, false if its for such that.
- * @return a Token object with the corresponding information of the parsed entRef.
+ * @return a Token object with the corresponding information of the parsed entRef, a bool denoting whether
+ * the entRef was synonym (true) or IDENT (false)
  */
-Token QueryParser::ParseEntRef(bool isPatternCl) {
+std::pair<Token, bool> QueryParser::ParseEntRef(bool isPatternCl) {
   std::string token_name;
   TokenTag token_type;
+  bool is_syn = false;
   if (lookahead.GetTokenTag() == TokenTag::kName) {
     // parse as known synonym. Synonym must be variable for pattern cl.
     if (isPatternCl && !IsValidSynonym(lookahead, DesignEntity::kVariable)) {
@@ -362,6 +370,7 @@ Token QueryParser::ParseEntRef(bool isPatternCl) {
     }
     token_name = Eat(TokenTag::kName).GetTokenString();
     token_type = TokenTag::kName;
+    is_syn = true;
   } else if (lookahead.GetTokenTag() == TokenTag::kUnderscore) {
     // parse as underscore
     Eat(TokenTag::kUnderscore);
@@ -374,7 +383,7 @@ Token QueryParser::ParseEntRef(bool isPatternCl) {
     token_type = TokenTag::kName;
     Eat(TokenTag::kStringQuote);
   }
-  return Token(token_name, token_type);
+  return {Token(token_name, token_type), is_syn};
 }
 
 // expression-spec : ‘"‘ expr’"’ | ‘_’ ‘"’ expr ‘"’ ‘_’ | ‘_’
@@ -464,10 +473,12 @@ void QueryParser::ParseWhilePattern() {
   Eat(TokenTag::kName); // eat 'syn-while'
   Eat(TokenTag::kOpenBracket);
   // parse_lhs
-  Token lhs_token = ParseEntRef(true);
+  Token lhs_token = Token("", TokenTag::kInvalid);
+  bool lhs_is_case_syn;
+  std::tie(lhs_token, lhs_is_case_syn) = ParseEntRef(true);
   Eat(TokenTag::kComma);
   std::string lhs = lhs_token.GetTokenString();
-  bool lhs_is_syn = IsValidSynonym(lhs_token, DesignEntity::kVariable);
+  bool lhs_is_syn = lhs_is_case_syn && IsValidSynonym(lhs_token, DesignEntity::kVariable);
   //parse_rhs
   Eat(TokenTag::kUnderscore);
   Eat(TokenTag::kCloseBracket);
@@ -488,10 +499,12 @@ void QueryParser::ParseAssignPattern() {
   Eat(TokenTag::kName); // eat 'syn-assign'
   Eat(TokenTag::kOpenBracket);
   // parse_lhs
-  Token lhs_token = ParseEntRef(true);
+  Token lhs_token = Token("", TokenTag::kInvalid);
+  bool lhs_is_case_syn;
+  std::tie(lhs_token, lhs_is_case_syn) = ParseEntRef(true);
   Eat(TokenTag::kComma);
   std::string lhs = lhs_token.GetTokenString();
-  bool lhs_is_syn = IsValidSynonym(lhs_token, DesignEntity::kVariable);
+  bool lhs_is_syn = lhs_is_case_syn && IsValidSynonym(lhs_token, DesignEntity::kVariable);
   //parse_rhs
   std::pair<std::string, bool> rhs_info = ParseExpressionSpec();
   Eat(TokenTag::kCloseBracket);
@@ -512,10 +525,12 @@ void QueryParser::ParseIfPattern() {
   Eat(TokenTag::kName); // eat 'syn-if'
   Eat(TokenTag::kOpenBracket);
   // parse_lhs
-  Token lhs_token = ParseEntRef(true);
+  Token lhs_token = Token("", TokenTag::kInvalid);
+  bool lhs_is_case_syn;
+  std::tie(lhs_token, lhs_is_case_syn) = ParseEntRef(true);
   Eat(TokenTag::kComma);
   std::string lhs = lhs_token.GetTokenString();
-  bool lhs_is_syn = IsValidSynonym(lhs_token, DesignEntity::kVariable);
+  bool lhs_is_syn = lhs_is_case_syn && IsValidSynonym(lhs_token, DesignEntity::kVariable);
   //parse mid and rhs
   Eat(TokenTag::kUnderscore);
   Eat(TokenTag::kComma);

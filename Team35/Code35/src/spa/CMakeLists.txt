@@ -22,7 +22,6 @@ add_library(spa ${srcs} ${headers}
         src/component/SourceProcessor/DesignExtractor.cpp
         src/component/SourceProcessor/Parser.h src/component/SourceProcessor/Parser.cpp
         src/component/SourceProcessor/DesignExtractor.h
-        src/component/QueryProcessor/types/Exceptions.h
         src/component/QueryProcessor/types/Types.h src/component/QueryProcessor/types/Types.cpp
         src/component/QueryProcessor/types/QueryEvaluatorTable.h src/component/QueryProcessor/types/QueryEvaluatorTable.cpp
         src/component/QueryProcessor/types/UnformattedQueryResult.h src/component/QueryProcessor/types/UnformattedQueryResult.cpp

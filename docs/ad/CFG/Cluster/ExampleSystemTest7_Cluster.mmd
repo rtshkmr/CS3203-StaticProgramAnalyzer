@@ -1,0 +1,23 @@
+stateDiagram-v2  
+   state "1: Procedure Cluster (1, 7)" as Procedure Cluster {
+        1_If_Cluster(1,7) 
+   }
+
+
+    state 1_If_Cluster(1,7) {
+        2_IfCluster_(2,4) --> 5_IfCluster_(5,7)
+    }
+
+    state 5_IfCluster_(5,7) {
+     5_IfCondBlock(5,5) --> 6_IfBodyBlock(6,6)
+     6_IfBodyBlock(6,6) --> 7_ElseBodyBlock(7,7)
+    }
+
+
+
+    state 2_IfCluster_(2,4) {
+            2_IfCondBlock(2,2) --> 3_IfBodyBlock(3,3)
+            3_IfBodyBlock(3,3) --> 4_ElseBodyBlock(4,4)
+    }
+
+    

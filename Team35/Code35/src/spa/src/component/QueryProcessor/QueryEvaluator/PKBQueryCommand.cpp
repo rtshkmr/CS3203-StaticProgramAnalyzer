@@ -22,12 +22,12 @@ PKBRelRefs PKBQueryCommand::GetPKBRelRef(RelRef relation, bool order_of_values_u
                     return order_of_values_unchanged_from_clause ? PKBRelRefs::kFollowsT : PKBRelRefs::kFollowedByT;
                     case RelRef::kCalls:
                       return order_of_values_unchanged_from_clause ? PKBRelRefs::kCalls : PKBRelRefs::kCalledBy;
-//                      case RelRef::kCallsT:
-//                        return PKBRelRefs::kCallsT;
-//                        case RelRef::kNext:
-//                          return PKBRelRefs::kNext;
-//                          case RelRef::kNextT:
-//                            return PKBRelRefs::kNextT;
+                        case RelRef::kCallsT:
+                          return order_of_values_unchanged_from_clause ? PKBRelRefs::kCallsT : PKBRelRefs::kCalledByT;
+                          case RelRef::kNext:
+                            return order_of_values_unchanged_from_clause ? PKBRelRefs::kNext : PKBRelRefs::kPrevious;
+//                            case RelRef::kNextT:
+//                              return PKBRelRefs::kNextT;
 //                            case RelRef::kAffects:
 //                              return PKBRelRefs::kAffects;
 //                              case RelRef::kAffectsT:
@@ -221,7 +221,7 @@ IntermediateTable * QuerySuchThatNoSynonymCommand::ExecuteQuery(Clause *clause) 
     return this->receiver->QueryPKBByValueForBoolean(pkb_rel, such_that->right_hand_side);
   } else if (such_that->right_hand_side == "_") {
     PKBRelRefs pkb_rel = GetPKBRelRef(such_that->rel_ref, true);
-    return this->receiver->QueryPKBByValueForBoolean(pkb_rel, such_that->right_hand_side);
+    return this->receiver->QueryPKBByValueForBoolean(pkb_rel, such_that->left_hand_side);
   } else {
     PKBRelRefs pkb_rel = GetPKBRelRef(such_that->rel_ref, true);
     return this->receiver->QueryPKBByValueForBoolean(pkb_rel, such_that->left_hand_side, such_that->right_hand_side);
