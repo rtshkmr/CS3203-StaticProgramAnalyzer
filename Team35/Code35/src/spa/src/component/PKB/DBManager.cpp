@@ -19,7 +19,8 @@ void DBManager::PopulateDataStructures(Deliverable d) {
 }
 
 /**
- * Gets relationships for 1 specific entity, e.g. Uses(3, _)
+ * Gets relationships for 1 specific entity, e.g. Uses(3, _) or Affects(3, a)
+ * but not (3, _) for runtime relationships.
  * @param ref Relationship type
  * @param entity String form of entity to query
  * @return Entities that are on the RHS of the relationship with this entity.
