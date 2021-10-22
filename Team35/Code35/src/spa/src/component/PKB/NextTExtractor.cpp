@@ -100,23 +100,25 @@ std::list<Statement*> NextTExtractor::GetNextTFromWhile(Cluster* w_cluster, int 
   Block* block_after_w = w_block;
   for (Block* next_block: w_block->GetNextBlocks()) {
     // not the immediate block after the w cond
-    if (next_block->GetStartEndRange().first != block_after_w->GetStartEndRange().first + 1) {
+    if (next_block->GetStartEndRange().first != w_block->GetStartEndRange().first + 1) {
       block_after_w = next_block;
     }
   }
-  std::list<Statement*> next_t_after_w = GetNextTByTraversal(block_after_w, target_num);
+  std::list<Statement*> next_t_after_w;
+  if (block_after_w != w_block) {
+     next_t_after_w = GetNextTByTraversal(block_after_w, target_num);
+     next_t_after_w.push_back(stmt_list_[block_after_w->GetStartEndRange().first-1]);
+  }
 
   std::pair<int, int> range = w_cluster->GetStartEndRange();
   int count = range.second - range.first + 1;
+  std::list<Statement*> w_statements(count);
+  std::copy(&stmt_list_[range.first - 1], &stmt_list_[range.second - 1]+1, w_statements.begin());
+  w_statements.insert(w_statements.end(), next_t_after_w.begin(), next_t_after_w.end());
   for (int i = range.first - 1; i < range.second; ++i) {
-    std::vector<Statement*> w_statements(count);
-    std::copy(&stmt_list_[range.first - 1], &stmt_list_[range.second - 1], w_statements.begin());
-    w_statements.erase(w_statements.begin() + i);
-    std::list<Statement*> to_add;
-    to_add.insert(to_add.end(), w_statements.begin(), w_statements.end());
-    to_add.insert(to_add.end(), next_t_after_w.begin(), next_t_after_w.end());
-    AddNextT(stmt_list_[i], to_add);
+    AddNextT(stmt_list_[i], w_statements);
   }
+
   if (next_t_map_.count(stmt_list_[w_block->GetStartEndRange().first - 1]) == 0) {
     return std::list<Statement*>{};
   } else {
@@ -142,7 +144,10 @@ std::list<Statement*> NextTExtractor::GetNextTByTraversal(Block* block, int targ
   for (Block* next_block: block->GetNextBlocks()) {
     std::list<Statement*> next_block_next_t = GetNextTByTraversal(next_block, target_num);
     next_t.insert(next_t.end(), next_block_next_t.begin(), next_block_next_t.end());
-    next_t.push_back(stmt_list_[next_block->GetStartEndRange().first-1]);
+    // if the first next* in the list is not the next_block (while cases), add next* of next_block
+    if (next_t.front()->GetStatementNumber()->GetNum() != next_block->GetStartEndRange().first) {
+      next_t.push_back(stmt_list_[next_block->GetStartEndRange().first-1]);
+    }
   }
 
   std::pair<int, int> range = block->GetStartEndRange();
@@ -164,33 +169,6 @@ std::list<Statement*> NextTExtractor::GetNextTByTraversal(Block* block, int targ
     return std::list<Statement*>{};
   } else {
     return *next_t_map_.find(stmt_list_[target_num - 1])->second;
-  }
-}
-
-void NextTExtractor::AddNextTRelationship(Statement* s1, Statement* s2) {
-  std::list<Statement*> s{s1};
-  if (next_t_map_.count(s1)) {
-    std::list<Statement*>* nexts = next_t_map_.find(s1)->second;
-    if (std::find(nexts->begin(), nexts->end(), s2) == nexts->end()) {
-      // add s2 if it does not exist in nexts
-      nexts->push_back(s2);
-    }
-  } else {
-    auto* list = new std::list<Statement*>();
-    list->push_back(s2);
-    next_t_map_.insert(std::make_pair(s1, list));
-  }
-
-  if (previous_t_map_.count(s2)) {
-    std::list<Statement*>* previous = previous_t_map_.find(s2)->second;
-    if (std::find(previous->begin(), previous->end(), s1) == previous->end()) {
-      // add s1 if it does not exist in previous
-      previous->push_back(s1);
-    }
-  } else {
-    auto* list = new std::list<Statement*>();
-    list->push_back(s1);
-    previous_t_map_.insert(std::make_pair(s2, list));
   }
 }
 

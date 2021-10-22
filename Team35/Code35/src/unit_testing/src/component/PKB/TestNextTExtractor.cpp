@@ -118,109 +118,93 @@ TEST_CASE("2.PKB.NextTExtractor basic conditions") {
     CHECK(TestUtils::AreVectorsEqual(actual_s6, expected_s6));
   }
 
-//  SECTION("1 while with next") {
-//    /*
-//     * s1
-//     * w2
-//     *  s3
-//     *  s4
-//     *  s5
-//     * s6
-//     */
-//    Block* b1 = new Block();
-//    Block* b2 = new Block();
-//    Block* b3 = new Block();
-//    Block* b4 = new Block();
-//    b1->AddStmt(StatementNumber(1));
-//    b2->AddStmt(StatementNumber(2));
-//    b3->AddStmt(StatementNumber(3));
-//    b3->AddStmt(StatementNumber(4));
-//    b3->AddStmt(StatementNumber(5));
-//    b4->AddStmt(StatementNumber(6));
-//    Cluster* c1 = new Cluster();
-//    c1->SetStartEnd(1, 6);
-//    b1->AddNextBlock(b2);
-//    b2->AddNextBlock(b3);
-//    b2->AddNextBlock(b4);
-//    b3->AddNextBlock(b2);
-//    Procedure* proc1 = GetProc1();
-//    proc1->SetBlockRoot(b1);
-//    proc1->SetClusterRoot(c1);
-//    deliverable.proc_list_.push_back(proc1);
-//
-//    Statement* s1 = CreateStatement(GetAssign1(), 1);
-//    Statement* s2 = CreateStatement(GetWhileEntity1(), 2);
-//    Statement* s3 = CreateStatement(GetAssign2(), 3);
-//    Statement* s4 = CreateStatement(GetPrintX(), 4);
-//    Statement* s5 = CreateStatement(GetAssign3(), 5);
-//    Statement* s6 = CreateStatement(GetAssign4(), 6);
-//    deliverable.AddStatement(s1);
-//    deliverable.AddStatement(s2);
-//    deliverable.AddStatement(s3);
-//    deliverable.AddStatement(s4);
-//    deliverable.AddStatement(s5);
-//    deliverable.AddStatement(s6);
-//    NextExtractor next_extractor{};
-//    next_extractor.Extract(&deliverable);
-//
-//    CHECK(deliverable.next_hash_.size() == 5);
-//    std::list<Statement*> expected_s1 = {s2};
-//    CHECK(TestUtils::AreListsEqual(
-//        *deliverable.next_hash_.find(s1)->second, expected_s1));
-//    std::list<Statement*> expected_s2 = {s3, s6};
-//    CHECK(TestUtils::AreListsEqual(
-//        *deliverable.next_hash_.find(s2)->second, expected_s2));
-//    std::list<Statement*> expected_s3 = {s4};
-//    CHECK(TestUtils::AreListsEqual(
-//        *deliverable.next_hash_.find(s3)->second, expected_s3));
-//    std::list<Statement*> expected_s4 = {s5};
-//    CHECK(TestUtils::AreListsEqual(
-//        *deliverable.next_hash_.find(s4)->second, expected_s4));
-//    std::list<Statement*> expected_s5 = {s2};
-//    CHECK(TestUtils::AreListsEqual(
-//        *deliverable.next_hash_.find(s5)->second, expected_s5));
-//  }
-//
-//  SECTION("1 while without next") {
-//    /*
-//     * w1
-//     *  s2
-//     *  s3
-//     */
-//    Block* b1 = new Block();
-//    Block* b2 = new Block();
-//    b1->AddStmt(StatementNumber(1));
-//    b2->AddStmt(StatementNumber(2));
-//    b2->AddStmt(StatementNumber(3));
-//    Cluster* c1 = new Cluster();
-//    c1->SetStartEnd(1, 3);
-//    b1->AddNextBlock(b2);
-//    b2->AddNextBlock(b1);
-//    Procedure* proc1 = GetProc1();
-//    proc1->SetBlockRoot(b1);
-//    proc1->SetClusterRoot(c1);
-//    deliverable.proc_list_.push_back(proc1);
-//
-//    Statement* s1 = CreateStatement(GetWhileEntity1(), 1);
-//    Statement* s2 = CreateStatement(GetAssign2(), 2);
-//    Statement* s3 = CreateStatement(GetPrintX(), 3);
-//    deliverable.AddStatement(s1);
-//    deliverable.AddStatement(s2);
-//    deliverable.AddStatement(s3);
-//    NextExtractor next_extractor{};
-//    next_extractor.Extract(&deliverable);
-//
-//    CHECK(deliverable.next_hash_.size() == 3);
-//    std::list<Statement*> expected_s1 = {s2};
-//    CHECK(TestUtils::AreListsEqual(
-//        *deliverable.next_hash_.find(s1)->second, expected_s1));
-//    std::list<Statement*> expected_s2 = {s3};
-//    CHECK(TestUtils::AreListsEqual(
-//        *deliverable.next_hash_.find(s2)->second, expected_s2));
-//    std::list<Statement*> expected_s3 = {s1};
-//    CHECK(TestUtils::AreListsEqual(
-//        *deliverable.next_hash_.find(s3)->second, expected_s3));
-//  }
+  SECTION("1 while with next") {
+    /*
+     * s1
+     * w2
+     *  s3
+     *  s4
+     *  s5
+     * s6
+     */
+    b1->AddStmt(StatementNumber(1));
+    b2->AddStmt(StatementNumber(2));
+    b2->isWhile = true;
+    b3->AddStmt(StatementNumber(3));
+    b3->AddStmt(StatementNumber(4));
+    b3->AddStmt(StatementNumber(5));
+    b4->AddStmt(StatementNumber(6));
+    b1->AddNextBlock(b2);
+    b2->AddNextBlock(b3);
+    b2->AddNextBlock(b4);
+    b3->AddNextBlock(b2);
+    proc1->SetBlockRoot(b1);
+    c1->AddChildClusterToBack(b1);
+    c2->AddChildClusterToBack(b2);
+    c2->AddChildClusterToBack(b3);
+    c1->AddChildClusterToBack(c2);
+    c1->AddChildClusterToBack(b4);
+    c1->UpdateClusterRange();
+    CHECK(c1->GetStartEndRange() == std::make_pair(1, 6));
+    proc1->SetClusterRoot(c1);
+    proc_list.push_back(proc1);
+    stmt_list = {s1, s2, s3, s4, s5, s6};
+
+    NextTExtractor next_t_extractor{};
+
+    std::vector<Entity*> expected_s1 = {s2, s3, s4, s5, s6};
+    std::vector<Entity*> actual_s1 = next_t_extractor.GetNextT("1", proc_list, stmt_list);
+    CHECK(next_t_extractor.GetNextTSize() == 5);
+    CHECK(TestUtils::AreVectorsEqual(actual_s1, expected_s1));
+    std::vector<Entity*> expected_s2 = {s2, s3, s4, s5, s6};
+    std::vector<Entity*> actual_s2 = next_t_extractor.GetNextT("2", proc_list, stmt_list);
+    CHECK(TestUtils::AreVectorsEqual(actual_s2, expected_s2));
+    std::vector<Entity*> expected_s3 = {s2, s3, s4, s5, s6};
+    std::vector<Entity*> actual_s3 = next_t_extractor.GetNextT("3", proc_list, stmt_list);
+    CHECK(TestUtils::AreVectorsEqual(actual_s3, expected_s3));
+    std::vector<Entity*> expected_s4 = {s2, s3, s4, s5, s6};
+    std::vector<Entity*> actual_s4 = next_t_extractor.GetNextT("4", proc_list, stmt_list);
+    CHECK(TestUtils::AreVectorsEqual(actual_s4, expected_s4));
+    std::vector<Entity*> expected_s5 = {s2, s3, s4, s5, s6};
+    std::vector<Entity*> actual_s5 = next_t_extractor.GetNextT("5", proc_list, stmt_list);
+    CHECK(TestUtils::AreVectorsEqual(actual_s5, expected_s5));
+  }
+
+  SECTION("1 while without next") {
+    /*
+     * w1
+     *  s2
+     *  s3
+     */
+    b1->AddStmt(StatementNumber(1));
+    b2->AddStmt(StatementNumber(2));
+    b2->AddStmt(StatementNumber(3));
+    b1->isWhile = true;
+    b1->AddNextBlock(b2);
+    b2->AddNextBlock(b1);
+    c2->AddChildClusterToBack(b1);
+    c2->AddChildClusterToBack(b2);
+    c1->AddChildClusterToBack(c2);
+    c1->UpdateClusterRange();
+    CHECK(c1->GetStartEndRange() == std::make_pair(1, 3));
+    proc1->SetBlockRoot(b1);
+    proc1->SetClusterRoot(c1);
+    proc_list.push_back(proc1);
+    stmt_list = {s1, s2, s3};
+
+    NextTExtractor next_t_extractor{};
+
+    std::vector<Entity*> expected_s1 = {s1, s2, s3};
+    std::vector<Entity*> actual_s1 = next_t_extractor.GetNextT("1", proc_list, stmt_list);
+    CHECK(next_t_extractor.GetNextTSize() == 3);
+    CHECK(TestUtils::AreVectorsEqual(actual_s1, expected_s1));
+    std::vector<Entity*> expected_s2 = {s1, s2, s3};
+    std::vector<Entity*> actual_s2 = next_t_extractor.GetNextT("2", proc_list, stmt_list);
+    CHECK(TestUtils::AreVectorsEqual(actual_s2, expected_s2));
+    std::vector<Entity*> expected_s3 = {s1, s2, s3};
+    std::vector<Entity*> actual_s3 = next_t_extractor.GetNextT("3", proc_list, stmt_list);
+    CHECK(TestUtils::AreVectorsEqual(actual_s3, expected_s3));
+  }
 //
 //  SECTION("multiple procedures") {
 //    /*
