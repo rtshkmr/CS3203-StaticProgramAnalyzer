@@ -145,7 +145,7 @@ std::list<Statement*> NextTExtractor::GetNextTByTraversal(Block* block, int targ
     std::list<Statement*> next_block_next_t = GetNextTByTraversal(next_block, target_num);
     next_t.insert(next_t.end(), next_block_next_t.begin(), next_block_next_t.end());
     // if the first next* in the list is not the next_block (while cases), add next* of next_block
-    if (next_t.front()->GetStatementNumber()->GetNum() != next_block->GetStartEndRange().first) {
+    if (next_t.empty() || next_t.front()->GetStatementNumber()->GetNum() != next_block->GetStartEndRange().first) {
       next_t.push_back(stmt_list_[next_block->GetStartEndRange().first-1]);
     }
   }
