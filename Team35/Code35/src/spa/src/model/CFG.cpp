@@ -60,6 +60,11 @@ bool Cluster::CheckIfStatementInRange(StatementNumber sn) const {
   int num = sn.GetNum();
   return start_ <= num && num <= end_;
 }
+
+bool Cluster::CheckIfStmtNumInRange(int num) {
+  return start_ <= num && num <= end_;
+}
+
 Cluster* Cluster::GetParentCluster() {
   return this->parent_cluster_;
 }
