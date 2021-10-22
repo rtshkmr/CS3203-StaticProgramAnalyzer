@@ -18,6 +18,8 @@ class DBManager {
   void PopulateDataStructures(Deliverable d);
 
   // Getting relationships from PKB
+  std::vector<Entity*> GetRelationship(PKBRelRefs ref, std::string entity);
+
   std::vector<Entity*> GetRelationshipByType(PKBRelRefs ref, DesignEntity de);
 
   std::vector<std::tuple<Entity*, Entity*>> GetRelationshipByTypes(PKBRelRefs ref,

@@ -4,6 +4,34 @@ RuntimeExtractor::RuntimeExtractor(PKB* pkb) {
   pkb_ = pkb;
 }
 
+std::vector<Entity*> RuntimeExtractor::GetNextT(std::string target) {
+  return next_t_extractor_.GetNextT(target,
+                                    std::vector<Procedure*>{},
+                                    std::vector<Statement*>{});  // todo update with pkb api
+}
+
+std::vector<Entity*> RuntimeExtractor::GetPrevT(std::string target) {
+  return next_t_extractor_.GetPrevT(target,
+                                    std::vector<Procedure*>{},
+                                    std::vector<Statement*>{});
+}
+
+std::vector<Entity*> RuntimeExtractor::GetAffects(std::string target) {
+  return affects_extractor_.GetAffects(target);
+}
+
+std::vector<Entity*> RuntimeExtractor::GetAffectedBy(std::string target) {
+  return affects_extractor_.GetAffectedBy(target);
+}
+
+std::vector<Entity*> RuntimeExtractor::GetAffectsT(std::string target) {
+  return affects_t_extractor_.GetAffectsT(target);
+}
+
+std::vector<Entity*> RuntimeExtractor::GetAffectedByT(std::string target) {
+  return affects_t_extractor_.GetAffectedByT(target);
+}
+
 bool RuntimeExtractor::HasNextT(int target) {
   return false;
 }

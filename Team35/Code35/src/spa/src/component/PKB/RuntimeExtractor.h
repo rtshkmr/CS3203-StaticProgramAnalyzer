@@ -20,6 +20,12 @@ class RuntimeExtractor {
   AffectsTExtractor affects_t_extractor_ = AffectsTExtractor();
  public:
   RuntimeExtractor(PKB* pkb);
+  std::vector<Entity*> GetNextT(std::string target);
+  std::vector<Entity*> GetPrevT(std::string target);
+  std::vector<Entity*> GetAffects(std::string target);
+  std::vector<Entity*> GetAffectedBy(std::string target);
+  std::vector<Entity*> GetAffectsT(std::string target);
+  std::vector<Entity*> GetAffectedByT(std::string target);
 
   std::vector<Entity*> GetNextT(DesignEntity de);
   std::vector<Entity*> GetPrevT(DesignEntity de);

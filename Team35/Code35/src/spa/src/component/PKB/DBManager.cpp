@@ -20,6 +20,24 @@ void DBManager::PopulateDataStructures(Deliverable d) {
 }
 
 /**
+ * Gets relationships for 1 specific entity, e.g. Uses(3, s)
+ * @param ref Relationship type
+ * @param entity String form of entity to query
+ * @return Entities that are on the RHS of the relationship with this entity.
+ */
+std::vector<Entity*> DBManager::GetRelationship(PKBRelRefs ref, std::string entity) {
+  switch (ref) {
+    case PKBRelRefs::kNextT: return runtime_extractor_->GetNextT(entity);
+    case PKBRelRefs::kPreviousT: return runtime_extractor_->GetPrevT(entity);
+    case PKBRelRefs::kAffects: return runtime_extractor_->GetAffects(entity);
+    case PKBRelRefs::kAffectedBy: return runtime_extractor_->GetAffectedBy(entity);
+    case PKBRelRefs::kAffectsT: return runtime_extractor_->GetAffectsT(entity);
+    case PKBRelRefs::kAffectedByT: return runtime_extractor_->GetAffectedByT(entity);
+    default: return pkb_->GetRelationship(ref, entity);
+  }
+}
+
+/**
  * Gets relationships for 1 type-specified entity, e.g. Uses(s, _)
  * @param ref Relationship type
  * @param de Type of entity to query
