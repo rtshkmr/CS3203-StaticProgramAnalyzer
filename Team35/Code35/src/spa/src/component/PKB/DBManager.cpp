@@ -141,15 +141,13 @@ bool DBManager::HasRelationship(PKBRelRefs ref, std::string entity) {
  * @throws SyntaxException - when it is not an integer or outside of 2^32-1
  */
 bool DBManager::HasRelationship(PKBRelRefs ref, std::string first, std::string second) {
-  int lineRef_first = Utility::ConvertStringToInt(first);
-  int lineRef_second = Utility::ConvertStringToInt(second);
   switch (ref) {
-    case PKBRelRefs::kNextT: return runtime_extractor_->HasNextT(lineRef_first, lineRef_second);
-    case PKBRelRefs::kPreviousT: return runtime_extractor_->HasPrevT(lineRef_first, lineRef_second);
-    case PKBRelRefs::kAffects: return runtime_extractor_->HasAffects(lineRef_first, lineRef_second);
-    case PKBRelRefs::kAffectedBy: return runtime_extractor_->HasAffectedBy(lineRef_first, lineRef_second);
-    case PKBRelRefs::kAffectsT: return runtime_extractor_->HasAffectsT(lineRef_first, lineRef_second);
-    case PKBRelRefs::kAffectedByT: return runtime_extractor_->HasAffectedByT(lineRef_first, lineRef_second);
+    case PKBRelRefs::kNextT: return runtime_extractor_->HasNextT(Utility::ConvertStringToInt(first), Utility::ConvertStringToInt(second));
+    case PKBRelRefs::kPreviousT: return runtime_extractor_->HasPrevT(Utility::ConvertStringToInt(first), Utility::ConvertStringToInt(second));
+    case PKBRelRefs::kAffects: return runtime_extractor_->HasAffects(Utility::ConvertStringToInt(first), Utility::ConvertStringToInt(second));
+    case PKBRelRefs::kAffectedBy: return runtime_extractor_->HasAffectedBy(Utility::ConvertStringToInt(first), Utility::ConvertStringToInt(second));
+    case PKBRelRefs::kAffectsT: return runtime_extractor_->HasAffectsT(Utility::ConvertStringToInt(first), Utility::ConvertStringToInt(second));
+    case PKBRelRefs::kAffectedByT: return runtime_extractor_->HasAffectedByT(Utility::ConvertStringToInt(first), Utility::ConvertStringToInt(second));
     default: return pkb_->HasRelationship(ref, first, second);
   }
 }
