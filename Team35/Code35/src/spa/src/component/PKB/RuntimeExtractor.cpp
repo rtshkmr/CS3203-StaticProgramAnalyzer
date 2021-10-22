@@ -4,32 +4,28 @@ RuntimeExtractor::RuntimeExtractor(PKB* pkb) {
   pkb_ = pkb;
 }
 
-std::vector<Entity*> RuntimeExtractor::GetNextT(std::string target) {
-  return next_t_extractor_.GetNextT(target,
-                                   std::vector<Procedure*>{},
-                                   std::vector<Statement*>{});  // todo update with pkb api
+bool RuntimeExtractor::HasNextT(int target) {
+  return false;
 }
 
-std::vector<Entity*> RuntimeExtractor::GetPrevT(std::string target) {
-  return next_t_extractor_.GetPrevT(target,
-                                    std::vector<Procedure*>{},
-                                    std::vector<Statement*>{});
+bool RuntimeExtractor::HasPrevT(int target) {
+  return false;
 }
 
-std::vector<Entity*> RuntimeExtractor::GetAffects(std::string target) {
-  return affects_extractor_.GetAffects(target);
+bool RuntimeExtractor::HasAffects(int target) {
+  return false;
 }
 
-std::vector<Entity*> RuntimeExtractor::GetAffectedBy(std::string target) {
-  return affects_extractor_.GetAffectedBy(target);
+bool RuntimeExtractor::HasAffectedBy(int target) {
+  return false;
 }
 
-std::vector<Entity*> RuntimeExtractor::GetAffectsT(std::string target) {
-  return affects_t_extractor_.GetAffectsT(target);
+bool RuntimeExtractor::HasAffectsT(int target) {
+  return false;
 }
 
-std::vector<Entity*> RuntimeExtractor::GetAffectedByT(std::string target) {
-  return affects_t_extractor_.GetAffectedByT(target);
+bool RuntimeExtractor::HasAffectedByT(int target) {
+  return false;
 }
 
 std::vector<Entity*> RuntimeExtractor::GetNextT(DesignEntity de) { return std::vector<Entity*>(); }
@@ -61,12 +57,12 @@ std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetAffectedByT(Desig
 bool RuntimeExtractor::HasAffects() { return false; }
 bool RuntimeExtractor::HasAffectedBy() { return false; }
 
-bool RuntimeExtractor::HasNextT(std::string first, std::string second) { return false; }
-bool RuntimeExtractor::HasPrevT(std::string first, std::string second) { return false; }
-bool RuntimeExtractor::HasAffects(std::string first, std::string second) { return false; }
-bool RuntimeExtractor::HasAffectedBy(std::string first, std::string second) { return false; }
-bool RuntimeExtractor::HasAffectsT(std::string first, std::string second) { return false; }
-bool RuntimeExtractor::HasAffectedByT(std::string first, std::string second) { return false; }
+bool RuntimeExtractor::HasNextT(int first, int second) { return false; }
+bool RuntimeExtractor::HasPrevT(int first, int second) { return false; }
+bool RuntimeExtractor::HasAffects(int first, int second) { return false; }
+bool RuntimeExtractor::HasAffectedBy(int first, int second) { return false; }
+bool RuntimeExtractor::HasAffectsT(int first, int second) { return false; }
+bool RuntimeExtractor::HasAffectedByT(int first, int second) { return false; }
 
 void RuntimeExtractor::Delete() {
   next_t_extractor_.Delete();

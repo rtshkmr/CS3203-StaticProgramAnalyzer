@@ -8,6 +8,7 @@
 #include <datatype/RegexPatterns.h>
 #include <cassert>
 #include <exception/SpaException.h>
+#include "../util/Utility.h"
 
 /**
  * This method checks if the given string as in the correct name syntax.
@@ -192,15 +193,7 @@ bool VariableName::operator==(const VariableName& other) const {
  * @throws SyntaxException when a non-integer in passed in or when integers that had exceeded the range.
  */
 ConstantValue::ConstantValue(const std::string& constant) {
-  size_t num_chars = 0;
-  try {
-    value_ = stoi(constant, & num_chars);
-  } catch (std::exception ia) {
-    throw SyntaxException("Argument is not smaller that max int.");
-  }
-  if (num_chars != constant.size()) {
-    throw SyntaxException("Constant is not valid. Numbers mixed with letters.");
-  }
+  value_ = Utility::ConvertStringToInt(constant);
 }
 
 /**
