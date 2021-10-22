@@ -17,13 +17,7 @@
 void NextExtractor::Extract(Deliverable* deliverable) {
   this->deliverable_ = deliverable;
 
-  int total_num_of_stmts = 0;
-  for (Procedure* proc: deliverable_->proc_list_) {
-    Cluster* proc_cluster = const_cast<Cluster*>(proc->GetClusterRoot());
-    std::pair<int, int> range = proc_cluster->GetStartEndRange();
-    int num_of_stmts = range.second - range.first + 1;
-    total_num_of_stmts += num_of_stmts;
-  }
+  int total_num_of_stmts = deliverable_->stmt_list_.size();
   for (Procedure* proc: deliverable_->proc_list_) {
     visited_blocks_ = new std::vector<int>(total_num_of_stmts, 0);
     ExtractBlock(const_cast<Block*>(proc->GetBlockRoot()));
