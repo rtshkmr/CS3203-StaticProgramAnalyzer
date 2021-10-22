@@ -9,7 +9,7 @@
 
 class Utility {
  public:
-  static int ConvertStringToInt(std::string input);
+  static int ConvertStringToInt(const std::string& input);
 };
 
 #endif //AUTOTESTER_CODE35_SRC_SPA_SRC_UTIL_UTILITY_H_

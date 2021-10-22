@@ -11,7 +11,7 @@
  * @return The integer value after being converted.
  * @throws SyntaxException when a non-integer in passed in or when integers that had exceeded the range.
  */
-int Utility::ConvertStringToInt(std::string input) {
+int Utility::ConvertStringToInt(const std::string& input) {
   size_t num_chars = 0;
   int value = 0;
   try {
@@ -22,4 +22,5 @@ int Utility::ConvertStringToInt(std::string input) {
   if (num_chars != input.size()) {
     throw SyntaxException("Constant is not valid. Numbers mixed with letters.");
   }
+  return value;
 }
