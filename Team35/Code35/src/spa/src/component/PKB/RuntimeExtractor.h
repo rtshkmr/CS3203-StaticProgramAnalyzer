@@ -44,12 +44,19 @@ class RuntimeExtractor {
   bool HasAffects();
   bool HasAffectedBy();
 
-  bool HasNextT(std::string first, std::string second);
-  bool HasPrevT(std::string first, std::string second);
-  bool HasAffects(std::string first, std::string second);
-  bool HasAffectedBy(std::string first, std::string second);
-  bool HasAffectsT(std::string first, std::string second);
-  bool HasAffectedByT(std::string first, std::string second);
+  bool HasNextT(int first);
+  bool HasPrevT(int first);
+  bool HasAffects(int first);
+  bool HasAffectedBy(int first);
+  bool HasAffectsT(int first);
+  bool HasAffectedByT(int first);
+  
+  bool HasNextT(int first, int second);
+  bool HasPrevT(int first, int second);
+  bool HasAffects(int first, int second);
+  bool HasAffectedBy(int first, int second);
+  bool HasAffectsT(int first, int second);
+  bool HasAffectedByT(int first, int second);
 
   void Delete();
 };

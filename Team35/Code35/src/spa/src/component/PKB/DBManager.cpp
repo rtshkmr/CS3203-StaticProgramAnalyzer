@@ -1,4 +1,5 @@
 #include "DBManager.h"
+#include "util/Utility.h"
 
 DBManager::DBManager(PKB* pkb) {
   this->pkb_ = pkb;
@@ -19,8 +20,7 @@ void DBManager::PopulateDataStructures(Deliverable d) {
 }
 
 /**
- * Gets relationships for 1 specific entity, e.g. Uses(3, _) or Affects(3, a)
- * but not (3, _) for runtime relationships.
+ * Gets relationships for 1 specific entity, e.g. Uses(3, s)
  * @param ref Relationship type
  * @param entity String form of entity to query
  * @return Entities that are on the RHS of the relationship with this entity.
@@ -113,20 +113,41 @@ bool DBManager::HasRelationship(PKBRelRefs ref, DesignEntity first, DesignEntity
 }
 
 /**
- * To query for existence of relationship with 2 specific entities, e.g. Uses("3", "x")
+ * To query for existence of relationship for 1 specific entity, e.g. Next(3, _)
  * @param ref Relationship type
- * @param first String of first entity
- * @param second String of second entity
- * @return true if relationship between the entities exists.
+ * @param entity String form of statement number to query
+ * @return true if any relationship with the specified types exists.
+ * @throws SyntaxException - when it is not an integer or outside of 2^32-1
+ */
+bool DBManager::HasRelationship(PKBRelRefs ref, std::string entity) {
+  switch (ref) {
+    case PKBRelRefs::kNextT: return runtime_extractor_->HasNextT(Utility::ConvertStringToInt(entity));
+    case PKBRelRefs::kPreviousT: return runtime_extractor_->HasPrevT(Utility::ConvertStringToInt(entity));
+    case PKBRelRefs::kAffects: return runtime_extractor_->HasAffects(Utility::ConvertStringToInt(entity));
+    case PKBRelRefs::kAffectedBy: return runtime_extractor_->HasAffectedBy(Utility::ConvertStringToInt(entity));
+    case PKBRelRefs::kAffectsT: return runtime_extractor_->HasAffectsT(Utility::ConvertStringToInt(entity));
+    case PKBRelRefs::kAffectedByT: return runtime_extractor_->HasAffectedByT(Utility::ConvertStringToInt(entity));
+    default: return false;
+  }
+}
+
+
+/**
+ * To query for existence of relationship with 2 specific entities, e.g. Next("3", "4")
+ * @param ref Relationship type
+ * @param first String of first statement number
+ * @param second String of second statement number
+ * @return true if relationship between the prog_line / assignment exists.
+ * @throws SyntaxException - when it is not an integer or outside of 2^32-1
  */
 bool DBManager::HasRelationship(PKBRelRefs ref, std::string first, std::string second) {
   switch (ref) {
-    case PKBRelRefs::kNextT: return runtime_extractor_->HasNextT(first, second);
-    case PKBRelRefs::kPreviousT: return runtime_extractor_->HasPrevT(first, second);
-    case PKBRelRefs::kAffects: return runtime_extractor_->HasAffects(first, second);
-    case PKBRelRefs::kAffectedBy: return runtime_extractor_->HasAffectedBy(first, second);
-    case PKBRelRefs::kAffectsT: return runtime_extractor_->HasAffectsT(first, second);
-    case PKBRelRefs::kAffectedByT: return runtime_extractor_->HasAffectedByT(first, second);
+    case PKBRelRefs::kNextT: return runtime_extractor_->HasNextT(Utility::ConvertStringToInt(first), Utility::ConvertStringToInt(second));
+    case PKBRelRefs::kPreviousT: return runtime_extractor_->HasPrevT(Utility::ConvertStringToInt(first), Utility::ConvertStringToInt(second));
+    case PKBRelRefs::kAffects: return runtime_extractor_->HasAffects(Utility::ConvertStringToInt(first), Utility::ConvertStringToInt(second));
+    case PKBRelRefs::kAffectedBy: return runtime_extractor_->HasAffectedBy(Utility::ConvertStringToInt(first), Utility::ConvertStringToInt(second));
+    case PKBRelRefs::kAffectsT: return runtime_extractor_->HasAffectsT(Utility::ConvertStringToInt(first), Utility::ConvertStringToInt(second));
+    case PKBRelRefs::kAffectedByT: return runtime_extractor_->HasAffectedByT(Utility::ConvertStringToInt(first), Utility::ConvertStringToInt(second));
     default: return pkb_->HasRelationship(ref, first, second);
   }
 }
