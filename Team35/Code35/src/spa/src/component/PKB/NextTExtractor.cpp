@@ -41,8 +41,11 @@ int NextTExtractor::GetNextTSize() {
 std::vector<Entity*> NextTExtractor::GetNextT(int target,
                                               std::vector<Procedure*> proc_list,
                                               std::vector<Statement*> stmt_list) {
-  if (target - 1 < stmt_list_.size() && next_t_map_.count(stmt_list_[target - 1]) == 1) {
-    return ltov(*next_t_map_.find(stmt_list_[target - 1])->second);
+  bool is_out_of_bounds = target > stmt_list.size() || target <= 0;
+  if (is_out_of_bounds) {
+    return std::vector<Entity*>{};
+  } else if (next_t_map_.count(stmt_list[target - 1]) == 1) {
+    return ltov(*next_t_map_.find(stmt_list[target - 1])->second);
   }
 
   Init(stmt_list);
