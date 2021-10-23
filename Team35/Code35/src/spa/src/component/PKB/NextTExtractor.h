@@ -8,15 +8,16 @@ class NextTExtractor {
  public:
   int GetNextTSize();
   void Delete();
-  std::vector<Entity*> GetNextT(std::string target,
+  std::vector<Entity*> GetNextT(int target,
                                 std::vector<Procedure*> proc_list,
                                 std::vector<Statement*> stmt_list);
-  std::vector<Entity*> GetPrevT(std::string target,
+  std::vector<Entity*> GetPrevT(int target,
                                 std::vector<Procedure*> proc_list,
                                 std::vector<Statement*> stmt_list);
   std::vector<Entity*> GetAllNextTLHS(std::vector<Procedure*> proc_list, std::vector<Statement*> stmt_list);
   std::vector<std::tuple<Entity*, Entity*>> GetAllNextT(std::vector<Procedure*> proc_list,
                                                         std::vector<Statement*> stmt_list);
+  bool HasNextT(int first, int second, std::vector<Procedure*> proc_list, std::vector<Statement*> stmt_list);
  private:
   bool initialized_ = false;
   std::vector<Statement*> stmt_list_;

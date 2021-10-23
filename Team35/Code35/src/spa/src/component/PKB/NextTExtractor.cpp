@@ -38,21 +38,20 @@ int NextTExtractor::GetNextTSize() {
  * return next* of recursed block
  * add list of next* to this block
  */
-std::vector<Entity*> NextTExtractor::GetNextT(std::string target,
+std::vector<Entity*> NextTExtractor::GetNextT(int target,
                                               std::vector<Procedure*> proc_list,
                                               std::vector<Statement*> stmt_list) {
-  int target_num = stoi(target);
-  if (target_num - 1 < stmt_list_.size() && next_t_map_.count(stmt_list_[target_num - 1]) == 1) {
-    return ltov(*next_t_map_.find(stmt_list_[target_num - 1])->second);
+  if (target - 1 < stmt_list_.size() && next_t_map_.count(stmt_list_[target - 1]) == 1) {
+    return ltov(*next_t_map_.find(stmt_list_[target - 1])->second);
   }
 
   Init(stmt_list);
 
   for (Procedure* proc: proc_list) {  // todo: optimise finding procedure of target stmt
     Cluster* proc_cluster = const_cast<Cluster*>(proc->GetClusterRoot());
-    if (proc_cluster->CheckIfStmtNumInRange(target_num)) {
-      Cluster* t_cluster = GetTargetCluster(proc_cluster, target_num);
-      return ltov(GetNextTFromCluster(t_cluster, target_num));
+    if (proc_cluster->CheckIfStmtNumInRange(target)) {
+      Cluster* t_cluster = GetTargetCluster(proc_cluster, target);
+      return ltov(GetNextTFromCluster(t_cluster, target));
     }
   }
   return std::vector<Entity*>{};
@@ -234,12 +233,6 @@ std::vector<Entity*> NextTExtractor::ltov(std::list<Statement*> l) {
   return v;
 }
 
-std::vector<Entity*> NextTExtractor::GetPrevT(std::string target,
-                                              std::vector<Procedure*> proc_list,
-                                              std::vector<Statement*> stmt_list) {
-  return std::vector<Entity*>();
-}
-
 /**
  * Gets all Entities that can be on the LHS of the relationship, i.e. Next*(s, _).
  * @param proc_list Full list of procedures.
@@ -259,7 +252,7 @@ std::vector<Entity*> NextTExtractor::GetAllNextTLHS(std::vector<Procedure*> proc
 void NextTExtractor::PopulateAllNextT(std::vector<Procedure*> proc_list) {
   for (Procedure* proc: proc_list) {
     int first_stmt = const_cast<Cluster*>(proc->GetClusterRoot())->GetStartEndRange().first;
-    GetNextT(std::to_string(first_stmt), {proc}, stmt_list_);
+    GetNextT(first_stmt, {proc}, stmt_list_);
   }
   next_t_populated_ = true;
 }
@@ -287,4 +280,11 @@ std::vector<std::tuple<Entity*, Entity*>> NextTExtractor::GetAllNextT(std::vecto
   }
   got_all_next_t_ = true;
   return all_next_t_;
+}
+
+bool NextTExtractor::HasNextT(int first,
+                              int second,
+                              std::vector<Procedure*> proc_list,
+                              std::vector<Statement*> stmt_list) {
+  return false;
 }

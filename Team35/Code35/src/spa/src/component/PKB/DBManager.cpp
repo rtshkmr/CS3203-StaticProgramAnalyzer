@@ -27,12 +27,12 @@ void DBManager::PopulateDataStructures(Deliverable d) {
  */
 std::vector<Entity*> DBManager::GetRelationship(PKBRelRefs ref, std::string entity) {
   switch (ref) {
-    case PKBRelRefs::kNextT: return runtime_extractor_->GetNextT(entity);
-    case PKBRelRefs::kPreviousT: return runtime_extractor_->GetPrevT(entity);
-    case PKBRelRefs::kAffects: return runtime_extractor_->GetAffects(entity);
-    case PKBRelRefs::kAffectedBy: return runtime_extractor_->GetAffectedBy(entity);
-    case PKBRelRefs::kAffectsT: return runtime_extractor_->GetAffectsT(entity);
-    case PKBRelRefs::kAffectedByT: return runtime_extractor_->GetAffectedByT(entity);
+    case PKBRelRefs::kNextT: return runtime_extractor_->GetNextT(Utility::ConvertStringToInt(entity));
+    case PKBRelRefs::kPreviousT: return runtime_extractor_->GetPrevT(Utility::ConvertStringToInt(entity));
+    case PKBRelRefs::kAffects: return runtime_extractor_->GetAffects(Utility::ConvertStringToInt(entity));
+    case PKBRelRefs::kAffectedBy: return runtime_extractor_->GetAffectedBy(Utility::ConvertStringToInt(entity));
+    case PKBRelRefs::kAffectsT: return runtime_extractor_->GetAffectsT(Utility::ConvertStringToInt(entity));
+    case PKBRelRefs::kAffectedByT: return runtime_extractor_->GetAffectedByT(Utility::ConvertStringToInt(entity));
     default: return pkb_->GetRelationship(ref, entity);
   }
 }
@@ -121,7 +121,7 @@ bool DBManager::HasRelationship(PKBRelRefs ref, DesignEntity first, DesignEntity
  */
 bool DBManager::HasRelationship(PKBRelRefs ref, std::string entity) {
   switch (ref) {
-    case PKBRelRefs::kNextT: return runtime_extractor_->HasNextT(Utility::ConvertStringToInt(entity));
+    case PKBRelRefs::kNextT: return runtime_extractor_->HasNextT(Utility::ConvertStringToInt(entity));  // todo: use new pkb api to query for hasnext(string)
     case PKBRelRefs::kPreviousT: return runtime_extractor_->HasPrevT(Utility::ConvertStringToInt(entity));
     case PKBRelRefs::kAffects: return runtime_extractor_->HasAffects(Utility::ConvertStringToInt(entity));
     case PKBRelRefs::kAffectedBy: return runtime_extractor_->HasAffectedBy(Utility::ConvertStringToInt(entity));
