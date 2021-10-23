@@ -1,6 +1,22 @@
 #include <cassert>
 #include "NextTExtractor.h"
 
+void NextTExtractor::Delete() {}
+
+/**
+ * Initializes next_t_array using a procedure list to get the total number of stmts in the program.
+ */
+void NextTExtractor::Init(const std::vector<Statement*> &stmt_list) {
+  if (initialized_) return;
+  initialized_ = true;
+  stmt_list_ = stmt_list;
+
+  int total = stmt_list.size();
+  next_t_2d_array_ = std::vector<std::vector<int>>(total, std::vector<int>(total));
+  next_t_array_ = std::vector<int>(total);
+  has_prev_t_array_ = std::vector<int>(total);
+}
+
 /**
  * @return size of next_t_map
  */
@@ -12,6 +28,7 @@ int NextTExtractor::GetNextTSize() {
  * Extracts list of Next* of the target from the CFG. Caches Next* relationships for blocks traversed.
  *
  * @param target String of the statement number to look for.
+ * @param proc_list List of procedures to get the target from.
  * @return List of Entities that are Next* of the target.
  *
  * pseudocode
@@ -24,12 +41,14 @@ int NextTExtractor::GetNextTSize() {
 std::vector<Entity*> NextTExtractor::GetNextT(std::string target,
                                               std::vector<Procedure*> proc_list,
                                               std::vector<Statement*> stmt_list) {
-  proc_list_ = proc_list;
-  stmt_list_ = stmt_list;
-  Init();
-
   int target_num = stoi(target);
-  for (Procedure* proc: proc_list) {
+  if (target_num - 1 < stmt_list_.size() && next_t_map_.count(stmt_list_[target_num - 1]) == 1) {
+    return ltov(*next_t_map_.find(stmt_list_[target_num - 1])->second);
+  }
+
+  Init(stmt_list);
+
+  for (Procedure* proc: proc_list) {  // todo: optimise finding procedure of target stmt
     Cluster* proc_cluster = const_cast<Cluster*>(proc->GetClusterRoot());
     if (proc_cluster->CheckIfStmtNumInRange(target_num)) {
       Cluster* t_cluster = GetTargetCluster(proc_cluster, target_num);
@@ -100,23 +119,25 @@ std::list<Statement*> NextTExtractor::GetNextTFromWhile(Cluster* w_cluster, int 
   Block* block_after_w = w_block;
   for (Block* next_block: w_block->GetNextBlocks()) {
     // not the immediate block after the w cond
-    if (next_block->GetStartEndRange().first != block_after_w->GetStartEndRange().first + 1) {
+    if (next_block->GetStartEndRange().first != w_block->GetStartEndRange().first + 1) {
       block_after_w = next_block;
     }
   }
-  std::list<Statement*> next_t_after_w = GetNextTByTraversal(block_after_w, target_num);
+  std::list<Statement*> next_t_after_w;
+  if (block_after_w != w_block) {
+    next_t_after_w = GetNextTByTraversal(block_after_w, target_num);
+    next_t_after_w.push_back(stmt_list_[block_after_w->GetStartEndRange().first - 1]);
+  }
 
   std::pair<int, int> range = w_cluster->GetStartEndRange();
   int count = range.second - range.first + 1;
+  std::list<Statement*> w_statements(count);
+  std::copy(&stmt_list_[range.first - 1], &stmt_list_[range.second - 1] + 1, w_statements.begin());
+  w_statements.insert(w_statements.end(), next_t_after_w.begin(), next_t_after_w.end());
   for (int i = range.first - 1; i < range.second; ++i) {
-    std::vector<Statement*> w_statements(count);
-    std::copy(&stmt_list_[range.first - 1], &stmt_list_[range.second - 1], w_statements.begin());
-    w_statements.erase(w_statements.begin() + i);
-    std::list<Statement*> to_add;
-    to_add.insert(to_add.end(), w_statements.begin(), w_statements.end());
-    to_add.insert(to_add.end(), next_t_after_w.begin(), next_t_after_w.end());
-    AddNextT(stmt_list_[i], to_add);
+    AddNextT(stmt_list_[i], w_statements);
   }
+
   if (next_t_map_.count(stmt_list_[w_block->GetStartEndRange().first - 1]) == 0) {
     return std::list<Statement*>{};
   } else {
@@ -142,7 +163,10 @@ std::list<Statement*> NextTExtractor::GetNextTByTraversal(Block* block, int targ
   for (Block* next_block: block->GetNextBlocks()) {
     std::list<Statement*> next_block_next_t = GetNextTByTraversal(next_block, target_num);
     next_t.insert(next_t.end(), next_block_next_t.begin(), next_block_next_t.end());
-    next_t.push_back(stmt_list_[next_block->GetStartEndRange().first-1]);
+    // if the first next* in the list is not the next_block (while cases), add next* of next_block
+    if (next_t.empty() || next_t.front()->GetStatementNumber()->GetNum() != next_block->GetStartEndRange().first) {
+      next_t.push_back(stmt_list_[next_block->GetStartEndRange().first - 1]);
+    }
   }
 
   std::pair<int, int> range = block->GetStartEndRange();
@@ -155,7 +179,7 @@ std::list<Statement*> NextTExtractor::GetNextTByTraversal(Block* block, int targ
   } else {
     AddNextT(stmt_list_[range.second - 1], next_t);
   }
-  for (int i = range.second-1; i >= target_num; --i) {
+  for (int i = range.second - 1; i >= target_num; --i) {
     next_t.push_back(stmt_list_[i]);
     AddNextT(stmt_list_[i - 1], next_t);
   }
@@ -167,35 +191,9 @@ std::list<Statement*> NextTExtractor::GetNextTByTraversal(Block* block, int targ
   }
 }
 
-void NextTExtractor::AddNextTRelationship(Statement* s1, Statement* s2) {
-  std::list<Statement*> s{s1};
-  if (next_t_map_.count(s1)) {
-    std::list<Statement*>* nexts = next_t_map_.find(s1)->second;
-    if (std::find(nexts->begin(), nexts->end(), s2) == nexts->end()) {
-      // add s2 if it does not exist in nexts
-      nexts->push_back(s2);
-    }
-  } else {
-    auto* list = new std::list<Statement*>();
-    list->push_back(s2);
-    next_t_map_.insert(std::make_pair(s1, list));
-  }
-
-  if (previous_t_map_.count(s2)) {
-    std::list<Statement*>* previous = previous_t_map_.find(s2)->second;
-    if (std::find(previous->begin(), previous->end(), s1) == previous->end()) {
-      // add s1 if it does not exist in previous
-      previous->push_back(s1);
-    }
-  } else {
-    auto* list = new std::list<Statement*>();
-    list->push_back(s1);
-    previous_t_map_.insert(std::make_pair(s2, list));
-  }
-}
-
 /**
  * Assumes that there are no duplicates. Appending lists take O(1).
+ * Assumes that next_t_map will only be updated once.
  */
 void NextTExtractor::AddNextT(Statement* s1, std::list<Statement*> s2) {
   assert(next_t_map_.count(s1) == 0);
@@ -203,10 +201,13 @@ void NextTExtractor::AddNextT(Statement* s1, std::list<Statement*> s2) {
   auto* list = new std::list<Statement*>();
   list->insert(list->begin(), s2.begin(), s2.end());
   next_t_map_.insert({s1, list});
+  next_t_array_[s1->GetStatementNumber()->GetNum()-1] = 1;
+  next_t_lhs_stmts_.push_back(s1);
 }
 
 /**
  * Adds Next* while checking for duplicates. Uses an array for tracking duplicates, taking O(n) time.
+ * Assumes that next_t_map will only be updated once.
  */
 void NextTExtractor::AddNextTForIf(Statement* s1, std::list<Statement*> s2) {
   assert(next_t_map_.count(s1) == 0);
@@ -216,12 +217,14 @@ void NextTExtractor::AddNextTForIf(Statement* s1, std::list<Statement*> s2) {
   int s1_num = s1->GetStatementNumber()->GetNum();
   for (Statement* s: s2) {
     int s_num = s->GetStatementNumber()->GetNum();
-    if (next_t_array_[s1_num-1][s_num-1] == 0) {
-      next_t_array_[s1_num-1][s_num-1] = 1;
+    if (next_t_2d_array_[s1_num - 1][s_num - 1] == 0) {
+      next_t_2d_array_[s1_num - 1][s_num - 1] = 1;
       list->push_back(s);
     }
   }
   next_t_map_.insert({s1, list});
+  next_t_array_[s1->GetStatementNumber()->GetNum()-1] = 1;
+  next_t_lhs_stmts_.push_back(s1);
 }
 
 std::vector<Entity*> NextTExtractor::ltov(std::list<Statement*> l) {
@@ -237,21 +240,51 @@ std::vector<Entity*> NextTExtractor::GetPrevT(std::string target,
   return std::vector<Entity*>();
 }
 
-void NextTExtractor::Delete() {
+/**
+ * Gets all Entities that can be on the LHS of the relationship, i.e. Next*(s, _).
+ * @param proc_list Full list of procedures.
+ * @param stmt_list Full list of statements.
+ * @return all Entities that can be on the LHS of the relationship.
+ */
+std::vector<Entity*> NextTExtractor::GetAllNextTLHS(std::vector<Procedure*> proc_list, std::vector<Statement*> stmt_list) {
+  if (next_t_populated_) {
+    return next_t_lhs_stmts_;
+  }
+  Init(stmt_list);
 
+  PopulateAllNextT(proc_list);
+  return next_t_lhs_stmts_;
 }
 
-void NextTExtractor::Init() {
-  if (initialized_) return;
-  initialized_ = true;
-  int total = 0;
-  for (Procedure* proc: proc_list_) {
-    Cluster* proc_cluster = const_cast<Cluster*>(proc->GetClusterRoot());
-    int last_stmt = proc_cluster->GetStartEndRange().second;
-    total = last_stmt > total ? last_stmt : total;
+void NextTExtractor::PopulateAllNextT(std::vector<Procedure*> proc_list) {
+  for (Procedure* proc: proc_list) {
+    int first_stmt = const_cast<Cluster*>(proc->GetClusterRoot())->GetStartEndRange().first;
+    GetNextT(std::to_string(first_stmt), {proc}, stmt_list_);
   }
-  for (int i = 0; i < total; ++i) {
-    std::vector v(total, 0);
-    next_t_array_.push_back(v);
+  next_t_populated_ = true;
+}
+
+/**
+ * Gets all Entity pairs that are in a Next* relationship, i.e. Next*(s1, s2).
+ * @param proc_list Full list of procedures.
+ * @param stmt_list Full list of statements.
+ * @return all Entity pairs that are in a Next* relationship.
+ */
+std::vector<std::tuple<Entity*, Entity*>> NextTExtractor::GetAllNextT(std::vector<Procedure*> proc_list,
+                                                                      std::vector<Statement*> stmt_list) {
+  if (got_all_next_t_) {
+    return all_next_t_;
   }
+  Init(stmt_list);
+
+  if (!next_t_populated_) {
+    PopulateAllNextT(proc_list);
+  }
+  for (auto pair: next_t_map_) {
+    for (Statement* stmt: *pair.second) {
+      all_next_t_.push_back({pair.first, stmt});
+    }
+  }
+  got_all_next_t_ = true;
+  return all_next_t_;
 }
