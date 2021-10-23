@@ -115,13 +115,7 @@ std::list<Statement*> NextTExtractor::GetNextTFromWhile(Cluster* w_cluster, int 
   }
 
   Block* w_block = dynamic_cast<Block*>(w_cluster->GetNestedClusters().front());
-  Block* block_after_w = w_block;
-  for (Block* next_block: w_block->GetNextBlocks()) {
-    // not the immediate block after the w cond
-    if (next_block->GetStartEndRange().first != w_block->GetStartEndRange().first + 1) {
-      block_after_w = next_block;
-    }
-  }
+  Block* block_after_w = GetNextBlockAfterWhile(w_block);
   std::list<Statement*> next_t_after_w;
   if (block_after_w != w_block) {
     next_t_after_w = GetNextTByTraversal(block_after_w, target_num);
@@ -142,6 +136,17 @@ std::list<Statement*> NextTExtractor::GetNextTFromWhile(Cluster* w_cluster, int 
   } else {
     return *next_t_map_.find(stmt_list_[w_block->GetStartEndRange().first - 1])->second;
   }
+}
+
+Block* NextTExtractor::GetNextBlockAfterWhile(Block* w_block) {
+  Block* block_after_w;
+  for (Block* next_block: w_block->GetNextBlocks()) {
+    // not the immediate block after the w cond
+    if (next_block->GetStartEndRange().first != w_block->GetStartEndRange().first + 1) {
+      block_after_w = next_block;
+    }
+  }
+  return block_after_w;
 }
 
 /**
@@ -200,7 +205,7 @@ void NextTExtractor::AddNextT(Statement* s1, std::list<Statement*> s2) {
   auto* list = new std::list<Statement*>();
   list->insert(list->begin(), s2.begin(), s2.end());
   next_t_map_.insert({s1, list});
-  next_t_array_[s1->GetStatementNumber()->GetNum()-1] = 1;
+  next_t_array_[s1->GetStatementNumber()->GetNum() - 1] = 1;
   next_t_lhs_stmts_.push_back(s1);
 }
 
@@ -222,7 +227,7 @@ void NextTExtractor::AddNextTForIf(Statement* s1, std::list<Statement*> s2) {
     }
   }
   next_t_map_.insert({s1, list});
-  next_t_array_[s1->GetStatementNumber()->GetNum()-1] = 1;
+  next_t_array_[s1->GetStatementNumber()->GetNum() - 1] = 1;
   next_t_lhs_stmts_.push_back(s1);
 }
 
@@ -239,7 +244,8 @@ std::vector<Entity*> NextTExtractor::ltov(std::list<Statement*> l) {
  * @param stmt_list Full list of statements.
  * @return all Entities that can be on the LHS of the relationship.
  */
-std::vector<Entity*> NextTExtractor::GetAllNextTLHS(std::vector<Procedure*> proc_list, std::vector<Statement*> stmt_list) {
+std::vector<Entity*> NextTExtractor::GetAllNextTLHS(std::vector<Procedure*> proc_list,
+                                                    std::vector<Statement*> stmt_list) {
   if (next_t_populated_) {
     return next_t_lhs_stmts_;
   }
@@ -282,9 +288,123 @@ std::vector<std::tuple<Entity*, Entity*>> NextTExtractor::GetAllNextT(std::vecto
   return all_next_t_;
 }
 
+/**
+ * Returns true if Next*(first, second).
+ */
 bool NextTExtractor::HasNextT(int first,
                               int second,
                               std::vector<Procedure*> proc_list,
                               std::vector<Statement*> stmt_list) {
+  if (next_t_2d_array_[first - 1][second - 1] == 1) {
+    return true;
+  }
+  Init(stmt_list);
+
+  for (Procedure* proc: proc_list) {  // todo: optimise finding procedure of target stmt
+    Cluster* proc_cluster = const_cast<Cluster*>(proc->GetClusterRoot());
+    if (proc_cluster->CheckIfStmtNumInRange(first)) {
+      if (proc_cluster->CheckIfStmtNumInRange(second)) {
+        Cluster* t_cluster = GetTargetCluster(proc_cluster, first);
+        return HasNextTInFirstCluster(t_cluster, first, second);
+      } else {  // first and second not in the same procedure
+        return false;
+      }
+    }
+  }
   return false;
+}
+
+/**
+ * Checks if the outermost cluster is while, and the first and second is either both in the while loop or
+ * the second is after first. Else find HasNextTInCluster.
+ *
+ * @param cluster cluster that contains first.
+ * @param first statement number.
+ * @param second statement number.
+ * @return true if Next*(first, second).
+ */
+bool NextTExtractor::HasNextTInFirstCluster(Cluster* cluster, int first, int second) {
+  assert(cluster->CheckIfStmtNumInRange(first));
+  std::list<Cluster*> nested_clusters = cluster->GetNestedClusters();
+  if (nested_clusters.empty()) {
+    if (first < second) {
+      next_t_2d_array_[first - 1][second - 1] = 1;
+      return true;
+    } else {
+      return false;
+    }
+  } else {
+    Block* first_block = dynamic_cast<Block*>(nested_clusters.front());
+    if (first_block->isWhile) {
+      if (first <= second || cluster->CheckIfStmtNumInRange(second)) {
+        next_t_2d_array_[first - 1][second - 1] = 1;
+        return true;
+      } else {  // second is before first and not in the same while loop of the outermost cluster
+        return false;
+      }
+    } else {  // first cluster not a while loop
+      Cluster* inner_cluster = GetTargetCluster(cluster, first);
+      return HasNextTInCluster(inner_cluster, first, second);
+    }
+  }
+}
+
+/**
+  * Gets to the innermost cluster containing first to find if Next*(first, second).
+  * cluster must contain first. first and second must be in the same procedure.
+  * Must traverse to conclusively determine Next* as this cluster is nested.
+  * Pseudocode:
+  * first >= second:
+  * check for while loop then traverse
+  * first < second:
+  * traverse through clusters
+  */
+bool NextTExtractor::HasNextTInCluster(Cluster* cluster, int first, int second) {
+  assert(cluster->CheckIfStmtNumInRange(first));
+  std::list<Cluster*> nested_clusters = cluster->GetNestedClusters();
+  if (nested_clusters.empty()) {
+    return HasNextTByTraversal(dynamic_cast<Block*>(cluster), first, second);
+  } else {
+    Block* first_block = dynamic_cast<Block*>(nested_clusters.front());
+    if (first_block->isWhile) {
+      if (cluster->CheckIfStmtNumInRange(second)) {
+        next_t_2d_array_[first - 1][second - 1] = 1;
+        return true;
+      } else if (second < first) {
+        return false;
+      } else {  // second > first
+        Block* block_after_w = GetNextBlockAfterWhile(first_block);
+        return HasNextTByTraversal(block_after_w, first, second);
+      }
+    } else {
+      Cluster* inner_cluster = GetTargetCluster(cluster, first);
+      return HasNextTInCluster(inner_cluster, first, second);
+    }
+  }
+}
+
+/**
+ * Traverse and check. first should be guaranteed to be in this cluster or a previous cluster.
+ * Cluster traversal cannot work on a nested level because of else block being the next sibling of if body block.
+ */
+bool NextTExtractor::HasNextTByTraversal(Block* block, int first, int second) {
+  if (block->CheckIfStmtNumInRange(second)) {
+    if (first < second) {
+      next_t_2d_array_[first - 1][second - 1] = 1;
+      return true;
+    } else {
+      return false;
+    }
+  } else {
+    bool result = false;
+    if (!block->CheckIfStmtNumInRange(first)) {
+      next_t_2d_array_[first - 1][block->GetStartEndRange().first - 1] = 1;
+    }
+    for (Block* next_block: block->GetNextBlocks()) {
+      if (next_t_2d_array_[first - 1][next_block->GetStartEndRange().first - 1] != 1) {
+        result = result || HasNextTByTraversal(next_block, first, second);
+      }
+    }
+    return result;
+  }
 }
