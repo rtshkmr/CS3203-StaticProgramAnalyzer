@@ -125,6 +125,17 @@ enum class Attribute {
   kInvalid
 };
 
+/**
+ * ScopeIndication is used by the PKBQueryReceiver when passing arguments to the DBManager.
+ * This indicates whether the DBManager should utilize the scoped entity vectors (for left and right param) or just the DE itself.
+ */
+enum class ScopeIndication {
+  kNoScope,
+  kLeftScope, // i.e. only the left param is scoped, so use the entity vector for left param and DE for the right param
+  kRightScope,
+  kAllScope
+};
+
 Attribute GetAttribute(std::string attr_string);
 
 struct QueryInfo {

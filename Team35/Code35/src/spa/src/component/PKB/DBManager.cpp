@@ -37,6 +37,7 @@ std::vector<Entity*> DBManager::GetRelationship(PKBRelRefs ref, std::string enti
   }
 }
 
+// todo: DEPRECATE THIS
 /**
  * Gets relationships for 1 type-specified entity, e.g. Uses(s, _)
  * @param ref Relationship type
@@ -55,6 +56,33 @@ std::vector<Entity*> DBManager::GetRelationshipByType(PKBRelRefs ref, DesignEnti
   }
 }
 
+std::vector<Entity*> DBManager::GetRelationshipByType(PKBRelRefs ref,
+                                                      DesignEntity de,
+                                                      std::vector<Entity *> scoped_entities,
+                                                      ScopeIndication scope_indication) {
+  return {};
+}
+
+/**
+ *
+ * @param ref
+ * @param first_de
+ * @param second_de
+ * @param left_scoped_entities
+ * @param right_scoped_entities
+ * @param scoping_indication
+ * @return
+ */
+std::vector<Entity*> GetRelationshipByType(PKBRelRefs ref,
+                                           DesignEntity first_de,
+                                           DesignEntity second_de,
+                                           std::vector<Entity *> left_scoped_entities,
+                                           std::vector<Entity *> right_scoped_entities,
+                                           ScopeIndication scoping_indication){
+  return {};
+}
+
+// todo: DEPRECATE THIS
 /**
  * Gets relationships for 2 type-specified entities, e.g. Uses(p, v)
  * @param ref Relationship type
@@ -74,6 +102,15 @@ std::vector<std::tuple<Entity*, Entity*>> DBManager::GetRelationshipByTypes(PKBR
     case PKBRelRefs::kAffectedByT: return runtime_extractor_->GetAffectedByT(first, second);
     default: return pkb_->GetRelationshipByTypes(ref, first, second);
   }
+}
+
+std::vector<Entity*> DBManager::GetRelationshipByTypes(PKBRelRefs ref,
+                                                       DesignEntity first_de,
+                                                       DesignEntity second_de,
+                                                       std::vector<Entity*> left_scoped_entities,
+                                                       std::vector<Entity*> right_scoped_entities,
+                                                       ScopeIndication scope_indication) {
+  return {};
 }
 
 /**
@@ -112,6 +149,9 @@ bool DBManager::HasRelationship(PKBRelRefs ref, DesignEntity first, DesignEntity
   }
 }
 
+bool DBManager::HasRelationship(PKBRelRefs ref, std::string ident_string) {
+  return false;
+}
 /**
  * To query for existence of relationship with 2 specific entities, e.g. Uses("3", "x")
  * @param ref Relationship type
@@ -166,3 +206,5 @@ DesignEntity DBManager::EntityToDesignEntity(Entity* entity) {
 std::string DBManager::GetNameFromEntity(Entity* entity) {
   return PKB::GetNameFromEntity(entity);
 }
+
+
