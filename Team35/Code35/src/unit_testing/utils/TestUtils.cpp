@@ -35,6 +35,19 @@ bool TestUtils::AreListsEqual(std::list<Statement*> as, std::list<Statement*> bs
   return as.size() == bs.size();
 }
 
+bool TestUtils::AreVectorsEqual(std::vector<Entity*> as, std::vector<Entity*> bs) {
+  for (Entity* a: as) {
+    bool found_a = false;
+    for (Entity* b: bs) {
+      found_a = found_a || a == b;
+    }
+    if (!found_a) {
+      return false;
+    }
+  }
+  return as.size() == bs.size();
+}
+
 bool TestUtils::AreListsEqual(std::list<Procedure*> a, std::list<Procedure*> b) {
   for (Procedure* a_proc: a) {
     bool found_a = false;
