@@ -127,10 +127,9 @@ bool DBManager::HasRelationship(PKBRelRefs ref, std::string entity) {
     case PKBRelRefs::kAffectedBy: return runtime_extractor_->HasAffectedBy(Utility::ConvertStringToInt(entity));
     case PKBRelRefs::kAffectsT: return runtime_extractor_->HasAffectsT(Utility::ConvertStringToInt(entity));
     case PKBRelRefs::kAffectedByT: return runtime_extractor_->HasAffectedByT(Utility::ConvertStringToInt(entity));
-    default: return false;
+    default: return false;  // todo: insert new api here
   }
 }
-
 
 /**
  * To query for existence of relationship with 2 specific entities, e.g. Next("3", "4")
@@ -142,12 +141,24 @@ bool DBManager::HasRelationship(PKBRelRefs ref, std::string entity) {
  */
 bool DBManager::HasRelationship(PKBRelRefs ref, std::string first, std::string second) {
   switch (ref) {
-    case PKBRelRefs::kNextT: return runtime_extractor_->HasNextT(Utility::ConvertStringToInt(first), Utility::ConvertStringToInt(second));
-    case PKBRelRefs::kPreviousT: return runtime_extractor_->HasPrevT(Utility::ConvertStringToInt(first), Utility::ConvertStringToInt(second));
-    case PKBRelRefs::kAffects: return runtime_extractor_->HasAffects(Utility::ConvertStringToInt(first), Utility::ConvertStringToInt(second));
-    case PKBRelRefs::kAffectedBy: return runtime_extractor_->HasAffectedBy(Utility::ConvertStringToInt(first), Utility::ConvertStringToInt(second));
-    case PKBRelRefs::kAffectsT: return runtime_extractor_->HasAffectsT(Utility::ConvertStringToInt(first), Utility::ConvertStringToInt(second));
-    case PKBRelRefs::kAffectedByT: return runtime_extractor_->HasAffectedByT(Utility::ConvertStringToInt(first), Utility::ConvertStringToInt(second));
+    case PKBRelRefs::kNextT:
+      return runtime_extractor_->HasNextT(Utility::ConvertStringToInt(first),
+                                          Utility::ConvertStringToInt(second));
+    case PKBRelRefs::kPreviousT:
+      return runtime_extractor_->HasPrevT(Utility::ConvertStringToInt(first),
+                                          Utility::ConvertStringToInt(second));
+    case PKBRelRefs::kAffects:
+      return runtime_extractor_->HasAffects(Utility::ConvertStringToInt(first),
+                                            Utility::ConvertStringToInt(second));
+    case PKBRelRefs::kAffectedBy:
+      return runtime_extractor_->HasAffectedBy(Utility::ConvertStringToInt(first),
+                                               Utility::ConvertStringToInt(second));
+    case PKBRelRefs::kAffectsT:
+      return runtime_extractor_->HasAffectsT(Utility::ConvertStringToInt(first),
+                                             Utility::ConvertStringToInt(second));
+    case PKBRelRefs::kAffectedByT:
+      return runtime_extractor_->HasAffectedByT(Utility::ConvertStringToInt(first),
+                                                Utility::ConvertStringToInt(second));
     default: return pkb_->HasRelationship(ref, first, second);
   }
 }
