@@ -45,11 +45,12 @@ TEST_CASE("2.PKB.NextTExtractor basic conditions") {
     stmt_list.push_back(s1);
 
     NextTExtractor next_t_extractor{};
-    std::vector<Entity*> actual = next_t_extractor.GetNextT(1, proc_list, stmt_list);
-    CHECK(actual.empty());
+    CHECK(next_t_extractor.GetNextT(1, proc_list, stmt_list).empty());
     CHECK_FALSE(next_t_extractor.HasNextT(1, 2, proc_list, stmt_list));
     CHECK(next_t_extractor.GetAllNextTLHS(proc_list, stmt_list).empty());
     CHECK(next_t_extractor.GetAllNextT(proc_list, stmt_list).empty());
+
+    CHECK(next_t_extractor.GetPrevT(1, proc_list, stmt_list).empty());
   }
 
   SECTION("single level statement list") {
@@ -79,6 +80,14 @@ TEST_CASE("2.PKB.NextTExtractor basic conditions") {
     std::vector<std::tuple<Entity*, Entity*>> expected_all = {{s1, s2}, {s1, s3}, {s2, s3}};
     std::vector<std::tuple<Entity*, Entity*>> actual_all = next_t_extractor.GetAllNextT(proc_list, stmt_list);
     CHECK(TestUtils::AreVectorsEqual(actual_all, expected_all));
+
+    std::vector<Entity*> expected_p1 = {s1, s2};
+    std::vector<Entity*> expected_p2 = {s1};
+    std::vector<Entity*> actual_p2 = next_t_extractor.GetPrevT(2, proc_list, stmt_list);
+    CHECK(TestUtils::AreVectorsEqual(actual_p2, expected_p2));
+    std::vector<Entity*> actual_p1 = next_t_extractor.GetPrevT(3, proc_list, stmt_list);
+    CHECK(TestUtils::AreVectorsEqual(actual_p1, expected_p1));
+    CHECK(next_t_extractor.GetPrevTSize() == 2);
   }
 
   SECTION("1 if") {
@@ -152,6 +161,26 @@ TEST_CASE("2.PKB.NextTExtractor basic conditions") {
                                                               {s5, s7}, {s6, s7}};
     std::vector<std::tuple<Entity*, Entity*>> actual_all = next_t_extractor.GetAllNextT(proc_list, stmt_list);
     CHECK(TestUtils::AreVectorsEqual(actual_all, expected_all));
+
+    std::vector<Entity*> expected_p2 = {s1};
+    std::vector<Entity*> expected_p3 = {s1, s2};
+    std::vector<Entity*> expected_p4 = {s1, s2, s3};
+    std::vector<Entity*> expected_p5 = {s1, s2};
+    std::vector<Entity*> expected_p6 = {s1, s2, s5};
+    std::vector<Entity*> expected_p7 = {s1, s2, s3, s4, s5, s6};
+    std::vector<Entity*> actual_p2 = next_t_extractor.GetPrevT(2, proc_list, stmt_list);
+    CHECK(TestUtils::AreVectorsEqual(actual_p2, expected_p2));
+    std::vector<Entity*> actual_p3 = next_t_extractor.GetPrevT(3, proc_list, stmt_list);
+    CHECK(TestUtils::AreVectorsEqual(actual_p3, expected_p3));
+    std::vector<Entity*> actual_p4 = next_t_extractor.GetPrevT(4, proc_list, stmt_list);
+    CHECK(TestUtils::AreVectorsEqual(actual_p4, expected_p4));
+    std::vector<Entity*> actual_p5 = next_t_extractor.GetPrevT(5, proc_list, stmt_list);
+    CHECK(TestUtils::AreVectorsEqual(actual_p5, expected_p5));
+    std::vector<Entity*> actual_p6 = next_t_extractor.GetPrevT(6, proc_list, stmt_list);
+    CHECK(TestUtils::AreVectorsEqual(actual_p6, expected_p6));
+    std::vector<Entity*> actual_p7 = next_t_extractor.GetPrevT(7, proc_list, stmt_list);
+    CHECK(TestUtils::AreVectorsEqual(actual_p7, expected_p7));
+    CHECK(next_t_extractor.GetPrevTSize() == 6);
   }
 
   SECTION("1 while with next") {
@@ -189,10 +218,10 @@ TEST_CASE("2.PKB.NextTExtractor basic conditions") {
     NextTExtractor next_t_extractor{};
 
     std::vector<Entity*> expected_s1 = {s2, s3, s4, s5, s6};
-    std::vector<Entity*> actual_s3 = next_t_extractor.GetNextT(3, proc_list, stmt_list);
-    CHECK(TestUtils::AreVectorsEqual(actual_s3, expected_s1));
     std::vector<Entity*> actual_s2 = next_t_extractor.GetNextT(2, proc_list, stmt_list);
     CHECK(TestUtils::AreVectorsEqual(actual_s2, expected_s1));
+    std::vector<Entity*> actual_s3 = next_t_extractor.GetNextT(3, proc_list, stmt_list);
+    CHECK(TestUtils::AreVectorsEqual(actual_s3, expected_s1));
     std::vector<Entity*> actual_s1 = next_t_extractor.GetNextT(1, proc_list, stmt_list);
     CHECK(TestUtils::AreVectorsEqual(actual_s1, expected_s1));
     CHECK(next_t_extractor.HasNextT(2, 4, proc_list, stmt_list));
@@ -215,6 +244,19 @@ TEST_CASE("2.PKB.NextTExtractor basic conditions") {
                                                               {s5, s2}, {s5, s3}, {s5, s4}, {s5, s5}, {s5, s6}};
     std::vector<std::tuple<Entity*, Entity*>> actual_all = next_t_extractor.GetAllNextT(proc_list, stmt_list);
     CHECK(TestUtils::AreVectorsEqual(actual_all, expected_all));
+
+    std::vector<Entity*> expected_p6 = {s1, s2, s3, s4, s5};
+    std::vector<Entity*> actual_p2 = next_t_extractor.GetPrevT(2, proc_list, stmt_list);
+    CHECK(TestUtils::AreVectorsEqual(actual_p2, expected_p6));
+    std::vector<Entity*> actual_p3 = next_t_extractor.GetPrevT(3, proc_list, stmt_list);
+    CHECK(TestUtils::AreVectorsEqual(actual_p3, expected_p6));
+    std::vector<Entity*> actual_p4 = next_t_extractor.GetPrevT(4, proc_list, stmt_list);
+    CHECK(TestUtils::AreVectorsEqual(actual_p4, expected_p6));
+    std::vector<Entity*> actual_p5 = next_t_extractor.GetPrevT(5, proc_list, stmt_list);
+    CHECK(TestUtils::AreVectorsEqual(actual_p5, expected_p6));
+    std::vector<Entity*> actual_p6 = next_t_extractor.GetPrevT(6, proc_list, stmt_list);
+    CHECK(TestUtils::AreVectorsEqual(actual_p6, expected_p6));
+    CHECK(next_t_extractor.GetPrevTSize() == 5);
   }
 
   SECTION("1 while without next") {

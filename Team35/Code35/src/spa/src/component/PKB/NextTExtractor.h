@@ -7,6 +7,7 @@
 class NextTExtractor {
  public:
   int GetNextTSize();
+  int GetPrevTSize();
   void Delete();
   std::vector<Entity*> GetNextT(int target,
                                 std::vector<Procedure*> proc_list,
@@ -44,6 +45,7 @@ class NextTExtractor {
   std::list<Statement*> GetNextTFromWhile(Cluster* w_cluster, int target_num);
   static Block* GetNextBlockAfterWhile(Block* w_block);
   std::list<Statement*> GetNextTByTraversal(Block* block, int target_num);
+  std::list<Statement*> RecurseNextBlocks(Block* block, int target_num);
   void AddNextT(Statement* s1, std::list<Statement*> s2);
   void AddNextTForIf(Statement* s1, std::list<Statement*> s2);
   static std::vector<Entity*> ltov(std::list<Statement*> l);
@@ -52,11 +54,13 @@ class NextTExtractor {
   bool HasNextTInCluster(Cluster* cluster, int first, int second);
   bool HasNextTByTraversal(Block* block, int first, int second);
   std::list<Statement*> GetPrevTFromCluster(Cluster* cluster, int target);
-  std::list<Statement*> GetPrevTFromWhile(Cluster* w_cluster, int target_num);
-  static std::list<Block*> GetPrevBlocksBeforeWhile(Block* w_block);
   std::list<Statement*> GetPrevTByTraversal(Block* block, int target_num);
-  std::list<Statement*> RecurseNextBlocks(Block* block, int target_num);
+  std::list<Statement*> RecursePrevBlocks(Block* block, int target_num);
   void AddPrevT(Statement* s1, std::list<Statement*> s2);
+  void AddPrevTWithDup(Statement* s1, std::list<Statement*> s2);
+  std::list<Statement*> GetPrevTFromWhile(Cluster* w_cluster, int target_num);
+  static std::list<Block*> GetPrevBlockBeforeWhile(Block* w_block);
+  std::list<Statement*> MakeUniquePrevList(int s1_num, std::list<Statement*> list);
 };
 
 #endif //AUTOTESTER_CODE35_SRC_SPA_SRC_COMPONENT_PKB_NEXTTEXTRACTOR_H_
