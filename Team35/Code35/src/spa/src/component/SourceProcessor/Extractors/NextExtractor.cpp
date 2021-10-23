@@ -38,7 +38,6 @@ void NextExtractor::ExtractBlock(Block* block) {
   if ((*visited_blocks_)[start - 1] == 1) return;
 
   std::vector<Statement*> stmt_list = deliverable_->stmt_list_;
-
   Statement* prev_statement = stmt_list[start - 1];
   for (int i = start + 1; i <= range.second; ++i) {
     Statement* next_statement = stmt_list[i - 1];
@@ -47,18 +46,15 @@ void NextExtractor::ExtractBlock(Block* block) {
   }
 
   (*visited_blocks_)[start - 1] = 1;
-
   int end = range.second;
   Statement* end_statement = stmt_list[end - 1];
 
   for (Block* next_block: block->GetNextBlocks()) {
     int next = next_block->GetStartEndRange().first;
-
     if (next == -1) { // exit block
       assert(next_block->GetNextBlocks().empty());
       continue;
     }
-
     Statement* next_block_statement = stmt_list[next - 1];
     deliverable_->AddNextRelationship(end_statement, next_block_statement);
     ExtractBlock(next_block);

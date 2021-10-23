@@ -145,8 +145,8 @@ bool DBManager::HasRelationship(PKBRelRefs ref, std::string first, std::string s
       return runtime_extractor_->HasNextT(Utility::ConvertStringToInt(first),
                                           Utility::ConvertStringToInt(second));
     case PKBRelRefs::kPreviousT:
-      return runtime_extractor_->HasPrevT(Utility::ConvertStringToInt(first),
-                                          Utility::ConvertStringToInt(second));
+      return runtime_extractor_->HasNextT(Utility::ConvertStringToInt(second),
+                                          Utility::ConvertStringToInt(first));
     case PKBRelRefs::kAffects:
       return runtime_extractor_->HasAffects(Utility::ConvertStringToInt(first),
                                             Utility::ConvertStringToInt(second));

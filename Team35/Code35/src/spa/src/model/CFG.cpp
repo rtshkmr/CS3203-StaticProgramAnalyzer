@@ -228,3 +228,7 @@ std::set<Block*> Block::GetNextBlocks() const {
   return this->next_blocks_;
 }
 
+std::set<Block*> Block::GetPrevBlocks() const {
+  return this->prev_blocks_;
+}
+

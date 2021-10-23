@@ -5,13 +5,12 @@ RuntimeExtractor::RuntimeExtractor(PKB* pkb) {
 }
 
 std::vector<Entity*> RuntimeExtractor::GetNextT(int target) {
-  return next_t_extractor_.GetNextT(target,
-                                    std::vector<Procedure*>{},
-                                    std::vector<Statement*>{});  // todo update with pkb api
+  return next_t_extractor_.GetNextT(target,std::vector<Procedure*>{},std::vector<Statement*>{});
+  // todo update with pkb api
 }
 
 std::vector<Entity*> RuntimeExtractor::GetPrevT(int target) {
-  return std::vector<Entity*>();
+  return next_t_extractor_.GetPrevT(target,std::vector<Procedure*>{},std::vector<Statement*>{});
 }
 
 std::vector<Entity*> RuntimeExtractor::GetAffects(int target) {
@@ -37,7 +36,13 @@ std::vector<Entity*> RuntimeExtractor::GetNextT(DesignEntity de) {
   return next_t_extractor_.GetAllNextTLHS(std::vector<Procedure*>{}, std::vector<Statement*>{});
 }
 
-std::vector<Entity*> RuntimeExtractor::GetPrevT(DesignEntity de) { return std::vector<Entity*>(); }
+std::vector<Entity*> RuntimeExtractor::GetPrevT(DesignEntity de) {
+  if (de != DesignEntity::kStmt) {
+    return std::vector<Entity*>{};
+  }
+  return next_t_extractor_.GetAllNextTRHS(std::vector<Procedure*>{}, std::vector<Statement*>{});
+}
+
 std::vector<Entity*> RuntimeExtractor::GetAffects(DesignEntity de) { return std::vector<Entity*>(); }
 std::vector<Entity*> RuntimeExtractor::GetAffectedBy(DesignEntity de) { return std::vector<Entity*>(); }
 std::vector<Entity*> RuntimeExtractor::GetAffectsT(DesignEntity de) { return std::vector<Entity*>(); }
@@ -51,8 +56,12 @@ std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetNextT(DesignEntit
 }
 
 std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetPrevT(DesignEntity first, DesignEntity second) {
-  return std::vector<std::tuple<Entity*, Entity*>>();
+  if (first != DesignEntity::kStmt || second != DesignEntity::kStmt) {
+    return std::vector<std::tuple<Entity*, Entity*>>{};
+  }
+  return next_t_extractor_.GetAllPrevT(std::vector<Procedure*>{}, std::vector<Statement*>{});
 }
+
 std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetAffects(DesignEntity first, DesignEntity second) {
   return std::vector<std::tuple<Entity*, Entity*>>();
 }
@@ -99,7 +108,6 @@ bool RuntimeExtractor::HasNextT(int first, int second) {
                                     std::vector<Statement*>{});
 }
 
-bool RuntimeExtractor::HasPrevT(int first, int second) { return false; }
 bool RuntimeExtractor::HasAffects(int first, int second) { return false; }
 bool RuntimeExtractor::HasAffectedBy(int first, int second) { return false; }
 bool RuntimeExtractor::HasAffectsT(int first, int second) { return false; }

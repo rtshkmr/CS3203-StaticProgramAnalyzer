@@ -52,7 +52,6 @@ class RuntimeExtractor {
   bool HasAffectedByT(int first);
   
   bool HasNextT(int first, int second);
-  bool HasPrevT(int first, int second);
   bool HasAffects(int first, int second);
   bool HasAffectedBy(int first, int second);
   bool HasAffectsT(int first, int second);

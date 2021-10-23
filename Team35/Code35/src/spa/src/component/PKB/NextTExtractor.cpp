@@ -13,8 +13,7 @@ void NextTExtractor::Init(const std::vector<Statement*> &stmt_list) {
 
   int total = stmt_list.size();
   next_t_2d_array_ = std::vector<std::vector<int>>(total, std::vector<int>(total));
-  next_t_array_ = std::vector<int>(total);
-  has_prev_t_array_ = std::vector<int>(total);
+  prev_t_visited_array_ = std::vector<int>(total);
 }
 
 /**
@@ -164,15 +163,7 @@ std::list<Statement*> NextTExtractor::GetNextTByTraversal(Block* block, int targ
   if (block->isWhile) {
     return GetNextTFromWhile(block->GetParentCluster(), target_num);
   }
-  std::list<Statement*> next_t;
-  for (Block* next_block: block->GetNextBlocks()) {
-    std::list<Statement*> next_block_next_t = GetNextTByTraversal(next_block, target_num);
-    next_t.insert(next_t.end(), next_block_next_t.begin(), next_block_next_t.end());
-    // if the first next* in the list is not the next_block (while cases), add next* of next_block
-    if (next_t.empty() || next_t.front()->GetStatementNumber()->GetNum() != next_block->GetStartEndRange().first) {
-      next_t.push_back(stmt_list_[next_block->GetStartEndRange().first - 1]);
-    }
-  }
+  std::list<Statement*> next_t = RecurseNextBlocks(block, target_num);
 
   std::pair<int, int> range = block->GetStartEndRange();
   if (block->GetNextBlocks().size() == 2) { // if block because while was handled separately
@@ -180,9 +171,7 @@ std::list<Statement*> NextTExtractor::GetNextTByTraversal(Block* block, int targ
   } else {
     AddNextT(stmt_list_[range.second - 1], next_t);
   }
-  if (target_num < range.first) {
-    target_num = range.first;
-  }
+  target_num = target_num < range.first ? range.first : target_num;
   for (int i = range.second - 1; i >= target_num; --i) {
     next_t.push_back(stmt_list_[i]);
     AddNextT(stmt_list_[i - 1], next_t);
@@ -195,6 +184,23 @@ std::list<Statement*> NextTExtractor::GetNextTByTraversal(Block* block, int targ
   }
 }
 
+std::list<Statement*> NextTExtractor::RecurseNextBlocks(Block* block, int target_num) {
+  std::list<Statement*> next_t;
+  for (Block* next_block: block->GetNextBlocks()) {
+    if (next_block->GetStartEndRange().first == -1) { // exit block
+      assert(next_block->GetNextBlocks().empty());
+      continue;
+    }
+    std::list<Statement*> next_block_next_t = GetNextTByTraversal(next_block, target_num);
+    next_t.insert(next_t.end(), next_block_next_t.begin(), next_block_next_t.end());
+    // if the first next* in the list is not the next_block (while cases), add next* of next_block
+    if (next_t.empty() || next_t.front()->GetStatementNumber()->GetNum() != next_block->GetStartEndRange().first) {
+      next_t.push_back(stmt_list_[next_block->GetStartEndRange().first - 1]);
+    }
+  }
+  return next_t;
+}
+
 /**
  * Assumes that there are no duplicates. Appending lists take O(1).
  * Assumes that next_t_map will only be updated once.
@@ -204,7 +210,6 @@ void NextTExtractor::AddNextT(Statement* s1, std::list<Statement*> s2) {
   auto* list = new std::list<Statement*>();
   list->insert(list->begin(), s2.begin(), s2.end());
   next_t_map_.insert({s1, list});
-  next_t_array_[s1->GetStatementNumber()->GetNum() - 1] = 1;
   next_t_lhs_stmts_.push_back(s1);
 }
 
@@ -227,7 +232,6 @@ void NextTExtractor::AddNextTForIf(Statement* s1, std::list<Statement*> s2) {
     }
   }
   next_t_map_.insert({s1, list});
-  next_t_array_[s1->GetStatementNumber()->GetNum() - 1] = 1;
   next_t_lhs_stmts_.push_back(s1);
 }
 
@@ -411,4 +415,114 @@ bool NextTExtractor::HasNextTByTraversal(Block* block, int first, int second) {
     }
     return result;
   }
+}
+
+/**
+ * Extracts list of Next* that has target on the rhs, by dfs up the cfg.
+ * @param target Statement number.
+ * @param proc_list Full list of procedures.
+ * @param stmt_list Full list of statements.
+ * @return list of Next* that has target on the rhs.
+ */
+std::vector<Entity*> NextTExtractor::GetPrevT(int target,
+                                              std::vector<Procedure*> proc_list,
+                                              std::vector<Statement*> stmt_list) {
+  bool is_out_of_bounds = target > stmt_list.size() || target <= 0;
+  if (is_out_of_bounds) {
+    return std::vector<Entity*>{};
+  } else if (prev_t_map_.count(stmt_list[target - 1]) == 1) {
+    return ltov(*prev_t_map_.find(stmt_list[target - 1])->second);
+  }
+
+  Init(stmt_list);
+
+  for (Procedure* proc: proc_list) {  // todo: optimise finding procedure of target stmt
+    Cluster* proc_cluster = const_cast<Cluster*>(proc->GetClusterRoot());
+    if (proc_cluster->CheckIfStmtNumInRange(target)) {
+      Cluster* t_cluster = GetTargetCluster(proc_cluster, target);
+      return ltov(GetPrevTFromCluster(t_cluster, target));
+    }
+  }
+  return std::vector<Entity*>{};
+}
+
+/**
+ * Go to innermost target block and start traversal. If any while loop is met, process from while.
+ * Assumes that map entry is only updated once.
+ */
+std::list<Statement*> NextTExtractor::GetPrevTFromCluster(Cluster* cluster, int target) {
+  if (prev_t_map_.count(stmt_list_[target - 1]) == 1) {
+    return *prev_t_map_.find(stmt_list_[target - 1])->second;
+  }
+
+  std::list<Cluster*> nested_clusters = cluster->GetNestedClusters();
+  if (nested_clusters.empty()) {
+    GetPrevTByTraversal(dynamic_cast<Block*>(cluster), target);
+  } else {
+    Cluster* t_cluster = GetTargetCluster(cluster, target);
+    return GetPrevTFromCluster(t_cluster, target);
+  }
+  if (prev_t_map_.count(stmt_list_[target - 1]) == 0) {
+    return std::list<Statement*>{};
+  } else {
+    return *prev_t_map_.find(stmt_list_[target - 1])->second;
+  }
+}
+
+/**
+ * Start recursive traversal
+ *
+ * @return List of Statements that Prev* the Statement at the bottom of this block, or the target Statement.
+ */
+std::list<Statement*> NextTExtractor::GetPrevTByTraversal(Block* block, int target_num) {
+  std::pair<int, int> range = block->GetStartEndRange();
+  if (prev_t_visited_array_[range.second - 1] == 1) {
+    if (prev_t_map_.count(stmt_list_[range.second - 1]) == 1) {
+      return *prev_t_map_.find(stmt_list_[range.second - 1])->second;
+    } else {
+      return std::list<Statement*>{};
+    }
+  }
+
+  std::list<Statement*> prev_t;
+  for (Block* prev_block: block->GetPrevBlocks()) {
+    prev_t_visited_array_[prev_block->GetStartEndRange().second - 1] = 1;
+    std::list<Statement*> prev_block_prev_t = GetPrevTByTraversal(prev_block, target_num);
+    prev_t.insert(prev_t.end(), prev_block_prev_t.begin(), prev_block_prev_t.end());
+    prev_t.push_back(stmt_list_[prev_block->GetStartEndRange().second - 1]);
+  }
+
+  AddPrevT(stmt_list_[range.first - 1], prev_t);
+  target_num = target_num > range.second ? range.second : target_num;
+  for (int i = range.first - 1; i < target_num - 1; ++i) {
+    prev_t.push_back(stmt_list_[i]);
+    AddPrevT(stmt_list_[i + 1], prev_t);
+  }
+
+  if (prev_t_map_.count(stmt_list_[target_num - 1]) == 0) {
+    return std::list<Statement*>{};
+  } else {
+    return *prev_t_map_.find(stmt_list_[target_num - 1])->second;
+  }
+}
+
+/**
+ * Assumes that there are no duplicates. Appending lists take O(1).
+ * Assumes that prev_t_map will only be updated once.
+ */
+void NextTExtractor::AddPrevT(Statement* s1, std::list<Statement*> s2) {
+  if (s2.empty() || prev_t_map_.count(s1) == 1) return;
+  auto* list = new std::list<Statement*>();
+  list->insert(list->begin(), s2.begin(), s2.end());
+  prev_t_map_.insert({s1, list});
+}
+
+std::vector<Entity*> NextTExtractor::GetAllNextTRHS(std::vector<Procedure*> proc_list,
+                                                    std::vector<Statement*> stmt_list) {
+  return std::vector<Entity*>();
+}
+
+std::vector<std::tuple<Entity*, Entity*>> NextTExtractor::GetAllPrevT(std::vector<Procedure*> proc_list,
+                                                                      std::vector<Statement*> stmt_list) {
+  return std::vector<std::tuple<Entity*, Entity*>>();
 }
