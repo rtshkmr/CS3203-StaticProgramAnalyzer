@@ -13,7 +13,6 @@ void NextTExtractor::Init(const std::vector<Statement*> &stmt_list) {
 
   int total = stmt_list.size();
   next_t_2d_array_ = std::vector<std::vector<int>>(total, std::vector<int>(total));
-  prev_t_visited_array_ = std::vector<int>(total);
 }
 
 /**
@@ -278,7 +277,7 @@ void NextTExtractor::PopulateAllNextT(std::vector<Procedure*> proc_list) {
  */
 std::vector<std::tuple<Entity*, Entity*>> NextTExtractor::GetAllNextT(std::vector<Procedure*> proc_list,
                                                                       std::vector<Statement*> stmt_list) {
-  if (got_all_next_t_) {
+  if (got_all_next_prev_t_) {
     return all_next_t_;
   }
   Init(stmt_list);
@@ -289,9 +288,10 @@ std::vector<std::tuple<Entity*, Entity*>> NextTExtractor::GetAllNextT(std::vecto
   for (auto pair: next_t_map_) {
     for (Statement* stmt: *pair.second) {
       all_next_t_.push_back({pair.first, stmt});
+      all_prev_t_.push_back({stmt, pair.first});
     }
   }
-  got_all_next_t_ = true;
+  got_all_next_prev_t_ = true;
   return all_next_t_;
 }
 
@@ -491,7 +491,7 @@ std::list<Statement*> NextTExtractor::GetPrevTFromWhile(Cluster* w_cluster, int 
   }
 
   Block* w_block = dynamic_cast<Block*>(w_cluster->GetNestedClusters().front());
-  std::list<Block*> prev_blocks = GetPrevBlockBeforeWhile(w_block);
+  std::list<Block*> prev_blocks = GetPrevBlocksBeforeWhile(w_block);
   std::list<Statement*> prev_t_before_w;
   for (Block* prev_block: prev_blocks) {
     std::list<Statement*> prev_stmts = GetPrevTByTraversal(prev_block, target_num);
@@ -516,7 +516,7 @@ std::list<Statement*> NextTExtractor::GetPrevTFromWhile(Cluster* w_cluster, int 
   }
 }
 
-std::list<Block*> NextTExtractor::GetPrevBlockBeforeWhile(Block* w_block) {
+std::list<Block*> NextTExtractor::GetPrevBlocksBeforeWhile(Block* w_block) {
   std::list<Block*> prev_blocks;
   for (Block* prev_block: w_block->GetPrevBlocks()) {
     if (prev_block->GetStartEndRange().first < w_block->GetStartEndRange().first) {
@@ -580,6 +580,7 @@ void NextTExtractor::AddPrevT(Statement* s1, std::list<Statement*> s2) {
   auto* list = new std::list<Statement*>();
   list->insert(list->begin(), s2.begin(), s2.end());
   prev_t_map_.insert({s1, list});
+  next_t_rhs_stmts_.push_back(s1);
 }
 
 /**
@@ -593,6 +594,7 @@ void NextTExtractor::AddPrevTWithDup(Statement* s1, std::list<Statement*> s2) {
   std::list<Statement*> new_list = MakeUniquePrevList(s1_num, s2);
   list->insert(list->end(), new_list.begin(), new_list.end());
   prev_t_map_.insert({s1, list});
+  next_t_rhs_stmts_.push_back(s1);
 }
 
 std::list<Statement*> NextTExtractor::MakeUniquePrevList(int s1_num, std::list<Statement*> list) {
@@ -609,12 +611,53 @@ std::list<Statement*> NextTExtractor::MakeUniquePrevList(int s1_num, std::list<S
   return new_list;
 }
 
+/**
+ * Gets all Entities that can be on the RHS of the relationship, i.e. Next*(_, s).
+ * @param proc_list Full list of procedures.
+ * @param stmt_list Full list of statements.
+ * @return all Entities that can be on the RHS of the relationship.
+ */
 std::vector<Entity*> NextTExtractor::GetAllNextTRHS(std::vector<Procedure*> proc_list,
                                                     std::vector<Statement*> stmt_list) {
-  return std::vector<Entity*>();
+  if (prev_t_populated_) {
+    return next_t_rhs_stmts_;
+  }
+  Init(stmt_list);
+
+  PopulateAllPrevT(proc_list);
+  return next_t_rhs_stmts_;
 }
 
+void NextTExtractor::PopulateAllPrevT(std::vector<Procedure*> proc_list) {
+  for (Procedure* proc: proc_list) {
+    int last_stmt = const_cast<Cluster*>(proc->GetClusterRoot())->GetStartEndRange().second;
+    GetPrevT(last_stmt, {proc}, stmt_list_);
+  }
+  prev_t_populated_ = true;
+}
+
+/**
+ * Gets all Entity pairs that are in a Next* relationship, i.e. Next*(s1, s2).
+ * @param proc_list Full list of procedures.
+ * @param stmt_list Full list of statements.
+ * @return all Entity pairs in reverse order i.e. <s2, s1> of Next*(s1, s2).
+ */
 std::vector<std::tuple<Entity*, Entity*>> NextTExtractor::GetAllPrevT(std::vector<Procedure*> proc_list,
                                                                       std::vector<Statement*> stmt_list) {
-  return std::vector<std::tuple<Entity*, Entity*>>();
+  if (got_all_next_prev_t_) {
+    return all_prev_t_;
+  }
+  Init(stmt_list);
+
+  if (!prev_t_populated_) {
+    PopulateAllPrevT(proc_list);
+  }
+  for (auto pair: prev_t_map_) {
+    for (Statement* stmt: *pair.second) {
+      all_prev_t_.push_back({pair.first, stmt});
+      all_next_t_.push_back({stmt, pair.first});
+    }
+  }
+  got_all_next_prev_t_ = true;
+  return all_prev_t_;
 }
