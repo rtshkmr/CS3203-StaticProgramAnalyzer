@@ -167,15 +167,15 @@ std::list<Statement*> NextTExtractor::GetNextTByTraversal(Block* block, int targ
   if (block->isWhile) {
     return GetNextTFromWhile(block->GetParentCluster(), target_num);
   }
+  std::pair<int, int> range = block->GetStartEndRange();
+  target_num = target_num < range.first ? range.first : target_num;
   std::list<Statement*> next_t = RecurseNextBlocks(block, target_num);
 
-  std::pair<int, int> range = block->GetStartEndRange();
   if (block->GetNextBlocks().size() == 2) { // if block because while was handled separately
     AddNextTForIf(stmt_list_[range.second - 1], next_t);
   } else {
     AddNextT(stmt_list_[range.second - 1], next_t);
   }
-  target_num = target_num < range.first ? range.first : target_num;
   for (int i = range.second - 1; i >= target_num; --i) {
     next_t.push_back(stmt_list_[i]);
     AddNextT(stmt_list_[i - 1], next_t);
@@ -197,8 +197,7 @@ std::list<Statement*> NextTExtractor::RecurseNextBlocks(Block* block, int target
     }
     std::list<Statement*> next_block_next_t = GetNextTByTraversal(next_block, target_num);
     next_t.insert(next_t.end(), next_block_next_t.begin(), next_block_next_t.end());
-    // if the first next* in the list is not the next_block (while cases), add next* of next_block
-    if (next_t.empty() || next_t.front()->GetStatementNumber()->GetNum() != next_block->GetStartEndRange().first) {
+    if (next_t.empty() || !next_block->isWhile) {
       next_t.push_back(stmt_list_[next_block->GetStartEndRange().first - 1]);
     }
   }
@@ -495,7 +494,7 @@ std::list<Statement*> NextTExtractor::GetPrevTFromWhile(Cluster* w_cluster, int 
   std::list<Block*> prev_blocks = GetPrevBlockBeforeWhile(w_block);
   std::list<Statement*> prev_t_before_w;
   for (Block* prev_block: prev_blocks) {
-    std::list<Statement*> prev_stmts = GetNextTByTraversal(prev_block, target_num);
+    std::list<Statement*> prev_stmts = GetPrevTByTraversal(prev_block, target_num);
     prev_t_before_w.insert(prev_t_before_w.end(), prev_stmts.begin(), prev_stmts.end());
     prev_t_before_w.push_back(stmt_list_[prev_block->GetStartEndRange().second - 1]);
   }
@@ -533,48 +532,21 @@ std::list<Block*> NextTExtractor::GetPrevBlockBeforeWhile(Block* w_block) {
  * @return List of Statements that Prev* the Statement at the bottom of this block, or the target Statement.
  */
 std::list<Statement*> NextTExtractor::GetPrevTByTraversal(Block* block, int target_num) {
-//  std::pair<int, int> range = block->GetStartEndRange();
-//  if (prev_t_visited_array_[range.second - 1] == 1) {
-//    if (prev_t_map_.count(stmt_list_[range.second - 1]) == 1) {
-//      return *prev_t_map_.find(stmt_list_[range.second - 1])->second;
-//    } else {
-//      return std::list<Statement*>{};
-//    }
-//  }
-//
-//  std::list<Statement*> prev_t = RecursePrevBlocks(block, target_num);
-//  if (block->GetPrevBlocks().size() == 2 && !block->isWhile) {
-//    AddPrevTWithDup(stmt_list_[range.first - 1], prev_t);
-//  } else {
-//    AddPrevT(stmt_list_[range.first - 1], prev_t);
-//  }
-////  target_num = block->CheckIfStmtNumInRange(target_num) ? range.second : target_num;
-//  target_num = range.second;
-//  for (int i = range.first - 1; i < target_num - 1; ++i) {
-//    prev_t.push_back(stmt_list_[i]);
-//    AddPrevT(stmt_list_[i + 1], prev_t);
-//  }
-//
-//  if (prev_t_map_.count(stmt_list_[target_num - 1]) == 0) {
-//    return std::list<Statement*>{};
-//  } else {
-//    return *prev_t_map_.find(stmt_list_[target_num - 1])->second;
-//  }
   if (prev_t_map_.count(stmt_list_[target_num - 1]) == 1) {
     return *prev_t_map_.find(stmt_list_[target_num - 1])->second;
   }
   if (block->isWhile) {
     return GetPrevTFromWhile(block->GetParentCluster(), target_num);
   }
+  std::pair<int, int> range = block->GetStartEndRange();
+  target_num = target_num > range.second ? range.second : target_num;
   std::list<Statement*> prev_t = RecursePrevBlocks(block, target_num);
 
-  std::pair<int, int> range = block->GetStartEndRange();
-  if (block->GetPrevBlocks().size() == 2) { // if block because while was handled separately
+  if (block->GetPrevBlocks().size() >= 2) { // if block because while was handled separately
     AddPrevTWithDup(stmt_list_[range.first - 1], prev_t);
   } else {
     AddPrevT(stmt_list_[range.first - 1], prev_t);
   }
-  target_num = target_num > range.second ? range.second : target_num;
   for (int i = range.first - 1; i < target_num - 1; ++i) {
     prev_t.push_back(stmt_list_[i]);
     AddPrevT(stmt_list_[i + 1], prev_t);
@@ -592,7 +564,9 @@ std::list<Statement*> NextTExtractor::RecursePrevBlocks(Block* block, int target
   for (Block* prev_block: block->GetPrevBlocks()) {
     std::list<Statement*> prev_block_prev_t = GetPrevTByTraversal(prev_block, target_num);
     prev_t.insert(prev_t.end(), prev_block_prev_t.begin(), prev_block_prev_t.end());
-    prev_t.push_back(stmt_list_[prev_block->GetStartEndRange().second - 1]);
+    if (prev_t.empty() || !prev_block->isWhile) {
+      prev_t.push_back(stmt_list_[prev_block->GetStartEndRange().second - 1]);
+    }
   }
   return prev_t;
 }
