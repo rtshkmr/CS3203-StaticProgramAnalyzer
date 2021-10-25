@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <array>
-#include <set>
+#include <unordered_set>
 #include <datatype/DataType.h>
 //#include <component/QueryProcessor/types/QueryEvaluatorTable.h>
 #include <typeinfo>
@@ -75,6 +75,70 @@ enum class PKBRelRefs {
   kAffectedBy,
   kAffectsT,
   kAffectedByT
+};
+
+const std::unordered_set<PKBRelRefs> pkb_rel_set = {
+  PKBRelRefs::kFollows,
+  PKBRelRefs::kFollowsT,
+  PKBRelRefs::kFollowedBy,
+  PKBRelRefs::kFollowedByT,
+  PKBRelRefs::kParent,
+  PKBRelRefs::kParentT,
+  PKBRelRefs::kChild,
+  PKBRelRefs::kChildT,
+  PKBRelRefs::kUsesS,
+  PKBRelRefs::kUsesC,
+  PKBRelRefs::kUsedByS,
+  PKBRelRefs::kUsedByC,
+  PKBRelRefs::kModifiesStatement,
+  PKBRelRefs::kModifiesContainer,
+  PKBRelRefs::kModifiedByStatement,
+  PKBRelRefs::kModifiedByContainer,
+  PKBRelRefs::kCalls,
+  PKBRelRefs::kCalledBy,
+  PKBRelRefs::kCallsT,
+  PKBRelRefs::kCalledByT,
+  PKBRelRefs::kUses,
+  PKBRelRefs::kUsedBy,
+  PKBRelRefs::kModifies,
+  PKBRelRefs::kModifiedBy,
+  PKBRelRefs::kNext,
+  PKBRelRefs::kPrevious
+};
+
+const std::unordered_set<PKBRelRefs> second_param_is_stmt = {
+  PKBRelRefs::kFollows,
+  PKBRelRefs::kFollowsT,
+  PKBRelRefs::kFollowedBy,
+  PKBRelRefs::kFollowedByT,
+  PKBRelRefs::kParent,
+  PKBRelRefs::kParentT,
+  PKBRelRefs::kChild,
+  PKBRelRefs::kChildT,
+  PKBRelRefs::kUsedByS,
+  PKBRelRefs::kUsedByC,
+  PKBRelRefs::kModifiedByStatement,
+  PKBRelRefs::kModifiedByContainer,
+  PKBRelRefs::kUsedBy,
+  PKBRelRefs::kModifiedBy,
+  PKBRelRefs::kNext,
+  PKBRelRefs::kPrevious
+};
+
+const std::unordered_set<PKBRelRefs> second_param_is_var = {
+  PKBRelRefs::kUsesS,
+  PKBRelRefs::kUsesC,
+  PKBRelRefs::kModifiesStatement,
+  PKBRelRefs::kModifiesContainer,
+  PKBRelRefs::kUses,
+  PKBRelRefs::kModifies
+};
+
+const std::unordered_set<PKBRelRefs> second_param_is_proc = {
+  PKBRelRefs::kCalls,
+  PKBRelRefs::kCalledBy,
+  PKBRelRefs::kCallsT,
+  PKBRelRefs::kCalledByT
 };
 
 const std::array<PKBRelRefs, 16> pkb_rel_refs = {
