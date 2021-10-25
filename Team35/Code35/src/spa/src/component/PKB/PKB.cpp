@@ -298,6 +298,20 @@ bool PKB::HasRelationship(PKBRelRefs ref, DesignEntity d1, DesignEntity d2) {
     return !relationship_by_type_table_[ref][{d1, d2}].empty();
 }
 
+bool PKB::HasRelationship(PKBRelRefs ref, std::string e) {
+  if (!HasRelationship(ref)) {
+    return false;
+  } else {
+    std::unordered_map<std::string, std::vector<Entity*>> rel_map = relationship_table_[ref];
+    auto t = rel_map.find(e);
+    if (t != rel_map.end()) {
+      return false;
+    } else {
+      return !rel_map[e].empty();
+    }
+  }
+}
+
 bool PKB::HasRelationship(PKBRelRefs ref, std::string e1, std::string e2) {
     return relationship_set_.find({ref, e1, e2}) != relationship_set_.end();
 }

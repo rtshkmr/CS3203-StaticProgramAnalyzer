@@ -48,6 +48,7 @@ class PKB {
   // Check if relationship exists
   bool HasRelationship(PKBRelRefs);
   bool HasRelationship(PKBRelRefs, DesignEntity, DesignEntity);
+  bool HasRelationship(PKBRelRefs, std::string);
   bool HasRelationship(PKBRelRefs, std::string, std::string);
 
   DesignEntity EntityToDesignEntity(Entity* entity);
