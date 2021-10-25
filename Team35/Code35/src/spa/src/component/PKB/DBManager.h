@@ -20,7 +20,6 @@ class DBManager {
   // Getting relationships from PKB
   std::vector<Entity*> GetRelationship(PKBRelRefs ref, std::string entity);
 
-  std::vector<Entity*> GetRelationshipByType(PKBRelRefs ref, DesignEntity de);
   std::vector<Entity*> GetRelationshipByType(PKBRelRefs ref, DesignEntity de,
                                              std::vector<Entity *> scoped_entities,
                                              ScopeIndication scope_indication);
@@ -58,6 +57,9 @@ class DBManager {
   static std::string GetNameFromEntity(Entity* entity);
 
  private:
+
+  std::vector<Entity*> GetRelationshipByTypeUnscoped(PKBRelRefs ref, DesignEntity de);
+
   PKB* pkb_;
   RuntimeExtractor* runtime_extractor_;
   bool is_optimized_ = true;
