@@ -39,6 +39,7 @@ ClauseStrategy::DetermineDoubleSynonymCommands(QueryEvaluatorTable *table, Synon
     clause_command = new DoubleSynonymSinglePresentCommand(false);
   } else {
     // Should not be the case unless cross product
+    assert(false);
   }
   return std::make_tuple(query_command, clause_command);
 }
@@ -95,7 +96,7 @@ PatternStrategy::DetermineClauseCommand(Clause *clause, QueryEvaluatorTable *tab
       return DetermineSingleSynonymCommand(clause, true);
     } else {
       // Assign is not in the table yet, cross product
+      assert(false);
     }
   }
-  return std::make_tuple(query_command, clause_command);
 }
