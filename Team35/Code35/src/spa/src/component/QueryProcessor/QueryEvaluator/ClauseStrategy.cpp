@@ -24,7 +24,12 @@ std::tuple<PKBQueryCommand *, ClauseCommand *> ClauseContext::ProcessClause(Clau
 std::tuple<PKBQueryCommand *, ClauseCommand *>
 ClauseStrategy::DetermineDoubleSynonymCommands(QueryEvaluatorTable *table, Synonym *first_synonym,
                                                Synonym *second_synonym, Clause *clause) {
-  PKBQueryCommand *query_command = new QuerySuchThatTwoSynonymCommand(clause);
+  PKBQueryCommand *query_command = nullptr;
+  if (typeid(*clause) == typeid(SuchThat)) {
+    query_command = new QuerySuchThatTwoSynonymCommand(clause);
+  } else {
+    query_command = new QueryPatternTwoSynonymCommand(clause);
+  }
   ClauseCommand *clause_command = nullptr;
   if (table->ContainsColumn(first_synonym) && table->ContainsColumn(second_synonym)) {
     clause_command = new DoubleSynonymBothPresentCommand();
@@ -33,7 +38,6 @@ ClauseStrategy::DetermineDoubleSynonymCommands(QueryEvaluatorTable *table, Synon
   } else if (table->ContainsColumn(second_synonym)) {
     clause_command = new DoubleSynonymSinglePresentCommand(false);
   } else {
-    // Neither synonym in the target table
     // Should not be the case unless cross product
   }
   return std::make_tuple(query_command, clause_command);
