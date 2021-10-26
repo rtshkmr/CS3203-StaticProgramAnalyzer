@@ -542,7 +542,7 @@ TEST_CASE("2.PKB.NextTExtractor nested containers") {
                                                                 {s8, s7}, {s5, s4}, {s6, s4}, {s8, s4}};
     std::vector<std::tuple<Entity*, Entity*>> actual_all_p = next_t_extractor.GetAllPrevT(proc_list, stmt_list);
     CHECK(TestUtils::AreVectorsEqual(actual_all_p, expected_all_p));
-    
+
     std::vector<Entity*> expected_s1 = {s2, s3, s4, s5, s6, s7, s8};
     std::vector<Entity*> expected_s2 = {s3, s4, s5, s6, s8};
     std::vector<Entity*> expected_s3 = {s8};

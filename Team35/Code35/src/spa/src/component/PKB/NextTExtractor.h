@@ -42,16 +42,19 @@ class NextTExtractor {
 
   void Init(const std::vector<Statement*> &stmt_list);
   std::list<Statement*> GetNextTFromCluster(Cluster* cluster, int target_num);
+  Cluster* GetProcCluster(std::vector<Procedure*> proc_list, int target);
+  std::list<Statement*> GetValueFromMap(std::unordered_map<Statement*, std::list<Statement*>*> map, int stmt_num);
   static Cluster* GetTargetCluster(Cluster* p_cluster, int target_num);
   std::list<Statement*> GetNextTFromWhile(Cluster* w_cluster, int target_num);
   static Block* GetNextBlockAfterWhile(Block* w_block);
   std::list<Statement*> GetNextTByTraversal(Block* block, int target_num);
   std::list<Statement*> RecurseNextBlocks(Block* block, int target_num);
   void AddNextT(Statement* s1, std::list<Statement*> s2);
-  void AddNextTForIf(Statement* s1, std::list<Statement*> s2);
+  void AddNextTWithDup(Statement* s1, std::list<Statement*> s2);
   static std::vector<Entity*> ltov(std::list<Statement*> l);
   void PopulateAllNextT(std::vector<Procedure*> proc_list);
   bool HasNextTInFirstCluster(Cluster* cluster, int first, int second);
+  bool IsNextTDownstream(int first, int second);
   bool HasNextTInCluster(Cluster* cluster, int first, int second);
   bool HasNextTByTraversal(Block* block, int first, int second);
   std::list<Statement*> GetPrevTFromCluster(Cluster* cluster, int target);
@@ -61,7 +64,7 @@ class NextTExtractor {
   std::list<Statement*> RecursePrevBlocks(Block* block, int target_num);
   void AddPrevT(Statement* s1, std::list<Statement*> s2);
   void AddPrevTWithDup(Statement* s1, std::list<Statement*> s2);
-  std::list<Statement*> MakeUniquePrevList(int s1_num, std::list<Statement*> list);
+  std::list<Statement*>* MakeUniqueList(int s1_num, std::list<Statement*> list);
   void PopulateAllPrevT(std::vector<Procedure*> proc_list);
 };
 

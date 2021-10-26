@@ -5,12 +5,12 @@ RuntimeExtractor::RuntimeExtractor(PKB* pkb) {
 }
 
 std::vector<Entity*> RuntimeExtractor::GetNextT(int target) {
-  return next_t_extractor_.GetNextT(target,std::vector<Procedure*>{},std::vector<Statement*>{});
+  return next_t_extractor_.GetNextT(target, std::vector<Procedure*>{}, std::vector<Statement*>{});
   // todo update with pkb api
 }
 
 std::vector<Entity*> RuntimeExtractor::GetPrevT(int target) {
-  return next_t_extractor_.GetPrevT(target,std::vector<Procedure*>{},std::vector<Statement*>{});
+  return next_t_extractor_.GetPrevT(target, std::vector<Procedure*>{}, std::vector<Statement*>{});
 }
 
 std::vector<Entity*> RuntimeExtractor::GetAffects(int target) {
