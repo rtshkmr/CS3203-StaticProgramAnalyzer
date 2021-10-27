@@ -20,24 +20,8 @@ enum class DesignEntity : unsigned int {
   kVariable = 7,
   kConstant = 8,
   kProcedure = 9,
-  kInvalid = 10,
-  kWildcard = 11,
-  kProgLine = 12
-};
-
-const std::array<DesignEntity, 12> all_design_entities = {
-    DesignEntity:: kStmt,
-    DesignEntity:: kRead,
-    DesignEntity:: kPrint,
-    DesignEntity:: kCall,
-    DesignEntity:: kWhile,
-    DesignEntity:: kIf,
-    DesignEntity:: kAssign,
-    DesignEntity:: kVariable,
-    DesignEntity:: kConstant,
-    DesignEntity:: kProcedure,
-    DesignEntity:: kInvalid,
-    DesignEntity:: kProgLine,
+  kProgLine = 10,
+  kInvalid = 11
 };
 
 DesignEntity GetDesignEntity(std::string reference);
@@ -77,7 +61,7 @@ enum class PKBRelRefs {
   kAffectedByT
 };
 
-const std::unordered_set<PKBRelRefs> pkb_rel_set = {
+const std::unordered_set<PKBRelRefs> preprocessed_rel_refs = {
   PKBRelRefs::kFollows,
   PKBRelRefs::kFollowsT,
   PKBRelRefs::kFollowedBy,
@@ -141,25 +125,6 @@ const std::unordered_set<PKBRelRefs> second_param_is_proc = {
   PKBRelRefs::kCalledByT
 };
 
-const std::array<PKBRelRefs, 16> pkb_rel_refs = {
-    PKBRelRefs::kFollows,
-    PKBRelRefs::kFollowsT,
-    PKBRelRefs::kFollowedBy,
-    PKBRelRefs::kFollowedByT,
-    PKBRelRefs::kParent,
-    PKBRelRefs::kParentT,
-    PKBRelRefs::kChild,
-    PKBRelRefs::kChildT,
-    PKBRelRefs::kUsesS,
-    PKBRelRefs::kUsesC,
-    PKBRelRefs::kUsedByS,
-    PKBRelRefs::kUsedByC,
-    PKBRelRefs::kModifiesStatement,
-    PKBRelRefs::kModifiesContainer,
-    PKBRelRefs::kModifiedByStatement,
-    PKBRelRefs::kModifiedByContainer
-};
-
 enum class RelRef {
   kModifiesP,
   kModifiesS,
@@ -175,7 +140,6 @@ enum class RelRef {
   kNextT,
   kAffects,
   kAffectsT,
-  kWildcard,
   kInvalid,
 };
 
