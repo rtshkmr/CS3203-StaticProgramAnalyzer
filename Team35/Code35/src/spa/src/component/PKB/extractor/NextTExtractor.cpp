@@ -59,6 +59,7 @@ std::vector<Entity*> NextTExtractor::GetNextT(int target,
   return std::vector<Entity*>{};
 }
 
+// todo: deprecate this, use Program::GetProcClusterForLineNum instead @jx
 Cluster* NextTExtractor::GetProcCluster(std::vector<Procedure*> proc_list, int target) {
   for (Procedure* proc: proc_list) {  // todo: optimise finding procedure of target stmt
     Cluster* proc_cluster = const_cast<Cluster*>(proc->GetClusterRoot());

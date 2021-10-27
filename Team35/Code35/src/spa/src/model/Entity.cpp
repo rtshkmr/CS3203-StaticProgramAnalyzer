@@ -14,7 +14,7 @@ void Container::AddStatement(Statement* stmt) {
 }
 
 std::list<Statement*>* Container::GetStatementList() {
-  return &statement_list_;
+  return & statement_list_;
 }
 
 Procedure::Procedure(ProcedureName* pName) {
@@ -70,17 +70,17 @@ std::vector<std::set<Statement*>> Variable::GetStatementTable() {
 std::vector<Variable*> Variable::SortVariableVector(std::vector<Variable*> var_list) {
   std::vector<Variable*> var_list_copy = var_list;
   std::sort(var_list_copy.begin(), var_list_copy.end(),
-            [](Variable* a, Variable* b) { return *a->GetName() < *b->GetName(); });
+            [](Variable* a, Variable* b) { return * a->GetName() < * b->GetName(); });
   return var_list_copy;
 }
 
 Constant::Constant(ConstantValue* cv) {
-    type = EntityEnum::kConstantEntity;
-    constant_value_ = cv;
+  type = EntityEnum::kConstantEntity;
+  constant_value_ = cv;
 }
 
 const ConstantValue* Constant::GetValue() {
-    return constant_value_;
+  return constant_value_;
 }
 
 Program::Program(Procedure* p) {
@@ -93,6 +93,38 @@ std::list<Procedure*>* Program::GetProcedureList() {
 
 void Program::AddProcedure(Procedure* p) {
   procedure_list_.push_back(p);
+}
+
+/**
+ * Given a target line number, returns the procedure that that line number belongs to
+ * @param line_num
+ * @return
+ */
+Procedure* Program::GetProcForLineNum(int line_num) {
+  std::list<Procedure*>* proc_list = this->GetProcedureList();
+  for (Procedure* proc: * proc_list) {  // todo: optimise finding procedure of target stmt
+    auto* cluster_root = const_cast<Cluster*>(proc->GetClusterRoot());
+    if(cluster_root->CheckIfStatementInRange(line_num)) {
+      return proc;
+    }
+  }
+  return nullptr;
+}
+
+
+
+/**
+ * Given a target line number, returns the procedure cluster that contains this line number
+ * @param line_num
+ * @return
+ */
+Cluster* Program::GetProcClusterForLineNum(int line_num) {
+    Procedure* proc = this->GetProcForLineNum(line_num);
+    if(proc) {
+      return const_cast<Cluster*>(proc->GetClusterRoot());
+    } else {
+      return nullptr;
+    }
 }
 
 void Statement::SetStatementNumber(StatementNumber* sn) {
@@ -125,4 +157,7 @@ StatementNumber* Statement::GetStatementNumber() {
 
 LineNumber* Statement::GetLineNumber() {
   return line_number_;
+}
+std::string Statement::GetLineNumberString() {
+  return std::to_string(line_number_->getNum());
 }

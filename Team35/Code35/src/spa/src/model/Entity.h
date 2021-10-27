@@ -55,6 +55,7 @@ class Statement : public Entity {
   void SetBeforeNode(Statement* before);
   StatementNumber* GetStatementNumber();
   LineNumber* GetLineNumber();
+  std::string GetLineNumberString();
   Container* GetParentNode();
   Statement* GetBeforeNode();
 };
@@ -142,6 +143,8 @@ class Program {
   Program(Procedure* p);
 
   std::list<Procedure*>* GetProcedureList();
+  Cluster* GetProcClusterForLineNum(int line_num);
+  Procedure* GetProcForLineNum(int line_num);
 
   void AddProcedure(Procedure* p);
 };
