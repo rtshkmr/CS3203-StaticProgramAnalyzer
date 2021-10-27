@@ -28,19 +28,9 @@ void Deliverable::AddReadEntity(ReadEntity* read_entity) {
   read_list_.push_back(read_entity);
 }
 
-/**
- * Adds Follows relationship into the hashmap of deliverable. Follows is a 1-to-1 bidirectional relationship
- * so f2 cannot be inserted into followed_by_hash if f1 was not inserted into follow_hash_.
- *
- * @param f1 Previous Statement.
- * @param f2 Following Statement.
- */
 void Deliverable::AddFollowRelationship(Statement* f1, Statement* f2) {
-  // Follows is a 1-to-1 relationship so if f1 was not inserted into follow_hash_,
-  // f2 cannot be inserted into followed_by_hash
-  if (follow_hash_.insert({f1, f2}).second) {   // only inserts if the key is unique
-    followed_by_hash_.insert({f2, f1}); // only inserts if the insertion into follow_hash is true
-  }
+  AddRelationshipToMap(&follow_hash_, f1, f2);
+  AddRelationshipToMap(&followed_by_hash_, f2, f1);
 }
 
 void Deliverable::AddFollowsTransitiveRelationship(Statement* before, Statement* after) {
@@ -56,7 +46,7 @@ void Deliverable::AddFollowsTransitiveRelationshipForList(Statement* before, std
 
 void Deliverable::AddParentRelationship(Statement* parent, Statement* child) {
   AddRelationshipToMap(&parent_to_child_hash_, parent, child);
-  child_to_parent_hash_.insert({child, parent}); // only inserts if the key is unique
+  AddRelationshipToMap(&child_to_parent_hash_, child, parent);
 }
 
 void Deliverable::AddParentTransitiveRelationship(Statement* parent, Statement* child) {
@@ -152,7 +142,7 @@ std::list<Procedure*>* Deliverable::GetProcList() {
 std::list<Variable*>* Deliverable::GetVariableList() {
   return & var_list_;
 }
-std::list<ConstantValue*>* Deliverable::GetConstantValueList() {
+std::list<Constant*>* Deliverable::GetConstantList() {
   return & const_list_;
 }
 
