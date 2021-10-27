@@ -6,6 +6,7 @@ add_executable(unit_testing ${srcs}
         src/component/QueryProcessor/QueryExtractor/TestQueryExtractor.cpp
         src/component/QueryProcessor/QueryExtractor/TestQueryGrouper.cpp
         src/component/QueryProcessor/QueryEvaluator/TestQueryEvaluator.cpp
+        src/component/QueryProcessor/QueryEvaluator/TestClauseStrategy.cpp
         src/component/SourceProcessor/TestTokenizer.cpp
         src/component/SourceProcessor/TestSyntaxValidator.cpp
         src/component/SourceProcessor/TestEntityFactory.cpp

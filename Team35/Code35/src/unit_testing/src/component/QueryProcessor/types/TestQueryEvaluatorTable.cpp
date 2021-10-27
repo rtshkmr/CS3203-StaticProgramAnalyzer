@@ -11,11 +11,8 @@ TEST_CASE("3.QueryEvaluatorTable.Target synonym is statement") {
   QueryEvaluatorTable table(read_synonym);
   REQUIRE(table.GetRowSize() == 0);
 
-  Variable* var_x = GetVarX();
   ReadEntity* stmt1 = GetReadX();
-  Variable* var_y = GetVarY();
   ReadEntity* stmt2 = GetReadY();
-  Variable* var_z = GetVarZ();
   ReadEntity* stmt3 = GetReadZ();
 
   Synonym *assign_syn = new Synonym("a1", DesignEntity::kAssign);
@@ -160,32 +157,3 @@ TEST_CASE("3.QueryEvaluatorTable.Multiple Target Synonyms") {
     REQUIRE(target_synonym_in_table[1] == assign_synonym);
   }
 }
-
-//TEST_CASE("3.QueryEvaluatorTable.Add Multiple Rows") {
-//  std::string target = "s1";
-//  QueryEvaluatorTable table(target);
-//
-//  std::list<std::string> synonym_list = {"2", "3", "4", "5"};
-//  bool outcome = table.AddTargetSynonym(synonym_list);
-//  REQUIRE(outcome);
-//  table.AddColumn("v1");
-//  table.AddRow("v1", 0, "x");
-//  bool result = table.AddRow("v1", 2, "x");
-//  REQUIRE_FALSE(result);
-//  table.AddRow("v1", 1, "y");
-//  table.AddRow("v1", 2, "QWERT");
-//  table.AddRow("v1", 3, "p2p");
-//  table.AddColumn("test");
-//  table.AddMultipleRowForAllColumn("test", 0, "a", 0);
-//  table.AddMultipleRowForAllColumn("test", 0, "b", 1);
-//  table.AddMultipleRowForAllColumn("test", 0, "c", 2);
-//  table.AddMultipleRowForAllColumn("test", 0, "d", 3);
-//  REQUIRE(table.GetRowSize() == 7);
-//  std::vector<std::string> expected = {"2", "2", "2", "2", "3", "4", "5"};
-//  REQUIRE(table.GetResults() == expected);
-//  table.AddColumn("test2");
-//  table.AddRowForAllColumn("test2", 0, "new input");
-//  expected = {"2", "2", "2", "2", "2", "3", "4", "5"};
-//  REQUIRE(table.GetResults() == expected);
-//  REQUIRE(table.GetRowSize() == 8);
-//}

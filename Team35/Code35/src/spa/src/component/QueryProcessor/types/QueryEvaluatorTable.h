@@ -21,7 +21,8 @@ class QueryEvaluatorTable {
     bool AddTargetSynonymValues(Synonym *target, std::vector<Entity *> entity_list);
     // Add column to table
     bool AddColumn(Synonym *synonym);
-    bool ContainsColumn(Synonym *synonym);
+
+    virtual bool ContainsColumn(Synonym *synonym);
     // Add Rows to table
     bool AddMultipleRowForAllColumn(Synonym *synonym, int index, Entity *entity, int repeat_count);
     // Delete row
