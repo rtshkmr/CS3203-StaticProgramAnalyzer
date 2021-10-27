@@ -17,15 +17,15 @@ TEST_CASE("3.QueryEvaluatorTable.Target synonym is statement") {
   Synonym *assign_syn = new Synonym("a1", DesignEntity::kAssign);
   std::string stmt4_s = "1";
   std::vector<Variable*> stmt4_var_expr;
-  std::vector<ConstantValue*> stmt4_cv_expr;
+  std::vector<Constant*> stmt4_cv_expr;
   AssignEntity* stmt4 = new AssignEntity(var_y, stmt4_s, stmt4_var_expr, stmt4_cv_expr);
   std::string stmt5_s = "2";
   std::vector<Variable*> stmt5_var_expr;
-  std::vector<ConstantValue*> stmt5_cv_expr;
+  std::vector<Constant*> stmt5_cv_expr;
   AssignEntity* stmt5 = new AssignEntity(var_y, stmt5_s, stmt5_var_expr, stmt5_cv_expr);
   std::string stmt6_s = "3";
   std::vector<Variable*> stmt6_var_expr;
-  std::vector<ConstantValue*> stmt6_cv_expr;
+  std::vector<Constant*> stmt6_cv_expr;
   AssignEntity* stmt6 = new AssignEntity(var_y, stmt6_s, stmt6_var_expr, stmt6_cv_expr);
 
   std::vector<Entity *> synonym_list = {stmt1, stmt2, stmt3};

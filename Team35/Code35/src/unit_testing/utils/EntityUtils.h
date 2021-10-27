@@ -19,10 +19,10 @@ inline Variable* var_n_ = new Variable(new VariableName("n"));
 inline Variable* var_m_ = new Variable(new VariableName("m"));
 
 // constant values
-inline ConstantValue* const_0_ = new ConstantValue("0");
-inline ConstantValue* const_1_ = new ConstantValue("1");
-inline ConstantValue* const_2_ = new ConstantValue("2");
-inline ConstantValue* const_3_ = new ConstantValue("3");
+inline Constant* const_0_ = new Constant(new ConstantValue("0"));
+inline Constant* const_1_ = new Constant(new ConstantValue("1"));
+inline Constant* const_2_ = new Constant(new ConstantValue("2"));
+inline Constant* const_3_ = new Constant(new ConstantValue("3"));
 
 /**
  * These functions provide the ability to redefine the statements,
@@ -91,70 +91,70 @@ inline AssignEntity* GetAssign1() {
   return new AssignEntity(var_z_,
                           "1",
                           std::vector<Variable*>(),
-                          std::vector<ConstantValue*>{const_1_});
+                          std::vector<Constant*>{const_1_});
 }
 // x=2
 inline AssignEntity* GetAssign2() {
   return new AssignEntity(var_x_,
                           "2",
                           std::vector<Variable*>(),
-                          std::vector<ConstantValue*>{const_2_});
+                          std::vector<Constant*>{const_2_});
 }
 // z=3
 inline AssignEntity* GetAssign3() {
   return new AssignEntity(var_z_,
                           "3",
                           std::vector<Variable*>(),
-                          std::vector<ConstantValue*>{const_3_});
+                          std::vector<Constant*>{const_3_});
 }
 // y=z
 inline AssignEntity* GetAssign4() {
   return new AssignEntity(var_y_,
                           "z",
                           std::vector<Variable*>{var_z_},
-                          std::vector<ConstantValue*>());
+                          std::vector<Constant*>());
 }
 // z=y
 inline AssignEntity* GetAssign5() {
   return new AssignEntity(var_z_,
                           "y",
                           std::vector<Variable*>{var_y_},
-                          std::vector<ConstantValue*>());
+                          std::vector<Constant*>());
 }
 // y=i
 inline AssignEntity* GetAssign6() {
   return new AssignEntity(var_y_,
                           "i",
                           std::vector<Variable*>{var_i_},
-                          std::vector<ConstantValue*>());
+                          std::vector<Constant*>());
 }
 // i=z
 inline AssignEntity* GetAssign7() {
   return new AssignEntity(var_i_,
                           "z",
                           std::vector<Variable*>{var_z_},
-                          std::vector<ConstantValue*>());
+                          std::vector<Constant*>());
 }
 // x=z
 inline AssignEntity* GetAssign8() {
   return new AssignEntity(var_x_,
                           "z",
                           std::vector<Variable*>{var_z_},
-                          std::vector<ConstantValue*>());
+                          std::vector<Constant*>());
 }
 // x=x
 inline AssignEntity* GetAssign9() {
   return new AssignEntity(var_x_,
                           "x",
                           std::vector<Variable*>{var_x_},
-                          std::vector<ConstantValue*>());
+                          std::vector<Constant*>());
 }
 // x=y
 inline AssignEntity* GetAssign10() {
   return new AssignEntity(var_x_,
                           "y",
                           std::vector<Variable*>{var_y_},
-                          std::vector<ConstantValue*>());
+                          std::vector<Constant*>());
 }
 
 // if
@@ -163,7 +163,7 @@ inline IfEntity* GetIf1() {
                       std::vector<Variable*>{
                           var_x_
                       },
-                      std::vector<ConstantValue*>{
+                      std::vector<Constant*>{
                           const_0_
                       });
 }
@@ -172,7 +172,7 @@ inline IfEntity* GetIf2() {
                       std::vector<Variable*>{
                           var_y_
                       },
-                      std::vector<ConstantValue*>{
+                      std::vector<Constant*>{
                           const_3_
                       });
 }
@@ -181,7 +181,7 @@ inline IfEntity* GetIf3() {
                       std::vector<Variable*>{
                           var_z_
                       },
-                      std::vector<ConstantValue*>{
+                      std::vector<Constant*>{
                           const_1_
                       });
 
@@ -191,7 +191,7 @@ inline IfEntity* GetIf4() {
                       std::vector<Variable*>{
                           var_i_
                       },
-                      std::vector<ConstantValue*>{
+                      std::vector<Constant*>{
                           const_2_
                       });
 }
@@ -205,7 +205,7 @@ inline ElseEntity* GetElse() {
 inline IfEntity* GetIf6() {
   return new IfEntity("1 == 2",
                       std::vector<Variable*>{ },
-                      std::vector<ConstantValue*>{
+                      std::vector<Constant*>{
                           const_1_,
                           const_2_
                       });
@@ -219,7 +219,7 @@ inline IfEntity* GetIf7() {
                           var_x_,
                           var_y_
                       },
-                      std::vector<ConstantValue*>{});
+                      std::vector<Constant*>{});
 }
 
 // 3 variable style
@@ -231,7 +231,7 @@ inline IfEntity* GetIf8() {
                           var_y_,
                           var_x_
                       },
-                      std::vector<ConstantValue*>{});
+                      std::vector<Constant*>{});
 }
 
 // 3 variable style + 2 constants
@@ -243,7 +243,7 @@ inline IfEntity* GetIf9() {
                           var_y_,
                           var_z_
                       },
-                      std::vector<ConstantValue*>{
+                      std::vector<Constant*>{
                           const_1_,
                           const_2_
                       });
@@ -255,7 +255,7 @@ inline WhileEntity* GetWhileEntity1() {
   return new WhileEntity("x==0", std::vector<Variable*>{
                              var_x_
                          },
-                         std::vector<ConstantValue*>{
+                         std::vector<Constant*>{
                              const_0_
                          });
 }
@@ -263,7 +263,7 @@ inline WhileEntity* GetWhileEntity2() {
   return new WhileEntity("y<=3", std::vector<Variable*>{
                              var_y_
                          },
-                         std::vector<ConstantValue*>{
+                         std::vector<Constant*>{
                              const_3_
                          });
 }
@@ -271,7 +271,7 @@ inline WhileEntity* GetWhileEntity3() {
   return new WhileEntity("z>1", std::vector<Variable*>{
                              var_z_
                          },
-                         std::vector<ConstantValue*>{
+                         std::vector<Constant*>{
                              const_1_
                          });
 }
