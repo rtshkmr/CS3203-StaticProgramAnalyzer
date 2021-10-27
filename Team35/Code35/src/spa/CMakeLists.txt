@@ -46,14 +46,14 @@ add_library(spa ${srcs} ${headers}
         src/util/util.h
         src/util/TimeUtil.cpp src/util/TimeUtil.h
         src/util/PKBStub.cpp src/util/PKBStub.h src/model/CFG.cpp src/model/CFG.h
-        src/component/PKB/extractor/RuntimeExtractor.cpp src/component/PKB/extractor/RuntimeExtractor.h
-        src/component/PKB/extractor/NextTExtractor.cpp src/component/PKB/extractor/NextTExtractor.h
+        src/component/PKB/RuntimeExtractor.cpp src/component/PKB/RuntimeExtractor.h
+        src/component/PKB/NextTExtractor.cpp src/component/PKB/NextTExtractor.h
         src/component/SourceProcessor/Extractors/NextExtractor.cpp src/component/SourceProcessor/Extractors/NextExtractor
         src/component/SourceProcessor/Extractors/CallsTExtractor.cpp 
         src/component/SourceProcessor/Extractors/CallsTExtractor.h
         src/component/PKB/DBManager.cpp src/component/PKB/DBManager.h
-        src/component/PKB/extractor/AffectsExtractor.cpp src/component/PKB/extractor/AffectsExtractor.h
-        src/component/PKB/extractor/AffectsTExtractor.cpp src/component/PKB/extractor/AffectsTExtractor.h
+        src/component/PKB/AffectsExtractor.cpp src/component/PKB/AffectsExtractor.h
+        src/component/PKB/AffectsTExtractor.cpp src/component/PKB/AffectsTExtractor.h
         src/util/Utility.cpp src/util/Utility.h)
 
 

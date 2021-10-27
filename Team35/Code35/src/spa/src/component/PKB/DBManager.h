@@ -2,7 +2,7 @@
 #define AUTOTESTER_CODE35_SRC_SPA_SRC_COMPONENT_PKB_DBMANAGER_H_
 
 #include "PKB.h"
-#include "component/PKB/extractor/RuntimeExtractor.h"
+#include "RuntimeExtractor.h"
 
 /**
  * This class provides a facade for the PKB and RuntimeExtractor.

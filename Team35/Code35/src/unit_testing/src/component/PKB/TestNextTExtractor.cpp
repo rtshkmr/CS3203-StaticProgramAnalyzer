@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include <component/PKB/extractor/NextTExtractor.h>
+#include <component/PKB/NextTExtractor.h>
 #include "../../../utils/EntityUtils.h"
 #include "../../../utils/TestUtils.h"
 

@@ -3,10 +3,10 @@
 
 #include <model/Entity.h>
 #include <component/QueryProcessor/types/Types.h>
-#include "component/PKB/PKB.h"
-#include "component/PKB/extractor/NextTExtractor.h"
-#include "component/PKB/extractor/AffectsExtractor.h"
-#include "component/PKB/extractor/AffectsTExtractor.h"
+#include "PKB.h"
+#include "NextTExtractor.h"
+#include "AffectsExtractor.h"
+#include "AffectsTExtractor.h"
 
 /**
  * This class acts as a facade for runtime extraction of relationships, for the DBManager to query. It abstracts out
