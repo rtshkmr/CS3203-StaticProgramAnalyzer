@@ -44,7 +44,7 @@ void PKB::PopulateDataStructures(Deliverable d) {
   PopulateRelationship(&d.called_by_hash_, PKBRelRefs::kCalledBy);
   PopulateRelationship(&d.calls_T_hash_, PKBRelRefs::kCallsT);
   PopulateRelationship(&d.called_by_T_hash_, PKBRelRefs::kCalledByT);
-  PopulateRelationship(&d.next_hash_, PKBRelRefs::kNextT);
+  PopulateRelationship(&d.next_hash_, PKBRelRefs::kNext);
   PopulateRelationship(&d.previous_hash_, PKBRelRefs::kPrevious);
 
 
