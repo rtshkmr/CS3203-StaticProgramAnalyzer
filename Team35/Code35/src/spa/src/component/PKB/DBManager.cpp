@@ -200,15 +200,6 @@ bool DBManager::HasRelationship(PKBRelRefs ref, DesignEntity first, DesignEntity
   }
 }
 
-bool DBManager::HasRelationship(PKBRelRefs ref, std::string ident_string) {
-  const bool pkb_ref = pkb_rel_set.find(ref) != pkb_rel_set.end();
-  if (pkb_ref) {
-    // PKB
-    return pkb_->HasRelationship(ref, ident_string);
-  } else {
-    // RuntimeExtractor
-  }
-}
 /**
  * To query for existence of relationship for 1 specific entity, e.g. Next(3, _)
  * @param ref Relationship type

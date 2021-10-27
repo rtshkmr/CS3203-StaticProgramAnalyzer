@@ -48,7 +48,6 @@ class DBManager {
 
   // Check if relationship exists
   bool HasRelationship(PKBRelRefs ref);
-  bool HasRelationship(PKBRelRefs ref, std::string entity);
   bool HasRelationship(PKBRelRefs ref, DesignEntity first, DesignEntity second);
   bool HasRelationship(PKBRelRefs ref, std::string first, std::string second);
   bool HasRelationship(PKBRelRefs ref, std::string ident_string);
