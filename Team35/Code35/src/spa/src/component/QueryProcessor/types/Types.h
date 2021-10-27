@@ -234,6 +234,59 @@ struct Clause {
   virtual ~Clause() {};
 };
 
+struct With : Clause {
+  Attribute left_attribute;
+  Attribute right_attribute;
+  bool left_is_prog_line;
+  bool right_is_prog_line;
+  bool left_is_synonym;
+  bool right_is_synonym;
+  With() {};
+  With(bool l_is_syn, bool r_is_syn, std::string lhs, std::string rhs, Attribute left_attr, Attribute right_attr,
+       bool left_is_pl, bool right_is_pl) {
+    left_is_synonym = l_is_syn;
+    right_is_synonym = r_is_syn;
+    left_hand_side = lhs;
+    right_hand_side = rhs;
+    left_attribute = left_attr;
+    right_attribute = right_attr;
+    left_is_prog_line = left_is_pl;
+    right_is_prog_line = right_is_pl;
+  };
+  With(bool l_is_syn, bool r_is_syn, std::string lhs, std::string rhs, bool left_is_pl, bool right_is_pl) {
+    left_is_synonym = l_is_syn;
+    right_is_synonym = r_is_syn;
+    left_hand_side = lhs;
+    right_hand_side = rhs;
+    left_is_prog_line = left_is_pl;
+    right_is_prog_line = right_is_pl;
+  };
+  std::vector<std::string> GetAllSynonymNamesOfClause() {
+    std::vector<std::string> v;
+    if (left_is_synonym) v.push_back(left_hand_side);
+    if (right_is_synonym) v.push_back(right_hand_side);
+    return v;
+  };
+  std::string getType() const { return typeid(this).name(); }
+  bool isEqual(Clause* toObj) {
+    if (this->getType() == toObj->getType()) {
+      With* obj = (With*) & toObj;
+      return (
+              this->left_hand_side == obj->left_hand_side &&
+              this->right_hand_side == obj->right_hand_side &&
+              this->left_attribute == obj->left_attribute &&
+              this->right_attribute == obj->right_attribute &&
+              this->left_is_synonym == obj->left_is_synonym &&
+              this->right_is_synonym == obj->right_is_synonym &&
+              this->left_is_prog_line == obj->left_is_prog_line &&
+              this->right_is_prog_line == obj->right_is_prog_line
+              );
+    } else {
+      return false;
+    }
+  }
+};
+
 struct SuchThat : Clause {
   RelRef rel_ref;
   bool left_is_synonym;
