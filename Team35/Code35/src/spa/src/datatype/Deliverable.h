@@ -97,6 +97,9 @@ class Deliverable {
   std::unordered_map<Procedure*, std::list<Procedure*>*> called_by_T_hash_; // represents a Calls*(x, y) where y -> x
   std::unordered_map<Statement*, std::list<Statement*>*> previous_hash_;  // reverse of next
 
+ private:
+  template<typename X, typename Y>
+  void AddRelationshipToMap(std::unordered_map<X, std::list<Y>*>* map, X key, Y value);
 };
 
 #endif //AUTOTESTER_DELIVERABLE_H
