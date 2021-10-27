@@ -15,8 +15,10 @@ std::tuple<PKBQueryCommand *, ClauseCommand *> ClauseContext::ProcessClause(Clau
   ClauseStrategy *strategy;
   if (typeid(*clause) == typeid(SuchThat)) {
     strategy = new SuchThatStrategy();
-  } else {
+  } else if (typeid(*clause) == typeid(Pattern)) {
     strategy = new PatternStrategy();
+  } else {
+    strategy = new WithStrategy();
   }
   return strategy->DetermineClauseCommand(clause, group_table);
 }
@@ -98,4 +100,11 @@ PatternStrategy::DetermineClauseCommand(Clause *clause, QueryEvaluatorTable *tab
     }
   }
   return std::make_tuple(query_command, clause_command);
+}
+
+std::tuple<PKBQueryCommand *, ClauseCommand *>
+WithStrategy::DetermineClauseCommand(Clause *clause, QueryEvaluatorTable *table) {
+  auto* with_clause = dynamic_cast<With*>(clause);
+
+  return std::tuple<PKBQueryCommand *, ClauseCommand *>();
 }
