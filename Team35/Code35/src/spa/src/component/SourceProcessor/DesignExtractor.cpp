@@ -4,6 +4,7 @@
 #include <component/SourceProcessor/Extractors/FollowsTExtractor.h>
 #include <component/SourceProcessor/Extractors/NextExtractor.h>
 #include <component/SourceProcessor/Extractors/CallsTExtractor.h>
+#include <component/SourceProcessor/Extractors/TransitiveExtractor.h>
 #include "DesignExtractor.h"
 
 DesignExtractor::DesignExtractor(Deliverable* deliverable) {
@@ -15,8 +16,8 @@ DesignExtractor::DesignExtractor(Deliverable* deliverable) {
  * namely Calls, Uses, Modifies, Parent* and Follow* and their reverse relationships.
  */
 void DesignExtractor::ExtractDesignAbstractions() {
-  CallsTExtractor calls_t_extractor{};
-  calls_t_extractor.Extract(deliverable_);
+  auto calls_t_extractor = TransitiveExtractor<Procedure>(deliverable_);
+  calls_t_extractor.Extract(&deliverable_->calls_T_hash_, &deliverable_->calls_hash_, TransitiveRel::kCalls);
 
   UsesExtractor uses_extractor{};
   uses_extractor.Extract(deliverable_);
