@@ -72,7 +72,7 @@ IntermediateTable *PKBQueryReceiver::QueryPKBByValue(PKBRelRefs rel, std::string
 
 // E.g Uses(a1, _) should be kUsedBy instead of kUses
 IntermediateTable *PKBQueryReceiver::QueryPKBForSynonymWithWildCard(PKBRelRefs rel, DesignEntity entity) {
-  std::vector<Entity *> output = pkb->GetRelationshipByType(rel, entity);
+  std::vector<Entity *> output = pkb->GetFirstEntityOfRelationship(rel, entity);
   IntermediateTable *table = new IntermediateTable();
   table->InsertData(output);
   return table;
@@ -127,13 +127,13 @@ IntermediateTable *PKBQueryReceiver::QueryPatternByValue(DesignEntity design_ent
   // Returns std::vector<Entity*>
   switch(design_entity) {
     case DesignEntity::kAssign:
-      table->InsertData(pkb->GetAssignEntityByVariable(value));
+      table->InsertData(pkb->GetPatternEntities(DesignEntity::kAssign, value));
       break;
       case DesignEntity::kWhile:
-        table->InsertData(pkb->GetWhileEntityByVariable(value));
+        table->InsertData(pkb->GetPatternEntities(DesignEntity::kWhile, value));
         break;
         case DesignEntity::kIf:
-          table->InsertData(pkb->GetIfEntityByVariable(value));
+          table->InsertData(pkb->GetPatternEntities(DesignEntity::kIf, value));
           break;
           default:
             break;
