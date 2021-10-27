@@ -85,6 +85,11 @@ int QueryEvaluatorTable::GetColumnSize() {
   return synonym_to_entity_map.size();
 }
 
+/**
+ * The row size of the table is calculated from the number of rows for the first target synonym. This is because
+ * the table is assumed to contain the first row first.
+ * @return
+ */
 int QueryEvaluatorTable::GetRowSize() {
   auto search = synonym_to_entity_map.find(target_synonym_list[0]);
 
