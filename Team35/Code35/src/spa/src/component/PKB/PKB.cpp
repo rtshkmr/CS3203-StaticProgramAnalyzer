@@ -73,7 +73,6 @@ std::vector<std::tuple<Entity*, Entity*>> PKB::GetRelationshipByTypes(PKBRelRefs
       d2 = DesignEntity::kStmt;
     }
 
-    auto hi = relationship_by_types_table_[ref][{d1, d2}];
     return relationship_by_types_table_[ref][{d1, d2}];
 }
 
