@@ -1,15 +1,15 @@
 #ifndef INC_21S1_CP_SPA_TEAM_35_QUERYEVALUATOR_H
 #define INC_21S1_CP_SPA_TEAM_35_QUERYEVALUATOR_H
 
-#include <component/PKB/PKB.h>
+#include <component/PKB/DBManager.h>
 #include <component/QueryProcessor/types/UnformattedQueryResult.h>
 
 class QueryEvaluator {
   public:
-    QueryEvaluator(PKB *pkb);
+    QueryEvaluator(DBManager *db_manager);
     UnformattedQueryResult EvaluateQuery(const std::vector<Group *>&);
   private:
-    PKB *pkb;
+    DBManager *db_manager;
     bool boolean_result;
 
     void ProcessGroup(QueryEvaluatorTable *table, Group *group);

@@ -1,8 +1,8 @@
-#ifndef AUTOTESTER_PKBQUERYCOMMAND_H
-#define AUTOTESTER_PKBQUERYCOMMAND_H
+#ifndef AUTOTESTER_DBQUERYCOMMAND_H
+#define AUTOTESTER_DBQUERYCOMMAND_H
 
 #include <component/QueryProcessor/types/IntermediateTable.h>
-#include "component/PKB/PKB.h"
+#include "component/PKB/DBManager.h"
 #include "model/Entity.h"
 #include "component/QueryProcessor/types/Types.h"
 
@@ -11,13 +11,13 @@
  */
 class PKBQueryReceiver {
   private:
-    PKB *pkb;
+    DBManager *db_manager;
   public:
-    PKBQueryReceiver(PKB *pkb);
+    PKBQueryReceiver(DBManager *db_manager);
 
     IntermediateTable *QueryPKBTwoSynonyms(PKBRelRefs rel, DesignEntity first_synonym, DesignEntity second_synonym);
     IntermediateTable *QueryPKBByValue(PKBRelRefs rel, std::string value);
-    IntermediateTable *QueryPKBForSynonymWithWildCard(PKBRelRefs rel, DesignEntity entity);
+    IntermediateTable *QueryEntityWithWildcard(PKBRelRefs rel, DesignEntity entity);
     IntermediateTable *QueryPKBByValueForBoolean(PKBRelRefs rel, std::string value);
     IntermediateTable *QueryPKBByValueForBoolean(PKBRelRefs rel, std::string first_value, std::string second_value);
     IntermediateTable *QueryRelRefExistence(PKBRelRefs rel);
@@ -25,7 +25,7 @@ class PKBQueryReceiver {
     IntermediateTable *QueryPatternByValue(DesignEntity design_entity, std::string value);
 };
 
-class PKBQueryCommand {
+class DBQueryCommand {
   public:
     virtual void SetReceiver(PKBQueryReceiver *receiver) = 0;
     virtual IntermediateTable * ExecuteQuery(Clause *clause) = 0;
@@ -33,7 +33,7 @@ class PKBQueryCommand {
     PKBRelRefs GetPKBRelRef(RelRef relation, bool order_of_values_unchanged_from_clause);
 };
 
-class QuerySuchThatTwoSynonymCommand : public PKBQueryCommand {
+class QuerySuchThatTwoSynonymCommand : public DBQueryCommand {
   private:
     Clause *clause;
     PKBQueryReceiver *receiver;
@@ -44,7 +44,7 @@ class QuerySuchThatTwoSynonymCommand : public PKBQueryCommand {
 };
 
 
-class QuerySuchThatOneSynonymCommand : public PKBQueryCommand {
+class QuerySuchThatOneSynonymCommand : public DBQueryCommand {
   private:
     Clause *clause;
     PKBQueryReceiver *receiver;
@@ -58,7 +58,7 @@ class QuerySuchThatOneSynonymCommand : public PKBQueryCommand {
  * This class should handle all sorts of no-synonym queries regardless of number of wildcards and should always return
  * a boolean in the Intermediate table.
  */
-class QuerySuchThatNoSynonymCommand : public PKBQueryCommand {
+class QuerySuchThatNoSynonymCommand : public DBQueryCommand {
   private:
     Clause *clause;
     PKBQueryReceiver *receiver;
@@ -68,7 +68,7 @@ class QuerySuchThatNoSynonymCommand : public PKBQueryCommand {
     IntermediateTable * ExecuteQuery(Clause *clause) override;
 };
 
-class QueryPatternTwoSynonymCommand : public PKBQueryCommand {
+class QueryPatternTwoSynonymCommand : public DBQueryCommand {
   private:
     Clause *clause;
     PKBQueryReceiver *receiver;
@@ -78,7 +78,7 @@ class QueryPatternTwoSynonymCommand : public PKBQueryCommand {
     IntermediateTable * ExecuteQuery(Clause *clause) override;
 };
 
-class QueryPatternOneSynonymCommand : public PKBQueryCommand {
+class QueryPatternOneSynonymCommand : public DBQueryCommand {
   private:
     Clause *clause;
     PKBQueryReceiver *receiver;
@@ -88,4 +88,4 @@ class QueryPatternOneSynonymCommand : public PKBQueryCommand {
     IntermediateTable * ExecuteQuery(Clause *clause) override;
 };
 
-#endif //AUTOTESTER_PKBQUERYCOMMAND_H
+#endif //AUTOTESTER_DBQUERYCOMMAND_H
