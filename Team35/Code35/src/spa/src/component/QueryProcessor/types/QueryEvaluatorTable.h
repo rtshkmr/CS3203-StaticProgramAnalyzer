@@ -34,14 +34,6 @@ class QueryEvaluatorTable {
     // Return vector of target synonym results
     std::vector<std::vector<Entity*>> GetResults();
     std::vector<Synonym*> GetTargetSynonymList();
-
-    //    // Empty column but keep the synonym (header) in the table
-    //    bool RemoveColumn(std::string synonym);
-    //
-    //
-    //
-    //
-    //    std::string GetStatementSynonym(std::synonym_to_entity_map<std::string, DesignEntity> synonym_design_entity_map);
     // Add row (and new col)
     bool AddRow(Synonym *synonym, int index, Entity *entity);
 
