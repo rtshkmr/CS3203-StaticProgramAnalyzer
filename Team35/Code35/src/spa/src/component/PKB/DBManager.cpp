@@ -77,7 +77,7 @@ std::vector<Entity*> DBManager::GetRelationshipByType(PKBRelRefs ref,
   } else {
     // Scoped
     // Check if pkb contains the relationship type
-    const bool pkb_ref = pkb_rel_set.find(ref) != pkb_rel_set.end();
+    const bool pkb_ref = preprocessed_rel_refs.find(ref) != preprocessed_rel_refs.end();
     if (pkb_ref) {
       // PKB contains the relationship type
 
@@ -144,7 +144,7 @@ std::vector<Entity*> DBManager::GetRelationshipByTypes(PKBRelRefs ref,
   } else {
     // Scoped
     // Check if pkb contains the relationship type
-    const bool pkb_ref = pkb_rel_set.find(ref) != pkb_rel_set.end();
+    const bool pkb_ref = preprocessed_rel_refs.find(ref) != preprocessed_rel_refs.end();
     if (pkb_ref) {
       // PKB contains the relationship type
 
@@ -201,7 +201,7 @@ bool DBManager::HasRelationship(PKBRelRefs ref, DesignEntity first, DesignEntity
 }
 
 bool DBManager::HasRelationship(PKBRelRefs ref, std::string ident_string) {
-  const bool pkb_ref = pkb_rel_set.find(ref) != pkb_rel_set.end();
+  const bool pkb_ref = preprocessed_rel_refs.find(ref) != preprocessed_rel_refs.end();
   if (pkb_ref) {
     // PKB
     return pkb_->HasRelationship(ref, ident_string);
