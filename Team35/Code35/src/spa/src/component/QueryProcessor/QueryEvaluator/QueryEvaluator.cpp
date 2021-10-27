@@ -42,8 +42,8 @@ UnformattedQueryResult QueryEvaluator::EvaluateQuery(const std::vector<Group *>&
 void QueryEvaluator::ProcessGroup(QueryEvaluatorTable *table, Group *group) {
   for (Clause* current_clause: group->GetClauses()) {
     auto clause_context = ClauseContext(table);
-    std::tuple<DBQueryCommand*, ClauseCommand*> commands = clause_context.ProcessClause(current_clause);
-    DBQueryCommand *query_command = std::get<0>(commands);
+    std::tuple<PKBQueryCommand*, ClauseCommand*> commands = clause_context.ProcessClause(current_clause);
+    PKBQueryCommand *query_command = std::get<0>(commands);
     ClauseCommand *clause_command = std::get<1>(commands);
 
     auto query_receiver = PKBQueryReceiver(db_manager);

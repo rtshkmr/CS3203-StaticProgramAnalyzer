@@ -32,7 +32,7 @@ add_library(spa ${srcs} ${headers}
         src/component/QueryProcessor/QueryExtractor/QueryGrouper.h src/component/QueryProcessor/QueryExtractor/QueryGrouper.cpp
         src/component/QueryProcessor/QueryExtractor/QuerySemanticValidator.h src/component/QueryProcessor/QueryExtractor/QuerySemanticValidator.cpp
         src/component/QueryProcessor/QueryEvaluator/QueryEvaluator.h src/component/QueryProcessor/QueryEvaluator/QueryEvaluator.cpp
-        src/component/QueryProcessor/QueryEvaluator/DBQueryCommand.h src/component/QueryProcessor/QueryEvaluator/DBQueryCommand.cpp
+        src/component/QueryProcessor/QueryEvaluator/PKBQueryCommand.h src/component/QueryProcessor/QueryEvaluator/PKBQueryCommand.cpp
         src/component/QueryProcessor/QueryEvaluator/ClauseCommand.h src/component/QueryProcessor/QueryEvaluator/ClauseCommand.cpp
         src/component/QueryProcessor/QueryEvaluator/ClauseCommandExecutor.h src/component/QueryProcessor/QueryEvaluator/ClauseCommandExecutor.cpp
         src/component/QueryProcessor/QueryEvaluator/ClauseStrategy.h src/component/QueryProcessor/QueryEvaluator/ClauseStrategy.cpp

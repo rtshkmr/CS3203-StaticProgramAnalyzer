@@ -1,8 +1,8 @@
-#include "DBQueryCommand.h"
+#include "PKBQueryCommand.h"
 
 PKBQueryReceiver::PKBQueryReceiver(DBManager *db_manager) : db_manager(db_manager) {}
 
-PKBRelRefs DBQueryCommand::GetPKBRelRef(RelRef relation, bool order_of_values_unchanged_from_clause) {
+PKBRelRefs PKBQueryCommand::GetPKBRelRef(RelRef relation, bool order_of_values_unchanged_from_clause) {
   switch(relation) {
     case RelRef::kFollows:
       return order_of_values_unchanged_from_clause ? PKBRelRefs::kFollows : PKBRelRefs::kFollowedBy;
@@ -198,7 +198,7 @@ IntermediateTable * QuerySuchThatOneSynonymCommand::ExecuteQuery(Clause *clause)
 
   if (query_value == "_") {
     PKBRelRefs pkb_rel = GetPKBRelRef(such_that->rel_ref, synonym_is_first_param);
-    return this->receiver->QueryPKBForSynonymWithWildCard(pkb_rel, query_synonym->GetType());
+    return this->receiver->QueryEntityWithWildcard(pkb_rel, query_synonym->GetType());
   } else {
     PKBRelRefs pkb_rel = GetPKBRelRef(such_that->rel_ref, !synonym_is_first_param);
     return this->receiver->QueryPKBByValue(pkb_rel, query_value);

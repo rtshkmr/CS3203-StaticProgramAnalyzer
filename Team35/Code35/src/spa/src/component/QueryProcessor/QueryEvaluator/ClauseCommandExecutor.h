@@ -7,7 +7,7 @@
 //#include "component/PKB/PKB.h"
 //#include "ClauseCommandExecutor.h"
 //#include <component/QueryProcessor/types/QueryEvaluatorTable.h>
-//#include "DBQueryCommand.h"
+//#include "PKBQueryCommand.h"
 //#include "ClauseStrategy.h"
 
 #include <component/QueryProcessor/types/QueryEvaluatorTable.h>

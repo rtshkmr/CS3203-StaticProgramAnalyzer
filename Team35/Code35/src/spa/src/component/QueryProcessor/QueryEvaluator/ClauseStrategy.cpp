@@ -9,9 +9,9 @@ ClauseContext::ClauseContext(QueryEvaluatorTable *table) : group_table(table){}
 /**
  * Determines the type of the clause and calls the corresponding strategy to create the commands.
  * @param clause Current clause being evaluated.
- * @return DBQueryCommand and ClauseCommand.
+ * @return PKBQueryCommand and ClauseCommand.
  */
-std::tuple<DBQueryCommand *, ClauseCommand *> ClauseContext::ProcessClause(Clause *clause) {
+std::tuple<PKBQueryCommand *, ClauseCommand *> ClauseContext::ProcessClause(Clause *clause) {
   ClauseStrategy *strategy;
   if (typeid(*clause) == typeid(SuchThat)) {
     strategy = new SuchThatStrategy();
@@ -21,10 +21,10 @@ std::tuple<DBQueryCommand *, ClauseCommand *> ClauseContext::ProcessClause(Claus
   return strategy->DetermineClauseCommand(clause, group_table);
 }
 
-std::tuple<DBQueryCommand *, ClauseCommand *>
+std::tuple<PKBQueryCommand *, ClauseCommand *>
 ClauseStrategy::DetermineDoubleSynonymCommands(QueryEvaluatorTable *table, Synonym *first_synonym,
                                                Synonym *second_synonym, Clause *clause) {
-  DBQueryCommand *query_command = nullptr;
+  PKBQueryCommand *query_command = nullptr;
   if (typeid(*clause) == typeid(SuchThat)) {
     query_command = new QuerySuchThatTwoSynonymCommand(clause);
   } else {
@@ -43,9 +43,9 @@ ClauseStrategy::DetermineDoubleSynonymCommands(QueryEvaluatorTable *table, Synon
   return std::make_tuple(query_command, clause_command);
 }
 
-std::tuple<DBQueryCommand *, ClauseCommand *>
+std::tuple<PKBQueryCommand *, ClauseCommand *>
 ClauseStrategy::DetermineSingleSynonymCommand(Clause *clause, bool synonym_is_first_param) {
-  DBQueryCommand *query_command = nullptr;
+  PKBQueryCommand *query_command = nullptr;
   if (typeid(*clause) == typeid(SuchThat)) {
     query_command = new QuerySuchThatOneSynonymCommand(clause);
   } else {
@@ -61,10 +61,10 @@ ClauseStrategy::DetermineSingleSynonymCommand(Clause *clause, bool synonym_is_fi
  * @param table
  * @return
  */
-std::tuple<DBQueryCommand *, ClauseCommand *>
+std::tuple<PKBQueryCommand *, ClauseCommand *>
 SuchThatStrategy::DetermineClauseCommand(Clause *clause, QueryEvaluatorTable *table) {
   auto* such_that_clause = dynamic_cast<SuchThat*>(clause);
-  DBQueryCommand *query_command = nullptr;
+  PKBQueryCommand *query_command = nullptr;
   ClauseCommand *clause_command = nullptr;
 
   if (such_that_clause->left_is_synonym && such_that_clause->right_is_synonym) {
@@ -80,11 +80,11 @@ SuchThatStrategy::DetermineClauseCommand(Clause *clause, QueryEvaluatorTable *ta
   }
 }
 
-std::tuple<DBQueryCommand *, ClauseCommand *>
+std::tuple<PKBQueryCommand *, ClauseCommand *>
 PatternStrategy::DetermineClauseCommand(Clause *clause, QueryEvaluatorTable *table) {
   auto* pattern_clause = dynamic_cast<Pattern*>(clause);
   Synonym *assign_synonym = pattern_clause->first_synonym;
-  DBQueryCommand *query_command = nullptr;
+  PKBQueryCommand *query_command = nullptr;
   ClauseCommand *clause_command = nullptr;
 
   if (pattern_clause->left_is_synonym) {

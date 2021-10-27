@@ -1,5 +1,5 @@
-#ifndef AUTOTESTER_DBQUERYCOMMAND_H
-#define AUTOTESTER_DBQUERYCOMMAND_H
+#ifndef AUTOTESTER_PKBQUERYCOMMAND_H
+#define AUTOTESTER_PKBQUERYCOMMAND_H
 
 #include <component/QueryProcessor/types/IntermediateTable.h>
 #include "component/PKB/DBManager.h"
@@ -25,7 +25,7 @@ class PKBQueryReceiver {
     IntermediateTable *QueryPatternByValue(DesignEntity design_entity, std::string value);
 };
 
-class DBQueryCommand {
+class PKBQueryCommand {
   public:
     virtual void SetReceiver(PKBQueryReceiver *receiver) = 0;
     virtual IntermediateTable * ExecuteQuery(Clause *clause) = 0;
@@ -33,7 +33,7 @@ class DBQueryCommand {
     PKBRelRefs GetPKBRelRef(RelRef relation, bool order_of_values_unchanged_from_clause);
 };
 
-class QuerySuchThatTwoSynonymCommand : public DBQueryCommand {
+class QuerySuchThatTwoSynonymCommand : public PKBQueryCommand {
   private:
     Clause *clause;
     PKBQueryReceiver *receiver;
@@ -44,7 +44,7 @@ class QuerySuchThatTwoSynonymCommand : public DBQueryCommand {
 };
 
 
-class QuerySuchThatOneSynonymCommand : public DBQueryCommand {
+class QuerySuchThatOneSynonymCommand : public PKBQueryCommand {
   private:
     Clause *clause;
     PKBQueryReceiver *receiver;
@@ -58,7 +58,7 @@ class QuerySuchThatOneSynonymCommand : public DBQueryCommand {
  * This class should handle all sorts of no-synonym queries regardless of number of wildcards and should always return
  * a boolean in the Intermediate table.
  */
-class QuerySuchThatNoSynonymCommand : public DBQueryCommand {
+class QuerySuchThatNoSynonymCommand : public PKBQueryCommand {
   private:
     Clause *clause;
     PKBQueryReceiver *receiver;
@@ -68,7 +68,7 @@ class QuerySuchThatNoSynonymCommand : public DBQueryCommand {
     IntermediateTable * ExecuteQuery(Clause *clause) override;
 };
 
-class QueryPatternTwoSynonymCommand : public DBQueryCommand {
+class QueryPatternTwoSynonymCommand : public PKBQueryCommand {
   private:
     Clause *clause;
     PKBQueryReceiver *receiver;
@@ -78,7 +78,7 @@ class QueryPatternTwoSynonymCommand : public DBQueryCommand {
     IntermediateTable * ExecuteQuery(Clause *clause) override;
 };
 
-class QueryPatternOneSynonymCommand : public DBQueryCommand {
+class QueryPatternOneSynonymCommand : public PKBQueryCommand {
   private:
     Clause *clause;
     PKBQueryReceiver *receiver;
@@ -88,4 +88,4 @@ class QueryPatternOneSynonymCommand : public DBQueryCommand {
     IntermediateTable * ExecuteQuery(Clause *clause) override;
 };
 
-#endif //AUTOTESTER_DBQUERYCOMMAND_H
+#endif //AUTOTESTER_PKBQUERYCOMMAND_H
