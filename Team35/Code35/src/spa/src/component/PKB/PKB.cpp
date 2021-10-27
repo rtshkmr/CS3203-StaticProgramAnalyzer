@@ -73,6 +73,7 @@ std::vector<std::tuple<Entity*, Entity*>> PKB::GetRelationshipByTypes(PKBRelRefs
       d2 = DesignEntity::kStmt;
     }
 
+    auto hi = relationship_by_types_table_[ref][{d1, d2}];
     return relationship_by_types_table_[ref][{d1, d2}];
 }
 
@@ -189,9 +190,11 @@ void PKB::PopulateRelationship(std::unordered_map<X*, std::list<Y*>*>* hash, PKB
             relationship_set_.insert({ref, k_string, GetNameFromEntity(entity)});
             relationship_table_[ref][k_string].push_back(entity);
 
+            DesignEntity second_type = EntityToDesignEntity(entity);
             if (second_types.empty()) {
-              DesignEntity second_type = EntityToDesignEntity(entity);
               second_types = GetApplicableTypes(second_type);
+            } else {
+              second_types.push_back(second_type);
             }
 
             for (DesignEntity type1 : first_types) {
