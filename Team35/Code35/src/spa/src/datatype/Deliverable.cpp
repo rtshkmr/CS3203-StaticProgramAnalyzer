@@ -29,8 +29,10 @@ void Deliverable::AddReadEntity(ReadEntity* read_entity) {
 }
 
 void Deliverable::AddFollowRelationship(Statement* f1, Statement* f2) {
-  AddRelationshipToMap(&follow_hash_, f1, f2);
-  AddRelationshipToMap(&followed_by_hash_, f2, f1);
+  if (follow_hash_.find(f1) == follow_hash_.end()) {
+    AddRelationshipToMap(&follow_hash_, f1, f2);
+    AddRelationshipToMap(&followed_by_hash_, f2, f1);
+  }
 }
 
 void Deliverable::AddFollowsTransitiveRelationship(Statement* before, Statement* after) {
