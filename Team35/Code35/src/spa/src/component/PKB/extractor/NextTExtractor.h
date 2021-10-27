@@ -51,7 +51,7 @@ class NextTExtractor {
   std::list<Statement*> RecurseNextBlocks(Block* block, int target_num);
   void AddNextT(Statement* s1, std::list<Statement*> s2);
   void AddNextTWithDup(Statement* s1, std::list<Statement*> s2);
-  static std::vector<Entity*> ltov(std::list<Statement*> l);
+  static std::vector<Entity*> ConvertListToVector(std::list<Statement*> list);
   void PopulateAllNextT(std::vector<Procedure*> proc_list);
   bool HasNextTInFirstCluster(Cluster* cluster, int first, int second);
   bool IsNextTDownstream(int first, int second);

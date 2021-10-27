@@ -47,14 +47,14 @@ std::vector<Entity*> NextTExtractor::GetNextT(int target,
   if (is_out_of_bounds) {
     return std::vector<Entity*>{};
   } else if (next_t_map_.count(stmt_list[target - 1]) == 1) {
-    return ltov(*next_t_map_.find(stmt_list[target - 1])->second);
+    return ConvertListToVector(* next_t_map_.find(stmt_list[target - 1])->second);
   }
 
   Init(stmt_list);
   Cluster* proc_cluster = GetProcCluster(proc_list, target);
   if (proc_cluster) {
     Cluster* t_cluster = GetTargetCluster(proc_cluster, target);
-    return ltov(GetNextTFromCluster(t_cluster, target));
+    return ConvertListToVector(GetNextTFromCluster(t_cluster, target));
   }
   return std::vector<Entity*>{};
 }
@@ -244,11 +244,9 @@ std::list<Statement*>* NextTExtractor::MakeUniqueList(int s1_num, std::list<Stat
   return new_list;
 }
 
-std::vector<Entity*> NextTExtractor::ltov(std::list<Statement*> l) {
-  std::vector<Entity*> v;
-  v.reserve(l.size());
-  std::copy(std::begin(l), std::end(l), std::back_inserter(v));
-  return v;
+std::vector<Entity*> NextTExtractor::ConvertListToVector(std::list<Statement*> list) {
+  std::vector<Entity*> vector {std::make_move_iterator(std::begin(list)), std::make_move_iterator(std::end(list))};
+  return vector;
 }
 
 /**
@@ -441,14 +439,14 @@ std::vector<Entity*> NextTExtractor::GetPrevT(int target,
   if (is_out_of_bounds) {
     return std::vector<Entity*>{};
   } else if (prev_t_map_.count(stmt_list[target - 1]) == 1) {
-    return ltov(*prev_t_map_.find(stmt_list[target - 1])->second);
+    return ConvertListToVector(* prev_t_map_.find(stmt_list[target - 1])->second);
   }
 
   Init(stmt_list);
   Cluster* proc_cluster = GetProcCluster(proc_list, target);
   if (proc_cluster) {
     Cluster* t_cluster = GetTargetCluster(proc_cluster, target);
-    return ltov(GetPrevTFromCluster(t_cluster, target));
+    return ConvertListToVector(GetPrevTFromCluster(t_cluster, target));
   }
   return std::vector<Entity*>{};
 }
