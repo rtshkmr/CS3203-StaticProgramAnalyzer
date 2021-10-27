@@ -16,7 +16,7 @@ class QueryGrouper {
                              std::unordered_set<std::string>* visited_tgt_synonyms,
                              std::unordered_set<std::string>* visited_synonyms,
                              std::unordered_map<std::string, std::vector<int>>* map_of_syn_to_clause_indices);
-  static void UpdateGroupMetadata(Group* group, std::unordered_set<std::string>* tgt_synonyms_in_group,
+  static void UpdateGroupMetadata(Group* group, std::vector<std::string>* tgt_synonyms_in_group,
                                   std::unordered_map<std::string, Synonym*>* tgt_synonyms_map);
  public:
   static void GroupClauses(std::vector<Clause*>* clauses, std::vector<Group*>* groups,

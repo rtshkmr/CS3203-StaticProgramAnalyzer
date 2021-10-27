@@ -43,7 +43,7 @@ std::vector<Entity*> DBManager::GetRelationship(PKBRelRefs ref, std::string enti
  * @param de Type of entity to query
  * @return All entities that can be on the LHS of the relationship.
  */
-std::vector<Entity*> DBManager::GetRelationshipByType(PKBRelRefs ref, DesignEntity de) {
+std::vector<Entity*> DBManager::GetRelationshipByTypeUnscoped(PKBRelRefs ref, DesignEntity de) {
   switch (ref) {
     case PKBRelRefs::kNextT: return runtime_extractor_->GetNextT(de);
     case PKBRelRefs::kPreviousT: return runtime_extractor_->GetPrevT(de);
@@ -52,6 +52,48 @@ std::vector<Entity*> DBManager::GetRelationshipByType(PKBRelRefs ref, DesignEnti
     case PKBRelRefs::kAffectsT: return runtime_extractor_->GetAffectsT(de);
     case PKBRelRefs::kAffectedByT: return runtime_extractor_->GetAffectedByT(de);
     default: return pkb_->GetRelationshipByType(ref, de);
+  }
+}
+
+/**
+ * Gets relationships for 1 type-specified entity, e.g. Uses(s, _)
+ * @param ref Relationship type
+ * @param de Type of entity to query
+ * @param scoped_entities Entities that have already been scoped
+ * @param scope_indication Enum describing if result has already been scoped
+ * @return All entities that can be on the LHS of the relationship.
+ */
+std::vector<Entity*> DBManager::GetRelationshipByType(PKBRelRefs ref,
+                                                      DesignEntity de,
+                                                      std::vector<Entity *> scoped_entities,
+                                                      ScopeIndication scope_indication) {
+  // Retrieve all entities from PKB/RuntimeExtractor
+  std::vector<Entity*> unscoped_entities = GetRelationshipByTypeUnscoped(ref, de);
+
+  // If there is no scope, return the unscoped_entities from PKB/RuntimeExtractor
+  if (scope_indication == ScopeIndication::kNoScope) {
+    // No scope
+    return unscoped_entities;
+  } else {
+    // Scoped
+    // Check if pkb contains the relationship type
+    const bool pkb_ref = pkb_rel_set.find(ref) != pkb_rel_set.end();
+    if (pkb_ref) {
+      // PKB contains the relationship type
+
+      // Scoped entities will always be a subset of unscoped entities
+      // Can simply check if scoped_entities is smaller than unscoped_entities
+      // and return the smaller vector
+      if (scoped_entities.size() <= unscoped_entities.size()) {
+        return scoped_entities;
+      } else {
+        return unscoped_entities;
+      }
+    } else {
+      // PKB does not contain the relationship type
+      // (insert RuntimeExtractor code here)
+
+    }
   }
 }
 
@@ -73,6 +115,52 @@ std::vector<std::tuple<Entity*, Entity*>> DBManager::GetRelationshipByTypes(PKBR
     case PKBRelRefs::kAffectsT: return runtime_extractor_->GetAffectsT(first, second);
     case PKBRelRefs::kAffectedByT: return runtime_extractor_->GetAffectedByT(first, second);
     default: return pkb_->GetRelationshipByTypes(ref, first, second);
+  }
+}
+
+/**
+ *
+ * @param ref
+ * @param first_de
+ * @param second_de
+ * @param left_scoped_entities
+ * @param right_scoped_entities
+ * @param scope_indication
+ * @return
+ */
+std::vector<Entity*> DBManager::GetRelationshipByTypes(PKBRelRefs ref,
+                                                       DesignEntity first_de,
+                                                       DesignEntity second_de,
+                                                       std::vector<Entity *> left_scoped_entities,
+                                                       std::vector<Entity *> right_scoped_entities,
+                                                       ScopeIndication scope_indication) {
+  // Retrieve all entities from PKB/RuntimeExtractor
+  std::vector<Entity*> unscoped_entities = pkb_->GetFirstEntityOfRelationship(ref, first_de, second_de);
+
+  // If there is no scope, return the unscoped_entities from PKB/RuntimeExtractor
+  if (scope_indication == ScopeIndication::kNoScope) {
+    // No scope
+    return unscoped_entities;
+  } else {
+    // Scoped
+    // Check if pkb contains the relationship type
+    const bool pkb_ref = pkb_rel_set.find(ref) != pkb_rel_set.end();
+    if (pkb_ref) {
+      // PKB contains the relationship type
+
+      // Scoped entities will always be a subset of unscoped entities
+      // Can simply check if lef_scoped_entities is smaller than unscoped_entities
+      // and return the smaller vector
+      if (left_scoped_entities.size() <= unscoped_entities.size()) {
+        return left_scoped_entities;
+      } else {
+        return unscoped_entities;
+      }
+    } else {
+      // PKB does not contain the relationship type
+      // (insert RuntimeExtractor code here)
+
+    }
   }
 }
 
@@ -112,6 +200,15 @@ bool DBManager::HasRelationship(PKBRelRefs ref, DesignEntity first, DesignEntity
   }
 }
 
+bool DBManager::HasRelationship(PKBRelRefs ref, std::string ident_string) {
+  const bool pkb_ref = pkb_rel_set.find(ref) != pkb_rel_set.end();
+  if (pkb_ref) {
+    // PKB
+    return pkb_->HasRelationship(ref, ident_string);
+  } else {
+    // RuntimeExtractor
+  }
+}
 /**
  * To query for existence of relationship for 1 specific entity, e.g. Next(3, _)
  * @param ref Relationship type
@@ -198,3 +295,5 @@ DesignEntity DBManager::EntityToDesignEntity(Entity* entity) {
 std::string DBManager::GetNameFromEntity(Entity* entity) {
   return PKB::GetNameFromEntity(entity);
 }
+
+
