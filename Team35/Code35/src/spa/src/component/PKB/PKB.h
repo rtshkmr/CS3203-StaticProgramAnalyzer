@@ -18,6 +18,8 @@ struct type_combo_hash {
   }
 };
 
+typedef std::tuple<Entity*, Entity*> entity_pair;
+
 typedef std::tuple<PKBRelRefs, std::string, std::string> relationship;
 
 class PKB {
@@ -25,21 +27,26 @@ class PKB {
   // Population of PKB
   void PopulateDataStructures(Deliverable d);
 
-  // Getting relationships from PKB
+  // Getting entities in relationship with specified entity
   std::vector<Entity*> GetRelationship(PKBRelRefs ref, std::string entity);
 
+  // Get entities of a specified type in a relationship
   std::vector<Entity*> GetRelationshipByType(PKBRelRefs, DesignEntity);
 
-  std::vector<std::tuple<Entity*, Entity*>> GetRelationshipByTypes(PKBRelRefs, DesignEntity, DesignEntity);
+  // Get pairs of entities in a relationship type
+  std::vector<entity_pair> GetRelationshipByTypes(PKBRelRefs, DesignEntity, DesignEntity);
 
+  // Get first param entities in relationship type
   std::vector<Entity*> GetFirstEntityOfRelationship(PKBRelRefs, DesignEntity, DesignEntity);
 
   // Getting entities from PKB by type
   std::vector<Entity*> GetDesignEntities(DesignEntity de);
 
+  // Get entities by their attribute values
   std::vector<Entity*> GetEntitiesWithAttributeValue(DesignEntity design_entity, Attribute attribute, std::string value);
 
-  std::vector<std::tuple<Entity*, Entity*>> GetStatementConstantPair(DesignEntity type_one, DesignEntity type_two)
+  // Get entities with matching attributes
+  std::vector<entity_pair> GetEntitiesWithMatchingAttributes(DesignEntity type_one, DesignEntity type_two);
 
   // Getting entities for pattern matching
   std::vector<Entity*> GetAssignEntityByStmtRef(std::string stmtRef);
@@ -51,21 +58,26 @@ class PKB {
 
   // Check if relationship exists
   bool HasRelationship(PKBRelRefs);
+
+  // Check if relationship exists between specified entity types
   bool HasRelationship(PKBRelRefs, DesignEntity, DesignEntity);
+
+  // Check if an entity type is in a relationship type
   bool HasRelationship(PKBRelRefs, std::string);
+
+  // Check if two specified entities have a relationship with each other
   bool HasRelationship(PKBRelRefs, std::string, std::string);
 
+  // Get entity type from an entity
   DesignEntity EntityToDesignEntity(Entity* entity);
 
+  // Get name from an entity
   static std::string GetNameFromEntity(Entity* entity);
 
   // Constructor
   PKB() = default;
 
  private:
-
-  std::unordered_map<DesignEntity, std::vector<std::tuple<DesignEntity, DesignEntity>>> first_param_map_;
-  std::unordered_map<DesignEntity, std::vector<std::tuple<DesignEntity, DesignEntity>>> second_param_map_;
 
   std::unordered_map<DesignEntity, std::vector<Entity*>> type_to_entity_map_;
   std::unordered_map<std::string, DesignEntity> entity_string_to_type_map_;
@@ -87,9 +99,7 @@ class PKB {
     PKBRelRefs,
     std::unordered_map<
       type_combo,
-      std::vector<
-        std::tuple<Entity*, Entity*>
-      >,
+      std::vector<entity_pair>,
       type_combo_hash
     >
   > relationship_by_type_table_;
