@@ -128,12 +128,6 @@ std::vector<Entity*> PKB::GetRelationshipByType(PKBRelRefs ref, DesignEntity d) 
 }
 
 void PKB::InitializeDataStructures() {
-    for (DesignEntity param1 : all_design_entities) {
-        for (DesignEntity param2 : all_design_entities) {
-            first_param_map_[param1].push_back(std::make_tuple(param1, param2));
-            second_param_map_[param2].push_back(std::make_tuple(param1, param2));
-        }
-    }
 
     stmt_design_entities_.insert(DesignEntity::kRead);
     stmt_design_entities_.insert(DesignEntity::kPrint);
