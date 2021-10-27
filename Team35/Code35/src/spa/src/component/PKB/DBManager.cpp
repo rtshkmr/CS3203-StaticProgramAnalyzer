@@ -43,7 +43,7 @@ std::vector<Entity*> DBManager::GetRelationship(PKBRelRefs ref, std::string enti
  * @param de Type of entity to query
  * @return All entities that can be on the LHS of the relationship.
  */
-std::vector<Entity*> DBManager::GetRelationshipByTypeUnscoped(PKBRelRefs ref, DesignEntity de) {
+std::vector<Entity*> DBManager::GetFirstEntityOfRelationship(PKBRelRefs ref, DesignEntity de) {
   switch (ref) {
     case PKBRelRefs::kNextT: return runtime_extractor_->GetNextT(de);
     case PKBRelRefs::kPreviousT: return runtime_extractor_->GetPrevT(de);
@@ -51,7 +51,7 @@ std::vector<Entity*> DBManager::GetRelationshipByTypeUnscoped(PKBRelRefs ref, De
     case PKBRelRefs::kAffectedBy: return runtime_extractor_->GetAffectedBy(de);
     case PKBRelRefs::kAffectsT: return runtime_extractor_->GetAffectsT(de);
     case PKBRelRefs::kAffectedByT: return runtime_extractor_->GetAffectedByT(de);
-    default: return pkb_->GetRelationshipByType(ref, de);
+    default: return pkb_->GetFirstEntityOfRelationship(ref, de);
   }
 }
 
@@ -63,12 +63,12 @@ std::vector<Entity*> DBManager::GetRelationshipByTypeUnscoped(PKBRelRefs ref, De
  * @param scope_indication Enum describing if result has already been scoped
  * @return All entities that can be on the LHS of the relationship.
  */
-std::vector<Entity*> DBManager::GetRelationshipByType(PKBRelRefs ref,
+std::vector<Entity*> DBManager::GetFirstEntityOfRelationship(PKBRelRefs ref,
                                                       DesignEntity de,
                                                       std::vector<Entity *> scoped_entities,
                                                       ScopeIndication scope_indication) {
   // Retrieve all entities from PKB/RuntimeExtractor
-  std::vector<Entity*> unscoped_entities = GetRelationshipByTypeUnscoped(ref, de);
+  std::vector<Entity*> unscoped_entities = GetFirstEntityOfRelationship(ref, de);
 
   // If there is no scope, return the unscoped_entities from PKB/RuntimeExtractor
   if (scope_indication == ScopeIndication::kNoScope) {
@@ -232,28 +232,8 @@ std::vector<Entity*> DBManager::GetDesignEntities(DesignEntity de) {
   return pkb_->GetDesignEntities(de);
 }
 
-std::vector<Entity*> DBManager::GetAssignEntityByStmtRef(std::string stmtRef) {
-  return pkb_->GetAssignEntityByStmtRef(stmtRef);
-}
-
-std::vector<Entity*> DBManager::GetAssignEntityByVariable(std::string variable) {
-  return pkb_->GetAssignEntityByVariable(variable);
-}
-
-std::vector<Entity*> DBManager::GetWhileEntityByStmtRef(std::string stmtRef) {
-  return pkb_->GetWhileEntityByStmtRef(stmtRef);
-}
-
-std::vector<Entity*> DBManager::GetWhileEntityByVariable(std::string variable) {
-  return pkb_->GetWhileEntityByVariable(variable);
-}
-
-std::vector<Entity*> DBManager::GetIfEntityByStmtRef(std::string stmtRef) {
-  return pkb_->GetIfEntityByStmtRef(stmtRef);
-}
-
-std::vector<Entity*> DBManager::GetIfEntityByVariable(std::string variable) {
-  return pkb_->GetIfEntityByVariable(variable);
+std::vector<Entity*> DBManager::GetPatternEntities(DesignEntity de, std::string var_or_stmt) {
+  return pkb_->GetPatternEntities(de, var_or_stmt);
 }
 
 DesignEntity DBManager::EntityToDesignEntity(Entity* entity) {
