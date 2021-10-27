@@ -266,11 +266,11 @@ std::vector<Entity*> PKB::GetDesignEntities(DesignEntity de) {
     return type_to_entity_map_[de];
 }
 
-std::vector<Entity*> PKB::GetAssignEntityByStmtRef(std::string stmtRef) {
+std::vector<Entity*> PKB::GetAssignEntityByStmtRef(const std::string stmtRef) {
     return assign_map_[stmtRef];
 }
 
-std::vector<Entity*> PKB::GetAssignEntityByVariable(std::string variable) {
+std::vector<Entity*> PKB::GetAssignEntityByVariable(const std::string variable) {
     return assign_map_[variable];
 }
 

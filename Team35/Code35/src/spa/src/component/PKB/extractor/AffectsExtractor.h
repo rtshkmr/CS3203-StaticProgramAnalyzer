@@ -3,13 +3,16 @@
 
 #include <model/Entity.h>
 #include <unordered_map>
+#include <component/PKB/PKB.h>
 
 class AffectsExtractor {
  public:
   std::vector<Entity*> GetAffects(int target);
   std::vector<Entity*> GetAffectedBy(int target);
+  void SetPKB(PKB* pkb);
   void Delete();
  private:
+  PKB* pkb_;
   std::unordered_map<Statement*, std::list<Statement*>*> affects_map_;
   std::unordered_map<Statement*, std::list<Statement*>*> affected_by_map_;
 };
