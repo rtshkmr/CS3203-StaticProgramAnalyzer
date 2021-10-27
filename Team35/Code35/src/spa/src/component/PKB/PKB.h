@@ -37,6 +37,10 @@ class PKB {
   // Getting entities from PKB by type
   std::vector<Entity*> GetDesignEntities(DesignEntity de);
 
+  std::vector<Entity*> GetEntitiesWithAttributeValue(DesignEntity design_entity, Attribute attribute, std::string value);
+
+  std::vector<std::tuple<Entity*, Entity*>> GetStatementConstantPair(DesignEntity type_one, DesignEntity type_two)
+
   // Getting entities for pattern matching
   std::vector<Entity*> GetAssignEntityByStmtRef(std::string stmtRef);
   std::vector<Entity*> GetAssignEntityByVariable(std::string variable);
