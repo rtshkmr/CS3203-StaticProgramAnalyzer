@@ -6,26 +6,26 @@ PKBRelRefs PKBQueryCommand::GetPKBRelRef(RelRef relation, bool order_of_values_u
   switch(relation) {
     case RelRef::kFollows:
       return order_of_values_unchanged_from_clause ? PKBRelRefs::kFollows : PKBRelRefs::kFollowedBy;
-      case RelRef::kParentT:
-        return order_of_values_unchanged_from_clause ? PKBRelRefs::kParentT : PKBRelRefs::kChildT;
-        case RelRef::kParent:
-          return order_of_values_unchanged_from_clause ? PKBRelRefs::kParent : PKBRelRefs::kChild;
-          case RelRef::kModifiesP:
-            return order_of_values_unchanged_from_clause ? PKBRelRefs::kModifiesContainer : PKBRelRefs::kModifiedByContainer;
-            case RelRef::kModifiesS:
-              return order_of_values_unchanged_from_clause ? PKBRelRefs::kModifies : PKBRelRefs::kModifiedBy;
-              case RelRef::kUsesS:
-                return order_of_values_unchanged_from_clause ? PKBRelRefs::kUses : PKBRelRefs::kUsedBy;
-                case RelRef::kUsesP:
-                  return order_of_values_unchanged_from_clause ? PKBRelRefs::kUsesC : PKBRelRefs::kUsedByC;
-                  case RelRef::kFollowsT:
-                    return order_of_values_unchanged_from_clause ? PKBRelRefs::kFollowsT : PKBRelRefs::kFollowedByT;
-                    case RelRef::kCalls:
-                      return order_of_values_unchanged_from_clause ? PKBRelRefs::kCalls : PKBRelRefs::kCalledBy;
-                        case RelRef::kCallsT:
-                          return order_of_values_unchanged_from_clause ? PKBRelRefs::kCallsT : PKBRelRefs::kCalledByT;
-                          case RelRef::kNext:
-                            return order_of_values_unchanged_from_clause ? PKBRelRefs::kNext : PKBRelRefs::kPrevious;
+    case RelRef::kParentT:
+      return order_of_values_unchanged_from_clause ? PKBRelRefs::kParentT : PKBRelRefs::kChildT;
+    case RelRef::kParent:
+      return order_of_values_unchanged_from_clause ? PKBRelRefs::kParent : PKBRelRefs::kChild;
+    case RelRef::kModifiesP:
+      return order_of_values_unchanged_from_clause ? PKBRelRefs::kModifiesContainer : PKBRelRefs::kModifiedByContainer;
+    case RelRef::kModifiesS:
+      return order_of_values_unchanged_from_clause ? PKBRelRefs::kModifies : PKBRelRefs::kModifiedBy;
+    case RelRef::kUsesS:
+      return order_of_values_unchanged_from_clause ? PKBRelRefs::kUses : PKBRelRefs::kUsedBy;
+    case RelRef::kUsesP:
+      return order_of_values_unchanged_from_clause ? PKBRelRefs::kUsesC : PKBRelRefs::kUsedByC;
+    case RelRef::kFollowsT:
+      return order_of_values_unchanged_from_clause ? PKBRelRefs::kFollowsT : PKBRelRefs::kFollowedByT;
+    case RelRef::kCalls:
+      return order_of_values_unchanged_from_clause ? PKBRelRefs::kCalls : PKBRelRefs::kCalledBy;
+    case RelRef::kCallsT:
+      return order_of_values_unchanged_from_clause ? PKBRelRefs::kCallsT : PKBRelRefs::kCalledByT;
+    case RelRef::kNext:
+      return order_of_values_unchanged_from_clause ? PKBRelRefs::kNext : PKBRelRefs::kPrevious;
 //                            case RelRef::kNextT:
 //                              return PKBRelRefs::kNextT;
 //                            case RelRef::kAffects:
