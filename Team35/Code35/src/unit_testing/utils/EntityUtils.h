@@ -28,6 +28,40 @@ inline ConstantValue* const_3_ = new ConstantValue("3");
  * These functions provide the ability to redefine the statements,
  * so that they do not carry modifications across test cases.
  */
+// variables
+inline Variable* GetVarX() {
+  return var_x_;
+}
+inline Variable* GetVarY() {
+  return var_y_;
+}
+inline Variable* GetVarZ() {
+  return var_z_;
+}
+inline Variable* GetVarI() {
+  return var_i_;
+}
+inline Variable* GetVarN() {
+  return var_n_;
+}
+inline Variable* GetVarM() {
+  return var_m_;
+}
+
+// Constants
+inline Constant* GetConst0() {
+  return new Constant(const_0_);
+}
+inline Constant* GetConst1() {
+  return new Constant(const_1_);
+}
+inline Constant* GetConst2() {
+  return new Constant(const_2_);
+}
+inline Constant* GetConst3() {
+  return new Constant(const_3_);
+}
+
 // Procedures
 inline Procedure* GetProc1() {
   return new Procedure(new ProcedureName("proc1"));

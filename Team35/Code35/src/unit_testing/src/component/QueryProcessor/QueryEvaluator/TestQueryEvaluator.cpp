@@ -2,7 +2,7 @@
 #include "component/QueryProcessor/QueryEvaluator/QueryEvaluator.h"
 #include "component/QueryProcessor/types/Types.h"
 #include "component/PKB/PKB.h"
-#include "util/PKBStub.h"
+#include "../../../../utils/PKBStub.h"
 
 //TEST_CASE("3.QueryProcessor.Query select only") {
 //  Deliverable d1_ = Deliverable();
