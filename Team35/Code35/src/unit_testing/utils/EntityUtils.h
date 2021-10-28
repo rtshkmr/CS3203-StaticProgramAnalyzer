@@ -28,9 +28,55 @@ inline ConstantValue* const_3_ = new ConstantValue("3");
  * These functions provide the ability to redefine the statements,
  * so that they do not carry modifications across test cases.
  */
+// variables
+inline Variable* GetVarX() {
+  return var_x_;
+}
+inline Variable* GetVarY() {
+  return var_y_;
+}
+inline Variable* GetVarZ() {
+  return var_z_;
+}
+inline Variable* GetVarI() {
+  return var_i_;
+}
+inline Variable* GetVarN() {
+  return var_n_;
+}
+inline Variable* GetVarM() {
+  return var_m_;
+}
+
+// Constants
+inline Constant* GetConst0() {
+  return new Constant(const_0_);
+}
+inline Constant* GetConst1() {
+  return new Constant(const_1_);
+}
+inline Constant* GetConst2() {
+  return new Constant(const_2_);
+}
+inline Constant* GetConst3() {
+  return new Constant(const_3_);
+}
+
 // Procedures
 inline Procedure* GetProc1() {
   return new Procedure(new ProcedureName("proc1"));
+}
+inline Procedure* GetProc2() {
+  return new Procedure(new ProcedureName("proc2"));
+}
+inline Procedure* GetProc3() {
+  return new Procedure(new ProcedureName("proc3"));
+}
+inline Procedure* GetProc4() {
+  return new Procedure(new ProcedureName("proc4"));
+}
+inline Procedure* GetProc5() {
+  return new Procedure(new ProcedureName("proc5"));
 }
 
 // read
@@ -264,8 +310,20 @@ inline WhileEntity* GetWhileEntity3() {
                          });
 }
 
+// util
+inline Statement* CreateStatement(Entity* entity, int stmt_num) {
+  Statement* stmt = dynamic_cast<Statement*>(entity);
+  stmt->SetStatementNumber(new StatementNumber(stmt_num));
+  return stmt;
+}
+
 // For copying
 //
+//Procedure* proc1 = GetProc1();
+//Procedure* proc2 = GetProc2();
+//Procedure* proc3 = GetProc3();
+//Procedure* proc4 = GetProc4();
+//Procedure* proc5 = GetProc5();
 //ReadEntity* read_x = GetReadX();
 //ReadEntity* read_y = GetReadY();
 //ReadEntity* read_z = GetReadZ();

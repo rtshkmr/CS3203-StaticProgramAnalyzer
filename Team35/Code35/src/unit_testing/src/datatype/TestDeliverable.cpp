@@ -14,6 +14,9 @@ TEST_CASE("1.Deliverable.Add relationships") {
   IfEntity* if_2 = GetIf2();
   WhileEntity* while_1 = GetWhileEntity1();
   Procedure* proc1 = GetProc1();
+  Procedure* proc2 = GetProc2();
+  Procedure* proc3 = GetProc3();
+  Procedure* proc4 = GetProc4();
   Container* cont_if_1 = dynamic_cast<Container*>(if_1);
   Container* cont_if_2 = dynamic_cast<Container*>(if_2);
   Container* cont_while_1 = dynamic_cast<Container*>(while_1);
@@ -343,5 +346,111 @@ TEST_CASE("1.Deliverable.Add relationships") {
     std::list<Container*> expected_varz_cont_list = {cont_if_1, cont_if_2, cont_proc_1};
     REQUIRE(deliverable.container_modified_by_hash_.count(var_z_));
     REQUIRE(* deliverable.container_modified_by_hash_.find(var_z_)->second == expected_varz_cont_list);
+  }
+
+  SECTION ("AddCallsRelationship") {
+    deliverable.AddCallsRelationship(proc1, proc2);
+    deliverable.AddCallsRelationship(proc1, proc2);  // duplicate check
+    std::list<Procedure*> add_proc_list = {proc2};
+    std::list<Procedure*> add_2_proc_list = {proc2, proc3};
+    REQUIRE(deliverable.calls_hash_.count(proc1));
+    REQUIRE(* deliverable.calls_hash_.find(proc1)->second == add_proc_list);
+
+    // adding more proc to existing entry
+    deliverable.AddCallsRelationship(proc1, proc3);
+    REQUIRE(* deliverable.calls_hash_.find(proc1)->second == add_2_proc_list);
+
+    std::list<Procedure*> add_proc_list2 = {proc3};
+    std::list<Procedure*> add_2_proc_list2 = {proc3, proc4};
+    deliverable.AddCallsRelationship(proc2, proc3);
+    deliverable.AddCallsRelationship(proc2, proc3);  // duplicate check
+    REQUIRE(deliverable.calls_hash_.count(proc2));
+    REQUIRE(* deliverable.calls_hash_.find(proc2)->second == add_proc_list2);
+
+    // adding more proc to existing entry
+    deliverable.AddCallsRelationship(proc2, proc4);
+    REQUIRE(* deliverable.calls_hash_.find(proc2)->second == add_2_proc_list2);
+
+    // reverse check
+    std::list<Procedure*> called_proc_list1 = {proc2};
+    std::list<Procedure*> called_proc_list2 = {proc1, proc2};
+    REQUIRE(deliverable.called_by_hash_.count(proc4));
+    REQUIRE(*deliverable.called_by_hash_.find(proc4)->second == called_proc_list1);
+    REQUIRE(deliverable.called_by_hash_.count(proc3));
+    REQUIRE(*deliverable.called_by_hash_.find(proc3)->second == called_proc_list2);
+  }
+
+  SECTION ("AddCallsTransitiveRelationship and ForList") {
+    deliverable.AddCallsTransitiveRelationship(proc1, proc2);
+    deliverable.AddCallsTransitiveRelationship(proc1, proc2);  // duplicate check
+    std::list<Procedure*> proc_list1 = {proc2};
+    REQUIRE(deliverable.calls_T_hash_.count(proc1));
+    REQUIRE(* deliverable.calls_T_hash_.find(proc1)->second == proc_list1);
+
+    // adding more var to existing entry
+    std::list<Procedure*> proc_list2 = {proc2, proc3};
+    deliverable.AddCallsTransitiveRelationship(proc1, proc3);
+    REQUIRE(* deliverable.calls_T_hash_.find(proc1)->second == proc_list2);
+
+    // adding list
+    std::list<Procedure*> add_proc_list = {proc2, proc3, proc4};
+    deliverable.AddCallsTransitiveRelationshipForList(proc1, & add_proc_list);
+    std::list<Procedure*> expected_proc_list = {proc2, proc3, proc4};
+    REQUIRE(* deliverable.calls_T_hash_.find(proc1)->second == expected_proc_list);
+
+    deliverable.AddCallsTransitiveRelationship(proc4, proc2);
+    deliverable.AddCallsTransitiveRelationship(proc4, proc2);  // duplicate check
+    REQUIRE(deliverable.calls_T_hash_.count(proc4));
+    REQUIRE(* deliverable.calls_T_hash_.find(proc4)->second == proc_list1);
+
+    // adding more var to existing entry
+    deliverable.AddCallsTransitiveRelationship(proc4, proc3);
+    REQUIRE(* deliverable.calls_T_hash_.find(proc4)->second == proc_list2);
+
+    // adding list
+    std::list<Procedure*> add_proc_list2 = {proc1, proc2, proc3};
+    deliverable.AddCallsTransitiveRelationshipForList(proc4, & add_proc_list2);
+    std::list<Procedure*> expected_proc_list2 = {proc2, proc3, proc1};
+    REQUIRE(* deliverable.calls_T_hash_.find(proc4)->second == expected_proc_list2);
+
+    // reverse check
+    std::list<Procedure*> expected_proc_list3 = {proc1, proc4};
+    REQUIRE(deliverable.called_by_T_hash_.count(proc2));
+    REQUIRE(* deliverable.called_by_T_hash_.find(proc2)->second == expected_proc_list3);
+    std::list<Procedure*> expected_proc_list4 = {proc1};
+    REQUIRE(deliverable.called_by_T_hash_.count(proc4));
+    REQUIRE(* deliverable.called_by_T_hash_.find(proc4)->second == expected_proc_list4);
+  }
+
+  SECTION ("AddNextRelationship") {
+    deliverable.AddNextRelationship(if_1, rx);
+    deliverable.AddNextRelationship(if_1, rx);  // duplicate check
+    std::list<Statement*> stmt_list1 = {rx};
+    REQUIRE(deliverable.next_hash_.count(if_1));
+    REQUIRE(* deliverable.next_hash_.find(if_1)->second == stmt_list1);
+
+    // adding more var to existing entry
+    std::list<Statement*> stmt_list2 = {rx, a1};
+    deliverable.AddNextRelationship(if_1, a1);
+    REQUIRE(* deliverable.next_hash_.find(if_1)->second == stmt_list2);
+
+    deliverable.AddNextRelationship(while_1, if_1);
+    deliverable.AddNextRelationship(while_1, if_1);  // duplicate check
+    REQUIRE(deliverable.next_hash_.count(while_1));
+    std::list<Statement*> stmt_list3 = {if_1};
+    REQUIRE(* deliverable.next_hash_.find(while_1)->second == stmt_list3);
+
+    // adding more var to existing entry
+    deliverable.AddNextRelationship(while_1, a1);
+    std::list<Statement*> stmt_list4 = {if_1, a1};
+    REQUIRE(* deliverable.next_hash_.find(while_1)->second == stmt_list4);
+
+    // reverse check
+    std::list<Statement*> expected_stmt_list5 = {if_1, while_1};
+    REQUIRE(deliverable.previous_hash_.count(a1));
+    REQUIRE(* deliverable.previous_hash_.find(a1)->second == expected_stmt_list5);
+    std::list<Statement*> expected_stmt_list6 = {while_1};
+    REQUIRE(deliverable.previous_hash_.count(if_1));
+    REQUIRE(* deliverable.previous_hash_.find(if_1)->second == expected_stmt_list6);
   }
 }

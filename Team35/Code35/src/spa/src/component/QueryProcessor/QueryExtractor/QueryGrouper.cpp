@@ -1,6 +1,5 @@
 #include <queue>
 #include "QueryGrouper.h"
-#include <component/QueryProcessor/types/Exceptions.h>
 
 /**
  * Groups multiple queries that should be evaluated together, based on existence of common synonyms.
@@ -48,10 +47,10 @@ void QueryGrouper::DfsFromSynonym(std::unordered_map<std::string, Synonym*>* tgt
                                     std::unordered_set<std::string>* visited_synonyms,
                                     std::unordered_map<std::string, std::vector<int>>* map_of_syn_to_clause_indices) {
   Group* g = new Group();
-  std::unordered_set<std::string> tgt_synonyms_in_this_group;
+  std::vector<std::string> tgt_synonyms_in_this_group;
   bool is_starting_syn_a_target_syn = tgt_synonyms_map->find(tgt_syn) != tgt_synonyms_map->end();
   if (is_starting_syn_a_target_syn) {
-    tgt_synonyms_in_this_group.insert(tgt_syn);
+    tgt_synonyms_in_this_group.push_back(tgt_syn);
     visited_tgt_synonyms->insert(tgt_syn);
   }
   visited_synonyms->insert(tgt_syn);
@@ -83,7 +82,7 @@ void QueryGrouper::DfsFromSynonym(std::unordered_map<std::string, Synonym*>* tgt
         }
         if (tgt_synonyms_map->find(clause_syn_name) != tgt_synonyms_map->end()) {
           visited_tgt_synonyms->insert(clause_syn_name);
-          tgt_synonyms_in_this_group.insert(clause_syn_name);
+          tgt_synonyms_in_this_group.push_back(clause_syn_name);
         }
         visited_synonyms->insert(clause_syn_name);
         q.push(clause_syn_name);
@@ -97,7 +96,7 @@ void QueryGrouper::DfsFromSynonym(std::unordered_map<std::string, Synonym*>* tgt
   QueryGrouper::UpdateGroupMetadata(g, &tgt_synonyms_in_this_group, tgt_synonyms_map);
 }
 
-void QueryGrouper::UpdateGroupMetadata(Group* group, std::unordered_set<std::string>* tgt_synonyms_in_grp,
+void QueryGrouper::UpdateGroupMetadata(Group* group, std::vector<std::string>* tgt_synonyms_in_grp,
                                          std::unordered_map<std::string, Synonym*>* tgt_syns_map) {
   for (auto item : *tgt_synonyms_in_grp) {
     group->AddSynToTargetSyns(tgt_syns_map->at(item));

@@ -32,6 +32,8 @@ class PKB {
 
   std::vector<std::tuple<Entity*, Entity*>> GetRelationshipByTypes(PKBRelRefs, DesignEntity, DesignEntity);
 
+  std::vector<Entity*> GetFirstEntityOfRelationship(PKBRelRefs, DesignEntity, DesignEntity);
+
   // Getting entities from PKB by type
   std::vector<Entity*> GetDesignEntities(DesignEntity de);
 
@@ -46,6 +48,7 @@ class PKB {
   // Check if relationship exists
   bool HasRelationship(PKBRelRefs);
   bool HasRelationship(PKBRelRefs, DesignEntity, DesignEntity);
+  bool HasRelationship(PKBRelRefs, std::string);
   bool HasRelationship(PKBRelRefs, std::string, std::string);
 
   DesignEntity EntityToDesignEntity(Entity* entity);
@@ -87,6 +90,15 @@ class PKB {
     >
   > relationship_by_type_table_;
 
+  std::unordered_map<
+    PKBRelRefs,
+    std::unordered_map<
+      type_combo,
+      std::vector<Entity*>,
+      type_combo_hash
+    >
+  > entities_in_relationship_by_types_table_;
+
   std::set<DesignEntity> stmt_design_entities_;
   std::set<relationship> relationship_set_;
 
@@ -95,7 +107,7 @@ class PKB {
   void PopulateProcEntities(const std::list<Procedure*>& proc_list);
   void PopulateVarEntities(const std::list<Variable*>& var_list);
   void PopulateConstEntities(const std::list<ConstantValue*>& const_list);
-  void PopulateStmtEntities(const std::list<Statement*>& stmt_list);
+  void PopulateStmtEntities(const std::vector<Statement*> &stmt_list);
   void PopulateIfEntities(const std::list<IfEntity*>& if_list);
   void PopulateWhileEntities(const std::list<WhileEntity*>& while_list);
   void PopulateAssignEntities(const std::list<AssignEntity*>& assign_list);

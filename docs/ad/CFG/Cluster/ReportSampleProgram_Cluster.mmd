@@ -1,0 +1,45 @@
+stateDiagram-v2
+   state Cluster_procedure(1,15) { 
+       Block(1,2) --> Cluster_while(3,11)
+       Cluster_while(3,11) --> Cluster_if(12,14)
+       Cluster_if(12,14) --> Block(15,15)
+   }
+
+   state Cluster_while(3,11) {
+      Block_while_cond(3,3) --> Cluster_while(4,11)
+   } 
+
+
+   state Cluster_while(4,11) {
+      Block_while_cond(4,4) --> Block(5,6)
+      Block(5,6) --> Cluster_if(7,10)
+      Cluster_if(7,10) --> Block(11,11)
+
+   }
+
+   state Cluster_if(7,10) {
+      Block_if_cond(7,7) --> Block(8,8)
+      Block(8,8) --> Block(9,10)
+
+   }
+
+
+
+   state Cluster_if(12,14) {
+      Block_IfCond(12,12) --> Block(13,13)
+      Block(13,13) --> Bock(14,14)
+   }
+
+
+
+   state Cluster_Procedure_Proc2(16,17) {
+       Block(16,17)
+   }
+
+   state Cluster_Procedure_Proc2(18,18) {
+       Block(18,18)
+   }
+
+
+
+   

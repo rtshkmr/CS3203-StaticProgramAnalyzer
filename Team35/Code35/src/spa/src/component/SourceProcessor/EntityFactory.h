@@ -13,7 +13,7 @@ class EntityFactory {
   EntityFactory(std::list<Procedure*>* proc_list,
                 std::list<Variable*>* var_list,
                 std::list<ConstantValue*>* const_list);
-  Entity* CreateEntities(std::vector<Token> tokens);
+  Entity* CreateEntity(std::vector<Token> tokens);
   static std::vector<Token> GetExpressionTokens(std::vector<Token> tokens, TokenTag start_tag, TokenTag end_tag);
  private:
   //attribute

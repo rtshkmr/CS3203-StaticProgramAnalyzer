@@ -65,7 +65,7 @@ Deliverable* SetUpDeliverable_Week4() {
   deliverable->AddAssignEntity(stmt3);
   deliverable->AddModifiesRelationship(stmt3, stmt3->GetVariable());
 
-  for (Variable* v: stmt3->GetExpressionVariables()) {
+  for (Variable* v: stmt3->GetControlVariables()) {
     deliverable->AddUsesRelationship(stmt3, v);
   }
 
@@ -88,7 +88,7 @@ Deliverable* SetUpDeliverable_Week4() {
   deliverable->AddAssignEntity(stmt4);
   deliverable->AddModifiesRelationship(stmt4, stmt4->GetVariable());
 
-  for (Variable* v: stmt4->GetExpressionVariables()) {
+  for (Variable* v: stmt4->GetControlVariables()) {
     deliverable->AddUsesRelationship(stmt4, v);
   }
 
@@ -111,7 +111,7 @@ Deliverable* SetUpDeliverable_Week4() {
   deliverable->AddAssignEntity(stmt5);
   deliverable->AddModifiesRelationship(stmt5, stmt5->GetVariable());
 
-  for (Variable* v: stmt5->GetExpressionVariables()) {
+  for (Variable* v: stmt5->GetControlVariables()) {
     deliverable->AddUsesRelationship(stmt5, v);
   }
 

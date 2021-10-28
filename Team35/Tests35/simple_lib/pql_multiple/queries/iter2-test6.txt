@@ -1,0 +1,95 @@
+1 - Only such that clause, invalid result
+stmt s1; assign a1, a2; variable v1; procedure pr1; prog_line pl; while w1;
+Select s2 such that Next(s1, w1) such that Modifies(a2, s1) such that Uses(s2, a2)
+none
+5000
+2 - Only such that clause, valid result
+stmt s1; assign a1, a2; variable v1; procedure pr1; prog_line pl;
+Select s1 such that Modifies(s1, v1) such that Parent*(s1, a2) such that Uses(a2, v1)
+5, 7, 10
+5000
+3 - Only such that clause, valid result
+stmt s1; assign a1, a2; variable v1; procedure pr1; prog_line pl;
+Select s1 such that Modifies(s1, v1) such that Parent*(s1, a2) such that Uses(a2, v1) pattern a2(v1, _"i"_)
+10
+5000
+4 - Only such that clause, valid result, with circular relation
+stmt s1; assign a1, a2; variable v1; procedure pr1; prog_line pl;
+Select s1 such that Uses(s1, v1) and Parent*(s1, a2) and Modifies(a2, v1)
+5, 7, 10
+5000
+5 - Only such that clause, valid result, with circular relation
+stmt s1, s2; assign a1, a2; variable v1; procedure pr1; prog_line pl;
+Select s1 such that Uses(s1, v1) and Parent*(s1, s2) and Modifies(a2, v1) and Follows(s2, a2)
+10
+5000
+6 - Only pattern clause, valid result
+stmt s1; assign a1, a2; variable v1; procedure pr1; while w1; if if1;
+Select a2 pattern a2(v1, _) and a1(v1, _"i"_) pattern if1(v1, _, _)
+12
+5000
+7 - Only pattern clause, invalid result
+stmt s1; assign a1, a2; variable v1; procedure pr1; while w1; if if1;
+Select s1 pattern a1(v1, _"z"_) pattern if1(v1, _, _) pattern w1(v1, _)
+none
+5000
+8 - Mix, valid result, with circular relation
+stmt s1; assign a1, a2; variable v1; procedure pr1; prog_line pl;
+Select s1 pattern a1(v1, _"i"_) and a2(v1, _) such that Follows*(a1, a2)
+none
+5000
+9 - Mix, valid result, with circular relation
+assign a1, a2; variable v1, v2;
+Select a1 pattern a1(v1, _) and a2(v2, _) such that Follows*(a1, a2)
+11, 16
+5000
+10 - Mix, valid result, with circular relation
+assign a1, a2; variable v1, v2;
+Select a2 pattern a1(v1, _) and a2(v2, _) such that Follows*(a1, a2)
+12, 17
+5000
+11 - Mix, valid result, with circular relation
+assign a1, a2; variable v1, v2;
+Select v1 pattern a1(v1, _) and a2(v2, _) such that Follows*(a1, a2)
+x, z
+5000
+12 - Mix, valid result, with circular relation
+assign a1, a2; variable v1, v2;
+Select v2 pattern a1(v1, _) and a2(v2, _) such that Follows*(a1, a2)
+i, v
+5000
+13 - Mix, valid result, with circular relation
+stmt s1, s2; assign a1, a2; variable v1; procedure pr1; prog_line pl;
+Select s2 such that Uses(s1, v1) such that Parent(s1, s2) such that Follows*(a1, s2) pattern a2(v1, _)
+12, 13
+5000
+14 - Mix, valid result, with single synonym clause
+stmt s1, s2; assign a1, a2; variable v1; procedure pr1; prog_line pl; while w1; if if1; call c1;
+Select c1 such that Follows(if1, w1) pattern w1("i", _) such that Parent(w1, c1)
+13
+5000
+15 - Mix, valid result, with single synonym clause
+stmt s1, s2; assign a1, a2; variable v1; procedure pr1; prog_line pl;
+Select s1 such that Follows(a1, s1) pattern a1(v1, _"y"_) pattern a1("x", _)
+12
+5000
+16 - Mix, valid result, with single synonym clause
+stmt s1, s2; assign a1, a2; variable v1; procedure pr1; prog_line pl;
+Select s1 pattern a1(v1, _"y"_) such that Follows(a1, s1) pattern a1("x", _)
+12
+5000
+17 - Mix, valid result, with single synonym clause
+stmt s1, s2; assign a1, a2; variable v1; procedure pr1; prog_line pl;
+Select s1 such that Follows(a1, s1) pattern a1(v1, _"y"_) and a1("x", _)
+12
+5000
+18 - Mix, valid result, with single synonym clause
+stmt s1, s2; assign a1, a2; variable v1; procedure pr1; prog_line pl;
+Select s1 pattern a1(v1, _"y"_) and a1("x", _) such that Follows(a1, s1)
+12
+5000
+19 - Mix, valid result, with single synonym clause
+stmt s1, s2; assign a1, a2; variable v1; procedure pr1; prog_line pl;
+Select s1 such that Parent(s1, s2) and Parent*(s1, 8) pattern a1(v1, _) pattern a1("x", _"x"_)
+5, 7
+5000

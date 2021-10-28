@@ -22,7 +22,6 @@ add_library(spa ${srcs} ${headers}
         src/component/SourceProcessor/DesignExtractor.cpp
         src/component/SourceProcessor/Parser.h src/component/SourceProcessor/Parser.cpp
         src/component/SourceProcessor/DesignExtractor.h
-        src/component/QueryProcessor/types/Exceptions.h
         src/component/QueryProcessor/types/Types.h src/component/QueryProcessor/types/Types.cpp
         src/component/QueryProcessor/types/QueryEvaluatorTable.h src/component/QueryProcessor/types/QueryEvaluatorTable.cpp
         src/component/QueryProcessor/types/UnformattedQueryResult.h src/component/QueryProcessor/types/UnformattedQueryResult.cpp
@@ -31,7 +30,7 @@ add_library(spa ${srcs} ${headers}
         src/component/QueryProcessor/QueryExtractor/QueryParser.h src/component/QueryProcessor/QueryExtractor/QueryParser.cpp
         src/component/QueryProcessor/QueryExtractor/QueryExtractor.h src/component/QueryProcessor/QueryExtractor/QueryExtractor.cpp
         src/component/QueryProcessor/QueryExtractor/QueryGrouper.h src/component/QueryProcessor/QueryExtractor/QueryGrouper.cpp
-        src/component/QueryProcessor/QueryExtractor/QueryValidator.h src/component/QueryProcessor/QueryExtractor/QueryValidator.cpp
+        src/component/QueryProcessor/QueryExtractor/QuerySemanticValidator.h src/component/QueryProcessor/QueryExtractor/QuerySemanticValidator.cpp
         src/component/QueryProcessor/QueryEvaluator/QueryEvaluator.h src/component/QueryProcessor/QueryEvaluator/QueryEvaluator.cpp
         src/component/QueryProcessor/QueryEvaluator/PKBQueryCommand.h src/component/QueryProcessor/QueryEvaluator/PKBQueryCommand.cpp
         src/component/QueryProcessor/QueryEvaluator/ClauseCommand.h src/component/QueryProcessor/QueryEvaluator/ClauseCommand.cpp
@@ -46,7 +45,16 @@ add_library(spa ${srcs} ${headers}
         src/util/Logger.cpp src/util/Logger.h
         src/util/util.h
         src/util/TimeUtil.cpp src/util/TimeUtil.h
-        src/util/PKBStub.cpp src/util/PKBStub.h )
+        ../unit_testing/utils/PKBStub.cpp ../unit_testing/utils/PKBStub.h src/model/CFG.cpp src/model/CFG.h
+        src/component/PKB/RuntimeExtractor.cpp src/component/PKB/RuntimeExtractor.h
+        src/component/PKB/NextTExtractor.cpp src/component/PKB/NextTExtractor.h
+        src/component/SourceProcessor/Extractors/NextExtractor.cpp src/component/SourceProcessor/Extractors/NextExtractor
+        src/component/SourceProcessor/Extractors/CallsTExtractor.cpp 
+        src/component/SourceProcessor/Extractors/CallsTExtractor.h
+        src/component/PKB/DBManager.cpp src/component/PKB/DBManager.h
+        src/component/PKB/AffectsExtractor.cpp src/component/PKB/AffectsExtractor.h
+        src/component/PKB/AffectsTExtractor.cpp src/component/PKB/AffectsTExtractor.h
+        )
 
 
 # this makes the headers accessible for other projects which uses spa lib

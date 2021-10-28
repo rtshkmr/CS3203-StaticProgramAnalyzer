@@ -33,8 +33,8 @@ TEST_CASE("1.Model.Statement.IfEntity.ElseEntity") {
 
   SECTION ("Check Conditional Elements") {
     REQUIRE(if1->GetCondExpr()->GetExpressionString() == ConditionalExpression(condition, expr_var).GetExpressionString());
-    REQUIRE(if1->GetExpressionVariables() == expr_var);
-    REQUIRE(if1->GetExpressionConstants() == expr_constants);
+    REQUIRE(if1->GetControlVariables() == expr_var);
+    REQUIRE(if1->GetControlConstants() == expr_constants);
   }
 
   SECTION ("If Container") {
@@ -129,8 +129,8 @@ TEST_CASE("1.Model.Statement.WhileEntity") {
   SECTION ("Check Conditional Elements") {
     REQUIRE(
         while_entity->GetCondExpr()->GetExpressionString() == ConditionalExpression(condition, expr_a_var).GetExpressionString());
-    REQUIRE(while_entity->GetExpressionVariables() == expr_var);
-    REQUIRE(while_entity->GetExpressionConstants() == expr_constants);
+    REQUIRE(while_entity->GetControlVariables() == expr_var);
+    REQUIRE(while_entity->GetControlConstants() == expr_constants);
   }
 
   SECTION ("While Container") {
@@ -188,7 +188,7 @@ TEST_CASE("1.Model.Statement.AssignEntity") {
 
     REQUIRE(assign_entity->GetAssignmentExpr()->CheckExact(expression));
 
-    REQUIRE(assign_entity->GetExpressionVariables() == expr_var);
+    REQUIRE(assign_entity->GetControlVariables() == expr_var);
     REQUIRE(assign_entity->GetExpressionConstants() == expr_constants);
   }
 

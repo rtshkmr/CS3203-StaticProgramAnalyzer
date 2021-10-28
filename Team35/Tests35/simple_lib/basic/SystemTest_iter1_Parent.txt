@@ -1,0 +1,45 @@
+procedure testParentParentS {
+    a = b + c + d;               
+    read a;                      
+    print b;                     
+    while (a == b) {             
+        while (c == d) {         
+            read a;              
+            print a;             
+        }
+        b = a + c + d;           
+        read b;                  
+        if (a == b) then {       
+            b = a + c + d;       
+            read b;              
+            print b;             
+            if (b == c) then {   
+                read a;          
+                c = a + b + d;   
+                while (c == d) { 
+                    read b;      
+                    print b;     
+                }
+            } else {
+                read b;         
+                print b;        
+                if (b == c) then {  
+                    b = c + 10;     
+                } else {
+                    read c;         
+                    print c;        
+                }
+            }
+            read d;                 
+        } else {
+            print d;                
+            d = a + b + c;          
+            while (a < b) {         
+                read b;             
+                print b;            
+                c = a + b + d;      
+            }
+            read a;                 
+        }
+    }
+}

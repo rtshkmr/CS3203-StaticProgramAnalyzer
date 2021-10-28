@@ -1,33 +1,33 @@
 #include "PKBQueryCommand.h"
 
-PKBQueryReceiver::PKBQueryReceiver(PKB *pkb) : pkb(pkb) {}
+PKBQueryReceiver::PKBQueryReceiver(DBManager *db_manager) : db_manager(db_manager) {}
 
 PKBRelRefs PKBQueryCommand::GetPKBRelRef(RelRef relation, bool order_of_values_unchanged_from_clause) {
   switch(relation) {
     case RelRef::kFollows:
       return order_of_values_unchanged_from_clause ? PKBRelRefs::kFollows : PKBRelRefs::kFollowedBy;
-      case RelRef::kParentT:
-        return order_of_values_unchanged_from_clause ? PKBRelRefs::kParentT : PKBRelRefs::kChildT;
-        case RelRef::kParent:
-          return order_of_values_unchanged_from_clause ? PKBRelRefs::kParent : PKBRelRefs::kChild;
-          case RelRef::kModifiesP:
-            return order_of_values_unchanged_from_clause ? PKBRelRefs::kModifiesContainer : PKBRelRefs::kModifiedByContainer;
-            case RelRef::kModifiesS:
-              return order_of_values_unchanged_from_clause ? PKBRelRefs::kModifies : PKBRelRefs::kModifiedBy;
-              case RelRef::kUsesS:
-                return order_of_values_unchanged_from_clause ? PKBRelRefs::kUses : PKBRelRefs::kUsedBy;
-                case RelRef::kUsesP:
-                  return order_of_values_unchanged_from_clause ? PKBRelRefs::kUsesC : PKBRelRefs::kUsedByC;
-                  case RelRef::kFollowsT:
-                    return order_of_values_unchanged_from_clause ? PKBRelRefs::kFollowsT : PKBRelRefs::kFollowedByT;
-                    case RelRef::kCalls:
-                      return order_of_values_unchanged_from_clause ? PKBRelRefs::kCalls : PKBRelRefs::kCalledBy;
-//                      case RelRef::kCallsT:
-//                        return PKBRelRefs::kCallsT;
-//                        case RelRef::kNext:
-//                          return PKBRelRefs::kNext;
-//                          case RelRef::kNextT:
-//                            return PKBRelRefs::kNextT;
+    case RelRef::kParentT:
+      return order_of_values_unchanged_from_clause ? PKBRelRefs::kParentT : PKBRelRefs::kChildT;
+    case RelRef::kParent:
+      return order_of_values_unchanged_from_clause ? PKBRelRefs::kParent : PKBRelRefs::kChild;
+    case RelRef::kModifiesP:
+      return order_of_values_unchanged_from_clause ? PKBRelRefs::kModifiesContainer : PKBRelRefs::kModifiedByContainer;
+    case RelRef::kModifiesS:
+      return order_of_values_unchanged_from_clause ? PKBRelRefs::kModifies : PKBRelRefs::kModifiedBy;
+    case RelRef::kUsesS:
+      return order_of_values_unchanged_from_clause ? PKBRelRefs::kUses : PKBRelRefs::kUsedBy;
+    case RelRef::kUsesP:
+      return order_of_values_unchanged_from_clause ? PKBRelRefs::kUsesC : PKBRelRefs::kUsedByC;
+    case RelRef::kFollowsT:
+      return order_of_values_unchanged_from_clause ? PKBRelRefs::kFollowsT : PKBRelRefs::kFollowedByT;
+    case RelRef::kCalls:
+      return order_of_values_unchanged_from_clause ? PKBRelRefs::kCalls : PKBRelRefs::kCalledBy;
+    case RelRef::kCallsT:
+      return order_of_values_unchanged_from_clause ? PKBRelRefs::kCallsT : PKBRelRefs::kCalledByT;
+    case RelRef::kNext:
+      return order_of_values_unchanged_from_clause ? PKBRelRefs::kNext : PKBRelRefs::kPrevious;
+//                            case RelRef::kNextT:
+//                              return PKBRelRefs::kNextT;
 //                            case RelRef::kAffects:
 //                              return PKBRelRefs::kAffects;
 //                              case RelRef::kAffectsT:
@@ -48,7 +48,7 @@ PKBRelRefs PKBQueryCommand::GetPKBRelRef(RelRef relation, bool order_of_values_u
  * @return The intermediate table with the results.
  */
 IntermediateTable* PKBQueryReceiver::QueryPKBTwoSynonyms(PKBRelRefs rel, DesignEntity first_synonym, DesignEntity second_synonym) {
-  std::vector<std::tuple<Entity *, Entity *>> output = pkb->GetRelationshipByTypes(rel, first_synonym, second_synonym);
+  std::vector<std::tuple<Entity *, Entity *>> output = db_manager->GetRelationshipByTypes(rel, first_synonym, second_synonym);
   IntermediateTable *table = new IntermediateTable();
 
   table->InsertData(output);
@@ -64,15 +64,17 @@ IntermediateTable* PKBQueryReceiver::QueryPKBTwoSynonyms(PKBRelRefs rel, DesignE
  * @return The intermediate table with the results.
  */
 IntermediateTable *PKBQueryReceiver::QueryPKBByValue(PKBRelRefs rel, std::string value) {
-  std::vector<Entity *> output = pkb->GetRelationship(rel, value);
+  std::vector<Entity *> output = db_manager->GetRelationship(rel, value);
   IntermediateTable *table = new IntermediateTable();
   table->InsertData(output);
   return table;
 }
 
 // E.g Uses(a1, _) should be kUsedBy instead of kUses
-IntermediateTable *PKBQueryReceiver::QueryPKBForSynonymWithWildCard(PKBRelRefs rel, DesignEntity entity) {
-  std::vector<Entity *> output = pkb->GetRelationshipByType(rel, entity);
+IntermediateTable *PKBQueryReceiver::QueryEntityWithWildcard(PKBRelRefs rel, DesignEntity entity) {
+  std::vector<Entity *> scoped_list = db_manager->GetDesignEntities(entity);
+  // TODO: I don't understand this API
+  std::vector<Entity *> output = db_manager->GetRelationshipByType(rel, entity, scoped_list, ScopeIndication::kNoScope);
   IntermediateTable *table = new IntermediateTable();
   table->InsertData(output);
   return table;
@@ -85,14 +87,14 @@ IntermediateTable *PKBQueryReceiver::QueryPKBForSynonymWithWildCard(PKBRelRefs r
  * @return The intermediate table with the results.
  */
 IntermediateTable *PKBQueryReceiver::QueryRelRefExistence(PKBRelRefs rel) {
-  bool output = pkb->HasRelationship(rel);
+  bool output = db_manager->HasRelationship(rel);
   IntermediateTable *table = new IntermediateTable();
   table->InsertData(output);
   return table;
 }
 
 /**
- * Querying Pattern clause with Assign synonym in the group table and the variable clause.
+ * Querying Pattern clause with [Assign, If, While] synonym in the group table and the variable clause.
  * @param design_entity The type of design entity in the pattern clause.
  * @return The intermediate table with the results.
  */
@@ -100,16 +102,16 @@ IntermediateTable *PKBQueryReceiver::QueryDesignEntity(DesignEntity design_entit
   IntermediateTable *table = new IntermediateTable();
   switch(design_entity) {
     case DesignEntity::kAssign:
-      table->InsertData(pkb->GetDesignEntities(DesignEntity::kAssign));
+      table->InsertData(db_manager->GetDesignEntities(DesignEntity::kAssign));
       break;
-      case DesignEntity::kWhile:
-        table->InsertData(pkb->GetDesignEntities(DesignEntity::kWhile));
-        break;
-        case DesignEntity::kIf:
-          table->InsertData(pkb->GetDesignEntities(DesignEntity::kIf));
-          break;
-          default:
-            break;
+    case DesignEntity::kWhile:
+      table->InsertData(db_manager->GetDesignEntities(DesignEntity::kWhile));
+      break;
+    case DesignEntity::kIf:
+      table->InsertData(db_manager->GetDesignEntities(DesignEntity::kIf));
+      break;
+    default:
+      break;
   }
   return table;
 
@@ -120,23 +122,23 @@ IntermediateTable *PKBQueryReceiver::QueryPatternByValue(DesignEntity design_ent
 
   if (value == "_") {
     // Returns std::vector<Entity*>
-    table->InsertData(pkb->GetDesignEntities(design_entity));
+    table->InsertData(db_manager->GetDesignEntities(design_entity));
     return table;
   }
 
   // Returns std::vector<Entity*>
   switch(design_entity) {
     case DesignEntity::kAssign:
-      table->InsertData(pkb->GetAssignEntityByVariable(value));
+      table->InsertData(db_manager->GetAssignEntityByVariable(value));
       break;
-      case DesignEntity::kWhile:
-        table->InsertData(pkb->GetWhileEntityByVariable(value));
-        break;
-        case DesignEntity::kIf:
-          table->InsertData(pkb->GetIfEntityByVariable(value));
-          break;
-          default:
-            break;
+    case DesignEntity::kWhile:
+      table->InsertData(db_manager->GetWhileEntityByVariable(value));
+      break;
+    case DesignEntity::kIf:
+      table->InsertData(db_manager->GetIfEntityByVariable(value));
+      break;
+    default:
+      break;
   }
   return table;
 }
@@ -145,7 +147,7 @@ IntermediateTable *PKBQueryReceiver::QueryPatternByValue(DesignEntity design_ent
 //Returns true in the Intermediate table if the relationship contains at least some values. Used for value and wildcard.
 IntermediateTable *PKBQueryReceiver::QueryPKBByValueForBoolean(PKBRelRefs rel, std::string value) {
   IntermediateTable *table = new IntermediateTable();
-  std::vector<Entity *> list = pkb->GetRelationship(rel, value);
+  std::vector<Entity *> list = db_manager->GetRelationship(rel, value);
   table->InsertData(list.size() != 0);
   return table;
 }
@@ -155,15 +157,12 @@ IntermediateTable *PKBQueryReceiver::QueryPKBByValueForBoolean(PKBRelRefs rel, s
 IntermediateTable *
 PKBQueryReceiver::QueryPKBByValueForBoolean(PKBRelRefs rel, std::string first_value, std::string second_value) {
   IntermediateTable *table = new IntermediateTable();
-  bool has_result = pkb->HasRelationship(rel, first_value, second_value);
+  bool has_result = db_manager->HasRelationship(rel, first_value, second_value);
   table->InsertData(has_result);
   return table;
 }
 
 QuerySuchThatTwoSynonymCommand::QuerySuchThatTwoSynonymCommand(Clause *clause) : clause(clause), receiver(nullptr) {}
-
-QuerySuchThatTwoSynonymCommand::QuerySuchThatTwoSynonymCommand(PKBQueryReceiver *receiver, Clause *clause) :
-clause(clause), receiver(receiver) {};
 
 void QuerySuchThatTwoSynonymCommand::SetReceiver(PKBQueryReceiver *receiver) {
   delete this->receiver;
@@ -178,9 +177,6 @@ IntermediateTable * QuerySuchThatTwoSynonymCommand::ExecuteQuery(Clause *clause)
 
 
 QuerySuchThatOneSynonymCommand::QuerySuchThatOneSynonymCommand(Clause *clause) : clause(clause), receiver(nullptr) {}
-
-QuerySuchThatOneSynonymCommand::QuerySuchThatOneSynonymCommand(PKBQueryReceiver *receiver, Clause *clause) :
-clause(clause), receiver(receiver) {};
 
 void QuerySuchThatOneSynonymCommand::SetReceiver(PKBQueryReceiver *receiver) {
   delete this->receiver;
@@ -202,7 +198,7 @@ IntermediateTable * QuerySuchThatOneSynonymCommand::ExecuteQuery(Clause *clause)
 
   if (query_value == "_") {
     PKBRelRefs pkb_rel = GetPKBRelRef(such_that->rel_ref, synonym_is_first_param);
-    return this->receiver->QueryPKBForSynonymWithWildCard(pkb_rel, query_synonym->GetType());
+    return this->receiver->QueryEntityWithWildcard(pkb_rel, query_synonym->GetType());
   } else {
     PKBRelRefs pkb_rel = GetPKBRelRef(such_that->rel_ref, !synonym_is_first_param);
     return this->receiver->QueryPKBByValue(pkb_rel, query_value);
@@ -211,9 +207,6 @@ IntermediateTable * QuerySuchThatOneSynonymCommand::ExecuteQuery(Clause *clause)
 }
 
 QuerySuchThatNoSynonymCommand::QuerySuchThatNoSynonymCommand(Clause *clause) : clause(clause), receiver(nullptr) {}
-
-QuerySuchThatNoSynonymCommand::QuerySuchThatNoSynonymCommand(PKBQueryReceiver *receiver, Clause *clause) :
-clause(clause), receiver(receiver) {};
 
 void QuerySuchThatNoSynonymCommand::SetReceiver(PKBQueryReceiver *receiver) {
   delete this->receiver;
@@ -230,7 +223,7 @@ IntermediateTable * QuerySuchThatNoSynonymCommand::ExecuteQuery(Clause *clause) 
     return this->receiver->QueryPKBByValueForBoolean(pkb_rel, such_that->right_hand_side);
   } else if (such_that->right_hand_side == "_") {
     PKBRelRefs pkb_rel = GetPKBRelRef(such_that->rel_ref, true);
-    return this->receiver->QueryPKBByValueForBoolean(pkb_rel, such_that->right_hand_side);
+    return this->receiver->QueryPKBByValueForBoolean(pkb_rel, such_that->left_hand_side);
   } else {
     PKBRelRefs pkb_rel = GetPKBRelRef(such_that->rel_ref, true);
     return this->receiver->QueryPKBByValueForBoolean(pkb_rel, such_that->left_hand_side, such_that->right_hand_side);
@@ -239,9 +232,6 @@ IntermediateTable * QuerySuchThatNoSynonymCommand::ExecuteQuery(Clause *clause) 
 
 QueryPatternTwoSynonymCommand::QueryPatternTwoSynonymCommand(Clause *clause) : clause(clause), receiver(nullptr) {}
 
-QueryPatternTwoSynonymCommand::QueryPatternTwoSynonymCommand(PKBQueryReceiver *receiver, Clause *clause) :
-clause(clause), receiver(receiver) {};
-
 void QueryPatternTwoSynonymCommand::SetReceiver(PKBQueryReceiver *receiver) {
   delete this->receiver;
   this->receiver = receiver;
@@ -249,14 +239,11 @@ void QueryPatternTwoSynonymCommand::SetReceiver(PKBQueryReceiver *receiver) {
 
 IntermediateTable * QueryPatternTwoSynonymCommand::ExecuteQuery(Clause *clause) {
   auto* pattern = dynamic_cast<Pattern *>(clause);
-  // TODO: CHANGE here for while and if support
-  return this->receiver->QueryDesignEntity(DesignEntity::kAssign);
+  DesignEntity pattern_design_entity = pattern->first_synonym->GetType();
+  return this->receiver->QueryDesignEntity(pattern_design_entity);
 }
 
 QueryPatternOneSynonymCommand::QueryPatternOneSynonymCommand(Clause *clause) : clause(clause), receiver(nullptr) {}
-
-QueryPatternOneSynonymCommand::QueryPatternOneSynonymCommand(PKBQueryReceiver *receiver, Clause *clause) :
-clause(clause), receiver(receiver) {};
 
 void QueryPatternOneSynonymCommand::SetReceiver(PKBQueryReceiver *receiver) {
   delete this->receiver;
@@ -265,6 +252,6 @@ void QueryPatternOneSynonymCommand::SetReceiver(PKBQueryReceiver *receiver) {
 
 IntermediateTable * QueryPatternOneSynonymCommand::ExecuteQuery(Clause *clause) {
   auto* pattern = dynamic_cast<Pattern *>(clause);
-  // TODO: CHANGE here for while and if support
-  return this->receiver->QueryPatternByValue(DesignEntity::kAssign, pattern->left_hand_side);
+  DesignEntity pattern_design_entity = pattern->first_synonym->GetType();
+  return this->receiver->QueryPatternByValue(pattern_design_entity, pattern->left_hand_side);
 }

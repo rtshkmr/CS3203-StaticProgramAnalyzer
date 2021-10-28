@@ -239,6 +239,90 @@ void Deliverable::AddModifiesRelationship(Container* container, std::list<Variab
   }
 }
 
+void Deliverable::AddCallsRelationship(Procedure* p1, Procedure* p2) {
+  if (calls_hash_.count(p1)) {
+    std::list<Procedure*>* calls_proc = calls_hash_.find(p1)->second;
+    if (std::find(calls_proc->begin(), calls_proc->end(), p2) == calls_proc->end()) {
+      // add procedure p2 if it does not exist in calls_proc
+      calls_proc->push_back(p2);
+    }
+  } else {
+    std::list<Procedure*>* lst = new std::list<Procedure*>();
+    lst->push_back(p2);
+    calls_hash_.insert(make_pair(p1, lst));
+  }
+
+  if (called_by_hash_.count(p2)) {
+    std::list<Procedure*>* call_by_proc = called_by_hash_.find(p2)->second;
+    if (std::find(call_by_proc->begin(), call_by_proc->end(), p1) == call_by_proc->end()) {
+      // add procedure p1 if it does not exist in call_by_proc
+      call_by_proc->push_back(p1);
+    }
+  } else {
+    std::list<Procedure*>* lst = new std::list<Procedure*>();
+    lst->push_back(p1);
+    called_by_hash_.insert(make_pair(p2, lst));
+  }
+}
+
+void Deliverable::AddCallsTransitiveRelationship(Procedure* p1, Procedure* p2) {
+  if (calls_T_hash_.count(p1)) {
+    std::list<Procedure*>* calls_list = calls_T_hash_.find(p1)->second;
+    if (std::find(calls_list->begin(), calls_list->end(), p2) == calls_list->end()) {
+      // add p2 if it does not exist in calls_list
+      calls_list->push_back(p2);
+    }
+  } else {
+    auto* list = new std::list<Procedure*>();
+    list->push_back(p2);
+    calls_T_hash_.insert(std::make_pair(p1, list));
+  }
+
+  if (called_by_T_hash_.count(p2)) {
+    std::list<Procedure*>* called_list = called_by_T_hash_.find(p2)->second;
+    if (std::find(called_list->begin(), called_list->end(), p1) == called_list->end()) {
+      // add p1 if it does not exist in called_list
+      called_list->push_back(p1);
+    }
+  } else {
+    auto* list = new std::list<Procedure*>();
+    list->push_back(p1);
+    called_by_T_hash_.insert(std::make_pair(p2, list));
+  }
+}
+
+void Deliverable::AddCallsTransitiveRelationshipForList(Procedure* p1, std::list<Procedure*>* proc_list) {
+  for (Procedure* proc: *proc_list) {
+    AddCallsTransitiveRelationship(p1, proc);
+  }
+}
+
+void Deliverable::AddNextRelationship(Statement* s1, Statement* s2) {
+  if (next_hash_.count(s1)) {
+    std::list<Statement*>* nexts = next_hash_.find(s1)->second;
+    if (std::find(nexts->begin(), nexts->end(), s2) == nexts->end()) {
+      // add s2 if it does not exist in nexts
+      nexts->push_back(s2);
+    }
+  } else {
+    auto* list = new std::list<Statement*>();
+    list->push_back(s2);
+    next_hash_.insert(std::make_pair(s1, list));
+  }
+
+  if (previous_hash_.count(s2)) {
+    std::list<Statement*>* previous = previous_hash_.find(s2)->second;
+    if (std::find(previous->begin(), previous->end(), s1) == previous->end()) {
+      // add s1 if it does not exist in previous
+      previous->push_back(s1);
+    }
+  } else {
+    auto* list = new std::list<Statement*>();
+    list->push_back(s1);
+    previous_hash_.insert(std::make_pair(s2, list));
+  }
+}
+
 void Deliverable::SetProgram(Program* program) {
   this->program_ = program;
 }
@@ -258,7 +342,7 @@ std::list<ConstantValue*>* Deliverable::GetConstantValueList() {
   return & const_list_;
 }
 
-std::list<Statement*>* Deliverable::GetStatementList() {
+std::vector<Statement*>* Deliverable::GetStatementList() {
   return & stmt_list_;
 }
 
