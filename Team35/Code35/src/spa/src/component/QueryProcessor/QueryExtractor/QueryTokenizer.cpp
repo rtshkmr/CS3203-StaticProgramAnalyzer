@@ -57,6 +57,11 @@ bool QueryTokenizer::HasMoreTokens() {
   return cursor < query.size();
 }
 
+/**
+ * Tokenizes the next token based on the current cursor position in the query input stream through regex matching.
+ * @return a Token object which contains information about the type and value of input tokenized.
+ * Note that if there are no more tokens to tokenize (end of input), a token with non-meaningful fields is returned.
+ */
 Token QueryTokenizer::GetNextToken() {
   if (!HasMoreTokens()) {
     return Token("", TokenTag::kInvalid);
