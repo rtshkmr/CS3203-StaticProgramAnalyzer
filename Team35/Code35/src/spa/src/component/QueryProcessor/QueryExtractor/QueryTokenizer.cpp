@@ -6,15 +6,10 @@
 #include <exception/SpaException.h>
 
 // note: order of regex evaluation matters! always retrieve key-values based on defined insertion_order.
-std::vector<std::string> insertion_order = {"+", "-", "%", "*", "/", "STRING_QUOTE", "INTEGER", "SUCH_THAT", "PROG_LINE",
+std::vector<std::string> insertion_order = {"*", "STRING_QUOTE", "INTEGER", "SUCH_THAT", "PROG_LINE",
                                             "stmt#", "IDENT", ";", "SPACINGS", "(", ")", ",", "_", "<", ">", ".", "="};
 static std::map<std::string, std::regex> spec_table{
-    // TODO: for performance optimization, group (+, -) and (%, *, /) together if separate regex is not required.
-    {"+", std::regex("^[+]")},
-    {"-", std::regex("^[-]")},
-    {"%", std::regex("^[%]")},
     {"*", std::regex("^[*]")},
-    {"/", std::regex("^[/]")},
     {"STRING_QUOTE", std::regex("^\"")},
     {"INTEGER", RegexPatterns::GetIntegerPatternNonTerminating()},
     {"SUCH_THAT", std::regex("^such that")},
@@ -39,11 +34,7 @@ static std::map<std::string, std::regex> spec_table{
 TokenTag QueryTokenizer::GetPqlTokenType(std::string type) {
   // TODO: optimise this using a lookup table.
   if (type.compare("stmt#") == 0) { return TokenTag::kStmtHash; }
-  if (type.compare("+") == 0) { return TokenTag::kPlus; }
-  if (type.compare("-") == 0) { return TokenTag::kMinus; }
-  if (type.compare("%") == 0) { return TokenTag::kModulo; }
   if (type.compare("*") == 0) { return TokenTag::kTimes; }
-  if (type.compare("/") == 0) { return TokenTag::kDivide; }
   if (type.compare("STRING_QUOTE") == 0) { return TokenTag::kStringQuote; }
   if (type.compare("INTEGER") == 0) { return TokenTag::kInteger; }
   if (type.compare("PROG_LINE") == 0) { return TokenTag::kProgLine; }
