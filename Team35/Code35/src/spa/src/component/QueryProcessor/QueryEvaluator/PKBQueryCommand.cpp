@@ -104,14 +104,14 @@ IntermediateTable *PKBQueryReceiver::QueryDesignEntity(DesignEntity design_entit
     case DesignEntity::kAssign:
       table->InsertData(db_manager->GetDesignEntities(DesignEntity::kAssign));
       break;
-      case DesignEntity::kWhile:
-        table->InsertData(db_manager->GetDesignEntities(DesignEntity::kWhile));
-        break;
-        case DesignEntity::kIf:
-          table->InsertData(db_manager->GetDesignEntities(DesignEntity::kIf));
-          break;
-          default:
-            break;
+    case DesignEntity::kWhile:
+      table->InsertData(db_manager->GetDesignEntities(DesignEntity::kWhile));
+      break;
+    case DesignEntity::kIf:
+      table->InsertData(db_manager->GetDesignEntities(DesignEntity::kIf));
+      break;
+    default:
+      break;
   }
   return table;
 
@@ -131,14 +131,14 @@ IntermediateTable *PKBQueryReceiver::QueryPatternByValue(DesignEntity design_ent
     case DesignEntity::kAssign:
       table->InsertData(db_manager->GetAssignEntityByVariable(value));
       break;
-      case DesignEntity::kWhile:
-        table->InsertData(db_manager->GetWhileEntityByVariable(value));
-        break;
-        case DesignEntity::kIf:
-          table->InsertData(db_manager->GetIfEntityByVariable(value));
-          break;
-          default:
-            break;
+    case DesignEntity::kWhile:
+      table->InsertData(db_manager->GetWhileEntityByVariable(value));
+      break;
+    case DesignEntity::kIf:
+      table->InsertData(db_manager->GetIfEntityByVariable(value));
+      break;
+    default:
+      break;
   }
   return table;
 }
