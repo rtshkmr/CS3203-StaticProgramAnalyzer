@@ -6,7 +6,6 @@
 #include <array>
 #include <unordered_set>
 #include <datatype/DataType.h>
-//#include <component/QueryProcessor/types/QueryEvaluatorTable.h>
 #include <typeinfo>
 
 enum class DesignEntity : unsigned int {
@@ -20,27 +19,9 @@ enum class DesignEntity : unsigned int {
   kVariable = 7,
   kConstant = 8,
   kProcedure = 9,
-  kInvalid = 10,
-  kWildcard = 11,
-  kProgLine = 12
+  kProgLine = 10,
+  kInvalid = 11
 };
-
-const std::array<DesignEntity, 12> all_design_entities = {
-    DesignEntity:: kStmt,
-    DesignEntity:: kRead,
-    DesignEntity:: kPrint,
-    DesignEntity:: kCall,
-    DesignEntity:: kWhile,
-    DesignEntity:: kIf,
-    DesignEntity:: kAssign,
-    DesignEntity:: kVariable,
-    DesignEntity:: kConstant,
-    DesignEntity:: kProcedure,
-    DesignEntity:: kInvalid,
-    DesignEntity:: kProgLine,
-};
-
-DesignEntity GetDesignEntity(std::string reference);
 
 enum class PKBRelRefs {
   kFollows,
@@ -77,7 +58,63 @@ enum class PKBRelRefs {
   kAffectedByT
 };
 
-const std::unordered_set<PKBRelRefs> pkb_rel_set = {
+enum class RelRef {
+  kModifiesP,
+  kModifiesS,
+  kUsesP,
+  kUsesS,
+  kCalls,
+  kCallsT,
+  kParent,
+  kParentT,
+  kFollows,
+  kFollowsT,
+  kNext,
+  kNextT,
+  kAffects,
+  kAffectsT,
+  kInvalid
+};
+
+enum class Attribute {
+  kStmtNumber,
+  kProcName,
+  kVarName,
+  kValue,
+  kInvalid
+};
+
+/**
+ * ScopeIndication is used by the PKBQueryReceiver when passing arguments to the DBManager.
+ * This indicates whether the DBManager should utilize the scoped entity vectors (for left and right param) or just the DE itself.
+ */
+enum class ScopeIndication {
+  kNoScope,
+  kLeftScope, // i.e. only the left param is scoped, so use the entity vector for left param and DE for the right param
+  kRightScope,
+  kAllScope
+};
+
+DesignEntity GetDesignEntity(std::string reference);
+RelRef GetRelRef(std::string reference);
+Attribute GetAttribute(std::string attr_string);
+
+const std::unordered_set<DesignEntity> stmt_design_entities_ = {
+  DesignEntity::kRead,
+  DesignEntity::kPrint,
+  DesignEntity::kCall,
+  DesignEntity::kWhile,
+  DesignEntity::kIf,
+  DesignEntity::kAssign
+};
+
+const std::unordered_set<DesignEntity> pattern_entities_ = {
+  DesignEntity::kWhile,
+  DesignEntity::kIf,
+  DesignEntity::kAssign
+};
+
+const std::unordered_set<PKBRelRefs> preprocessed_rel_refs = {
   PKBRelRefs::kFollows,
   PKBRelRefs::kFollowsT,
   PKBRelRefs::kFollowedBy,
@@ -139,72 +176,6 @@ const std::unordered_set<PKBRelRefs> second_param_is_proc = {
   PKBRelRefs::kCalledBy,
   PKBRelRefs::kCallsT,
   PKBRelRefs::kCalledByT
-};
-
-const std::array<PKBRelRefs, 16> pkb_rel_refs = {
-    PKBRelRefs::kFollows,
-    PKBRelRefs::kFollowsT,
-    PKBRelRefs::kFollowedBy,
-    PKBRelRefs::kFollowedByT,
-    PKBRelRefs::kParent,
-    PKBRelRefs::kParentT,
-    PKBRelRefs::kChild,
-    PKBRelRefs::kChildT,
-    PKBRelRefs::kUsesS,
-    PKBRelRefs::kUsesC,
-    PKBRelRefs::kUsedByS,
-    PKBRelRefs::kUsedByC,
-    PKBRelRefs::kModifiesStatement,
-    PKBRelRefs::kModifiesContainer,
-    PKBRelRefs::kModifiedByStatement,
-    PKBRelRefs::kModifiedByContainer
-};
-
-enum class RelRef {
-  kModifiesP,
-  kModifiesS,
-  kUsesP,
-  kUsesS,
-  kCalls,
-  kCallsT,
-  kParent,
-  kParentT,
-  kFollows,
-  kFollowsT,
-  kNext,
-  kNextT,
-  kAffects,
-  kAffectsT,
-  kWildcard,
-  kInvalid,
-};
-
-RelRef GetRelRef(std::string reference);
-
-enum class Attribute {
-  kStmtNumber,
-  kProcName,
-  kVarName,
-  kValue,
-  kInvalid
-};
-
-/**
- * ScopeIndication is used by the PKBQueryReceiver when passing arguments to the DBManager.
- * This indicates whether the DBManager should utilize the scoped entity vectors (for left and right param) or just the DE itself.
- */
-enum class ScopeIndication {
-  kNoScope,
-  kLeftScope, // i.e. only the left param is scoped, so use the entity vector for left param and DE for the right param
-  kRightScope,
-  kAllScope
-};
-
-Attribute GetAttribute(std::string attr_string);
-
-struct QueryInfo {
-  bool all_boolean_true;
-  // std::vector<*QueryEvaluatorTable> table_list;
 };
 
 class Synonym {
