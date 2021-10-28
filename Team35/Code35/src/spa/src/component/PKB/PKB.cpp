@@ -117,11 +117,8 @@ void PKB::PopulateRelationship(std::unordered_map<X*, std::list<Y*>*>* hash, PKB
       relationship_table_[ref][k_string].push_back(entity);
 
       DesignEntity second_type = GetDesignEntityFromEntity(entity);
-      if (second_types.empty()) {
-        second_types = GetApplicableTypes(second_type);
-      } else {
-        second_types.push_back(second_type);
-      }
+      second_types = GetApplicableTypes(second_type);
+
 
       for (DesignEntity type1 : first_types) {
         for (DesignEntity type2 : second_types) {
