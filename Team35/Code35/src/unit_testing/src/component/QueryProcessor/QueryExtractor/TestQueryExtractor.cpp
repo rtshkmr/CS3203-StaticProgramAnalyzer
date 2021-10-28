@@ -1032,3 +1032,21 @@ TEST_CASE("3.QueryExtractor.Single well-formed while-pattern") {
                         Catch::Contains("Unexpected token"));
   }
 }
+
+// with clause
+TEST_CASE("3.QueryExtractor.Single with clause + lhs prog_line + rhs INTEGER") {
+  std::string query = "prog_line n; stmt s; Select s.stmt# such that Follows* (s, n) with n=10";
+  auto query_extractor = QueryExtractor(& query);
+  query_extractor.ExtractQuery();
+  std::vector<Group*> actual_groups = query_extractor.GetGroupsList();
+  REQUIRE(actual_groups.size() == 1);
+  Group* actual_group = actual_groups[0];
+  Clause* expected_cl_1 = new With(true, false, "n", "10", Attribute::kInvalid, Attribute::kInvalid, true, false);
+  Clause* expected_cl_2 = new SuchThat("s", "n", RelRef::kFollowsT, true, true);
+  std::vector<Clause*> clauses;
+  clauses.push_back(expected_cl_1);
+  clauses.push_back(expected_cl_2);
+  Group* expected_group = new Group(clauses, true);
+
+  REQUIRE(AreGroupsEqual(expected_group, actual_group));
+}
