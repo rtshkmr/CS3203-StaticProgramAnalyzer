@@ -71,7 +71,7 @@ Cluster* NextTExtractor::GetProcCluster(std::vector<Procedure*> proc_list, int t
 }
 
 /**
- * Traverses the cluster on surface level and returns the outermost cluster with the target number.
+ * Traverses the cluster on surface level and returns the  cluster with the target number.
  */
 Cluster* NextTExtractor::GetTargetCluster(Cluster* p_cluster, int target_num) {
   std::list<Cluster*> nested_clusters = p_cluster->GetNestedClusters();

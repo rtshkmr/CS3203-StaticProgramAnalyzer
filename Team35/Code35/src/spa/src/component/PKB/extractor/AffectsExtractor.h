@@ -9,6 +9,7 @@ class AffectsExtractor {
  public:
   std::vector<Entity*> GetAffects(int target);
   std::vector<Entity*> GetAffectedBy(int target);
+  bool HasAffects(AssignEntity* first_stmt, AssignEntity* second_stmt);
   void SetPKB(PKB* pkb);
   void Delete();
  private:
