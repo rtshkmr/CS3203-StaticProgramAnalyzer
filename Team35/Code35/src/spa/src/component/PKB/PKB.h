@@ -18,6 +18,15 @@ struct type_combo_hash {
   }
 };
 
+struct attribute_hash {
+  std::size_t operator()(const std::tuple<DesignEntity, Attribute>& combo) const
+  {
+    return static_cast<std::size_t>(std::get<0>(combo))
+    * static_cast<std::size_t>(DesignEntity::kInvalid)
+    + static_cast<std::size_t>(std::get<1>(combo));
+  }
+};
+
 typedef std::tuple<Entity*, Entity*> entity_pair;
 
 typedef std::tuple<PKBRelRefs, std::string, std::string> relationship;
@@ -27,8 +36,8 @@ class PKB {
   void PopulateDataStructures(Deliverable d);
   std::vector<Entity*> GetRelationship(PKBRelRefs ref, std::string entity);
   std::vector<entity_pair> GetRelationshipByTypes(PKBRelRefs, DesignEntity, DesignEntity);
-  std::vector<Entity*> GetFirstEntityOfRelationship(PKBRelRefs, DesignEntity);
   std::vector<Entity*> GetFirstEntityOfRelationship(PKBRelRefs, DesignEntity, DesignEntity);
+  std::vector<Entity*> GetFirstEntityOfRelationship(PKBRelRefs, DesignEntity);
   std::vector<Entity*> GetDesignEntities(DesignEntity de);
   std::vector<Entity*> GetPatternEntities(DesignEntity de, std::string var_or_stmt);
   std::vector<Entity*> GetEntitiesWithAttributeValue(DesignEntity design_entity, Attribute attribute, std::string value);
@@ -37,8 +46,9 @@ class PKB {
   bool HasRelationship(PKBRelRefs, DesignEntity, DesignEntity);
   bool HasRelationship(PKBRelRefs, std::string);
   bool HasRelationship(PKBRelRefs, std::string, std::string);
-  DesignEntity EntityToDesignEntity(Entity* entity);
   static std::string GetNameFromEntity(Entity* entity);
+  static DesignEntity GetDesignEntityFromEntity(Entity* entity);
+  static Attribute GetAttributeFromEntity(Entity* entity);
 
   // Constructor
   PKB() = default;
@@ -82,13 +92,34 @@ class PKB {
 
   std::set<relationship> relationship_set_;
 
+  std::unordered_map<
+    std::tuple<DesignEntity, Attribute>,
+    std::unordered_map<
+      std::string,
+      std::vector<Entity*>
+    >,
+    attribute_hash
+  > attribute_to_entity_map_;
+
+
+  std::unordered_map<
+    std::string,
+    std::unordered_set<Entity*>
+  > attribute_string_to_entity_map_;
+
+  std::unordered_map<
+    type_combo,
+    std::vector<entity_pair>,
+    type_combo_hash
+  > entities_with_matching_attributes_map_;
+
   template <typename T>
   void PopulateEntities(DesignEntity design_entity, T& entity_list);
 
-//  void PopulateRelationship(std::unordered_map<Entity*, std::list<Entity*>*>* hash, PKBRelRefs ref);
-
   template <typename X, typename Y>
   void PopulateRelationship(std::unordered_map<X*, std::list<Y*>*>* hash, PKBRelRefs ref);
+
+  void ProcessEntitiesWithMatchingAttributes();
 
   std::vector<DesignEntity> GetApplicableTypes(DesignEntity de);
 
