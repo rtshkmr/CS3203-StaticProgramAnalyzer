@@ -156,6 +156,13 @@ inline AssignEntity* GetAssign10() {
                           std::vector<Variable*>{var_y_},
                           std::vector<ConstantValue*>());
 }
+// m=n
+inline AssignEntity* GetAssign11() {
+  return new AssignEntity(var_m_,
+                          "n",
+                          std::vector<Variable*>{var_n_},
+                          std::vector<ConstantValue*>());
+}
 
 // if
 inline IfEntity* GetIf1() {
