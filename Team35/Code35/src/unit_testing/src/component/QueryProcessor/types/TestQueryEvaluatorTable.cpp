@@ -6,8 +6,8 @@
 using namespace entity_utils;
 
 TEST_CASE("3.QueryEvaluatorTable.Target synonym is statement") {
-  Synonym *read_synonym = new Synonym("test", DesignEntity::kRead);
-  Synonym *read_synonym_2 = new Synonym("test2", DesignEntity::kRead);
+  auto *read_synonym = new Synonym("test", DesignEntity::kRead);
+  auto *read_synonym_2 = new Synonym("test2", DesignEntity::kRead);
   QueryEvaluatorTable table(read_synonym);
   REQUIRE(table.GetRowSize() == 0);
 
@@ -15,7 +15,7 @@ TEST_CASE("3.QueryEvaluatorTable.Target synonym is statement") {
   ReadEntity* stmt2 = GetReadY();
   ReadEntity* stmt3 = GetReadZ();
 
-  Synonym *assign_syn = new Synonym("a1", DesignEntity::kAssign);
+  auto *assign_syn = new Synonym("a1", DesignEntity::kAssign);
   AssignEntity* stmt4 = GetAssign1();
   AssignEntity* stmt5 = GetAssign2();
   AssignEntity* stmt6 = GetAssign3();
@@ -27,7 +27,7 @@ TEST_CASE("3.QueryEvaluatorTable.Target synonym is statement") {
   REQUIRE(table.GetResults()[0][1] == stmt2);
 
   SECTION("Remove a valid row") {
-    bool outcome = table.DeleteRow(1);
+    outcome = table.DeleteRow(1);
     REQUIRE(outcome);
     REQUIRE(table.GetColumnSize() == 1);
 
@@ -36,13 +36,13 @@ TEST_CASE("3.QueryEvaluatorTable.Target synonym is statement") {
   }
 
   SECTION("Remove an invalid row") {
-    bool outcome = table.DeleteRow(3);
+    outcome = table.DeleteRow(3);
     REQUIRE_FALSE(outcome);
     REQUIRE(table.GetResults()[0].size() == 3);
   }
 
   SECTION("Add synonym column and values") {
-    bool outcome = table.AddColumn(assign_syn);
+    outcome = table.AddColumn(assign_syn);
     REQUIRE(outcome);
     REQUIRE(table.GetColumnSize() == 2);
 
@@ -70,10 +70,10 @@ TEST_CASE("3.QueryEvaluatorTable.Target synonym is statement") {
 }
 
 TEST_CASE("3.QueryEvaluatorTable.Multiple Target Synonyms") {
-  Synonym *variable_synonym = new Synonym("v1", DesignEntity::kRead);
-  Synonym *assign_synonym = new Synonym("a1", DesignEntity::kAssign);
-  Synonym *prog_line_synonym = new Synonym("pl", DesignEntity::kProgLine);
-  Synonym *constant_synonym = new Synonym("const1", DesignEntity::kConstant);
+  auto *variable_synonym = new Synonym("v1", DesignEntity::kRead);
+  auto *assign_synonym = new Synonym("a1", DesignEntity::kAssign);
+  auto *prog_line_synonym = new Synonym("pl", DesignEntity::kProgLine);
+  auto *constant_synonym = new Synonym("const1", DesignEntity::kConstant);
   std::vector<Synonym *> target_synonyms = {variable_synonym, assign_synonym};
   QueryEvaluatorTable table(target_synonyms);
   REQUIRE(table.GetColumnSize() == 0);
@@ -88,7 +88,7 @@ TEST_CASE("3.QueryEvaluatorTable.Multiple Target Synonyms") {
   AssignEntity *assign_3 = GetAssign3();
   std::vector<Entity *> assign_values = {assign_1, assign_2, assign_3};
 
-  table.AddTargetSynonymValues(variable_synonym, variable_values);
+  table.AddTargetSynonymValues(variable_synonym, variable_values);    // Init, and is first column
 
   REQUIRE(table.GetColumnSize() == 1);
   REQUIRE(table.GetResults()[0][2] == var_i);
@@ -116,7 +116,7 @@ TEST_CASE("3.QueryEvaluatorTable.Multiple Target Synonyms") {
 
     SECTION("Delete a valid row with no empty column") {
       table.DeleteRow(0);
-      std::vector<std::vector<Entity*>> results = table.GetResults();
+      std::vector<std::vector<Entity*>> curr_results = table.GetResults();
       REQUIRE(results[0][1] == var_z);
       REQUIRE(results[1][0] == assign_2);
     }
@@ -129,6 +129,18 @@ TEST_CASE("3.QueryEvaluatorTable.Multiple Target Synonyms") {
   table.AddMultipleRowForAllColumn(assign_synonym, 3, assign_1, 0);
   table.AddMultipleRowForAllColumn(assign_synonym, 3, assign_2, 1);
   table.AddMultipleRowForAllColumn(assign_synonym, 3, assign_3, 2);
+
+  SECTION("Cross Product column") {
+    std::vector<Synonym *> synonyms = {constant_synonym};
+    Entity *first_const = GetConst0();
+    Entity *second_const = GetConst1();
+    Entity *third_const = GetConst3();
+    std::vector<Entity *> constant_values = {first_const, second_const, third_const};
+    std::vector<std::vector<Entity *>> values = {constant_values};
+    table.CrossProductColumns(synonyms, values);
+    REQUIRE(table.GetColumnSize() == 3);
+    REQUIRE(table.GetRowSize() == 18);
+  }
 
   table.AddColumn(prog_line_synonym);
 

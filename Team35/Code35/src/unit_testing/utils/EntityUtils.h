@@ -49,17 +49,17 @@ inline Variable* GetVarM() {
 }
 
 // Constants
-inline ConstantValue* GetConst0() {
-  return const_0_;
+inline Constant* GetConst0() {
+  return new Constant(const_0_);
 }
-inline ConstantValue* GetConst1() {
-  return const_1_;
+inline Constant* GetConst1() {
+  return new Constant(const_1_);
 }
-inline ConstantValue* GetConst2() {
-  return const_2_;
+inline Constant* GetConst2() {
+  return new Constant(const_2_);
 }
-inline ConstantValue* GetConst3() {
-  return const_3_;
+inline Constant* GetConst3() {
+  return new Constant(const_3_);
 }
 
 // Procedures
