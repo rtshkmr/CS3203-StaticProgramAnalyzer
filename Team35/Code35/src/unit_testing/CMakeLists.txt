@@ -15,14 +15,14 @@ add_executable(unit_testing ${srcs}
         src/component/PKB/TestPKB.cpp src/datatype/TestAssignmentExpression.cpp
         src/datatype/TestDeliverable.cpp utils/EntityUtils.h
         src/component/SourceProcessor/Extractors/TestFollowsTExtractor.cpp
-        src/component/SourceProcessor/Extractors/TestParentTExtractor.cpp
+        src/component/SourceProcessor/Extractors/TestTransitiveExtractor/TestParentT.cpp
         ../spa/src/exception/SpaException.h utils/EntityUtils.h src/util/TestCommonUtils.cpp src/model/TestEntity.cpp
         src/model/TestStatement.cpp src/datatype/TestConditionalExpression.cpp src/model/TestCFG.cpp
         src/component/SourceProcessor/Extractors/TestNextRelationship.cpp
         src/component/SourceProcessor/TestParser.cpp
         src/component/PKB/TestNextTExtractor.cpp
-        src/component/SourceProcessor/Extractors/TestCallsTExtractor.cpp src/model/TestVariableMapping.cpp
-        src/component/SourceProcessor/Extractors/TestVariableTExtractor.cpp)
+        src/model/TestVariableMapping.cpp
+        src/component/SourceProcessor/Extractors/TestVariableTExtractor.cpp src/component/SourceProcessor/Extractors/TestTransitiveExtractor/TestCallsT.cpp)
 
 target_link_libraries(unit_testing spa)
 SET(CMAKE_BUILD_TYPE Debug)
