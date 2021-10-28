@@ -117,8 +117,9 @@ TEST_CASE("3.QueryEvaluatorTable.Multiple Target Synonyms") {
     SECTION("Delete a valid row with no empty column") {
       table.DeleteRow(0);
       std::vector<std::vector<Entity*>> curr_results = table.GetResults();
-      REQUIRE(results[0][1] == var_z);
-      REQUIRE(results[1][0] == assign_2);
+      bool output = curr_results[0][1] == var_z;
+      REQUIRE(output);
+      REQUIRE(curr_results[1][0] == assign_2);
     }
   }
 
