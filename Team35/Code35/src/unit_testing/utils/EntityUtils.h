@@ -49,16 +49,16 @@ inline Variable* GetVarM() {
 }
 
 // Constants
-inline ConstantValue* GetConst0() {
+inline Constant* GetConst0() {
   return const_0_;
 }
-inline ConstantValue* GetConst1() {
+inline Constant* GetConst1() {
   return const_1_;
 }
-inline ConstantValue* GetConst2() {
+inline Constant* GetConst2() {
   return const_2_;
 }
-inline ConstantValue* GetConst3() {
+inline Constant* GetConst3() {
   return const_3_;
 }
 
