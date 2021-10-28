@@ -1,6 +1,7 @@
 #include "QueryEvaluatorTable.h"
 
 #include <utility>
+#include <cassert>
 
 bool QueryEvaluatorTable::AddTargetSynonymValues(Synonym *target, std::vector<Entity *> entity_list) {
   synonym_to_entity_map[target] = std::move(entity_list);
