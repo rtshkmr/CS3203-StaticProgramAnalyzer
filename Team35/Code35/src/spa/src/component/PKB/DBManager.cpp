@@ -236,8 +236,8 @@ std::vector<Entity*> DBManager::GetPatternEntities(DesignEntity de, std::string 
   return pkb_->GetPatternEntities(de, var_or_stmt);
 }
 
-DesignEntity DBManager::EntityToDesignEntity(Entity* entity) {
-  return pkb_->EntityToDesignEntity(entity);
+DesignEntity DBManager::GetDesignEntityFromEntity(Entity* entity) {
+  return pkb_->GetDesignEntityFromEntity(entity);
 }
 
 std::string DBManager::GetNameFromEntity(Entity* entity) {

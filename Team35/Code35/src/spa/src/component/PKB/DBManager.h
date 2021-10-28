@@ -49,7 +49,7 @@ class DBManager {
   bool HasRelationship(PKBRelRefs ref, std::string first, std::string second);
   bool HasRelationship(PKBRelRefs ref, std::string ident_string);
 
-  DesignEntity EntityToDesignEntity(Entity* entity);
+  DesignEntity GetDesignEntityFromEntity(Entity* entity);
 
   static std::string GetNameFromEntity(Entity* entity);
 
