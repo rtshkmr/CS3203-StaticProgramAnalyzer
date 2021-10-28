@@ -18,7 +18,7 @@ class Cluster {
  public:
   Cluster() {};
   int size() const;
-  std::pair<int, int> GetStartEndRange();
+  std::pair<int, int> GetStartEndRange() const;
   void AddChildClusterToBack(Cluster* new_nested_cluster);
   void AddChildClusterToFront(Cluster* new_nested_cluster);
   void UpdateRange(Cluster* nested_cluster);
@@ -28,6 +28,7 @@ class Cluster {
   void RemoveStmt(StatementNumber statement_number);
   bool CheckIfStatementInRange(StatementNumber sn) const;
   bool CheckIfStmtNumInRange(int num);
+  bool CheckIfStatementsInRange(int first_stmt, int second_stmt) const;
   Cluster* GetParentCluster();
   std::list<Cluster*> GetNestedClusters() const;
   Cluster* GetNextSiblingCluster();

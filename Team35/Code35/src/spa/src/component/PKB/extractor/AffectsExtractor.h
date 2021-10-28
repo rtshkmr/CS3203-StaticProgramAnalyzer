@@ -16,6 +16,7 @@ class AffectsExtractor {
   PKB* pkb_;
   std::unordered_map<Statement*, std::list<Statement*>*> affects_map_;
   std::unordered_map<Statement*, std::list<Statement*>*> affected_by_map_;
+  bool HasValidUnmodifiedPath(AssignEntity* first_stmt, AssignEntity* second_stmt);
 };
 
 #endif //AUTOTESTER_CODE35_SRC_SPA_SRC_COMPONENT_PKB_AFFECTSEXTRACTOR_H_

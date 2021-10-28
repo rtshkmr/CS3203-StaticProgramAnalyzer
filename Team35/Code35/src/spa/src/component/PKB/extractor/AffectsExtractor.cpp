@@ -45,14 +45,38 @@ bool AffectsExtractor::HasAffects(AssignEntity* first_stmt, AssignEntity* second
   }
   if(!var_is_used) return false;
   // check nextT, (just as a guarantee)
+  return HasValidUnmodifiedPath(first_stmt, second_stmt);
 
   //  helper function for traversing:
   //   * get proc cluster,
   //   *
 
   // is this where the TA hint is to use a last modified table? we can pre-calculate the next used for every statement
+  return false;
+}
 
+/*
+ * Traversal function for Affects:
+ *
+ * 1. Get the innermost cluster that contains the first_stmt
+ * 2. Need to see if it's a while block body or not
+ *
+ * */
+bool AffectsExtractor::HasValidUnmodifiedPath(AssignEntity* first_stmt, AssignEntity* second_stmt) {
+  int first_stmt_num = first_stmt->GetStatementNumber()->GetNum();
+  int second_stmt_num = second_stmt->GetStatementNumber()->GetNum();
+  std::vector<Entity*> proc_entities = this->pkb_->GetDesignEntities(DesignEntity::kProcedure);
+  Cluster* scoped_cluster = nullptr;
+  for(auto entity : proc_entities) {
+    auto* proc = dynamic_cast<Procedure*>(entity);
+    assert(proc);
+    scoped_cluster = proc->GetInnermostCluster(first_stmt_num, second_stmt_num, nullptr);
+    if(scoped_cluster) break;
+  }
 
+  // now we have a starting node to work with, it's a graph traversal via some traversal helper function:
+  // look at nested children, if the current block doesn't modify the variable we looking at
+  // then can update the helper function to refine the block pointer
   return false;
 }
 
@@ -114,3 +138,4 @@ std::vector<Entity*> AffectsExtractor::GetAffectedBy(int target) {
 void AffectsExtractor::Delete() {
 
 }
+

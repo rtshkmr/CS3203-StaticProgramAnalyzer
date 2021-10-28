@@ -168,7 +168,7 @@ void Cluster::UpdateRange(Cluster* nested_cluster) {
     }
   }
 }
-std::pair<int, int> Cluster::GetStartEndRange() {
+std::pair<int, int> Cluster::GetStartEndRange() const {
   return std::pair<int, int>(this->start_, this->end_);
 }
 
@@ -184,7 +184,9 @@ void Cluster::UpdateClusterRange() {
     }
   }
 }
-
+bool Cluster::CheckIfStatementsInRange(int first_stmt, int second_stmt) const {
+  return first_stmt >= start_ && second_stmt <= end_;
+}
 
 // default destructors:
 Cluster::~Cluster() = default;
