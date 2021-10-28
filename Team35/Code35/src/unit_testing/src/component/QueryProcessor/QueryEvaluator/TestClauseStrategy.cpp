@@ -2,11 +2,6 @@
 #include "component/QueryProcessor/QueryEvaluator/ClauseStrategy.h"
 #include "component/QueryProcessor/types/QueryEvaluatorTable.h"
 
-/**
- * todo:
- *
- */
-
 class MockQueryEvaluatorTable : public QueryEvaluatorTable {
   private:
     bool has_synonym;

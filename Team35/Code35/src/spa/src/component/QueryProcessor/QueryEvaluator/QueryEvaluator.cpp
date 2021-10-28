@@ -10,7 +10,7 @@
  * various methods to further process each group of queries.
  * @param pkb The populated PKB database.
  */
-QueryEvaluator::QueryEvaluator(PKB *pkb) : pkb{pkb}, boolean_result{true} {}
+QueryEvaluator::QueryEvaluator(DBManager *db_manager) : db_manager{db_manager}, boolean_result{true} {}
 
 UnformattedQueryResult QueryEvaluator::EvaluateQuery(const std::vector<Group *>& list_of_groups) {
   UnformattedQueryResult unformatted_result = UnformattedQueryResult(true);
@@ -46,7 +46,7 @@ void QueryEvaluator::ProcessGroup(QueryEvaluatorTable *table, Group *group) {
     PKBQueryCommand *query_command = std::get<0>(commands);
     ClauseCommand *clause_command = std::get<1>(commands);
 
-    auto query_receiver = PKBQueryReceiver(pkb);
+    auto query_receiver = PKBQueryReceiver(db_manager);
     query_command->SetReceiver(&query_receiver);
     IntermediateTable *intermediate_table = query_command->ExecuteQuery(current_clause);
 
@@ -61,7 +61,7 @@ bool QueryEvaluator::ProcessBooleanGroupWithoutSynonym(Group *group) {
   Clause *clause = group->GetClauses()[0];
   // Only such that clause can have a single boolean group.
   auto query_command = QuerySuchThatNoSynonymCommand(clause);
-  auto query_receiver = PKBQueryReceiver(pkb);
+  auto query_receiver = PKBQueryReceiver(db_manager);
   query_command.SetReceiver(&query_receiver);
   IntermediateTable *table = query_command.ExecuteQuery(clause);
   return table->GetExistenceResult();
@@ -90,7 +90,7 @@ void QueryEvaluator::PreprocessBooleanGroup(Group *group) {
 
 void QueryEvaluator::ProcessBooleanGroupWithSynonym(Group *group, Synonym *main_synonym) {
   QueryEvaluatorTable current_table(main_synonym);
-  auto entity_list_test = pkb->GetDesignEntities(main_synonym->GetType());
+  auto entity_list_test = db_manager->GetDesignEntities(main_synonym->GetType());
   current_table.AddTargetSynonymValues(main_synonym, entity_list_test);
   ProcessGroup(&current_table, group);
   if (current_table.GetResults()[0].empty()) {
@@ -120,6 +120,6 @@ void QueryEvaluator::PreprocessNonBooleanGroup(Group *group, QueryEvaluatorTable
   Synonym *first_target_synonym = group->GetTargetSynonyms()[0];
   DesignEntity de = first_target_synonym->GetType();
 
-  table->AddTargetSynonymValues(first_target_synonym, pkb->GetDesignEntities(de));
+  table->AddTargetSynonymValues(first_target_synonym, db_manager->GetDesignEntities(de));
   ProcessGroup(table, group);
 }

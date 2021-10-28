@@ -2,7 +2,7 @@
 #define AUTOTESTER_PKBQUERYCOMMAND_H
 
 #include <component/QueryProcessor/types/IntermediateTable.h>
-#include "component/PKB/PKB.h"
+#include "component/PKB/DBManager.h"
 #include "model/Entity.h"
 #include "component/QueryProcessor/types/Types.h"
 
@@ -11,13 +11,13 @@
  */
 class PKBQueryReceiver {
   private:
-    PKB *pkb;
+    DBManager *db_manager;
   public:
-    PKBQueryReceiver(PKB *pkb);
+    PKBQueryReceiver(DBManager *db_manager);
 
     IntermediateTable *QueryPKBTwoSynonyms(PKBRelRefs rel, DesignEntity first_synonym, DesignEntity second_synonym);
     IntermediateTable *QueryPKBByValue(PKBRelRefs rel, std::string value);
-    IntermediateTable *QueryPKBForSynonymWithWildCard(PKBRelRefs rel, DesignEntity entity);
+    IntermediateTable *QueryEntityWithWildcard(PKBRelRefs rel, DesignEntity entity);
     IntermediateTable *QueryPKBByValueForBoolean(PKBRelRefs rel, std::string value);
     IntermediateTable *QueryPKBByValueForBoolean(PKBRelRefs rel, std::string first_value, std::string second_value);
     IntermediateTable *QueryRelRefExistence(PKBRelRefs rel);
