@@ -1,6 +1,7 @@
 #include "QueryTokenizer.h"
 #include <utility>
 #include <map>
+#include <unordered_map>
 #include <regex>
 #include <datatype/RegexPatterns.h>
 #include <exception/SpaException.h>
@@ -8,7 +9,7 @@
 // note: order of regex evaluation matters! always retrieve key-values based on defined insertion_order.
 std::vector<std::string> insertion_order = {"*", "STRING_QUOTE", "INTEGER", "SUCH_THAT", "PROG_LINE",
                                             "stmt#", "IDENT", ";", "SPACINGS", "(", ")", ",", "_", "<", ">", ".", "="};
-static std::map<std::string, std::regex> spec_table{
+static std::map<std::string, std::regex> spec_table {
     {"*", std::regex("^[*]")},
     {"STRING_QUOTE", std::regex("^\"")},
     {"INTEGER", RegexPatterns::GetIntegerPatternNonTerminating()},
@@ -28,29 +29,37 @@ static std::map<std::string, std::regex> spec_table{
     {"=", std::regex("^[=]")},
 };
 
-/* Gets correct TokenTag specific to PQL applications. Allowed alphabet of TokenTags corresponds to specTable.
+static std::unordered_map<std::string, TokenTag> spec_type_to_tag_table {
+  {"stmt#", TokenTag::kStmtHash},
+  {"*", TokenTag::kTimes},
+  {"STRING_QUOTE", TokenTag::kStringQuote},
+  {"INTEGER", TokenTag::kInteger},
+  {"PROG_LINE", TokenTag::kProgLine},
+  {"SUCH_THAT", TokenTag::kSuchThat},
+  {"IDENT", TokenTag::kName},
+  {";", TokenTag::kSemicolon},
+  {"(", TokenTag::kOpenBracket},
+  {")", TokenTag::kCloseBracket},
+  {",", TokenTag::kComma},
+  {"_", TokenTag::kUnderscore},
+  {"<", TokenTag::kOpenKarat},
+  {">", TokenTag::kCloseKarat},
+  {".", TokenTag::kDot},
+  {"=", TokenTag::kEquals}
+};
+
+/**
+ * Gets correct TokenTag specific to PQL applications by consulting spec_type_to_tag_table.
  * Note that this function does not check that the token is of SPACINGS type, as such tokens have already been dropped.
+ * @param type is a string corresponding to a valid key in spec_table.
+ * @return a TokenTag enum type.
  */
 TokenTag QueryTokenizer::GetPqlTokenType(std::string type) {
-  // TODO: optimise this using a lookup table.
-  if (type.compare("stmt#") == 0) { return TokenTag::kStmtHash; }
-  if (type.compare("*") == 0) { return TokenTag::kTimes; }
-  if (type.compare("STRING_QUOTE") == 0) { return TokenTag::kStringQuote; }
-  if (type.compare("INTEGER") == 0) { return TokenTag::kInteger; }
-  if (type.compare("PROG_LINE") == 0) { return TokenTag::kProgLine; }
-  if (type.compare("SUCH_THAT") == 0) { return TokenTag::kSuchThat; }
-  if (type.compare("IDENT") == 0) { return TokenTag::kName; }
-  if (type.compare(";") == 0) { return TokenTag::kSemicolon; }
-  if (type.compare("(") == 0) { return TokenTag::kOpenBracket; }
-  if (type.compare(")") == 0) { return TokenTag::kCloseBracket; }
-  if (type.compare(",") == 0) { return TokenTag::kComma; }
-  if (type.compare("_") == 0) { return TokenTag::kUnderscore; }
-  if (type.compare("<") == 0) { return TokenTag::kOpenKarat; }
-  if (type.compare(">") == 0) { return TokenTag::kCloseKarat; }
-  if (type.compare(".") == 0) { return TokenTag::kDot; }
-  if (type.compare("=") == 0) { return TokenTag::kEquals; }
-
-  return TokenTag::kInvalid;
+  std::unordered_map<std::string, TokenTag>::const_iterator got = spec_type_to_tag_table.find(type);
+  if (got == spec_type_to_tag_table.end()) {
+    return TokenTag::kInvalid;
+  }
+  return got->second;
 }
 
 bool QueryTokenizer::HasMoreTokens() {
