@@ -35,6 +35,7 @@ void VariableTExtractor::Extract(VariableRel rel_type) {
   EraseElse();
 }
 
+// todo: do not access member directly
 void VariableTExtractor::InitRelMaps() {
   if (rel_type_ == VariableRel::kModifies) {
     rel_map_ = &deliverable_->container_modifies_hash_;

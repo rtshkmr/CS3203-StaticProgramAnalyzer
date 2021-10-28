@@ -108,7 +108,7 @@ std::list<U*>* TransitiveExtractor<U>::GetExtractions(U* first_arg, std::vector<
   for (U* second_arg: *non_t_list) {
     std::list<U*>* extracted_ts = GetExtractions(second_arg, visited_nodes);
     for (U* extracted_t: *extracted_ts) {
-      if (extracted_t->GetName() == first_arg->GetName()) { // uses overloaded ==
+      if (extracted_t == first_arg) {
         throw SemanticException("Cyclic relationship detected.");
       }
       AddRelationship(first_arg, extracted_t);
@@ -121,11 +121,11 @@ std::list<U*>* TransitiveExtractor<U>::GetExtractions(U* first_arg, std::vector<
 template<typename U>
 void TransitiveExtractor<U>::AddRelationship(U* key, U* value) {
   if (rel_type_ == TransitiveRel::kCalls) {
-    deliverable_->AddCallsTransitiveRelationship(key, value);
-//  } else if (rel_type_ == TransitiveRel::kFollows) {
-//    deliverable_->AddFollowsTransitiveRelationship(key, value);
-//  } else if (rel_type_ == TransitiveRel::kParent) {
-//    deliverable_->AddParentTransitiveRelationship(key, value);
+    deliverable_->AddCallsTransitiveRelationship(dynamic_cast<Procedure*>(key), dynamic_cast<Procedure*>(value));
+  } else if (rel_type_ == TransitiveRel::kFollows) {
+    deliverable_->AddFollowsTransitiveRelationship(dynamic_cast<Statement*>(key), dynamic_cast<Statement*>(value));
+  } else if (rel_type_ == TransitiveRel::kParent) {
+    deliverable_->AddParentTransitiveRelationship(dynamic_cast<Statement*>(key), dynamic_cast<Statement*>(value));
   }
 }
 

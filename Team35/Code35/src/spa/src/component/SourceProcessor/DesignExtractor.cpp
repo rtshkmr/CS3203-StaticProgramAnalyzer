@@ -1,4 +1,3 @@
-#include <component/SourceProcessor/Extractors/ParentTExtractor.h>
 #include <component/SourceProcessor/Extractors/FollowsTExtractor.h>
 #include <component/SourceProcessor/Extractors/NextExtractor.h>
 #include <component/SourceProcessor/Extractors/TransitiveExtractor.h>
@@ -14,15 +13,15 @@ DesignExtractor::DesignExtractor(Deliverable* deliverable) {
  * namely Calls, Uses, Modifies, Parent* and Follow* and their reverse relationships.
  */
 void DesignExtractor::ExtractDesignAbstractions() {
-  auto calls_t_extractor = TransitiveExtractor<Procedure>(deliverable_);
-  calls_t_extractor.Extract(&deliverable_->calls_T_hash_, &deliverable_->calls_hash_, TransitiveRel::kCalls);
+  auto procedure_extractor = TransitiveExtractor<Procedure>(deliverable_);
+  procedure_extractor.Extract(&deliverable_->calls_T_hash_, &deliverable_->calls_hash_, TransitiveRel::kCalls);
+  // todo: do not access member directly
+  auto statement_extractor = TransitiveExtractor<Statement>(deliverable_);
+  statement_extractor.Extract(&deliverable_->parent_to_child_T_hash_, &deliverable_->parent_to_child_hash_, TransitiveRel::kParent);
 
   auto variable_t_extractor = VariableTExtractor(deliverable_);
   variable_t_extractor.Extract(VariableRel::kUses);
   variable_t_extractor.Extract(VariableRel::kModifies);
-
-  ParentTExtractor parent_t_extractor{};
-  parent_t_extractor.Extract(deliverable_);
 
   FollowsTExtractor follows_t_extractor{};
   follows_t_extractor.Extract(deliverable_);
