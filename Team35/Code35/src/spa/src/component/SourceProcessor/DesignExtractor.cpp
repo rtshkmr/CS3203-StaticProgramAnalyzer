@@ -13,13 +13,13 @@ DesignExtractor::DesignExtractor(Deliverable* deliverable) {
  */
 void DesignExtractor::ExtractDesignAbstractions() {
   auto procedure_extractor = TransitiveExtractor<Procedure>(deliverable_);
-  procedure_extractor.Extract(&deliverable_->calls_T_hash_, &deliverable_->calls_hash_, TransitiveRel::kCalls);
-  // todo: do not access member directly
+  procedure_extractor.Extract(deliverable_->GetCallsTMap(), deliverable_->GetCallsMap(), TransitiveRel::kCalls);
+
   auto statement_extractor = TransitiveExtractor<Statement>(deliverable_);
-  statement_extractor.Extract(&deliverable_->parent_to_child_T_hash_,
-                              &deliverable_->parent_to_child_hash_,
+  statement_extractor.Extract(deliverable_->GetParentTMap(),
+                              deliverable_->GetParentMap(),
                               TransitiveRel::kParent);
-  statement_extractor.Extract(&deliverable_->follows_T_hash_, &deliverable_->follow_hash_, TransitiveRel::kFollows);
+  statement_extractor.Extract(deliverable_->GetFollowsTMap(), deliverable_->GetFollowsMap(), TransitiveRel::kFollows);
 
   auto variable_t_extractor = VariableTExtractor(deliverable_);
   variable_t_extractor.Extract(VariableRel::kUses);

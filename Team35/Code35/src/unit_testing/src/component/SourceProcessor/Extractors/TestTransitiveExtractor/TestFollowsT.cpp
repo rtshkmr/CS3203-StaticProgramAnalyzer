@@ -55,7 +55,7 @@ TEST_CASE("1.FollowsTExtractor.Extract FollowsT basic conditions") {
     auto* proc1 = new Procedure(new ProcedureName("proc1"));
     TestUtils::AddStatementList(proc1, {assign_1_, assign_3_, read_x_, print_y_, assign_4_, assign_5_});
 
-    deliverable->proc_list_.push_back(proc1);
+    deliverable->GetProcList()->push_back(proc1);
     deliverable->AddFollowRelationship(assign_1_, assign_3_);
     deliverable->AddFollowRelationship(assign_3_, read_x_);
     deliverable->AddFollowRelationship(read_x_, print_y_);
@@ -111,7 +111,7 @@ TEST_CASE("1.FollowsTExtractor.Extract FollowsT basic conditions") {
     TestUtils::AddStatementList(if_1_, {assign_1_, read_y_, assign_3_});
     if_1_->SetElseEntity(else_1_);
 
-    deliverable->proc_list_.push_back(proc2);
+    deliverable->GetProcList()->push_back(proc2);
     deliverable->AddFollowRelationship(assign_1_, read_y_);
     deliverable->AddFollowRelationship(read_y_, assign_3_);
     deliverable->AddFollowRelationship(if_1_, print_y_);
@@ -156,7 +156,7 @@ TEST_CASE("1.FollowsTExtractor.Extract FollowsT basic conditions") {
     TestUtils::AddStatementList(while_3_, {read_z_, assign_5_});
     TestUtils::AddStatementList(proc2, {assign_1_, print_i_, while_3_});
 
-    deliverable->proc_list_.push_back(proc2);
+    deliverable->GetProcList()->push_back(proc2);
     deliverable->AddFollowRelationship(assign_1_, print_i_);
     deliverable->AddFollowRelationship(print_i_, while_3_);
     deliverable->AddFollowRelationship(read_z_, assign_5_);
@@ -199,8 +199,8 @@ TEST_CASE("1.FollowsTExtractor.Extract FollowsT basic conditions") {
     TestUtils::AddStatementList(proc3, {assign_1_, call4, print_y_});
     TestUtils::AddStatementList(proc4, {assign_4_, assign_5_, assign_6_});
 
-    deliverable->proc_list_.push_back(proc3);
-    deliverable->proc_list_.push_back(proc4);
+    deliverable->GetProcList()->push_back(proc3);
+    deliverable->GetProcList()->push_back(proc4);
     deliverable->AddFollowRelationship(assign_1_, call4);
     deliverable->AddFollowRelationship(call4, print_y_);
     deliverable->AddFollowRelationship(assign_4_, assign_5_);
@@ -308,7 +308,7 @@ TEST_CASE("1.FollowsTExtractor.Extract FollowsT nested containers") {
     if_1_->SetElseEntity(else_1_);
     TestUtils::AddStatementList(proc2, {if_1_, print_n_});
 
-    deliverable->proc_list_.push_back(proc2);
+    deliverable->GetProcList()->push_back(proc2);
     deliverable->AddFollowRelationship(if_1_, print_n_);
     deliverable->AddFollowRelationship(assign_1_, read_x_);
     deliverable->AddFollowRelationship(read_x_, assign_2_);
@@ -399,7 +399,7 @@ TEST_CASE("1.FollowsTExtractor.Extract FollowsT nested containers") {
     TestUtils::AddStatementList(while_1_, {assign_1_, assign_2_, while_2_, read_y_});
     TestUtils::AddStatementList(proc3, {while_1_, read_z_});
 
-    deliverable->proc_list_.push_back(proc3);
+    deliverable->GetProcList()->push_back(proc3);
     deliverable->AddFollowRelationship(while_1_, read_z_);
     deliverable->AddFollowRelationship(assign_1_, assign_2_);
     deliverable->AddFollowRelationship(assign_2_, while_2_);
@@ -464,7 +464,7 @@ TEST_CASE("1.FollowsTExtractor.Extract FollowsT nested containers") {
     TestUtils::AddStatementList(while_1_, {print_x_, print_y_, print_z_});
     TestUtils::AddStatementList(proc4, {if_4_, while_1_});
 
-    deliverable->proc_list_.push_back(proc4);
+    deliverable->GetProcList()->push_back(proc4);
 
     deliverable->AddFollowRelationship(if_4_, while_1_);
     deliverable->AddFollowRelationship(assign_1_, assign_2_);
@@ -544,7 +544,7 @@ TEST_CASE("1.FollowsTExtractor.Extract FollowsT nested containers") {
     if_2_->SetElseEntity(else_2_);
     TestUtils::AddStatementList(proc4, {if_1_, while_3_});
 
-    deliverable->proc_list_.push_back(proc4);
+    deliverable->GetProcList()->push_back(proc4);
 
     deliverable->AddFollowRelationship(if_1_, while_3_);
     deliverable->AddFollowRelationship(assign_1_, assign_2_);

@@ -16,7 +16,7 @@ TEST_CASE("1.NextExtractor.basic conditions") {
     Procedure* proc1 = GetProc1();
     proc1->SetBlockRoot(b1);
     proc1->SetClusterRoot(b1);
-    deliverable.proc_list_.push_back(proc1);
+    deliverable.GetProcList()->push_back(proc1);
 
     Statement* s1 = CreateStatement(GetAssign1(), 1);
     deliverable.AddStatement(s1);
@@ -34,7 +34,7 @@ TEST_CASE("1.NextExtractor.basic conditions") {
     Procedure* proc1 = GetProc1();
     proc1->SetBlockRoot(b1);
     proc1->SetClusterRoot(b1);
-    deliverable.proc_list_.push_back(proc1);
+    deliverable.GetProcList()->push_back(proc1);
 
     Statement* s1 = CreateStatement(GetAssign1(), 1);
     Statement* s2 = CreateStatement(GetPrintX(), 2);
@@ -85,7 +85,7 @@ TEST_CASE("1.NextExtractor.basic conditions") {
     Procedure* proc1 = GetProc1();
     proc1->SetBlockRoot(b1);
     proc1->SetClusterRoot(c1);
-    deliverable.proc_list_.push_back(proc1);
+    deliverable.GetProcList()->push_back(proc1);
 
     Statement* s1 = CreateStatement(GetAssign1(), 1);
     Statement* s2 = CreateStatement(GetIf1(), 2);
@@ -153,7 +153,7 @@ TEST_CASE("1.NextExtractor.basic conditions") {
     Procedure* proc1 = GetProc1();
     proc1->SetBlockRoot(b1);
     proc1->SetClusterRoot(c1);
-    deliverable.proc_list_.push_back(proc1);
+    deliverable.GetProcList()->push_back(proc1);
 
     Statement* s1 = CreateStatement(GetAssign1(), 1);
     Statement* s2 = CreateStatement(GetWhileEntity1(), 2);
@@ -206,7 +206,7 @@ TEST_CASE("1.NextExtractor.basic conditions") {
     Procedure* proc1 = GetProc1();
     proc1->SetBlockRoot(b1);
     proc1->SetClusterRoot(c1);
-    deliverable.proc_list_.push_back(proc1);
+    deliverable.GetProcList()->push_back(proc1);
 
     Statement* s1 = CreateStatement(GetWhileEntity1(), 1);
     Statement* s2 = CreateStatement(GetAssign2(), 2);
@@ -275,9 +275,9 @@ TEST_CASE("1.NextExtractor.basic conditions") {
     Procedure* proc3 = GetProc1();
     proc3->SetBlockRoot(b4);
     proc3->SetClusterRoot(c3);
-    deliverable.proc_list_.push_back(proc1);
-    deliverable.proc_list_.push_back(proc2);
-    deliverable.proc_list_.push_back(proc3);
+    deliverable.GetProcList()->push_back(proc1);
+    deliverable.GetProcList()->push_back(proc2);
+    deliverable.GetProcList()->push_back(proc3);
 
     Statement* s1 = CreateStatement(GetWhileEntity1(), 1);
     Statement* s2 = CreateStatement(GetAssign1(), 2);
@@ -368,7 +368,7 @@ TEST_CASE("1.NextExtractor.nested containers") {
     Procedure* proc1 = GetProc1();
     proc1->SetBlockRoot(b1);
     proc1->SetClusterRoot(c1);
-    deliverable.proc_list_.push_back(proc1);
+    deliverable.GetProcList()->push_back(proc1);
 
     deliverable.AddStatement(s1);
     deliverable.AddStatement(s2);
@@ -425,7 +425,7 @@ TEST_CASE("1.NextExtractor.nested containers") {
     Procedure* proc1 = GetProc1();
     proc1->SetBlockRoot(b1);
     proc1->SetClusterRoot(c1);
-    deliverable.proc_list_.push_back(proc1);
+    deliverable.GetProcList()->push_back(proc1);
 
     deliverable.AddStatement(s1);
     deliverable.AddStatement(s2);

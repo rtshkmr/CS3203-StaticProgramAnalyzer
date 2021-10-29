@@ -25,7 +25,7 @@ void VariableTExtractor::Extract(VariableRel rel_type) {
   InitRelMaps();
 
   std::vector<Procedure*> extracted_procedures;
-  for (Procedure* proc: deliverable_->proc_list_) {
+  for (Procedure* proc: *deliverable_->GetProcList()) {
     if (std::find(extracted_procedures.begin(), extracted_procedures.end(), proc)
         == extracted_procedures.end()) { // procedure not found in extracted_procedures
       ExtractFromContainer(proc, &extracted_procedures);
@@ -35,14 +35,13 @@ void VariableTExtractor::Extract(VariableRel rel_type) {
   EraseElse();
 }
 
-// todo: do not access member directly
 void VariableTExtractor::InitRelMaps() {
   if (rel_type_ == VariableRel::kModifies) {
-    rel_map_ = &deliverable_->container_modifies_hash_;
-    reverse_rel_map_ = &deliverable_->container_modified_by_hash_;
+    rel_map_ = deliverable_->GetModifiesCMap();
+    reverse_rel_map_ = deliverable_->GetModifiedByCMap();
   } else if (rel_type_ == VariableRel::kUses) {
-    rel_map_ = &deliverable_->container_use_hash_;
-    reverse_rel_map_ = &deliverable_->container_used_by_hash_;
+    rel_map_ = deliverable_->GetUseCMap();
+    reverse_rel_map_ = deliverable_->GetUsedByCMap();
   } else {
     assert(false);
   }

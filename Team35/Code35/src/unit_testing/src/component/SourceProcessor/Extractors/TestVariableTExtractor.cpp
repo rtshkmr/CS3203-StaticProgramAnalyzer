@@ -29,7 +29,7 @@ TEST_CASE("1.VariableTExtractor.Extract variables basic conditions") {
     Procedure* proc1 = new Procedure(new ProcedureName("proc1"));
     proc1->AddStatement(new PrintEntity(var_x_));
 
-    deliverable->proc_list_.push_back(proc1);
+    deliverable->GetProcList()->push_back(proc1);
     std::list<Variable*> proc_var_list = {
         var_x_ // from print
     };
@@ -38,7 +38,7 @@ TEST_CASE("1.VariableTExtractor.Extract variables basic conditions") {
     Procedure* proc2 = new Procedure(new ProcedureName("proc1"));
     proc2->AddStatement(new ReadEntity(var_x_));
 
-    deliverable->proc_list_.push_back(proc2);
+    deliverable->GetProcList()->push_back(proc2);
     std::list<Variable*> proc_var_list2 = {
         var_x_ // from read
     };
@@ -80,8 +80,8 @@ TEST_CASE("1.VariableTExtractor.Extract variables basic conditions") {
       proc2->AddStatement(new ReadEntity(var_x_));
       proc1->AddStatement(call2);
 
-      deliverable->proc_list_.push_back(proc1);
-      deliverable->proc_list_.push_back(proc2);
+      deliverable->GetProcList()->push_back(proc1);
+      deliverable->GetProcList()->push_back(proc2);
 
       auto variable_t_extractor = VariableTExtractor(deliverable);
       variable_t_extractor.Extract(VariableRel::kUses);
@@ -107,8 +107,8 @@ TEST_CASE("1.VariableTExtractor.Extract variables basic conditions") {
       proc2->AddStatement(new PrintEntity(var_x_));
       proc1->AddStatement(call2);
 
-      deliverable->proc_list_.push_back(proc1);
-      deliverable->proc_list_.push_back(proc2);
+      deliverable->GetProcList()->push_back(proc1);
+      deliverable->GetProcList()->push_back(proc2);
 
       auto variable_t_extractor = VariableTExtractor(deliverable);
       variable_t_extractor.Extract(VariableRel::kModifies);
@@ -142,7 +142,7 @@ TEST_CASE("1.VariableTExtractor.Extract variables basic conditions") {
     if_1_->SetElseEntity(else_1_);
     proc1->AddStatement(if_1_);
 
-    deliverable->proc_list_.push_back(proc1);
+    deliverable->GetProcList()->push_back(proc1);
     std::list<Variable*> proc_use_list = {
         var_y_, // from print
         var_x_, // from if
@@ -212,7 +212,7 @@ TEST_CASE("1.VariableTExtractor.Extract variables basic conditions") {
     proc2->AddStatement(new ReadEntity(var_x_));
     proc2->AddStatement(new PrintEntity(var_x_));
 
-    deliverable->proc_list_.push_back(proc2);
+    deliverable->GetProcList()->push_back(proc2);
     std::list<Variable*> proc_use_list = {
         var_y_, // from print
         var_z_,
@@ -276,8 +276,8 @@ TEST_CASE("1.VariableTExtractor.Extract variables basic conditions") {
     proc3->AddStatement(call4);
     proc4->AddStatement(assign_5_);
 
-    deliverable->proc_list_.push_back(proc3);
-    deliverable->proc_list_.push_back(proc4);
+    deliverable->GetProcList()->push_back(proc3);
+    deliverable->GetProcList()->push_back(proc4);
     std::list<Variable*> proc3_use_list = {
         var_z_
     };
@@ -380,7 +380,7 @@ TEST_CASE("1.VariableTExtractor.Extract variables nested containers") {
     Procedure* proc1 = new Procedure(new ProcedureName("proc1"));
     proc1->AddStatement(if_1_);
 
-    deliverable->proc_list_.push_back(proc1);
+    deliverable->GetProcList()->push_back(proc1);
     std::list<Variable*> if1_mod_list = {
         var_y_,
         var_i_
@@ -464,7 +464,7 @@ TEST_CASE("1.VariableTExtractor.Extract variables nested containers") {
     while_2_->AddStatement(while_3_);
     proc2->AddStatement(while_1_);
 
-    deliverable->proc_list_.push_back(proc2);
+    deliverable->GetProcList()->push_back(proc2);
     std::list<Variable*> while_mod_list = {
         var_y_
     };
@@ -541,9 +541,9 @@ TEST_CASE("1.VariableTExtractor.Extract variables nested containers") {
     proc4->AddStatement(call2);
     proc2->AddStatement(assign_11_);
 
-    deliverable->proc_list_.push_back(proc3);
-    deliverable->proc_list_.push_back(proc4);
-    deliverable->proc_list_.push_back(proc2);
+    deliverable->GetProcList()->push_back(proc3);
+    deliverable->GetProcList()->push_back(proc4);
+    deliverable->GetProcList()->push_back(proc2);
     std::list<Variable*> proc3_mod_list = {
         var_y_
     };
@@ -617,7 +617,7 @@ TEST_CASE("1.VariableTExtractor.Extract variables nested containers") {
     while_1_->AddStatement(assign_7_);
     proc1->AddStatement(while_1_);
 
-    deliverable->proc_list_.push_back(proc1);
+    deliverable->GetProcList()->push_back(proc1);
     std::list<Variable*> if_mod_list = {
         var_y_
     };
@@ -797,11 +797,11 @@ TEST_CASE("1.VariableTExtractor.Extract variables nested calls") {
   deliverable->container_use_hash_.insert(std::make_pair(if_2, &if2_use_list));
 
   SECTION("Called procedures parsed later") {
-    deliverable->proc_list_.push_back(proc1);
-    deliverable->proc_list_.push_back(proc2);
-    deliverable->proc_list_.push_back(proc3);
-    deliverable->proc_list_.push_back(proc4);
-    deliverable->proc_list_.push_back(proc5);
+    deliverable->GetProcList()->push_back(proc1);
+    deliverable->GetProcList()->push_back(proc2);
+    deliverable->GetProcList()->push_back(proc3);
+    deliverable->GetProcList()->push_back(proc4);
+    deliverable->GetProcList()->push_back(proc5);
 
     auto variable_t_extractor = VariableTExtractor(deliverable);
     variable_t_extractor.Extract(VariableRel::kUses);
@@ -850,11 +850,11 @@ TEST_CASE("1.VariableTExtractor.Extract variables nested calls") {
   }
 
   SECTION("Called procedures parsed first") {
-    deliverable->proc_list_.push_back(proc5);
-    deliverable->proc_list_.push_back(proc4);
-    deliverable->proc_list_.push_back(proc3);
-    deliverable->proc_list_.push_back(proc2);
-    deliverable->proc_list_.push_back(proc1);
+    deliverable->GetProcList()->push_back(proc5);
+    deliverable->GetProcList()->push_back(proc4);
+    deliverable->GetProcList()->push_back(proc3);
+    deliverable->GetProcList()->push_back(proc2);
+    deliverable->GetProcList()->push_back(proc1);
 
     auto variable_t_extractor = VariableTExtractor(deliverable);
     variable_t_extractor.Extract(VariableRel::kUses);

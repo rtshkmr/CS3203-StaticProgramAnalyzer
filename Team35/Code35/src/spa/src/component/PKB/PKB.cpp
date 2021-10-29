@@ -17,41 +17,40 @@ constexpr auto L = [](auto msg) {
 void PKB::PopulateDataStructures(Deliverable d) {
   L("... PKB will be populated by Deliverable object from SourceProcessor\n");
 
-  PopulateEntities(DesignEntity::kProcedure, d.proc_list_);
-  PopulateEntities(DesignEntity::kVariable, d.var_list_);
-  PopulateEntities(DesignEntity::kConstant, d.const_list_);
-  PopulateEntities(DesignEntity::kCall, d.call_list_);
-  PopulateEntities(DesignEntity::kPrint, d.print_list_);
-  PopulateEntities(DesignEntity::kRead, d.read_list_);
-  PopulateEntities(DesignEntity::kIf, d.if_list_);
-  PopulateEntities(DesignEntity::kWhile, d.while_list_);
-  PopulateEntities(DesignEntity::kAssign, d.assign_list_);
-  PopulateEntities(DesignEntity::kStmt, d.stmt_list_);
+  PopulateEntities(DesignEntity::kProcedure, *d.GetProcList());
+  PopulateEntities(DesignEntity::kVariable, *d.GetVariableList());
+  PopulateEntities(DesignEntity::kConstant, *d.GetConstantList());
+  PopulateEntities(DesignEntity::kCall, *d.GetCallList());
+  PopulateEntities(DesignEntity::kPrint, *d.GetPrintList());
+  PopulateEntities(DesignEntity::kRead, *d.GetReadList());
+  PopulateEntities(DesignEntity::kIf, *d.GetIfList());
+  PopulateEntities(DesignEntity::kWhile, *d.GetWhileList());
+  PopulateEntities(DesignEntity::kAssign, *d.GetAssignList());
+  PopulateEntities(DesignEntity::kStmt, *d.GetStatementList());
   
-  PopulateRelationship(&d.follow_hash_, PKBRelRefs::kFollows);
-  PopulateRelationship(&d.followed_by_hash_, PKBRelRefs::kFollowedBy);
-  PopulateRelationship(&d.follows_T_hash_, PKBRelRefs::kFollowsT);
-  PopulateRelationship(&d.followed_by_T_hash_, PKBRelRefs::kFollowedByT);
-  PopulateRelationship(&d.parent_to_child_hash_, PKBRelRefs::kParent);
-  PopulateRelationship(&d.parent_to_child_T_hash_, PKBRelRefs::kParentT);
-  PopulateRelationship(&d.child_to_parent_hash_, PKBRelRefs::kChild);
-  PopulateRelationship(&d.child_to_parent_T_hash_, PKBRelRefs::kChildT);
-  PopulateRelationship(&d.use_hash_, PKBRelRefs::kUsesS);
-  PopulateRelationship(&d.used_by_hash_, PKBRelRefs::kUsedByS);
-  PopulateRelationship(&d.modifies_hash_, PKBRelRefs::kModifiesStatement);
-  PopulateRelationship(&d.modified_by_hash_, PKBRelRefs::kModifiedByStatement);
-  PopulateRelationship(&d.calls_hash_, PKBRelRefs::kCalls);
-  PopulateRelationship(&d.called_by_hash_, PKBRelRefs::kCalledBy);
-  PopulateRelationship(&d.calls_T_hash_, PKBRelRefs::kCallsT);
-  PopulateRelationship(&d.called_by_T_hash_, PKBRelRefs::kCalledByT);
-  PopulateRelationship(&d.next_hash_, PKBRelRefs::kNext);
-  PopulateRelationship(&d.previous_hash_, PKBRelRefs::kPrevious);
+  PopulateRelationship(d.GetFollowsMap(), PKBRelRefs::kFollows);
+  PopulateRelationship(d.GetFollowedByMap(), PKBRelRefs::kFollowedBy);
+  PopulateRelationship(d.GetFollowsTMap(), PKBRelRefs::kFollowsT);
+  PopulateRelationship(d.GetFollowedByTMap(), PKBRelRefs::kFollowedByT);
+  PopulateRelationship(d.GetParentMap(), PKBRelRefs::kParent);
+  PopulateRelationship(d.GetParentTMap(), PKBRelRefs::kParentT);
+  PopulateRelationship(d.GetChildMap(), PKBRelRefs::kChild);
+  PopulateRelationship(d.GetChildTMap(), PKBRelRefs::kChildT);
+  PopulateRelationship(d.GetUseSMap(), PKBRelRefs::kUsesS);
+  PopulateRelationship(d.GetUsedBySMap(), PKBRelRefs::kUsedByS);
+  PopulateRelationship(d.GetModifiesSMap(), PKBRelRefs::kModifiesStatement);
+  PopulateRelationship(d.GetModifiedBySMap(), PKBRelRefs::kModifiedByStatement);
+  PopulateRelationship(d.GetCallsMap(), PKBRelRefs::kCalls);
+  PopulateRelationship(d.GetCalledByMap(), PKBRelRefs::kCalledBy);
+  PopulateRelationship(d.GetCallsTMap(), PKBRelRefs::kCallsT);
+  PopulateRelationship(d.GetCalledByTMap(), PKBRelRefs::kCalledByT);
+  PopulateRelationship(d.GetNextMap(), PKBRelRefs::kNext);
+  PopulateRelationship(d.GetPrevMap(), PKBRelRefs::kPrevious);
 
-
-  PopulateContainerUse(d.container_use_hash_);
-  PopulateContainerUsedBy(d.container_used_by_hash_);
-  PopulateContainerModifies(d.container_modifies_hash_);
-  PopulateContainerModifiedBy(d.container_modified_by_hash_);
+  PopulateContainerUse(*d.GetUseCMap());
+  PopulateContainerUsedBy(*d.GetUsedByCMap());
+  PopulateContainerModifies(*d.GetModifiesCMap());
+  PopulateContainerModifiedBy(*d.GetModifiedByCMap());
 
   PopulateUses();
   PopulateModifies();
