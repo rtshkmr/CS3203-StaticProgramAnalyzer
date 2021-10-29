@@ -9,9 +9,25 @@
 #include <datatype/DataType.h>
 #include "Entity.h"
 
+/**
+ * Tags cluster objects with the kind of code that they contain.
+ */
+enum class ClusterTag {
+  kIfCluster,
+  kWhileCluster,
+  kProcedureCluster,
+  kWhileCond,
+  kIfCond,
+  kWhileBody,
+  kIfBody,
+  kElseBody,
+  kNormalBlock // default tags since clusters will be tagged
+};
+
 class Cluster {
 
  protected:
+  ClusterTag cluster_tag_ = ClusterTag::kNormalBlock;
   int start_ = -1;
   int end_ = -1;
   Cluster* parent_cluster_;
@@ -19,6 +35,8 @@ class Cluster {
   Cluster() {};
   int size() const;
   std::pair<int, int> GetStartEndRange() const;
+  ClusterTag GetClusterTag() const;
+  void SetClusterTag(ClusterTag cluster_tag);
   void AddChildClusterToBack(Cluster* new_nested_cluster);
   void AddChildClusterToFront(Cluster* new_nested_cluster);
   void UpdateRange(Cluster* nested_cluster);
