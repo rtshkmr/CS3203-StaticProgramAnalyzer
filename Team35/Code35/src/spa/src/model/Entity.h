@@ -55,6 +55,7 @@ class Statement : public Entity {
   void SetBeforeNode(Statement* before);
   StatementNumber* GetStatementNumber();
   LineNumber* GetLineNumber();
+  std::string GetLineNumberString();
   Container* GetParentNode();
   Statement* GetBeforeNode();
 };
@@ -89,9 +90,8 @@ class Procedure : public Entity, public Container {
   const Block* block_tail_ = nullptr;
  public:
   Procedure(ProcedureName* procedureName);
-
   const ProcedureName* GetName();
-
+  Cluster* GetInnermostCluster(int first_stmt, int second_stmt, Cluster* prev_cluster);
   const void SetClusterRoot(Cluster* cluster);
   const void SetBlockRoot(Block* block_root);
   const void SetBlockTail(Block* block_tail);
@@ -142,6 +142,9 @@ class Program {
   Program(Procedure* p);
 
   std::list<Procedure*>* GetProcedureList();
+  Cluster* GetProcClusterForLineNum(int line_num);
+  Procedure* GetProcForLineNum(int line_num);
+  Cluster* GetEncapsulatingCluster(int first_stmt, int second_stmt, Cluster* prev_cluster);
 
   void AddProcedure(Procedure* p);
 };
