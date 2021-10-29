@@ -34,20 +34,55 @@ typedef std::tuple<PKBRelRefs, std::string, std::string> relationship;
 class PKB {
  public:
   void PopulateDataStructures(Deliverable d);
+  // Returns a vector of all entities in a relationship with the specified entity
+  // E.g. GetRelationship(kFollows, 1) returns a vector with one Entity with statement number 2
   std::vector<Entity*> GetRelationship(PKBRelRefs ref, std::string entity);
-  std::vector<entity_pair> GetRelationshipByTypes(PKBRelRefs, DesignEntity, DesignEntity);
-  std::vector<Entity*> GetFirstEntityOfRelationship(PKBRelRefs, DesignEntity, DesignEntity);
-  std::vector<Entity*> GetFirstEntityOfRelationship(PKBRelRefs, DesignEntity);
+
+  // Returns a vector of 2-tuples of entities in which the first element of the tuple is of type de1,
+  // the second elements is of type de2, and the ref relationship holds between them
+  std::vector<entity_pair> GetRelationshipByTypes(PKBRelRefs ref, DesignEntity de1, DesignEntity de2);
+
+  // Returns a vector of entities of type de1 such that the ref relationship holds between
+  // the specified entity and another entity of type de2
+  std::vector<Entity*> GetFirstEntityOfRelationship(PKBRelRefs ref, DesignEntity de);
+
+  // Returns a vector of entities of type de
   std::vector<Entity*> GetDesignEntities(DesignEntity de);
+
+  // Returns a vector of While, If or Assign entities (determined by type de) such that
+  // the entity is associated with var_or_stmt. If var_or_stmt is an integer string,
+  // returns a vector with one Entity with the specified statement number.
+  // Otherwise, return either AssignEntities that modify the specified variable or WhileEntities/IfEntities
+  // that have the specified variable in their condition.
   std::vector<Entity*> GetPatternEntities(DesignEntity de, std::string var_or_stmt);
-  std::vector<Entity*> GetEntitiesWithAttributeValue(DesignEntity design_entity, Attribute attribute, std::string value);
+
+  // Returns a vector of entities of type de whose attribute attribute matches the value
+  std::vector<Entity*> GetEntitiesWithAttributeValue(DesignEntity de, Attribute attribute, std::string value);
+
+  // Returns a vector of 2-tuples of entities in which the first element of the tuple is of type de1,
+  // the second elements is of type de2, and they have matching attribute values
   std::vector<entity_pair> GetEntitiesWithMatchingAttributes(DesignEntity type_one, DesignEntity type_two);
+
+  // Returns true if the relationship exists, false otherwise
   bool HasRelationship(PKBRelRefs);
+
+  // Returns true if the relationship exists between two entities of the specified types, false otherwise
   bool HasRelationship(PKBRelRefs, DesignEntity, DesignEntity);
+
+  // Returns true if the relationship exists with the first entity specified by the string, false otherwise
   bool HasRelationship(PKBRelRefs, std::string);
+
+  // Returns true if the relationship exists between the two entities specified by strings, false otherwise
   bool HasRelationship(PKBRelRefs, std::string, std::string);
+
+  // Returns the name of any entity in string format
+  // (statements - statement number, variables - variable name, procedures - procedure name, constant - value)
   static std::string GetNameFromEntity(Entity* entity);
+
+  // Returns the type of any entity in DesignEntity format
   static DesignEntity GetDesignEntityFromEntity(Entity* entity);
+
+  // Returns the attribute type that the specified entity type possesses
   static Attribute GetAttributeFromEntity(Entity* entity);
 
   // Constructor
