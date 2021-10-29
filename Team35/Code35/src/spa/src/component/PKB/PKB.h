@@ -38,12 +38,16 @@ class PKB {
   // E.g. GetRelationship(kFollows, 1) returns a vector with one Entity with statement number 2
   std::vector<Entity*> GetRelationship(PKBRelRefs ref, std::string entity);
 
-  // Returns a vector of 2-tuples of entities in which the first element of the tuple is of type de1,
+  // Returns a vector of 2-tuples in which the first element of the tuple is of type de1,
   // the second elements is of type de2, and the ref relationship holds between them
   std::vector<entity_pair> GetRelationshipByTypes(PKBRelRefs ref, DesignEntity de1, DesignEntity de2);
 
   // Returns a vector of entities of type de1 such that the ref relationship holds between
   // the specified entity and another entity of type de2
+  std::vector<Entity*> GetFirstEntityOfRelationship(PKBRelRefs ref, DesignEntity de1, DesignEntity de2);
+
+  // Returns a vector of entities of type dee such that the ref relationship holds between
+  // the specified entity and another entity of any type
   std::vector<Entity*> GetFirstEntityOfRelationship(PKBRelRefs ref, DesignEntity de);
 
   // Returns a vector of entities of type de
@@ -59,30 +63,14 @@ class PKB {
   // Returns a vector of entities of type de whose attribute attribute matches the value
   std::vector<Entity*> GetEntitiesWithAttributeValue(DesignEntity de, Attribute attribute, std::string value);
 
-  // Returns a vector of 2-tuples of entities in which the first element of the tuple is of type de1,
-  // the second elements is of type de2, and they have matching attribute values
+  // Returns a vector of 2-tuples in which
   std::vector<entity_pair> GetEntitiesWithMatchingAttributes(DesignEntity type_one, DesignEntity type_two);
-
-  // Returns true if the relationship exists, false otherwise
   bool HasRelationship(PKBRelRefs);
-
-  // Returns true if the relationship exists between two entities of the specified types, false otherwise
   bool HasRelationship(PKBRelRefs, DesignEntity, DesignEntity);
-
-  // Returns true if the relationship exists with the first entity specified by the string, false otherwise
   bool HasRelationship(PKBRelRefs, std::string);
-
-  // Returns true if the relationship exists between the two entities specified by strings, false otherwise
   bool HasRelationship(PKBRelRefs, std::string, std::string);
-
-  // Returns the name of any entity in string format
-  // (statements - statement number, variables - variable name, procedures - procedure name, constant - value)
   static std::string GetNameFromEntity(Entity* entity);
-
-  // Returns the type of any entity in DesignEntity format
   static DesignEntity GetDesignEntityFromEntity(Entity* entity);
-
-  // Returns the attribute type that the specified entity type possesses
   static Attribute GetAttributeFromEntity(Entity* entity);
 
   // Constructor
