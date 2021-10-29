@@ -26,7 +26,7 @@ enum class ClusterTag {
   kNormalBlock // default tags since clusters will be tagged
 };
 
-class Variable;
+//class Variable;
 class Cluster {
 
  protected:
