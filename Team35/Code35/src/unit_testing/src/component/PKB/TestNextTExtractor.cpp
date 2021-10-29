@@ -5,13 +5,13 @@
 
 using namespace entity_utils;
 
-void UpdateRanges(std::vector<Cluster*> clusters) {
+void UpdateRanges(const std::vector<Cluster*>& clusters) {
   for (Cluster* cluster: clusters) {
     cluster->UpdateClusterRange();
   }
 }
 
-void AddChildClusters(Cluster* c, std::vector<Cluster*> clusters) {
+void AddChildClusters(Cluster* c, const std::vector<Cluster*>& clusters) {
   for (Cluster* cluster: clusters) {
     c->AddChildClusterToBack(cluster);
   }
@@ -20,17 +20,17 @@ void AddChildClusters(Cluster* c, std::vector<Cluster*> clusters) {
 TEST_CASE("2.PKB.NextTExtractor basic conditions") {
   std::vector<Procedure*> proc_list;
   std::vector<Statement*> stmt_list;
-  Block* b1 = new Block();
-  Block* b2 = new Block();
-  Block* b3 = new Block();
-  Block* b4 = new Block();
-  Block* b5 = new Block();
-  Block* b6 = new Block();
-  Cluster* c1 = new Cluster();
-  Cluster* c2 = new Cluster();
-  Cluster* c3 = new Cluster();
-  Cluster* c4 = new Cluster();
-  Cluster* c5 = new Cluster();
+  auto* b1 = new Block();
+  auto* b2 = new Block();
+  auto* b3 = new Block();
+  auto* b4 = new Block();
+  auto* b5 = new Block();
+  auto* b6 = new Block();
+  auto* c1 = new Cluster();
+  auto* c2 = new Cluster();
+  auto* c3 = new Cluster();
+  auto* c4 = new Cluster();
+  auto* c5 = new Cluster();
   Procedure* proc1 = GetProc1();
   Procedure* proc2 = GetProc1();
   Procedure* proc3 = GetProc1();
@@ -437,25 +437,25 @@ TEST_CASE("2.PKB.NextTExtractor basic conditions") {
 TEST_CASE("2.PKB.NextTExtractor nested containers") {
   std::vector<Procedure*> proc_list;
   std::vector<Statement*> stmt_list;
-  Block* b1 = new Block();
-  Block* b2 = new Block();
-  Block* b3 = new Block();
-  Block* b4 = new Block();
-  Block* b5 = new Block();
-  Block* b6 = new Block();
-  Block* b7 = new Block();
-  Block* b8 = new Block();
-  Block* b9 = new Block();
-  Block* b10 = new Block();
-  Block* b11 = new Block();
-  Block* b12 = new Block();
-  Cluster* c0 = new Cluster();
-  Cluster* c1 = new Cluster();
-  Cluster* c2 = new Cluster();
-  Cluster* c3 = new Cluster();
-  Cluster* c4 = new Cluster();
-  Cluster* c5 = new Cluster();
-  Cluster* c6 = new Cluster();
+  auto* b1 = new Block();
+  auto* b2 = new Block();
+  auto* b3 = new Block();
+  auto* b4 = new Block();
+  auto* b5 = new Block();
+  auto* b6 = new Block();
+  auto* b7 = new Block();
+  auto* b8 = new Block();
+  auto* b9 = new Block();
+  auto* b10 = new Block();
+  auto* b11 = new Block();
+  auto* b12 = new Block();
+  auto* c0 = new Cluster();
+  auto* c1 = new Cluster();
+  auto* c2 = new Cluster();
+  auto* c3 = new Cluster();
+  auto* c4 = new Cluster();
+  auto* c5 = new Cluster();
+  auto* c6 = new Cluster();
   Procedure* proc1 = GetProc1();
   Procedure* proc2 = GetProc1();
   Procedure* proc3 = GetProc1();
