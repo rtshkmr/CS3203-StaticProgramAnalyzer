@@ -60,18 +60,8 @@ class NextTExtractor {
   std::list<Statement*> GetValueFromMap(std::unordered_map<Statement*, std::list<Statement*>*> map, int stmt_num);
   static Cluster* GetTargetCluster(Cluster* p_cluster, int target_num);
   static Block* GetNextBlockAfterWhile(Block* w_block);
-//<<<<<<< HEAD:Team35/Code35/src/spa/src/component/PKB/extractor/NextTExtractor.h
-//  std::list<Statement*> GetNextTByTraversal(Block* block, int target_num);
-//  std::list<Statement*> RecurseNextBlocks(Block* block, int target_num);
-//  void AddNextT(Statement* s1, std::list<Statement*> s2);
-//  void AddNextTWithDup(Statement* s1, std::list<Statement*> s2);
-//  static std::vector<Entity*> ConvertListToVector(std::list<Statement*> list);
-//  void PopulateAllNextT(std::vector<Procedure*> proc_list);
-//=======
-//  static std::vector<Entity*> ltov(std::list<Statement*> l);
   static std::vector<Entity*> ConvertListToVector(std::list<Statement*> list);
   void PopulateAllNextT(const std::vector<Procedure*> &proc_list);
-//>>>>>>> master:Team35/Code35/src/spa/src/component/PKB/NextTExtractor.h
   bool HasNextTInFirstCluster(Cluster* cluster, int first, int second);
   bool IsNextTDownstream(int first, int second);
   bool HasNextTInCluster(Cluster* cluster, int first, int second);

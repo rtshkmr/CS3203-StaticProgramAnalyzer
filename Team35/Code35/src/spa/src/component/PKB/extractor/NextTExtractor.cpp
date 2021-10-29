@@ -57,58 +57,19 @@ std::vector<Entity*> NextTExtractor::GetRel(int target,
   bool is_out_of_bounds = target > stmt_list.size() || target <= 0;
   if (is_out_of_bounds) {
     return std::vector<Entity*>{};
-//<<<<<<< HEAD:Team35/Code35/src/spa/src/component/PKB/extractor/NextTExtractor.cpp
-//  } else if (next_t_map_.count(stmt_list[target - 1]) == 1) {
-//    return ConvertListToVector(* next_t_map_.find(stmt_list[target - 1])->second);
-//=======
   } else if (map_to_populate_->count(stmt_list[target - 1]) == 1) {
     return ConvertListToVector(*map_to_populate_->find(stmt_list[target - 1])->second);
-//>>>>>>> master:Team35/Code35/src/spa/src/component/PKB/NextTExtractor.cpp
   }
 
   Init(stmt_list);
   Cluster* proc_cluster = GetProcCluster(proc_list, target);
   if (proc_cluster) {
     Cluster* t_cluster = GetTargetCluster(proc_cluster, target);
-//<<<<<<< HEAD:Team35/Code35/src/spa/src/component/PKB/extractor/NextTExtractor.cpp
     return ConvertListToVector(GetRelFromCluster(t_cluster, target));
-//=======
-//    return ltov(GetRelFromCluster(t_cluster, target));
-//>>>>>>> master:Team35/Code35/src/spa/src/component/PKB/NextTExtractor.cpp
   }
   return std::vector<Entity*>{};
 }
 
-//<<<<<<< HEAD:Team35/Code35/src/spa/src/component/PKB/extractor/NextTExtractor.cpp
-//// todo: deprecate this, use Program::GetProcClusterForLineNum instead @jx
-//Cluster* NextTExtractor::GetProcCluster(std::vector<Procedure*> proc_list, int target) {
-//  for (Procedure* proc: proc_list) {  // todo: optimise finding procedure of target stmt
-//    Cluster* proc_cluster = const_cast<Cluster*>(proc->GetClusterRoot());
-//    if (proc_cluster->CheckIfStmtNumInRange(target)) {
-//      return proc_cluster;
-//    }
-//  }
-//  return nullptr;
-//}
-//
-///**
-// * Traverses the cluster on surface level and returns the  cluster with the target number.
-// */
-//Cluster* NextTExtractor::GetTargetCluster(Cluster* p_cluster, int target_num) {
-//  std::list<Cluster*> nested_clusters = p_cluster->GetNestedClusters();
-//  if (nested_clusters.empty()) {
-//    return p_cluster;
-//  }
-//
-//  auto cluster_iter = nested_clusters.begin();
-//  while (!(*cluster_iter)->CheckIfStmtNumInRange(target_num)) {
-//    std::advance(cluster_iter, 1);
-//  }
-//  return *cluster_iter;
-//}
-//
-//=======
-//>>>>>>> master:Team35/Code35/src/spa/src/component/PKB/NextTExtractor.cpp
 /**
  * Go to innermost target block and start traversal. If any while loop is met, process from while.
  * Assumes that map entry is only updated once.
@@ -306,6 +267,7 @@ void NextTExtractor::AddRelationshipsWithDup(Statement* first_arg, const std::li
   first_args_->push_back(first_arg);
 }
 
+//// todo: deprecate this, use Program::GetProcClusterForLineNum instead @jx
 Cluster* NextTExtractor::GetProcCluster(const std::vector<Procedure*> &proc_list, int target) {
   for (Procedure* proc: proc_list) {  // todo: optimise finding procedure of target stmt
     auto* proc_cluster = const_cast<Cluster*>(proc->GetClusterRoot());
@@ -558,96 +520,9 @@ bool NextTExtractor::HasNextTByTraversal(Block* block, int first, int second) {
 std::vector<Entity*> NextTExtractor::GetPrevT(int target,
                                               const std::vector<Procedure*> &proc_list,
                                               std::vector<Statement*> stmt_list) {
-//<<<<<<< HEAD:Team35/Code35/src/spa/src/component/PKB/extractor/NextTExtractor.cpp
-//  bool is_out_of_bounds = target > stmt_list.size() || target <= 0;
-//  if (is_out_of_bounds) {
-//    return std::vector<Entity*>{};
-//  } else if (prev_t_map_.count(stmt_list[target - 1]) == 1) {
-//    return ConvertListToVector(* prev_t_map_.find(stmt_list[target - 1])->second);
-//  }
-//
-//  Init(stmt_list);
-//  Cluster* proc_cluster = GetProcCluster(proc_list, target);
-//  if (proc_cluster) {
-//    Cluster* t_cluster = GetTargetCluster(proc_cluster, target);
-//    return ConvertListToVector(GetPrevTFromCluster(t_cluster, target));
-//  }
-//  return std::vector<Entity*>{};
-//}
-//
-///**
-// * Go to innermost target block and start traversal. If any while loop is met, process from while.
-// * Assumes that map entry is only updated once.
-// */
-//std::list<Statement*> NextTExtractor::GetPrevTFromCluster(Cluster* cluster, int target) {
-//  if (prev_t_map_.count(stmt_list_[target - 1]) == 1) {
-//    return *prev_t_map_.find(stmt_list_[target - 1])->second;
-//  }
-//
-//  std::list<Cluster*> nested_clusters = cluster->GetNestedClusters();
-//  if (nested_clusters.empty()) {
-//    GetPrevTByTraversal(dynamic_cast<Block*>(cluster), target);
-//  } else {
-//    Cluster* cluster_head = nested_clusters.front();
-//    Block* head_block = dynamic_cast<Block*>(cluster_head);
-//    if (head_block->isWhile) {
-//      GetPrevTFromWhile(cluster, target);
-//    } else {
-//      Cluster* t_cluster = GetTargetCluster(cluster, target);
-//      return GetPrevTFromCluster(t_cluster, target);
-//    }
-//  }
-//  return GetValueFromMap(prev_t_map_, target);
-//}
-//
-///**
-// * Start recursive traversal from the block before the while loop. Adds all upstream relationships to all stmts in the
-// * while loop.
-// *
-// * @param w_cluster Cluster representing the while loop
-// * @return List of Statements that are prev* of the bottom of w_cluster
-// */
-//std::list<Statement*> NextTExtractor::GetPrevTFromWhile(Cluster* w_cluster, int target_num) {
-//  if (prev_t_map_.count(stmt_list_[target_num - 1]) == 1) {
-//    return *prev_t_map_.find(stmt_list_[target_num - 1])->second;
-//  }
-//
-//  Block* w_block = dynamic_cast<Block*>(w_cluster->GetNestedClusters().front());
-//  std::list<Block*> prev_blocks = GetPrevBlocksBeforeWhile(w_block);
-//  std::list<Statement*> prev_t_before_w;
-//  for (Block* prev_block: prev_blocks) {
-//    std::list<Statement*> prev_stmts = GetPrevTByTraversal(prev_block, target_num);
-//    prev_t_before_w.insert(prev_t_before_w.end(), prev_stmts.begin(), prev_stmts.end());
-//    prev_t_before_w.push_back(stmt_list_[prev_block->GetStartEndRange().second - 1]);
-//  }
-//
-//  std::pair<int, int> range = w_cluster->GetStartEndRange();
-//  prev_t_before_w = *MakeUniqueList(range.first, prev_t_before_w);
-//  int count = range.second - range.first + 1;
-//  std::list<Statement*> w_statements(count);
-//  std::copy(&stmt_list_[range.first - 1], &stmt_list_[range.second - 1] + 1, w_statements.begin());
-//  w_statements.insert(w_statements.end(), prev_t_before_w.begin(), prev_t_before_w.end());
-//  for (int i = range.first - 1; i < range.second; ++i) {
-//    AddPrevT(stmt_list_[i], w_statements);
-//  }
-//  return GetValueFromMap(prev_t_map_, w_cluster->GetStartEndRange().second);
-//}
-//
-//std::list<Block*> NextTExtractor::GetPrevBlocksBeforeWhile(Block* w_block) {
-//  std::list<Block*> prev_blocks;
-//  for (Block* prev_block: w_block->GetPrevBlocks()) {
-//    if (prev_block->GetStartEndRange().first < w_block->GetStartEndRange().first) {
-//      prev_blocks.push_back(prev_block);
-//    }
-//  }
-//  return prev_blocks;
-//}
-//=======
   map_to_populate_ = &prev_t_map_;
   first_args_ = &next_t_rhs_stmts_;
   rel_direction_ = RelDirection::kPrev;
-//>>>>>>> master:Team35/Code35/src/spa/src/component/PKB/NextTExtractor.cpp
-
   return GetRel(target, proc_list, std::move(stmt_list));
 }
 
