@@ -87,7 +87,7 @@ std::vector<Entity*> AffectsExtractor::GetAffectedBy(int target) {
   std::vector<Entity*> return_list = {};
 
   std::string s = std::to_string(target);
-  std::vector<Entity*> ae_vec_target = pkb_->GetAssignEntityByStmtRef(s);
+  std::vector<Entity*> ae_vec_target = pkb_->GetPatternEntities(DesignEntity::kAssign, s);
 
   if (ae_vec_target.size() == 0) //target given is not an assign entity.
     return return_list;
