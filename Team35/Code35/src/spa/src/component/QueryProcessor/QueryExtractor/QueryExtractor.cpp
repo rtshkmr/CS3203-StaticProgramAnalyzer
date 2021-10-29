@@ -5,9 +5,16 @@
 #include "QueryTokenizer.h"
 
 /**
- * Facade class that calls subcomponents for parsing of input, grouping of clauses and optimizations.
+ * QueryExtractor is a Facade class for the frontend of Query Subsystem that calls subcomponents for
+ * parsing of input, grouping of clauses and optimizations.
  */
+
 void QueryExtractor::ExtractQuery() {
+  // note: optimizations are enabled for production; toggling flag to false disables optimizations for testing purposes.
+  QueryExtractor::ExtractQuery(true);
+}
+
+void QueryExtractor::ExtractQuery(bool flag) {
   auto tokenizer = QueryTokenizer();
   tokenizer.SetQueryString(& query);
   std::vector<Clause*> clauses;
@@ -16,8 +23,8 @@ void QueryExtractor::ExtractQuery() {
   QueryExtractor::PopulateSynAdjacencyList(& map_of_syn_to_clause_indices, & clauses);
   QueryGrouper::GroupClauses(& clauses, & groups, & target_synonyms, &target_synonyms_map,
                              & map_of_syn_to_clause_indices);
-  // TODO: add toggle for optimizations
-  QueryOptimizer::ReorderGroups(& groups);
+  auto optimizer = QueryOptimizer(flag);
+  optimizer.ReorderGroups(& groups);
 }
 
 void QueryExtractor::PopulateSynAdjacencyList(std::unordered_map<std::string, std::vector<int>>* map_of_syn_to_cl_indices,

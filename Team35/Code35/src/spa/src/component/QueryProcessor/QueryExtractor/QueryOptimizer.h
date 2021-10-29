@@ -5,8 +5,11 @@
 #include <component/QueryProcessor/types/Types.h>
 
 class QueryOptimizer {
+  private:
+    bool are_optimizations_enabled;
   public:
-    static void ReorderGroups(std::vector<Group*>* groups);
+    QueryOptimizer(bool are_optimizations_enabled) : are_optimizations_enabled(are_optimizations_enabled) {};
+    void ReorderGroups(std::vector<Group*>* groups);
 };
 
 
