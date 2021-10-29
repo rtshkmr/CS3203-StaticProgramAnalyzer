@@ -195,7 +195,7 @@ inline AssignEntity* GetAssign11() {
   return new AssignEntity(var_m_,
                           "n",
                           std::vector<Variable*>{var_n_},
-                          std::vector<ConstantValue*>());
+                          std::vector<Constant*>());
 }
 
 // if
