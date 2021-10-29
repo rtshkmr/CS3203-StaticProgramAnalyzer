@@ -7,7 +7,7 @@
 using namespace entity_utils;
 
 TEST_CASE("1.TransitiveExtractor.Extract CallsT positive tests") {
-  Deliverable* deliverable = new Deliverable();
+  auto* deliverable = new Deliverable();
   Procedure* proc1 = GetProc1();
   Procedure* proc2 = GetProc2();
   Procedure* proc3 = GetProc3();
@@ -118,7 +118,7 @@ TEST_CASE("1.TransitiveExtractor.Extract CallsT positive tests") {
 }
 
 TEST_CASE("1.TransitiveExtractor.Extract CallsT negative tests") {
-  Deliverable* deliverable = new Deliverable();
+  auto* deliverable = new Deliverable();
   Procedure* proc1 = GetProc1();
   Procedure* proc2 = GetProc2();
   Procedure* proc3 = GetProc3();

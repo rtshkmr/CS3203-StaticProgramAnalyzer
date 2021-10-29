@@ -5,14 +5,8 @@
 
 using namespace entity_utils;
 
-void AddStatementList(Container* container, std::list<Statement*> stmt_list) {
-  for (Statement* stmt: stmt_list) {
-    container->AddStatement(stmt);
-  }
-}
-
 TEST_CASE("1.TransitiveExtractor.Extract ParentT basic conditions") {
-  Deliverable* deliverable = new Deliverable();
+  auto* deliverable = new Deliverable();
   ReadEntity* read_x_ = GetReadX();
   ReadEntity* read_y_ = GetReadY();
   ReadEntity* read_z_ = GetReadZ();
@@ -40,8 +34,8 @@ TEST_CASE("1.TransitiveExtractor.Extract ParentT basic conditions") {
      *  print
      * }
      */
-    Procedure* proc1 = new Procedure(new ProcedureName("proc1"));
-    AddStatementList(proc1, {assign_1_, assign_3_, read_x_, print_y_, assign_4_, assign_5_});
+    auto* proc1 = new Procedure(new ProcedureName("proc1"));
+    TestUtils::AddStatementList(proc1, {assign_1_, assign_3_, read_x_, print_y_, assign_4_, assign_5_});
 
     deliverable->proc_list_.push_back(proc1);
 
@@ -67,11 +61,11 @@ TEST_CASE("1.TransitiveExtractor.Extract ParentT basic conditions") {
      *  6. print
      * }
      */
-    Procedure* proc2 = new Procedure(new ProcedureName("proc2"));
-    AddStatementList(else_1_, {assign_5_, assign_6_});
-    AddStatementList(if_1_, {assign_1_, read_y_, else_1_});
-    AddStatementList(proc2, {if_1_, print_y_});
-
+    auto* proc2 = new Procedure(new ProcedureName("proc2"));
+    TestUtils::AddStatementList(else_1_, {assign_5_, assign_6_});
+    TestUtils::AddStatementList(if_1_, {assign_1_, read_y_});
+    TestUtils::AddStatementList(proc2, {if_1_, print_y_});
+    if_1_->SetElseEntity(else_1_);
     deliverable->proc_list_.push_back(proc2);
     deliverable->AddParentRelationship(if_1_, assign_1_);
     deliverable->AddParentRelationship(if_1_, read_y_);
@@ -99,9 +93,9 @@ TEST_CASE("1.TransitiveExtractor.Extract ParentT basic conditions") {
      * 4.   assign
      * }
      */
-    Procedure* proc2 = new Procedure(new ProcedureName("proc2"));
-    AddStatementList(while_3_, {read_z_, assign_5_});
-    AddStatementList(proc2, {assign_1_, print_i_, while_3_});
+    auto* proc2 = new Procedure(new ProcedureName("proc2"));
+    TestUtils::AddStatementList(while_3_, {read_z_, assign_5_});
+    TestUtils::AddStatementList(proc2, {assign_1_, print_i_, while_3_});
 
     deliverable->proc_list_.push_back(proc2);
     deliverable->AddParentRelationship(while_3_, read_z_);
@@ -136,15 +130,15 @@ TEST_CASE("1.TransitiveExtractor.Extract ParentT basic conditions") {
      * 9. assign
      * }
      */
-    Procedure* proc3 = new Procedure(new ProcedureName("proc3"));
-    Procedure* proc4 = new Procedure(new ProcedureName("proc4"));
-    CallEntity* call4 = new CallEntity(proc4);
-    AddStatementList(else_2_, {read_y_});
-    AddStatementList(if_2_, {assign_2_, else_2_});
-    AddStatementList(proc3, {assign_1_, call4, if_2_});
-    AddStatementList(while_1_, {print_y_});
-    AddStatementList(proc4, {while_1_, assign_4_});
-
+    auto* proc3 = new Procedure(new ProcedureName("proc3"));
+    auto* proc4 = new Procedure(new ProcedureName("proc4"));
+    auto* call4 = new CallEntity(proc4);
+    TestUtils::AddStatementList(else_2_, {read_y_});
+    TestUtils::AddStatementList(if_2_, {assign_2_});
+    TestUtils::AddStatementList(proc3, {assign_1_, call4, if_2_});
+    TestUtils::AddStatementList(while_1_, {print_y_});
+    TestUtils::AddStatementList(proc4, {while_1_, assign_4_});
+    if_2_->SetElseEntity(else_2_);
     deliverable->proc_list_.push_back(proc3);
     deliverable->proc_list_.push_back(proc4);
     deliverable->AddParentRelationship(if_2_, assign_2_);
@@ -169,7 +163,7 @@ TEST_CASE("1.TransitiveExtractor.Extract ParentT basic conditions") {
 }
 
 TEST_CASE("1.TransitiveExtractor.Extract ParentT nested containers") {
-  Deliverable* deliverable = new Deliverable();
+  auto* deliverable = new Deliverable();
   ReadEntity* read_x_ = GetReadX();
   ReadEntity* read_y_ = GetReadY();
   ReadEntity* read_z_ = GetReadZ();
@@ -210,15 +204,17 @@ TEST_CASE("1.TransitiveExtractor.Extract ParentT nested containers") {
      *  10.printn
      * }
      */
-    Procedure* proc2 = new Procedure(new ProcedureName("proc2"));
-    AddStatementList(else_3_, {read_z_});
-    AddStatementList(if_3_, {assign_5_, else_3_});
-    AddStatementList(else_2_, {if_3_});
-    AddStatementList(if_2_, {assign_4_, else_2_});
-    AddStatementList(else_1_, {assign_3_, if_2_, print_i_});
-    AddStatementList(if_1_, {assign_1_, else_1_});
-    AddStatementList(proc2, {if_1_, print_n_});
-
+    auto* proc2 = new Procedure(new ProcedureName("proc2"));
+    TestUtils::AddStatementList(else_3_, {read_z_});
+    TestUtils::AddStatementList(if_3_, {assign_5_});
+    TestUtils::AddStatementList(else_2_, {if_3_});
+    TestUtils::AddStatementList(if_2_, {assign_4_});
+    TestUtils::AddStatementList(else_1_, {assign_3_, if_2_, print_i_});
+    TestUtils::AddStatementList(if_1_, {assign_1_});
+    TestUtils::AddStatementList(proc2, {if_1_, print_n_});
+    if_1_->SetElseEntity(else_1_);
+    if_2_->SetElseEntity(else_2_);
+    if_3_->SetElseEntity(else_3_);
     deliverable->proc_list_.push_back(proc2);
     deliverable->AddParentRelationship(if_1_, assign_1_);
     deliverable->AddParentRelationship(if_1_, assign_3_);
@@ -272,15 +268,17 @@ TEST_CASE("1.TransitiveExtractor.Extract ParentT nested containers") {
      *  10.printn
      * }
      */
-    Procedure* proc2 = new Procedure(new ProcedureName("proc2"));
-    AddStatementList(else_3_, {read_z_});
-    AddStatementList(if_3_, {assign_5_, else_3_});
-    AddStatementList(else_2_, {assign_4_});
-    AddStatementList(if_2_, {if_3_, else_2_});
-    AddStatementList(else_1_, {assign_3_});
-    AddStatementList(if_1_, {assign_1_, if_2_, print_i_, else_1_});
-    AddStatementList(proc2, {if_1_, print_n_});
-
+    auto* proc2 = new Procedure(new ProcedureName("proc2"));
+    TestUtils::AddStatementList(else_3_, {read_z_});
+    TestUtils::AddStatementList(if_3_, {assign_5_});
+    TestUtils::AddStatementList(else_2_, {assign_4_});
+    TestUtils::AddStatementList(if_2_, {if_3_});
+    TestUtils::AddStatementList(else_1_, {assign_3_});
+    TestUtils::AddStatementList(if_1_, {assign_1_, if_2_, print_i_});
+    TestUtils::AddStatementList(proc2, {if_1_, print_n_});
+    if_1_->SetElseEntity(else_1_);
+    if_2_->SetElseEntity(else_2_);
+    if_3_->SetElseEntity(else_3_);
     deliverable->proc_list_.push_back(proc2);
     deliverable->AddParentRelationship(if_1_, assign_1_);
     deliverable->AddParentRelationship(if_1_, if_2_);
@@ -331,11 +329,11 @@ TEST_CASE("1.TransitiveExtractor.Extract ParentT nested containers") {
      * 9. readz
      * }
      */
-    Procedure* proc3 = new Procedure(new ProcedureName("proc3"));
-    AddStatementList(while_3_, {assign_5_});
-    AddStatementList(while_2_, {assign_3_, while_3_, read_x_});
-    AddStatementList(while_1_, {assign_1_, while_2_, read_y_});
-    AddStatementList(proc3, {while_1_, read_z_});
+    auto* proc3 = new Procedure(new ProcedureName("proc3"));
+    TestUtils::AddStatementList(while_3_, {assign_5_});
+    TestUtils::AddStatementList(while_2_, {assign_3_, while_3_, read_x_});
+    TestUtils::AddStatementList(while_1_, {assign_1_, while_2_, read_y_});
+    TestUtils::AddStatementList(proc3, {while_1_, read_z_});
 
     deliverable->proc_list_.push_back(proc3);
     deliverable->AddParentRelationship(while_1_, assign_1_);
@@ -390,15 +388,17 @@ TEST_CASE("1.TransitiveExtractor.Extract ParentT nested containers") {
      *  13.    assign3
      * }
      */
-    Procedure* proc4 = new Procedure(new ProcedureName("proc4"));
-    AddStatementList(else_2_, {assign_3_});
-    AddStatementList(if_2_, {assign_2_, else_2_});
-    AddStatementList(while_3_, {print_x_, if_2_});
-    AddStatementList(while_2_, {read_y_});
-    AddStatementList(while_1_, {read_x_});
-    AddStatementList(else_1_, {while_2_, assign_6_});
-    AddStatementList(if_1_, {assign_1_, while_1_, else_1_});
-    AddStatementList(proc4, {if_1_, while_3_});
+    auto* proc4 = new Procedure(new ProcedureName("proc4"));
+    TestUtils::AddStatementList(else_2_, {assign_3_});
+    TestUtils::AddStatementList(if_2_, {assign_2_});
+    TestUtils::AddStatementList(while_3_, {print_x_, if_2_});
+    TestUtils::AddStatementList(while_2_, {read_y_});
+    TestUtils::AddStatementList(while_1_, {read_x_});
+    TestUtils::AddStatementList(else_1_, {while_2_, assign_6_});
+    TestUtils::AddStatementList(if_1_, {assign_1_, while_1_});
+    TestUtils::AddStatementList(proc4, {if_1_, while_3_});
+    if_1_->SetElseEntity(else_1_);
+    if_2_->SetElseEntity(else_2_);
 
     deliverable->proc_list_.push_back(proc4);
     deliverable->AddParentRelationship(if_1_, assign_1_);

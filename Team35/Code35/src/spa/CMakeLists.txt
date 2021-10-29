@@ -39,7 +39,6 @@ add_library(spa ${srcs} ${headers}
         src/component/QueryProcessor/QueryEvaluator/ClauseStrategy.h src/component/QueryProcessor/QueryEvaluator/ClauseStrategy.cpp
         src/component/QueryProcessor/QueryProjector.h src/component/QueryProcessor/QueryProjector.cpp
         src/component/QueryProcessor/QuerySystemController.h src/component/QueryProcessor/QuerySystemController.cpp
-        src/component/SourceProcessor/Extractors/FollowsTExtractor.cpp src/component/SourceProcessor/Extractors/FollowsTExtractor.h
         src/util/Logger.cpp src/util/Logger.h
         src/util/util.h
         src/util/TimeUtil.cpp src/util/TimeUtil.h
