@@ -20,9 +20,11 @@ class DBManager {
   // Getting relationships from PKB
   std::vector<Entity*> GetRelationship(PKBRelRefs ref, std::string entity);
 
-  std::vector<Entity*> GetRelationshipByType(PKBRelRefs ref, DesignEntity de,
-                                             std::vector<Entity *> scoped_entities,
-                                             ScopeIndication scope_indication);
+  std::vector<Entity*> GetFirstEntityOfRelationship(PKBRelRefs ref, DesignEntity de);
+
+  std::vector<Entity*> GetFirstEntityOfRelationship(PKBRelRefs ref, DesignEntity de,
+                                                    std::vector<Entity *> scoped_entities,
+                                                    ScopeIndication scope_indication);
 
   std::vector<Entity*> GetRelationshipByTypes(PKBRelRefs ref,
                                               DesignEntity first_de,
@@ -39,12 +41,7 @@ class DBManager {
   std::vector<Entity*> GetDesignEntities(DesignEntity de);
 
   // Getting entities for pattern matching
-  std::vector<Entity*> GetAssignEntityByStmtRef(std::string stmtRef);
-  std::vector<Entity*> GetAssignEntityByVariable(std::string variable);
-  std::vector<Entity*> GetWhileEntityByStmtRef(std::string stmtRef);
-  std::vector<Entity*> GetWhileEntityByVariable(std::string variable);
-  std::vector<Entity*> GetIfEntityByStmtRef(std::string stmtRef);
-  std::vector<Entity*> GetIfEntityByVariable(std::string variable);
+  std::vector<Entity*> GetPatternEntities(DesignEntity de, std::string stmtRef);
 
   // Check if relationship exists
   bool HasRelationship(PKBRelRefs ref);
@@ -52,14 +49,11 @@ class DBManager {
   bool HasRelationship(PKBRelRefs ref, std::string first, std::string second);
   bool HasRelationship(PKBRelRefs ref, std::string ident_string);
 
-  DesignEntity EntityToDesignEntity(Entity* entity);
+  DesignEntity GetDesignEntityFromEntity(Entity* entity);
 
   static std::string GetNameFromEntity(Entity* entity);
 
  private:
-
-  std::vector<Entity*> GetRelationshipByTypeUnscoped(PKBRelRefs ref, DesignEntity de);
-
   PKB* pkb_;
   RuntimeExtractor* runtime_extractor_;
   bool is_optimized_ = true;

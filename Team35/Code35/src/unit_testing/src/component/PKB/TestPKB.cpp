@@ -10,15 +10,15 @@ TEST_CASE("2.PKB.PKB population and retrieval") {
   Procedure* p1_ = new Procedure(new ProcedureName("p1"));
   Variable* v1_ = new Variable(new VariableName("v1"));
   Variable* v2_ = new Variable(new VariableName("v2"));
-  ConstantValue* const1_ = new ConstantValue("1");
-  ConstantValue* const2_ = new ConstantValue("2");
+  Constant* const1_ = new Constant(new ConstantValue("1"));
+  Constant* const2_ = new Constant(new ConstantValue("2"));
 
   ReadEntity* read1_ = new ReadEntity(v1_);
   AssignEntity* a1_ = new AssignEntity
       (v1_,
        "v1=1+2+v2",
        std::vector<Variable*>{v2_},
-       std::vector<ConstantValue*>{const1_, const2_}
+       std::vector<Constant*>{const1_, const2_}
       );
   CallEntity* call1_ = new CallEntity(p1_);
   PrintEntity* print1_ = new PrintEntity(v1_);
@@ -78,9 +78,9 @@ TEST_CASE("2.PKB.PKB population and retrieval") {
       std::vector<Entity*> pkb_const = pkb.GetDesignEntities(DesignEntity::kConstant);
       REQUIRE(pkb_const.size() == 2);
       Constant* const1 = (Constant*) pkb_const.at(0);
-      REQUIRE(const1->GetValue() == const1_);
+      REQUIRE(const1 == const1_);
       Constant* const2 = (Constant*) pkb_const.at(1);
-      REQUIRE(const2->GetValue() == const2_);
+      REQUIRE(const2 == const2_);
     }
 
     SECTION("Statement") {
@@ -196,13 +196,13 @@ TEST_CASE("2.PKB.PKB population and retrieval") {
   // Check if PKB can store and retrieve assign expressions given either variable name or statement number
   SECTION("Assignment Expressions") {
     SECTION("Get pattern by assignment statement number") {
-      std::vector<Entity*> assign_vector = pkb.GetAssignEntityByStmtRef("2");
+      std::vector<Entity*> assign_vector = pkb.GetPatternEntities(DesignEntity::kAssign, "2");
       REQUIRE(assign_vector.size() == 1);
       REQUIRE(assign_vector[0] == a1_);
     }
 
     SECTION("Get pattern by variable name") {
-      std::vector<Entity*> assign_vector = pkb.GetAssignEntityByVariable("v1");
+      std::vector<Entity*> assign_vector = pkb.GetPatternEntities(DesignEntity::kAssign, "v1");
       REQUIRE(assign_vector.size() == 1);
       REQUIRE(assign_vector[0] == a1_);
     }
