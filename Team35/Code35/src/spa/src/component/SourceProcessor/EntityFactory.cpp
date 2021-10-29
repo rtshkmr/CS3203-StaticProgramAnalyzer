@@ -172,7 +172,7 @@ vector<Variable*> EntityFactory::GetVariablesFromExpressionTokens(const vector<T
   return variables;
 }
 
-vector<Constant*> EntityFactory::GetConstantsFromExpressionTokens(vector<Token> tokens) {
+vector<Constant*> EntityFactory::GetConstantsFromExpressionTokens(const vector<Token>& tokens) {
   vector<Constant*> constants;
   for (auto& token: tokens) {
     if (token.GetTokenTag() == TokenTag::kInteger) {
@@ -189,20 +189,20 @@ vector<Constant*> EntityFactory::GetConstantsFromExpressionTokens(vector<Token> 
 
 Procedure* EntityFactory::CreateProcedure(std::string proc_name) {
   // TODO iter2: Create destructor for ProcedureName and Procedure.
-  Procedure* p = new Procedure(new ProcedureName(std::move(proc_name)));
+  auto* p = new Procedure(new ProcedureName(std::move(proc_name)));
   proc_list_->push_back(p);
   return p;
 }
 
 Variable* EntityFactory::CreateVariable(std::string var_name) {
   //TODO iter2: Create destructor for VariableName and Variable.
-  Variable* v = new Variable(new VariableName(std::move(var_name)));
+  auto* v = new Variable(new VariableName(std::move(var_name)));
   var_list_->push_back(v);
   return v;
 }
 
-Constant* EntityFactory::CreateConstant(std::string const_val) {
-  Constant* val = new Constant(new ConstantValue(std::move(const_val)));
+Constant* EntityFactory::CreateConstant(const std::string& const_val) {
+  auto* val = new Constant(new ConstantValue(const_val));
   const_list_->push_back(val);
   return val;
 }
