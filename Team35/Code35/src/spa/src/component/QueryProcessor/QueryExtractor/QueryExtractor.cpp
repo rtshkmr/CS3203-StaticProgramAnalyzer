@@ -1,10 +1,11 @@
 #include "QueryExtractor.h"
 #include "QueryGrouper.h"
+#include "QueryOptimizer.h"
 #include "QueryParser.h"
 #include "QueryTokenizer.h"
 
 /**
- * Creates QueryTokenizer object and QueryParser object. Calls Parse method of QueryParser.
+ * Facade class that calls subcomponents for parsing of input, grouping of clauses and optimizations.
  */
 void QueryExtractor::ExtractQuery() {
   auto tokenizer = QueryTokenizer();
@@ -15,6 +16,8 @@ void QueryExtractor::ExtractQuery() {
   QueryExtractor::PopulateSynAdjacencyList(& map_of_syn_to_clause_indices, & clauses);
   QueryGrouper::GroupClauses(& clauses, & groups, & target_synonyms, &target_synonyms_map,
                              & map_of_syn_to_clause_indices);
+  // TODO: add toggle for optimizations
+  QueryOptimizer::ReorderGroups(& groups);
 }
 
 void QueryExtractor::PopulateSynAdjacencyList(std::unordered_map<std::string, std::vector<int>>* map_of_syn_to_cl_indices,
