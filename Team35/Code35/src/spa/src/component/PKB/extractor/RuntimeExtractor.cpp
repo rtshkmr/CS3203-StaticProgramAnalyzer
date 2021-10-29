@@ -2,6 +2,7 @@
 
 RuntimeExtractor::RuntimeExtractor(PKB* pkb) {
   pkb_ = pkb;
+  affects_extractor_.SetPKB(pkb);
 }
 
 std::vector<Entity*> RuntimeExtractor::GetNextT(int target) {

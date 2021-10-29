@@ -103,8 +103,8 @@ void PSubsystem::CloseProcedureBlock() {
     current_procedure_ = nullptr;
     Block* last_block = block_stack_.top();
     block_stack_.pop();
-    // put the block root into the
     Cluster* outermost_cluster = cluster_stack_.top();
+    outermost_cluster->SetClusterTag(ClusterTag::kProcedureCluster);
     if(!Block::IsExitBlock(last_block)) {
       outermost_cluster->AddChildClusterToBack(last_block);
       outermost_cluster->UpdateClusterRange();
@@ -130,6 +130,10 @@ void PSubsystem::CloseElseBlock() {
 
     Block* if_cond_block = block_stack_.top();
 
+    else_body_block->SetClusterTag(ClusterTag::kElseBody);
+    if_body_block->SetClusterTag(ClusterTag::kIfBody);
+    if_cond_block->SetClusterTag(ClusterTag::kIfCond);
+
     if (Block::IsExitBlock(else_body_block)) {
       Block::PatchEmptyBlocks(else_body_block, block_if_else_exit);
     } else {
@@ -149,6 +153,7 @@ void PSubsystem::CloseElseBlock() {
     bool is_currently_in_nested_cluster = cluster_stack_.size() > 1;
     assert(is_currently_in_nested_cluster);
     Cluster* if_cluster = cluster_stack_.top();
+    if_cluster->SetClusterTag(ClusterTag::kIfCluster);
     ///  add to if_cluster only if the if_cluster is currently empty.
     /// guarantee: There will be at most be 3 nested clusters in if cluster (ifcond, ifbody, elsebody):
     if(if_cluster->GetNestedClusters().empty()) {
@@ -178,12 +183,15 @@ void PSubsystem::CloseWhileBlock() {
   block_stack_.pop(); // link the last stmt to the while_cond_block block, and pop it.
   //todo: change from Block* to ConditionalBlock*
   Block* while_cond_block = dynamic_cast<Block*>(block_stack_.top());
+  while_cond_block->SetClusterTag(ClusterTag::kWhileCond);
+  while_body_block->SetClusterTag(ClusterTag::kWhileBody);
   assert(while_cond_block);
 
   bool is_currently_in_nested_cluster = cluster_stack_.size() > 1;
   assert(is_currently_in_nested_cluster);
   // add to cluster here:
   Cluster* while_cluster = cluster_stack_.top();
+  while_cluster->SetClusterTag(ClusterTag::kWhileCluster);
   while_cluster->AddChildClusterToFront(while_cond_block);
 
   if (while_body_block->size() > 0) {
