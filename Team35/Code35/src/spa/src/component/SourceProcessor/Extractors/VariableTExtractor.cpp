@@ -62,11 +62,11 @@ void VariableTExtractor::InitRelMaps() {
 std::list<Variable*>* VariableTExtractor::ExtractFromContainer(Container* container,
                                                                std::vector<Procedure*>* extracted_procedures) {
   for (Statement* statement: *container->GetStatementList()) {
-    if (IfEntity* if_entity = dynamic_cast<IfEntity*>(statement)) {
+    if (auto* if_entity = dynamic_cast<IfEntity*>(statement)) {
       ExtractFromIfContainer(if_entity, container, extracted_procedures);
-    } else if (WhileEntity* while_entity = dynamic_cast<WhileEntity*>(statement)) {
+    } else if (auto* while_entity = dynamic_cast<WhileEntity*>(statement)) {
       ExtractFromWhileContainer(while_entity, container, extracted_procedures);
-    } else if (CallEntity* call_entity = dynamic_cast<CallEntity*>(statement)) {
+    } else if (auto* call_entity = dynamic_cast<CallEntity*>(statement)) {
       ExtractFromCallContainer(call_entity, container, extracted_procedures);
     }
   }

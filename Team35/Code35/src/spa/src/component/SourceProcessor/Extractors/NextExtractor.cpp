@@ -19,7 +19,7 @@ void NextExtractor::Extract(Deliverable* deliverable) {
 
   int total_num_of_stmts = 0;
   for (Procedure* proc: deliverable_->proc_list_) {
-    Cluster* proc_cluster = const_cast<Cluster*>(proc->GetClusterRoot());
+    auto* proc_cluster = const_cast<Cluster*>(proc->GetClusterRoot());
     std::pair<int, int> range = proc_cluster->GetStartEndRange();
     int num_of_stmts = range.second - range.first + 1;
     total_num_of_stmts += num_of_stmts;

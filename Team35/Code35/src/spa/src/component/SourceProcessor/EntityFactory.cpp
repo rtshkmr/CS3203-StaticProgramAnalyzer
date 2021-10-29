@@ -131,12 +131,8 @@ Entity* EntityFactory::CreateAssignEntity(vector<Token> tokens) {
  * @return Vector of tokens which represents the expression alone.
  */
 vector<Token> EntityFactory::GetExpressionTokens(vector<Token> tokens, TokenTag start_tag, TokenTag end_tag) {
-  int start_iter = -1;
-  int end_iter = -1;
-  // finding first start tag
-  start_iter = Token::GetFirstMatchingTokenIdx(tokens, start_tag);
-  // finding last end tag
-  end_iter = Token::GetLastMatchingTokenIdx(tokens, end_tag);
+  int start_iter = Token::GetFirstMatchingTokenIdx(tokens, start_tag);
+  int end_iter = Token::GetLastMatchingTokenIdx(tokens, end_tag);
   if (start_iter < 0 || end_iter < 0) {
     throw std::invalid_argument("EF: Start or end tag not found.\n");
   }
@@ -153,7 +149,7 @@ vector<Token> EntityFactory::GetExpressionTokens(vector<Token> tokens, TokenTag 
   return expression_tokens;
 }
 
-string EntityFactory::ConvertTokensToString(vector<Token> tokens) {
+string EntityFactory::ConvertTokensToString(const vector<Token>& tokens) {
   std::string expression_string;
   for (auto& token: tokens) {
     expression_string += token.GetTokenString();
@@ -161,7 +157,7 @@ string EntityFactory::ConvertTokensToString(vector<Token> tokens) {
   return expression_string;
 }
 
-vector<Variable*> EntityFactory::GetVariablesFromExpressionTokens(vector<Token> tokens) {
+vector<Variable*> EntityFactory::GetVariablesFromExpressionTokens(const vector<Token>& tokens) {
   vector<Variable*> variables;
   for (auto& token: tokens) {
     if (token.GetTokenTag() == TokenTag::kName) {

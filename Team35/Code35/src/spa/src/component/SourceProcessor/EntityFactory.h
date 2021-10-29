@@ -33,8 +33,8 @@ class EntityFactory {
   Entity* CreateConditionalEntity(std::vector<Token> tokens, TokenTag entity_type);
   Entity* CreateAssignEntity(std::vector<Token> tokens);
 
-  static std::string ConvertTokensToString(std::vector<Token> tokens);
-  std::vector<Variable*> GetVariablesFromExpressionTokens(std::vector<Token> tokens);
+  static std::string ConvertTokensToString(const std::vector<Token>& tokens);
+  std::vector<Variable*> GetVariablesFromExpressionTokens(const std::vector<Token>& tokens);
   std::vector<ConstantValue*> GetConstantsFromExpressionTokens(std::vector<Token> tokens);
 };
 
