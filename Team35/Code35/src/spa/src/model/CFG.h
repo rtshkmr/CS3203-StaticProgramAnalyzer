@@ -60,6 +60,8 @@ class Cluster {
     end_ = end;
   };
   std::list<Cluster*> nested_clusters_;
+  Cluster* FindNextSiblingCluster();
+  Cluster* FindNextSiblingCluster(ClusterTag container_type);
 };
 
 class Block : public Cluster {
