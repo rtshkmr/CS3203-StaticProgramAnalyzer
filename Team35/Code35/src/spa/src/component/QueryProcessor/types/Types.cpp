@@ -83,3 +83,7 @@ std::vector<Synonym*> Group::GetTargetSynonyms() {
 void Group::UpdateHasTargetSynonymAttr() {
   has_target_synonym = target_synonyms.size() > 0 ? true : false;
 }
+
+int Group::GetGroupSize() {
+  return clauses.size();
+}
