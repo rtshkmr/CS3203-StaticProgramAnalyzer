@@ -1,10 +1,10 @@
 #include "AffectsExtractor.h"
 
-std::vector<Entity*> AffectsExtractor::GetAffects(std::string target) {
+std::vector<Entity*> AffectsExtractor::GetAffects(int target) {
   return std::vector<Entity*>();
 }
 
-std::vector<Entity*> AffectsExtractor::GetAffectedBy(std::string target) {
+std::vector<Entity*> AffectsExtractor::GetAffectedBy(int target) {
   return std::vector<Entity*>();
 }
 
