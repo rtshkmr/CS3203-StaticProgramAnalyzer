@@ -125,8 +125,8 @@ Cluster* Cluster::FindNextSiblingCluster() {
 Cluster* Cluster::FindNextSiblingCluster(ClusterTag container_type) {
   assert(container_type == ClusterTag::kIfCluster || container_type == ClusterTag::kWhileCluster);
   Cluster* next_sibling_cluster = this->FindNextSiblingCluster();
-  while(next_sibling_cluster) {
-    if(next_sibling_cluster->GetClusterTag() == container_type) {
+  while (next_sibling_cluster) {
+    if (next_sibling_cluster->GetClusterTag() == container_type) {
       return next_sibling_cluster;
     } else {
       next_sibling_cluster = next_sibling_cluster->GetNextSiblingCluster();
@@ -229,6 +229,90 @@ ClusterTag Cluster::GetClusterTag() const {
 }
 void Cluster::SetClusterTag(ClusterTag cluster_tag) {
   this->cluster_tag_ = cluster_tag;
+}
+
+/**
+ * Traverses cluster from first to second statement number, using the given pkb to retrieve
+ * data where necessary. Is recursive in nature, where we try to call on a small subproblem by
+ * restricting the start statement number where possible. This public subroutine calls on other
+ * private subroutines.
+ * @param rel_ref
+ * @param scoped_cluster
+ * @param first_stmt
+ * @param second_stmt
+ * @param pkb
+ * @return
+ */
+bool Cluster::TraverseScopedCluster(PKBRelRefs rel_ref,
+                                    Cluster* scoped_cluster,
+                                    int first_stmt,
+                                    int second_stmt,
+                                    PKB* pkb) {
+  switch (rel_ref) {
+    case PKBRelRefs::kAffects: {
+      return TraverseScopedClusterForAffects(scoped_cluster, first_stmt, second_stmt, pkb, nullptr);
+    };
+    default: {
+      return false;
+    };
+
+  }
+  return false;
+}
+
+/**
+ * Traverses a scoped cluster moving from first_stmt towards second_stmt and checks if the lhs_var remains unmodified along the way
+ * @param scoped_cluster
+ * @param first_stmt
+ * @param second_stmt
+ * @param pkb
+ * @param lhs_var
+ * @return true if there's a control flow between first and second stmt that does not modify lhs_var along the way
+ */
+bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
+                                              int first_stmt,
+                                              int second_stmt,
+                                              PKB* pkb,
+                                              Variable* lhs_var) {
+  // get all the children:
+  std::list<Cluster*> children = scoped_cluster->nested_clusters_;
+  for (auto child: children) {
+    ClusterTag tag = child->GetClusterTag();
+    bool is_not_if_or_while_cluster_constituents = tag != ClusterTag::kIfCond
+        && tag != ClusterTag::kIfBody && tag != ClusterTag::kElseBody && tag != ClusterTag::kWhileCond
+        && tag != ClusterTag::kWhileBody;
+    assert(is_not_if_or_while_cluster_constituents); // genuinely don't know if this is a valid assumption
+
+    if (tag == ClusterTag::kIfCluster) {
+      // need to consider different branches:
+      std::list<Cluster*> cluster_constituents = child->GetNestedClusters();
+      // conditional don't modify shit, ignore it
+      Cluster* if_cond = cluster_constituents.front();
+      assert(if_cond->GetClusterTag() == ClusterTag::kIfCond);
+      // check the if body block || else body block for the same
+      //
+
+    } else if (tag == ClusterTag::kWhileCluster) {
+
+    } else { // it's a simple block:
+      auto range = child->GetStartEndRange();
+      // for every line number in this range, check if the lhs_var is modified by the line:
+      bool lhs_is_modified = false;
+      // start with offset of +1 to avoid counting the current thing...
+      if(range.first + 1 == range.second)
+      for(int line_num = range.first + 1; line_num <= range.second; line_num++) {
+        // consider statement level:
+        // if line_num is a read stmt, then will this convert that
+        bool is_modified_stmt_level = pkb->HasRelationship(PKBRelRefs::kModifies,std::to_string(line_num),
+                                                              pkb->GetNameFromEntity(lhs_var));
+        bool is_call_stmt = pkb->GetRelationship(PKBRelRefs::kFollows, std::to_string(line_num - 1));
+        bool is_modified_by_proc_calls = false;
+         //
+         if(lhs_is_modified) break;
+      }
+    }
+  }
+  return false;
 }
 
 // default destructors:

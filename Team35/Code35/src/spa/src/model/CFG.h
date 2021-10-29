@@ -7,6 +7,8 @@
 #include <vector>
 #include <set>
 #include <datatype/DataType.h>
+#include <component/QueryProcessor/types/Types.h>
+#include <component/PKB/PKB.h>
 #include "Entity.h"
 
 /**
@@ -24,6 +26,7 @@ enum class ClusterTag {
   kNormalBlock // default tags since clusters will be tagged
 };
 
+class Variable;
 class Cluster {
 
  protected:
@@ -31,6 +34,11 @@ class Cluster {
   int start_ = -1;
   int end_ = -1;
   Cluster* parent_cluster_;
+  static bool TraverseScopedClusterForAffects(Cluster* scoped_cluster,
+                                              int first_stmt,
+                                              int second_stmt,
+                                              PKB* pkb,
+                                              Variable* lhs_var);
  public:
   Cluster() {};
   int size() const;
@@ -62,6 +70,8 @@ class Cluster {
   std::list<Cluster*> nested_clusters_;
   Cluster* FindNextSiblingCluster();
   Cluster* FindNextSiblingCluster(ClusterTag container_type);
+  // traversal logic:
+  static bool TraverseScopedCluster(PKBRelRefs rel_ref, Cluster* scoped_cluster, int first_stmt, int second_stmt, PKB* pkb);
 };
 
 class Block : public Cluster {
