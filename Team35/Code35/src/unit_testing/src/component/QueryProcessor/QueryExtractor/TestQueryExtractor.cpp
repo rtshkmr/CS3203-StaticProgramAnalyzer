@@ -402,7 +402,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed UsesP or ModifiesP; should PASS")
     std::string query = "assign a; variable v; Select a such that Uses(\"main\", \"x\")";
 
     auto query_extractor = QueryExtractor(& query);
-    query_extractor.ExtractQuery();
+    query_extractor.ExtractQuery(false);
     std::list<Synonym*> synonyms = query_extractor.GetSynonymsList();
     Synonym target = *query_extractor.GetTargetSynonymsList().at(0);
     std::vector<Group*> groups = query_extractor.GetGroupsList();
@@ -762,7 +762,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that Calls; should pass") {
   SECTION("Calls with lhs IDENT + rhs IDENT") {
     std::string query = "procedure p; Select p such that Calls(\"First\", \"Second\")";
     auto query_extractor = QueryExtractor(& query);
-    query_extractor.ExtractQuery();
+    query_extractor.ExtractQuery(false);
     std::vector<Group*> actual_groups = query_extractor.GetGroupsList();
     REQUIRE(actual_groups.size() == 2);
     Group* actual_group = actual_groups[1];
@@ -778,7 +778,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that Calls; should pass") {
   SECTION("Calls* with lhs proc synonym + rhs proc synonym") {
     std::string query = "procedure p, q; Select p such that Calls*(p, q)";
     auto query_extractor = QueryExtractor(& query);
-    query_extractor.ExtractQuery();
+    query_extractor.ExtractQuery(false);
     std::vector<Group*> actual_groups = query_extractor.GetGroupsList();
     REQUIRE(actual_groups.size() == 1);
     Group* actual_group = actual_groups[0];
@@ -796,7 +796,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that Next; should pass") {
   SECTION("Next with lhs INTEGER + rhs INTEGER") {
     std::string query = "procedure p; Select p such that Next(2, 3)";
     auto query_extractor = QueryExtractor(& query);
-    query_extractor.ExtractQuery();
+    query_extractor.ExtractQuery(false);
     std::vector<Group*> actual_groups = query_extractor.GetGroupsList();
     REQUIRE(actual_groups.size() == 2);
     Group* actual_group = actual_groups[1];
@@ -812,7 +812,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that Next; should pass") {
   SECTION("Next* containing prog_line syn + INTEGER") {
     std::string query = "assign a; prog_line n; Select a such that Next* (60, n)";
     auto query_extractor = QueryExtractor(& query);
-    query_extractor.ExtractQuery();
+    query_extractor.ExtractQuery(false);
     std::vector<Group*> actual_groups = query_extractor.GetGroupsList();
     REQUIRE(actual_groups.size() == 2);
     Group* actual_group = actual_groups[1];
@@ -828,7 +828,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that Next; should pass") {
   SECTION("Next containing generic stmt syn + INTEGER") {
     std::string query = "assign a; stmt n; Select a such that Next (60, n)";
     auto query_extractor = QueryExtractor(& query);
-    query_extractor.ExtractQuery();
+    query_extractor.ExtractQuery(false);
     std::vector<Group*> actual_groups = query_extractor.GetGroupsList();
     REQUIRE(actual_groups.size() == 2);
     Group* actual_group = actual_groups[1];
@@ -863,7 +863,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that Affects; should pass") 
   SECTION("Affects with lhs INTEGER + rhs INTEGER") {
     std::string query = "assign a; Select a such that Affects(2, 3)";
     auto query_extractor = QueryExtractor(& query);
-    query_extractor.ExtractQuery();
+    query_extractor.ExtractQuery(false);
     std::vector<Group*> actual_groups = query_extractor.GetGroupsList();
     REQUIRE(actual_groups.size() == 2);
     Group* actual_group = actual_groups[1];
@@ -1031,4 +1031,22 @@ TEST_CASE("3.QueryExtractor.Single well-formed while-pattern") {
     REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
                         Catch::Contains("Unexpected token"));
   }
+}
+
+// with clause
+TEST_CASE("3.QueryExtractor.Single with clause + lhs prog_line + rhs INTEGER") {
+  std::string query = "prog_line n; stmt s; Select s.stmt# such that Follows* (s, n) with n=10";
+  auto query_extractor = QueryExtractor(& query);
+  query_extractor.ExtractQuery();
+  std::vector<Group*> actual_groups = query_extractor.GetGroupsList();
+  REQUIRE(actual_groups.size() == 1);
+  Group* actual_group = actual_groups[0];
+  Clause* expected_cl_1 = new With(true, false, "n", "10", Attribute::kInvalid, Attribute::kInvalid, true, false);
+  Clause* expected_cl_2 = new SuchThat("s", "n", RelRef::kFollowsT, true, true);
+  std::vector<Clause*> clauses;
+  clauses.push_back(expected_cl_1);
+  clauses.push_back(expected_cl_2);
+  Group* expected_group = new Group(clauses, true);
+
+  REQUIRE(AreGroupsEqual(expected_group, actual_group));
 }
