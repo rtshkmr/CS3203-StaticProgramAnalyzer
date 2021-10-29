@@ -20,7 +20,7 @@ std::vector<std::string> QuerySystemController::Evaluate(std::string* query, PKB
   }
 
   DBManager* dbm = new DBManager(pkb);
-  auto query_evaluator = QueryEvaluator(pkb);
+  auto query_evaluator = QueryEvaluator(dbm);
 
   L("[ENTER] Query Evaluator Evaluate Query");
   // TODO: change this
