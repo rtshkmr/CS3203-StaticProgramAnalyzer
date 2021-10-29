@@ -52,10 +52,11 @@ std::list<Statement*>* FollowsTExtractor::ExtractFollowsTFromThread(Statement* t
     }
   }
 
-  std::unordered_map<Statement*, Statement*> follows_hash = deliverable_->follow_hash_;
+  std::unordered_map<Statement*, std::list<Statement*>*> follows_hash = deliverable_->follow_hash_;
   if (follows_hash.find(top) != follows_hash.end()) {
     // there is a statement following top
-    Statement* following_statement = follows_hash.find(top)->second;
+    std::list<Statement*>* following_statement_list = follows_hash.find(top)->second;
+    Statement* following_statement = following_statement_list->front();
 
     assert(following_statement != top); // erroneous non transitive relationship
     std::list<Statement*>* follows_T_list = ExtractFollowsTFromThread(following_statement);

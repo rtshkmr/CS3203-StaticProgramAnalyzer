@@ -6,8 +6,8 @@
 
 class AffectsExtractor {
  public:
-  std::vector<Entity*> GetAffects(std::string target);
-  std::vector<Entity*> GetAffectedBy(std::string target);
+  std::vector<Entity*> GetAffects(int target);
+  std::vector<Entity*> GetAffectedBy(int target);
   void Delete();
  private:
   std::unordered_map<Statement*, std::list<Statement*>*> affects_map_;

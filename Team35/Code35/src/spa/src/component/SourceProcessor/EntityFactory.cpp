@@ -9,7 +9,7 @@ using std::vector;
 
 EntityFactory::EntityFactory(std::list<Procedure*>* proc_list,
                              std::list<Variable*>* var_list,
-                             std::list<ConstantValue*>* const_list) {
+                             std::list<Constant*>* const_list) {
   proc_list_ = proc_list;
   var_list_ = var_list;
   const_list_ = const_list;
@@ -85,7 +85,7 @@ Entity* EntityFactory::CreateConditionalEntity(vector<Token> tokens, TokenTag en
   vector<Token> expression_tokens = GetExpressionTokens(tokens, TokenTag::kOpenBracket, TokenTag::kCloseBracket);
   std::string expression_string = ConvertTokensToString(expression_tokens);
   vector<Variable*> expression_variables = GetVariablesFromExpressionTokens(expression_tokens);
-  vector<ConstantValue*> expression_constants = GetConstantsFromExpressionTokens(expression_tokens);
+  vector<Constant*> expression_constants = GetConstantsFromExpressionTokens(expression_tokens);
 
   if (entity_type == TokenTag::kIfKeyword) {
     return new IfEntity(expression_string, expression_variables, expression_constants);
@@ -109,7 +109,7 @@ Entity* EntityFactory::CreateAssignEntity(vector<Token> tokens) {
   vector<Token> expression_tokens = GetExpressionTokens(tokens, TokenTag::kAssignmentOperator, TokenTag::kSemicolon);
   std::string expression_string = ConvertTokensToString(expression_tokens);
   vector<Variable*> expression_variables = GetVariablesFromExpressionTokens(expression_tokens);
-  vector<ConstantValue*> expression_constants = GetConstantsFromExpressionTokens(expression_tokens);
+  vector<Constant*> expression_constants = GetConstantsFromExpressionTokens(expression_tokens);
 
   return new AssignEntity(
       RetrieveVariable(tokens.front().GetTokenString()),
@@ -172,11 +172,11 @@ vector<Variable*> EntityFactory::GetVariablesFromExpressionTokens(const vector<T
   return variables;
 }
 
-vector<ConstantValue*> EntityFactory::GetConstantsFromExpressionTokens(vector<Token> tokens) {
-  vector<ConstantValue*> constants;
+vector<Constant*> EntityFactory::GetConstantsFromExpressionTokens(vector<Token> tokens) {
+  vector<Constant*> constants;
   for (auto& token: tokens) {
     if (token.GetTokenTag() == TokenTag::kInteger) {
-      ConstantValue* curr_const = CreateConstantValue(token.GetTokenString());
+      Constant* curr_const = CreateConstant(token.GetTokenString());
       auto iter = std::find(constants.begin(), constants.end(), curr_const);
       if (iter == constants.end()) {
         // add curr_const if it is not found in constants
@@ -201,8 +201,8 @@ Variable* EntityFactory::CreateVariable(std::string var_name) {
   return v;
 }
 
-ConstantValue* EntityFactory::CreateConstantValue(std::string const_val) {
-  ConstantValue* val = new ConstantValue(std::move(const_val));
+Constant* EntityFactory::CreateConstant(std::string const_val) {
+  Constant* val = new Constant(new ConstantValue(std::move(const_val)));
   const_list_->push_back(val);
   return val;
 }

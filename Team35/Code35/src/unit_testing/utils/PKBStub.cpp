@@ -24,7 +24,7 @@ Deliverable* SetUpDeliverable_Week4() {
   proc_list->push_back(proc);
 
   std::list<Variable*>* var_list = deliverable->GetVariableList();
-  std::list<ConstantValue*>* const_list = deliverable->GetConstantValueList();
+  std::list<Constant*>* const_list = deliverable->GetConstantList();
 
   // read x
   Variable* var_x = new Variable(new VariableName("x"));
@@ -47,14 +47,14 @@ Deliverable* SetUpDeliverable_Week4() {
   deliverable->AddUsesRelationship(stmt2, stmt2->GetVariable());
 
   // y = 1
-  ConstantValue* cv1 = new ConstantValue("1");
+  Constant* cv1 = new Constant(new ConstantValue("1"));
   const_list->push_back(cv1);
   Variable* var_y = new Variable(new VariableName("y"));
   var_list->push_back(var_y);
 
   std::string stmt3_s = "1";
   std::vector<Variable*> stmt3_var_expr;
-  std::vector<ConstantValue*> stmt3_cv_expr;
+  std::vector<Constant*> stmt3_cv_expr;
   stmt3_cv_expr.push_back(cv1);
 
   AssignEntity* stmt3 = new AssignEntity(var_y, stmt3_s, stmt3_var_expr, stmt3_cv_expr);
@@ -70,14 +70,14 @@ Deliverable* SetUpDeliverable_Week4() {
   }
 
   // z = 3
-  ConstantValue* cv2 = new ConstantValue("3");
+  Constant* cv2 = new Constant(new ConstantValue("3"));
   const_list->push_back(cv2);
   Variable* var_z = new Variable(new VariableName("z"));
   var_list->push_back(var_z);
 
   std::string stmt4_s = "3";
   std::vector<Variable*> stmt4_var_expr;
-  std::vector<ConstantValue*> stmt4_cv_expr;
+  std::vector<Constant*> stmt4_cv_expr;
   stmt3_cv_expr.push_back(cv2);
 
   AssignEntity* stmt4 = new AssignEntity(var_z, stmt4_s, stmt4_var_expr, stmt4_cv_expr);
@@ -93,14 +93,14 @@ Deliverable* SetUpDeliverable_Week4() {
   }
 
   // z = x + y + 3;
-  ConstantValue* cv3 = new ConstantValue("3"); //note that ConstantValue is not unique.
+  Constant* cv3 = new Constant(new ConstantValue("3")); //note that Constant is not unique.
   const_list->push_back(cv3);
 
   std::string stmt5_s = "x + y + 3";
   std::vector<Variable*> stmt5_var_expr;
   stmt5_var_expr.push_back(var_x);
   stmt5_var_expr.push_back(var_y);
-  std::vector<ConstantValue*> stmt5_cv_expr;
+  std::vector<Constant*> stmt5_cv_expr;
   stmt3_cv_expr.push_back(cv2);
 
   AssignEntity* stmt5 = new AssignEntity(var_z, stmt5_s, stmt5_var_expr, stmt5_cv_expr);
@@ -151,37 +151,37 @@ Deliverable* SetUpDeliverable_Transitive() {
   Variable* var_p = new Variable(new VariableName("p"));
 
   // constants
-  ConstantValue* cv_2 = new ConstantValue("2");
-  ConstantValue* cv_1 = new ConstantValue("1");
-  ConstantValue* cv_24 = new ConstantValue("24");
-  ConstantValue* cv_0 = new ConstantValue("0");
-  ConstantValue* cv_5 = new ConstantValue("5");
+  Constant* cv_2 = new Constant(new ConstantValue("2"));
+  Constant* cv_1 = new Constant(new ConstantValue("1"));
+  Constant* cv_24 = new Constant(new ConstantValue("24"));
+  Constant* cv_0 = new Constant(new ConstantValue("0"));
+  Constant* cv_5 = new Constant(new ConstantValue("5"));
 
   // assign
   // 1
   std::vector<Variable*> var_list_1 ({var_z});
-  std::vector<ConstantValue*> cv_list_1 ({cv_2});
+  std::vector<Constant*> cv_list_1 ({cv_2});
   AssignEntity* stmt1 = new AssignEntity(var_y, "y=2*z", var_list_1, cv_list_1);
 
   // 3
   std::vector<Variable*> var_list_3 ({var_x});
-  std::vector<ConstantValue*> cv_list_3 ({cv_24});
+  std::vector<Constant*> cv_list_3 ({cv_24});
   AssignEntity* stmt3 = new AssignEntity(var_z, "z=x*24", var_list_3, cv_list_3);
 
   // 5
   std::vector<Variable*> var_list_5 ({var_x, var_q});
-  std::vector<ConstantValue*> cv_list_5 ({cv_5});
+  std::vector<Constant*> cv_list_5 ({cv_5});
   AssignEntity* stmt5 = new AssignEntity(var_y, "y=x*q-5", var_list_5, cv_list_5);
 
   // 6
   std::vector<Variable*> var_list_6 ({var_x, var_y, var_z, var_p, var_q});
-  std::vector<ConstantValue*> cv_list_6 ({});
+  std::vector<Constant*> cv_list_6 ({});
   AssignEntity* stmt6 = new AssignEntity(var_y, "y=x+y*z+p*q", var_list_6, cv_list_6);
 
   // while
   // 4
   std::vector<Variable*> var_list_4 ({var_z});
-  std::vector<ConstantValue*> cv_list_4 ({cv_0});
+  std::vector<Constant*> cv_list_4 ({cv_0});
   WhileEntity* stmt4 = new WhileEntity("z<0", var_list_4, cv_list_4);
   stmt4->AddStatement(stmt5);
 
@@ -192,7 +192,7 @@ Deliverable* SetUpDeliverable_Transitive() {
   stmt2_else->AddStatement(stmt6);
 
   std::vector<Variable*> var_list_2 ({var_q});
-  std::vector<ConstantValue*> cv_list_2 ({cv_1});
+  std::vector<Constant*> cv_list_2 ({cv_1});
   IfEntity* stmt2 = new IfEntity("q!=1", var_list_2, cv_list_2);
   stmt2->AddStatement(stmt3);
   stmt2->SetElseEntity(stmt2_else);

@@ -6,7 +6,6 @@
 #include <array>
 #include <unordered_set>
 #include <datatype/DataType.h>
-//#include <component/QueryProcessor/types/QueryEvaluatorTable.h>
 #include <typeinfo>
 
 enum class DesignEntity : unsigned int {
@@ -20,27 +19,9 @@ enum class DesignEntity : unsigned int {
   kVariable = 7,
   kConstant = 8,
   kProcedure = 9,
-  kInvalid = 10,
-  kWildcard = 11,
-  kProgLine = 12
+  kProgLine = 10,
+  kInvalid = 11
 };
-
-const std::array<DesignEntity, 12> all_design_entities = {
-    DesignEntity:: kStmt,
-    DesignEntity:: kRead,
-    DesignEntity:: kPrint,
-    DesignEntity:: kCall,
-    DesignEntity:: kWhile,
-    DesignEntity:: kIf,
-    DesignEntity:: kAssign,
-    DesignEntity:: kVariable,
-    DesignEntity:: kConstant,
-    DesignEntity:: kProcedure,
-    DesignEntity:: kInvalid,
-    DesignEntity:: kProgLine,
-};
-
-DesignEntity GetDesignEntity(std::string reference);
 
 enum class PKBRelRefs {
   kFollows,
@@ -77,7 +58,63 @@ enum class PKBRelRefs {
   kAffectedByT
 };
 
-const std::unordered_set<PKBRelRefs> pkb_rel_set = {
+enum class RelRef {
+  kModifiesP,
+  kModifiesS,
+  kUsesP,
+  kUsesS,
+  kCalls,
+  kCallsT,
+  kParent,
+  kParentT,
+  kFollows,
+  kFollowsT,
+  kNext,
+  kNextT,
+  kAffects,
+  kAffectsT,
+  kInvalid
+};
+
+enum class Attribute {
+  kStmtNumber,
+  kProcName,
+  kVarName,
+  kValue,
+  kInvalid
+};
+
+/**
+ * ScopeIndication is used by the PKBQueryReceiver when passing arguments to the DBManager.
+ * This indicates whether the DBManager should utilize the scoped entity vectors (for left and right param) or just the DE itself.
+ */
+enum class ScopeIndication {
+  kNoScope,
+  kLeftScope, // i.e. only the left param is scoped, so use the entity vector for left param and DE for the right param
+  kRightScope,
+  kAllScope
+};
+
+DesignEntity GetDesignEntity(std::string reference);
+RelRef GetRelRef(std::string reference);
+Attribute GetAttribute(std::string attr_string);
+
+const std::unordered_set<DesignEntity> stmt_design_entities_ = {
+  DesignEntity::kRead,
+  DesignEntity::kPrint,
+  DesignEntity::kCall,
+  DesignEntity::kWhile,
+  DesignEntity::kIf,
+  DesignEntity::kAssign
+};
+
+const std::unordered_set<DesignEntity> pattern_entities_ = {
+  DesignEntity::kWhile,
+  DesignEntity::kIf,
+  DesignEntity::kAssign
+};
+
+const std::unordered_set<PKBRelRefs> preprocessed_rel_refs = {
   PKBRelRefs::kFollows,
   PKBRelRefs::kFollowsT,
   PKBRelRefs::kFollowedBy,
@@ -141,72 +178,6 @@ const std::unordered_set<PKBRelRefs> second_param_is_proc = {
   PKBRelRefs::kCalledByT
 };
 
-const std::array<PKBRelRefs, 16> pkb_rel_refs = {
-    PKBRelRefs::kFollows,
-    PKBRelRefs::kFollowsT,
-    PKBRelRefs::kFollowedBy,
-    PKBRelRefs::kFollowedByT,
-    PKBRelRefs::kParent,
-    PKBRelRefs::kParentT,
-    PKBRelRefs::kChild,
-    PKBRelRefs::kChildT,
-    PKBRelRefs::kUsesS,
-    PKBRelRefs::kUsesC,
-    PKBRelRefs::kUsedByS,
-    PKBRelRefs::kUsedByC,
-    PKBRelRefs::kModifiesStatement,
-    PKBRelRefs::kModifiesContainer,
-    PKBRelRefs::kModifiedByStatement,
-    PKBRelRefs::kModifiedByContainer
-};
-
-enum class RelRef {
-  kModifiesP,
-  kModifiesS,
-  kUsesP,
-  kUsesS,
-  kCalls,
-  kCallsT,
-  kParent,
-  kParentT,
-  kFollows,
-  kFollowsT,
-  kNext,
-  kNextT,
-  kAffects,
-  kAffectsT,
-  kWildcard,
-  kInvalid,
-};
-
-RelRef GetRelRef(std::string reference);
-
-enum class Attribute {
-  kStmtNumber,
-  kProcName,
-  kVarName,
-  kValue,
-  kInvalid
-};
-
-/**
- * ScopeIndication is used by the PKBQueryReceiver when passing arguments to the DBManager.
- * This indicates whether the DBManager should utilize the scoped entity vectors (for left and right param) or just the DE itself.
- */
-enum class ScopeIndication {
-  kNoScope,
-  kLeftScope, // i.e. only the left param is scoped, so use the entity vector for left param and DE for the right param
-  kRightScope,
-  kAllScope
-};
-
-Attribute GetAttribute(std::string attr_string);
-
-struct QueryInfo {
-  bool all_boolean_true;
-  // std::vector<*QueryEvaluatorTable> table_list;
-};
-
 class Synonym {
  private:
   std::string name;
@@ -232,6 +203,59 @@ struct Clause {
   virtual std::string getType() { return ""; };
   virtual bool isEqual(Clause toObj) { return 1; };
   virtual ~Clause() {};
+};
+
+struct With : Clause {
+  Attribute left_attribute;
+  Attribute right_attribute;
+  bool left_is_prog_line;
+  bool right_is_prog_line;
+  bool left_is_synonym;
+  bool right_is_synonym;
+  With() {};
+  With(bool l_is_syn, bool r_is_syn, std::string lhs, std::string rhs, Attribute left_attr, Attribute right_attr,
+       bool left_is_pl, bool right_is_pl) {
+    left_is_synonym = l_is_syn;
+    right_is_synonym = r_is_syn;
+    left_hand_side = lhs;
+    right_hand_side = rhs;
+    left_attribute = left_attr;
+    right_attribute = right_attr;
+    left_is_prog_line = left_is_pl;
+    right_is_prog_line = right_is_pl;
+  };
+  With(bool l_is_syn, bool r_is_syn, std::string lhs, std::string rhs, bool left_is_pl, bool right_is_pl) {
+    left_is_synonym = l_is_syn;
+    right_is_synonym = r_is_syn;
+    left_hand_side = lhs;
+    right_hand_side = rhs;
+    left_is_prog_line = left_is_pl;
+    right_is_prog_line = right_is_pl;
+  };
+  std::vector<std::string> GetAllSynonymNamesOfClause() {
+    std::vector<std::string> v;
+    if (left_is_synonym) v.push_back(left_hand_side);
+    if (right_is_synonym) v.push_back(right_hand_side);
+    return v;
+  };
+  std::string getType() const { return typeid(this).name(); }
+  bool isEqual(Clause* toObj) {
+    if (this->getType() == toObj->getType()) {
+      With* obj = (With*) & toObj;
+      return (
+              this->left_hand_side == obj->left_hand_side &&
+              this->right_hand_side == obj->right_hand_side &&
+              this->left_attribute == obj->left_attribute &&
+              this->right_attribute == obj->right_attribute &&
+              this->left_is_synonym == obj->left_is_synonym &&
+              this->right_is_synonym == obj->right_is_synonym &&
+              this->left_is_prog_line == obj->left_is_prog_line &&
+              this->right_is_prog_line == obj->right_is_prog_line
+              );
+    } else {
+      return false;
+    }
+  }
 };
 
 struct SuchThat : Clause {

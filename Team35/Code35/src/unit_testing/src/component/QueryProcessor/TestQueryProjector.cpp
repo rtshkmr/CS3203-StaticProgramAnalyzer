@@ -60,9 +60,9 @@ TEST_CASE("3.QueryProjector.Stringify tables") {
     Variable* vx = entity_utils::var_x_;
     Variable* vz = entity_utils::var_z_;
     Variable* vi = entity_utils::var_i_;
-    Constant* c1 = new Constant(entity_utils::const_1_);
-    Constant* c0 = new Constant(entity_utils::const_0_);
-    Constant* c3 = new Constant(entity_utils::const_3_);
+    Constant* c1 = entity_utils::const_1_;
+    Constant* c0 = entity_utils::const_0_;
+    Constant* c3 = entity_utils::const_3_;
 
     std::vector<Synonym*> synonyms = std::vector<Synonym*>{
         new Synonym("a", DesignEntity::kProcedure),
