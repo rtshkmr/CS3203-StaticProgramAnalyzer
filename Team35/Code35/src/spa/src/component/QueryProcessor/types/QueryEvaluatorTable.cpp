@@ -1,7 +1,10 @@
 #include "QueryEvaluatorTable.h"
 
+#include <utility>
+#include <cassert>
+
 bool QueryEvaluatorTable::AddTargetSynonymValues(Synonym *target, std::vector<Entity *> entity_list) {
-  synonym_to_entity_map[target] = entity_list;
+  synonym_to_entity_map[target] = std::move(entity_list);
   return true;
 }
 
@@ -46,14 +49,14 @@ bool QueryEvaluatorTable::AddMultipleRowForAllColumn(Synonym *synonym, int index
     return false;
   }
 
-  for (auto tableIterator = synonym_to_entity_map.begin(); tableIterator != synonym_to_entity_map.end(); tableIterator++) {
-    if (tableIterator->first == synonym) {
+  for (auto & tableIterator : synonym_to_entity_map) {
+    if (tableIterator.first == synonym) {
       AddRow(synonym, index + repeat_count, entity);
     } else {
       if (repeat_count > 0) {
-        std::vector<Entity *> currList = tableIterator->second;
+        std::vector<Entity *> currList = tableIterator.second;
         currList.insert(currList.begin() + index + repeat_count, currList[index]);
-        tableIterator->second = currList;
+        tableIterator.second = currList;
       }
     }
   }
@@ -64,12 +67,12 @@ bool QueryEvaluatorTable::DeleteRow(int index) {
   if (synonym_to_entity_map[target_synonym_list[0]].size() - 1 < index) {
     return false;
   }
-  for (auto iter = synonym_to_entity_map.begin(); iter != synonym_to_entity_map.end(); ++iter) {
-    std::vector<Entity *> current_column = iter->second;
+  for (auto & iter : synonym_to_entity_map) {
+    std::vector<Entity *> current_column = iter.second;
     unsigned long size = current_column.size();
     if (index < size) {
       current_column.erase(current_column.begin() + index);
-      iter->second = current_column;
+      iter.second = current_column;
     }
   }
   return true;
@@ -85,6 +88,11 @@ int QueryEvaluatorTable::GetColumnSize() {
   return synonym_to_entity_map.size();
 }
 
+/**
+ * The row size of the table is calculated from the number of rows for the first target synonym. This is because
+ * the table is assumed to contain the first row first.
+ * @return
+ */
 int QueryEvaluatorTable::GetRowSize() {
   auto search = synonym_to_entity_map.find(target_synonym_list[0]);
 
@@ -114,11 +122,55 @@ std::vector<Synonym*> QueryEvaluatorTable::GetTargetSynonymList() {
   return target_synonym_list;
 }
 
+/**
+ * Creates the new column and populate the table and the new column(s) with the cross producted rows.
+ * @param synonyms
+ * @param values
+ */
+void
+QueryEvaluatorTable::CrossProductColumns(std::vector<Synonym *> synonyms, std::vector<std::vector<Entity *>> values) {
+  assert(synonyms.size() == values.size());
+  for (int i = 0; i < synonyms.size(); i++) {
+    AddColumn(synonyms[i]);
+    CrossProductSingleColumn(synonyms[i], values[i]);
+  }
+}
+
+void QueryEvaluatorTable::CrossProductSingleColumn(Synonym *synonym, const std::vector<Entity *>& values) {
+  int number_of_repeat = 0;
+  int current_index = 0;
+  int original_number_of_rows = GetRowSize();
+  for (auto value : values) {
+    if (number_of_repeat > 0) {
+      DuplicateTableForCrossProduct(original_number_of_rows);
+    }
+    InsertValuesForCrossProduct(synonym, value, original_number_of_rows);
+    current_index += original_number_of_rows;
+    number_of_repeat++;
+  }
+}
+
 QueryEvaluatorTable::QueryEvaluatorTable(Synonym *target) {
   std::vector<Synonym *> list = {target};
   target_synonym_list = list;
 }
 
 QueryEvaluatorTable::QueryEvaluatorTable(std::vector<Synonym *> target_list) {
-  target_synonym_list = target_list;
+  target_synonym_list = std::move(target_list);
+}
+
+void QueryEvaluatorTable::DuplicateTableForCrossProduct(int original_size) {
+  for (auto & iter : synonym_to_entity_map) {
+    std::vector<Entity *> current_column = iter.second;
+    for (int i = 0; i < original_size; i++) {
+      current_column.push_back(current_column[i]);
+    }
+    iter.second = current_column;
+  }
+}
+
+void QueryEvaluatorTable::InsertValuesForCrossProduct(Synonym *synonym_column, Entity *value, int original_size) {
+  for (int i = 0; i < original_size; i++) {
+    synonym_to_entity_map[synonym_column].push_back(value);
+  }
 }

@@ -30,6 +30,7 @@ add_library(spa ${srcs} ${headers}
         src/component/QueryProcessor/QueryExtractor/QueryParser.h src/component/QueryProcessor/QueryExtractor/QueryParser.cpp
         src/component/QueryProcessor/QueryExtractor/QueryExtractor.h src/component/QueryProcessor/QueryExtractor/QueryExtractor.cpp
         src/component/QueryProcessor/QueryExtractor/QueryGrouper.h src/component/QueryProcessor/QueryExtractor/QueryGrouper.cpp
+        src/component/QueryProcessor/QueryExtractor/QueryOptimizer.h src/component/QueryProcessor/QueryExtractor/QueryOptimizer.cpp
         src/component/QueryProcessor/QueryExtractor/QuerySemanticValidator.h src/component/QueryProcessor/QueryExtractor/QuerySemanticValidator.cpp
         src/component/QueryProcessor/QueryEvaluator/QueryEvaluator.h src/component/QueryProcessor/QueryEvaluator/QueryEvaluator.cpp
         src/component/QueryProcessor/QueryEvaluator/PKBQueryCommand.h src/component/QueryProcessor/QueryEvaluator/PKBQueryCommand.cpp
@@ -45,7 +46,7 @@ add_library(spa ${srcs} ${headers}
         src/util/Logger.cpp src/util/Logger.h
         src/util/util.h
         src/util/TimeUtil.cpp src/util/TimeUtil.h
-        src/util/PKBStub.cpp src/util/PKBStub.h src/model/CFG.cpp src/model/CFG.h
+        ../unit_testing/utils/PKBStub.cpp ../unit_testing/utils/PKBStub.h src/model/CFG.cpp src/model/CFG.h
         src/component/PKB/RuntimeExtractor.cpp src/component/PKB/RuntimeExtractor.h
         src/component/PKB/NextTExtractor.cpp src/component/PKB/NextTExtractor.h
         src/component/SourceProcessor/Extractors/NextExtractor.cpp src/component/SourceProcessor/Extractors/NextExtractor
