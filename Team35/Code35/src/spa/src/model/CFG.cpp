@@ -241,13 +241,12 @@ bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
   // get all the children, for each child, explore depth if needed:
   std::list<Cluster*> children = scoped_cluster->nested_clusters_;
   for (auto child: children) {
+    bool start_target_not_in_child = !child->CheckIfStmtNumInRange(target_range.first);
+    if(start_target_not_in_child) continue; // skip child if targets are not in this child
     bool child_does_not_modify_var = true;
     bool child_contains_second_stmt = child->CheckIfStmtNumInRange(target_range.second);
     auto child_range = child->GetStartEndRange();
     ClusterTag tag = child->GetClusterTag();
-    bool child_is_not_if_or_while_cluster_constituents = tag != ClusterTag::kIfCond && tag != ClusterTag::kIfBody
-        && tag != ClusterTag::kElseBody && tag != ClusterTag::kWhileCond && tag != ClusterTag::kWhileBody;
-    assert(child_is_not_if_or_while_cluster_constituents); // genuinely don't know if this is a valid assumption
 
     // =========================== HANDLE IF CLUSTER ====================================
     if (tag == ClusterTag::kIfCluster) {
@@ -277,22 +276,27 @@ bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
         child_does_not_modify_var = else_body_is_unmodified_path;
       }
       //=================================== HANDLE WHILE CLUSTER =====================================
-    } else if (tag == ClusterTag::kWhileCluster && child_contains_second_stmt) {
+    }
+    else if (tag == ClusterTag::kWhileCluster && child_contains_second_stmt) {
       auto new_target_range = std::make_pair(child_range.first, target_range.second);
       return TraverseScopedClusterForAffects(child, new_target_range, pkb, lhs_var);
       // =================================== HANDLE CHILDREN THAT ARE SIMPLE BLOCKS =======================
     } else { // it's a simple block, no alternative paths to consider:
-      if (child_range.first + 1
-          != child_range.second) { // iterate
+      if (target_range.first + 1
+          != target_range.second) { // iterate // todo: should it be using the target instead of the child here(?)
         // start with offset of +1 to avoid counting the first statement
         int for_loop_end = std::min(child_range.second + 1, target_range.second);
-        for (int line_num = child_range.first + 1; line_num < for_loop_end; line_num++) {
+        // todo: likely bug. if it's a normal block, it should start from target.first right?
+        assert(!start_target_not_in_child);
+        for (int line_num = target_range.first + 1; line_num < for_loop_end; line_num++) {
           child_does_not_modify_var = !pkb->HasRelationship(PKBRelRefs::kModifies, std::to_string(line_num), lhs_var);
           // QQ: based on previous discussion here: https://discord.com/channels/877051619970269184/880007746647388180/893129063391187005 ,
           //     it's correct to say that for call statements also, this above line will work and we don't need
           //     to go do path traversal for the function calls right
           if (!child_does_not_modify_var) break;
         }
+        // after doing this traversal thru the plain blocks, need to update the target start:
+        target_range.first = for_loop_end;
       }
       if (!child_does_not_modify_var) {
         scoped_cluster_does_not_modify_var = false; // it does modify, fails early
