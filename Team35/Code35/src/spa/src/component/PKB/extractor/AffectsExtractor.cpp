@@ -51,6 +51,24 @@ std::vector<Entity*> AffectsExtractor::GetAllAffectedBy() {
 }
 
 /**
+ * For Affects(a1, a2)
+ */
+std::vector<std::tuple<Entity*, Entity*>> AffectsExtractor::GetAllPair() {
+  std::vector<std::tuple<Entity*, Entity*>> retList = {};
+
+  std::vector<Entity*> assign_list = pkb_->GetDesignEntities(DesignEntity::kAssign);
+  for (auto* entity : assign_list) {
+    AssignEntity* ae = dynamic_cast<AssignEntity*>(entity);
+    std::vector<Entity*> all_affected_by_ae = GetAffects(ae->GetStatementNumber()->GetNum());
+    for (auto* affected : all_affected_by_ae) {
+      retList.push_back(std::make_tuple(entity, affected));
+    }
+  }
+  retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
+  return retList;
+}
+
+/**
  * For Affects(_,_)
  */
 bool AffectsExtractor::HasAffects() {

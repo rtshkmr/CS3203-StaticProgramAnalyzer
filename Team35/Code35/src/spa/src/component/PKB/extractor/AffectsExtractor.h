@@ -19,6 +19,7 @@ class AffectsExtractor {
   std::vector<Entity*> GetAffectedBy(int target);
   std::vector<Entity*> GetAllAffects();
   std::vector<Entity*> GetAllAffectedBy();
+  std::vector<std::tuple<Entity*, Entity*>> GetAllPair();
   bool HasAffects();
   bool HasAffects(int target);
   bool HasAffectedBy(int target);

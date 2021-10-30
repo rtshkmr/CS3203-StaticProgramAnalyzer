@@ -77,11 +77,13 @@ std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetPrevT(DesignEntit
 }
 
 std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetAffects(DesignEntity first, DesignEntity second) {
-  return std::vector<std::tuple<Entity*, Entity*>>();
+  return affects_extractor_.GetAllPair();
 }
+
 std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetAffectedBy(DesignEntity first, DesignEntity second) {
-  return std::vector<std::tuple<Entity*, Entity*>>();
+  return affects_extractor_.GetAllPair();
 }
+
 std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetAffectsT(DesignEntity first, DesignEntity second) {
   return std::vector<std::tuple<Entity*, Entity*>>();
 }
