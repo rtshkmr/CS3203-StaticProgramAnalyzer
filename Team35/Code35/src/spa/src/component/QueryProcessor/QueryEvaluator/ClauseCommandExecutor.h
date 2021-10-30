@@ -27,6 +27,7 @@ class ClauseCommandExecutor {
     std::vector<Variable*> RetrieveVariablesFromStmt(Entity *stmt_entity);
     std::tuple<bool, int>DoubleSynonymExpansionCheck(Clause *clause, bool first_syn_in);
     bool DetermineWithTwoSynonyms(With *with_clause, int index);
+    std::string RetrieveEntityAttribute(Entity *entity, Attribute attribute);
   public:
     ClauseCommandExecutor(QueryEvaluatorTable *table, IntermediateTable *intermediate_table);
     void SuchThatTwoSynonym(Clause *clause);

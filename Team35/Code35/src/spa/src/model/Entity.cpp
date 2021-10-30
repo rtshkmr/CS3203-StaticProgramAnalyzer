@@ -52,6 +52,10 @@ const VariableName* Variable::GetName() {
   return variable_name_;
 }
 
+std::string Variable::GetNameInString() {
+  return const_cast<VariableName*>(variable_name_)->getName();
+}
+
 void Variable::AddStatement(Statement* stmt) {
   EntityEnum ent = stmt->GetEntityEnum();
   int lot = static_cast<int>(ent) - 1; // remove procedure from 0.

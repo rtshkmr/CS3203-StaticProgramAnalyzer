@@ -71,18 +71,10 @@ void ClauseCommandExecutor::PatternTwoSynonym(Clause *clause) {
 void ClauseCommandExecutor::WithTwoSynonym(Clause *clause) {
   auto *with_clause = dynamic_cast<With *>(clause);
   int delete_count = 0;
+  int table_size = group_table->GetRowSize();
 
-  std::vector<Entity *> first_stmt_list = group_table->GetColumn(with_clause->first_synonym);
-  std::vector<Entity *> second_stmt_list = group_table->GetColumn(with_clause->second_synonym);
-
-  for (int i = 0; i < first_stmt_list.size(); i++) {
-    Entity* first_entity = first_stmt_list[i];
-    Entity* second_entity = second_stmt_list[i];
-
-    bool relationship_holds = false;
-    // Logic for checking the attr value.
-    relationship_holds = DetermineWithTwoSynonyms(with_clause, i);
-
+  for (int i = 0; i < table_size; i++) {
+    bool relationship_holds = DetermineWithTwoSynonyms(with_clause, i);
     if (!relationship_holds) {
       group_table->DeleteRow(i - delete_count);
       delete_count++;
@@ -95,9 +87,31 @@ bool ClauseCommandExecutor::DetermineWithTwoSynonyms(With *with_clause, int inde
   std::vector<Entity *> second_stmt_list = group_table->GetColumn(with_clause->second_synonym);
   Entity* first_entity = first_stmt_list[index];
   Entity* second_entity = second_stmt_list[index];
-  switch (with_clause->left_attribute) {
-  case Attribute::kStmtNumber:
+  std::string first_entity_value = RetrieveEntityAttribute(first_entity, with_clause->left_attribute);
+  std::string second_entity_value = RetrieveEntityAttribute(second_entity, with_clause->right_attribute);
+  return first_entity_value == second_entity_value;
+}
 
+std::string ClauseCommandExecutor::RetrieveEntityAttribute(Entity *entity, Attribute attribute) {
+  switch (attribute) {
+  case (Attribute::kStmtNumber):
+    return std::to_string(const_cast<StatementNumber*>(dynamic_cast<Statement *>(entity)->GetStatementNumber())->GetNum());
+  case Attribute::kProcName :
+    if (typeid(*entity) == typeid(Procedure)) {
+      return const_cast<ProcedureName*>(dynamic_cast<Procedure *>(entity)->GetName())->getName();
+    } else {
+      return const_cast<ProcedureName*>(dynamic_cast<CallEntity *>(entity)->GetProcedure()->GetName())->getName();
+    }
+  case Attribute::kValue:
+    return std::to_string(const_cast<ConstantValue*>(dynamic_cast<Constant *>(entity)->GetValue())->Get());
+  case Attribute::kVarName:
+    if (typeid(*entity) == typeid(Variable)) {
+      return dynamic_cast<Variable*>(entity)->GetNameInString();
+    } else if (typeid(*entity) == typeid(ReadEntity)) {
+      return dynamic_cast<ReadEntity *>(entity)->GetVariable()->GetNameInString();
+    } else {
+      return dynamic_cast<PrintEntity *>(entity)->GetVariable()->GetNameInString();
+    }
   }
 }
 
