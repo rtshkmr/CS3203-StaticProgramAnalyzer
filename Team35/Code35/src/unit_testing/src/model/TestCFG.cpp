@@ -1,3 +1,4 @@
+#include <component/SourceProcessor/SourceProcessor.h>
 #include "catch.hpp"
 #include "model/CFG.h"
 #include "component/SourceProcessor/PSubsystem.h"
@@ -139,7 +140,27 @@ TEST_CASE("1.CFG.Cluster") {
   }
 
   SECTION("Traversal Helper Functions") {
-    //
+    // set up pkb and everything using
+    PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/mixed_loops_source.txt");
+    SECTION("Getting innermost cluster") {
+      Procedure* proc = dynamic_cast<Procedure*>(pkb->GetDesignEntities(DesignEntity::kProcedure).front());
+      Cluster* inner_cluster_4_5 = proc->GetInnermostCluster(4,5, nullptr);
+      Cluster* inner_cluster_4_7 = proc->GetInnermostCluster(4,7, nullptr);
+      auto range_for_4_5 = inner_cluster_4_5->GetStartEndRange();
+      bool output_4_5 = (range_for_4_5.first == 4 && range_for_4_5.second == 5);
+      REQUIRE(output_4_5);
+      auto range_for_4_7 = inner_cluster_4_7->GetStartEndRange();
+      bool output_4_7 = (range_for_4_7.first == 3 && range_for_4_7.second == 18); // it's the entire if cluster
+      REQUIRE(output_4_7);
+      Cluster* inner_cluster_13_15 = proc->GetInnermostCluster(13,15, nullptr);
+      auto range_for_13_15 = inner_cluster_13_15->GetStartEndRange();
+      bool output_13_15 = range_for_13_15.first == 11 && range_for_13_15.second == 15;
+      Cluster* inner_cluster_16_19 = proc->GetInnermostCluster(16,19, nullptr);
+      auto range_for_16_19 = inner_cluster_16_19->GetStartEndRange();
+      bool output_16_19 = range_for_16_19.first == 1 && range_for_16_19.second == 23;
+      REQUIRE(output_16_19);
+    }
+
   }
 }
 
