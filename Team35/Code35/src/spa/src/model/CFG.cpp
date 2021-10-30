@@ -320,6 +320,7 @@ bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
   return scoped_cluster_does_not_modify_var;
 }
 
+
 // default destructors:
 Cluster::~Cluster() = default;
 Block::~Block() = default;
