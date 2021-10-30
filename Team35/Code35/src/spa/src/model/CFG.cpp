@@ -279,7 +279,6 @@ bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
     bool child_does_not_modify_var = true;
     bool child_contains_second_stmt = child->CheckIfStmtNumInRange(target_range.second);
     auto child_range = child->GetStartEndRange();
-
     ClusterTag tag = child->GetClusterTag();
     bool is_not_if_or_while_cluster_constituents = tag != ClusterTag::kIfCond
         && tag != ClusterTag::kIfBody && tag != ClusterTag::kElseBody && tag != ClusterTag::kWhileCond

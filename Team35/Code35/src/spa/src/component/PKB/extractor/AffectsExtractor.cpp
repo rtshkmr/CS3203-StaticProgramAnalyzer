@@ -63,8 +63,10 @@ bool AffectsExtractor::HasAffects(AssignEntity* first_stmt, AssignEntity* second
  *
  * */
 bool AffectsExtractor::HasValidUnmodifiedPath(AssignEntity* first_stmt, AssignEntity* second_stmt) {
-  int first_stmt_num = first_stmt->GetStatementNumber()->GetNum();
-  int second_stmt_num = second_stmt->GetStatementNumber()->GetNum();
+//  int first_stmt_num = first_stmt->()->GetNum();
+//  int second_stmt_num = second_stmt->GetStatementNumber()->GetNum();
+  int first_stmt_num = 4;
+  int second_stmt_num = 5;
   std::vector<Entity*> proc_entities = this->pkb_->GetDesignEntities(DesignEntity::kProcedure);
   Cluster* scoped_cluster;
   for(auto entity : proc_entities) {
@@ -79,6 +81,7 @@ bool AffectsExtractor::HasValidUnmodifiedPath(AssignEntity* first_stmt, AssignEn
   // now we have a starting node to work with, it's a graph traversal via some traversal helper function:
   // look at nested children, if the current block doesn't modify the variable we looking at
   // then can update the helper function to refine the block pointer
+
   return false;
 }
 

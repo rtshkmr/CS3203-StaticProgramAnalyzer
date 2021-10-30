@@ -26,6 +26,7 @@ enum class ClusterTag {
   kNormalBlock // default tags since clusters will be tagged
 };
 
+//class Variable;
 class Cluster {
 
  protected:
@@ -33,6 +34,11 @@ class Cluster {
   int start_ = -1;
   int end_ = -1;
   Cluster* parent_cluster_;
+  static bool TraverseScopedClusterForAffects(Cluster* scoped_cluster,
+                                              int first_stmt,
+                                              int second_stmt,
+                                              PKB* pkb,
+                                              Variable* lhs_var);
  public:
   Cluster() {};
   int size() const;
