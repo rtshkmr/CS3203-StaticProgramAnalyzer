@@ -1,6 +1,8 @@
 #include <queue>
 #include <cassert>
 #include "AffectsExtractor.h"
+#include "../../../model/CFG.h"
+
 
 void AffectsExtractor::SetPKB(PKB* pkb) {
   this->pkb_ = pkb;
@@ -34,25 +36,19 @@ bool AffectsExtractor::HasAffects(AssignEntity* first_stmt, AssignEntity* second
   // get the modified variable v from the lhs of first statement
   assert(first_stmt->GetEntityEnum() == EntityEnum::kAssignEntity);
   Variable* modified_var = first_stmt->GetVariableObj();
-  std::vector<Variable*> vars_used_by_second_stmt = second_stmt->GetControlVariables(); // todo: this is named wrongly, should be GetExpr Var for this
+  std::vector<Variable*> vars_used_by_second_stmt =
+      second_stmt->GetControlVariables(); // todo: this is named wrongly, should be GetExpr Var for this
   // check Uses(second_stmt, v)
   bool var_is_used = false;
-  for(auto* var : vars_used_by_second_stmt) {
-    if(modified_var == var) {
+  for (auto* var: vars_used_by_second_stmt) {
+    if (modified_var == var) {
       var_is_used = true;
       break;
     }
   }
-  if(!var_is_used) return false;
+  if (!var_is_used) return false;
   // check nextT, (just as a guarantee)
   return HasValidUnmodifiedPath(first_stmt, second_stmt);
-
-  //  helper function for traversing:
-  //   * get proc cluster,
-  //   *
-
-  // is this where the TA hint is to use a last modified table? we can pre-calculate the next used for every statement
-  return false;
 }
 
 /*
@@ -67,20 +63,18 @@ bool AffectsExtractor::HasValidUnmodifiedPath(AssignEntity* first_stmt, AssignEn
   int second_stmt_num = second_stmt->GetStatementNumber()->GetNum();
   std::vector<Entity*> proc_entities = this->pkb_->GetDesignEntities(DesignEntity::kProcedure);
   Cluster* scoped_cluster;
-  for(auto entity : proc_entities) {
+  for (auto entity: proc_entities) {
     auto* proc = dynamic_cast<Procedure*>(entity);
     assert(proc);
     scoped_cluster = proc->GetInnermostCluster(first_stmt_num, second_stmt_num, nullptr);
-    if(scoped_cluster) break;
+    if (scoped_cluster) break;
   }
   // call the boolean traversal helper function here, pass in the lhs argument that we're looking at
   std::string lhs_var = first_stmt->GetVariableString();
-
-  // now we have a starting node to work with, it's a graph traversal via some traversal helper function:
-  // look at nested children, if the current block doesn't modify the variable we looking at
-  // then can update the helper function to refine the block pointer
-
-  return false;
+  return Cluster::TraverseScopedCluster(PKBRelRefs::kAffects,
+                                        scoped_cluster,
+                                        std::make_pair(first_stmt_num, second_stmt_num),
+                                        pkb_, lhs_var);
 }
 
 /**
