@@ -217,7 +217,7 @@ Constant* EntityFactory::CreateConstant(std::string const_val) {
 Procedure* EntityFactory::RetrieveProcedure(std::string proc_name) {
   ProcedureName temp_proc_name = ProcedureName(proc_name);
   for (auto const& proc: * proc_list_) {
-    if (* proc->GetVariableName() == temp_proc_name) { // uses the overloaded ==
+    if (* proc->GetName() == temp_proc_name) { // uses the overloaded ==
       return proc;
     }
   }

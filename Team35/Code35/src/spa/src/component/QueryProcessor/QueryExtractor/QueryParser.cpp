@@ -34,7 +34,7 @@ Token QueryParser::Eat(TokenTag token_type) {
 Synonym* QueryParser::GetSynonymInfo(std::string syn_name, std::list<Synonym*>* synonyms) {
   // Todo: Optimize.
   for (auto t: * synonyms) {
-    if (t->GetVariableName().compare(syn_name) == 0) {
+    if (t->GetName().compare(syn_name) == 0) {
       return t;
     }
   }
@@ -528,7 +528,7 @@ bool QueryParser::IsValidSynonym(Token token, DesignEntity de) {
   // syn_name must be a known synonym, and of permitted type.
   bool is_valid = false;
   for (auto s: synonyms) {
-    if (s->GetVariableName() == syn_name && s->GetType() == de) {
+    if (s->GetName() == syn_name && s->GetType() == de) {
       is_valid = true;
       break;
     }

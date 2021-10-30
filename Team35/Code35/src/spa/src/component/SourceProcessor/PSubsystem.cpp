@@ -328,7 +328,7 @@ void PSubsystem::PerformNewProcedureSteps(Procedure* procedure) {
   } else {
     // throw error if this name is duplicated
     for (auto const& proc: * deliverable_->GetProgram()->GetProcedureList()) {
-      if (* proc->GetVariableName() == * procedure->GetName()) { // uses the overloaded ==
+      if (* proc->GetName() == * procedure->GetName()) { // uses the overloaded ==
         throw SemanticException("Encountered 2 procedures with the same name.");
       }
     }

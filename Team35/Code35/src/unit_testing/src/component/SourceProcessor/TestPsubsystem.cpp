@@ -19,7 +19,7 @@ TEST_CASE("1.PSubsystem.Basic Single Line Creation") {
 
     ProcedureName pname("firstProc");
     REQUIRE(deliverable->GetProcList()->size() == 1);
-    REQUIRE(* (* deliverable->GetProcList()->front()).GetVariableName() == pname);
+    REQUIRE(* (* deliverable->GetProcList()->front()).GetName() == pname);
 
     VariableName vname("x");
     REQUIRE(deliverable->GetVariableList()->size() == 1);
