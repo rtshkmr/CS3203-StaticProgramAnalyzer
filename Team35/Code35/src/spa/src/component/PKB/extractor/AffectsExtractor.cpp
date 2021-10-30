@@ -63,10 +63,8 @@ bool AffectsExtractor::HasAffects(AssignEntity* first_stmt, AssignEntity* second
  *
  * */
 bool AffectsExtractor::HasValidUnmodifiedPath(AssignEntity* first_stmt, AssignEntity* second_stmt) {
-//  int first_stmt_num = first_stmt->()->GetNum();
-//  int second_stmt_num = second_stmt->GetStatementNumber()->GetNum();
-  int first_stmt_num = 4;
-  int second_stmt_num = 5;
+  int first_stmt_num = first_stmt->GetStatementNumber()->GetNum();
+  int second_stmt_num = second_stmt->GetStatementNumber()->GetNum();
   std::vector<Entity*> proc_entities = this->pkb_->GetDesignEntities(DesignEntity::kProcedure);
   Cluster* scoped_cluster;
   for(auto entity : proc_entities) {

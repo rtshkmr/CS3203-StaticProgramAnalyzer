@@ -100,41 +100,6 @@ Cluster* Cluster::GetNextSiblingCluster() {
   }
 }
 
-/**
- * Finds the next sibling that is either an if-cluster or a while cluster.
- * @return nullptr if no such sibling exists
- */
-Cluster* Cluster::FindNextSiblingCluster() {
-  Cluster* next_sibling = this->GetNextSiblingCluster();
-  while (next_sibling) {
-    const ClusterTag next_sibling_tag = next_sibling->GetClusterTag();
-    if (next_sibling_tag == ClusterTag::kWhileCluster || next_sibling_tag == ClusterTag::kIfCluster) {
-      return next_sibling;
-    } else {
-      next_sibling = next_sibling->GetNextSiblingCluster();
-    }
-  }
-  return nullptr;
-}
-
-/**
- * Finds the next sibling cluster that matches the container type indicated (i.e. either a
- * @param container_type
- * @return nullptr if no such cluster exists
- */
-Cluster* Cluster::FindNextSiblingCluster(ClusterTag container_type) {
-  assert(container_type == ClusterTag::kIfCluster || container_type == ClusterTag::kWhileCluster);
-  Cluster* next_sibling_cluster = this->FindNextSiblingCluster();
-  while (next_sibling_cluster) {
-    if (next_sibling_cluster->GetClusterTag() == container_type) {
-      return next_sibling_cluster;
-    } else {
-      next_sibling_cluster = next_sibling_cluster->GetNextSiblingCluster();
-    }
-  }
-  return nullptr;
-}
-
 Cluster* Cluster::GetPrevSiblingCluster() {
   Cluster* parent_cluster = this->GetParentCluster();
   if (parent_cluster != nullptr) { // i.e. not outmost cluster:
@@ -280,21 +245,27 @@ bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
     bool child_contains_second_stmt = child->CheckIfStmtNumInRange(target_range.second);
     auto child_range = child->GetStartEndRange();
     ClusterTag tag = child->GetClusterTag();
-    bool is_not_if_or_while_cluster_constituents = tag != ClusterTag::kIfCond
-        && tag != ClusterTag::kIfBody && tag != ClusterTag::kElseBody && tag != ClusterTag::kWhileCond
-        && tag != ClusterTag::kWhileBody;
-    assert(is_not_if_or_while_cluster_constituents); // genuinely don't know if this is a valid assumption
+    bool child_is_not_if_or_while_cluster_constituents = tag != ClusterTag::kIfCond && tag != ClusterTag::kIfBody
+        && tag != ClusterTag::kElseBody && tag != ClusterTag::kWhileCond && tag != ClusterTag::kWhileBody;
+    assert(child_is_not_if_or_while_cluster_constituents); // genuinely don't know if this is a valid assumption
 
     if (tag == ClusterTag::kIfCluster) {
       // need to consider different branches:
-      // todo: add if cluster logic to traversal: need to be able to jump around
-      std::list<Cluster*> cluster_constituents = child->GetNestedClusters();
-      // conditional don't modify shit, ignore it
-      Cluster* if_cond = cluster_constituents.front();
-      assert(if_cond->GetClusterTag() == ClusterTag::kIfCond);
-      // check the if body block || else body block for the same
+      Cluster* if_body = child->GetClusterConstituent(ClusterTag::kIfBody);
+      Cluster* else_body = child->GetClusterConstituent(ClusterTag::kElseBody);
+      auto if_body_range = if_body->GetStartEndRange();
+      auto else_body_range = else_body->GetStartEndRange();
+      if(child_contains_second_stmt) {
+        // case 1: child contains second statement, identify if it's if body or else body
+
+      } else {
+        // case 2: child does not contain second statement, then just have to at least one that gives unmod path
+
+      }
+
     } else if (tag == ClusterTag::kWhileCluster && child_contains_second_stmt) {
-      // todo: add while cluster traversal logic if the second statement is inside. note that it's possible to not enter the while statement at all
+      auto new_target_range = std::make_pair(child_range.first, target_range.second);
+      return TraverseScopedClusterForAffects(child, new_target_range, pkb, lhs_var);
     } else { // it's a simple block, no alternative paths to consider:
       if (child_range.first + 1
           != child_range.second) { // iterate
@@ -320,6 +291,62 @@ bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
   return scoped_cluster_does_not_modify_var;
 }
 
+/**
+ * Retrieves the correct tagged constituent from within a container cluster (if or while cluster)
+ * @return
+ */
+Cluster* Cluster::GetClusterConstituent(ClusterTag constituent_tag) {
+  auto constituents = this->GetNestedClusters();
+  Cluster* first_constituent = constituents.front();
+  switch (constituent_tag) {
+    case ClusterTag::kIfCond: {
+      assert(cluster_tag_ == ClusterTag::kIfCluster);
+      assert(first_constituent->GetClusterTag() == ClusterTag::kIfCond);
+      return first_constituent;
+    };
+    case ClusterTag::kIfBody: {
+      assert(cluster_tag_ == ClusterTag::kIfCluster);
+      assert(first_constituent->GetClusterTag() == ClusterTag::kIfCond);
+      return first_constituent->FindNextSibling(ClusterTag::kIfBody);
+    };
+    case ClusterTag::kElseBody: {
+      assert(cluster_tag_ == ClusterTag::kIfCluster);
+      assert(first_constituent->GetClusterTag() == ClusterTag::kIfCond);
+      return first_constituent->FindNextSibling(ClusterTag::kElseBody);
+    };
+    case ClusterTag::kWhileCond: {
+      assert(cluster_tag_ == ClusterTag::kWhileCluster);
+      assert(first_constituent->GetClusterTag() == ClusterTag::kWhileCond);
+      return first_constituent;
+    };
+    case ClusterTag::kWhileBody: {
+      assert(cluster_tag_ == ClusterTag::kWhileCluster);
+      assert(first_constituent->GetClusterTag() == ClusterTag::kWhileCond);
+      return first_constituent->FindNextSibling(ClusterTag::kWhileBody);
+    };
+    default: {
+      assert(false);
+    }
+  }
+}
+
+/**
+ * Retrieves the next sibling that matches the target cluster tag
+ * @param target_tag
+ * @return
+ */
+Cluster* Cluster::FindNextSibling(ClusterTag target_tag) {
+  Cluster* next_sibling = this->GetNextSiblingCluster();
+  while (next_sibling) {
+    const ClusterTag next_sibling_tag = next_sibling->GetClusterTag();
+    if (next_sibling_tag == target_tag) {
+      return next_sibling;
+    } else {
+      next_sibling = next_sibling->GetNextSiblingCluster();
+    }
+  }
+  return nullptr;
+}
 
 // default destructors:
 Cluster::~Cluster() = default;

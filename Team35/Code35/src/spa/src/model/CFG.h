@@ -64,8 +64,8 @@ class Cluster {
     end_ = end;
   };
   std::list<Cluster*> nested_clusters_;
-  Cluster* FindNextSiblingCluster();
-  Cluster* FindNextSiblingCluster(ClusterTag container_type);
+  Cluster* GetClusterConstituent(ClusterTag constituent_tag);
+  Cluster* FindNextSibling(ClusterTag target_tag);
   static bool TraverseScopedCluster(PKBRelRefs pkb_rel_refs, Cluster* scoped_cluster,
                                     std::pair<int, int> target_range,
                                     PKB* pkb,
