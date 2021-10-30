@@ -42,15 +42,13 @@ std::vector<std::string> QueryProjector::FormatQuery(UnformattedQueryResult unfo
     unordered_results.push_back(stringified_table);
   }
 
+  std::vector<std::string> query_ans;
   if (target_synonym_list.size() == 1) {
-    std::vector<std::string> query_ans = unordered_results.front()[0];
-    query_ans.erase(std::unique(query_ans.begin(), query_ans.end()), query_ans.end());
-    return query_ans;
+    query_ans = unordered_results.front()[0];
+  } else {
+    // need to cross product for multiple synonyms.
+    query_ans = FormatMultipleTables(unordered_results, result_synonym_order, target_synonym_list);
   }
-  // else need to cross product for multiple synonyms.
-  std::vector<std::string> query_ans = FormatMultipleTables(unordered_results,
-                                                            result_synonym_order,
-                                                            target_synonym_list);
   query_ans.erase(std::unique(query_ans.begin(), query_ans.end()), query_ans.end());
   return query_ans;
 }
