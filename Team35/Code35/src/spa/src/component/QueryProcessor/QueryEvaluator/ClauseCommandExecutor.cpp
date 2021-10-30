@@ -48,7 +48,6 @@ void ClauseCommandExecutor::PatternTwoSynonym(Clause *clause) {
 
   std::vector<Entity *> first_entity_stmt_list = group_table->GetColumn(first_clause);
   std::vector<Entity *> variable_list = group_table->GetColumn(second_clause);
-  std::vector<Entity *> intermediate_table = table->GetRelationships();
 
   int delete_count = 0;
 
@@ -66,6 +65,39 @@ void ClauseCommandExecutor::PatternTwoSynonym(Clause *clause) {
       group_table->DeleteRow(i - delete_count);
       delete_count++;
     }
+  }
+}
+
+void ClauseCommandExecutor::WithTwoSynonym(Clause *clause) {
+  auto *with_clause = dynamic_cast<With *>(clause);
+  int delete_count = 0;
+
+  std::vector<Entity *> first_stmt_list = group_table->GetColumn(with_clause->first_synonym);
+  std::vector<Entity *> second_stmt_list = group_table->GetColumn(with_clause->second_synonym);
+
+  for (int i = 0; i < first_stmt_list.size(); i++) {
+    Entity* first_entity = first_stmt_list[i];
+    Entity* second_entity = second_stmt_list[i];
+
+    bool relationship_holds = false;
+    // Logic for checking the attr value.
+    relationship_holds = DetermineWithTwoSynonyms(with_clause, i);
+
+    if (!relationship_holds) {
+      group_table->DeleteRow(i - delete_count);
+      delete_count++;
+    }
+  }
+}
+
+bool ClauseCommandExecutor::DetermineWithTwoSynonyms(With *with_clause, int index) {
+  std::vector<Entity *> first_stmt_list = group_table->GetColumn(with_clause->first_synonym);
+  std::vector<Entity *> second_stmt_list = group_table->GetColumn(with_clause->second_synonym);
+  Entity* first_entity = first_stmt_list[index];
+  Entity* second_entity = second_stmt_list[index];
+  switch (with_clause->left_attribute) {
+  case Attribute::kStmtNumber:
+
   }
 }
 
@@ -368,5 +400,28 @@ bool ClauseCommandExecutor::HasExpressionMatch(Pattern *pattern, AssignEntity *a
     return assignment_expression->CheckExist(expression);
   } else {
     return true;
+  }
+}
+
+// TODO: Refactor in progress.
+void ClauseCommandExecutor::DoubleSynonymExpansion(Clause *clause, bool first_syn_in) {
+  int group_table_pointer = 0;
+  int table_size = group_table->GetColumnSize();
+  for (int i = 0; i < table_size; i++) {
+    // Send to dispatcher to reallocate the work that returns repeat_count and has_relation.
+    int repeat_count = 0;
+    bool has_relation = false;
+    if (repeat_count > 0) group_table_pointer += repeat_count - 1;
+    if (!has_relation) {
+      group_table->DeleteRow(group_table_pointer);
+      group_table_pointer--;
+    }
+    group_table_pointer++;
+  }
+}
+
+std::tuple<bool, int> ClauseCommandExecutor::DoubleSynonymExpansionCheck(Clause *clause, bool first_syn_in) {
+  if (typeid(*clause) == typeid(SuchThat)) {
+//    return SuchThatRowAddition();
   }
 }

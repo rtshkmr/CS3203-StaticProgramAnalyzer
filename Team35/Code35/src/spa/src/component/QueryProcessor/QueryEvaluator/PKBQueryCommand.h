@@ -13,7 +13,7 @@ class PKBQueryReceiver {
   private:
     DBManager *db_manager;
   public:
-    PKBQueryReceiver(DBManager *db_manager);
+    explicit PKBQueryReceiver(DBManager *db_manager);
 
     IntermediateTable *QueryPKBTwoSynonyms(PKBRelRefs rel, DesignEntity first_synonym, DesignEntity second_synonym);
     IntermediateTable *QueryPKBByValue(PKBRelRefs rel, std::string value);
@@ -38,8 +38,8 @@ class QuerySuchThatTwoSynonymCommand : public PKBQueryCommand {
     Clause *clause;
     PKBQueryReceiver *receiver;
   public:
-    QuerySuchThatTwoSynonymCommand(Clause *clause);
-    void SetReceiver(PKBQueryReceiver *receiver);
+    explicit QuerySuchThatTwoSynonymCommand(Clause *clause);
+    void SetReceiver(PKBQueryReceiver *receiver) override;
     IntermediateTable * ExecuteQuery(Clause *clause) override;
 };
 
@@ -49,8 +49,8 @@ class QuerySuchThatOneSynonymCommand : public PKBQueryCommand {
     Clause *clause;
     PKBQueryReceiver *receiver;
   public:
-    QuerySuchThatOneSynonymCommand(Clause *clause);
-    void SetReceiver(PKBQueryReceiver *receiver);
+    explicit QuerySuchThatOneSynonymCommand(Clause *clause);
+    void SetReceiver(PKBQueryReceiver *receiver) override;
     IntermediateTable * ExecuteQuery(Clause *clause) override;
 };
 
@@ -63,8 +63,8 @@ class QuerySuchThatNoSynonymCommand : public PKBQueryCommand {
     Clause *clause;
     PKBQueryReceiver *receiver;
   public:
-    QuerySuchThatNoSynonymCommand(Clause *clause);
-    void SetReceiver(PKBQueryReceiver *receiver);
+    explicit QuerySuchThatNoSynonymCommand(Clause *clause);
+    void SetReceiver(PKBQueryReceiver *receiver) override;
     IntermediateTable * ExecuteQuery(Clause *clause) override;
 };
 
@@ -73,8 +73,8 @@ class QueryPatternTwoSynonymCommand : public PKBQueryCommand {
     Clause *clause;
     PKBQueryReceiver *receiver;
   public:
-    QueryPatternTwoSynonymCommand(Clause *clause);
-    void SetReceiver(PKBQueryReceiver *receiver);
+    explicit QueryPatternTwoSynonymCommand(Clause *clause);
+    void SetReceiver(PKBQueryReceiver *receiver) override;
     IntermediateTable * ExecuteQuery(Clause *clause) override;
 };
 
@@ -83,8 +83,8 @@ class QueryPatternOneSynonymCommand : public PKBQueryCommand {
     Clause *clause;
     PKBQueryReceiver *receiver;
   public:
-    QueryPatternOneSynonymCommand(Clause *clause);
-    void SetReceiver(PKBQueryReceiver *receiver);
+    explicit QueryPatternOneSynonymCommand(Clause *clause);
+    void SetReceiver(PKBQueryReceiver *receiver) override;
     IntermediateTable * ExecuteQuery(Clause *clause) override;
 };
 

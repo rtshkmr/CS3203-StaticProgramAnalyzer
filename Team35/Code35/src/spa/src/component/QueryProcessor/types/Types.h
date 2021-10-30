@@ -289,6 +289,12 @@ struct With : Clause {
   bool HasEqualValue() {
     return this->left_hand_side == this->right_hand_side;
   }
+  DesignEntity GetFirstSynonymType() {
+    return this->first_synonym->GetType();
+  }
+  DesignEntity GetSecondSynonymType() {
+    return this->second_synonym->GetType();
+  }
 };
 
 struct SuchThat : Clause {
