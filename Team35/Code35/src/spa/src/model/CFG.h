@@ -7,6 +7,8 @@
 #include <vector>
 #include <set>
 #include <datatype/DataType.h>
+#include <component/QueryProcessor/types/Types.h>
+#include <component/PKB/PKB.h>
 #include "Entity.h"
 
 /**
@@ -62,6 +64,14 @@ class Cluster {
   std::list<Cluster*> nested_clusters_;
   Cluster* FindNextSiblingCluster();
   Cluster* FindNextSiblingCluster(ClusterTag container_type);
+  static bool TraverseScopedCluster(PKBRelRefs pkb_rel_refs, Cluster* scoped_cluster,
+                                    std::pair<int, int> target_range,
+                                    PKB* pkb,
+                                    const std::string& lhs_var);
+  static bool TraverseScopedClusterForAffects(Cluster* scoped_cluster,
+                                              std::pair<int, int> target_range,
+                                              PKB* pkb,
+                                              const std::string& lhs_var);
 };
 
 class Block : public Cluster {

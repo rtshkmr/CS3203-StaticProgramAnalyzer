@@ -125,8 +125,8 @@ Cluster* Cluster::FindNextSiblingCluster() {
 Cluster* Cluster::FindNextSiblingCluster(ClusterTag container_type) {
   assert(container_type == ClusterTag::kIfCluster || container_type == ClusterTag::kWhileCluster);
   Cluster* next_sibling_cluster = this->FindNextSiblingCluster();
-  while(next_sibling_cluster) {
-    if(next_sibling_cluster->GetClusterTag() == container_type) {
+  while (next_sibling_cluster) {
+    if (next_sibling_cluster->GetClusterTag() == container_type) {
       return next_sibling_cluster;
     } else {
       next_sibling_cluster = next_sibling_cluster->GetNextSiblingCluster();
@@ -229,6 +229,96 @@ ClusterTag Cluster::GetClusterTag() const {
 }
 void Cluster::SetClusterTag(ClusterTag cluster_tag) {
   this->cluster_tag_ = cluster_tag;
+}
+
+/**
+ * Traverses cluster from first to second statement number, using the given pkb to retrieve
+ * data where necessary. Is recursive in nature, where we try to call on a small subproblem by
+ * restricting the start statement number where possible. This public subroutine calls on other
+ * @param pkb_rel_refs
+ * @param scoped_cluster
+ * @param target_range
+ * @param pkb
+ * @param lhs_var
+ * @return
+ */
+bool Cluster::TraverseScopedCluster(PKBRelRefs rel_ref,
+                                    Cluster* scoped_cluster,
+                                    std::pair<int, int> target_range,
+                                    PKB* pkb,
+                                    const std::string& lhs_var) {
+  switch (rel_ref) {
+    case PKBRelRefs::kAffects: {
+      return Cluster::TraverseScopedClusterForAffects(scoped_cluster, target_range, pkb, lhs_var);
+    };
+    default: {
+      return false;
+    };
+
+  }
+  return false;
+}
+
+/**
+ * Traverses a scoped cluster moving from first_stmt towards second_stmt in the target range and checks if the lhs_var remains unmodified along the way
+ * @param scoped_cluster
+ * @param target_range
+ * @param pkb
+ * @param lhs_var
+ * @return
+ */
+bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
+                                              std::pair<int, int> target_range,
+                                              PKB* pkb,
+                                              const std::string& lhs_var) {
+  assert(scoped_cluster->CheckIfStatementsInRange(target_range.first, target_range.second));
+  bool scoped_cluster_does_not_modify_var = true;
+  // get all the children, for each child, explore depth if needed:
+  std::list<Cluster*> children = scoped_cluster->nested_clusters_;
+  for (auto child: children) {
+    bool child_does_not_modify_var = true;
+    bool child_contains_second_stmt = child->CheckIfStmtNumInRange(target_range.second);
+    auto child_range = child->GetStartEndRange();
+
+    ClusterTag tag = child->GetClusterTag();
+    bool is_not_if_or_while_cluster_constituents = tag != ClusterTag::kIfCond
+        && tag != ClusterTag::kIfBody && tag != ClusterTag::kElseBody && tag != ClusterTag::kWhileCond
+        && tag != ClusterTag::kWhileBody;
+    assert(is_not_if_or_while_cluster_constituents); // genuinely don't know if this is a valid assumption
+
+    if (tag == ClusterTag::kIfCluster) {
+      // need to consider different branches:
+      // todo: add if cluster logic to traversal: need to be able to jump around
+      std::list<Cluster*> cluster_constituents = child->GetNestedClusters();
+      // conditional don't modify shit, ignore it
+      Cluster* if_cond = cluster_constituents.front();
+      assert(if_cond->GetClusterTag() == ClusterTag::kIfCond);
+      // check the if body block || else body block for the same
+    } else if (tag == ClusterTag::kWhileCluster && child_contains_second_stmt) {
+      // todo: add while cluster traversal logic if the second statement is inside. note that it's possible to not enter the while statement at all
+    } else { // it's a simple block, no alternative paths to consider:
+      if (child_range.first + 1
+          != child_range.second) { // iterate
+        // start with offset of +1 to avoid counting the first statement
+        int for_loop_end = std::min(child_range.second + 1, target_range.second);
+        for (int line_num = child_range.first + 1; line_num < for_loop_end; line_num++) {
+          child_does_not_modify_var = !pkb->HasRelationship(PKBRelRefs::kModifies, std::to_string(line_num), lhs_var);
+          // QQ: based on previous discussion here: https://discord.com/channels/877051619970269184/880007746647388180/893129063391187005 ,
+          //     it's correct to say that for call statements also, this above line will work and we don't need
+          //     to go do path traversal for the function calls right
+          if (!child_does_not_modify_var) break;
+        }
+      }
+      if (!child_does_not_modify_var) {
+        scoped_cluster_does_not_modify_var = false; // it does modify, fails early
+        break; // breaks the outer for loop
+      }
+    }
+    scoped_cluster_does_not_modify_var = child_does_not_modify_var;
+    // if this child cluster contains my second statement, then at the end of this for-loop's body, I can end my search
+    if (child_contains_second_stmt) break;// breaks the outer for loop if aldy reached out goal
+  }
+  return scoped_cluster_does_not_modify_var;
 }
 
 // default destructors:
