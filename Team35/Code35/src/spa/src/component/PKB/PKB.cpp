@@ -90,7 +90,7 @@ void PKB::PopulateEntities(DesignEntity design_entity, T& entity_list) {
         } break;
         case EntityEnum::kAssignEntity: {
           AssignEntity* assign_entity = reinterpret_cast<AssignEntity*>(entity);
-          pattern_variables.push_back(assign_entity->GetVariable());
+          pattern_variables.push_back(assign_entity->GetVariableObj());
         } break;
         default: {
           throw PKBException("Invalid EntityEnum in pattern entity.");
@@ -243,8 +243,8 @@ std::string PKB::GetNameFromEntity(Entity* entity) {
         return std::to_string(k_number->GetNum());
     } else if (dynamic_cast<Variable*>(entity) != nullptr) {
         Variable* var = dynamic_cast<Variable*>(entity);
-        VariableName* variable_name = const_cast<VariableName*>(var->GetName());
-        return variable_name->getName();
+        VariableName* variable_name = const_cast<VariableName*>(var->GetVariableName());
+        return variable_name->GetName();
     } else if (dynamic_cast<Constant*>(entity) != nullptr) {
         Constant* constant = dynamic_cast<Constant*>(entity);
         ConstantValue* cv = const_cast<ConstantValue*>(constant->GetValue());
@@ -348,8 +348,8 @@ void PKB::PopulateContainerUsedBy(std::unordered_map<Variable*, std::list<Contai
     std::string k_string;
 
     Variable* var = dynamic_cast<Variable*>(kv.first);
-    VariableName* variable_name = const_cast<VariableName*>(var->GetName());
-    k_string = variable_name->getName();
+    VariableName* variable_name = const_cast<VariableName*>(var->GetVariableName());
+    k_string = variable_name->GetName();
 
     for (Container* container : *kv.second) {
       Entity* entity = dynamic_cast<Entity*>(container);
@@ -402,8 +402,8 @@ void PKB::PopulateContainerModifiedBy(std::unordered_map<Variable*, std::list<Co
     std::string k_string;
 
     Variable* var = dynamic_cast<Variable*>(kv.first);
-    VariableName* variable_name = const_cast<VariableName*>(var->GetName());
-    k_string = variable_name->getName();
+    VariableName* variable_name = const_cast<VariableName*>(var->GetVariableName());
+    k_string = variable_name->GetName();
 
     for (Container* container : *kv.second) {
       Entity* entity = dynamic_cast<Entity*>(container);

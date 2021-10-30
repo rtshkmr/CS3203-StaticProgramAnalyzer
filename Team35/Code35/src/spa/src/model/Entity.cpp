@@ -79,7 +79,7 @@ Variable::Variable(VariableName* vName) {
   variable_name_ = vName;
 }
 
-const VariableName* Variable::GetName() {
+const VariableName* Variable::GetVariableName() {
   return variable_name_;
 }
 
@@ -101,8 +101,11 @@ std::vector<std::set<Statement*>> Variable::GetStatementTable() {
 std::vector<Variable*> Variable::SortVariableVector(std::vector<Variable*> var_list) {
   std::vector<Variable*> var_list_copy = var_list;
   std::sort(var_list_copy.begin(), var_list_copy.end(),
-            [](Variable* a, Variable* b) { return * a->GetName() < * b->GetName(); });
+            [](Variable* a, Variable* b) { return * a->GetVariableName() < * b->GetVariableName(); });
   return var_list_copy;
+}
+const std::string Variable::GetName() const{
+  return variable_name_->GetName();
 }
 
 Constant::Constant(ConstantValue* cv) {

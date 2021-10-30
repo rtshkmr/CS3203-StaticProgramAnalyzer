@@ -84,7 +84,7 @@ std::vector<std::vector<std::string>> QueryProjector::StringifyTable(std::vector
         break;
       case DesignEntity::kVariable:
         for (Entity* entity: entity_column) {
-          std::string var_string = const_cast<VariableName*>(dynamic_cast<Variable*>(entity)->GetName())->getName();
+          std::string var_string = const_cast<VariableName*>(dynamic_cast<Variable*>(entity)->GetVariableName())->GetName();
           stringified_column.push_back(var_string);
         }
         break;

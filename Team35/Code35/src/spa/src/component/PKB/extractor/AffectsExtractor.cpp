@@ -33,7 +33,7 @@ std::vector<Entity*> AffectsExtractor::GetAffects(int target) {
 bool AffectsExtractor::HasAffects(AssignEntity* first_stmt, AssignEntity* second_stmt) {
   // get the modified variable v from the lhs of first statement
   assert(first_stmt->GetEntityEnum() == EntityEnum::kAssignEntity);
-  Variable* modified_var = first_stmt->GetVariable();
+  Variable* modified_var = first_stmt->GetVariableObj();
   std::vector<Variable*> vars_used_by_second_stmt = second_stmt->GetControlVariables(); // todo: this is named wrongly, should be GetExpr Var for this
   // check Uses(second_stmt, v)
   bool var_is_used = false;
@@ -66,13 +66,15 @@ bool AffectsExtractor::HasValidUnmodifiedPath(AssignEntity* first_stmt, AssignEn
   int first_stmt_num = first_stmt->GetStatementNumber()->GetNum();
   int second_stmt_num = second_stmt->GetStatementNumber()->GetNum();
   std::vector<Entity*> proc_entities = this->pkb_->GetDesignEntities(DesignEntity::kProcedure);
-  Cluster* scoped_cluster = nullptr;
+  Cluster* scoped_cluster;
   for(auto entity : proc_entities) {
     auto* proc = dynamic_cast<Procedure*>(entity);
     assert(proc);
     scoped_cluster = proc->GetInnermostCluster(first_stmt_num, second_stmt_num, nullptr);
     if(scoped_cluster) break;
   }
+  // call the boolean traversal helper function here, pass in the lhs argument that we're looking at
+  std::string lhs_var = first_stmt->GetVariableString();
 
   // now we have a starting node to work with, it's a graph traversal via some traversal helper function:
   // look at nested children, if the current block doesn't modify the variable we looking at
@@ -99,8 +101,8 @@ std::vector<Entity*> AffectsExtractor::GetAffectedBy(int target) {
 
   // Have a PQ per var.
   for (Variable* var: rhs_varlist) {
-    VariableName* variable_name = const_cast<VariableName*>(var->GetName());
-    std::vector<Entity*> ent = pkb_->GetRelationship(PKBRelRefs::kModifiedBy, variable_name->getName());
+    VariableName* variable_name = const_cast<VariableName*>(var->GetVariableName());
+    std::vector<Entity*> ent = pkb_->GetRelationship(PKBRelRefs::kModifiedBy, variable_name->GetName());
 
     //filter vector<Entity> into only AssignEntity as it can only take assign in LHS
     auto cmp = [](AssignEntity* left, AssignEntity* right) {

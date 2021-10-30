@@ -328,7 +328,7 @@ void PSubsystem::PerformNewProcedureSteps(Procedure* procedure) {
   } else {
     // throw error if this name is duplicated
     for (auto const& proc: * deliverable_->GetProgram()->GetProcedureList()) {
-      if (* proc->GetName() == * procedure->GetName()) { // uses the overloaded ==
+      if (* proc->GetVariableName() == * procedure->GetName()) { // uses the overloaded ==
         throw SemanticException("Encountered 2 procedures with the same name.");
       }
     }
@@ -511,10 +511,10 @@ void PSubsystem::HandleAssignStmt(Entity* entity) {
   AssignEntity* assign_entity = dynamic_cast<AssignEntity*>(entity);
   assert(assign_entity);
   deliverable_->AddAssignEntity(assign_entity);
-  deliverable_->AddModifiesRelationship(assign_entity, assign_entity->GetVariable());
-  deliverable_->AddModifiesRelationship(current_procedure_, assign_entity->GetVariable());  //procedure level
+  deliverable_->AddModifiesRelationship(assign_entity, assign_entity->GetVariableObj());
+  deliverable_->AddModifiesRelationship(current_procedure_, assign_entity->GetVariableObj());  //procedure level
   if (current_procedure_ != current_node_)
-    deliverable_->AddModifiesRelationship(current_node_, assign_entity->GetVariable());  //container level
+    deliverable_->AddModifiesRelationship(current_node_, assign_entity->GetVariableObj());  //container level
 
   // todo: add these variables into the respective sets in cluster/block
   for (Variable* v: assign_entity->GetControlVariables()) {
