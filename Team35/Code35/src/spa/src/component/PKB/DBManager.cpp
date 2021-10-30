@@ -33,6 +33,8 @@ std::vector<Entity*> DBManager::GetRelationship(PKBRelRefs ref, std::string enti
     case PKBRelRefs::kAffectedBy: return runtime_extractor_->GetAffectedBy(Utility::ConvertStringToInt(entity));
     case PKBRelRefs::kAffectsT: return runtime_extractor_->GetAffectsT(Utility::ConvertStringToInt(entity));
     case PKBRelRefs::kAffectedByT: return runtime_extractor_->GetAffectedByT(Utility::ConvertStringToInt(entity));
+    case PKBRelRefs::kNextBip: return runtime_extractor_->GetNextBip(Utility::ConvertStringToInt(entity));
+    case PKBRelRefs::kPrevBip: return runtime_extractor_->GetPrevBip(Utility::ConvertStringToInt(entity));
     default: return pkb_->GetRelationship(ref, entity);
   }
 }
@@ -51,6 +53,8 @@ std::vector<Entity*> DBManager::GetFirstEntityOfRelationship(PKBRelRefs ref, Des
     case PKBRelRefs::kAffectedBy: return runtime_extractor_->GetAffectedBy(de);
     case PKBRelRefs::kAffectsT: return runtime_extractor_->GetAffectsT(de);
     case PKBRelRefs::kAffectedByT: return runtime_extractor_->GetAffectedByT(de);
+    case PKBRelRefs::kNextBip: return runtime_extractor_->GetNextBip(de);
+    case PKBRelRefs::kPrevBip: return runtime_extractor_->GetPrevBip(de);
     default: return pkb_->GetFirstEntityOfRelationship(ref, de);
   }
 }
@@ -114,6 +118,8 @@ std::vector<std::tuple<Entity*, Entity*>> DBManager::GetRelationshipByTypes(PKBR
     case PKBRelRefs::kAffectedBy: return runtime_extractor_->GetAffectedBy(first, second);
     case PKBRelRefs::kAffectsT: return runtime_extractor_->GetAffectsT(first, second);
     case PKBRelRefs::kAffectedByT: return runtime_extractor_->GetAffectedByT(first, second);
+    case PKBRelRefs::kNextBip: return runtime_extractor_->GetNextBip(first, second);
+    case PKBRelRefs::kPrevBip: return runtime_extractor_->GetPrevBip(first, second);
     default: return pkb_->GetRelationshipByTypes(ref, first, second);
   }
 }
@@ -177,6 +183,8 @@ bool DBManager::HasRelationship(PKBRelRefs ref) {
     case PKBRelRefs::kAffectedBy: return runtime_extractor_->HasAffectedBy();
     case PKBRelRefs::kAffectsT: return runtime_extractor_->HasAffects();
     case PKBRelRefs::kAffectedByT: return runtime_extractor_->HasAffectedBy();
+    case PKBRelRefs::kNextBip: return runtime_extractor_->HasNextBip();
+    case PKBRelRefs::kPrevBip: return runtime_extractor_->HasPrevBip();
     default: return pkb_->HasRelationship(ref);
   }
 }
@@ -196,6 +204,8 @@ bool DBManager::HasRelationship(PKBRelRefs ref, DesignEntity first, DesignEntity
     case PKBRelRefs::kAffectedBy: return runtime_extractor_->HasAffectedBy();
     case PKBRelRefs::kAffectsT: return runtime_extractor_->HasAffects();
     case PKBRelRefs::kAffectedByT: return runtime_extractor_->HasAffectedBy();
+    case PKBRelRefs::kNextBip: return runtime_extractor_->HasNextBip();
+    case PKBRelRefs::kPrevBip: return runtime_extractor_->HasPrevBip();
     default: return pkb_->HasRelationship(ref, first, second);
   }
 }
@@ -215,6 +225,8 @@ bool DBManager::HasRelationship(PKBRelRefs ref, std::string entity) {
     case PKBRelRefs::kAffectedBy: return runtime_extractor_->HasAffectedBy(Utility::ConvertStringToInt(entity));
     case PKBRelRefs::kAffectsT: return runtime_extractor_->HasAffectsT(Utility::ConvertStringToInt(entity));
     case PKBRelRefs::kAffectedByT: return runtime_extractor_->HasAffectedByT(Utility::ConvertStringToInt(entity));
+    case PKBRelRefs::kNextBip: return runtime_extractor_->HasNextBip(Utility::ConvertStringToInt(entity));
+    case PKBRelRefs::kPrevBip: return runtime_extractor_->HasPrevBip(Utility::ConvertStringToInt(entity));
     default: return pkb_->HasRelationship(ref, entity);
   }
 }
@@ -247,6 +259,12 @@ bool DBManager::HasRelationship(PKBRelRefs ref, std::string first, std::string s
     case PKBRelRefs::kAffectedByT:
       return runtime_extractor_->HasAffectedByT(Utility::ConvertStringToInt(first),
                                                 Utility::ConvertStringToInt(second));
+    case PKBRelRefs::kNextBip:
+      return runtime_extractor_->HasNextBip(Utility::ConvertStringToInt(first),
+                                            Utility::ConvertStringToInt(second));
+    case PKBRelRefs::kPrevBip:
+      return runtime_extractor_->HasNextBip(Utility::ConvertStringToInt(second),
+                                            Utility::ConvertStringToInt(first));
     default: return pkb_->HasRelationship(ref, first, second);
   }
 }
