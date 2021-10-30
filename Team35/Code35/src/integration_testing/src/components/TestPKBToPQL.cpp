@@ -24,7 +24,7 @@ Deliverable* SetUpDeliverable_Week4() {
   proc_list->push_back(proc);
 
   std::list<Variable*>* var_list = deliverable->GetVariableList();
-  std::list<ConstantValue*>* const_list = deliverable->GetConstantValueList();
+  std::list<Constant*>* const_list = deliverable->GetConstantList();
 
   // read x
   Variable* var_x = new Variable(new VariableName("x"));
@@ -47,14 +47,14 @@ Deliverable* SetUpDeliverable_Week4() {
   deliverable->AddUsesRelationship(stmt2, stmt2->GetVariable());
 
   // y = 1
-  ConstantValue* cv1 = new ConstantValue("1");
+  Constant* cv1 = new Constant(new ConstantValue("1"));
   const_list->push_back(cv1);
   Variable* var_y = new Variable(new VariableName("y"));
   var_list->push_back(var_y);
 
   std::string stmt3_s = "1";
   std::vector<Variable*> stmt3_var_expr;
-  std::vector<ConstantValue*> stmt3_cv_expr;
+  std::vector<Constant*> stmt3_cv_expr;
   stmt3_cv_expr.push_back(cv1);
 
   AssignEntity* stmt3 = new AssignEntity(var_y, stmt3_s, stmt3_var_expr, stmt3_cv_expr);
@@ -70,14 +70,14 @@ Deliverable* SetUpDeliverable_Week4() {
   }
 
   // z = 3
-  ConstantValue* cv2 = new ConstantValue("3");
+  Constant* cv2 = new Constant(new ConstantValue("3"));
   const_list->push_back(cv2);
   Variable* var_z = new Variable(new VariableName("z"));
   var_list->push_back(var_z);
 
   std::string stmt4_s = "3";
   std::vector<Variable*> stmt4_var_expr;
-  std::vector<ConstantValue*> stmt4_cv_expr;
+  std::vector<Constant*> stmt4_cv_expr;
   stmt4_cv_expr.push_back(cv2);
 
   AssignEntity* stmt4 = new AssignEntity(var_z, stmt4_s, stmt4_var_expr, stmt4_cv_expr);
@@ -93,14 +93,14 @@ Deliverable* SetUpDeliverable_Week4() {
   }
 
   // z = x + y + 3;
-  ConstantValue* cv3 = new ConstantValue("3"); //note that ConstantValue is not unique.
+  Constant* cv3 = new Constant(new ConstantValue("3")); //note that ConstantValue is not unique.
   const_list->push_back(cv3);
 
   std::string stmt5_s = "x + y + 3";
   std::vector<Variable*> stmt5_var_expr;
   stmt5_var_expr.push_back(var_x);
   stmt5_var_expr.push_back(var_y);
-  std::vector<ConstantValue*> stmt5_cv_expr;
+  std::vector<Constant*> stmt5_cv_expr;
   stmt5_cv_expr.push_back(cv3);
 
   AssignEntity* stmt5 = new AssignEntity(var_z, stmt5_s, stmt5_var_expr, stmt5_cv_expr);

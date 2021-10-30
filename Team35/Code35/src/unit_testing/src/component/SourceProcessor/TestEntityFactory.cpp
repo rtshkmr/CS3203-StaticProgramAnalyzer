@@ -9,7 +9,7 @@ using std::vector;
 TEST_CASE("1.EntityFactory.CreateEntity") {
   std::list<Procedure*> proc_list;
   std::list<Variable*> var_list;
-  std::list<ConstantValue*> const_list;
+  std::list<Constant*> const_list;
   EntityFactory entity_factory = EntityFactory(& proc_list, & var_list, & const_list);
 
   SECTION("procedure test") {

@@ -15,11 +15,11 @@ TEST_CASE("1.Model.Statement.IfEntity.ElseEntity") {
 
   /// Other object creation
   Variable* var_x = new Variable(new VariableName("x"));
-  ConstantValue* cv_3 = new ConstantValue("3");
+  Constant* cv_3 = new Constant(new ConstantValue("3"));
 
   std::string condition = "x == 3";
   std::vector<Variable*> expr_var{};
-  std::vector<ConstantValue*> expr_constants{cv_3};
+  std::vector<Constant*> expr_constants{cv_3};
 
   IfEntity* if1 = new IfEntity(condition, expr_var, expr_constants);
 
@@ -110,18 +110,18 @@ TEST_CASE("1.Model.Statement.WhileEntity") {
 
   /// Other object creation
   Variable* var_x = new Variable(new VariableName("x"));
-  ConstantValue* cv_1 = new ConstantValue("1");
-  ConstantValue* cv_10 = new ConstantValue("10");
+  Constant* cv_1 = new Constant(new ConstantValue("1"));
+  Constant* cv_10 = new Constant(new ConstantValue("10"));
 
   std::string condition = "x < 10";
   std::vector<Variable*> expr_var{var_x};
-  std::vector<ConstantValue*> expr_constants{cv_10};
+  std::vector<Constant*> expr_constants{cv_10};
 
   WhileEntity* while_entity = new WhileEntity(condition, expr_var, expr_constants);
 
   std::string expression = "x + 1";
   std::vector<Variable*> expr_a_var{var_x};
-  std::vector<ConstantValue*> expr_a_constants{cv_1};
+  std::vector<Constant*> expr_a_constants{cv_1};
 
   AssignEntity* assign_entity = new AssignEntity(var_x, expression, expr_a_var, expr_a_constants);
   while_entity->AddStatement(assign_entity);
@@ -173,11 +173,11 @@ TEST_CASE("1.Model.Statement.AssignEntity") {
   Variable* var_x = new Variable(new VariableName("x"));
   Variable* var_y = new Variable(new VariableName("y"));
   Variable* var_z = new Variable(new VariableName("z"));
-  ConstantValue* cv_100 = new ConstantValue("100");
+  Constant* cv_100 = new Constant(new ConstantValue("100"));
 
   std::string expression = "x + y + 100 + z";
   std::vector<Variable*> expr_var{var_x, var_y, var_z};
-  std::vector<ConstantValue*> expr_constants{cv_100};
+  std::vector<Constant*> expr_constants{cv_100};
 
   AssignEntity* assign_entity = new AssignEntity(var_x, expression, expr_var, expr_constants);
 
@@ -336,11 +336,11 @@ TEST_CASE("1.Model.Statement") {
 
   //while (x == 1) {
   Variable* var_x = new Variable(new VariableName("x"));
-  ConstantValue* cv_1 = new ConstantValue("1");
+  Constant* cv_1 = new Constant(new ConstantValue("1"));
 
   std::string condition = "x == 1";
   std::vector<Variable*> expr_var{var_x};
-  std::vector<ConstantValue*> expr_constants{cv_1};
+  std::vector<Constant*> expr_constants{cv_1};
 
   WhileEntity* while_entity = new WhileEntity(condition, expr_var, expr_constants);
   while_entity->SetStatementNumber(new StatementNumber(1));

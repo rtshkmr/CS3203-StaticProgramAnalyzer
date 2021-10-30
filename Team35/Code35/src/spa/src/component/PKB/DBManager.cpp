@@ -1,4 +1,5 @@
 #include "DBManager.h"
+#include "util/Utility.h"
 
 DBManager::DBManager(PKB* pkb) {
   this->pkb_ = pkb;
@@ -19,20 +20,19 @@ void DBManager::PopulateDataStructures(Deliverable d) {
 }
 
 /**
- * Gets relationships for 1 specific entity, e.g. Uses(3, _) or Affects(3, a)
- * but not (3, _) for runtime relationships.
+ * Gets relationships for 1 specific entity, e.g. Uses(3, s)
  * @param ref Relationship type
  * @param entity String form of entity to query
  * @return Entities that are on the RHS of the relationship with this entity.
  */
 std::vector<Entity*> DBManager::GetRelationship(PKBRelRefs ref, std::string entity) {
   switch (ref) {
-    case PKBRelRefs::kNextT: return runtime_extractor_->GetNextT(entity);
-    case PKBRelRefs::kPreviousT: return runtime_extractor_->GetPrevT(entity);
-    case PKBRelRefs::kAffects: return runtime_extractor_->GetAffects(entity);
-    case PKBRelRefs::kAffectedBy: return runtime_extractor_->GetAffectedBy(entity);
-    case PKBRelRefs::kAffectsT: return runtime_extractor_->GetAffectsT(entity);
-    case PKBRelRefs::kAffectedByT: return runtime_extractor_->GetAffectedByT(entity);
+    case PKBRelRefs::kNextT: return runtime_extractor_->GetNextT(Utility::ConvertStringToInt(entity));
+    case PKBRelRefs::kPreviousT: return runtime_extractor_->GetPrevT(Utility::ConvertStringToInt(entity));
+    case PKBRelRefs::kAffects: return runtime_extractor_->GetAffects(Utility::ConvertStringToInt(entity));
+    case PKBRelRefs::kAffectedBy: return runtime_extractor_->GetAffectedBy(Utility::ConvertStringToInt(entity));
+    case PKBRelRefs::kAffectsT: return runtime_extractor_->GetAffectsT(Utility::ConvertStringToInt(entity));
+    case PKBRelRefs::kAffectedByT: return runtime_extractor_->GetAffectedByT(Utility::ConvertStringToInt(entity));
     default: return pkb_->GetRelationship(ref, entity);
   }
 }
@@ -43,7 +43,7 @@ std::vector<Entity*> DBManager::GetRelationship(PKBRelRefs ref, std::string enti
  * @param de Type of entity to query
  * @return All entities that can be on the LHS of the relationship.
  */
-std::vector<Entity*> DBManager::GetRelationshipByTypeUnscoped(PKBRelRefs ref, DesignEntity de) {
+std::vector<Entity*> DBManager::GetFirstEntityOfRelationship(PKBRelRefs ref, DesignEntity de) {
   switch (ref) {
     case PKBRelRefs::kNextT: return runtime_extractor_->GetNextT(de);
     case PKBRelRefs::kPreviousT: return runtime_extractor_->GetPrevT(de);
@@ -51,7 +51,7 @@ std::vector<Entity*> DBManager::GetRelationshipByTypeUnscoped(PKBRelRefs ref, De
     case PKBRelRefs::kAffectedBy: return runtime_extractor_->GetAffectedBy(de);
     case PKBRelRefs::kAffectsT: return runtime_extractor_->GetAffectsT(de);
     case PKBRelRefs::kAffectedByT: return runtime_extractor_->GetAffectedByT(de);
-    default: return pkb_->GetRelationshipByType(ref, de);
+    default: return pkb_->GetFirstEntityOfRelationship(ref, de);
   }
 }
 
@@ -63,12 +63,12 @@ std::vector<Entity*> DBManager::GetRelationshipByTypeUnscoped(PKBRelRefs ref, De
  * @param scope_indication Enum describing if result has already been scoped
  * @return All entities that can be on the LHS of the relationship.
  */
-std::vector<Entity*> DBManager::GetRelationshipByType(PKBRelRefs ref,
+std::vector<Entity*> DBManager::GetFirstEntityOfRelationship(PKBRelRefs ref,
                                                       DesignEntity de,
                                                       std::vector<Entity *> scoped_entities,
                                                       ScopeIndication scope_indication) {
   // Retrieve all entities from PKB/RuntimeExtractor
-  std::vector<Entity*> unscoped_entities = GetRelationshipByTypeUnscoped(ref, de);
+  std::vector<Entity*> unscoped_entities = GetFirstEntityOfRelationship(ref, de);
 
   // If there is no scope, return the unscoped_entities from PKB/RuntimeExtractor
   if (scope_indication == ScopeIndication::kNoScope) {
@@ -77,7 +77,7 @@ std::vector<Entity*> DBManager::GetRelationshipByType(PKBRelRefs ref,
   } else {
     // Scoped
     // Check if pkb contains the relationship type
-    const bool pkb_ref = pkb_rel_set.find(ref) != pkb_rel_set.end();
+    const bool pkb_ref = preprocessed_rel_refs.find(ref) != preprocessed_rel_refs.end();
     if (pkb_ref) {
       // PKB contains the relationship type
 
@@ -144,7 +144,7 @@ std::vector<Entity*> DBManager::GetRelationshipByTypes(PKBRelRefs ref,
   } else {
     // Scoped
     // Check if pkb contains the relationship type
-    const bool pkb_ref = pkb_rel_set.find(ref) != pkb_rel_set.end();
+    const bool pkb_ref = preprocessed_rel_refs.find(ref) != preprocessed_rel_refs.end();
     if (pkb_ref) {
       // PKB contains the relationship type
 
@@ -200,30 +200,53 @@ bool DBManager::HasRelationship(PKBRelRefs ref, DesignEntity first, DesignEntity
   }
 }
 
-bool DBManager::HasRelationship(PKBRelRefs ref, std::string ident_string) {
-  const bool pkb_ref = pkb_rel_set.find(ref) != pkb_rel_set.end();
-  if (pkb_ref) {
-    // PKB
-    return pkb_->HasRelationship(ref, ident_string);
-  } else {
-    // RuntimeExtractor
+/**
+ * To query for existence of relationship for 1 specific entity, e.g. Next(3, _)
+ * @param ref Relationship type
+ * @param entity String form of statement number to query
+ * @return true if any relationship with the specified types exists.
+ * @throws SyntaxException - when it is not an integer or outside of 2^32-1
+ */
+bool DBManager::HasRelationship(PKBRelRefs ref, std::string entity) {
+  switch (ref) {
+    case PKBRelRefs::kNextT: // fallthrough
+    case PKBRelRefs::kPreviousT: return pkb_->HasRelationship(PKBRelRefs::kNext, entity);
+    case PKBRelRefs::kAffects: return runtime_extractor_->HasAffects(Utility::ConvertStringToInt(entity));
+    case PKBRelRefs::kAffectedBy: return runtime_extractor_->HasAffectedBy(Utility::ConvertStringToInt(entity));
+    case PKBRelRefs::kAffectsT: return runtime_extractor_->HasAffectsT(Utility::ConvertStringToInt(entity));
+    case PKBRelRefs::kAffectedByT: return runtime_extractor_->HasAffectedByT(Utility::ConvertStringToInt(entity));
+    default: return pkb_->HasRelationship(ref, entity);
   }
 }
+
 /**
- * To query for existence of relationship with 2 specific entities, e.g. Uses("3", "x")
+ * To query for existence of relationship with 2 specific entities, e.g. Next("3", "4")
  * @param ref Relationship type
- * @param first String of first entity
- * @param second String of second entity
- * @return true if relationship between the entities exists.
+ * @param first String of first statement number
+ * @param second String of second statement number
+ * @return true if relationship between the prog_line / assignment exists.
+ * @throws SyntaxException - when it is not an integer or outside of 2^32-1
  */
 bool DBManager::HasRelationship(PKBRelRefs ref, std::string first, std::string second) {
   switch (ref) {
-    case PKBRelRefs::kNextT: return runtime_extractor_->HasNextT(first, second);
-    case PKBRelRefs::kPreviousT: return runtime_extractor_->HasPrevT(first, second);
-    case PKBRelRefs::kAffects: return runtime_extractor_->HasAffects(first, second);
-    case PKBRelRefs::kAffectedBy: return runtime_extractor_->HasAffectedBy(first, second);
-    case PKBRelRefs::kAffectsT: return runtime_extractor_->HasAffectsT(first, second);
-    case PKBRelRefs::kAffectedByT: return runtime_extractor_->HasAffectedByT(first, second);
+    case PKBRelRefs::kNextT:
+      return runtime_extractor_->HasNextT(Utility::ConvertStringToInt(first),
+                                          Utility::ConvertStringToInt(second));
+    case PKBRelRefs::kPreviousT:
+      return runtime_extractor_->HasNextT(Utility::ConvertStringToInt(second),
+                                          Utility::ConvertStringToInt(first));
+    case PKBRelRefs::kAffects:
+      return runtime_extractor_->HasAffects(Utility::ConvertStringToInt(first),
+                                            Utility::ConvertStringToInt(second));
+    case PKBRelRefs::kAffectedBy:
+      return runtime_extractor_->HasAffectedBy(Utility::ConvertStringToInt(first),
+                                               Utility::ConvertStringToInt(second));
+    case PKBRelRefs::kAffectsT:
+      return runtime_extractor_->HasAffectsT(Utility::ConvertStringToInt(first),
+                                             Utility::ConvertStringToInt(second));
+    case PKBRelRefs::kAffectedByT:
+      return runtime_extractor_->HasAffectedByT(Utility::ConvertStringToInt(first),
+                                                Utility::ConvertStringToInt(second));
     default: return pkb_->HasRelationship(ref, first, second);
   }
 }
@@ -232,32 +255,12 @@ std::vector<Entity*> DBManager::GetDesignEntities(DesignEntity de) {
   return pkb_->GetDesignEntities(de);
 }
 
-std::vector<Entity*> DBManager::GetAssignEntityByStmtRef(std::string stmtRef) {
-  return pkb_->GetAssignEntityByStmtRef(stmtRef);
+std::vector<Entity*> DBManager::GetPatternEntities(DesignEntity de, std::string var_or_stmt) {
+  return pkb_->GetPatternEntities(de, var_or_stmt);
 }
 
-std::vector<Entity*> DBManager::GetAssignEntityByVariable(std::string variable) {
-  return pkb_->GetAssignEntityByVariable(variable);
-}
-
-std::vector<Entity*> DBManager::GetWhileEntityByStmtRef(std::string stmtRef) {
-  return pkb_->GetWhileEntityByStmtRef(stmtRef);
-}
-
-std::vector<Entity*> DBManager::GetWhileEntityByVariable(std::string variable) {
-  return pkb_->GetWhileEntityByVariable(variable);
-}
-
-std::vector<Entity*> DBManager::GetIfEntityByStmtRef(std::string stmtRef) {
-  return pkb_->GetIfEntityByStmtRef(stmtRef);
-}
-
-std::vector<Entity*> DBManager::GetIfEntityByVariable(std::string variable) {
-  return pkb_->GetIfEntityByVariable(variable);
-}
-
-DesignEntity DBManager::EntityToDesignEntity(Entity* entity) {
-  return pkb_->EntityToDesignEntity(entity);
+DesignEntity DBManager::GetDesignEntityFromEntity(Entity* entity) {
+  return pkb_->GetDesignEntityFromEntity(entity);
 }
 
 std::string DBManager::GetNameFromEntity(Entity* entity) {

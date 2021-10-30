@@ -56,6 +56,7 @@ class Block : public Cluster {
   static void PatchEmptyBlocks(Block* redundant, Block* to);
   void AddNextBlock(Block* next_block);
   std::set<Block*> GetNextBlocks() const;
+  std::set<Block*> GetPrevBlocks() const;
 
   bool isWhile = false;
 };
