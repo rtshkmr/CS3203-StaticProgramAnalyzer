@@ -1,10 +1,10 @@
 #include "AffectsTExtractor.h"
 
-std::vector<Entity*> AffectsTExtractor::GetAffectsT(std::string target) {
+std::vector<Entity*> AffectsTExtractor::GetAffectsT(int target) {
   return std::vector<Entity*>();
 }
 
-std::vector<Entity*> AffectsTExtractor::GetAffectedByT(std::string target) {
+std::vector<Entity*> AffectsTExtractor::GetAffectedByT(int target) {
   return std::vector<Entity*>();
 }
 

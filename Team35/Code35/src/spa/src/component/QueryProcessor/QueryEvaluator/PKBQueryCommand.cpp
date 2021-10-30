@@ -74,7 +74,7 @@ IntermediateTable *PKBQueryReceiver::QueryPKBByValue(PKBRelRefs rel, std::string
 IntermediateTable *PKBQueryReceiver::QueryEntityWithWildcard(PKBRelRefs rel, DesignEntity entity) {
   std::vector<Entity *> scoped_list = db_manager->GetDesignEntities(entity);
   // TODO: I don't understand this API
-  std::vector<Entity *> output = db_manager->GetRelationshipByType(rel, entity, scoped_list, ScopeIndication::kNoScope);
+  std::vector<Entity *> output = db_manager->GetFirstEntityOfRelationship(rel, entity, scoped_list, ScopeIndication::kNoScope);
   IntermediateTable *table = new IntermediateTable();
   table->InsertData(output);
   return table;
@@ -129,13 +129,13 @@ IntermediateTable *PKBQueryReceiver::QueryPatternByValue(DesignEntity design_ent
   // Returns std::vector<Entity*>
   switch(design_entity) {
     case DesignEntity::kAssign:
-      table->InsertData(db_manager->GetAssignEntityByVariable(value));
+      table->InsertData(db_manager->GetPatternEntities(DesignEntity::kAssign, value));
       break;
     case DesignEntity::kWhile:
-      table->InsertData(db_manager->GetWhileEntityByVariable(value));
+      table->InsertData(db_manager->GetPatternEntities(DesignEntity::kWhile, value));
       break;
     case DesignEntity::kIf:
-      table->InsertData(db_manager->GetIfEntityByVariable(value));
+      table->InsertData(db_manager->GetPatternEntities(DesignEntity::kIf, value));
       break;
     default:
       break;

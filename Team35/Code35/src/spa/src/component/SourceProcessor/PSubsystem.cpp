@@ -23,7 +23,7 @@ void PSubsystem::InitDataStructures() {
   syntax_validator_ = SyntaxValidator();
   entity_factory_ =
       EntityFactory(deliverable_->GetProcList(), deliverable_->GetVariableList(),
-                    deliverable_->GetConstantValueList());
+                    deliverable_->GetConstantList());
 }
 
 bool PSubsystem::CheckForStacksEmpty() {

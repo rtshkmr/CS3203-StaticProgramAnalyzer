@@ -60,3 +60,16 @@ bool TestUtils::AreListsEqual(std::list<Procedure*> a, std::list<Procedure*> b) 
   }
   return a.size() == b.size();
 }
+
+bool TestUtils::AreVectorsEqual(std::vector<std::tuple<Entity*, Entity*>> as, std::vector<std::tuple<Entity*, Entity*>> bs) {
+  for (std::tuple<Entity*, Entity*> a: as) {
+    bool found_a = false;
+    for (std::tuple<Entity*, Entity*> b: bs) {
+      found_a = found_a || a == b;
+    }
+    if (!found_a) {
+      return false;
+    }
+  }
+  return as.size() == bs.size();
+}

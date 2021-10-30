@@ -26,28 +26,34 @@ TEST_CASE("1.Deliverable.Add relationships") {
     deliverable.AddFollowRelationship(if_1, a1);
     deliverable.AddFollowRelationship(if_1, a1);  // duplicate check
     REQUIRE(deliverable.follow_hash_.count(if_1));
-    REQUIRE(deliverable.follow_hash_.find(if_1)->second == a1);
+    REQUIRE(deliverable.follow_hash_.find(if_1)->second->size() == 1);
+    REQUIRE(deliverable.follow_hash_.find(if_1)->second->front() == a1);
 
     // adding more var to existing entry
     deliverable.AddFollowRelationship(if_1, a2);
-    REQUIRE(deliverable.follow_hash_.find(if_1)->second == a1);
+    REQUIRE(deliverable.follow_hash_.find(if_1)->second->size() == 1);
+    REQUIRE(deliverable.follow_hash_.find(if_1)->second->front() == a1);
     REQUIRE_FALSE(deliverable.followed_by_hash_.count(a2));
 
     deliverable.AddFollowRelationship(while_1, rx);
     deliverable.AddFollowRelationship(while_1, rx);  // duplicate check
     REQUIRE(deliverable.follow_hash_.count(while_1));
-    REQUIRE(deliverable.follow_hash_.find(while_1)->second == rx);
+    REQUIRE(deliverable.follow_hash_.find(while_1)->second->size() == 1);
+    REQUIRE(deliverable.follow_hash_.find(while_1)->second->front() == rx);
 
     // adding more var to existing entry
     deliverable.AddFollowRelationship(while_1, px);
-    REQUIRE(deliverable.follow_hash_.find(while_1)->second == rx);
+    REQUIRE(deliverable.follow_hash_.find(while_1)->second->size() == 1);
+    REQUIRE(deliverable.follow_hash_.find(while_1)->second->front() == rx);
     REQUIRE_FALSE(deliverable.followed_by_hash_.count(px));
 
     // reverse check
     REQUIRE(deliverable.followed_by_hash_.count(rx));
-    REQUIRE(deliverable.followed_by_hash_.find(rx)->second == while_1);
+    REQUIRE(deliverable.followed_by_hash_.find(rx)->second->size() == 1);
+    REQUIRE(deliverable.followed_by_hash_.find(rx)->second->front() == while_1);
     REQUIRE(deliverable.followed_by_hash_.count(a1));
-    REQUIRE(deliverable.followed_by_hash_.find(a1)->second == if_1);
+    REQUIRE(deliverable.followed_by_hash_.find(a1)->second->size() == 1);
+    REQUIRE(deliverable.followed_by_hash_.find(a1)->second->front() == if_1);
   }
 
   SECTION ("AddFollowsTransitiveRelationship and ForList") {
@@ -118,9 +124,11 @@ TEST_CASE("1.Deliverable.Add relationships") {
 
     // reverse check
     REQUIRE(deliverable.child_to_parent_hash_.count(rx));
-    REQUIRE(deliverable.child_to_parent_hash_.find(rx)->second == while_1);
+    REQUIRE(deliverable.child_to_parent_hash_.find(rx)->second->size() == 1);
+    REQUIRE(deliverable.child_to_parent_hash_.find(rx)->second->front() == while_1);
     REQUIRE(deliverable.child_to_parent_hash_.count(a2));
-    REQUIRE(deliverable.child_to_parent_hash_.find(a2)->second == if_1);
+    REQUIRE(deliverable.child_to_parent_hash_.find(a2)->second->size() == 1);
+    REQUIRE(deliverable.child_to_parent_hash_.find(a2)->second->front() == if_1);
   }
 
   SECTION ("AddParentTransitiveRelationship and ForList") {

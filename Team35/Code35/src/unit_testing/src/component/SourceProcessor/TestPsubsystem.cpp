@@ -25,8 +25,9 @@ TEST_CASE("1.PSubsystem.Basic Single Line Creation") {
     REQUIRE(deliverable->GetVariableList()->size() == 1);
     REQUIRE(* (* deliverable->GetVariableList()->front()).GetName() == vname);
 
-    REQUIRE(deliverable->GetConstantValueList()->size() == 1);
-    REQUIRE((* deliverable->GetConstantValueList()->front()).Get() == 100);
+    REQUIRE(deliverable->GetConstantList()->size() == 1);
+    ConstantValue* constant_list_front = const_cast<ConstantValue*>(deliverable->GetConstantList()->front()->GetValue());
+    REQUIRE(constant_list_front->Get() == 100);
 
     //ensure StmtList and AssignList holds the same object
     REQUIRE(deliverable->GetStatementList()->size() == 1);
@@ -35,7 +36,9 @@ TEST_CASE("1.PSubsystem.Basic Single Line Creation") {
     REQUIRE(assign_entity == assign_entity2);
     REQUIRE(* assign_entity->GetVariable()->GetName() == vname);
     REQUIRE(assign_entity->GetAssignmentExpr()->CheckExact("x + 100"));
-    REQUIRE(assign_entity->GetExpressionConstants().front()->Get() == 100);
+    ConstantValue* expression_constant_front = const_cast<ConstantValue*>(
+      assign_entity->GetExpressionConstants().front()->GetValue());
+    REQUIRE(expression_constant_front->Get() == 100);
 
     //ensure trace down from Program is the same variable
     REQUIRE(deliverable->GetProgram()->GetProcedureList()->front() == deliverable->GetProcList()->front());

@@ -59,4 +59,13 @@ class PQLValidationException : public SyntaxException {
       : SyntaxException(msg.c_str()) {}
 };
 
+//! Represents an error that occurs during the population of or retrieval from the PKB
+class PKBException : public SpaException {
+ public:
+  explicit PKBException(char const* const message) : SpaException(message) {
+    std::string prefix = "[PKB EXCEPTION RAISED]: ";
+    E(prefix + message);
+  };
+};
+
 #endif //AUTOTESTER_SRC_UNIT_TESTING_SRC_EXCEPTION_SYNTAXEXCEPTION_H_

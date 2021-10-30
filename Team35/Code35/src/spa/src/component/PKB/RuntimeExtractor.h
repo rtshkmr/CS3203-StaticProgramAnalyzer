@@ -20,12 +20,12 @@ class RuntimeExtractor {
   AffectsTExtractor affects_t_extractor_ = AffectsTExtractor();
  public:
   RuntimeExtractor(PKB* pkb);
-  std::vector<Entity*> GetNextT(std::string target);
-  std::vector<Entity*> GetPrevT(std::string target);
-  std::vector<Entity*> GetAffects(std::string target);
-  std::vector<Entity*> GetAffectedBy(std::string target);
-  std::vector<Entity*> GetAffectsT(std::string target);
-  std::vector<Entity*> GetAffectedByT(std::string target);
+  std::vector<Entity*> GetNextT(int target);
+  std::vector<Entity*> GetPrevT(int target);
+  std::vector<Entity*> GetAffects(int target);
+  std::vector<Entity*> GetAffectedBy(int target);
+  std::vector<Entity*> GetAffectsT(int target);
+  std::vector<Entity*> GetAffectedByT(int target);
 
   std::vector<Entity*> GetNextT(DesignEntity de);
   std::vector<Entity*> GetPrevT(DesignEntity de);
@@ -44,12 +44,18 @@ class RuntimeExtractor {
   bool HasAffects();
   bool HasAffectedBy();
 
-  bool HasNextT(std::string first, std::string second);
-  bool HasPrevT(std::string first, std::string second);
-  bool HasAffects(std::string first, std::string second);
-  bool HasAffectedBy(std::string first, std::string second);
-  bool HasAffectsT(std::string first, std::string second);
-  bool HasAffectedByT(std::string first, std::string second);
+  bool HasNextT(int first);
+  bool HasPrevT(int first);
+  bool HasAffects(int first);
+  bool HasAffectedBy(int first);
+  bool HasAffectsT(int first);
+  bool HasAffectedByT(int first);
+  
+  bool HasNextT(int first, int second);
+  bool HasAffects(int first, int second);
+  bool HasAffectedBy(int first, int second);
+  bool HasAffectsT(int first, int second);
+  bool HasAffectedByT(int first, int second);
 
   void Delete();
 };

@@ -381,7 +381,7 @@ std::vector<Variable *> ClauseCommandExecutor::RetrieveVariablesFromStmt(Entity 
     for (auto variable : if_entity->GetControlVariables()) {
       variable_to_check.push_back(variable);
     }
-  } else {
+  } else if (typeid(*stmt_entity) == typeid(WhileEntity)) {
     WhileEntity *if_entity = dynamic_cast<WhileEntity *>(stmt_entity);
     for (auto variable : if_entity->GetControlVariables()) {
       variable_to_check.push_back(variable);
