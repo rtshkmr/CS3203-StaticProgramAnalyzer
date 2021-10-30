@@ -22,6 +22,34 @@ std::vector<Entity*> AffectsExtractor::GetAffects(int target) {
   return std::vector<Entity*>();
 }
 
+std::vector<Entity*> AffectsExtractor::GetAllAffects() {
+  std::vector<Entity*> retList = {};
+
+  std::vector<Entity*> assign_list = pkb_->GetDesignEntities(DesignEntity::kAssign);
+  for (auto* entity : assign_list) {
+    AssignEntity* ae = dynamic_cast<AssignEntity*>(entity);
+    if (HasAffects(ae->GetStatementNumber()->GetNum())) { //TODO change to Entity type?
+      retList.push_back(entity);
+    }
+  }
+  retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
+  return retList;
+}
+
+std::vector<Entity*> AffectsExtractor::GetAllAffectedBy() {
+  std::vector<Entity*> retList = {};
+
+  std::vector<Entity*> assign_list = pkb_->GetDesignEntities(DesignEntity::kAssign);
+  for (auto* entity : assign_list) {
+    AssignEntity* ae = dynamic_cast<AssignEntity*>(entity);
+    if (HasAffectedBy(ae->GetStatementNumber()->GetNum())) { //TODO change to Entity type?
+      retList.push_back(entity);
+    }
+  }
+  retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
+  return retList;
+}
+
 /**
  * For Affects(_,_)
  */

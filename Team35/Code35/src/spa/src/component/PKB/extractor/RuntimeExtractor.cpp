@@ -44,8 +44,21 @@ std::vector<Entity*> RuntimeExtractor::GetPrevT(DesignEntity de) {
   return next_t_extractor_.GetAllNextTRHS(std::vector<Procedure*>{}, std::vector<Statement*>{});
 }
 
-std::vector<Entity*> RuntimeExtractor::GetAffects(DesignEntity de) { return std::vector<Entity*>(); }
-std::vector<Entity*> RuntimeExtractor::GetAffectedBy(DesignEntity de) { return std::vector<Entity*>(); }
+std::vector<Entity*> RuntimeExtractor::GetAffects(DesignEntity de) {
+  if (de == DesignEntity::kStmt || de == DesignEntity::kAssign) {
+    return affects_extractor_.GetAllAffects();
+  } else {
+    return std::vector<Entity*>{};
+  }
+}
+
+std::vector<Entity*> RuntimeExtractor::GetAffectedBy(DesignEntity de) {
+  if (de == DesignEntity::kStmt || de == DesignEntity::kAssign) {
+    return affects_extractor_.GetAllAffectedBy();
+  } else {
+    return std::vector<Entity*>{};
+  }
+}
 std::vector<Entity*> RuntimeExtractor::GetAffectsT(DesignEntity de) { return std::vector<Entity*>(); }
 std::vector<Entity*> RuntimeExtractor::GetAffectedByT(DesignEntity de) { return std::vector<Entity*>(); }
 

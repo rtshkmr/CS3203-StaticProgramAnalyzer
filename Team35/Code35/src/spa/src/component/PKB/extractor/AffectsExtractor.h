@@ -17,6 +17,8 @@ class AffectsExtractor {
  public:
   std::vector<Entity*> GetAffects(int target);
   std::vector<Entity*> GetAffectedBy(int target);
+  std::vector<Entity*> GetAllAffects();
+  std::vector<Entity*> GetAllAffectedBy();
   bool HasAffects();
   bool HasAffects(int target);
   bool HasAffectedBy(int target);
