@@ -166,6 +166,10 @@ void Statement::SetLineNumber(LineNumber* ln) {
   line_number_ = ln;
 }
 
+void Statement::SetProcedureNode(Procedure* procedure) {
+  this->procedure_node_ = procedure;
+}
+
 void Statement::SetParentNode(Container* parent) {
   parent_node_ = parent;
 }
@@ -191,4 +195,8 @@ LineNumber* Statement::GetLineNumber() {
 }
 std::string Statement::GetLineNumberString() {
   return std::to_string(line_number_->getNum());
+}
+
+Procedure* Statement::GetProcedureNode() {
+  return procedure_node_;
 }

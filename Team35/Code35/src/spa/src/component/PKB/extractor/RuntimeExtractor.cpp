@@ -76,8 +76,13 @@ std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetAffectedByT(Desig
   return std::vector<std::tuple<Entity*, Entity*>>();
 }
 
-bool RuntimeExtractor::HasAffects() { return false; }
-bool RuntimeExtractor::HasAffectedBy() { return false; }
+bool RuntimeExtractor::HasAffects() {
+  return affects_extractor_.HasAffects();
+}
+
+bool RuntimeExtractor::HasAffectedBy() {
+  return affects_extractor_.HasAffects(); // Can be replace with (_,_)
+}
 
 bool RuntimeExtractor::HasNextT(int target) {
   return false;
@@ -88,11 +93,11 @@ bool RuntimeExtractor::HasPrevT(int target) {
 }
 
 bool RuntimeExtractor::HasAffects(int target) {
-  return false;
+  return affects_extractor_.HasAffects(target);
 }
 
 bool RuntimeExtractor::HasAffectedBy(int target) {
-  return false;
+  return affects_extractor_.HasAffectedBy(target);
 }
 
 bool RuntimeExtractor::HasAffectsT(int target) {
@@ -109,8 +114,14 @@ bool RuntimeExtractor::HasNextT(int first, int second) {
                                     std::vector<Statement*>{});
 }
 
-bool RuntimeExtractor::HasAffects(int first, int second) { return false; }
-bool RuntimeExtractor::HasAffectedBy(int first, int second) { return false; }
+bool RuntimeExtractor::HasAffects(int first, int second) {
+  return affects_extractor_.HasAffects(first, second);
+}
+
+bool RuntimeExtractor::HasAffectedBy(int first, int second) {
+  return affects_extractor_.HasAffectedBy(first, second);
+}
+
 bool RuntimeExtractor::HasAffectsT(int first, int second) { return false; }
 bool RuntimeExtractor::HasAffectedByT(int first, int second) { return false; }
 
