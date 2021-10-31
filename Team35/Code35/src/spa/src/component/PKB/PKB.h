@@ -86,8 +86,14 @@ class PKB {
   // Returns the type of any entity in DesignEntity format
   static DesignEntity GetDesignEntityFromEntity(Entity* entity);
 
-  // Returns the attribute type that the specified entity type possesses
-  static Attribute GetAttributeFromEntity(Entity* entity);
+  // Returns a string corresponding to a specific attribute of an entity
+  static std::string GetAttributeFromEntity(Entity* entity, Attribute);
+
+  // Returns a vector of Attribute types that an entity possesses
+  static std::vector<Attribute> GetAttributeTypes(Entity* entity);
+
+  // Returns an unordered_map of Attribute to attribute strings
+  static std::unordered_map<Attribute, std::string> GetAttributesFromEntity(Entity*);
 
   // Constructor
   PKB() = default;
@@ -161,14 +167,4 @@ class PKB {
   void ProcessEntitiesWithMatchingAttributes();
 
   std::vector<DesignEntity> GetApplicableTypes(DesignEntity de);
-
-  void PopulateContainerUse(std::unordered_map<Container*, std::list<Variable*>*> container_use_hash_);
-  void PopulateContainerUsedBy(std::unordered_map<Variable*, std::list<Container*>*> container_used_by_hash_);
-  void PopulateContainerModifies(std::unordered_map<Container*, std::list<Variable*>*> container_modifies_hash_);
-  void PopulateContainerModifiedBy(std::unordered_map<Variable*, std::list<Container*>*> container_modified_by_hash_);
-
-  void PopulateUses();
-  void PopulateUsedBy();
-  void PopulateModifies();
-  void PopulateModifiedBy();
 };
