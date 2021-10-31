@@ -2,8 +2,8 @@
 #include <cassert>
 #include "QueryProjector.h"
 
-QueryProjector::QueryProjector(std::vector<Synonym*> target_synonyms_list)
-    : target_synonym_list(target_synonyms_list) {}
+QueryProjector::QueryProjector(std::vector<std::pair<Synonym*, Attribute>> target_syn_attr_list)
+    : target_syn_attr_list(target_syn_attr_list) {}
 
 /**
  * Formats the UnformattedQueryResult into the requirements for the TestWrapper.
@@ -20,11 +20,11 @@ QueryProjector::QueryProjector(std::vector<Synonym*> target_synonyms_list)
 std::vector<std::string> QueryProjector::FormatQuery(UnformattedQueryResult unformatted_results) {
   std::vector<QueryEvaluatorTable*> table_references = unformatted_results.GetTables();
 
-  if (!unformatted_results.GetBooleanResult() && !target_synonym_list.empty()) {
+  if (!unformatted_results.GetBooleanResult() && !target_syn_attr_list.empty()) {
     return std::vector<std::string>{};
   }
   // boolean synonym
-  if (target_synonym_list.empty()) {
+  if (target_syn_attr_list.empty()) {
     std::vector<std::string> wrapped_boolean =
         std::vector<std::string>{unformatted_results.GetBooleanResult() ? "TRUE" : "FALSE"};
     return wrapped_boolean;
@@ -34,20 +34,22 @@ std::vector<std::string> QueryProjector::FormatQuery(UnformattedQueryResult unfo
   std::vector<std::vector<std::vector<std::string>>> unordered_results = {};  // vector of tables of columns
   for (QueryEvaluatorTable* table : table_references) {
     // Get the unique list of results for that table
+    // TODO: have a pair of (synonym, attribute)
     std::vector<Synonym*> table_target_list = table->GetTargetSynonymList();
     result_synonym_order.insert(result_synonym_order.end(), table_target_list.begin(), table_target_list.end());
 
     std::vector<std::vector<Entity*>> entity_table = table->GetResults();
+    // TODO: find the attributes that the target syns in the table can take
     std::vector<std::vector<std::string>> stringified_table = StringifyTable(table_target_list, entity_table);
     unordered_results.push_back(stringified_table);
   }
 
   std::vector<std::string> query_ans;
-  if (target_synonym_list.size() == 1) {
+  if (target_syn_attr_list.size() == 1) {
     query_ans = unordered_results.front()[0];
   } else {
     // need to cross product for multiple synonyms.
-    query_ans = FormatMultipleTables(unordered_results, result_synonym_order, target_synonym_list);
+    query_ans = FormatMultipleTables(unordered_results, result_synonym_order, target_syn_attr_list);
   }
   query_ans.erase(std::unique(query_ans.begin(), query_ans.end()), query_ans.end());
   return query_ans;
@@ -107,14 +109,14 @@ std::vector<std::vector<std::string>> QueryProjector::StringifyTable(std::vector
 
 std::vector<std::string> QueryProjector::FormatMultipleTables(std::vector<std::vector<std::vector<std::string>>> tables,
                                                               std::vector<Synonym*> table_synonym_order,
-                                                              std::vector<Synonym*> target_synonym_list) {
+                                                              std::vector<std::pair<Synonym*, Attribute>> tgt_syn_attrs) {
   std::vector<std::vector<std::string>> crossed_table = tables[0];  // vector of tables of columns
   for (int i = 1; i < tables.size(); ++i) {
     std::vector<std::vector<std::string>> current_table = tables[i];
     crossed_table = CrossProductTables(crossed_table, current_table);
   }
 
-  std::vector<std::vector<std::string>> ordered_table = ReorderTable(std::move(target_synonym_list),
+  std::vector<std::vector<std::string>> ordered_table = ReorderTable(std::move(tgt_syn_attrs),
                                                                      std::move(table_synonym_order),
                                                                      crossed_table);
   std::vector<std::string> query_ans = JoinTuples(ordered_table);
@@ -158,13 +160,14 @@ std::vector<std::vector<std::string>> QueryProjector::CrossProductTables(std::ve
  * @param table Table to reorder.
  * @return Reordered table.
  */
-std::vector<std::vector<std::string>> QueryProjector::ReorderTable(std::vector<Synonym*> desired_order,
+std::vector<std::vector<std::string>> QueryProjector::ReorderTable(std::vector<std::pair<Synonym*, Attribute>> desired_order,
                                                                    std::vector<Synonym*> current_order,
                                                                    std::vector<std::vector<std::string>> table) {
   std::vector<std::vector<std::string>> reordered_table(desired_order.size());
 
   int i = 0;
-  for (Synonym* syn: desired_order) {
+  for (auto p: desired_order) {
+    Synonym* syn = p.first;
     if (i < current_order.size() && *current_order[i] == *syn) {
       reordered_table[i] = table[i];
     } else {

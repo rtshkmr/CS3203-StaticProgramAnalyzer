@@ -129,20 +129,17 @@ std::pair<Synonym*, Attribute> QueryParser::ParseElem(bool is_first_pass) {
   }
 
   Synonym* s = QueryParser::GetSynonymInfo(target, &synonyms);
-  if (is_first_pass) {
-    this->target_synonyms_list.push_back(s);
-    this->target_synonyms_map.emplace(std::make_pair(s->GetName(), s));
-  }
-
   // handle case where we need to parse attrRef
   Attribute attr = Attribute::kInvalid;
   if (lookahead.GetTokenTag() == TokenTag::kDot) {
     Eat(TokenTag::kDot);
     attr = ParseAttrName(s);
-    if (is_first_pass) {
-      s->SetAttribute(attr);
-    }
   }
+  if (is_first_pass) {
+    this->target_syn_attrs_list.push_back(std::make_pair(s, attr));
+    this->target_synonyms_map.emplace(std::make_pair(s->GetName(), s));
+  }
+
   return {s, attr};
 }
 

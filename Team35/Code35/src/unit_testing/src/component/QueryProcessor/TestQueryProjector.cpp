@@ -134,13 +134,13 @@ TEST_CASE("3.QueryProjector.Cross product tables") {
 }
 
 TEST_CASE("3.QueryProjector.Reorder tables") {
-  std::vector<Synonym*> desired_order = std::vector<Synonym*>{
-      new Synonym("b", DesignEntity::kVariable),
-      new Synonym("f", DesignEntity::kVariable),
-      new Synonym("a", DesignEntity::kAssign),
-      new Synonym("d", DesignEntity::kIf),
-      new Synonym("e", DesignEntity::kWhile),
-      new Synonym("c", DesignEntity::kProcedure),
+  auto desired_order = std::vector<std::pair<Synonym*, Attribute>>{
+      std::make_pair(new Synonym("b", DesignEntity::kVariable), Attribute::kVarName),
+      std::make_pair(new Synonym("f", DesignEntity::kVariable), Attribute::kVarName),
+      std::make_pair(new Synonym("a", DesignEntity::kAssign), Attribute::kStmtNumber),
+      std::make_pair(new Synonym("d", DesignEntity::kIf), Attribute::kStmtNumber),
+      std::make_pair(new Synonym("e", DesignEntity::kWhile), Attribute::kStmtNumber),
+      std::make_pair(new Synonym("c", DesignEntity::kProcedure), Attribute::kProcName),
   };
   std::vector<Synonym*> current_order = std::vector<Synonym*>{
       new Synonym("a", DesignEntity::kAssign),
@@ -171,15 +171,15 @@ TEST_CASE("3.QueryProjector.Reorder tables") {
   CHECK(expected_table == actual_table);
 
   // MULTIPLE SAME SYNONYM
-  std::vector<Synonym*> desired_order2 = std::vector<Synonym*>{
-      new Synonym("a", DesignEntity::kAssign),
-      new Synonym("a", DesignEntity::kAssign),
-      new Synonym("b", DesignEntity::kVariable),
-      new Synonym("c", DesignEntity::kProcedure),
-      new Synonym("d", DesignEntity::kIf),
-      new Synonym("e", DesignEntity::kWhile),
-      new Synonym("f", DesignEntity::kVariable),
-      new Synonym("d", DesignEntity::kIf),
+  auto desired_order2 = std::vector<std::pair<Synonym*, Attribute>>{
+    std::make_pair(new Synonym("a", DesignEntity::kAssign), Attribute::kStmtNumber),
+    std::make_pair(new Synonym("a", DesignEntity::kAssign), Attribute::kStmtNumber),
+    std::make_pair(new Synonym("b", DesignEntity::kVariable), Attribute::kStmtNumber),
+    std::make_pair(new Synonym("c", DesignEntity::kProcedure), Attribute::kProcName),
+    std::make_pair(new Synonym("d", DesignEntity::kIf), Attribute::kStmtNumber),
+    std::make_pair(new Synonym("e", DesignEntity::kWhile), Attribute::kStmtNumber),
+    std::make_pair(new Synonym("f", DesignEntity::kVariable), Attribute::kStmtNumber),
+    std::make_pair(new Synonym("d", DesignEntity::kIf), Attribute::kStmtNumber),
   };
   std::vector<std::vector<std::string>> expected_table2 = std::vector<std::vector<std::string>>{
       {"0", "0", "0", "2", "2", "2", "3", "3", "3", "4", "4", "4"},
@@ -223,8 +223,8 @@ TEST_CASE("3.QueryProjector.1 target synonym") {
     UnformattedQueryResult uqr = UnformattedQueryResult(true);
     uqr.AddTable(table1);
 
-    std::vector<Synonym*> syn_list = std::vector<Synonym*>{target_syn1};
-    QueryProjector qp = QueryProjector(syn_list);
+    auto syn_attrs = std::vector<std::pair<Synonym*, Attribute>>{std::make_pair(target_syn1, Attribute::kStmtNumber)};
+    QueryProjector qp = QueryProjector(syn_attrs);
 
     std::vector<std::string> expected_values = std::vector<std::string>{};
     std::vector<std::string> actual_values = qp.FormatQuery(uqr);
@@ -278,8 +278,8 @@ TEST_CASE("3.QueryProjector.1 target synonym") {
     uqr.AddTable(table2);
     uqr.AddTable(table3);
 
-    std::vector<Synonym*> target_syn_list = std::vector<Synonym*>{syn1};
-    QueryProjector qp = QueryProjector(target_syn_list);
+    auto target_syn_attrs = std::vector<std::pair<Synonym*, Attribute>>{std::make_pair(syn1, Attribute::kStmtNumber)};
+    QueryProjector qp = QueryProjector(target_syn_attrs);
 
     std::vector<std::string> expected_values = std::vector<std::string>{"1", "2", "3"};
     std::vector<std::string> actual_values = qp.FormatQuery(uqr);
@@ -292,8 +292,10 @@ TEST_CASE("3.QueryProjector.no target synonym") {
   SECTION("boolean false") {
     UnformattedQueryResult uqr = UnformattedQueryResult(false);
     Synonym* target_syn1 = new Synonym("a", DesignEntity::kIf);
-    std::vector<Synonym*> syn_list = std::vector<Synonym*>{target_syn1};
-    QueryProjector qp = QueryProjector(syn_list);
+    auto target_syn_attrs = std::vector<std::pair<Synonym*, Attribute>>{
+      std::make_pair(target_syn1, Attribute::kStmtNumber)
+    };
+    QueryProjector qp = QueryProjector(target_syn_attrs);
 
     std::vector<std::string> expected_list = std::vector<std::string>{};
     std::vector<std::string> actual_list = qp.FormatQuery(uqr);
@@ -302,8 +304,8 @@ TEST_CASE("3.QueryProjector.no target synonym") {
 
   SECTION("BOOLEAN false") {
     UnformattedQueryResult uqr = UnformattedQueryResult(false);
-    std::vector<Synonym*> syn_list = std::vector<Synonym*>{};
-    QueryProjector qp = QueryProjector(syn_list);
+    std::vector<std::pair<Synonym*, Attribute>> target_syn_attrs;
+    QueryProjector qp = QueryProjector(target_syn_attrs);
 
     std::vector<std::string> expected_list = std::vector<std::string>{"FALSE"};
     std::vector<std::string> actual_list = qp.FormatQuery(uqr);
@@ -312,8 +314,8 @@ TEST_CASE("3.QueryProjector.no target synonym") {
 
   SECTION("BOOLEAN true") {
     UnformattedQueryResult uqr = UnformattedQueryResult(true);
-    std::vector<Synonym*> syn_list = std::vector<Synonym*>{};
-    QueryProjector qp = QueryProjector(syn_list);
+    std::vector<std::pair<Synonym*, Attribute>> target_syn_attrs;
+    QueryProjector qp = QueryProjector(target_syn_attrs);
 
     std::vector<std::string> expected_list = std::vector<std::string>{"TRUE"};
     std::vector<std::string> actual_list = qp.FormatQuery(uqr);
@@ -362,8 +364,10 @@ TEST_CASE("3.QueryProjector.multiple target synonym") {
     UnformattedQueryResult uqr = UnformattedQueryResult(true);
     uqr.AddTable(table1);
 
-    std::vector<Synonym*> syn_list = std::vector<Synonym*>{syn2, syn3};
-    QueryProjector qp = QueryProjector(syn_list);
+    std::vector<std::pair<Synonym*, Attribute>> target_syn_attrs {
+      {syn2, Attribute::kStmtNumber}, {syn3, Attribute::kStmtNumber}
+    };
+    QueryProjector qp = QueryProjector(target_syn_attrs);
 
     std::vector<std::string> expected_values = std::vector<std::string>{"x 4", "y 5", "z 6"};
     std::vector<std::string> actual_values = qp.FormatQuery(uqr);
@@ -429,8 +433,10 @@ TEST_CASE("3.QueryProjector.multiple target synonym") {
     uqr.AddTable(table2);
     uqr.AddTable(table3);
 
-    std::vector<Synonym*> syn_list = std::vector<Synonym*>{syn4, syn2, syn3};
-    QueryProjector qp = QueryProjector(syn_list);
+    std::vector<std::pair<Synonym*, Attribute>> target_syn_attrs {
+      {syn4, Attribute::kStmtNumber}, {syn2, Attribute::kStmtNumber}, {syn3, Attribute::kStmtNumber}
+    };
+    QueryProjector qp = QueryProjector(target_syn_attrs);
 
     std::vector<std::string> expected_values = std::vector<std::string>{
         "7 x 4", "8 x 4", "9 x 4", "7 x 5", "8 x 5", "9 x 5", "7 x 6", "8 x 6", "9 x 6",
@@ -496,8 +502,10 @@ TEST_CASE("3.QueryProjector.multiple target synonym") {
     uqr.AddTable(table1);
     uqr.AddTable(table2);
 
-    std::vector<Synonym*> syn_list = std::vector<Synonym*>{syn4, syn3};
-    QueryProjector qp = QueryProjector(syn_list);
+    std::vector<std::pair<Synonym*, Attribute>> target_syn_attrs {
+      {syn4, Attribute::kStmtNumber}, {syn3, Attribute::kStmtNumber}
+    };
+    QueryProjector qp = QueryProjector(target_syn_attrs);
 
     std::vector<std::string> expected_values = std::vector<std::string>{
         "7 4", "8 4", "9 4", "7 5", "8 5", "9 5", "7 6", "8 6", "9 6"
@@ -561,8 +569,13 @@ TEST_CASE("3.QueryProjector.multiple target synonym") {
     uqr.AddTable(table1);
     uqr.AddTable(table2);
 
-    std::vector<Synonym*> syn_list = std::vector<Synonym*>{syn4, syn3, syn4, syn3};
-    QueryProjector qp = QueryProjector(syn_list);
+    std::vector<std::pair<Synonym*, Attribute>> target_syn_attrs {
+      {syn4, Attribute::kStmtNumber},
+      {syn3, Attribute::kStmtNumber},
+      {syn4, Attribute::kStmtNumber},
+      {syn3, Attribute::kStmtNumber},
+    };
+    QueryProjector qp = QueryProjector(target_syn_attrs);
 
     std::vector<std::string> expected_values = std::vector<std::string>{
       "7 4 7 4", "8 4 8 4", "9 4 9 4", "7 5 7 5", "8 5 8 5", "9 5 9 5", "7 6 7 6", "8 6 8 6", "9 6 9 6"
