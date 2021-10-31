@@ -29,8 +29,10 @@ ClauseStrategy::DetermineDoubleSynonymCommands(QueryEvaluatorTable *table, Synon
   PKBQueryCommand *query_command = nullptr;
   if (typeid(*clause) == typeid(SuchThat)) {
     query_command = new QuerySuchThatTwoSynonymCommand(clause);
-  } else {
+  } else if (typeid(*clause) == typeid(Pattern)) {
     query_command = new QueryPatternTwoSynonymCommand(clause);
+  } else {
+    query_command = new QueryWithTwoSynonymCommand(clause);
   }
   ClauseCommand *clause_command = nullptr;
   if (table->ContainsColumn(first_synonym) && table->ContainsColumn(second_synonym)) {
@@ -50,8 +52,10 @@ ClauseStrategy::DetermineSingleSynonymCommand(Clause *clause, bool synonym_is_fi
   PKBQueryCommand *query_command = nullptr;
   if (typeid(*clause) == typeid(SuchThat)) {
     query_command = new QuerySuchThatOneSynonymCommand(clause);
-  } else {
+  } else if (typeid(*clause) == typeid(Pattern)) {
     query_command = new QueryPatternOneSynonymCommand(clause);
+  }else {
+    query_command = new QueryWithOneSynonymCommand(clause);
   }
   ClauseCommand *clause_command = new SingleSynonymPresentCommand(synonym_is_first_param);
   return std::make_tuple(query_command, clause_command);
@@ -105,6 +109,16 @@ PatternStrategy::DetermineClauseCommand(Clause *clause, QueryEvaluatorTable *tab
 std::tuple<PKBQueryCommand *, ClauseCommand *>
 WithStrategy::DetermineClauseCommand(Clause *clause, QueryEvaluatorTable *table) {
   auto* with_clause = dynamic_cast<With*>(clause);
+
+  if (with_clause->left_is_synonym && with_clause->right_is_synonym) {
+    return DetermineDoubleSynonymCommands(table, with_clause->first_synonym, with_clause->second_synonym, clause);
+  } else if (with_clause->left_is_synonym) {
+    return DetermineSingleSynonymCommand(clause, true);
+  } else if (with_clause->right_is_synonym) {
+    return DetermineSingleSynonymCommand(clause, true);
+  } else {
+    // Cross product.
+  }
 
   return std::tuple<PKBQueryCommand *, ClauseCommand *>();
 }

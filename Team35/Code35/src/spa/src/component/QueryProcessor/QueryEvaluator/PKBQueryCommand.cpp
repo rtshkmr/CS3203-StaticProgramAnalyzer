@@ -165,8 +165,10 @@ PKBQueryReceiver::QueryPKBByValueForBoolean(PKBRelRefs rel, std::string first_va
 IntermediateTable *
 PKBQueryReceiver::QueryAttributeMatch(DesignEntity first_design_entity, DesignEntity second_design_entity) {
   IntermediateTable *table = new IntermediateTable();
-  std::vector<std::tuple<Entity*, Entity*>> result = db_manager->
-          GetEntitiesWithMatchingAttributes(first_design_entity, second_design_entity);
+  // TODO: Support needed in DBManager
+  std::vector<std::tuple<Entity*, Entity*>> result;
+//  std::vector<std::tuple<Entity*, Entity*>> result = db_manager->
+//          GetEntitiesWithMatchingAttributes(first_design_entity, second_design_entity);
   table->InsertData(result);
   return table;
 }
@@ -174,7 +176,9 @@ PKBQueryReceiver::QueryAttributeMatch(DesignEntity first_design_entity, DesignEn
 IntermediateTable *
 PKBQueryReceiver::QueryEntityAttributeMatch(DesignEntity design_entity, Attribute attribute, std::string value) {
   IntermediateTable *table = new IntermediateTable();
-  std::vector<Entity*> result = db_manager->GetEntitiesWithAttributeValue(design_entity, attribute, value);
+  // TODO: Support needed in DBManager
+  std::vector<std::tuple<Entity*, Entity*>> result;
+//  std::vector<Entity*> result = db_manager->GetEntitiesWithAttributeValue(design_entity, attribute, value);
   table->InsertData(result);
   return table;
 }
