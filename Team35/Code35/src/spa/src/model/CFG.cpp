@@ -278,12 +278,12 @@ bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
       }
       //=================================== HANDLE WHILE CLUSTER =====================================
     }
-    else if (tag == ClusterTag::kWhileCluster && ) {
+    else if (tag == ClusterTag::kWhileCluster) {
       if (child_contains_second_stmt) {
         auto new_target_range = std::make_pair(child_range.first, target_range.second);
         return TraverseScopedClusterForAffects(child, new_target_range, pkb, lhs_var);
-      }; else {
-        continue
+      }else {
+        continue;
       }
       // =================================== HANDLE CHILDREN THAT ARE SIMPLE BLOCKS =======================
     } else { // it's a simple block, no alternative paths to consider:
