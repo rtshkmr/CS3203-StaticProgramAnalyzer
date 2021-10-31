@@ -162,6 +162,23 @@ PKBQueryReceiver::QueryPKBByValueForBoolean(PKBRelRefs rel, std::string first_va
   return table;
 }
 
+IntermediateTable *
+PKBQueryReceiver::QueryAttributeMatch(DesignEntity first_design_entity, DesignEntity second_design_entity) {
+  IntermediateTable *table = new IntermediateTable();
+  std::vector<std::tuple<Entity*, Entity*>> result = db_manager->
+          GetEntitiesWithMatchingAttributes(first_design_entity, second_design_entity);
+  table->InsertData(result);
+  return table;
+}
+
+IntermediateTable *
+PKBQueryReceiver::QueryEntityAttributeMatch(DesignEntity design_entity, Attribute attribute, std::string value) {
+  IntermediateTable *table = new IntermediateTable();
+  std::vector<Entity*> result = db_manager->GetEntitiesWithAttributeValue(design_entity, attribute, value);
+  table->InsertData(result);
+  return table;
+}
+
 QuerySuchThatTwoSynonymCommand::QuerySuchThatTwoSynonymCommand(Clause *clause) : clause(clause), receiver(nullptr) {}
 
 void QuerySuchThatTwoSynonymCommand::SetReceiver(PKBQueryReceiver *receiver) {
@@ -185,12 +202,8 @@ void QuerySuchThatOneSynonymCommand::SetReceiver(PKBQueryReceiver *receiver) {
 
 IntermediateTable * QuerySuchThatOneSynonymCommand::ExecuteQuery(Clause *clause) {
   auto* such_that = dynamic_cast<SuchThat *>(clause);
-  bool synonym_is_first_param;
-  if (such_that ->left_is_synonym) {
-    synonym_is_first_param = true;
-  } else {
-    synonym_is_first_param = false;
-  }
+  bool synonym_is_first_param = such_that->left_is_synonym;
+
   std::string first = such_that->left_hand_side;
   std::string second = such_that->right_hand_side;
   std::string query_value = synonym_is_first_param ? second : first;
@@ -254,4 +267,34 @@ IntermediateTable * QueryPatternOneSynonymCommand::ExecuteQuery(Clause *clause) 
   auto* pattern = dynamic_cast<Pattern *>(clause);
   DesignEntity pattern_design_entity = pattern->first_synonym->GetType();
   return this->receiver->QueryPatternByValue(pattern_design_entity, pattern->left_hand_side);
+}
+
+QueryWithTwoSynonymCommand::QueryWithTwoSynonymCommand(Clause *clause) : clause(clause), receiver(nullptr) {}
+
+void QueryWithTwoSynonymCommand::SetReceiver(PKBQueryReceiver *receiver) {
+  delete this->receiver;
+  this->receiver = receiver;
+}
+
+IntermediateTable * QueryWithTwoSynonymCommand::ExecuteQuery(Clause *clause) {
+  auto* with = dynamic_cast<With *>(clause);
+  return this->receiver->QueryAttributeMatch(with->GetFirstSynonymType(), with->GetSecondSynonymType());
+}
+
+QueryWithOneSynonymCommand::QueryWithOneSynonymCommand(Clause *clause) : clause(clause), receiver(nullptr) {}
+
+void QueryWithOneSynonymCommand::SetReceiver(PKBQueryReceiver *receiver) {
+  delete this->receiver;
+  this->receiver = receiver;
+}
+
+IntermediateTable *QueryWithOneSynonymCommand::ExecuteQuery(Clause *clause) {
+  auto* with_clause = dynamic_cast<With*>(clause);
+  bool synonym_is_first_param = with_clause->left_is_synonym;
+  DesignEntity design_entity_to_check = synonym_is_first_param ? with_clause->GetFirstSynonymType()
+          : with_clause->GetSecondSynonymType();
+  Attribute attribute = synonym_is_first_param ? with_clause->left_attribute : with_clause->right_attribute;
+  std::string value = synonym_is_first_param ? with_clause->right_hand_side : with_clause->left_hand_side;
+
+  return this->receiver->QueryEntityAttributeMatch(design_entity_to_check, attribute, value);
 }

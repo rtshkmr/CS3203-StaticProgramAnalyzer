@@ -23,8 +23,11 @@ class PKBQueryReceiver {
     IntermediateTable *QueryRelRefExistence(PKBRelRefs rel);
     IntermediateTable *QueryDesignEntity(DesignEntity design_entity);
     IntermediateTable *QueryPatternByValue(DesignEntity design_entity, std::string value);
+    IntermediateTable *QueryAttributeMatch(DesignEntity first_design_entity, DesignEntity second_design_entity);
+    IntermediateTable *QueryEntityAttributeMatch(DesignEntity design_entity, Attribute attribute, std::string value);
 };
 
+// TODO: change the set receiver method to be in the base class.
 class PKBQueryCommand {
   public:
     virtual void SetReceiver(PKBQueryReceiver *receiver) = 0;
@@ -84,6 +87,26 @@ class QueryPatternOneSynonymCommand : public PKBQueryCommand {
     PKBQueryReceiver *receiver;
   public:
     explicit QueryPatternOneSynonymCommand(Clause *clause);
+    void SetReceiver(PKBQueryReceiver *receiver) override;
+    IntermediateTable * ExecuteQuery(Clause *clause) override;
+};
+
+class QueryWithTwoSynonymCommand : public PKBQueryCommand {
+  private:
+    Clause *clause;
+    PKBQueryReceiver *receiver;
+  public:
+    explicit QueryWithTwoSynonymCommand(Clause *clause);
+    void SetReceiver(PKBQueryReceiver *receiver) override;
+    IntermediateTable * ExecuteQuery(Clause *clause) override;
+};
+
+class QueryWithOneSynonymCommand : public PKBQueryCommand {
+  private:
+    Clause *clause;
+    PKBQueryReceiver *receiver;
+  public:
+    explicit QueryWithOneSynonymCommand(Clause *clause);
     void SetReceiver(PKBQueryReceiver *receiver) override;
     IntermediateTable * ExecuteQuery(Clause *clause) override;
 };
