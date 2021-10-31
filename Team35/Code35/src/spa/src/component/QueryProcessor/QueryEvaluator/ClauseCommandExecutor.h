@@ -28,6 +28,7 @@ class ClauseCommandExecutor {
     std::tuple<bool, int>DoubleSynonymExpansionCheck(Clause *clause, bool first_syn_in);
     bool DetermineWithTwoSynonyms(With *with_clause, int index);
     std::string RetrieveEntityAttribute(Entity *entity, Attribute attribute);
+    std::tuple<bool, int> WithClauseDoubleSynonymExpansionCheck(With *with_clause, bool first_syn_in, int index);
   public:
     ClauseCommandExecutor(QueryEvaluatorTable *table, IntermediateTable *intermediate_table);
     void SuchThatTwoSynonym(Clause *clause);
@@ -35,8 +36,10 @@ class ClauseCommandExecutor {
     void WithTwoSynonym(Clause *clause);
     void SuchThatTwoSynonymOneInTable(Clause *clause, bool first_syn_in);
     void PatternTwoSynonymOneInTable(Clause *clause, bool first_syn_in);
+    void WithTwoSynonymOneInTable(Clause *clause, bool first_syn_in);
     void SuchThatOneSynonym(Clause *clause, bool first_syn_in);
     void PatternOneSynonym(Clause *clause);
+    void WithOneSynonym(Clause *clause, bool first_syn_in);
     void DoubleSynonymExpansion(Clause *clause, bool first_syn_in);
 };
 
