@@ -28,7 +28,7 @@ add_executable(unit_testing ${srcs}
         src/component/SourceProcessor/TestParser.cpp
         src/component/PKB/TestNextTExtractor.cpp
         src/component/SourceProcessor/Extractors/TestCallsTExtractor.cpp src/model/TestVariableMapping.cpp
-        )
+        src/component/PKB/extractor/TestNextBipExtractor.cpp)
 
 target_link_libraries(unit_testing spa)
 SET(CMAKE_BUILD_TYPE Debug)

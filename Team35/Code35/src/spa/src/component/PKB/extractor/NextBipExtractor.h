@@ -17,6 +17,9 @@ class NextBipExtractor {
   std::vector<Entity*> GetPrevBip(int target);
   std::vector<Entity*> GetAllNextBipRHS();
   std::vector<Entity*> GetAllNextBipLHS();
+  // made public to test
+  void PopulateBipMaps(std::unordered_map<int, std::vector<Entity*>*> next_map,
+                       std::unordered_map<int, std::vector<Entity*>*> prev_map);
  private:
   PKB* pkb_{};
   std::vector<Entity*> stmt_list_;
@@ -25,8 +28,6 @@ class NextBipExtractor {
   std::unordered_map<int, std::vector<Entity*>*> next_bip_map_; // maps nextbip of stmt num to list of stmts
   std::unordered_map<int, std::vector<Entity*>*> prev_bip_map_;
 
-  void PopulateBipMaps(std::unordered_map<int, std::vector<Entity*>*> next_map,
-                       std::unordered_map<int, std::vector<Entity*>*> prev_map);
   void JoinEndToEnd(Procedure* called_proc, const std::vector<Entity*> &next_entities);
   void JoinStartToStart(Procedure* called_proc, Entity* prev_entity);
   void AddNext(Entity* prev_entity, Entity* next_entity);
@@ -38,6 +39,7 @@ class NextBipExtractor {
   void ErasePrevRelationship(Entity* next_stmt, Entity* prev_stmt);
   std::vector<Entity*> GetRelFromMap(int target, NextBipRel rel);
   std::vector<Entity*> GetRel(NextBipRel rel, int target);
+  std::list<int> GetLastStmts(Block* block);
 };
 
 #endif //AUTOTESTER_CODE35_SRC_SPA_SRC_COMPONENT_PKB_EXTRACTOR_NEXTBIPEXTRACTOR_H_

@@ -56,7 +56,8 @@ void NextBipExtractor::JoinStartToStart(Procedure* called_proc, Entity* prev_ent
 
 void NextBipExtractor::JoinEndToEnd(Procedure* called_proc, const std::vector<Entity*> &next_entities) {
   for (Entity* next_entity : next_entities) {
-    std::list<int> last_stmts; //findprocedureandgetlastvalues
+    auto* root_block = const_cast<Block*>(called_proc->GetBlockRoot());
+    std::list<int> last_stmts = GetLastStmts(root_block);
     for (int last_stmt : last_stmts) {
       AddNext(stmt_list_[last_stmt], next_entity);
     }
@@ -123,6 +124,25 @@ void NextBipExtractor::ErasePrevRelationship(Entity* next_stmt, Entity* prev_stm
   }
   prev_bip_map_.erase(prev_bip_map_.find(next_stmt_num));
   prev_bip_map_.insert({next_stmt_num, entities_to_keep});
+}
+
+std::list<int> NextBipExtractor::GetLastStmts(Block* block) {
+  std::set<Block*> next_blocks = block->GetNextBlocks();
+  std::list<int> last_stmts = std::list<int>{};
+  for (Block* next_block: next_blocks) {
+    int next = next_block->GetStartEndRange().first;
+    if (next == -1) { // exit block
+      assert(next_block->GetNextBlocks().empty());
+      last_stmts.push_back(block->GetStartEndRange().second);
+      continue;
+    }
+    std::list<int> next_last_stmts = GetLastStmts(next_block);
+    last_stmts.insert(last_stmts.end(), next_last_stmts.begin(), next_last_stmts.end());
+  }
+  if (next_blocks.empty()) {
+    last_stmts.push_back(block->GetStartEndRange().second);
+  }
+  return last_stmts;
 }
 
 /**
