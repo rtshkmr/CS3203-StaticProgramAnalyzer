@@ -25,8 +25,8 @@ RelRef GetRelRef(std::string reference) {
 }
 
 static std::unordered_map<std::string, Attribute> _attribute_map = {{"procName", Attribute::kProcName},
-                                                                    {"varName", Attribute::kProcName},
-                                                                    {"value", Attribute::kProcName},
+                                                                    {"varName", Attribute::kVarName},
+                                                                    {"value", Attribute::kValue},
                                                                     {"stmt#", Attribute::kStmtNumber}};
 Attribute GetAttribute(std::string attr_string) {
   std::unordered_map<std::string, Attribute>::const_iterator iter = _attribute_map.find(attr_string);
