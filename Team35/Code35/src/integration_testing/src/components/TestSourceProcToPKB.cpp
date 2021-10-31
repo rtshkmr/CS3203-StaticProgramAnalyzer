@@ -602,10 +602,10 @@ TEST_CASE("SP to PKB relationships tests") {
     std::list<std::tuple<EntityEnum, std::string>>
     expected_list_var5 = std::list<std::tuple<EntityEnum, std::string>>{
       std::make_tuple(EntityEnum::kVariableEntity, "psubsystem"),
+      std::make_tuple(EntityEnum::kVariableEntity, "fileName"),
       std::make_tuple(EntityEnum::kVariableEntity, "chara"),
       std::make_tuple(EntityEnum::kVariableEntity, "byte"),
       std::make_tuple(EntityEnum::kVariableEntity, "lastByte"),
-      std::make_tuple(EntityEnum::kVariableEntity, "fileName"),
       };
     std::vector<Entity*> actual_list_var5 = pkb->GetRelationship(PKBRelRefs::kModifiesContainer, "Parser");
     i = 0;
