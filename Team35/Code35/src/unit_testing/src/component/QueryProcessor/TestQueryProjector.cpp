@@ -174,11 +174,11 @@ TEST_CASE("3.QueryProjector.Reorder tables") {
   auto desired_order2 = std::vector<std::pair<Synonym*, Attribute>>{
     std::make_pair(new Synonym("a", DesignEntity::kAssign), Attribute::kStmtNumber),
     std::make_pair(new Synonym("a", DesignEntity::kAssign), Attribute::kStmtNumber),
-    std::make_pair(new Synonym("b", DesignEntity::kVariable), Attribute::kStmtNumber),
+    std::make_pair(new Synonym("b", DesignEntity::kVariable), Attribute::kVarName),
     std::make_pair(new Synonym("c", DesignEntity::kProcedure), Attribute::kProcName),
     std::make_pair(new Synonym("d", DesignEntity::kIf), Attribute::kStmtNumber),
     std::make_pair(new Synonym("e", DesignEntity::kWhile), Attribute::kStmtNumber),
-    std::make_pair(new Synonym("f", DesignEntity::kVariable), Attribute::kStmtNumber),
+    std::make_pair(new Synonym("f", DesignEntity::kVariable), Attribute::kVarName),
     std::make_pair(new Synonym("d", DesignEntity::kIf), Attribute::kStmtNumber),
   };
   std::vector<std::vector<std::string>> expected_table2 = std::vector<std::vector<std::string>>{
@@ -365,7 +365,7 @@ TEST_CASE("3.QueryProjector.multiple target synonym") {
     uqr.AddTable(table1);
 
     std::vector<std::pair<Synonym*, Attribute>> target_syn_attrs {
-      {syn2, Attribute::kStmtNumber}, {syn3, Attribute::kStmtNumber}
+      {syn2, Attribute::kVarName}, {syn3, Attribute::kStmtNumber}
     };
     QueryProjector qp = QueryProjector(target_syn_attrs);
 

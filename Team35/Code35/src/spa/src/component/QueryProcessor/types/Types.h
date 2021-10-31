@@ -98,6 +98,7 @@ enum class ScopeIndication {
 DesignEntity GetDesignEntity(std::string reference);
 RelRef GetRelRef(std::string reference);
 Attribute GetAttribute(std::string attr_string);
+Attribute GetDefaultAttribute(DesignEntity de);
 
 const std::unordered_set<DesignEntity> stmt_design_entities_ = {
   DesignEntity::kRead,
