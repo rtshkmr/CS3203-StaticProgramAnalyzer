@@ -539,7 +539,7 @@ void PSubsystem::HandleReadStmt(Entity* entity) {
   assert(read_entity);
   deliverable_->AddReadEntity(read_entity);
   deliverable_->AddModifiesRelationship(read_entity, read_entity->GetVariable());
-  deliverable_->AddUsesRelationship(current_procedure_, read_entity->GetVariable()); //procedure level
+  deliverable_->AddModifiesRelationship(current_procedure_, read_entity->GetVariable()); //procedure level
   if (current_procedure_ != current_node_)
     deliverable_->AddModifiesRelationship(current_node_, read_entity->GetVariable());  //container level
 }
