@@ -132,30 +132,30 @@ TEST_CASE("2.PKB.PKB population and retrieval") {
         REQUIRE(followed_by_list == pkb.GetRelationship(PKBRelRefs::kFollowedBy, "2"));
     }
 
-    SECTION("UsesS") {
-        std::vector<Entity*> uses_list;
-        uses_list.push_back(v1_);
-        REQUIRE(uses_list == pkb.GetRelationship(PKBRelRefs::kUsesS, "4"));
-    }
-
-    SECTION("UsedByS") {
-        std::vector<Entity*> used_by_list;
-        used_by_list.push_back(a1_);
-        REQUIRE(used_by_list == pkb.GetRelationship(PKBRelRefs::kUsedByS, "v2"));
-    }
-
-    SECTION("ModifiesS") {
-      std::vector<Entity*> modifies_list;
-      modifies_list.push_back(v1_);
-      REQUIRE(modifies_list == pkb.GetRelationship(PKBRelRefs::kModifiesStatement, "1"));
-    }
-
-    SECTION("ModifiedByS") {
-        std::vector<Entity*> modified_by_list;
-        modified_by_list.push_back(read1_);
-        modified_by_list.push_back(a1_);
-        REQUIRE(modified_by_list == pkb.GetRelationship(PKBRelRefs::kModifiedByStatement, "v1"));
-    }
+//    SECTION("UsesS") {
+//        std::vector<Entity*> uses_list;
+//        uses_list.push_back(v1_);
+//        REQUIRE(uses_list == pkb.GetRelationship(PKBRelRefs::kUsesS, "4"));
+//    }
+//
+//    SECTION("UsedByS") {
+//        std::vector<Entity*> used_by_list;
+//        used_by_list.push_back(a1_);
+//        REQUIRE(used_by_list == pkb.GetRelationship(PKBRelRefs::kUsedByS, "v2"));
+//    }
+//
+//    SECTION("ModifiesS") {
+//      std::vector<Entity*> modifies_list;
+//      modifies_list.push_back(v1_);
+//      REQUIRE(modifies_list == pkb.GetRelationship(PKBRelRefs::kModifiesStatement, "1"));
+//    }
+//
+//    SECTION("ModifiedByS") {
+//        std::vector<Entity*> modified_by_list;
+//        modified_by_list.push_back(read1_);
+//        modified_by_list.push_back(a1_);
+//        REQUIRE(modified_by_list == pkb.GetRelationship(PKBRelRefs::kModifiedByStatement, "v1"));
+//    }
   }
 
   // Check if PKB can store and retrieve the existence of any relationship
@@ -176,21 +176,21 @@ TEST_CASE("2.PKB.PKB population and retrieval") {
       REQUIRE(!pkb.HasRelationship(PKBRelRefs::kChild));
     }
 
-    SECTION("UsesS") {
-      REQUIRE(pkb.HasRelationship(PKBRelRefs::kUsesS));
-    }
-
-    SECTION("UsedByS") {
-      REQUIRE(pkb.HasRelationship(PKBRelRefs::kUsedByS));
-    }
-
-    SECTION("ModifiesS") {
-      REQUIRE(pkb.HasRelationship(PKBRelRefs::kModifiesStatement));
-    }
-
-    SECTION("ModifiedByS") {
-      REQUIRE(pkb.HasRelationship(PKBRelRefs::kModifiedByStatement));
-    }
+//    SECTION("UsesS") {
+//      REQUIRE(pkb.HasRelationship(PKBRelRefs::kUsesS));
+//    }
+//
+//    SECTION("UsedByS") {
+//      REQUIRE(pkb.HasRelationship(PKBRelRefs::kUsedByS));
+//    }
+//
+//    SECTION("ModifiesS") {
+//      REQUIRE(pkb.HasRelationship(PKBRelRefs::kModifiesStatement));
+//    }
+//
+//    SECTION("ModifiedByS") {
+//      REQUIRE(pkb.HasRelationship(PKBRelRefs::kModifiedByStatement));
+//    }
   }
 
   // Check if PKB can store and retrieve assign expressions given either variable name or statement number
