@@ -1,5 +1,6 @@
 #include <list>
 #include <cassert>
+#include <model/Statement.h>
 #include "QueryProjector.h"
 
 QueryProjector::QueryProjector(std::vector<std::pair<Synonym*, Attribute>> target_syn_attr_list)
@@ -94,13 +95,31 @@ std::vector<std::vector<std::string>> QueryProjector::StringifyTable(std::vector
         break;
       case Attribute::kVarName:
         for (Entity* entity: entity_column) {
-          std::string var_string = const_cast<VariableName*>(dynamic_cast<Variable*>(entity)->GetName())->getName();
+          std::string var_string;
+          Variable* temp;
+          if (syn_attrs[i].first->GetType() == DesignEntity::kPrint) {
+            temp = dynamic_cast<PrintEntity*>(entity)->GetVariable();
+          }
+          else if (syn_attrs[i].first->GetType() == DesignEntity::kRead) {
+            temp = dynamic_cast<ReadEntity*>(entity)->GetVariable();
+          }
+          else {
+            temp = dynamic_cast<Variable*>(entity);
+          }
+          var_string = const_cast<VariableName*>(temp->GetName())->getName();
           stringified_column.push_back(var_string);
         }
         break;
       case Attribute::kProcName:
         for (Entity* entity: entity_column) {
-          std::string proc_string = const_cast<ProcedureName*>(dynamic_cast<Procedure*>(entity)->GetName())->getName();
+          std::string proc_string;
+          Procedure* temp;
+          if (syn_attrs[i].first->GetType() == DesignEntity::kCall) {
+            temp = dynamic_cast<CallEntity*>(entity)->GetProcedure();
+          } else {
+            temp = dynamic_cast<Procedure*>(entity);
+          }
+          proc_string = const_cast<ProcedureName*>(temp->GetName())->getName();
           stringified_column.push_back(proc_string);
         }
         break;
