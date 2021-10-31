@@ -33,10 +33,10 @@ TEST_CASE("3.QueryProjector.Stringify tables") {
     ReadEntity* r3 = entity_utils::GetReadX();
     r3->SetStatementNumber(new StatementNumber(9));
 
-    std::vector<Synonym*> synonyms = std::vector<Synonym*>{
-        new Synonym("a", DesignEntity::kAssign),
-        new Synonym("p", DesignEntity::kPrint),
-        new Synonym("r", DesignEntity::kRead),
+    auto syn_attrs = std::vector<std::pair<Synonym*, Attribute>>{
+      {new Synonym("a", DesignEntity::kAssign), Attribute::kStmtNumber},
+      {new Synonym("p", DesignEntity::kPrint), Attribute::kStmtNumber},
+      {new Synonym("r", DesignEntity::kRead), Attribute::kStmtNumber},
     };
     std::vector<std::vector<Entity*>> entity_table = std::vector<std::vector<Entity*>>{
         {a1, a2, a3},
@@ -49,7 +49,7 @@ TEST_CASE("3.QueryProjector.Stringify tables") {
         {"4", "5", "6"},
         {"7", "8", "9"},
     };
-    std::vector<std::vector<std::string>> actual_table = QueryProjector::StringifyTable(synonyms, entity_table);
+    std::vector<std::vector<std::string>> actual_table = QueryProjector::StringifyTable(syn_attrs, entity_table);
     CHECK(expected_table == actual_table);
   }
 
@@ -64,6 +64,11 @@ TEST_CASE("3.QueryProjector.Stringify tables") {
     Constant* c0 = entity_utils::const_0_;
     Constant* c3 = entity_utils::const_3_;
 
+    auto syn_attrs = std::vector<std::pair<Synonym*, Attribute>>{
+        {new Synonym("a", DesignEntity::kProcedure), Attribute::kProcName},
+        {new Synonym("p", DesignEntity::kVariable), Attribute::kVarName},
+        {new Synonym("r", DesignEntity::kConstant), Attribute::kValue},
+    };
     std::vector<Synonym*> synonyms = std::vector<Synonym*>{
         new Synonym("a", DesignEntity::kProcedure),
         new Synonym("p", DesignEntity::kVariable),
@@ -74,13 +79,12 @@ TEST_CASE("3.QueryProjector.Stringify tables") {
         {vz, vx, vi},
         {c0, c1, c3},
     };
-
     std::vector<std::vector<std::string>> expected_table = std::vector<std::vector<std::string>>{
         {"proc1", "proc2", "proc3"},
         {"z", "x", "i"},
         {"0", "1", "3"},
     };
-    std::vector<std::vector<std::string>> actual_table = QueryProjector::StringifyTable(synonyms, entity_table);
+    std::vector<std::vector<std::string>> actual_table = QueryProjector::StringifyTable(syn_attrs, entity_table);
     CHECK(expected_table == actual_table);
   }
 }
@@ -434,7 +438,7 @@ TEST_CASE("3.QueryProjector.multiple target synonym") {
     uqr.AddTable(table3);
 
     std::vector<std::pair<Synonym*, Attribute>> target_syn_attrs {
-      {syn4, Attribute::kStmtNumber}, {syn2, Attribute::kStmtNumber}, {syn3, Attribute::kStmtNumber}
+      {syn4, Attribute::kStmtNumber}, {syn2, Attribute::kVarName}, {syn3, Attribute::kStmtNumber}
     };
     QueryProjector qp = QueryProjector(target_syn_attrs);
 

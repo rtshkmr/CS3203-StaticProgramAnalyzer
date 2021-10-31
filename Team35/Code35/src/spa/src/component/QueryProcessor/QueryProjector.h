@@ -11,8 +11,7 @@ class QueryProjector {
     QueryProjector(std::vector<std::pair<Synonym*, Attribute>> target_syn_attr_list);
     std::vector<std::string> FormatQuery(UnformattedQueryResult unformatted_results);
 
-    // made public purely for testing
-    static std::vector<std::vector<std::string>> StringifyTable(std::vector<Synonym*> synonyms,
+    static std::vector<std::vector<std::string>> StringifyTable(std::vector<std::pair<Synonym*, Attribute>> syn_attrs,
                                                          std::vector<std::vector<Entity*>> entity_table);
     static std::vector<std::vector<std::string>> CrossProductTables(std::vector<std::vector<std::string>> t1,
                                                              std::vector<std::vector<std::string>> t2);
@@ -22,6 +21,7 @@ class QueryProjector {
     static std::vector<std::string> JoinTuples(std::vector<std::vector<std::string>> table);
   private:
     std::vector<std::pair<Synonym*, Attribute>> target_syn_attr_list;
+    std::unordered_map<std::string, std::vector<Attribute>> syn_to_attrs_map;
     static std::vector<std::string> FormatMultipleTables(std::vector<std::vector<std::vector<std::string>>> tables,
                                                          std::vector<Synonym*> table_synonym_order,
                                                          std::vector<std::pair<Synonym*, Attribute>> tgt_syn_attrs);

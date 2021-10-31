@@ -3,7 +3,14 @@
 #include "QueryProjector.h"
 
 QueryProjector::QueryProjector(std::vector<std::pair<Synonym*, Attribute>> target_syn_attr_list)
-    : target_syn_attr_list(target_syn_attr_list) {}
+    : target_syn_attr_list(target_syn_attr_list) {
+  for (auto p : target_syn_attr_list) {
+    if (syn_to_attrs_map.find(p.first->GetName()) == syn_to_attrs_map.end()) {
+      syn_to_attrs_map[p.first->GetName()] = std::vector<Attribute>();
+    }
+    syn_to_attrs_map[p.first->GetName()].push_back(p.second);
+  }
+}
 
 /**
  * Formats the UnformattedQueryResult into the requirements for the TestWrapper.
@@ -34,13 +41,23 @@ std::vector<std::string> QueryProjector::FormatQuery(UnformattedQueryResult unfo
   std::vector<std::vector<std::vector<std::string>>> unordered_results = {};  // vector of tables of columns
   for (QueryEvaluatorTable* table : table_references) {
     // Get the unique list of results for that table
-    // TODO: have a pair of (synonym, attribute)
     std::vector<Synonym*> table_target_list = table->GetTargetSynonymList();
-    result_synonym_order.insert(result_synonym_order.end(), table_target_list.begin(), table_target_list.end());
-
-    std::vector<std::vector<Entity*>> entity_table = table->GetResults();
-    // TODO: find the attributes that the target syns in the table can take
-    std::vector<std::vector<std::string>> stringified_table = StringifyTable(table_target_list, entity_table);
+    std::vector<std::vector<Entity*>> temp_table = table->GetResults();
+    std::vector<std::pair<Synonym*, Attribute>> table_target_syn_list;
+    std::vector<std::vector<Entity*>> entity_table;
+    for (int i = 0; i < table_target_list.size(); i++) {
+      auto t = table_target_list[i];
+      auto column = temp_table[i];
+      auto attrs = syn_to_attrs_map[t->GetName()];
+      for (auto a : attrs) {
+        table_target_syn_list.push_back({t, a});
+        entity_table.push_back(column);
+      }
+    }
+    for (auto item : table_target_syn_list) {
+      result_synonym_order.push_back(item.first);
+    }
+    std::vector<std::vector<std::string>> stringified_table = StringifyTable(table_target_syn_list, entity_table);
     unordered_results.push_back(stringified_table);
   }
 
@@ -62,45 +79,38 @@ std::vector<std::string> QueryProjector::FormatQuery(UnformattedQueryResult unfo
  * @param entity_table Vector of vector of Entities.
  * @return Stringified table.
  */
-std::vector<std::vector<std::string>> QueryProjector::StringifyTable(std::vector<Synonym*> synonyms,
+std::vector<std::vector<std::string>> QueryProjector::StringifyTable(std::vector<std::pair<Synonym*, Attribute>> syn_attrs,
                                                                      std::vector<std::vector<Entity*>> entity_table) {
   std::vector<std::vector<std::string>> stringified_table;
-  for (int i = 0; i < synonyms.size(); ++i) {
+  for (int i = 0; i < syn_attrs.size(); ++i) {
     std::vector<std::string> stringified_column;
     std::vector<Entity*> entity_column = entity_table[i];
-    switch (synonyms[i]->GetType()) {
-      case DesignEntity::kStmt:
-      case DesignEntity::kRead:
-      case DesignEntity::kPrint:
-      case DesignEntity::kCall:
-      case DesignEntity::kWhile:
-      case DesignEntity::kIf:
-      case DesignEntity::kAssign:
-      case DesignEntity::kProgLine:
+    switch (syn_attrs[i].second) {
+      case Attribute::kStmtNumber:
         for (Entity* entity: entity_column) {
           int statement_num = dynamic_cast<Statement*>(entity)->GetStatementNumber()->GetNum();
           stringified_column.push_back(std::to_string(statement_num));
         }
         break;
-      case DesignEntity::kVariable:
+      case Attribute::kVarName:
         for (Entity* entity: entity_column) {
           std::string var_string = const_cast<VariableName*>(dynamic_cast<Variable*>(entity)->GetName())->getName();
           stringified_column.push_back(var_string);
         }
         break;
-      case DesignEntity::kConstant:
-        for (Entity* entity: entity_column) {
-          int constant_int = const_cast<ConstantValue*>(dynamic_cast<Constant*>(entity)->GetValue())->Get();
-          stringified_column.push_back(std::to_string(constant_int));
-        }
-        break;
-      case DesignEntity::kProcedure:
+      case Attribute::kProcName:
         for (Entity* entity: entity_column) {
           std::string proc_string = const_cast<ProcedureName*>(dynamic_cast<Procedure*>(entity)->GetName())->getName();
           stringified_column.push_back(proc_string);
         }
         break;
-      case DesignEntity::kInvalid:break;
+      case Attribute::kValue:
+        for (Entity* entity: entity_column) {
+          int constant_int = const_cast<ConstantValue*>(dynamic_cast<Constant*>(entity)->GetValue())->Get();
+          stringified_column.push_back(std::to_string(constant_int));
+        }
+        break;
+      case Attribute::kInvalid: break;
     }
     stringified_table.push_back(stringified_column);
   }
