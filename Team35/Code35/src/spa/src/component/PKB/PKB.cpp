@@ -36,10 +36,10 @@ void PKB::PopulateDataStructures(Deliverable d) {
   PopulateRelationship(&d.parent_to_child_T_hash_, PKBRelRefs::kParentT);
   PopulateRelationship(&d.child_to_parent_hash_, PKBRelRefs::kChild);
   PopulateRelationship(&d.child_to_parent_T_hash_, PKBRelRefs::kChildT);
-  PopulateRelationship(&d.use_hash_, PKBRelRefs::kUses);
-  PopulateRelationship(&d.used_by_hash_, PKBRelRefs::kUsedBy);
-  PopulateRelationship(&d.modifies_hash_, PKBRelRefs::kModifies);
-  PopulateRelationship(&d.modified_by_hash_, PKBRelRefs::kModifiedBy);
+  PopulateRelationship(&d.use_hash_, PKBRelRefs::kUsesS);
+  PopulateRelationship(&d.used_by_hash_, PKBRelRefs::kUsedByS);
+  PopulateRelationship(&d.modifies_hash_, PKBRelRefs::kModifiesStatement);
+  PopulateRelationship(&d.modified_by_hash_, PKBRelRefs::kModifiedByStatement);
   PopulateRelationship(&d.calls_hash_, PKBRelRefs::kCalls);
   PopulateRelationship(&d.called_by_hash_, PKBRelRefs::kCalledBy);
   PopulateRelationship(&d.calls_T_hash_, PKBRelRefs::kCallsT);
@@ -47,26 +47,16 @@ void PKB::PopulateDataStructures(Deliverable d) {
   PopulateRelationship(&d.next_hash_, PKBRelRefs::kNext);
   PopulateRelationship(&d.previous_hash_, PKBRelRefs::kPrevious);
 
-  auto c_use_hash = reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.container_use_hash_);
-  auto c_used_by_hash = reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.container_used_by_hash_);
-  auto c_modifies_hash = reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.container_modifies_hash_);
-  auto c_modified_by_hash = reinterpret_cast<std::unordered_map<Entity*, std::list<Entity*>*>*>(&d.container_modified_by_hash_);
 
-  PopulateRelationship(c_use_hash, PKBRelRefs::kUses);
-  PopulateRelationship(c_used_by_hash, PKBRelRefs::kUsedBy);
-  PopulateRelationship(c_modifies_hash, PKBRelRefs::kModifies);
-  PopulateRelationship(c_modified_by_hash, PKBRelRefs::kModifiedBy);
+  PopulateContainerUse(d.container_use_hash_);
+  PopulateContainerUsedBy(d.container_used_by_hash_);
+  PopulateContainerModifies(d.container_modifies_hash_);
+  PopulateContainerModifiedBy(d.container_modified_by_hash_);
 
-
-//  PopulateContainerUse(d.container_use_hash_);
-//  PopulateContainerUsedBy(d.container_used_by_hash_);
-//  PopulateContainerModifies(d.container_modifies_hash_);
-//  PopulateContainerModifiedBy(d.container_modified_by_hash_);
-//
-//  PopulateUses();
-//  PopulateModifies();
-//  PopulateUsedBy();
-//  PopulateModifiedBy();
+  PopulateUses();
+  PopulateModifies();
+  PopulateUsedBy();
+  PopulateModifiedBy();
 
   ProcessEntitiesWithMatchingAttributes();
 
