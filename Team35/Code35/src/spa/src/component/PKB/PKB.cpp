@@ -130,6 +130,10 @@ void PKB::PopulateRelationship(std::unordered_map<X*, std::list<Y*>*>* hash, PKB
   }
 }
 
+std::unordered_map<std::string, std::vector<Entity*>> PKB::GetRelationshipMap(PKBRelRefs ref) {
+  return relationship_table_[ref];
+}
+
 std::vector<Entity*> PKB::GetRelationship(PKBRelRefs ref, std::string entity) {
     return relationship_table_[ref][entity];
 }

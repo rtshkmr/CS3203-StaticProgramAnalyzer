@@ -33,8 +33,8 @@ std::vector<Entity*> DBManager::GetRelationship(PKBRelRefs ref, std::string enti
     case PKBRelRefs::kAffectedBy: return runtime_extractor_->GetAffectedBy(Utility::ConvertStringToInt(entity));
     case PKBRelRefs::kAffectsT: return runtime_extractor_->GetAffectsT(Utility::ConvertStringToInt(entity));
     case PKBRelRefs::kAffectedByT: return runtime_extractor_->GetAffectedByT(Utility::ConvertStringToInt(entity));
-    case PKBRelRefs::kNextBip: return runtime_extractor_->GetNextBip(Utility::ConvertStringToInt(entity));
-    case PKBRelRefs::kPrevBip: return runtime_extractor_->GetPrevBip(Utility::ConvertStringToInt(entity));
+    case PKBRelRefs::kNextBip: return runtime_extractor_->GetNextBip(entity);
+    case PKBRelRefs::kPrevBip: return runtime_extractor_->GetPrevBip(entity);
     default: return pkb_->GetRelationship(ref, entity);
   }
 }
@@ -225,8 +225,8 @@ bool DBManager::HasRelationship(PKBRelRefs ref, std::string entity) {
     case PKBRelRefs::kAffectedBy: return runtime_extractor_->HasAffectedBy(Utility::ConvertStringToInt(entity));
     case PKBRelRefs::kAffectsT: return runtime_extractor_->HasAffectsT(Utility::ConvertStringToInt(entity));
     case PKBRelRefs::kAffectedByT: return runtime_extractor_->HasAffectedByT(Utility::ConvertStringToInt(entity));
-    case PKBRelRefs::kNextBip: return runtime_extractor_->HasNextBip(Utility::ConvertStringToInt(entity));
-    case PKBRelRefs::kPrevBip: return runtime_extractor_->HasPrevBip(Utility::ConvertStringToInt(entity));
+    case PKBRelRefs::kNextBip: return runtime_extractor_->HasNextBip(entity);
+    case PKBRelRefs::kPrevBip: return runtime_extractor_->HasPrevBip(entity);
     default: return pkb_->HasRelationship(ref, entity);
   }
 }
@@ -260,11 +260,9 @@ bool DBManager::HasRelationship(PKBRelRefs ref, std::string first, std::string s
       return runtime_extractor_->HasAffectedByT(Utility::ConvertStringToInt(first),
                                                 Utility::ConvertStringToInt(second));
     case PKBRelRefs::kNextBip:
-      return runtime_extractor_->HasNextBip(Utility::ConvertStringToInt(first),
-                                            Utility::ConvertStringToInt(second));
+      return runtime_extractor_->HasNextBip(first, second);
     case PKBRelRefs::kPrevBip:
-      return runtime_extractor_->HasNextBip(Utility::ConvertStringToInt(second),
-                                            Utility::ConvertStringToInt(first));
+      return runtime_extractor_->HasNextBip(second, first);
     default: return pkb_->HasRelationship(ref, first, second);
   }
 }

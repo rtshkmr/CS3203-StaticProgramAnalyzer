@@ -1,0 +1,34 @@
+procedure proc1 {
+    while ((a == b) || (c!= d)) {
+        if (c > d) then {
+            a = a - b - c - d;
+            call proc2;
+        } else {
+            read yomam;
+        }
+        call proc3;
+    }
+}
+procedure proc2 {
+    if (CDs >= mew2) then {
+        while (im == g) {
+            read gongcha;
+            read chacha;
+        }
+    } else {
+        print ney;
+        if (im != g) then {
+            thats = it;
+            call proc3;
+        } else {
+            thats = notit;
+            call proc3;
+        }
+    }
+}
+procedure proc3 {
+    print img;
+    while (cs3203 == alive) {
+        im = dead;
+    }
+}

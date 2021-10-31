@@ -30,11 +30,11 @@ std::vector<Entity*> RuntimeExtractor::GetAffectedByT(int target) {
   return affects_t_extractor_.GetAffectedByT(target);
 }
 
-std::vector<Entity*> RuntimeExtractor::GetNextBip(int target) {
+std::vector<Entity*> RuntimeExtractor::GetNextBip(std::string target) {
   return next_bip_extractor_.GetNextBip(target);
 }
 
-std::vector<Entity*> RuntimeExtractor::GetPrevBip(int target) {
+std::vector<Entity*> RuntimeExtractor::GetPrevBip(std::string target) {
   return next_bip_extractor_.GetPrevBip(target);
 }
 
@@ -103,22 +103,32 @@ std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetAffectedByT(Desig
 }
 
 std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetNextBip(DesignEntity first, DesignEntity second) {
-  return std::vector<std::tuple<Entity*, Entity*>>();
+  bool not_stmt = first != DesignEntity::kStmt || second != DesignEntity::kStmt;
+  bool not_prog_line = first != DesignEntity::kProgLine || second != DesignEntity::kProgLine;
+  if (not_stmt && not_prog_line) {
+    return std::vector<std::tuple<Entity*, Entity*>>{};
+  }
+  return next_bip_extractor_.GetAllNextBip();
 }
 
 std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetPrevBip(DesignEntity first, DesignEntity second) {
-  return std::vector<std::tuple<Entity*, Entity*>>();
+  bool not_stmt = first != DesignEntity::kStmt || second != DesignEntity::kStmt;
+  bool not_prog_line = first != DesignEntity::kProgLine || second != DesignEntity::kProgLine;
+  if (not_stmt && not_prog_line) {
+    return std::vector<std::tuple<Entity*, Entity*>>{};
+  }
+  return next_bip_extractor_.GetAllPrevBip();
 }
 
 bool RuntimeExtractor::HasAffects() { return false; }
 bool RuntimeExtractor::HasAffectedBy() { return false; }
 
 bool RuntimeExtractor::HasNextBip() {
-  return false;
+  return next_bip_extractor_.HasNextBip();
 }
 
 bool RuntimeExtractor::HasPrevBip() {
-  return false;
+  return next_bip_extractor_.HasPrevBip();
 }
 
 bool RuntimeExtractor::HasAffects(int target) {
@@ -137,12 +147,12 @@ bool RuntimeExtractor::HasAffectedByT(int target) {
   return false;
 }
 
-bool RuntimeExtractor::HasNextBip(int target) {
-  return false;
+bool RuntimeExtractor::HasNextBip(std::string first) {
+  return next_bip_extractor_.HasNextBip(first);
 }
 
-bool RuntimeExtractor::HasPrevBip(int target) {
-  return false;
+bool RuntimeExtractor::HasPrevBip(std::string first) {
+  return next_bip_extractor_.HasPrevBip(first);
 }
 
 bool RuntimeExtractor::HasNextT(int first, int second) {
@@ -156,8 +166,8 @@ bool RuntimeExtractor::HasAffectedBy(int first, int second) { return false; }
 bool RuntimeExtractor::HasAffectsT(int first, int second) { return false; }
 bool RuntimeExtractor::HasAffectedByT(int first, int second) { return false; }
 
-bool RuntimeExtractor::HasNextBip(int first, int second) {
-  return false;
+bool RuntimeExtractor::HasNextBip(std::string first, std::string second) {
+  return next_bip_extractor_.HasNextBip(first, second);
 }
 
 void RuntimeExtractor::Delete() {

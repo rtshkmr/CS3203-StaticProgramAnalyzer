@@ -28,8 +28,8 @@ class RuntimeExtractor {
   std::vector<Entity*> GetAffectedBy(int target);
   std::vector<Entity*> GetAffectsT(int target);
   std::vector<Entity*> GetAffectedByT(int target);
-  std::vector<Entity*> GetNextBip(int target);
-  std::vector<Entity*> GetPrevBip(int target);
+  std::vector<Entity*> GetNextBip(std::string target);
+  std::vector<Entity*> GetPrevBip(std::string target);
 
   std::vector<Entity*> GetNextT(DesignEntity de);
   std::vector<Entity*> GetPrevT(DesignEntity de);
@@ -58,15 +58,15 @@ class RuntimeExtractor {
   bool HasAffectedBy(int first);
   bool HasAffectsT(int first);
   bool HasAffectedByT(int first);
-  bool HasNextBip(int first);
-  bool HasPrevBip(int first);
+  bool HasNextBip(std::string first);
+  bool HasPrevBip(std::string first);
 
   bool HasNextT(int first, int second);
   bool HasAffects(int first, int second);
   bool HasAffectedBy(int first, int second);
   bool HasAffectsT(int first, int second);
   bool HasAffectedByT(int first, int second);
-  bool HasNextBip(int first, int second);
+  bool HasNextBip(std::string first, std::string second);
 
   void Delete();
 };

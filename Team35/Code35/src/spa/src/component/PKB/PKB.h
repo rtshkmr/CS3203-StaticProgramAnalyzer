@@ -34,6 +34,10 @@ typedef std::tuple<PKBRelRefs, std::string, std::string> relationship;
 class PKB {
  public:
   void PopulateDataStructures(Deliverable d);
+
+  // Returns a stmt number to vector of related Entities map.
+  std::unordered_map<std::string, std::vector<Entity*>> GetRelationshipMap(PKBRelRefs ref);
+
   // Returns a vector of all entities in a relationship with the specified entity
   // E.g. GetRelationship(kFollows, 1) returns a vector with one Entity with statement number 2
   std::vector<Entity*> GetRelationship(PKBRelRefs ref, std::string entity);
