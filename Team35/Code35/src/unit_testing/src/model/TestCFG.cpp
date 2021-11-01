@@ -164,6 +164,46 @@ TEST_CASE("1.CFG.Cluster") {
       REQUIRE(output_16_19);
     }
     SECTION("Affects Traversal Helper for HasAffects(#,#)") {
+      // ========================= USE THIS TO VERIFY / ADD TEST CASES ==================================
+      //      procedure Parser {
+      //          1.    psubsystem = 0;
+      //          2.    read fileName;
+      //
+      //          3.    if (fileName != 0) then {
+      //            4.       chara = 0;
+      //            5.       byte = 0;
+      //
+      //            6.       while (fileName > 1) {
+      //              7.           read byte;
+      //              8.           if (byte != 99) then {
+      //                    9.               chara = chara + byte;
+      //                    10.               lastByte = byte;
+      //                    11.               if (byte == 88) then {
+      //                      12.                   psubsystem = psubsystem + 1;
+      //                      13.                   print ProcessStmtNow;
+      //                      14.                   chara = 0;
+      //                    } else {
+      //                      15.                   print cont1nueREad1ng;
+      //                    }
+      //                    16.               fileName = fileName - 1;
+      //                } else {
+      //                17.               print SyntaxErr0rFound;
+      //              }
+      //            }
+      //          } else {
+      //            18.        print InvalidFileName;
+      //          }
+      //
+      //          19.    if (fileName == 1) then {
+      //            20.        print pr0cessSuccessfuI;
+      //          } else {
+      //            21.        print SyntaxErr0rFound;
+      //          }
+      //
+      //          22.    print psubsystem;
+      //          23.    psubsystem = 0;
+      //      }
+      // ================================================================================================
       bool valid_unmod_chara_4_5 = Cluster::TraverseScopedCluster(PKBRelRefs::kAffects,
                                                                   inner_cluster_4_5,
                                                                   std::make_pair(4, 5),
@@ -190,6 +230,28 @@ TEST_CASE("1.CFG.Cluster") {
                                                                        "chara");
       REQUIRE(inner_cluster_9_15 == inner_cluster_9_14);
       REQUIRE(valid_unmod_procedure_9_15);
+      Cluster* inner_cluster_1_18 = proc->GetInnermostCluster(1, 18, nullptr);
+      bool valid_unmod_procedure_1_18 = Cluster::TraverseScopedCluster(PKBRelRefs::kAffects, inner_cluster_1_18,
+                                                                       std::make_pair(1, 18),
+                                                                       pkb,
+                                                                       "psubsystem");
+      REQUIRE(valid_unmod_procedure_1_18);
+
+      /// This traversal function will work on non-assign statements also. Note that the rule of "both start and end stmt have to be assign stmt" is handled upstream from this function call
+      Cluster* inner_cluster_2_16 = proc->GetInnermostCluster(2, 16, nullptr);
+      bool valid_unmod_procedure_2_16 = Cluster::TraverseScopedCluster(PKBRelRefs::kAffects, inner_cluster_2_16,
+                                                                       std::make_pair(2, 16),
+                                                                       pkb,
+                                                                       "fileName");
+      REQUIRE(valid_unmod_procedure_2_16);
+      Cluster* inner_cluster_7_16 = proc->GetInnermostCluster(7, 16, nullptr);
+
+      /// Child is if-cluster, case 2, where have to find either branch at least one of them to clear that if cluster and move onto a statment after that
+      bool valid_unmod_procedure_7_16 = Cluster::TraverseScopedCluster(PKBRelRefs::kAffects, inner_cluster_7_16,
+                                                                       std::make_pair(7, 16),
+                                                                       pkb,
+                                                                       "fileName");
+      REQUIRE(valid_unmod_procedure_7_16);
     }
   }
 }

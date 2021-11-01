@@ -299,7 +299,6 @@ bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
                                                lhs_var);
       } else {
         // case 2: child does not contain second statement, then just have to at least one that gives unmod path
-        // todo: test this case.
         bool if_body_is_unmodified_path = TraverseScopedClusterForAffects(if_body, if_body_range, pkb, lhs_var);
         if (if_body_is_unmodified_path) continue;
         bool else_body_is_unmodified_path = TraverseScopedClusterForAffects(else_body, else_body_range, pkb, lhs_var);
@@ -335,7 +334,7 @@ bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
           target_range.first = std::min(child_range.second, target_range.second);
         }
       } else {
-        // todo: test this case:
+        // todo: test this case: have to call in if{while{...}}else{..}
         target_range.first = child_range.first - 1;
         return TraverseScopedClusterForAffects(child, target_range, pkb, lhs_var);
       }
