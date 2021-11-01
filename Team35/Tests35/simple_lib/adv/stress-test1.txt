@@ -1,4 +1,4 @@
-Procedure First {
+procedure First {
  if (! (17>=g)) then {
      print i;
 
