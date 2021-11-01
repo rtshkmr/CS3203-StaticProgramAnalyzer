@@ -581,7 +581,7 @@ void PSubsystem::CheckForExistingProcedure() {
 }
 
 void PSubsystem::FiniStateChecker() {
-  if (deliverable_->stmt_list_.empty()) {
+  if (deliverable_->GetStatementList()->empty()) {
     throw SyntaxException("A blank simple file is encountered.");
   }
 

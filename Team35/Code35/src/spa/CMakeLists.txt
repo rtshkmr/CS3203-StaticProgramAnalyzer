@@ -39,10 +39,6 @@ add_library(spa ${srcs} ${headers}
         src/component/QueryProcessor/QueryEvaluator/ClauseStrategy.h src/component/QueryProcessor/QueryEvaluator/ClauseStrategy.cpp
         src/component/QueryProcessor/QueryProjector.h src/component/QueryProcessor/QueryProjector.cpp
         src/component/QueryProcessor/QuerySystemController.h src/component/QueryProcessor/QuerySystemController.cpp
-        src/component/SourceProcessor/Extractors/UsesExtractor.cpp src/component/SourceProcessor/Extractors/UsesExtractor.h
-        src/component/SourceProcessor/Extractors/ModifiesExtractor.cpp src/component/SourceProcessor/Extractors/ModifiesExtractor.h
-        src/component/SourceProcessor/Extractors/ParentTExtractor.cpp src/component/SourceProcessor/Extractors/ParentTExtractor.h
-        src/component/SourceProcessor/Extractors/FollowsTExtractor.cpp src/component/SourceProcessor/Extractors/FollowsTExtractor.h
         src/util/Logger.cpp src/util/Logger.h
         src/util/util.h
         src/util/TimeUtil.cpp src/util/TimeUtil.h
@@ -50,11 +46,11 @@ add_library(spa ${srcs} ${headers}
         src/component/PKB/RuntimeExtractor.cpp src/component/PKB/RuntimeExtractor.h
         src/component/PKB/NextTExtractor.cpp src/component/PKB/NextTExtractor.h
         src/component/SourceProcessor/Extractors/NextExtractor.cpp src/component/SourceProcessor/Extractors/NextExtractor
-        src/component/SourceProcessor/Extractors/CallsTExtractor.cpp 
-        src/component/SourceProcessor/Extractors/CallsTExtractor.h
         src/component/PKB/DBManager.cpp src/component/PKB/DBManager.h
         src/component/PKB/AffectsExtractor.cpp src/component/PKB/AffectsExtractor.h
         src/component/PKB/AffectsTExtractor.cpp src/component/PKB/AffectsTExtractor.h
+        src/component/SourceProcessor/Extractors/TransitiveExtractor.h
+        src/component/SourceProcessor/Extractors/VariableTExtractor.cpp src/component/SourceProcessor/Extractors/VariableTExtractor.h
         src/util/Utility.cpp src/util/Utility.h)
 
 

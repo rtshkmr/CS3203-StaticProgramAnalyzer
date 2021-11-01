@@ -9,7 +9,7 @@
  */
 class DesignExtractor {
  public:
-  DesignExtractor(Deliverable* deliverable);
+  explicit DesignExtractor(Deliverable* deliverable);
   void ExtractDesignAbstractions();
  private:
   Deliverable* deliverable_;

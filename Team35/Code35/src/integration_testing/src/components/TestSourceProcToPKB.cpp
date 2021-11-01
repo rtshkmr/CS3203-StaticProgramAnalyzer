@@ -2,6 +2,20 @@
 #include "component/SourceProcessor/SourceProcessor.h"
 #include "component/SourceProcessor/Parser.h"
 
+bool AreEntityListsEqual(const std::list<std::tuple<EntityEnum, std::string>>& l1, std::vector<Entity*> l2) {
+  for (Entity* a: l2) {
+    bool found_a = false;
+    for (std::tuple<EntityEnum, std::string> b: l1) {
+      bool match = a->GetEntityEnum() == std::get<0>(b) && PKB::GetNameFromEntity(a) == std::get<1>(b);
+      found_a = found_a || match;
+    }
+    if (!found_a) {
+      return false;
+    }
+  }
+  return l2.size() == l1.size();
+}
+
 TEST_CASE("SP to PKB basic retrieval") {
   PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/basic_source.txt");
   SECTION("Procedure") {
@@ -224,13 +238,7 @@ TEST_CASE("SP to PKB relationships tests") {
       std::string stmt_no_str = std::to_string(i);
       std::list<std::tuple<EntityEnum, std::string>> expected_get_followsT_list = expected_get_followsT_lists[i - 1];
       std::vector<Entity*> actual_list = pkb->GetRelationship(PKBRelRefs::kFollowsT, stmt_no_str);
-      int j = 0;
-      for (auto expected_followsT : expected_get_followsT_list) {
-        Entity* actual_followsT_entity = actual_list[j];
-        CHECK(pkb->GetNameFromEntity(actual_followsT_entity) == std::get<1>(expected_followsT));
-        CHECK(actual_followsT_entity->GetEntityEnum() == std::get<0>(expected_followsT));
-        j += 1;
-      }
+      CHECK(AreEntityListsEqual(expected_get_followsT_list, actual_list));
     }
   }
 
@@ -372,13 +380,7 @@ TEST_CASE("SP to PKB relationships tests") {
       std::string stmt_no_str = std::to_string(i);
       std::list<std::tuple<EntityEnum, std::string>> expected_get_parentT_list = expected_get_parentT_lists[i - 1];
       std::vector<Entity*> actual_list = pkb->GetRelationship(PKBRelRefs::kParentT, stmt_no_str);
-      int j = 0;
-      for (auto expected_parentT : expected_get_parentT_list) {
-        Entity* actual_parentT_entity = actual_list[j];
-        CHECK(pkb->GetNameFromEntity(actual_parentT_entity) == std::get<1>(expected_parentT));
-        CHECK(actual_parentT_entity->GetEntityEnum() == std::get<0>(expected_parentT));
-        j += 1;
-      }
+      CHECK(AreEntityListsEqual(expected_get_parentT_list, actual_list));
     }
   }
 
