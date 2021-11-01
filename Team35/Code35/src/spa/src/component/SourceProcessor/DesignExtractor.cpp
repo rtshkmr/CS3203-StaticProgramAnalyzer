@@ -1,9 +1,6 @@
-#include <component/SourceProcessor/Extractors/UsesExtractor.h>
-#include <component/SourceProcessor/Extractors/ModifiesExtractor.h>
-#include <component/SourceProcessor/Extractors/ParentTExtractor.h>
-#include <component/SourceProcessor/Extractors/FollowsTExtractor.h>
 #include <component/SourceProcessor/Extractors/NextExtractor.h>
-#include <component/SourceProcessor/Extractors/CallsTExtractor.h>
+#include <component/SourceProcessor/Extractors/TransitiveExtractor.h>
+#include <component/SourceProcessor/Extractors/VariableTExtractor.h>
 #include "DesignExtractor.h"
 
 DesignExtractor::DesignExtractor(Deliverable* deliverable) {
@@ -15,20 +12,18 @@ DesignExtractor::DesignExtractor(Deliverable* deliverable) {
  * namely Calls, Uses, Modifies, Parent* and Follow* and their reverse relationships.
  */
 void DesignExtractor::ExtractDesignAbstractions() {
-  CallsTExtractor calls_t_extractor{};
-  calls_t_extractor.Extract(deliverable_);
+  auto procedure_extractor = TransitiveExtractor<Procedure>(deliverable_);
+  procedure_extractor.Extract(deliverable_->GetCallsTMap(), deliverable_->GetCallsMap(), TransitiveRel::kCalls);
 
-  UsesExtractor uses_extractor{};
-  uses_extractor.Extract(deliverable_);
+  auto statement_extractor = TransitiveExtractor<Statement>(deliverable_);
+  statement_extractor.Extract(deliverable_->GetParentTMap(),
+                              deliverable_->GetParentMap(),
+                              TransitiveRel::kParent);
+  statement_extractor.Extract(deliverable_->GetFollowsTMap(), deliverable_->GetFollowsMap(), TransitiveRel::kFollows);
 
-  ModifiesExtractor modifies_extractor{};
-  modifies_extractor.Extract(deliverable_);
-
-  ParentTExtractor parent_t_extractor{};
-  parent_t_extractor.Extract(deliverable_);
-
-  FollowsTExtractor follows_t_extractor{};
-  follows_t_extractor.Extract(deliverable_);
+  auto variable_t_extractor = VariableTExtractor(deliverable_);
+  variable_t_extractor.Extract(VariableRel::kUses);
+  variable_t_extractor.Extract(VariableRel::kModifies);
 
   NextExtractor next_extractor{};
   next_extractor.Extract(deliverable_);

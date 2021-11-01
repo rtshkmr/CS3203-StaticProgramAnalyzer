@@ -175,3 +175,70 @@ std::list<PrintEntity*>* Deliverable::GetPrintList() {
 std::list<ReadEntity*>* Deliverable::GetReadList() {
   return & read_list_;
 }
+
+std::unordered_map<Statement*, std::list<Statement*>*>* Deliverable::GetFollowsMap() {
+  return &follow_hash_;
+}
+std::unordered_map<Statement*, std::list<Statement*>*>* Deliverable::GetFollowsTMap() {
+  return &follows_T_hash_;
+}
+std::unordered_map<Statement*, std::list<Statement*>*>* Deliverable::GetParentMap() {
+  return &parent_to_child_hash_;
+}
+std::unordered_map<Statement*, std::list<Statement*>*>* Deliverable::GetParentTMap() {
+  return &parent_to_child_T_hash_;
+}
+std::unordered_map<Statement*, std::list<Variable*>*>* Deliverable::GetUseSMap() {
+  return &use_hash_;
+}
+std::unordered_map<Container*, std::list<Variable*>*>* Deliverable::GetUseCMap() {
+  return &container_use_hash_;
+}
+std::unordered_map<Statement*, std::list<Variable*>*>* Deliverable::GetModifiesSMap() {
+  return &modifies_hash_;
+}
+std::unordered_map<Container*, std::list<Variable*>*>* Deliverable::GetModifiesCMap() {
+  return &container_modifies_hash_;
+}
+std::unordered_map<Procedure*, std::list<Procedure*>*>* Deliverable::GetCallsMap() {
+  return &calls_hash_;
+}
+std::unordered_map<Procedure*, std::list<Procedure*>*>* Deliverable::GetCallsTMap() {
+  return &calls_T_hash_;
+}
+std::unordered_map<Statement*, std::list<Statement*>*>* Deliverable::GetNextMap() {
+  return &next_hash_;
+}
+std::unordered_map<Statement*, std::list<Statement*>*>* Deliverable::GetFollowedByMap() {
+  return &followed_by_hash_;
+}
+std::unordered_map<Statement*, std::list<Statement*>*>* Deliverable::GetFollowedByTMap() {
+  return &followed_by_T_hash_;
+}
+std::unordered_map<Statement*, std::list<Statement*>*>* Deliverable::GetChildMap() {
+  return &child_to_parent_hash_;
+}
+std::unordered_map<Statement*, std::list<Statement*>*>* Deliverable::GetChildTMap() {
+  return &child_to_parent_T_hash_;
+}
+std::unordered_map<Variable*, std::list<Statement*>*>* Deliverable::GetUsedBySMap() {
+  return &used_by_hash_;
+}
+std::unordered_map<Variable*, std::list<Container*>*>* Deliverable::GetUsedByCMap() {
+  return &container_used_by_hash_;
+}
+std::unordered_map<Variable*, std::list<Statement*>*>* Deliverable::GetModifiedBySMap() {
+  return &modified_by_hash_;
+}
+std::unordered_map<Variable*, std::list<Container*>*>* Deliverable::GetModifiedByCMap() {
+  return &container_modified_by_hash_;
+}
+std::unordered_map<Procedure*, std::list<Procedure*>*>* Deliverable::GetCalledByMap() {
+  return &called_by_hash_;
+}
+std::unordered_map<Procedure*, std::list<Procedure*>*>* Deliverable::GetCalledByTMap() {
+  return &called_by_T_hash_;
+}
+std::unordered_map<Statement*, std::list<Statement*>*>* Deliverable::GetPrevMap() {
+  return &previous_hash_;
+}
