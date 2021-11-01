@@ -419,12 +419,15 @@ void PSubsystem::HandleIfStmt(Entity* entity) {
   current_node_ = if_entity;
   Statement* conditional_statement = dynamic_cast<Statement*>(entity);
   ConditionalBlock* block_if_cond = CreateConditionalBlock(conditional_statement);
+  block_if_cond->SetClusterTag(ClusterTag::kIfCond);
   CreateBodyBlock(block_if_cond);
   AddControlVariableRelationships(if_entity->GetControlVariables());
   Cluster* if_cluster = new Cluster();
+  if_cluster->SetClusterTag(ClusterTag::kIfCluster);
   cluster_stack_.push(if_cluster);
   if_cluster->AddChildClusterToFront(block_if_cond);
   Cluster* if_body_cluster = new Cluster();
+  if_body_cluster->SetClusterTag(ClusterTag::kIfBody);
   if_cluster->AddChildClusterToBack(if_body_cluster);
   cluster_stack_.push(if_body_cluster);
 
@@ -448,6 +451,7 @@ void PSubsystem::HandleElseStmt(Entity* entity) {
   current_node_ = if_entity;
   CreateBodyBlock();
   Cluster* else_body_cluster = new Cluster();
+  else_body_cluster->SetClusterTag(ClusterTag::kElseBody);
   cluster_stack_.top()->AddChildClusterToBack(else_body_cluster);
   cluster_stack_.push(else_body_cluster);
 }
@@ -462,13 +466,16 @@ void PSubsystem::HandleWhileStmt(Entity* entity) {
 
   Statement* conditional_statement = dynamic_cast<Statement*>(entity);
   ConditionalBlock* block_while_cond = CreateConditionalBlock(conditional_statement);
+  block_while_cond->SetClusterTag(ClusterTag::kWhileCond);
   block_while_cond->isWhile = true;
   CreateBodyBlock(block_while_cond);
   AddControlVariableRelationships(while_entity->GetControlVariables());
   Cluster* while_cluster = new Cluster();
+  while_cluster->SetClusterTag(ClusterTag::kWhileCluster);
   cluster_stack_.push(while_cluster);
   while_cluster->AddChildClusterToFront(block_while_cond);
   Cluster* while_body_cluster = new Cluster();
+  while_body_cluster->SetClusterTag(ClusterTag::kWhileBody);
   while_cluster->AddChildClusterToBack(while_body_cluster);
   cluster_stack_.push(while_body_cluster);
 }
@@ -496,7 +503,6 @@ ConditionalBlock* PSubsystem::CreateConditionalBlock(Statement* conditional_stat
     }
     block_stack_.push(static_cast<Block* const>(conditional_block));
   } else {
-    // todo: need to convert this to dynamic_cast by adding a virtual destructor as WeiJie advised?
     conditional_block = static_cast<ConditionalBlock*>(block_stack_.top());
   }
   return conditional_block;
