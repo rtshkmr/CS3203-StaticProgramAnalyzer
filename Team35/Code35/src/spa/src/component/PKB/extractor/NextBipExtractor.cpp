@@ -21,7 +21,8 @@ NextBipExtractor::NextBipExtractor(PKB* pkb) {
  * @return Vector of Entities that are NextBip of the target.
  */
 std::vector<Entity*> NextBipExtractor::GetNextBip(const std::string& target) {
-  return GetRelationship(PKBRelRefs::kNextBip, target);
+  PopulateBipMaps();
+  return pkb_->GetRelationship(PKBRelRefs::kNextBip, target);
 }
 
 /**
@@ -30,7 +31,8 @@ std::vector<Entity*> NextBipExtractor::GetNextBip(const std::string& target) {
  * @return Vector of entities satisfying the relationship.
  */
 std::vector<Entity*> NextBipExtractor::GetPrevBip(const std::string& target) {
-  return GetRelationship(PKBRelRefs::kPrevBip, target);
+  PopulateBipMaps();
+  return pkb_->GetRelationship(PKBRelRefs::kPrevBip, target);
 }
 
 std::vector<Entity*> NextBipExtractor::GetRelationship(PKBRelRefs rel, const std::string& target) {
