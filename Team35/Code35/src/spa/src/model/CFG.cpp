@@ -285,7 +285,6 @@ bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
       auto if_body_range = if_body->GetStartEndRange();
       auto else_body_range = else_body->GetStartEndRange();
       bool is_target_in_if_cluster = child->CheckIfStmtNumInRange(target_range.second);
-      bool child_does_not_modify_var = true;
       if (is_target_in_if_cluster) {
         // case 1: child contains second statement, identify if it's if body or else body
         bool is_target_in_if_body = if_body->CheckIfStmtNumInRange(target_range.second);
@@ -301,10 +300,10 @@ bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
                                                lhs_var);
       } else {
         // case 2: child does not contain second statement, then just have to at least one that gives unmod path
+        // todo: handle this path
         bool if_body_is_unmodified_path = TraverseScopedClusterForAffects(if_body, if_body_range, pkb, lhs_var);
         if (if_body_is_unmodified_path) continue;
         bool else_body_is_unmodified_path = TraverseScopedClusterForAffects(else_body, else_body_range, pkb, lhs_var);
-        child_does_not_modify_var = else_body_is_unmodified_path;
       }
     } else if (tag == ClusterTag::kWhileCluster) {
       //=================================== HANDLE WHILE CLUSTER =====================================
@@ -318,11 +317,10 @@ bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
       }
     } else if (tag == ClusterTag::kWhileBody) {
       assert(child->CheckIfStmtNumInRange(target_range.second)); // will only enter a while body if the second statement is inside it, else will just skip
-      target_range.first = child_range.first;
       // iterate into the while body:
       target_range.first = child_range.first - 1;
       return TraverseScopedClusterForAffects(child, target_range, pkb, lhs_var);
-    } else if (tag == ClusterTag::kIfBody) {
+    } else if (tag == ClusterTag::kIfBody || tag == ClusterTag::kElseBody) {
       bool child_is_normal_block = child->nested_clusters_.empty();
       if (child_is_normal_block) {
         auto traversal_results = TraverseNormalBlockForAffects(child, target_range, pkb, lhs_var);
@@ -334,7 +332,11 @@ bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
           // update target start to equal the value that I've already checked until
           target_range.first = std::min(child_range.second, target_range.second);
         }
-      } // todo: what if body is not a normal body, i.e. it's a cluster??
+      } else {
+        // todo: what if body is not a normal body, i.e. it's a cluster?? ans: should be just recurse similar to while block
+        target_range.first = child_range.first - 1;
+        return TraverseScopedClusterForAffects(child, target_range, pkb, lhs_var);
+      }
     } else { // it's a simple block, no alternative paths to consider:
       assert(child->GetClusterTag() == ClusterTag::kNormalBlock);
       // first: child does not modify? second: is second stmt checked:

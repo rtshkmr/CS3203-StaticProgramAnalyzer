@@ -179,10 +179,17 @@ TEST_CASE("1.CFG.Cluster") {
       REQUIRE_FALSE(invalid_unmod_procedure_5_10);
       Cluster* inner_cluster_9_14 = proc->GetInnermostCluster(9, 14, nullptr);
       bool valid_unmod_procedure_9_14 = Cluster::TraverseScopedCluster(PKBRelRefs::kAffects, inner_cluster_9_14,
-                                                                         std::make_pair(9, 14),
-                                                                         pkb,
-                                                                         "chara");
+                                                                       std::make_pair(9, 14),
+                                                                       pkb,
+                                                                       "chara");
       REQUIRE(valid_unmod_procedure_9_14);
+      Cluster* inner_cluster_9_15 = proc->GetInnermostCluster(9, 15, nullptr);
+      bool valid_unmod_procedure_9_15 = Cluster::TraverseScopedCluster(PKBRelRefs::kAffects, inner_cluster_9_15,
+                                                                       std::make_pair(9, 15),
+                                                                       pkb,
+                                                                       "chara");
+      REQUIRE(inner_cluster_9_15 == inner_cluster_9_14);
+      REQUIRE(valid_unmod_procedure_9_15);
     }
   }
 }
