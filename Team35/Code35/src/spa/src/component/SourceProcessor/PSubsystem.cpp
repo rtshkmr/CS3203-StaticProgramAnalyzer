@@ -180,6 +180,7 @@ void PSubsystem::CloseElseBlock() {
     cluster_stack_.pop(); // pops out the else_body_cluster
     Cluster* if_cluster = cluster_stack_.top();
     if_cluster->UpdateClusterRange();
+    assert(if_cluster->GetNestedClusters().size() == 3);
     cluster_stack_.pop(); // pops out the if_cluster
     assert(!cluster_stack_.empty());
     Cluster* outer_cluster = cluster_stack_.top();
@@ -216,6 +217,7 @@ void PSubsystem::CloseWhileBlock() {
   cluster_stack_.pop();
   Cluster* while_cluster = cluster_stack_.top();
   while_cluster->UpdateClusterRange();
+  assert(while_cluster->GetNestedClusters().size() == 2);
   cluster_stack_.pop();
   assert(!cluster_stack_.empty());
   Cluster* outer_cluster = cluster_stack_.top();
