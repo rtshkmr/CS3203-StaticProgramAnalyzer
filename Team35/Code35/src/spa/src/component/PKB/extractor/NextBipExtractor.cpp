@@ -129,7 +129,7 @@ void NextBipExtractor::JoinStartToStart(Procedure* called_proc, Entity* prev_ent
 void NextBipExtractor::JoinEndToEnd(Procedure* called_proc, const std::list<Entity*> &next_entities) {
   for (Entity* next_entity : next_entities) {
     auto* root_block = const_cast<Block*>(called_proc->GetBlockRoot());
-    std::list<int> last_stmts = GetLastStmts(root_block);
+    std::list<int> last_stmts = GetBipLastStmts(root_block);
     for (int last_stmt : last_stmts) {
       AddNext(stmt_list_[last_stmt - 1], next_entity);
     }
@@ -177,26 +177,20 @@ void NextBipExtractor::ErasePrevRelationship(Entity* next_stmt, Entity* prev_stm
   prev_bip_map_->insert({next_stmt, entities_to_keep});
 }
 
-std::list<int> NextBipExtractor::GetLastStmts(Block* block) {
-  std::set<Block*> next_blocks = block->GetNextBlocks();
-  std::list<int> last_stmts = std::list<int>{};
-  for (Block* next_block: next_blocks) {
-    int next = next_block->GetStartEndRange().first;
-    if (block->isWhile && next == block->GetStartEndRange().first + 1) {
-      continue;
+std::list<int> NextBipExtractor::GetBipLastStmts(Block* block) {
+  std::list<int> last_stmts = block->GetCFGLastStmts();
+  bool call_exists = true;
+  while (call_exists) {
+    for (int last_stmt : last_stmts) {
+      Entity* last_entity = stmt_list_[last_stmt - 1];
+      if (std::find(call_list_.begin(), call_list_.end(), last_entity) != call_list_.end()) {
+        last_stmts = HandleCallLastStmt(last_stmts);
+        goto found_call;
+      }
     }
-    if (next == -1) { // exit block
-      assert(next_block->GetNextBlocks().empty());
-      last_stmts.push_back(block->GetStartEndRange().second);
-      continue;
-    }
-    std::list<int> next_last_stmts = GetLastStmts(next_block);
-    last_stmts.insert(last_stmts.end(), next_last_stmts.begin(), next_last_stmts.end());
+    call_exists = false;
+    found_call:;
   }
-  if (next_blocks.empty() || (next_blocks.size() == 1 && block->isWhile)) {
-    last_stmts.push_back(block->GetStartEndRange().second);
-  }
-  last_stmts = HandleCallLastStmt(last_stmts);
   return last_stmts;
 }
 
@@ -208,7 +202,7 @@ std::list<int> NextBipExtractor::HandleCallLastStmt(const std::list<int> &last_s
       auto* call_entity = dynamic_cast<CallEntity*>(last_entity);
       Procedure* called_proc = call_entity->GetProcedure();
       auto* root_block = const_cast<Block*>(called_proc->GetBlockRoot());
-      std::list<int> called_last_stmts = GetLastStmts(root_block);
+      std::list<int> called_last_stmts = root_block->GetCFGLastStmts();
       nested_last_stmts.insert(nested_last_stmts.end(), called_last_stmts.begin(), called_last_stmts.end());
     } else {
       nested_last_stmts.push_back(last_stmt);

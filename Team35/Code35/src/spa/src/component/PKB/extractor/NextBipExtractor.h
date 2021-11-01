@@ -40,7 +40,7 @@ class NextBipExtractor {
                               std::unordered_map<Entity*, std::list<Entity*>*>* map);
   void EraseNextRelationship(Entity* entity);
   void ErasePrevRelationship(Entity* next_stmt, Entity* prev_stmt);
-  std::list<int> GetLastStmts(Block* block);
+  std::list<int> GetBipLastStmts(Block* block);
   std::list<int> HandleCallLastStmt(const std::list<int>& last_stmts);
   std::unordered_map<Entity*, std::list<Entity*>*>* ConvertPKBMap(const std::unordered_map<std::string,
                                                                                      std::vector<Entity*>>& pkb_map);
