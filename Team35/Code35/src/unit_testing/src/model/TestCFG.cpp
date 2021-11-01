@@ -165,18 +165,24 @@ TEST_CASE("1.CFG.Cluster") {
     }
     SECTION("Affects Traversal Helper for HasAffects(#,#)") {
       bool valid_unmod_chara_4_5 = Cluster::TraverseScopedCluster(PKBRelRefs::kAffects,
-                                                        inner_cluster_4_5,
-                                                        std::make_pair(4, 5),
-                                                        pkb,
-                                                        "chara");
+                                                                  inner_cluster_4_5,
+                                                                  std::make_pair(4, 5),
+                                                                  pkb,
+                                                                  "chara");
       REQUIRE(valid_unmod_chara_4_5);
 
       Cluster* inner_cluster_5_10 = proc->GetInnermostCluster(5, 10, nullptr);
       bool invalid_unmod_procedure_5_10 = Cluster::TraverseScopedCluster(PKBRelRefs::kAffects, inner_cluster_5_10,
-                                                                    std::make_pair(5, 10),
-                                                                    pkb,
-                                                                    "byte");
+                                                                         std::make_pair(5, 10),
+                                                                         pkb,
+                                                                         "byte");
       REQUIRE_FALSE(invalid_unmod_procedure_5_10);
+      Cluster* inner_cluster_9_14 = proc->GetInnermostCluster(9, 14, nullptr);
+      bool valid_unmod_procedure_9_14 = Cluster::TraverseScopedCluster(PKBRelRefs::kAffects, inner_cluster_9_14,
+                                                                         std::make_pair(9, 14),
+                                                                         pkb,
+                                                                         "chara");
+      REQUIRE(valid_unmod_procedure_9_14);
     }
   }
 }
