@@ -184,7 +184,6 @@ class PKB {
  */
 template <typename X, typename Y>
 void PKB::PopulateRelationship(std::unordered_map<X*, std::list<Y*>*>* hash, PKBRelRefs ref) {
-  if (!relationship_table_[ref].empty()) return;
   for (std::pair<X*, std::list<Y*>*> kv: *hash) {
     Entity* first_entity = dynamic_cast<Entity*>(kv.first);
     std::string k_string = GetNameFromEntity(first_entity);
