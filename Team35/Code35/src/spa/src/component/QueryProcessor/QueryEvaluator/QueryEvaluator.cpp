@@ -17,7 +17,6 @@ QueryEvaluator::QueryEvaluator(DBManager *db_manager) : db_manager{db_manager}, 
  */
 UnformattedQueryResult QueryEvaluator::EvaluateQuery(const std::vector<Group *>& list_of_groups) {
   UnformattedQueryResult unformatted_result = UnformattedQueryResult(true);
-
   for (Group *current_group : list_of_groups) {
     if (current_group->ContainsTargetSynonym()) {       // Evaluate non-boolean group
       auto *table = new QueryEvaluatorTable(current_group->GetTargetSynonyms());
@@ -80,15 +79,8 @@ void QueryEvaluator::ProcessBooleanGroupWithoutSynonym(Group *group) {
  */
 void QueryEvaluator::PreprocessBooleanGroup(Group *group) {
   Clause* firstClause = group->GetClauses()[0];
-  Synonym *main_synonym;
-  if (typeid(* firstClause) == typeid(SuchThat)) {
-    main_synonym = ProcessMainSynonymFromSuchThat(firstClause);
-  } else if (typeid(* firstClause) == typeid(Pattern)) {
-    main_synonym = ProcessMainSynonymFromPattern(firstClause);
-  } else {
-    assert( typeid(* firstClause) == typeid(With) );
-    main_synonym = ProcessMainSynonymFromWith(firstClause);
-  }
+  Synonym *main_synonym = GetMainSynonymFromClause(firstClause);
+
   if (main_synonym != nullptr) {
     ProcessBooleanGroupWithSynonym(group, main_synonym);
   } else {
@@ -120,29 +112,12 @@ void QueryEvaluator::PreprocessNonBooleanGroup(Group *group, QueryEvaluatorTable
   ProcessGroup(table, group);
 }
 
-// TODO: consider changing the first_synonym to clause so that the following 3 methods can be combined.
-Synonym *QueryEvaluator::ProcessMainSynonymFromSuchThat(Clause *first_clause) {
-  auto* st = dynamic_cast<SuchThat*>(first_clause);
-  if (st->left_is_synonym) {
-    return st->first_synonym;
-  } else if (st->right_is_synonym) {
-    return st->second_synonym;
+Synonym *QueryEvaluator::GetMainSynonymFromClause(Clause *clause) {
+  if (clause->left_is_synonym) {
+    return clause->first_synonym;
+  } else if (clause->right_is_synonym) {
+    return clause->second_synonym;
   } else {
     return nullptr;
   }
-}
-
-Synonym *QueryEvaluator::ProcessMainSynonymFromPattern(Clause *first_clause) {
-  auto* pattern = dynamic_cast<Pattern*>(first_clause);
-  return pattern->first_synonym;
-}
-
-Synonym *QueryEvaluator::ProcessMainSynonymFromWith(Clause *first_clause) {
-  auto* with_clause = dynamic_cast<With*>(first_clause);
-  if (with_clause->left_is_synonym) {
-    return with_clause->first_synonym;
-  } else if (with_clause->right_is_synonym) {
-    return with_clause->second_synonym;
-  }
-  return nullptr;
 }

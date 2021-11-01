@@ -17,9 +17,7 @@ class QueryEvaluator {
     void ProcessBooleanGroupWithSynonym(Group *group, Synonym *main_synonym);
     void PreprocessBooleanGroup(Group *group);
     void PreprocessNonBooleanGroup(Group *group, QueryEvaluatorTable *table);
-    static Synonym *ProcessMainSynonymFromSuchThat(Clause *first_clause);
-    static Synonym* ProcessMainSynonymFromPattern(Clause *first_clause);
-    static Synonym* ProcessMainSynonymFromWith(Clause *first_clause);
+    static Synonym *GetMainSynonymFromClause(Clause *first_clause);
 };
 
 #endif //INC_21S1_CP_SPA_TEAM_35_QUERYEVALUATOR_H
