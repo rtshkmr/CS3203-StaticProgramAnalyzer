@@ -4,17 +4,12 @@
 #include <model/Entity.h>
 #include <component/PKB/PKB.h>
 
-enum class NextBipRel {
-  kNextBip,
-  kPrevBip
-};
-
 class NextBipExtractor {
  public:
   NextBipExtractor() = default;
   explicit NextBipExtractor(PKB* pkb);
-  std::vector<Entity*> GetNextBip(std::string target);
-  std::vector<Entity*> GetPrevBip(std::string target);
+  std::vector<Entity*> GetNextBip(const std::string& target);
+  std::vector<Entity*> GetPrevBip(const std::string& target);
   std::vector<Entity*> GetAllNextBipRHS();
   std::vector<Entity*> GetAllNextBipLHS();
   std::vector<std::tuple<Entity*, Entity*>> GetAllNextBip();
@@ -30,24 +25,25 @@ class NextBipExtractor {
   std::vector<Entity*> stmt_list_;
   std::vector<Procedure*> proc_list_;
   std::vector<Entity*> call_list_;
-  std::unordered_map<std::string, std::vector<Entity*>> next_bip_map_; // maps nextbip of stmt num to list of stmts
-  std::unordered_map<std::string, std::vector<Entity*>> prev_bip_map_;
+  std::unordered_map<Entity*, std::list<Entity*>*>* next_bip_map_; // maps nextbip of stmt num to list of stmts
+  std::unordered_map<Entity*, std::list<Entity*>*>* prev_bip_map_;
+  bool populated_ = false;
 
-  void PopulateBipMaps(std::unordered_map<std::string, std::vector<Entity*>> next_map,
-                       std::unordered_map<std::string, std::vector<Entity*>> prev_map);
-  void JoinEndToEnd(Procedure* called_proc, const std::vector<Entity*> &next_entities);
+  std::vector<Entity*> GetRelationship(PKBRelRefs rel, const std::string& target);
+  void PopulateBipMaps();
+  void JoinEndToEnd(Procedure* called_proc, const std::list<Entity*> &next_entities);
   void JoinStartToStart(Procedure* called_proc, Entity* prev_entity);
+  std::list<Entity*> GetRelFromMap(Entity* target, PKBRelRefs rel);
   void AddNext(Entity* prev_entity, Entity* next_entity);
   static void AddRelationship(Entity* first_arg,
                               Entity* second_arg,
-                              std::unordered_map<std::string, std::vector<Entity*>>* map);
-  static int GetStmtNum(Entity* entity);
+                              std::unordered_map<Entity*, std::list<Entity*>*>* map);
   void EraseNextRelationship(Entity* entity);
   void ErasePrevRelationship(Entity* next_stmt, Entity* prev_stmt);
-  std::vector<Entity*> GetRelFromMap(const std::string& target, NextBipRel rel);
-  std::vector<Entity*> GetRelationship(NextBipRel rel, std::string target);
   std::list<int> GetLastStmts(Block* block);
   std::list<int> HandleCallLastStmt(const std::list<int>& last_stmts);
+  std::unordered_map<Entity*, std::list<Entity*>*>* ConvertPKBMap(const std::unordered_map<std::string,
+                                                                                     std::vector<Entity*>>& pkb_map);
 };
 
 #endif //AUTOTESTER_CODE35_SRC_SPA_SRC_COMPONENT_PKB_EXTRACTOR_NEXTBIPEXTRACTOR_H_

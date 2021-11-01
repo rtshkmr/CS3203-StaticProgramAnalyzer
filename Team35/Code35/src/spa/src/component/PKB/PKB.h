@@ -96,6 +96,9 @@ class PKB {
   // Constructor
   PKB() = default;
 
+  template <typename X, typename Y>
+  void PopulateRelationship(std::unordered_map<X*, std::list<Y*>*>* hash, PKBRelRefs ref);
+
  private:
   std::unordered_map<DesignEntity, std::vector<Entity*>> type_to_entity_map_;
 
@@ -159,9 +162,6 @@ class PKB {
   template <typename T>
   void PopulateEntities(DesignEntity design_entity, T& entity_list);
 
-  template <typename X, typename Y>
-  void PopulateRelationship(std::unordered_map<X*, std::list<Y*>*>* hash, PKBRelRefs ref);
-
   void ProcessEntitiesWithMatchingAttributes();
 
   std::vector<DesignEntity> GetApplicableTypes(DesignEntity de);
@@ -176,3 +176,38 @@ class PKB {
   void PopulateModifies();
   void PopulateModifiedBy();
 };
+
+/**
+ * Populates the respective hashmap and tables in the pkb for the ref according to the hashmap provided.
+ * Population will only be carried out once for each ref.
+ * @tparam X Type of key of hash.
+ * @tparam Y Type of element in the value list of hash.
+ * @param hash Hashmap used to provide information to populate the pkb.
+ * @param ref Type of relationship.
+ */
+template <typename X, typename Y>
+void PKB::PopulateRelationship(std::unordered_map<X*, std::list<Y*>*>* hash, PKBRelRefs ref) {
+  if (!relationship_table_[ref].empty()) return;
+  for (std::pair<X*, std::list<Y*>*> kv: *hash) {
+    std::string k_string = GetNameFromEntity(kv.first);
+    DesignEntity first_type = GetDesignEntityFromEntity(kv.first);
+    std::vector<DesignEntity> first_types = GetApplicableTypes(first_type);
+    std::vector<DesignEntity> second_types;
+
+    for (Entity* entity : *kv.second) {
+      relationship_set_.insert({ref, k_string, GetNameFromEntity(entity)});
+      relationship_table_[ref][k_string].push_back(entity);
+
+      DesignEntity second_type = GetDesignEntityFromEntity(entity);
+      second_types = GetApplicableTypes(second_type);
+
+
+      for (DesignEntity type1 : first_types) {
+        for (DesignEntity type2 : second_types) {
+          relationship_by_types_table_[ref][{type1, type2}].push_back({kv.first, entity});
+          first_param_by_types_table_[ref][{type1, type2}].push_back(kv.first);
+        }
+      }
+    }
+  }
+}
