@@ -164,19 +164,19 @@ TEST_CASE("1.CFG.Cluster") {
       REQUIRE(output_16_19);
     }
     SECTION("Affects Traversal Helper for HasAffects(#,#)") {
-//      bool valid_unmod_chara_4_5 = Cluster::TraverseScopedCluster(PKBRelRefs::kAffects,
-//                                                        inner_cluster_4_5,
-//                                                        std::make_pair(4, 5),
-//                                                        pkb,
-//                                                        "chara");
-//      REQUIRE(valid_unmod_chara_4_5);
+      bool valid_unmod_chara_4_5 = Cluster::TraverseScopedCluster(PKBRelRefs::kAffects,
+                                                        inner_cluster_4_5,
+                                                        std::make_pair(4, 5),
+                                                        pkb,
+                                                        "chara");
+      REQUIRE(valid_unmod_chara_4_5);
 
-//      Cluster* inner_cluster_5_10 = proc->GetInnermostCluster(5, 10, nullptr);
-//      bool invalid_unmod_procedure_5_10 = Cluster::TraverseScopedCluster(PKBRelRefs::kAffects, inner_cluster_5_10,
-//                                                                    std::make_pair(5, 10),
-//                                                                    pkb,
-//                                                                    "procedure");
-//      REQUIRE_FALSE(invalid_unmod_procedure_5_10);
+      Cluster* inner_cluster_5_10 = proc->GetInnermostCluster(5, 10, nullptr);
+      bool invalid_unmod_procedure_5_10 = Cluster::TraverseScopedCluster(PKBRelRefs::kAffects, inner_cluster_5_10,
+                                                                    std::make_pair(5, 10),
+                                                                    pkb,
+                                                                    "byte");
+      REQUIRE_FALSE(invalid_unmod_procedure_5_10);
     }
   }
 }
