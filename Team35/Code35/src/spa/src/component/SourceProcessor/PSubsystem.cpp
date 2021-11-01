@@ -152,24 +152,34 @@ void PSubsystem::CloseElseBlock() {
     block_stack_.push(block_if_else_exit);
     bool is_currently_in_nested_cluster = cluster_stack_.size() > 1;
     assert(is_currently_in_nested_cluster);
-    Cluster* if_cluster = cluster_stack_.top();
-    if_cluster->SetClusterTag(ClusterTag::kIfCluster);
-    ///  add to if_cluster only if the if_cluster is currently empty.
-    /// guarantee: There will be at most be 3 nested clusters in if cluster (ifcond, ifbody, elsebody):
-    if(if_cluster->GetNestedClusters().empty()) {
-      if_cluster->AddChildClusterToBack(if_cond_block);
-      if_cluster->AddChildClusterToBack(if_body_block);
-      if_cluster->AddChildClusterToBack(else_body_block); // this is ok because there is at least 1 stmt
-      if_cluster->UpdateClusterRange();
-    } else {
-      if_cluster->AddChildClusterToFront(if_cond_block);
-      if (else_body_block->size() > 0) {
-        if_cluster->AddChildClusterToBack(else_body_block); //append anything else
-      }
-      if_cond_block->SetParentCluster(if_cluster);
-      if_cluster->UpdateClusterRange();
-      int x = 1;
+//<<<<<<< HEAD
+//    Cluster* if_cluster = cluster_stack_.top();
+//    if_cluster->SetClusterTag(ClusterTag::kIfCluster);
+//    ///  add to if_cluster only if the if_cluster is currently empty.
+//    /// guarantee: There will be at most be 3 nested clusters in if cluster (ifcond, ifbody, elsebody):
+//    if(if_cluster->GetNestedClusters().empty()) {
+//      if_cluster->AddChildClusterToBack(if_cond_block);
+//      if_cluster->AddChildClusterToBack(if_body_block);
+//      if_cluster->AddChildClusterToBack(else_body_block); // this is ok because there is at least 1 stmt
+//      if_cluster->UpdateClusterRange();
+//    } else {
+//      if_cluster->AddChildClusterToFront(if_cond_block);
+//      if (else_body_block->size() > 0) {
+//        if_cluster->AddChildClusterToBack(else_body_block); //append anything else
+//      }
+//      if_cond_block->SetParentCluster(if_cluster);
+//      if_cluster->UpdateClusterRange();
+//      int x = 1;
+//=======
+    Cluster* else_body_cluster = cluster_stack_.top();
+    if (else_body_block->size() > 0) {
+      else_body_cluster->AddChildClusterToBack(else_body_block); //append anything else
+//>>>>>>> SourceProc/CFG-bodycluster
     }
+    else_body_cluster->UpdateClusterRange();
+    cluster_stack_.pop(); // pops out the else_body_cluster
+    Cluster* if_cluster = cluster_stack_.top();
+    if_cluster->UpdateClusterRange();
     cluster_stack_.pop(); // pops out the if_cluster
     assert(!cluster_stack_.empty());
     Cluster* outer_cluster = cluster_stack_.top();
@@ -190,15 +200,22 @@ void PSubsystem::CloseWhileBlock() {
   bool is_currently_in_nested_cluster = cluster_stack_.size() > 1;
   assert(is_currently_in_nested_cluster);
   // add to cluster here:
-  Cluster* while_cluster = cluster_stack_.top();
-  while_cluster->SetClusterTag(ClusterTag::kWhileCluster);
-  while_cluster->AddChildClusterToFront(while_cond_block);
+//<<<<<<< HEAD
+//  Cluster* while_cluster = cluster_stack_.top();
+//  while_cluster->SetClusterTag(ClusterTag::kWhileCluster);
+//  while_cluster->AddChildClusterToFront(while_cond_block);
+//=======
+  Cluster* while_body_cluster = cluster_stack_.top();
+//>>>>>>> SourceProc/CFG-bodycluster
 
   if (while_body_block->size() > 0) {
-    while_cluster->AddChildClusterToBack(while_body_block); //add only non empty tails
+    while_body_cluster->AddChildClusterToBack(while_body_block); //add only non empty tails
   }
-  while_cluster->UpdateClusterRange();
+  while_body_cluster->UpdateClusterRange();
 
+  cluster_stack_.pop();
+  Cluster* while_cluster = cluster_stack_.top();
+  while_cluster->UpdateClusterRange();
   cluster_stack_.pop();
   assert(!cluster_stack_.empty());
   Cluster* outer_cluster = cluster_stack_.top();
@@ -275,6 +292,11 @@ void PSubsystem::HandleCloseBrace() {
       current_node_type_ == NodeType::kProcedure && parent_stack_.empty());
 
   if (current_node_type_ == NodeType::kIf) {
+    if(!Block::IsExitBlock(block_stack_.top())) {
+      cluster_stack_.top()->AddChildClusterToBack(block_stack_.top());
+    }
+    cluster_stack_.top()->UpdateClusterRange();
+    cluster_stack_.pop();
     return; // do not pop anything in if-close brace. pop 2 when finishing else.
   }
 
@@ -397,10 +419,18 @@ void PSubsystem::HandleIfStmt(Entity* entity) {
   current_node_ = if_entity;
   Statement* conditional_statement = dynamic_cast<Statement*>(entity);
   ConditionalBlock* block_if_cond = CreateConditionalBlock(conditional_statement);
+  block_if_cond->SetClusterTag(ClusterTag::kIfCond);
   CreateBodyBlock(block_if_cond);
   AddControlVariableRelationships(if_entity->GetControlVariables());
   Cluster* if_cluster = new Cluster();
+  if_cluster->SetClusterTag(ClusterTag::kIfCluster);
   cluster_stack_.push(if_cluster);
+  if_cluster->AddChildClusterToFront(block_if_cond);
+  Cluster* if_body_cluster = new Cluster();
+  if_body_cluster->SetClusterTag(ClusterTag::kIfBody);
+  if_cluster->AddChildClusterToBack(if_body_cluster);
+  cluster_stack_.push(if_body_cluster);
+
 }
 
 /**
@@ -420,6 +450,10 @@ void PSubsystem::HandleElseStmt(Entity* entity) {
   current_node_type_ = NodeType::kElse;
   current_node_ = if_entity;
   CreateBodyBlock();
+  Cluster* else_body_cluster = new Cluster();
+  else_body_cluster->SetClusterTag(ClusterTag::kElseBody);
+  cluster_stack_.top()->AddChildClusterToBack(else_body_cluster);
+  cluster_stack_.push(else_body_cluster);
 }
 
 void PSubsystem::HandleWhileStmt(Entity* entity) {
@@ -432,11 +466,18 @@ void PSubsystem::HandleWhileStmt(Entity* entity) {
 
   Statement* conditional_statement = dynamic_cast<Statement*>(entity);
   ConditionalBlock* block_while_cond = CreateConditionalBlock(conditional_statement);
+  block_while_cond->SetClusterTag(ClusterTag::kWhileCond);
   block_while_cond->isWhile = true;
   CreateBodyBlock(block_while_cond);
   AddControlVariableRelationships(while_entity->GetControlVariables());
   Cluster* while_cluster = new Cluster();
+  while_cluster->SetClusterTag(ClusterTag::kWhileCluster);
   cluster_stack_.push(while_cluster);
+  while_cluster->AddChildClusterToFront(block_while_cond);
+  Cluster* while_body_cluster = new Cluster();
+  while_body_cluster->SetClusterTag(ClusterTag::kWhileBody);
+  while_cluster->AddChildClusterToBack(while_body_cluster);
+  cluster_stack_.push(while_body_cluster);
 }
 
 /**
@@ -462,7 +503,6 @@ ConditionalBlock* PSubsystem::CreateConditionalBlock(Statement* conditional_stat
     }
     block_stack_.push(static_cast<Block* const>(conditional_block));
   } else {
-    // todo: need to convert this to dynamic_cast by adding a virtual destructor as WeiJie advised?
     conditional_block = static_cast<ConditionalBlock*>(block_stack_.top());
   }
   return conditional_block;
@@ -490,12 +530,6 @@ BodyBlock* PSubsystem::CreateBodyBlock() {
   block_if_cond->AddNextBlock(block_else_body);
   block_stack_.push(block_if_body);
   block_stack_.push(block_else_body);
-
-  if(block_if_body->size() > 0) {
-    cluster_stack_.top()->AddChildClusterToBack(block_if_body);
-    cluster_stack_.top()->UpdateClusterRange();
-  }
-
   return block_else_body;
 }
 
