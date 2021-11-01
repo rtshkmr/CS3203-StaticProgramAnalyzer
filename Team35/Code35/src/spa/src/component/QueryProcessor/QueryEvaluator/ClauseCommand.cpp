@@ -27,9 +27,9 @@ void DoubleSynonymSinglePresentCommand::SetExecutor(ClauseCommandExecutor *execu
 
 void DoubleSynonymSinglePresentCommand::Execute(Clause *clause) {
   if (typeid(*clause) == typeid(Pattern)) {
-    this->executor->PatternTwoSynonymOneInTable(clause, first_synonym_given);
+    this->executor->DoubleSynonymExpansion(clause, first_synonym_given);
   } else {
-    this->executor->SuchThatTwoSynonymOneInTable(clause, first_synonym_given);
+    this->executor->DoubleSynonymExpansion(clause, first_synonym_given);
   }
 }
 

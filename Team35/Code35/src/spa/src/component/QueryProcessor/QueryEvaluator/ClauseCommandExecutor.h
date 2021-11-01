@@ -25,10 +25,12 @@ class ClauseCommandExecutor {
     std::tuple<bool, int>PatternRowAdditionForVariable(int index, Synonym *synonym_column_to_add, Entity* entity_in_table, Pattern *pattern);
     bool HasPatternValueMatch(Entity *stmt_entity_in_table, std::string value, Pattern *pattern);
     std::vector<Variable*> RetrieveVariablesFromStmt(Entity *stmt_entity);
-    std::tuple<bool, int>DoubleSynonymExpansionCheck(Clause *clause, bool first_syn_in);
+    std::tuple<bool, int> DoubleSynonymExpansionCheck(Clause *clause, bool first_syn_in, int index);
+    std::tuple<bool, int> SuchThatRowAddition(SuchThat *clause, bool first_syn_in, int index);
+    std::tuple<bool, int> PatternRowAddition(Pattern *clause, bool first_syn_in, int index);
+    std::tuple<bool, int> WithRowAddition(With *with_clause, bool first_syn_in, int index);
     bool DetermineWithTwoSynonyms(With *with_clause, int index);
     std::string RetrieveEntityAttribute(Entity *entity, Attribute attribute);
-    std::tuple<bool, int> WithClauseDoubleSynonymExpansionCheck(With *with_clause, bool first_syn_in, int index);
   public:
     ClauseCommandExecutor(QueryEvaluatorTable *table, IntermediateTable *intermediate_table);
     void SuchThatTwoSynonym(Clause *clause);
