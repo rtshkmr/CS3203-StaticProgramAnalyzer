@@ -13,8 +13,8 @@ struct type_combo_hash {
   std::size_t operator()(const type_combo& combo) const
   {
     return static_cast<std::size_t>(std::get<0>(combo))
-    * static_cast<std::size_t>(DesignEntity::kInvalid)
-    + static_cast<std::size_t>(std::get<1>(combo));
+      * static_cast<std::size_t>(DesignEntity::kInvalid)
+      + static_cast<std::size_t>(std::get<1>(combo));
   }
 };
 
@@ -22,8 +22,8 @@ struct attribute_hash {
   std::size_t operator()(const std::tuple<DesignEntity, Attribute>& combo) const
   {
     return static_cast<std::size_t>(std::get<0>(combo))
-    * static_cast<std::size_t>(DesignEntity::kInvalid)
-    + static_cast<std::size_t>(std::get<1>(combo));
+      * static_cast<std::size_t>(DesignEntity::kInvalid)
+      + static_cast<std::size_t>(std::get<1>(combo));
   }
 };
 
@@ -109,60 +109,60 @@ class PKB {
   std::unordered_map<DesignEntity, std::vector<Entity*>> type_to_entity_map_;
 
   std::unordered_map<
-  DesignEntity,
-  std::unordered_map<
-  std::string,
-  std::vector<Entity*>
-  >
+    DesignEntity,
+    std::unordered_map<
+      std::string,
+      std::vector<Entity*>
+    >
   > pattern_maps_;
 
   std::unordered_map<
-  PKBRelRefs,
-  std::unordered_map<
-  std::string,
-  std::vector<Entity*>
-  >
+    PKBRelRefs,
+    std::unordered_map<
+      std::string,
+      std::vector<Entity*>
+    >
   > relationship_table_;
 
   std::unordered_map<
-  PKBRelRefs,
-  std::unordered_map<
-  type_combo,
-  std::vector<entity_pair>,
-  type_combo_hash
-  >
+    PKBRelRefs,
+    std::unordered_map<
+      type_combo,
+      std::vector<entity_pair>,
+      type_combo_hash
+    >
   > relationship_by_types_table_;
 
   std::unordered_map<
-  PKBRelRefs,
-  std::unordered_map<
-  type_combo,
-  std::vector<Entity*>,
-  type_combo_hash
-  >
+    PKBRelRefs,
+    std::unordered_map<
+      type_combo,
+      std::vector<Entity*>,
+      type_combo_hash
+    >
   > first_param_by_types_table_;
 
   std::set<relationship> relationship_set_;
 
   std::unordered_map<
-  std::tuple<DesignEntity, Attribute>,
-  std::unordered_map<
-  std::string,
-  std::vector<Entity*>
-  >,
-  attribute_hash
+    std::tuple<DesignEntity, Attribute>,
+    std::unordered_map<
+      std::string,
+      std::vector<Entity*>
+    >,
+    attribute_hash
   > attribute_to_entity_map_;
 
 
   std::unordered_map<
-  std::string,
-  std::unordered_set<Entity*>
+    std::string,
+    std::unordered_set<Entity*>
   > attribute_string_to_entity_map_;
 
   std::unordered_map<
-  type_combo,
-  std::vector<entity_pair>,
-  type_combo_hash
+    type_combo,
+    std::vector<entity_pair>,
+    type_combo_hash
   > entities_with_matching_attributes_map_;
 
   template <typename T>
@@ -186,23 +186,24 @@ template <typename X, typename Y>
 void PKB::PopulateRelationship(std::unordered_map<X*, std::list<Y*>*>* hash, PKBRelRefs ref) {
   if (!relationship_table_[ref].empty()) return;
   for (std::pair<X*, std::list<Y*>*> kv: *hash) {
-    std::string k_string = GetNameFromEntity(kv.first);
-    DesignEntity first_type = GetDesignEntityFromEntity(kv.first);
+    Entity* first_entity = dynamic_cast<Entity*>(kv.first);
+    std::string k_string = GetNameFromEntity(first_entity);
+    DesignEntity first_type = GetDesignEntityFromEntity(first_entity);
     std::vector<DesignEntity> first_types = GetApplicableTypes(first_type);
     std::vector<DesignEntity> second_types;
 
-    for (Entity* entity : *kv.second) {
+    for (Y* e : *kv.second) {
+      Entity* entity = dynamic_cast<Entity*>(e);
       relationship_set_.insert({ref, k_string, GetNameFromEntity(entity)});
       relationship_table_[ref][k_string].push_back(entity);
 
       DesignEntity second_type = GetDesignEntityFromEntity(entity);
       second_types = GetApplicableTypes(second_type);
 
-
       for (DesignEntity type1 : first_types) {
         for (DesignEntity type2 : second_types) {
-          relationship_by_types_table_[ref][{type1, type2}].push_back({kv.first, entity});
-          first_param_by_types_table_[ref][{type1, type2}].push_back(kv.first);
+          relationship_by_types_table_[ref][{type1, type2}].push_back({first_entity, entity});
+          first_param_by_types_table_[ref][{type1, type2}].push_back(first_entity);
         }
       }
     }
