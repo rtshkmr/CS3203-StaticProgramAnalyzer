@@ -18,44 +18,45 @@ void PKB::PopulateDataStructures(Deliverable d) {
   L("... PKB will be populated by Deliverable object from SourceProcessor\n");
 
   // Populate Entities
-  PopulateEntities(DesignEntity::kProcedure, d.proc_list_);
-  PopulateEntities(DesignEntity::kVariable, d.var_list_);
-  PopulateEntities(DesignEntity::kConstant, d.const_list_);
-  PopulateEntities(DesignEntity::kCall, d.call_list_);
-  PopulateEntities(DesignEntity::kPrint, d.print_list_);
-  PopulateEntities(DesignEntity::kRead, d.read_list_);
-  PopulateEntities(DesignEntity::kIf, d.if_list_);
-  PopulateEntities(DesignEntity::kWhile, d.while_list_);
-  PopulateEntities(DesignEntity::kAssign, d.assign_list_);
-  PopulateEntities(DesignEntity::kStmt, d.stmt_list_);
+  PopulateEntities(DesignEntity::kProcedure, *d.GetProcList());
+  PopulateEntities(DesignEntity::kVariable, *d.GetVariableList());
+  PopulateEntities(DesignEntity::kConstant, *d.GetConstantList());
+  PopulateEntities(DesignEntity::kCall, *d.GetCallList());
+  PopulateEntities(DesignEntity::kPrint, *d.GetPrintList());
+  PopulateEntities(DesignEntity::kRead, *d.GetReadList());
+  PopulateEntities(DesignEntity::kIf, *d.GetIfList());
+  PopulateEntities(DesignEntity::kWhile, *d.GetWhileList());
+  PopulateEntities(DesignEntity::kAssign, *d.GetAssignList());
+  PopulateEntities(DesignEntity::kStmt, *d.GetStatementList());
 
   // Populate non-transitive relationships
-  PopulateRelationship(&d.follow_hash_, PKBRelRefs::kFollows);
-  PopulateRelationship(&d.followed_by_hash_, PKBRelRefs::kFollowedBy);
-  PopulateRelationship(&d.parent_to_child_hash_, PKBRelRefs::kParent);
-  PopulateRelationship(&d.child_to_parent_hash_, PKBRelRefs::kChild);
-  PopulateRelationship(&d.use_hash_, PKBRelRefs::kUses);
-  PopulateRelationship(&d.used_by_hash_, PKBRelRefs::kUsedBy);
-  PopulateRelationship(&d.modifies_hash_, PKBRelRefs::kModifies);
-  PopulateRelationship(&d.modified_by_hash_, PKBRelRefs::kModifiedBy);
-  PopulateRelationship(&d.calls_hash_, PKBRelRefs::kCalls);
-  PopulateRelationship(&d.called_by_hash_, PKBRelRefs::kCalledBy);
-  PopulateRelationship(&d.next_hash_, PKBRelRefs::kNext);
-  PopulateRelationship(&d.previous_hash_, PKBRelRefs::kPrevious);
+  PopulateRelationship(d.GetFollowsMap(), PKBRelRefs::kFollows);
+  PopulateRelationship(d.GetFollowedByMap(), PKBRelRefs::kFollowedBy);
+  PopulateRelationship(d.GetParentMap(), PKBRelRefs::kParent);
+  PopulateRelationship(d.GetChildMap(), PKBRelRefs::kChild);
+  PopulateRelationship(d.GetUseSMap(), PKBRelRefs::kUses);
+  PopulateRelationship(d.GetUsedBySMap(), PKBRelRefs::kUsedBy);
+  PopulateRelationship(d.GetModifiesSMap(), PKBRelRefs::kModifies);
+  PopulateRelationship(d.GetModifiedBySMap(), PKBRelRefs::kModifiedBy);
+  PopulateRelationship(d.GetCallsMap(), PKBRelRefs::kCalls);
+  PopulateRelationship(d.GetCalledByMap(), PKBRelRefs::kCalledBy);
+  PopulateRelationship(d.GetNextMap(), PKBRelRefs::kNext);
+  PopulateRelationship(d.GetPrevMap(), PKBRelRefs::kPrevious);
 
   // Populate transitive relationships
-  PopulateRelationship(&d.follows_T_hash_, PKBRelRefs::kFollowsT);
-  PopulateRelationship(&d.followed_by_T_hash_, PKBRelRefs::kFollowedByT);
-  PopulateRelationship(&d.parent_to_child_T_hash_, PKBRelRefs::kParentT);
-  PopulateRelationship(&d.child_to_parent_T_hash_, PKBRelRefs::kChildT);
-  PopulateRelationship(&d.calls_T_hash_, PKBRelRefs::kCallsT);
-  PopulateRelationship(&d.called_by_T_hash_, PKBRelRefs::kCalledByT);
+  PopulateRelationship(d.GetFollowsTMap(), PKBRelRefs::kFollowsT);
+  PopulateRelationship(d.GetFollowedByTMap(), PKBRelRefs::kFollowedByT);
+  PopulateRelationship(d.GetParentTMap(), PKBRelRefs::kParentT);
+  PopulateRelationship(d.GetChildTMap(), PKBRelRefs::kChildT);
+  PopulateRelationship(d.GetCallsTMap(), PKBRelRefs::kCallsT);
+  PopulateRelationship(d.GetCalledByTMap(), PKBRelRefs::kCalledByT);
 
   // Populate container relationships
-  PopulateRelationship(&d.container_use_hash_, PKBRelRefs::kUses);
-  PopulateRelationship(&d.container_used_by_hash_, PKBRelRefs::kUsedBy);
-  PopulateRelationship(&d.container_modifies_hash_, PKBRelRefs::kModifies);
-  PopulateRelationship(&d.container_modified_by_hash_, PKBRelRefs::kModifiedBy);
+  PopulateRelationship(d.GetUseCMap(), PKBRelRefs::kUses);
+  PopulateRelationship(d.GetUsedByCMap(), PKBRelRefs::kUsedBy);
+  PopulateRelationship(d.GetModifiesCMap(), PKBRelRefs::kModifies);
+  PopulateRelationship(d.GetModifiedByCMap(), PKBRelRefs::kModifiedBy);
+
 
   ProcessEntitiesWithMatchingAttributes();
 
@@ -105,31 +106,9 @@ void PKB::PopulateEntities(DesignEntity design_entity, T& entity_list) {
   }
 }
 
-template <typename X, typename Y>
-void PKB::PopulateRelationship(std::unordered_map<X*, std::list<Y*>*>* hash, PKBRelRefs ref) {
-  for (std::pair<X*, std::list<Y*>*> kv: *hash) {
-    Entity* first_entity = dynamic_cast<Entity*>(kv.first);
-    std::string k_string = GetNameFromEntity(first_entity);
-    DesignEntity first_type = GetDesignEntityFromEntity(first_entity);
-    std::vector<DesignEntity> first_types = GetApplicableTypes(first_type);
-    std::vector<DesignEntity> second_types;
 
-    for (Y* e : *kv.second) {
-      Entity* entity = dynamic_cast<Entity*>(e);
-      relationship_set_.insert({ref, k_string, GetNameFromEntity(entity)});
-      relationship_table_[ref][k_string].push_back(entity);
-
-      DesignEntity second_type = GetDesignEntityFromEntity(entity);
-      second_types = GetApplicableTypes(second_type);
-
-      for (DesignEntity type1 : first_types) {
-        for (DesignEntity type2 : second_types) {
-          relationship_by_types_table_[ref][{type1, type2}].push_back({first_entity, entity});
-          first_param_by_types_table_[ref][{type1, type2}].push_back(first_entity);
-        }
-      }
-    }
-  }
+std::unordered_map<std::string, std::vector<Entity*>> PKB::GetRelationshipMap(PKBRelRefs ref) {
+  return relationship_table_[ref];
 }
 
 std::vector<Entity*> PKB::GetRelationship(PKBRelRefs ref, std::string entity) {

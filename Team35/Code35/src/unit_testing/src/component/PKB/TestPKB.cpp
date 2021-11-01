@@ -28,11 +28,11 @@ TEST_CASE("2.PKB.PKB population and retrieval") {
   call1_->SetStatementNumber(new StatementNumber(3));
   print1_->SetStatementNumber(new StatementNumber(4));
 
-  d1_.proc_list_.push_back(p1_);
-  d1_.var_list_.push_back(v1_);
-  d1_.var_list_.push_back(v2_);
-  d1_.const_list_.push_back(const1_);
-  d1_.const_list_.push_back(const2_);
+  d1_.GetProcList()->push_back(p1_);
+  d1_.GetVariableList()->push_back(v1_);
+  d1_.GetVariableList()->push_back(v2_);
+  d1_.GetConstantList()->push_back(const1_);
+  d1_.GetConstantList()->push_back(const2_);
 
   d1_.AddStatement(read1_);
   d1_.AddStatement(a1_);

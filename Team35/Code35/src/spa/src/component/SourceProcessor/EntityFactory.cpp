@@ -131,12 +131,8 @@ Entity* EntityFactory::CreateAssignEntity(vector<Token> tokens) {
  * @return Vector of tokens which represents the expression alone.
  */
 vector<Token> EntityFactory::GetExpressionTokens(vector<Token> tokens, TokenTag start_tag, TokenTag end_tag) {
-  int start_iter = -1;
-  int end_iter = -1;
-  // finding first start tag
-  start_iter = Token::GetFirstMatchingTokenIdx(tokens, start_tag);
-  // finding last end tag
-  end_iter = Token::GetLastMatchingTokenIdx(tokens, end_tag);
+  int start_iter = Token::GetFirstMatchingTokenIdx(tokens, start_tag);
+  int end_iter = Token::GetLastMatchingTokenIdx(tokens, end_tag);
   if (start_iter < 0 || end_iter < 0) {
     throw std::invalid_argument("EF: Start or end tag not found.\n");
   }
@@ -153,7 +149,7 @@ vector<Token> EntityFactory::GetExpressionTokens(vector<Token> tokens, TokenTag 
   return expression_tokens;
 }
 
-string EntityFactory::ConvertTokensToString(vector<Token> tokens) {
+string EntityFactory::ConvertTokensToString(const vector<Token>& tokens) {
   std::string expression_string;
   for (auto& token: tokens) {
     expression_string += token.GetTokenString();
@@ -161,7 +157,7 @@ string EntityFactory::ConvertTokensToString(vector<Token> tokens) {
   return expression_string;
 }
 
-vector<Variable*> EntityFactory::GetVariablesFromExpressionTokens(vector<Token> tokens) {
+vector<Variable*> EntityFactory::GetVariablesFromExpressionTokens(const vector<Token>& tokens) {
   vector<Variable*> variables;
   for (auto& token: tokens) {
     if (token.GetTokenTag() == TokenTag::kName) {
@@ -176,7 +172,7 @@ vector<Variable*> EntityFactory::GetVariablesFromExpressionTokens(vector<Token> 
   return variables;
 }
 
-vector<Constant*> EntityFactory::GetConstantsFromExpressionTokens(vector<Token> tokens) {
+vector<Constant*> EntityFactory::GetConstantsFromExpressionTokens(const vector<Token>& tokens) {
   vector<Constant*> constants;
   for (auto& token: tokens) {
     if (token.GetTokenTag() == TokenTag::kInteger) {
@@ -193,20 +189,20 @@ vector<Constant*> EntityFactory::GetConstantsFromExpressionTokens(vector<Token> 
 
 Procedure* EntityFactory::CreateProcedure(std::string proc_name) {
   // TODO iter2: Create destructor for ProcedureName and Procedure.
-  Procedure* p = new Procedure(new ProcedureName(std::move(proc_name)));
+  auto* p = new Procedure(new ProcedureName(std::move(proc_name)));
   proc_list_->push_back(p);
   return p;
 }
 
 Variable* EntityFactory::CreateVariable(std::string var_name) {
   //TODO iter2: Create destructor for VariableName and Variable.
-  Variable* v = new Variable(new VariableName(std::move(var_name)));
+  auto* v = new Variable(new VariableName(std::move(var_name)));
   var_list_->push_back(v);
   return v;
 }
 
-Constant* EntityFactory::CreateConstant(std::string const_val) {
-  Constant* val = new Constant(new ConstantValue(std::move(const_val)));
+Constant* EntityFactory::CreateConstant(const std::string& const_val) {
+  auto* val = new Constant(new ConstantValue(const_val));
   const_list_->push_back(val);
   return val;
 }

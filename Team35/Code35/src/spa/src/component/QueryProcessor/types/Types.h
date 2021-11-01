@@ -47,7 +47,11 @@ enum class PKBRelRefs {
   kAffects,
   kAffectedBy,
   kAffectsT,
-  kAffectedByT
+  kAffectedByT,
+  kNextBip,
+  kPrevBip,
+  kNextBipT,
+  kPrevBipT
 };
 
 enum class RelRef {
