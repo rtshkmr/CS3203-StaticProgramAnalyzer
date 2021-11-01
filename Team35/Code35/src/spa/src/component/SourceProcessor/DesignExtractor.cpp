@@ -12,14 +12,18 @@ DesignExtractor::DesignExtractor(Deliverable* deliverable) {
  * namely Calls, Uses, Modifies, Parent* and Follow* and their reverse relationships.
  */
 void DesignExtractor::ExtractDesignAbstractions() {
-  auto procedure_extractor = TransitiveExtractor<Procedure>(deliverable_);
-  procedure_extractor.Extract(deliverable_->GetCallsTMap(), deliverable_->GetCallsMap(), TransitiveRel::kCalls);
+  auto procedure_extractor = TransitiveExtractor<Procedure>();
+  procedure_extractor.Extract(deliverable_->GetCallsTMap(),
+                              deliverable_->GetCalledByTMap(),
+                              deliverable_->GetCallsMap());
 
-  auto statement_extractor = TransitiveExtractor<Statement>(deliverable_);
+  auto statement_extractor = TransitiveExtractor<Statement>();
   statement_extractor.Extract(deliverable_->GetParentTMap(),
-                              deliverable_->GetParentMap(),
-                              TransitiveRel::kParent);
-  statement_extractor.Extract(deliverable_->GetFollowsTMap(), deliverable_->GetFollowsMap(), TransitiveRel::kFollows);
+                              deliverable_->GetChildTMap(),
+                              deliverable_->GetParentMap());
+  statement_extractor.Extract(deliverable_->GetFollowsTMap(),
+                              deliverable_->GetFollowedByTMap(),
+                              deliverable_->GetFollowsMap());
 
   auto variable_t_extractor = VariableTExtractor(deliverable_);
   variable_t_extractor.Extract(VariableRel::kUses);

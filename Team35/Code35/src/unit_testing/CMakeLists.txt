@@ -18,6 +18,7 @@ add_executable(unit_testing ${srcs}
         src/component/PKB/TestPKB.cpp src/datatype/TestAssignmentExpression.cpp
         src/datatype/TestDeliverable.cpp utils/EntityUtils.h
         src/component/SourceProcessor/Extractors/TestTransitiveExtractor/TestFollowsT.cpp
+        src/component/SourceProcessor/Extractors/TestTransitiveExtractor/TestParentT.cpp
         ../spa/src/exception/SpaException.h
         src/util/TestCommonUtils.cpp src/model/TestEntity.cpp
         src/model/TestStatement.cpp src/datatype/TestConditionalExpression.cpp src/model/TestCFG.cpp

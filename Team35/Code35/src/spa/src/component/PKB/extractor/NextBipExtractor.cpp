@@ -1,7 +1,6 @@
 #include "NextBipExtractor.h"
 
 #include <utility>
-#include <cassert>
 #include <util/Utility.h>
 
 /**
