@@ -14,6 +14,8 @@ void AffectsExtractor::SetPKB(PKB* pkb) {
  * @return
  */
 std::vector<Entity*> AffectsExtractor::GetAffects(int target) {
+  std::string target_string = std::to_string(target);
+
   // retrieve the entity that target points to
   // possible to have no such targets
 
@@ -52,10 +54,7 @@ bool AffectsExtractor::HasAffects(AssignEntity* first_stmt, AssignEntity* second
 }
 
 /*
- * Traversal function for Affects:
- *
- * 1. Get the innermost cluster that contains the first_stmt
- * 2. Need to see if it's a while block body or not
+ * Verifies whether there exists a valid unmodified path between two assignment statements.
  *
  * */
 bool AffectsExtractor::HasValidUnmodifiedPath(AssignEntity* first_stmt, AssignEntity* second_stmt) {
