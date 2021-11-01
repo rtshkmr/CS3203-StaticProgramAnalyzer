@@ -490,11 +490,12 @@ bool ClauseCommandExecutor::HasExpressionMatch(Pattern *pattern, AssignEntity *a
  */
 void ClauseCommandExecutor::DoubleSynonymExpansion(Clause *clause, bool first_syn_in) {
   int group_table_pointer = 0;
-  int table_size = group_table->GetColumnSize();
-  // The new column should be created here.
+  int table_size = group_table->GetRowSize();
+  Synonym* new_synonym = first_syn_in ? clause->second_synonym : clause->first_synonym;
+  group_table->AddColumn(new_synonym);
   for (int i = 0; i < table_size; i++) {
     // Send to dispatcher to reallocate the work that returns repeat_count and has_relation.
-    std::tuple<bool, int> tuple = DoubleSynonymExpansionCheck(clause, first_syn_in, i);
+    std::tuple<bool, int> tuple = DoubleSynonymExpansionCheck(clause, first_syn_in, group_table_pointer);
     bool has_relation = std::get<0>(tuple);
     int repeat_count = std::get<1>(tuple);
     if (repeat_count > 0) group_table_pointer += repeat_count - 1;

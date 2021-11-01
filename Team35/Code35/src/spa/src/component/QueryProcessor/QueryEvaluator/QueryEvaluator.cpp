@@ -19,18 +19,16 @@ UnformattedQueryResult QueryEvaluator::EvaluateQuery(const std::vector<Group *>&
   UnformattedQueryResult unformatted_result = UnformattedQueryResult(true);
 
   for (Group *current_group : list_of_groups) {
-    if (current_group->ContainsTargetSynonym()) {
-      // Evaluate non-boolean group
+    if (current_group->ContainsTargetSynonym()) {       // Evaluate non-boolean group
       auto *table = new QueryEvaluatorTable(current_group->GetTargetSynonyms());
       PreprocessNonBooleanGroup(current_group, table);
       unformatted_result.AddTable(table);
-    } else {
-      // Evaluate boolean group
+    } else {                                            // Evaluate boolean group
       PreprocessBooleanGroup(current_group);
-      if (!boolean_result) {
-        unformatted_result.SetBooleanResult(false);
-        break;
-      }
+    }
+    if (!boolean_result) {
+      unformatted_result.SetBooleanResult(false);
+      break;
     }
   }
   return unformatted_result;
@@ -58,7 +56,7 @@ void QueryEvaluator::ProcessGroup(QueryEvaluatorTable *table, Group *group) {
     clause_command->Execute(current_clause);
   }
 }
-// TODO: DONE.
+
 void QueryEvaluator::ProcessBooleanGroupWithoutSynonym(Group *group) {
   assert(group->GetClauses().size() == 1);
   Clause *clause = group->GetClauses()[0];
