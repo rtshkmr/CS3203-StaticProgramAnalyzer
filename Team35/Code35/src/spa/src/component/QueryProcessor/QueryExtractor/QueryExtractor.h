@@ -5,6 +5,7 @@
 #include <list>
 #include <unordered_set>
 #include <unordered_map>
+#include <utility>
 #include <component/QueryProcessor/types/Types.h>
 
 /**
@@ -16,7 +17,7 @@ class QueryExtractor {
   std::string query;
   std::vector<Group*> groups;
   std::list<Synonym*> synonyms;
-  std::vector<Synonym*> target_synonyms;
+  std::vector<std::pair<Synonym*, Attribute>> target_syn_attrs;
   std::unordered_map<std::string, Synonym*> target_synonyms_map;
   std::unordered_map<std::string, std::vector<int>> map_of_syn_to_clause_indices;
   static void PopulateSynAdjacencyList(std::unordered_map<std::string, std::vector<int>>* map_of_syn_to_clause_indices,
@@ -27,7 +28,7 @@ class QueryExtractor {
   void ExtractQuery(bool are_optimizations_enabled);
   std::vector<Group*> GetGroupsList() { return groups; };
   std::list<Synonym*> GetSynonymsList() { return synonyms; }; // TODO: deprecate or convert to private.
-  std::vector<Synonym*> GetTargetSynonymsList() { return target_synonyms; };
+  std::vector<std::pair<Synonym*, Attribute>> GetTargetSynAttrPairs() { return target_syn_attrs; };
 };
 
 #endif //INC_21S1_CP_SPA_TEAM_35_QUERYEXTRACTOR_H

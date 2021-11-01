@@ -32,7 +32,7 @@ TEST_CASE("3.QueryExtractor.Extract single synonym + select declared synonym; sh
   auto query_extractor = QueryExtractor(& query);
   query_extractor.ExtractQuery();
   std::list<Synonym*> synonyms = query_extractor.GetSynonymsList();
-  Synonym target = *query_extractor.GetTargetSynonymsList().at(0);
+  Synonym target = *query_extractor.GetTargetSynAttrPairs().at(0).first;
   std::vector<Group*> groups = query_extractor.GetGroupsList();
 
   std::list<Synonym> expected_synonyms = {Synonym("a1", DesignEntity::kAssign)};
@@ -57,7 +57,7 @@ TEST_CASE("3.QueryExtractor.Extract multiple synonym + select declared synonym; 
   auto query_extractor = QueryExtractor(& query);
   query_extractor.ExtractQuery();
   std::list<Synonym*> synonyms = query_extractor.GetSynonymsList();
-  Synonym target = *query_extractor.GetTargetSynonymsList().at(0);
+  Synonym target = *query_extractor.GetTargetSynAttrPairs().at(0).first;
   std::vector<Group*> groups = query_extractor.GetGroupsList();
 
   std::list<Synonym> expected_synonyms = {Synonym("a", DesignEntity::kAssign),
@@ -91,7 +91,7 @@ TEST_CASE("3.QueryExtractor.Extract multiple unique synonym + select declared sy
   auto query_extractor = QueryExtractor(& query);
   query_extractor.ExtractQuery();
   std::list<Synonym*> synonyms = query_extractor.GetSynonymsList();
-  Synonym target = *query_extractor.GetTargetSynonymsList().at(0);
+  Synonym target = *query_extractor.GetTargetSynAttrPairs().at(0).first;
   std::vector<Group*> groups = query_extractor.GetGroupsList();
 
   std::list<Synonym> expected_synonyms = {Synonym("a1", DesignEntity::kAssign),
@@ -125,12 +125,11 @@ TEST_CASE("3.QueryExtractor.Extract multiple synonyms + select BOOLEAN; should P
   query_extractor.ExtractQuery();
   std::list<Synonym*> synonyms = query_extractor.GetSynonymsList();
   std::vector<Group*> groups = query_extractor.GetGroupsList();
-  std::vector<Synonym*> target_synonyms = query_extractor.GetTargetSynonymsList();
-
+  auto target_syn_attrs = query_extractor.GetTargetSynAttrPairs();
   // we have already tested that parsing of declaration synonyms works, so focus on checking target_synonyms_list
   REQUIRE(synonyms.size() == 5);
   REQUIRE(groups.size() == 0);
-  REQUIRE(target_synonyms.size() == 0);
+  REQUIRE(target_syn_attrs.size() == 0);
 }
 
 TEST_CASE("3.QueryExtractor.Extract multiple synonyms + select tuple of declared synonyms; should PASS") {
@@ -140,7 +139,7 @@ TEST_CASE("3.QueryExtractor.Extract multiple synonyms + select tuple of declared
   query_extractor.ExtractQuery();
   std::list<Synonym*> synonyms = query_extractor.GetSynonymsList();
   std::vector<Group*> groups = query_extractor.GetGroupsList();
-  std::vector<Synonym*> target_synonyms = query_extractor.GetTargetSynonymsList();
+  auto target_syn_attrs = query_extractor.GetTargetSynAttrPairs();
 
   // we have already tested that parsing of declaration synonyms works, so focus on checking target_synonyms_list
   REQUIRE(synonyms.size() == 5);
@@ -151,9 +150,9 @@ TEST_CASE("3.QueryExtractor.Extract multiple synonyms + select tuple of declared
                                                     new Synonym("a3", DesignEntity::kAssign),
                                                     new Synonym("a4", DesignEntity::kAssign),
                                                     new Synonym("a5", DesignEntity::kAssign)};
-  REQUIRE(target_synonyms.size() == 5);
+  REQUIRE(target_syn_attrs.size() == 5);
   for (int i = 0; i < expected_target_synonyms.size(); i++) {
-    REQUIRE(AreSynonymsEqual(*target_synonyms[i], *expected_target_synonyms[i]));
+    REQUIRE(AreSynonymsEqual(*target_syn_attrs[i].first, *expected_target_synonyms[i]));
   }
 }
 
@@ -195,7 +194,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that with correct relRef and
   auto query_extractor = QueryExtractor(& query);
   query_extractor.ExtractQuery();
   std::list<Synonym*> synonyms = query_extractor.GetSynonymsList();
-  Synonym target = *query_extractor.GetTargetSynonymsList().at(0);
+  Synonym target = *query_extractor.GetTargetSynAttrPairs().at(0).first;
   std::vector<Group*> groups = query_extractor.GetGroupsList();
 
   std::list<Synonym> expected_synonyms = {Synonym("a", DesignEntity::kAssign),
@@ -237,7 +236,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that with correct entRef and
     auto query_extractor = QueryExtractor(& query);
     query_extractor.ExtractQuery();
     std::list<Synonym*> synonyms = query_extractor.GetSynonymsList();
-    Synonym target = *query_extractor.GetTargetSynonymsList().at(0);
+    Synonym target = *query_extractor.GetTargetSynAttrPairs().at(0).first;
     std::vector<Group*> groups = query_extractor.GetGroupsList();
 
     std::list<Synonym> expected_synonyms = {Synonym("a", DesignEntity::kAssign),
@@ -278,7 +277,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that with correct entRef and
     auto query_extractor = QueryExtractor(& query);
     query_extractor.ExtractQuery();
     std::list<Synonym*> synonyms = query_extractor.GetSynonymsList();
-    Synonym target = *query_extractor.GetTargetSynonymsList().at(0);
+    Synonym target = *query_extractor.GetTargetSynAttrPairs().at(0).first;
     std::vector<Group*> groups = query_extractor.GetGroupsList();
 
     std::list<Synonym> expected_synonyms = {Synonym("a", DesignEntity::kAssign)};
@@ -322,7 +321,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed UsesP or ModifiesP; should PASS")
     auto query_extractor = QueryExtractor(& query);
     query_extractor.ExtractQuery();
     std::list<Synonym*> synonyms = query_extractor.GetSynonymsList();
-    Synonym target = *query_extractor.GetTargetSynonymsList().at(0);
+    Synonym target = *query_extractor.GetTargetSynAttrPairs().at(0).first;
     std::vector<Group*> groups = query_extractor.GetGroupsList();
 
     std::list<Synonym> expected_synonyms = {Synonym("p", DesignEntity::kProcedure),
@@ -363,7 +362,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed UsesP or ModifiesP; should PASS")
     auto query_extractor = QueryExtractor(& query);
     query_extractor.ExtractQuery();
     std::list<Synonym*> synonyms = query_extractor.GetSynonymsList();
-    Synonym target = *query_extractor.GetTargetSynonymsList().at(0);
+    Synonym target = *query_extractor.GetTargetSynAttrPairs().at(0).first;
     std::vector<Group*> groups = query_extractor.GetGroupsList();
 
     std::list<Synonym> expected_synonyms = {Synonym("c", DesignEntity::kCall),
@@ -404,7 +403,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed UsesP or ModifiesP; should PASS")
     auto query_extractor = QueryExtractor(& query);
     query_extractor.ExtractQuery(false);
     std::list<Synonym*> synonyms = query_extractor.GetSynonymsList();
-    Synonym target = *query_extractor.GetTargetSynonymsList().at(0);
+    Synonym target = *query_extractor.GetTargetSynAttrPairs().at(0).first;
     std::vector<Group*> groups = query_extractor.GetGroupsList();
 
     std::list<Synonym> expected_synonyms = {Synonym("a", DesignEntity::kAssign),
@@ -499,7 +498,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed pattern with correct syn-assign a
     auto query_extractor = QueryExtractor(& query);
     query_extractor.ExtractQuery();
     std::list<Synonym*> synonyms = query_extractor.GetSynonymsList();
-    Synonym target = *query_extractor.GetTargetSynonymsList().at(0);
+    Synonym target = *query_extractor.GetTargetSynAttrPairs().at(0).first;
     std::vector<Group*> groups = query_extractor.GetGroupsList();
 
     std::list<Synonym> expected_synonyms = {Synonym("a1", DesignEntity::kAssign)};
@@ -538,7 +537,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed pattern with correct syn-assign a
     auto query_extractor = QueryExtractor(& query);
     query_extractor.ExtractQuery();
     std::list<Synonym*> synonyms = query_extractor.GetSynonymsList();
-    Synonym target = *query_extractor.GetTargetSynonymsList().at(0);
+    Synonym target = *query_extractor.GetTargetSynAttrPairs().at(0).first;
     std::vector<Group*> groups = query_extractor.GetGroupsList();
 
     std::list<Synonym> expected_synonyms = {Synonym("a1", DesignEntity::kAssign)};
@@ -577,7 +576,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed pattern with correct syn-assign a
     auto query_extractor = QueryExtractor(& query);
     query_extractor.ExtractQuery();
     std::list<Synonym*> synonyms = query_extractor.GetSynonymsList();
-    Synonym target = *query_extractor.GetTargetSynonymsList().at(0);
+    Synonym target = *query_extractor.GetTargetSynAttrPairs().at(0).first;
     std::vector<Group*> groups = query_extractor.GetGroupsList();
 
     std::list<Synonym> expected_synonyms = {Synonym("a1", DesignEntity::kAssign)};
@@ -616,7 +615,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed pattern with correct syn-assign a
     auto query_extractor = QueryExtractor(& query);
     query_extractor.ExtractQuery();
     std::list<Synonym*> synonyms = query_extractor.GetSynonymsList();
-    Synonym target = *query_extractor.GetTargetSynonymsList().at(0);
+    Synonym target = *query_extractor.GetTargetSynAttrPairs().at(0).first;
     std::vector<Group*> groups = query_extractor.GetGroupsList();
 
     std::list<Synonym> expected_synonyms = {Synonym("a1", DesignEntity::kAssign)};
@@ -655,7 +654,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed pattern with correct syn-assign a
     auto query_extractor = QueryExtractor(& query);
     query_extractor.ExtractQuery();
     std::list<Synonym*> synonyms = query_extractor.GetSynonymsList();
-    Synonym target = *query_extractor.GetTargetSynonymsList().at(0);
+    Synonym target = *query_extractor.GetTargetSynAttrPairs().at(0).first;
     std::vector<Group*> groups = query_extractor.GetGroupsList();
 
     std::list<Synonym> expected_synonyms = {Synonym("a1", DesignEntity::kAssign)};

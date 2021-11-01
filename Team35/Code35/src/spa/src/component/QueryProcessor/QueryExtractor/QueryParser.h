@@ -18,7 +18,7 @@ class QueryParser {
   std::unordered_set<std::string> synonyms_name_set;
   std::vector<Clause*>& clauses;
   std::list<Synonym*>& synonyms;
-  std::vector<Synonym*>& target_synonyms_list;
+  std::vector<std::pair<Synonym*, Attribute>>& target_syn_attrs_list;
   std::unordered_map<std::string, Synonym*>& target_synonyms_map;
 
   Token lookahead = Token("", TokenTag::kInvalid);
@@ -52,10 +52,11 @@ class QueryParser {
   bool IsValidSynonym(Token token);
   bool IsValidSynonym(Token token, DesignEntity de);
  public:
-  QueryParser(std::vector<Clause*>& clauses, std::list<Synonym*>& synonyms, std::vector<Synonym*>& target_synonyms_list,
+  QueryParser(std::vector<Clause*>& clauses, std::list<Synonym*>& synonyms,
+              std::vector<std::pair<Synonym*, Attribute>>& target_syn_attrs_list,
               std::unordered_map<std::string, Synonym*>& target_synonyms_map, QueryTokenizer tokenizer) :
       clauses(clauses), synonyms(synonyms),
-      target_synonyms_list(target_synonyms_list), target_synonyms_map(target_synonyms_map), tokenizer(tokenizer) {};
+      target_syn_attrs_list(target_syn_attrs_list), target_synonyms_map(target_synonyms_map), tokenizer(tokenizer) {};
   void Parse();
   static Synonym* GetSynonymInfo(std::string syn_name, std::list<Synonym*>* synonyms);
 };
