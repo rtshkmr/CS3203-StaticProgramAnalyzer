@@ -5,14 +5,15 @@
  * Groups multiple queries that should be evaluated together, based on existence of common synonyms.
  */
 void QueryGrouper::GroupClauses(std::vector<Clause*>* clauses, std::vector<Group*>* groups,
-                                    std::vector<Synonym*>* target_synonyms,
+                                std::vector<std::pair<Synonym*, Attribute>>* target_syn_attrs_list,
                                     std::unordered_map<std::string, Synonym*>* target_synonyms_map,
                                     std::unordered_map<std::string, std::vector<int>>* map_of_syn_to_clause_indices) {
   // First create groups for clauses containing target synonyms (and their 'neighbouring' synonyms).
   std::unordered_set<int> visited_clauses;
   std::unordered_set<std::string> visited_target_synonyms;
   std::unordered_set<std::string> visited_synonyms;
-  for (Synonym* tgt_syn : *target_synonyms) {
+  for (auto p : *target_syn_attrs_list) {
+    Synonym* tgt_syn = p.first;
     if (visited_target_synonyms.find(tgt_syn->GetName()) != visited_target_synonyms.end()) {
       continue;
     }
