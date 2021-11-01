@@ -103,30 +103,8 @@ void PKB::PopulateEntities(DesignEntity design_entity, T& entity_list) {
   }
 }
 
-template <typename X, typename Y>
-void PKB::PopulateRelationship(std::unordered_map<X*, std::list<Y*>*>* hash, PKBRelRefs ref) {
-  for (std::pair<X*, std::list<Y*>*> kv: *hash) {
-    std::string k_string = GetNameFromEntity(kv.first);
-    DesignEntity first_type = GetDesignEntityFromEntity(kv.first);
-    std::vector<DesignEntity> first_types = GetApplicableTypes(first_type);
-    std::vector<DesignEntity> second_types;
-
-    for (Entity* entity : *kv.second) {
-      relationship_set_.insert({ref, k_string, GetNameFromEntity(entity)});
-      relationship_table_[ref][k_string].push_back(entity);
-
-      DesignEntity second_type = GetDesignEntityFromEntity(entity);
-      second_types = GetApplicableTypes(second_type);
-
-
-      for (DesignEntity type1 : first_types) {
-        for (DesignEntity type2 : second_types) {
-          relationship_by_types_table_[ref][{type1, type2}].push_back({kv.first, entity});
-          first_param_by_types_table_[ref][{type1, type2}].push_back(kv.first);
-        }
-      }
-    }
-  }
+std::unordered_map<std::string, std::vector<Entity*>> PKB::GetRelationshipMap(PKBRelRefs ref) {
+  return relationship_table_[ref];
 }
 
 std::vector<Entity*> PKB::GetRelationship(PKBRelRefs ref, std::string entity) {

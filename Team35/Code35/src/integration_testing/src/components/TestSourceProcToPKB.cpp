@@ -1,20 +1,9 @@
 #include "catch.hpp"
 #include "component/SourceProcessor/SourceProcessor.h"
 #include "component/SourceProcessor/Parser.h"
+#include "../../util/TestUtil.h"
 
-bool AreEntityListsEqual(const std::list<std::tuple<EntityEnum, std::string>>& l1, std::vector<Entity*> l2) {
-  for (Entity* a: l2) {
-    bool found_a = false;
-    for (std::tuple<EntityEnum, std::string> b: l1) {
-      bool match = a->GetEntityEnum() == std::get<0>(b) && PKB::GetNameFromEntity(a) == std::get<1>(b);
-      found_a = found_a || match;
-    }
-    if (!found_a) {
-      return false;
-    }
-  }
-  return l2.size() == l1.size();
-}
+using namespace test_util;
 
 TEST_CASE("SP to PKB basic retrieval") {
   PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/basic_source.txt");
@@ -112,57 +101,30 @@ TEST_CASE("SP to PKB relationships tests") {
 
   PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/mixed_loops_source.txt");
 
-  std::vector<std::tuple<EntityEnum, std::string>> source_tuples = {
-      std::make_tuple(EntityEnum::kAssignEntity, "-1000000"), // placeholder
-      std::make_tuple(EntityEnum::kAssignEntity, "1"),
-      std::make_tuple(EntityEnum::kReadEntity, "2"),
-      std::make_tuple(EntityEnum::kIfEntity, "3"),
-      std::make_tuple(EntityEnum::kAssignEntity, "4"),
-      std::make_tuple(EntityEnum::kAssignEntity, "5"),
-      std::make_tuple(EntityEnum::kWhileEntity, "6"),
-      std::make_tuple(EntityEnum::kReadEntity, "7"),
-      std::make_tuple(EntityEnum::kIfEntity, "8"),
-      std::make_tuple(EntityEnum::kAssignEntity, "9"),
-      std::make_tuple(EntityEnum::kAssignEntity, "10"),
-      std::make_tuple(EntityEnum::kIfEntity, "11"),
-      std::make_tuple(EntityEnum::kAssignEntity, "12"),
-      std::make_tuple(EntityEnum::kPrintEntity, "13"),
-      std::make_tuple(EntityEnum::kAssignEntity, "14"),
-      std::make_tuple(EntityEnum::kPrintEntity, "15"),
-      std::make_tuple(EntityEnum::kAssignEntity, "16"),
-      std::make_tuple(EntityEnum::kPrintEntity, "17"),
-      std::make_tuple(EntityEnum::kPrintEntity, "18"),
-      std::make_tuple(EntityEnum::kIfEntity, "19"),
-      std::make_tuple(EntityEnum::kPrintEntity, "20"),
-      std::make_tuple(EntityEnum::kPrintEntity, "21"),
-      std::make_tuple(EntityEnum::kPrintEntity, "22"),
-      std::make_tuple(EntityEnum::kAssignEntity, "23")
-  };
-
   SECTION("Follows") {
     std::vector<std::list<std::tuple<EntityEnum, std::string>>> expected_get_follows_lists = {
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[2]},    //1
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[3]},      //2
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[19]},     //3
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[5]},  //4
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[6]},   //5
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[2]},    //1
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[3]},      //2
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[19]},     //3
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[5]},  //4
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[6]},   //5
         std::list<std::tuple<EntityEnum, std::string>>(),                                             //6
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[8]},      //7
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[8]},      //7
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //8
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[10]}, //9
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[11]},     //10
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[16]}, //11
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[13]},  //12
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[14]}, //13
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[10]}, //9
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[11]},     //10
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[16]}, //11
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[13]},  //12
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[14]}, //13
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //14
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //15
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //16
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //17
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //18
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[22]},  //19
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[22]},  //19
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //20
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //21
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[23]}, //22
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[23]}, //22
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //23
         std::list<std::tuple<EntityEnum, std::string>>{}, //out of bounds check
     };
@@ -185,50 +147,50 @@ TEST_CASE("SP to PKB relationships tests") {
   SECTION("Follows*") {
     std::vector<std::list<std::tuple<EntityEnum, std::string>>> expected_get_followsT_lists = {
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[2],
-            source_tuples[3],
-            source_tuples[19],
-            source_tuples[22],
-            source_tuples[23],},    //1
+            ml_source_tuples[2],
+            ml_source_tuples[3],
+            ml_source_tuples[19],
+            ml_source_tuples[22],
+            ml_source_tuples[23],},    //1
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[3],
-            source_tuples[19],
-            source_tuples[22],
-            source_tuples[23],},      //2
+            ml_source_tuples[3],
+            ml_source_tuples[19],
+            ml_source_tuples[22],
+            ml_source_tuples[23],},      //2
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[19],
-            source_tuples[22],
-            source_tuples[23],},     //3
+            ml_source_tuples[19],
+            ml_source_tuples[22],
+            ml_source_tuples[23],},     //3
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[5],
-            source_tuples[6],},  //4
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[6]},   //5
+            ml_source_tuples[5],
+            ml_source_tuples[6],},  //4
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[6]},   //5
         std::list<std::tuple<EntityEnum, std::string>>(),                                             //6
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[8]},      //7
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[8]},      //7
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //8
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[10],
-            source_tuples[11],
-            source_tuples[16],}, //9
+            ml_source_tuples[10],
+            ml_source_tuples[11],
+            ml_source_tuples[16],}, //9
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[11],
-            source_tuples[16],},     //10
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[16]}, //11
+            ml_source_tuples[11],
+            ml_source_tuples[16],},     //10
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[16]}, //11
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[13],
-            source_tuples[14],},  //12
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[14]}, //13
+            ml_source_tuples[13],
+            ml_source_tuples[14],},  //12
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[14]}, //13
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //14
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //15
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //16
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //17
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //18
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[22],
-            source_tuples[23],},  //19
+            ml_source_tuples[22],
+            ml_source_tuples[23],},  //19
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //20
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //21
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[23]}, //22
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[23]}, //22
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //23
         std::list<std::tuple<EntityEnum, std::string>>{}, //out of bounds check
     };
@@ -247,30 +209,30 @@ TEST_CASE("SP to PKB relationships tests") {
         std::list<std::tuple<EntityEnum, std::string>>{},    //1
         std::list<std::tuple<EntityEnum, std::string>>{},      //2
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[4],
-            source_tuples[5],
-            source_tuples[6],
-            source_tuples[18],},     //3
+            ml_source_tuples[4],
+            ml_source_tuples[5],
+            ml_source_tuples[6],
+            ml_source_tuples[18],},     //3
         std::list<std::tuple<EntityEnum, std::string>>{},  //4
         std::list<std::tuple<EntityEnum, std::string>>{},   //5
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[7],
-            source_tuples[8],},                                             //6
+            ml_source_tuples[7],
+            ml_source_tuples[8],},                                             //6
         std::list<std::tuple<EntityEnum, std::string>>{},      //7
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[9],
-            source_tuples[10],
-            source_tuples[11],
-            source_tuples[16],
-            source_tuples[17],
+            ml_source_tuples[9],
+            ml_source_tuples[10],
+            ml_source_tuples[11],
+            ml_source_tuples[16],
+            ml_source_tuples[17],
         },                                             //8
         std::list<std::tuple<EntityEnum, std::string>>{}, //9
         std::list<std::tuple<EntityEnum, std::string>>{},     //10
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[12],
-            source_tuples[13],
-            source_tuples[14],
-            source_tuples[15],}, //11
+            ml_source_tuples[12],
+            ml_source_tuples[13],
+            ml_source_tuples[14],
+            ml_source_tuples[15],}, //11
         std::list<std::tuple<EntityEnum, std::string>>{},  //12
         std::list<std::tuple<EntityEnum, std::string>>{}, //13
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //14
@@ -279,8 +241,8 @@ TEST_CASE("SP to PKB relationships tests") {
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //17
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //18
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[20],
-            source_tuples[21],},  //19
+            ml_source_tuples[20],
+            ml_source_tuples[21],},  //19
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //20
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //21
         std::list<std::tuple<EntityEnum, std::string>>{}, //22
@@ -309,54 +271,54 @@ TEST_CASE("SP to PKB relationships tests") {
         std::list<std::tuple<EntityEnum, std::string>>{},    //1
         std::list<std::tuple<EntityEnum, std::string>>{},      //2
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[4],
-            source_tuples[5],
-            source_tuples[6],
-            source_tuples[7],
-            source_tuples[8],
-            source_tuples[9],
-            source_tuples[10],
-            source_tuples[11],
-            source_tuples[12],
-            source_tuples[13],
-            source_tuples[14],
-            source_tuples[15],
-            source_tuples[16],
-            source_tuples[17],
-            source_tuples[18],},     //3
+            ml_source_tuples[4],
+            ml_source_tuples[5],
+            ml_source_tuples[6],
+            ml_source_tuples[7],
+            ml_source_tuples[8],
+            ml_source_tuples[9],
+            ml_source_tuples[10],
+            ml_source_tuples[11],
+            ml_source_tuples[12],
+            ml_source_tuples[13],
+            ml_source_tuples[14],
+            ml_source_tuples[15],
+            ml_source_tuples[16],
+            ml_source_tuples[17],
+            ml_source_tuples[18],},     //3
         std::list<std::tuple<EntityEnum, std::string>>{},  //4
         std::list<std::tuple<EntityEnum, std::string>>{},   //5
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[7],
-            source_tuples[8],
-            source_tuples[9],
-            source_tuples[10],
-            source_tuples[11],
-            source_tuples[12],
-            source_tuples[13],
-            source_tuples[14],
-            source_tuples[15],
-            source_tuples[16],
-            source_tuples[17],},                                             //6
+            ml_source_tuples[7],
+            ml_source_tuples[8],
+            ml_source_tuples[9],
+            ml_source_tuples[10],
+            ml_source_tuples[11],
+            ml_source_tuples[12],
+            ml_source_tuples[13],
+            ml_source_tuples[14],
+            ml_source_tuples[15],
+            ml_source_tuples[16],
+            ml_source_tuples[17],},                                             //6
         std::list<std::tuple<EntityEnum, std::string>>{},      //7
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[9],
-            source_tuples[10],
-            source_tuples[11],
-            source_tuples[12],
-            source_tuples[13],
-            source_tuples[14],
-            source_tuples[15],
-            source_tuples[16],
-            source_tuples[17],
+            ml_source_tuples[9],
+            ml_source_tuples[10],
+            ml_source_tuples[11],
+            ml_source_tuples[12],
+            ml_source_tuples[13],
+            ml_source_tuples[14],
+            ml_source_tuples[15],
+            ml_source_tuples[16],
+            ml_source_tuples[17],
         },                                             //8
         std::list<std::tuple<EntityEnum, std::string>>{}, //9
         std::list<std::tuple<EntityEnum, std::string>>{},     //10
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[12],
-            source_tuples[13],
-            source_tuples[14],
-            source_tuples[15],}, //11
+            ml_source_tuples[12],
+            ml_source_tuples[13],
+            ml_source_tuples[14],
+            ml_source_tuples[15],}, //11
         std::list<std::tuple<EntityEnum, std::string>>{},  //12
         std::list<std::tuple<EntityEnum, std::string>>{}, //13
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //14
@@ -365,8 +327,8 @@ TEST_CASE("SP to PKB relationships tests") {
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //17
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //18
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[20],
-            source_tuples[21],},  //19
+            ml_source_tuples[20],
+            ml_source_tuples[21],},  //19
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //20
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //21
         std::list<std::tuple<EntityEnum, std::string>>{}, //22
@@ -804,57 +766,31 @@ TEST_CASE("SP to PKB relationships tests") {
 
 TEST_CASE("CFG and Next relationship tests") {
   PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/mixed_loops2_source.txt");
-  std::vector<std::tuple<EntityEnum, std::string>> source_tuples = {
-      {EntityEnum::kAssignEntity, "-1000000"}, // placeholder
-      {EntityEnum::kAssignEntity, "1"},
-      {EntityEnum::kReadEntity, "2"},
-      {EntityEnum::kIfEntity, "3"},
-      {EntityEnum::kAssignEntity, "4"},
-      {EntityEnum::kAssignEntity, "5"},
-      {EntityEnum::kWhileEntity, "6"},
-      {EntityEnum::kWhileEntity, "7"},
-      {EntityEnum::kReadEntity, "8"},
-      {EntityEnum::kIfEntity, "9"},
-      {EntityEnum::kAssignEntity, "10"},
-      {EntityEnum::kAssignEntity, "11"},
-      {EntityEnum::kIfEntity, "12"},
-      {EntityEnum::kAssignEntity, "13"},
-      {EntityEnum::kPrintEntity, "14"},
-      {EntityEnum::kAssignEntity, "15"},
-      {EntityEnum::kPrintEntity, "16"},
-      {EntityEnum::kAssignEntity, "17"},
-      {EntityEnum::kPrintEntity, "18"},
-      {EntityEnum::kIfEntity, "19"},
-      {EntityEnum::kPrintEntity, "20"},
-      {EntityEnum::kPrintEntity, "21"},
-      {EntityEnum::kPrintEntity, "22"},
-      {EntityEnum::kAssignEntity, "23"}
-  };
 
   SECTION("Next relationships") {
     std::vector<std::vector<std::tuple<EntityEnum, std::string>>> expected_next_lists = {
-        {source_tuples[2]},//1
-        {source_tuples[3]},//2
-        {source_tuples[4], source_tuples[6]},//3
-        {source_tuples[5]},//4
-        {source_tuples[19]},//5
-        {source_tuples[7], source_tuples[19]},//6
-        {source_tuples[6], source_tuples[8]},//7
-        {source_tuples[9]},//8
-        {source_tuples[10], source_tuples[18]},//9
-        {source_tuples[11]},//10
-        {source_tuples[12]},//11
-        {source_tuples[13], source_tuples[16]},//12
-        {source_tuples[14]},//13
-        {source_tuples[15]},//14
-        {source_tuples[17]},//15
-        {source_tuples[17]},//16
-        {source_tuples[7]},//17
-        {source_tuples[7]},//18
-        {source_tuples[20], source_tuples[21]},//19
-        {source_tuples[22]},//20
-        {source_tuples[22]},//21
-        {source_tuples[23]},//22
+        {ml2_source_tuples[2]},//1
+        {ml2_source_tuples[3]},//2
+        {ml2_source_tuples[4], ml2_source_tuples[6]},//3
+        {ml2_source_tuples[5]},//4
+        {ml2_source_tuples[19]},//5
+        {ml2_source_tuples[7], ml2_source_tuples[19]},//6
+        {ml2_source_tuples[6], ml2_source_tuples[8]},//7
+        {ml2_source_tuples[9]},//8
+        {ml2_source_tuples[10], ml2_source_tuples[18]},//9
+        {ml2_source_tuples[11]},//10
+        {ml2_source_tuples[12]},//11
+        {ml2_source_tuples[13], ml2_source_tuples[16]},//12
+        {ml2_source_tuples[14]},//13
+        {ml2_source_tuples[15]},//14
+        {ml2_source_tuples[17]},//15
+        {ml2_source_tuples[17]},//16
+        {ml2_source_tuples[7]},//17
+        {ml2_source_tuples[7]},//18
+        {ml2_source_tuples[20], ml2_source_tuples[21]},//19
+        {ml2_source_tuples[22]},//20
+        {ml2_source_tuples[22]},//21
+        {ml2_source_tuples[23]},//22
         {},//23
     };
 
