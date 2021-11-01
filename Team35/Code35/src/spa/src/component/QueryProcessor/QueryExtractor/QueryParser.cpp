@@ -554,7 +554,7 @@ void QueryParser::ParseWhilePattern() {
   Eat(TokenTag::kCloseBracket);
 
   // create clause object
-  Clause* cl = new Pattern(lhs, "_", DesignEntity::kWhile, lhs_is_syn, false);
+  Clause* cl = new Pattern(while_tok.GetTokenString(), lhs, DesignEntity::kWhile, lhs_is_syn, false);
   cl->first_synonym = QueryParser::GetSynonymInfo(while_tok.GetTokenString(), &synonyms);
   if (lhs_is_syn) {
     cl->second_synonym = QueryParser::GetSynonymInfo(lhs, &synonyms);
@@ -608,7 +608,7 @@ void QueryParser::ParseIfPattern() {
   Eat(TokenTag::kCloseBracket);
 
   // create clause object
-  Clause* cl = new Pattern(lhs, "_", DesignEntity::kIf, lhs_is_syn, false);
+  Clause* cl = new Pattern(if_tok.GetTokenString(), lhs, DesignEntity::kIf, lhs_is_syn, false);
   cl->first_synonym = QueryParser::GetSynonymInfo(if_tok.GetTokenString(), &synonyms);
   if (lhs_is_syn) {
     cl->second_synonym = QueryParser::GetSynonymInfo(lhs, &synonyms);
@@ -623,9 +623,9 @@ void QueryParser::ParsePatternCond() {
   // ensure that lookahead is either matching kAssign, kIf or kWhile.
   DesignEntity pattern_syn = DesignEntity::kInvalid;
   std::vector<DesignEntity> pattern_syn_whitelist = {DesignEntity::kAssign, DesignEntity::kIf, DesignEntity::kWhile};
-  for (DesignEntity _de : pattern_syn_whitelist) {
-    if (IsValidSynonym(lookahead, _de)) {
-      pattern_syn = _de;
+  for (DesignEntity de : pattern_syn_whitelist) {
+    if (IsValidSynonym(lookahead, de)) {
+      pattern_syn = de;
       break;
     }
   }

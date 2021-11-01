@@ -303,25 +303,25 @@ struct Pattern : Clause {
   DesignEntity pattern_type;
   bool is_exact = false;
   Pattern() { right_is_synonym = false; };
-  Pattern(std::string lhs, std::string rhs, std::string assn_syn, bool lhs_is_syn, bool is_ext) {
+  Pattern(std::string lhs, std::string rhs, std::string assn_syn, bool rhs_is_syn, bool is_ext) {
     left_hand_side = lhs;
     right_hand_side = rhs;
     assign_synonym = assn_syn;
-    left_is_synonym = lhs_is_syn;
-    right_is_synonym = false;
+    left_is_synonym = true;
+    right_is_synonym = rhs_is_syn;
     is_exact = is_ext;
   }
-  Pattern(std::string lhs, std::string rhs, DesignEntity de, bool lhs_is_syn, bool is_ext) {
+  Pattern(std::string lhs, std::string rhs, DesignEntity de, bool rhs_is_syn, bool is_ext) {
     left_hand_side = lhs;
     right_hand_side = rhs;
     pattern_type = de;
-    left_is_synonym = lhs_is_syn;
-    right_is_synonym = false;
+    left_is_synonym = true;
+    right_is_synonym = rhs_is_syn;
     is_exact = is_ext;
   }
   std::vector<std::string> GetAllSynonymNamesOfClause() {
     std::vector<std::string> v;
-    if (left_is_synonym) v.push_back(left_hand_side);
+    if (right_is_synonym) v.push_back(right_hand_side);
     v.push_back(first_synonym->GetName());
     return v;
   };
