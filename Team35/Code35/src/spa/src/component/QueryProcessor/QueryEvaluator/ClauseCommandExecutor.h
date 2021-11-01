@@ -23,7 +23,7 @@ class ClauseCommandExecutor {
     std::tuple<bool, int> WithRowAddition(With *with_clause, bool first_syn_in, int index);
     std::tuple<bool, int>PatternRowAdditionForStmt(int index, Synonym *synonym_column_to_add, Entity* entity_in_table, Pattern *pattern);
     std::tuple<bool, int>PatternRowAdditionForVariable(int index, Synonym *synonym_column_to_add, Entity* entity_in_table, Pattern *pattern);
-    static static bool HasPatternValueMatch(Entity *stmt_entity_in_table, const std::string& value, Pattern *pattern);
+    static bool HasPatternValueMatch(Entity *stmt_entity_in_table, const std::string& value, Pattern *pattern);
     static std::vector<Variable*> RetrieveVariablesFromStmt(Entity *stmt_entity);
     bool SingleSynonymIntersectionCheck(Clause *clause, bool first_syn_in, int index);
     bool SuchThatSingleSynonymIntersection(SuchThat *clause, bool first_syn_in, int index);
