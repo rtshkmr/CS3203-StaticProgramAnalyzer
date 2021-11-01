@@ -17,6 +17,7 @@ constexpr auto L = [](auto msg) {
 void PKB::PopulateDataStructures(Deliverable d) {
   L("... PKB will be populated by Deliverable object from SourceProcessor\n");
 
+  // Populate Entities
   PopulateEntities(DesignEntity::kProcedure, *d.GetProcList());
   PopulateEntities(DesignEntity::kVariable, *d.GetVariableList());
   PopulateEntities(DesignEntity::kConstant, *d.GetConstantList());
@@ -27,35 +28,35 @@ void PKB::PopulateDataStructures(Deliverable d) {
   PopulateEntities(DesignEntity::kWhile, *d.GetWhileList());
   PopulateEntities(DesignEntity::kAssign, *d.GetAssignList());
   PopulateEntities(DesignEntity::kStmt, *d.GetStatementList());
-  
+
+  // Populate non-transitive relationships
   PopulateRelationship(d.GetFollowsMap(), PKBRelRefs::kFollows);
   PopulateRelationship(d.GetFollowedByMap(), PKBRelRefs::kFollowedBy);
-  PopulateRelationship(d.GetFollowsTMap(), PKBRelRefs::kFollowsT);
-  PopulateRelationship(d.GetFollowedByTMap(), PKBRelRefs::kFollowedByT);
   PopulateRelationship(d.GetParentMap(), PKBRelRefs::kParent);
-  PopulateRelationship(d.GetParentTMap(), PKBRelRefs::kParentT);
   PopulateRelationship(d.GetChildMap(), PKBRelRefs::kChild);
-  PopulateRelationship(d.GetChildTMap(), PKBRelRefs::kChildT);
-  PopulateRelationship(d.GetUseSMap(), PKBRelRefs::kUsesS);
-  PopulateRelationship(d.GetUsedBySMap(), PKBRelRefs::kUsedByS);
-  PopulateRelationship(d.GetModifiesSMap(), PKBRelRefs::kModifiesStatement);
-  PopulateRelationship(d.GetModifiedBySMap(), PKBRelRefs::kModifiedByStatement);
+  PopulateRelationship(d.GetUseSMap(), PKBRelRefs::kUses);
+  PopulateRelationship(d.GetUsedBySMap(), PKBRelRefs::kUsedBy);
+  PopulateRelationship(d.GetModifiesSMap(), PKBRelRefs::kModifies);
+  PopulateRelationship(d.GetModifiedBySMap(), PKBRelRefs::kModifiedBy);
   PopulateRelationship(d.GetCallsMap(), PKBRelRefs::kCalls);
   PopulateRelationship(d.GetCalledByMap(), PKBRelRefs::kCalledBy);
-  PopulateRelationship(d.GetCallsTMap(), PKBRelRefs::kCallsT);
-  PopulateRelationship(d.GetCalledByTMap(), PKBRelRefs::kCalledByT);
   PopulateRelationship(d.GetNextMap(), PKBRelRefs::kNext);
   PopulateRelationship(d.GetPrevMap(), PKBRelRefs::kPrevious);
 
-  PopulateContainerUse(*d.GetUseCMap());
-  PopulateContainerUsedBy(*d.GetUsedByCMap());
-  PopulateContainerModifies(*d.GetModifiesCMap());
-  PopulateContainerModifiedBy(*d.GetModifiedByCMap());
+  // Populate transitive relationships
+  PopulateRelationship(d.GetFollowsTMap(), PKBRelRefs::kFollowsT);
+  PopulateRelationship(d.GetFollowedByTMap(), PKBRelRefs::kFollowedByT);
+  PopulateRelationship(d.GetParentTMap(), PKBRelRefs::kParentT);
+  PopulateRelationship(d.GetChildTMap(), PKBRelRefs::kChildT);
+  PopulateRelationship(d.GetCallsTMap(), PKBRelRefs::kCallsT);
+  PopulateRelationship(d.GetCalledByTMap(), PKBRelRefs::kCalledByT);
 
-  PopulateUses();
-  PopulateModifies();
-  PopulateUsedBy();
-  PopulateModifiedBy();
+  // Populate container relationships
+  PopulateRelationship(d.GetUseCMap(), PKBRelRefs::kUses);
+  PopulateRelationship(d.GetUsedByCMap(), PKBRelRefs::kUsedBy);
+  PopulateRelationship(d.GetModifiesCMap(), PKBRelRefs::kModifies);
+  PopulateRelationship(d.GetModifiedByCMap(), PKBRelRefs::kModifiedBy);
+
 
   ProcessEntitiesWithMatchingAttributes();
 
@@ -67,9 +68,11 @@ void PKB::PopulateEntities(DesignEntity design_entity, T& entity_list) {
   for (auto entity : entity_list) {
     type_to_entity_map_[design_entity].push_back(entity);
     std::string entity_name = GetNameFromEntity(entity);
-    Attribute attribute = GetAttributeFromEntity(entity);
-    attribute_to_entity_map_[{design_entity, attribute}][entity_name].push_back(entity);
-    attribute_string_to_entity_map_[entity_name].insert(entity);
+    std::unordered_map<Attribute, std::string> attributes = GetAttributesFromEntity(entity);
+    for (std::pair<Attribute, std::string> attribute: attributes) {
+      attribute_to_entity_map_[{design_entity, attribute.first}][attribute.second].push_back(entity);
+      attribute_string_to_entity_map_[attribute.second].insert(entity);
+    }
     if (pattern_entities_.find(design_entity) != pattern_entities_.end()) {
       pattern_maps_[design_entity][entity_name].push_back(entity);
 
@@ -103,6 +106,7 @@ void PKB::PopulateEntities(DesignEntity design_entity, T& entity_list) {
   }
 }
 
+
 std::unordered_map<std::string, std::vector<Entity*>> PKB::GetRelationshipMap(PKBRelRefs ref) {
   return relationship_table_[ref];
 }
@@ -112,31 +116,19 @@ std::vector<Entity*> PKB::GetRelationship(PKBRelRefs ref, std::string entity) {
 }
 
 std::vector<std::tuple<Entity*, Entity*>> PKB::GetRelationshipByTypes(PKBRelRefs ref, DesignEntity d1, DesignEntity d2) {
-    if (d1 == DesignEntity::kProgLine) {
-      d1 = DesignEntity::kStmt;
-    }
-    if (d2 == DesignEntity::kProgLine) {
-      d2 = DesignEntity::kStmt;
-    }
-
+    if (d1 == DesignEntity::kProgLine) d1 = DesignEntity::kStmt;
+    if (d2 == DesignEntity::kProgLine) d2 = DesignEntity::kStmt;
     return relationship_by_types_table_[ref][{d1, d2}];
 }
 
 std::vector<Entity*> PKB::GetFirstEntityOfRelationship(PKBRelRefs ref, DesignEntity d1, DesignEntity d2) {
-  if (d1 == DesignEntity::kProgLine) {
-    d1 = DesignEntity::kStmt;
-  }
-  if (d2 == DesignEntity::kProgLine) {
-    d2 = DesignEntity::kStmt;
-  }
-
+  if (d1 == DesignEntity::kProgLine) d1 = DesignEntity::kStmt;
+  if (d2 == DesignEntity::kProgLine) d2 = DesignEntity::kStmt;
   return first_param_by_types_table_[ref][{d1, d2}];
 }
 
 std::vector<Entity*> PKB::GetFirstEntityOfRelationship(PKBRelRefs ref, DesignEntity d) {
-    if (d == DesignEntity::kProgLine) {
-      d = DesignEntity::kStmt;
-    }
+    if (d == DesignEntity::kProgLine) d = DesignEntity::kStmt;
     if (second_param_is_stmt.find(ref) != second_param_is_stmt.end()) {
       return first_param_by_types_table_[ref][{d, DesignEntity::kStmt}];
     } else {
@@ -144,14 +136,14 @@ std::vector<Entity*> PKB::GetFirstEntityOfRelationship(PKBRelRefs ref, DesignEnt
         return first_param_by_types_table_[ref][{d, DesignEntity::kVariable}];
       } else if (second_param_is_proc.find(ref) != second_param_is_proc.end()) {
         return first_param_by_types_table_[ref][{d, DesignEntity::kProcedure}];
+      } else {
+        return std::vector<Entity*>{};
       }
     }
 }
 
 std::vector<Entity*> PKB::GetDesignEntities(DesignEntity de) {
-    if (de == DesignEntity::kProgLine) {
-      de = DesignEntity::kStmt;
-    }
+    if (de == DesignEntity::kProgLine) de = DesignEntity::kStmt;
     return type_to_entity_map_[de];
 }
 
@@ -175,18 +167,8 @@ bool PKB::HasRelationship(PKBRelRefs ref, DesignEntity d1, DesignEntity d2) {
   return !relationship_by_types_table_[ref][{d1, d2}].empty();
 }
 
-// todo: see if last part of function can be replaced with return !rel_map[e].empty();
 bool PKB::HasRelationship(PKBRelRefs ref, std::string e) {
-  if (!HasRelationship(ref)) {
-    return false;
-  } else {
-    std::unordered_map<std::string, std::vector<Entity*>> rel_map = relationship_table_[ref];
-    if (rel_map.find(e) != rel_map.end()) {
-      return !rel_map[e].empty();
-    } else {
-      return false;
-    }
-  }
+  return !relationship_table_[ref][e].empty();
 }
 
 bool PKB::HasRelationship(PKBRelRefs ref, std::string e1, std::string e2) {
@@ -207,25 +189,23 @@ void PKB::ProcessEntitiesWithMatchingAttributes() {
 }
 
 
-
-// todo: See if can optimize this
 std::string PKB::GetNameFromEntity(Entity* entity) {
-    if (dynamic_cast<Procedure*>(entity) != nullptr) {
+    EntityEnum e = entity->GetEntityEnum();
+    if (e == EntityEnum::kProcedureEntity) {
         Procedure* proc = dynamic_cast<Procedure*>(entity);
         ProcedureName* proc_name = const_cast<ProcedureName*>(proc->GetName());
         return proc_name->getName();
-    } else if (dynamic_cast<Statement*>(entity) != nullptr) {
-        Statement* stmt = dynamic_cast<Statement*>(entity);
-        auto* k_number = const_cast<StatementNumber*>(stmt->GetStatementNumber());
-        return std::to_string(k_number->GetNum());
-    } else if (dynamic_cast<Variable*>(entity) != nullptr) {
+    } else if (e == EntityEnum::kVariableEntity) {
         Variable* var = dynamic_cast<Variable*>(entity);
         VariableName* variable_name = const_cast<VariableName*>(var->GetName());
         return variable_name->getName();
-    } else if (dynamic_cast<Constant*>(entity) != nullptr) {
-        Constant* constant = dynamic_cast<Constant*>(entity);
-        ConstantValue* cv = const_cast<ConstantValue*>(constant->GetValue());
-        return std::to_string(cv->Get());
+    } else if (e == EntityEnum::kConstantEntity) {
+      Constant* constant = dynamic_cast<Constant*>(entity);
+      ConstantValue* cv = const_cast<ConstantValue*>(constant->GetValue());
+      return std::to_string(cv->Get());
+    } else if (Statement* stmt = dynamic_cast<Statement*>(entity)) {
+      auto* k_number = const_cast<StatementNumber*>(stmt->GetStatementNumber());
+      return std::to_string(k_number->GetNum());
     } else {
       throw PKBException("Invalid entity type encountered.");
     }
@@ -259,25 +239,54 @@ DesignEntity PKB::GetDesignEntityFromEntity(Entity* entity) {
     }
 }
 
-Attribute PKB::GetAttributeFromEntity(Entity* entity) {
+std::vector<Attribute> PKB::GetAttributeTypes(Entity* entity) {
   EntityEnum entity_enum = entity->GetEntityEnum();
   switch (entity_enum) {
+    case (EntityEnum::kProcedureEntity):
+      return std::vector<Attribute> {Attribute::kProcName};
+    case (EntityEnum::kVariableEntity):
+      return std::vector<Attribute> {Attribute::kVarName};
+    case (EntityEnum::kConstantEntity):
+      return std::vector<Attribute> {Attribute::kValue};
+    case (EntityEnum::kElseEntity):
+    case (EntityEnum::kNone): 
+      return std::vector<Attribute> {Attribute::kInvalid};
     case (EntityEnum::kIfEntity):
     case (EntityEnum::kWhileEntity):
     case (EntityEnum::kAssignEntity):
+      return std::vector<Attribute> {Attribute::kStmtNumber};
     case (EntityEnum::kCallEntity):
+      return std::vector<Attribute> {Attribute::kStmtNumber, Attribute::kProcName};
     case (EntityEnum::kPrintEntity):
     case (EntityEnum::kReadEntity):
-      return Attribute::kStmtNumber;
-    case (EntityEnum::kProcedureEntity):
-      return Attribute::kProcName;
-    case (EntityEnum::kVariableEntity):
-      return Attribute::kVarName;
-    case (EntityEnum::kConstantEntity):
-      return Attribute::kValue;
-    case (EntityEnum::kElseEntity):
-    case (EntityEnum::kNone):
-      return Attribute::kInvalid;
+      return std::vector<Attribute> {Attribute::kStmtNumber, Attribute::kVarName};
+  }
+}
+
+std::unordered_map<Attribute, std::string> PKB::GetAttributesFromEntity(Entity* entity) {
+  std::vector<Attribute> attribute_types = GetAttributeTypes(entity);
+  std::unordered_map<Attribute, std::string> attribute_map;
+  for (Attribute attribute : attribute_types)
+    attribute_map[attribute] = GetAttributeFromEntity(entity, attribute);
+  return attribute_map;
+}
+
+std::string PKB::GetAttributeFromEntity(Entity* entity, Attribute attribute) {
+  EntityEnum entity_enum = entity->GetEntityEnum();
+
+  if (attribute == Attribute::kStmtNumber) {
+    return GetNameFromEntity(entity);
+  } else if (entity_enum == EntityEnum::kCallEntity) {
+    CallEntity* call_entity = dynamic_cast<CallEntity*>(entity);
+    return GetNameFromEntity(call_entity->GetProcedure());
+  } else if (entity_enum == EntityEnum::kPrintEntity) {
+    PrintEntity* print_entity = dynamic_cast<PrintEntity*>(entity);
+    return GetNameFromEntity(print_entity->GetVariable());
+  } else if (entity_enum == EntityEnum::kReadEntity) {
+    ReadEntity* read_entity = dynamic_cast<ReadEntity*>(entity);
+    return GetNameFromEntity(read_entity->GetVariable());
+  } else {
+    return GetNameFromEntity(entity);
   }
 }
 
@@ -287,318 +296,4 @@ std::vector<DesignEntity> PKB::GetApplicableTypes(DesignEntity de) {
     types.push_back(DesignEntity::kStmt);
   }
   return types;
-}
-
-// todo: refactor the below
-
-void PKB::PopulateContainerUse(std::unordered_map<Container*, std::list<Variable*>*> container_use_hash_) {
-  for (std::pair<Container*, std::list<Variable*>*> kv: container_use_hash_) {
-    std::string k_string;
-
-    if (dynamic_cast<Statement*>(kv.first) != nullptr) {
-      Statement* stmt = dynamic_cast<Statement*>(kv.first);
-      auto* k_number = const_cast<StatementNumber*>(stmt->GetStatementNumber());
-      k_string = std::to_string(k_number->GetNum());
-    } else if (dynamic_cast<Procedure*>(kv.first) != nullptr) {
-      Procedure* proc = dynamic_cast<Procedure*>(kv.first);
-      ProcedureName* proc_name = const_cast<ProcedureName*>(proc->GetName());
-      k_string = proc_name->getName();
-    }
-    for (Entity* entity : *kv.second) {
-      relationship_set_.insert({PKBRelRefs::kUsesC, k_string, GetNameFromEntity(entity)});
-      relationship_table_[PKBRelRefs::kUsesC][k_string].push_back(entity);
-      Entity* first_entity = dynamic_cast<Entity*>(kv.first);
-      DesignEntity first_type = GetDesignEntityFromEntity(first_entity);
-      DesignEntity second_type = GetDesignEntityFromEntity(entity);
-      relationship_by_types_table_[PKBRelRefs::kUsesC][{first_type, second_type}].push_back({first_entity, entity});
-      first_param_by_types_table_[PKBRelRefs::kUsesC][{first_type, second_type}].push_back(first_entity);
-      if (stmt_design_entities_.find(first_type) != stmt_design_entities_.end()) {
-        relationship_by_types_table_[PKBRelRefs::kUsesC][{DesignEntity::kStmt, second_type}].push_back({first_entity, entity});
-        first_param_by_types_table_[PKBRelRefs::kUsesC][{DesignEntity::kStmt, second_type}].push_back(first_entity);
-      }
-    }
-  }
-}
-
-void PKB::PopulateContainerUsedBy(std::unordered_map<Variable*, std::list<Container*>*> container_used_by_hash_) {
-  for (std::pair<Variable*, std::list<Container*>*> kv: container_used_by_hash_) {
-    std::string k_string;
-
-    Variable* var = dynamic_cast<Variable*>(kv.first);
-    VariableName* variable_name = const_cast<VariableName*>(var->GetName());
-    k_string = variable_name->getName();
-
-    for (Container* container : *kv.second) {
-      Entity* entity = dynamic_cast<Entity*>(container);
-      relationship_set_.insert({PKBRelRefs::kUsedByC, k_string, GetNameFromEntity(entity)});
-      relationship_table_[PKBRelRefs::kUsedByC][k_string].push_back(entity);
-      Entity* first_entity = dynamic_cast<Entity*>(kv.first);
-      DesignEntity first_type = GetDesignEntityFromEntity(first_entity);
-      DesignEntity second_type = GetDesignEntityFromEntity(entity);
-      relationship_by_types_table_[PKBRelRefs::kUsedByC][{first_type, second_type}].push_back({first_entity, entity});
-      first_param_by_types_table_[PKBRelRefs::kUsedByC][{first_type, second_type}].push_back(first_entity);
-      if (stmt_design_entities_.find(second_type) != stmt_design_entities_.end()) {
-        relationship_by_types_table_[PKBRelRefs::kUsedByC][{first_type, DesignEntity::kStmt}].push_back({first_entity, entity});
-        first_param_by_types_table_[PKBRelRefs::kUsedByC][{first_type, DesignEntity::kStmt}].push_back(first_entity);
-      }
-    }
-  }
-}
-
-void PKB::PopulateContainerModifies(std::unordered_map<Container*, std::list<Variable*>*> container_modifies_hash_) {
-  for (std::pair<Container*, std::list<Variable*>*> kv: container_modifies_hash_) {
-    std::string k_string;
-
-    if (dynamic_cast<Statement*>(kv.first) != nullptr) {
-      Statement* stmt = dynamic_cast<Statement*>(kv.first);
-      auto* k_number = const_cast<StatementNumber*>(stmt->GetStatementNumber());
-      k_string = std::to_string(k_number->GetNum());
-    } else if (dynamic_cast<Procedure*>(kv.first) != nullptr) {
-      Procedure* proc = dynamic_cast<Procedure*>(kv.first);
-      ProcedureName* proc_name = const_cast<ProcedureName*>(proc->GetName());
-      k_string = proc_name->getName();
-    }
-    for (Entity* entity : *kv.second) {
-      relationship_set_.insert({PKBRelRefs::kModifiesContainer, k_string, GetNameFromEntity(entity)});
-      relationship_table_[PKBRelRefs::kModifiesContainer][k_string].push_back(entity);
-      Entity* first_entity = dynamic_cast<Entity*>(kv.first);
-      DesignEntity first_type = GetDesignEntityFromEntity(first_entity);
-      DesignEntity second_type = GetDesignEntityFromEntity(entity);
-      relationship_by_types_table_[PKBRelRefs::kModifiesContainer][{first_type, second_type}].push_back({first_entity, entity});
-      first_param_by_types_table_[PKBRelRefs::kModifiesContainer][{first_type, second_type}].push_back(first_entity);
-      if (stmt_design_entities_.find(first_type) != stmt_design_entities_.end()) {
-        relationship_by_types_table_[PKBRelRefs::kModifiesContainer][{DesignEntity::kStmt, second_type}].push_back({first_entity, entity});
-        first_param_by_types_table_[PKBRelRefs::kModifiesContainer][{DesignEntity::kStmt, second_type}].push_back(first_entity);
-      }
-    }
-  }
-}
-
-void PKB::PopulateContainerModifiedBy(std::unordered_map<Variable*, std::list<Container*>*> container_used_by_hash_) {
-  for (std::pair<Variable*, std::list<Container*>*> kv: container_used_by_hash_) {
-    std::string k_string;
-
-    Variable* var = dynamic_cast<Variable*>(kv.first);
-    VariableName* variable_name = const_cast<VariableName*>(var->GetName());
-    k_string = variable_name->getName();
-
-    for (Container* container : *kv.second) {
-      Entity* entity = dynamic_cast<Entity*>(container);
-      relationship_set_.insert({PKBRelRefs::kModifiedByContainer, k_string, GetNameFromEntity(entity)});
-      relationship_table_[PKBRelRefs::kModifiedByContainer][k_string].push_back(entity);
-      Entity* first_entity = dynamic_cast<Entity*>(kv.first);
-      DesignEntity first_type = GetDesignEntityFromEntity(first_entity);
-      DesignEntity second_type = GetDesignEntityFromEntity(entity);
-      relationship_by_types_table_[PKBRelRefs::kModifiedByContainer][{first_type, second_type}].push_back({first_entity, entity});
-      first_param_by_types_table_[PKBRelRefs::kModifiedByContainer][{first_type, second_type}].push_back(first_entity);
-      if (stmt_design_entities_.find(second_type) != stmt_design_entities_.end()) {
-        relationship_by_types_table_[PKBRelRefs::kModifiedByContainer][{first_type, DesignEntity::kStmt}].push_back({first_entity, entity});
-        first_param_by_types_table_[PKBRelRefs::kModifiedByContainer][{first_type, DesignEntity::kStmt}].push_back(first_entity);
-      }
-    }
-  }
-}
-
-void PKB::PopulateUses() {
-  std::unordered_map<std::string, std::vector<Entity*>> usesS = relationship_table_[PKBRelRefs::kUsesS];
-  std::unordered_map<std::string, std::vector<Entity*>> usesC = relationship_table_[PKBRelRefs::kUsesC];
-  for (auto pair : usesS) {
-    relationship_table_[PKBRelRefs::kUses].insert(pair);
-    for (auto second_param : pair.second) {
-      relationship_set_.insert({PKBRelRefs::kUses, pair.first, GetNameFromEntity(second_param)});
-    }
-  }
-  for (auto pair : usesC) {
-    if (isdigit(pair.first[0])) {
-      relationship_table_[PKBRelRefs::kUses].insert(pair);
-      for (auto second_param : pair.second) {
-        relationship_set_.insert({PKBRelRefs::kUses, pair.first, GetNameFromEntity(second_param)});
-      }
-    }
-  }
-
-  std::unordered_map<type_combo, std::vector<std::tuple<Entity*, Entity*>>, type_combo_hash>
-  s_combo_map = relationship_by_types_table_[PKBRelRefs::kUsesS];
-
-  std::unordered_map<type_combo, std::vector<std::tuple<Entity*, Entity*>>, type_combo_hash>
-  c_combo_map = relationship_by_types_table_[PKBRelRefs::kUsesC];
-
-  for (auto pair : s_combo_map) {
-    relationship_by_types_table_[PKBRelRefs::kUses][pair.first].insert(
-      std::end(relationship_by_types_table_[PKBRelRefs::kUses][pair.first]),
-      std::begin(pair.second),
-      std::end(pair.second)
-      );
-
-    for (auto entity_pairs : pair.second) {
-      first_param_by_types_table_[PKBRelRefs::kUses][pair.first].push_back(std::get<0>(entity_pairs));
-    }
-  }
-
-  for (auto pair : c_combo_map) {
-    if (std::get<0>(pair.first) == DesignEntity::kProcedure) {
-      continue;
-    }
-    relationship_by_types_table_[PKBRelRefs::kUses][pair.first].insert(
-      std::end(relationship_by_types_table_[PKBRelRefs::kUses][pair.first]),
-      std::begin(pair.second),
-      std::end(pair.second)
-      );
-
-    for (auto entity_pairs : pair.second) {
-      first_param_by_types_table_[PKBRelRefs::kUses][pair.first].push_back(std::get<0>(entity_pairs));
-    }
-  }
-}
-
-void PKB::PopulateModifies() {
-  std::unordered_map<std::string, std::vector<Entity*>> modifiesS = relationship_table_[PKBRelRefs::kModifiesStatement];
-  std::unordered_map<std::string, std::vector<Entity*>> modifiesC = relationship_table_[PKBRelRefs::kModifiesContainer];
-  for (auto pair : modifiesS) {
-    relationship_table_[PKBRelRefs::kModifies].insert(pair);
-    for (auto second_param : pair.second) {
-      relationship_set_.insert({PKBRelRefs::kModifies, pair.first, GetNameFromEntity(second_param)});
-    }
-  }
-  for (auto pair : modifiesC) {
-    if (isdigit(pair.first[0])) {
-      relationship_table_[PKBRelRefs::kModifies].insert(pair);
-      for (auto second_param : pair.second) {
-        relationship_set_.insert({PKBRelRefs::kModifies, pair.first, GetNameFromEntity(second_param)});
-      }
-    }
-  }
-
-  std::unordered_map<type_combo, std::vector<std::tuple<Entity*, Entity*>>, type_combo_hash>
-  s_combo_map = relationship_by_types_table_[PKBRelRefs::kModifiesStatement];
-
-  std::unordered_map<type_combo, std::vector<std::tuple<Entity*, Entity*>>, type_combo_hash>
-  c_combo_map = relationship_by_types_table_[PKBRelRefs::kModifiesContainer];
-
-  for (auto pair : s_combo_map) {
-    relationship_by_types_table_[PKBRelRefs::kModifies][pair.first].insert(
-      std::end(relationship_by_types_table_[PKBRelRefs::kModifies][pair.first]),
-      std::begin(pair.second),
-      std::end(pair.second)
-      );
-    for (auto entity_pairs : pair.second) {
-      first_param_by_types_table_[PKBRelRefs::kModifies][pair.first].push_back(std::get<0>(entity_pairs));
-    }
-  }
-
-  for (auto pair : c_combo_map) {
-    if (std::get<0>(pair.first) == DesignEntity::kProcedure) {
-      continue;
-    }
-    relationship_by_types_table_[PKBRelRefs::kModifies][pair.first].insert(
-      std::end(relationship_by_types_table_[PKBRelRefs::kModifies][pair.first]),
-      std::begin(pair.second),
-      std::end(pair.second)
-      );
-    for (auto entity_pairs : pair.second) {
-      first_param_by_types_table_[PKBRelRefs::kModifies][pair.first].push_back(std::get<0>(entity_pairs));
-    }
-  }
-}
-
-void PKB::PopulateUsedBy() {
-  std::unordered_map<std::string, std::vector<Entity*>> usedByS = relationship_table_[PKBRelRefs::kUsedByS];
-  std::unordered_map<std::string, std::vector<Entity*>> usedByC = relationship_table_[PKBRelRefs::kUsedByC];
-  for (auto pair : usedByS) {
-    relationship_table_[PKBRelRefs::kUsedBy].insert(pair);
-    for (auto second_param : pair.second) {
-      relationship_set_.insert({PKBRelRefs::kUsedBy, pair.first, GetNameFromEntity(second_param)});
-    }
-  }
-  for (auto pair : usedByC) {
-    for (auto second_param : pair.second) {
-      if (dynamic_cast<Procedure*>(second_param) != nullptr) {
-        continue;
-      }
-      relationship_table_[PKBRelRefs::kUsedBy][pair.first].push_back(second_param);
-      relationship_set_.insert({PKBRelRefs::kUsedBy, pair.first, GetNameFromEntity(second_param)});
-    }
-  }
-
-  std::unordered_map<type_combo, std::vector<std::tuple<Entity*, Entity*>>, type_combo_hash>
-  s_combo_map = relationship_by_types_table_[PKBRelRefs::kUsedByS];
-
-  std::unordered_map<type_combo, std::vector<std::tuple<Entity*, Entity*>>, type_combo_hash>
-  c_combo_map = relationship_by_types_table_[PKBRelRefs::kUsedByC];
-
-  for (auto pair : s_combo_map) {
-    relationship_by_types_table_[PKBRelRefs::kUsedBy][pair.first].insert(
-      std::end(relationship_by_types_table_[PKBRelRefs::kUsedBy][pair.first]),
-      std::begin(pair.second),
-      std::end(pair.second)
-      );
-    for (auto entity_pairs : pair.second) {
-      first_param_by_types_table_[PKBRelRefs::kUsedBy][pair.first].push_back(std::get<0>(entity_pairs));
-    }
-  }
-
-  for (auto pair : c_combo_map) {
-    if (std::get<1>(pair.first) == DesignEntity::kProcedure) {
-      continue;
-    }
-    relationship_by_types_table_[PKBRelRefs::kUsedBy][pair.first].insert(
-      std::end(relationship_by_types_table_[PKBRelRefs::kUsedBy][pair.first]),
-      std::begin(pair.second),
-      std::end(pair.second)
-      );
-    for (auto entity_pairs : pair.second) {
-      first_param_by_types_table_[PKBRelRefs::kUsedBy][pair.first].push_back(std::get<0>(entity_pairs));
-    }
-  }
-}
-
-void PKB::PopulateModifiedBy() {
-  std::unordered_map<std::string, std::vector<Entity*>> modifiedByS = relationship_table_[PKBRelRefs::kModifiedByStatement];
-  std::unordered_map<std::string, std::vector<Entity*>> modifiedByC = relationship_table_[PKBRelRefs::kModifiedByContainer];
-  for (auto pair : modifiedByS) {
-    relationship_table_[PKBRelRefs::kModifiedBy].insert(pair);
-    for (auto second_param : pair.second) {
-      relationship_set_.insert({PKBRelRefs::kModifiedBy, pair.first, GetNameFromEntity(second_param)});
-    }
-  }
-  for (auto pair : modifiedByC) {
-    for (auto second_param : pair.second) {
-      if (dynamic_cast<Procedure*>(second_param) != nullptr) {
-        continue;
-      }
-      relationship_table_[PKBRelRefs::kModifiedBy][pair.first].push_back(second_param);
-      relationship_set_.insert({PKBRelRefs::kModifiedBy, pair.first, GetNameFromEntity(second_param)});
-    }
-  }
-
-  std::unordered_map<type_combo, std::vector<std::tuple<Entity*, Entity*>>, type_combo_hash>
-  s_combo_map = relationship_by_types_table_[PKBRelRefs::kModifiedByStatement];
-
-  std::unordered_map<type_combo, std::vector<std::tuple<Entity*, Entity*>>, type_combo_hash>
-  c_combo_map = relationship_by_types_table_[PKBRelRefs::kModifiedByContainer];
-
-  for (auto pair : s_combo_map) {
-    relationship_by_types_table_[PKBRelRefs::kModifiedBy][pair.first].insert(
-      std::end(relationship_by_types_table_[PKBRelRefs::kModifiedBy][pair.first]),
-      std::begin(pair.second),
-      std::end(pair.second)
-      );
-    for (auto entity_pairs : pair.second) {
-      first_param_by_types_table_[PKBRelRefs::kUsedBy][pair.first].push_back(std::get<0>(entity_pairs));
-    }
-  }
-
-  for (auto pair : c_combo_map) {
-    if (std::get<1>(pair.first) == DesignEntity::kProcedure) {
-      continue;
-    }
-    relationship_by_types_table_[PKBRelRefs::kModifiedBy][pair.first].insert(
-      std::end(relationship_by_types_table_[PKBRelRefs::kModifiedBy][pair.first]),
-      std::begin(pair.second),
-      std::end(pair.second)
-      );
-    for (auto entity_pairs : pair.second) {
-      first_param_by_types_table_[PKBRelRefs::kUsedBy][pair.first].push_back(std::get<0>(entity_pairs));
-    }
-  }
 }
