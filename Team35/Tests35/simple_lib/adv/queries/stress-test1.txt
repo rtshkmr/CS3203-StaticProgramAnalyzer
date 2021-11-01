@@ -1,5 +1,5 @@
 1 - Dummy query
 stmt s1; variable v1;
-Select s1 such that Uses(s1, v1)
-none
+Select BOOLEAN such that Uses(s1, v1)
+TRUE
 5000
