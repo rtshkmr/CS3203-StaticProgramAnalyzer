@@ -26,8 +26,30 @@ enum class ClusterTag {
   kNormalBlock // default tags since clusters will be tagged
 };
 
-//class Variable;
 class Cluster {
+
+ private:
+  static std::pair<bool, bool> TraverseNormalBlockForAffects(Cluster* child,
+                                                             std::pair<int, int> target_range,
+                                                             PKB* pkb,
+                                                             const std::string& lhs_var);
+  static std::pair<bool, bool> TraverseIfClusterForAffects(Cluster* child,
+                                                                   std::pair<int, int> target_range,
+                                                                   PKB* pkb,
+                                                                   const std::string& lhs_var);
+
+
+  // todo: finish this abstraction
+  static std::pair<bool, bool> TraverseIfElseBodyClusterForAffects(Cluster* child,
+                                                                   std::pair<int, int> target_range,
+                                                                   PKB* pkb,
+                                                                   const std::string& lhs_var);
+
+  static bool TraverseWhileBodyClusterForAffects(Cluster* child,
+                                                 std::pair<int, int> target_range,
+                                                 PKB* pkb,
+                                                 const std::string& lhs_var);
+
 
  protected:
   ClusterTag cluster_tag_ = ClusterTag::kNormalBlock;

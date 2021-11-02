@@ -225,6 +225,45 @@ bool Cluster::TraverseScopedCluster(PKBRelRefs rel_ref,
   return false;
 }
 
+
+//bool TraverseIfClusterForAffects(Cluster* if_cluster,
+//                                 std::pair<int,int> target_range,
+//                                 PKB* pkb,
+//                                 const std::string& lhs_var) {
+//  // need to consider different branches:
+//  Cluster* if_body = child->GetClusterConstituent(ClusterTag::kIfBody);
+//  Cluster* else_body = child->GetClusterConstituent(ClusterTag::kElseBody);
+//  auto if_body_range = if_body->GetStartEndRange();
+//  auto else_body_range = else_body->GetStartEndRange();
+//  bool is_target_in_if_cluster = child->CheckIfStmtNumInRange(target_range.second);
+//  if (is_target_in_if_cluster) {
+//    // case 1: child contains second statement, identify if it's if body or else body
+//    bool is_target_in_if_body = if_body->CheckIfStmtNumInRange(target_range.second);
+//    bool is_target_in_else_body = else_body->CheckIfStmtNumInRange(target_range.second);
+//    assert(is_target_in_else_body ^ is_target_in_if_body);
+//    int new_start = is_target_in_if_body ? if_body_range.first : else_body_range.first;
+//    auto new_target_range = std::make_pair(new_start, target_range.second);
+//    return TraverseScopedClusterForAffects((is_target_in_if_body
+//                                            ? if_body
+//                                            : else_body),
+//                                           new_target_range,
+//                                           pkb,
+//                                           lhs_var);
+//  } else {
+//    // case 2: child does not contain second statement, then just have to at least one that gives unmod path
+//    bool if_body_is_unmodified_path = TraverseScopedClusterForAffects(if_body, if_body_range, pkb, lhs_var);
+//    if (if_body_is_unmodified_path) continue;
+//    bool else_body_is_unmodified_path = TraverseScopedClusterForAffects(else_body, else_body_range, pkb, lhs_var);
+//    bool has_no_unmod_path = !if_body_is_unmodified_path && !else_body_is_unmodified_path;
+//    if(has_no_unmod_path) {
+//      scoped_cluster_does_not_modify_var = false;
+//      break; // breaks outer for loop
+//    }
+//  }
+//
+//}
+
+
 /**
  * Treats the child as a normal block and traverses it to check if the lhs_var has been modified.
  * @param child
@@ -233,12 +272,10 @@ bool Cluster::TraverseScopedCluster(PKBRelRefs rel_ref,
  * @param lhs_var
  * @return
  */
-std::pair<bool, bool> TraverseNormalBlockForAffects(Cluster* child,
-                                                    std::pair<int, int> target_range,
-                                                    PKB* pkb,
-                                                    const std::string& lhs_var) {
-  // =================================== HANDLE CHILDREN THAT ARE SIMPLE BLOCKS =======================
-//  assert(child->GetClusterTag() == ClusterTag::kNormalBlock);
+std::pair<bool, bool> Cluster::TraverseNormalBlockForAffects(Cluster* child,
+                                                             std::pair<int, int> target_range,
+                                                             PKB* pkb,
+                                                             const std::string& lhs_var) {
   bool child_does_not_modify_var = true;
   bool is_second_stmt_checked = false;
   auto child_range = child->GetStartEndRange();
@@ -251,7 +288,6 @@ std::pair<bool, bool> TraverseNormalBlockForAffects(Cluster* child,
     if (!child_does_not_modify_var) break; // break this for loop for normal block if child actually modifies var
   }
   return std::make_pair(child_does_not_modify_var, is_second_stmt_checked);
-//      ========================  END OF TRAVERSING NORMAL BLOCK FOR AFFECTS =============
 }
 
 /**
@@ -278,53 +314,30 @@ bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
 
     // =========================== HANDLE IF CLUSTER ====================================
     if (tag == ClusterTag::kIfCluster) {
-      // need to consider different branches:
-      Cluster* if_body = child->GetClusterConstituent(ClusterTag::kIfBody);
-      Cluster* else_body = child->GetClusterConstituent(ClusterTag::kElseBody);
-      auto if_body_range = if_body->GetStartEndRange();
-      auto else_body_range = else_body->GetStartEndRange();
-      bool is_target_in_if_cluster = child->CheckIfStmtNumInRange(target_range.second);
-      if (is_target_in_if_cluster) {
-        // case 1: child contains second statement, identify if it's if body or else body
-        bool is_target_in_if_body = if_body->CheckIfStmtNumInRange(target_range.second);
-        bool is_target_in_else_body = else_body->CheckIfStmtNumInRange(target_range.second);
-        assert(is_target_in_else_body ^ is_target_in_if_body);
-        int new_start = is_target_in_if_body ? if_body_range.first : else_body_range.first;
-        auto new_target_range = std::make_pair(new_start, target_range.second);
-        return TraverseScopedClusterForAffects((is_target_in_if_body
-                                                ? if_body
-                                                : else_body),
-                                               new_target_range,
-                                               pkb,
-                                               lhs_var);
+
+      // <should break?, result value>
+      auto traversal_results = TraverseIfClusterForAffects(child, target_range, pkb, lhs_var);
+      if(traversal_results.first) {
+        scoped_cluster_does_not_modify_var = false;
+        break;
       } else {
-        // case 2: child does not contain second statement, then just have to at least one that gives unmod path
-        bool if_body_is_unmodified_path = TraverseScopedClusterForAffects(if_body, if_body_range, pkb, lhs_var);
-        if (if_body_is_unmodified_path) continue;
-        bool else_body_is_unmodified_path = TraverseScopedClusterForAffects(else_body, else_body_range, pkb, lhs_var);
-        bool has_no_unmod_path = !if_body_is_unmodified_path && !else_body_is_unmodified_path;
-        if(has_no_unmod_path) {
-          scoped_cluster_does_not_modify_var = false;
-          break; // breaks outer for loop
-        }
+        scoped_cluster_does_not_modify_var = traversal_results.second;
+        if(!scoped_cluster_does_not_modify_var) break; // break early
       }
     } else if (tag == ClusterTag::kWhileCluster) {
-      //=================================== HANDLE WHILE CLUSTER =====================================
       bool is_target_in_while_cluster = child->CheckIfStmtNumInRange(target_range.second);
       if (is_target_in_while_cluster) {
-        // the first thing in the while cluster will be the cond, so it's okay to say that it's been checked:
         auto new_target_range = std::make_pair(child_range.first - 1, target_range.second);
         return TraverseScopedClusterForAffects(child, new_target_range, pkb, lhs_var);
       }
     } else if (tag == ClusterTag::kWhileBody) {
-      assert(child->CheckIfStmtNumInRange(target_range.second)); // will only enter a while body if the second statement is inside it, else will just skip
-      // iterate into the while body:
-      target_range.first = child_range.first - 1;
-      return TraverseScopedClusterForAffects(child, target_range, pkb, lhs_var);
+      return TraverseWhileBodyClusterForAffects(child, target_range, pkb, lhs_var);
     } else if (tag == ClusterTag::kIfBody || tag == ClusterTag::kElseBody) {
+      // =======================================================
       bool child_is_normal_block = child->nested_clusters_.empty();
       if (child_is_normal_block) {
-        auto traversal_results = TraverseNormalBlockForAffects(child, target_range, pkb, lhs_var);
+        //*******************************
+        auto traversal_results = Cluster::TraverseNormalBlockForAffects(child, target_range, pkb, lhs_var);
         if (!traversal_results.first) { // i.e. child modifies variable:
           scoped_cluster_does_not_modify_var =
               traversal_results.second; // check if it was target second stmt that modded it.
@@ -333,15 +346,17 @@ bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
           // update target start to equal the value that I've already checked until
           target_range.first = std::min(child_range.second, target_range.second);
         }
+        //*******************************
       } else {
         // todo: test this case: have to call in if{while{...}}else{..}
         target_range.first = child_range.first - 1;
         return TraverseScopedClusterForAffects(child, target_range, pkb, lhs_var);
       }
+      // =======================================================
     } else { // it's a simple block, no alternative paths to consider:
       assert(child->GetClusterTag() == ClusterTag::kNormalBlock);
       // first: child does not modify? second: is second stmt checked:
-      auto traversal_results = TraverseNormalBlockForAffects(child, target_range, pkb, lhs_var);
+      auto traversal_results = Cluster::TraverseNormalBlockForAffects(child, target_range, pkb, lhs_var);
       if (!traversal_results.first) { // i.e. child modifies variable:
         scoped_cluster_does_not_modify_var =
             traversal_results.second; // check if it was target second stmt that modded it.
@@ -409,6 +424,94 @@ Cluster* Cluster::FindNextSibling(ClusterTag target_tag) {
     }
   }
   return nullptr;
+}
+
+/**
+ * This traversal is done with the guarantee that the target second stmt is within the while body and
+ * so, the entire traversal can be limited to just this while body. A recursive call to the Traversal function
+ * is therefore made. The starting statement is decremented because the first statement in the while body cluster has not
+ * been checked yet and our main traversal function respects the invariant that the range verify (i.e. find a valid
+ * unmodified path) is [target_range.first + 1, target_range.second - 1].
+ * @param child
+ * @param target_range
+ * @param pkb
+ * @param lhs_var
+ * @return
+ */
+bool Cluster::TraverseWhileBodyClusterForAffects(Cluster* child,
+                                                 std::pair<int, int> target_range,
+                                                 PKB* pkb,
+                                                 const std::string& lhs_var) {
+  assert(child->CheckIfStmtNumInRange(target_range.second)); // will only enter a while body if the second statement is inside it, else will just skip
+  auto child_range = child->GetStartEndRange();
+  // iterate into the while body:
+  target_range.first = child_range.first - 1;
+  return Cluster::TraverseScopedClusterForAffects(child, target_range, pkb, lhs_var);
+}
+
+std::pair<bool, bool> Cluster::TraverseIfElseBodyClusterForAffects(Cluster* child,
+                                                                   std::pair<int, int> target_range,
+                                                                   PKB* pkb,
+//                                                                   const std::string& lhs_var) {
+//  bool child_is_normal_block = child->nested_clusters_.empty();
+//  if (child_is_normal_block) {
+//    auto traversal_results = Cluster::TraverseNormalBlockForAffects(child, target_range, pkb, lhs_var);
+//    if (!traversal_results.first) { // i.e. child modifies variable:
+//      scoped_cluster_does_not_modify_var =
+//          traversal_results.second; // check if it was target second stmt that modded it.
+//      break;
+//    } else {
+//      // update target start to equal the value that I've already checked until
+//      target_range.first = std::min(child_range.second, target_range.second);
+//    }
+//  } else {
+//    // todo: test this case: have to call in if{while{...}}else{..}
+//    target_range.first = child_range.first - 1;
+//    return TraverseScopedClusterForAffects(child, target_range, pkb, lhs_var);
+//  }
+//  // =======================================================
+//
+
+  return std::make_pair(true, true);
+}
+
+// todo: finish this abstraction
+std::pair<bool, bool> Cluster::TraverseIfClusterForAffects(Cluster* child,
+                                                           std::pair<int, int> target_range,
+                                                           PKB* pkb,
+                                                           const std::string& lhs_var) {
+  // need to consider different branches:
+  Cluster* if_body = child->GetClusterConstituent(ClusterTag::kIfBody);
+  Cluster* else_body = child->GetClusterConstituent(ClusterTag::kElseBody);
+  auto if_body_range = if_body->GetStartEndRange();
+  auto else_body_range = else_body->GetStartEndRange();
+  bool is_target_in_if_cluster = child->CheckIfStmtNumInRange(target_range.second);
+  if (is_target_in_if_cluster) {
+    // case 1: child contains second statement, identify if it's if body or else body
+    bool is_target_in_if_body = if_body->CheckIfStmtNumInRange(target_range.second);
+    bool is_target_in_else_body = else_body->CheckIfStmtNumInRange(target_range.second);
+    assert(is_target_in_else_body ^ is_target_in_if_body);
+    int new_start = is_target_in_if_body ? if_body_range.first : else_body_range.first;
+    auto new_target_range = std::make_pair(new_start, target_range.second);
+    return std::make_pair(false, TraverseScopedClusterForAffects((is_target_in_if_body
+                                                                  ? if_body
+                                                                  : else_body),
+                                                                 new_target_range,
+                                                                 pkb,
+                                                                 lhs_var));
+
+  } else {
+    // case 2: child does not contain second statement, then just have to at least one that gives unmod path
+    bool if_body_is_unmodified_path = TraverseScopedClusterForAffects(if_body, if_body_range, pkb, lhs_var);
+    if (if_body_is_unmodified_path) return std::make_pair(false, true);
+    bool else_body_is_unmodified_path = TraverseScopedClusterForAffects(else_body, else_body_range, pkb, lhs_var);
+    bool has_no_unmod_path = !if_body_is_unmodified_path && !else_body_is_unmodified_path;
+    if (has_no_unmod_path) {
+      return std::make_pair(true, false);
+    } else {
+      return std::make_pair(false, true);
+    }
+  }
 }
 
 // default destructors:
