@@ -111,6 +111,8 @@ class Variable : public Entity {
 
   const VariableName* GetName();
 
+  std::string GetNameInString();
+
   void AddStatement(Statement* stmt);
 
   std::vector<std::set<Statement*>> GetStatementTable();

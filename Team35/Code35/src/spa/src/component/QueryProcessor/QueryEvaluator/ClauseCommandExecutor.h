@@ -1,15 +1,6 @@
 #ifndef AUTOTESTER_CLAUSECOMMANDEXECUTOR_H
 #define AUTOTESTER_CLAUSECOMMANDEXECUTOR_H
 
-//#include <string>
-//#include <vector>
-//#include "component/QueryProcessor/types/Types.h"
-//#include "component/PKB/PKB.h"
-//#include "ClauseCommandExecutor.h"
-//#include <component/QueryProcessor/types/QueryEvaluatorTable.h>
-//#include "PKBQueryCommand.h"
-//#include "ClauseStrategy.h"
-
 #include <component/QueryProcessor/types/QueryEvaluatorTable.h>
 #include <component/QueryProcessor/types/IntermediateTable.h>
 #include <model/Statement.h>
@@ -18,21 +9,33 @@ class ClauseCommandExecutor {
   private:
     QueryEvaluatorTable *group_table;
     IntermediateTable *table;
-    bool HasExpressionMatch(Pattern *pattern , AssignEntity *assign_entity);
+
+    bool DoubleSynonymIntersectionCheck(Clause *clause, int index);
+    bool SuchThatDoubleSynonymIntersection(SuchThat *clause, int index);
+    bool PatternDoubleSynonymIntersection(Pattern *clause, int index);
+    bool WithDoubleSynonymIntersection(With *with_clause, int index);
     bool HasAssignPatternRelationship(Entity * assign_entity, Entity *variable_entity, Pattern *pattern);
     bool HasWhileOrIfPatternRelationship(Entity * assign_entity, Entity *variable_entity);
+    static std::string RetrieveEntityAttribute(Entity *entity, Attribute attribute);
+    std::tuple<bool, int> DoubleSynonymExpansionCheck(Clause *clause, bool first_syn_in, int index);
+    std::tuple<bool, int> SuchThatRowAddition(SuchThat *clause, bool first_syn_in, int index);
+    std::tuple<bool, int> PatternRowAddition(Pattern *clause, bool first_syn_in, int index);
+    std::tuple<bool, int> WithRowAddition(With *with_clause, bool first_syn_in, int index);
     std::tuple<bool, int>PatternRowAdditionForStmt(int index, Synonym *synonym_column_to_add, Entity* entity_in_table, Pattern *pattern);
     std::tuple<bool, int>PatternRowAdditionForVariable(int index, Synonym *synonym_column_to_add, Entity* entity_in_table, Pattern *pattern);
-    bool HasPatternValueMatch(Entity *stmt_entity_in_table, std::string value, Pattern *pattern);
-    std::vector<Variable*> RetrieveVariablesFromStmt(Entity *stmt_entity);
+    static bool HasPatternValueMatch(Entity *stmt_entity_in_table, const std::string& value, Pattern *pattern);
+    static std::vector<Variable*> RetrieveVariablesFromStmt(Entity *stmt_entity);
+    bool SingleSynonymIntersectionCheck(Clause *clause, bool first_syn_in, int index);
+    bool SuchThatSingleSynonymIntersection(SuchThat *clause, bool first_syn_in, int index);
+    bool PatternSingleSynonymIntersection(Pattern *clause, int index);
+    bool WithSingleSynonymIntersection(With *clause, bool first_syn_in, int index);
+    static bool HasExpressionMatch(Pattern *pattern , AssignEntity *assign_entity);
   public:
     ClauseCommandExecutor(QueryEvaluatorTable *table, IntermediateTable *intermediate_table);
-    void SuchThatTwoSynonym(Clause *clause);
-    void PatternTwoSynonym(Clause *clause);
-    void SuchThatTwoSynonymOneInTable(Clause *clause, bool first_syn_in);
-    void PatternTwoSynonymOneInTable(Clause *clause, bool first_syn_in);
-    void SuchThatOneSynonym(Clause *clause, bool first_syn_in);
-    void PatternOneSynonym(Clause *clause);
+
+    void DoubleSynonymIntersection(Clause *clause);
+    void DoubleSynonymExpansion(Clause *clause, bool first_syn_in);
+    void SingleSynonymIntersection(Clause *clause, bool first_syn_in);
 };
 
 #endif //AUTOTESTER_CLAUSECOMMANDEXECUTOR_H

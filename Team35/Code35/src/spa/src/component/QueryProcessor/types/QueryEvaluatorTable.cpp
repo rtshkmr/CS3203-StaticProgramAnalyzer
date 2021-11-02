@@ -85,7 +85,7 @@ std::vector<Entity *> QueryEvaluatorTable::GetColumn(Synonym *synonym) {
 }
 
 int QueryEvaluatorTable::GetColumnSize() {
-  return synonym_to_entity_map.size();
+  return (int) synonym_to_entity_map.size();
 }
 
 /**
@@ -97,7 +97,7 @@ int QueryEvaluatorTable::GetRowSize() {
   auto search = synonym_to_entity_map.find(target_synonym_list[0]);
 
   if(search == synonym_to_entity_map.end()) return 0;
-  return search->second.size();
+  return (int) search->second.size();
 }
 
 /**

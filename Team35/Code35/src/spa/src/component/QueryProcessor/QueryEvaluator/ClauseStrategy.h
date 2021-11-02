@@ -40,4 +40,11 @@ class PatternStrategy : public ClauseStrategy {
     DetermineClauseCommand(Clause *clause, QueryEvaluatorTable *table) override;
 };
 
+class WithStrategy : public ClauseStrategy {
+  public:
+    WithStrategy() {};
+    std::tuple<PKBQueryCommand *, ClauseCommand *>
+    DetermineClauseCommand(Clause *clause, QueryEvaluatorTable *table) override;
+};
+
 #endif //AUTOTESTER_CLAUSECOMMANDINVOKER_H
