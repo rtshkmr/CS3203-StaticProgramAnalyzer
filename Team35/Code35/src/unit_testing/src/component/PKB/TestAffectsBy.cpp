@@ -6,19 +6,25 @@
 #include "../../../utils/TestUtils.h"
 
 // todo: rename this file into just TestAffectsExtractor (idw merge conflict first)
-//TEST_CASE("2.PKB.AffectsBy") {
-//  PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/basic_source.txt");
-//  DBManager* dbm = new DBManager(pkb);
-//  std::vector<Entity*> rs = dbm->GetRelationship(PKBRelRefs::kAffectedBy, "5");
-//  REQUIRE(rs.size() == 1);
-//  REQUIRE(dynamic_cast<AssignEntity*>(rs[0])->GetStatementNumber()->GetNum() == 3);
-//}
+TEST_CASE("2.PKB.AffectsBy") {
+  PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/basic_source.txt");
+  DBManager* dbm = new DBManager(pkb);
+  std::vector<Entity*> rs = dbm->GetRelationship(PKBRelRefs::kAffectedBy, "5");
+  REQUIRE(rs.size() == 1);
+  REQUIRE(dynamic_cast<AssignEntity*>(rs[0])->GetStatementNumber()->GetNum() == 3);
+}
 
 TEST_CASE("2.PKB.Affects") {
   PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/basic_source.txt");
   DBManager* dbm = new DBManager(pkb);
   AffectsExtractor* affects_extractor = new AffectsExtractor();
   affects_extractor->SetPKB(pkb);
+
+//  SECTION("AffectsBy()") {
+//    std::vector<Entity*> rs = dbm->GetRelationship(PKBRelRefs::kAffectedBy, "5");
+//    REQUIRE(rs.size() == 1);
+//    REQUIRE(dynamic_cast<AssignEntity*>(rs[0])->GetStatementNumber()->GetNum() == 3);
+//  }
 
   SECTION("HasAffects(#,#)") {
     std::vector<Entity*> rs_1 = pkb->GetPatternEntities(DesignEntity::kAssign, "3");

@@ -90,6 +90,7 @@ class Block : public Cluster {
   void AddNextBlock(Block* next_block);
   std::set<Block*> GetNextBlocks() const;
   std::set<Block*> GetPrevBlocks() const;
+  std::list<int> GetCFGLastStmts();
 
   bool isWhile = false;
 };

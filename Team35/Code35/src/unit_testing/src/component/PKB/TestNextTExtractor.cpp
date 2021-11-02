@@ -2,6 +2,7 @@
 #include <component/PKB/extractor/NextTExtractor.h>
 #include "../../../utils/EntityUtils.h"
 #include "../../../utils/TestUtils.h"
+#include "model/CFG.h"
 
 using namespace entity_utils;
 

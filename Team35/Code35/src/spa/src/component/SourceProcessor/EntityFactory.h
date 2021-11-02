@@ -23,7 +23,7 @@ class EntityFactory {
 
   Procedure* CreateProcedure(std::string proc_name);
   Variable* CreateVariable(std::string var_name);
-  Constant* CreateConstant(std::string const_val);
+  Constant* CreateConstant(const std::string& const_val);
   Procedure* RetrieveProcedure(std::string proc_name);
   Variable* RetrieveVariable(std::string var_name);
 
@@ -33,9 +33,9 @@ class EntityFactory {
   Entity* CreateConditionalEntity(std::vector<Token> tokens, TokenTag entity_type);
   Entity* CreateAssignEntity(std::vector<Token> tokens);
 
-  static std::string ConvertTokensToString(std::vector<Token> tokens);
-  std::vector<Variable*> GetVariablesFromExpressionTokens(std::vector<Token> tokens);
-  std::vector<Constant*> GetConstantsFromExpressionTokens(std::vector<Token> tokens);
+  static std::string ConvertTokensToString(const std::vector<Token>& tokens);
+  std::vector<Variable*> GetVariablesFromExpressionTokens(const std::vector<Token>& tokens);
+  std::vector<Constant*> GetConstantsFromExpressionTokens(const std::vector<Token>& tokens);
 };
 
 #endif //AUTOTESTER_TEAM00_CODE00_SRC_SPA_SRC_COMPONENT_SOURCEPROCESSOR_ENTITYFACTORY_H_

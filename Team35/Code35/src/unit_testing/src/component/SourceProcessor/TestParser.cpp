@@ -11,7 +11,7 @@ TEST_CASE("1.Parser.Cluster") {
     par::Parser p = par::Parser();
     p.Parse("./../../../../Tests35/simple_lib/basic/test_7.txt");
     Deliverable* d = p.GetDeliverables();
-    Procedure* p1 = d->proc_list_.front();
+    Procedure* p1 = d->GetProcList()->front();
     Cluster* root_cluster = const_cast<Cluster*>(p1->GetClusterRoot());
     std::pair<int, int> range = root_cluster->GetStartEndRange();
     CHECK(range.first == 1);
@@ -64,7 +64,7 @@ TEST_CASE("1.Parser.Cluster") {
     par::Parser p = par::Parser();
     p.Parse("./../../../tests/integration_test_files/mixed_loops_source.txt");
     Deliverable* d = p.GetDeliverables();
-    Procedure* p1 = d->proc_list_.front();
+    Procedure* p1 = d->GetProcList()->front();
 
     Cluster* root_cluster = const_cast<Cluster*>(p1->GetClusterRoot());
     CHECK(IsCorrectRange(root_cluster->GetStartEndRange(), 1, 23));
@@ -174,7 +174,7 @@ TEST_CASE("1.Parser.Blocks") {
     par::Parser p = par::Parser();
     p.Parse("./../../../../Tests35/simple_lib/basic/test_7.txt");
     Deliverable* d = p.GetDeliverables();
-    Procedure* p1 = d->proc_list_.front();
+    Procedure* p1 = d->GetProcList()->front();
     Block* root_block = const_cast<Block*>(p1->GetBlockRoot());
     std::pair<int, int> range = root_block->GetStartEndRange();
     CHECK(range.first == 1);

@@ -209,23 +209,23 @@ Deliverable* SetUpDeliverable_Transitive() {
 
   // Add procedure
 
-  deliverable->proc_list_.push_back(Transitive);
+  deliverable->GetProcList()->push_back(Transitive);
 
   // Add variables
 
-  deliverable->var_list_.push_back(var_y);
-  deliverable->var_list_.push_back(var_q);
-  deliverable->var_list_.push_back(var_z);
-  deliverable->var_list_.push_back(var_x);
-  deliverable->var_list_.push_back(var_p);
+  deliverable->GetVariableList()->push_back(var_y);
+  deliverable->GetVariableList()->push_back(var_q);
+  deliverable->GetVariableList()->push_back(var_z);
+  deliverable->GetVariableList()->push_back(var_x);
+  deliverable->GetVariableList()->push_back(var_p);
 
   // Add constants
 
-  deliverable->const_list_.push_back(cv_2);
-  deliverable->const_list_.push_back(cv_1);
-  deliverable->const_list_.push_back(cv_24);
-  deliverable->const_list_.push_back(cv_0);
-  deliverable->const_list_.push_back(cv_5);
+  deliverable->GetConstantList()->push_back(cv_2);
+  deliverable->GetConstantList()->push_back(cv_1);
+  deliverable->GetConstantList()->push_back(cv_24);
+  deliverable->GetConstantList()->push_back(cv_0);
+  deliverable->GetConstantList()->push_back(cv_5);
 
   // Add statement numbers to statements
   stmt1->SetStatementNumber(new StatementNumber(1));

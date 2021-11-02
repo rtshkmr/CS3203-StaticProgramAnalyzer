@@ -1,4 +1,3 @@
-#include <queue>
 #include <cassert>
 #include "AffectsExtractor.h"
 #include "../../../model/CFG.h"
@@ -25,6 +24,130 @@ std::vector<Entity*> AffectsExtractor::GetAffects(int target) {
   // HasAffects(target, x)
 
   return std::vector<Entity*>();
+}
+
+std::vector<Entity*> AffectsExtractor::GetAllAffects() {
+  std::vector<Entity*> retList = {};
+
+  std::vector<Entity*> assign_list = pkb_->GetDesignEntities(DesignEntity::kAssign);
+  for (auto* entity : assign_list) {
+    AssignEntity* ae = dynamic_cast<AssignEntity*>(entity);
+    if (HasAffects(ae->GetStatementNumber()->GetNum())) { //TODO change to Entity type?
+      retList.push_back(entity);
+    }
+  }
+  retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
+  return retList;
+}
+
+std::vector<Entity*> AffectsExtractor::GetAllAffectedBy() {
+  std::vector<Entity*> retList = {};
+
+  std::vector<Entity*> assign_list = pkb_->GetDesignEntities(DesignEntity::kAssign);
+  for (auto* entity : assign_list) {
+    AssignEntity* ae = dynamic_cast<AssignEntity*>(entity);
+    if (HasAffectedBy(ae->GetStatementNumber()->GetNum())) { //TODO change to Entity type?
+      retList.push_back(entity);
+    }
+  }
+  retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
+  return retList;
+}
+
+/**
+ * For Affects(a1, a2)
+ */
+std::vector<std::tuple<Entity*, Entity*>> AffectsExtractor::GetAllPair() {
+  std::vector<std::tuple<Entity*, Entity*>> retList = {};
+
+  std::vector<Entity*> assign_list = pkb_->GetDesignEntities(DesignEntity::kAssign);
+  for (auto* entity : assign_list) {
+    AssignEntity* ae = dynamic_cast<AssignEntity*>(entity);
+    std::vector<Entity*> all_affected_by_ae = GetAffects(ae->GetStatementNumber()->GetNum());
+    for (auto* affected : all_affected_by_ae) {
+      retList.push_back(std::make_tuple(entity, affected));
+    }
+  }
+  retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
+  return retList;
+}
+
+/**
+ * For Affects(_,_)
+ */
+bool AffectsExtractor::HasAffects() {
+  //TODO: Check cache size > 0;
+
+  //TODO: Change optimised Affects(_,_)
+
+  std::vector<Entity*> all_assign_list = pkb_->GetDesignEntities(DesignEntity::kAssign);
+
+  for (auto* assign : all_assign_list) {
+    AssignEntity* ae_to_check = dynamic_cast<AssignEntity*>(assign); // TODO: make more overloading methods;
+    if (HasAffects(ae_to_check->GetStatementNumber()->GetNum())) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * For Affects(#,_)
+ */
+bool AffectsExtractor::HasAffects(int target) {
+  AssignEntity* target_ae = GetAssignEntityFromStmtNum(target);
+  Procedure* target_proc = target_ae->GetProcedureNode();
+//  VariableName* target_var = const_cast<VariableName*>(target_ae->GetVariableObj()yyp->GetName());
+  VariableName* target_var = reinterpret_cast<VariableName*>(target_ae->GetVariableObj());
+
+  //check against the entire procedure's assign
+  // TODO: create new PKB API, Given Procedure, Get all assign (Uses / Modifies)
+  std::vector<Entity*> affected_list =
+      pkb_->GetPatternEntities(DesignEntity::kVariable, target_var->GetName());
+
+  for (auto* assign : affected_list) {
+    if (assign->GetEntityEnum() != EntityEnum::kAssignEntity) {
+      continue;
+    }
+
+    AssignEntity* ae_to_check = dynamic_cast<AssignEntity*>(assign);
+    if (ae_to_check->GetProcedureNode() != target_proc) {
+      continue;
+    }
+
+    if (HasAffects(target_ae, ae_to_check)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * For Affects(_,#)
+ */
+bool AffectsExtractor::HasAffectedBy(int target) {
+  AssignEntity* target_assign_entity = GetAssignEntityFromStmtNum(target);
+
+  std::set<AssignEntity*, AffectsExtractor::AssignEntityComparator> affected_set = GetPotentialAffectedBy(target_assign_entity);
+
+  std::set<AssignEntity*, AffectsExtractor::AssignEntityComparator>::iterator itr;
+  for (itr = affected_set.begin(); itr != affected_set.end(); itr++) {
+    if (HasAffects(*itr, target_assign_entity)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool AffectsExtractor::HasAffects(int first, int second) {
+  AssignEntity* ae_first = GetAssignEntityFromStmtNum(first);
+  AssignEntity* ae_second = GetAssignEntityFromStmtNum(second);
+  return HasAffects(ae_first, ae_second);
+}
+
+bool AffectsExtractor::HasAffectedBy(int first, int second) {
+  return HasAffects(second, first);
 }
 
 /**
@@ -81,16 +204,35 @@ bool AffectsExtractor::HasValidUnmodifiedPath(AssignEntity* first_stmt, AssignEn
 std::vector<Entity*> AffectsExtractor::GetAffectedBy(int target) {
   std::vector<Entity*> return_list = {};
 
-  std::string s = std::to_string(target);
-  std::vector<Entity*> ae_vec_target = pkb_->GetPatternEntities(DesignEntity::kAssign, s);
+  AssignEntity* target_assign_entity = GetAssignEntityFromStmtNum(target);
+
+  std::set<AssignEntity*, AffectsExtractor::AssignEntityComparator> affected_set = GetPotentialAffectedBy(target_assign_entity);
+
+  std::set<AssignEntity*, AffectsExtractor::AssignEntityComparator>::iterator itr;
+  for (itr = affected_set.begin(); itr != affected_set.end(); itr++) {
+    if (HasAffects(*itr, target_assign_entity)) {
+      return_list.push_back(*itr);
+    }
+  }
+
+  // Clear PQ
+  return return_list;
+}
+
+AssignEntity* AffectsExtractor::GetAssignEntityFromStmtNum(int target) {
+  std::vector<Entity*> ae_vec_target =
+      pkb_->GetPatternEntities(DesignEntity::kAssign, std::to_string(target));
 
   if (ae_vec_target.size() == 0) //target given is not an assign entity.
-    return return_list;
+    return nullptr;
 
-  AssignEntity* assign_entity = dynamic_cast<AssignEntity*>(ae_vec_target[0]);
+  assert (ae_vec_target.size() == 1); // must be 1
+  return dynamic_cast<AssignEntity*>(ae_vec_target[0]);
+}
 
-  //Get the var from RHS of assign
-  std::vector<Variable*> rhs_varlist = assign_entity->GetControlVariables();
+std::set<AssignEntity*, AffectsExtractor::AssignEntityComparator> AffectsExtractor::GetPotentialAffectedBy(AssignEntity* target) {
+  std::vector<Variable*> rhs_varlist = target->GetControlVariables();
+  std::set<AssignEntity*, AffectsExtractor::AssignEntityComparator> affected_set = {};
 
   // Have a PQ per var.
   for (Variable* var: rhs_varlist) {
@@ -98,36 +240,17 @@ std::vector<Entity*> AffectsExtractor::GetAffectedBy(int target) {
     std::vector<Entity*> ent = pkb_->GetRelationship(PKBRelRefs::kModifiedBy, variable_name->GetName());
 
     //filter vector<Entity> into only AssignEntity as it can only take assign in LHS
-    auto cmp = [](AssignEntity* left, AssignEntity* right) {
-      return left->GetStatementNumber()->GetNum() < right->GetStatementNumber()->GetNum();
-    };
-    std::priority_queue<AssignEntity*, std::vector<AssignEntity*>, decltype(cmp)> queue(cmp);
-
     for (Entity* e: ent) {
       if (e->GetEntityEnum() == EntityEnum::kAssignEntity) {
         AssignEntity* ae = dynamic_cast<AssignEntity*>(e);
-        queue.push(ae);
+        if (ae->GetProcedureNode() == target->GetProcedureNode()) {
+          affected_set.insert(ae);
+        }
       }
-    }
-
-    while (queue.size() > 0) {
-      AssignEntity* ae = queue.top();
-
-      bool hasNextTRel = pkb_->HasRelationship(PKBRelRefs::kNextT,
-                                               std::to_string(ae->GetStatementNumber()->GetNum()),
-                                               std::to_string(target));
-
-      //find if there is a Next* relationship
-      if (hasNextTRel) {
-        return_list.push_back(ae); //TODO: check for split-path eg. if/else
-        break;
-      }
-      queue.pop();
     }
   }
 
-  // Clear PQ
-  return return_list;
+  return affected_set;
 }
 
 void AffectsExtractor::Delete() {

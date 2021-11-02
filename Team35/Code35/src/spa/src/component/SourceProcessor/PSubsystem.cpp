@@ -152,9 +152,35 @@ void PSubsystem::CloseElseBlock() {
     block_stack_.push(block_if_else_exit);
     bool is_currently_in_nested_cluster = cluster_stack_.size() > 1;
     assert(is_currently_in_nested_cluster);
+//<<<<<<< HEAD
+//    Cluster* else_body_cluster = cluster_stack_.top();
+//    if (else_body_block->size() > 0) {
+//      else_body_cluster->AddChildClusterToBack(else_body_block); //append anything else
+//=======
+//<<<<<<< HEAD
+//    Cluster* if_cluster = cluster_stack_.top();
+//    if_cluster->SetClusterTag(ClusterTag::kIfCluster);
+//    ///  add to if_cluster only if the if_cluster is currently empty.
+//    /// guarantee: There will be at most be 3 nested clusters in if cluster (ifcond, ifbody, elsebody):
+//    if(if_cluster->GetNestedClusters().empty()) {
+//      if_cluster->AddChildClusterToBack(if_cond_block);
+//      if_cluster->AddChildClusterToBack(if_body_block);
+//      if_cluster->AddChildClusterToBack(else_body_block); // this is ok because there is at least 1 stmt
+//      if_cluster->UpdateClusterRange();
+//    } else {
+//      if_cluster->AddChildClusterToFront(if_cond_block);
+//      if (else_body_block->size() > 0) {
+//        if_cluster->AddChildClusterToBack(else_body_block); //append anything else
+//      }
+//      if_cond_block->SetParentCluster(if_cluster);
+//      if_cluster->UpdateClusterRange();
+//      int x = 1;
+//=======
     Cluster* else_body_cluster = cluster_stack_.top();
     if (else_body_block->size() > 0) {
       else_body_cluster->AddChildClusterToBack(else_body_block); //append anything else
+//>>>>>>> master
+//>>>>>>> pkb/affects-extraction
     }
     else_body_cluster->UpdateClusterRange();
     cluster_stack_.pop(); // pops out the else_body_cluster
@@ -181,7 +207,17 @@ void PSubsystem::CloseWhileBlock() {
   bool is_currently_in_nested_cluster = cluster_stack_.size() > 1;
   assert(is_currently_in_nested_cluster);
   // add to cluster here:
+//<<<<<<< HEAD
+//  Cluster* while_body_cluster = cluster_stack_.top();
+//=======
+//<<<<<<< HEAD
+//  Cluster* while_cluster = cluster_stack_.top();
+//  while_cluster->SetClusterTag(ClusterTag::kWhileCluster);
+//  while_cluster->AddChildClusterToFront(while_cond_block);
+////=======
   Cluster* while_body_cluster = cluster_stack_.top();
+//>>>>>>> master
+//>>>>>>> pkb/affects-extraction
 
   if (while_body_block->size() > 0) {
     while_body_cluster->AddChildClusterToBack(while_body_block); //add only non empty tails
@@ -335,6 +371,8 @@ void PSubsystem::PerformNewProcedureSteps(Procedure* procedure) {
 }
 
 void PSubsystem::SetStatementObject(Statement* statement) {
+  statement->SetProcedureNode(current_procedure_);
+
   if (dynamic_cast<ElseEntity*>(statement) != nullptr)
     return;
 
@@ -557,7 +595,7 @@ void PSubsystem::HandleReadStmt(Entity* entity) {
   assert(read_entity);
   deliverable_->AddReadEntity(read_entity);
   deliverable_->AddModifiesRelationship(read_entity, read_entity->GetVariable());
-  deliverable_->AddUsesRelationship(current_procedure_, read_entity->GetVariable()); //procedure level
+  deliverable_->AddModifiesRelationship(current_procedure_, read_entity->GetVariable()); //procedure level
   if (current_procedure_ != current_node_)
     deliverable_->AddModifiesRelationship(current_node_, read_entity->GetVariable());  //container level
 }
@@ -593,7 +631,7 @@ void PSubsystem::CheckForExistingProcedure() {
 }
 
 void PSubsystem::FiniStateChecker() {
-  if (deliverable_->stmt_list_.empty()) {
+  if (deliverable_->GetStatementList()->empty()) {
     throw SyntaxException("A blank simple file is encountered.");
   }
 
