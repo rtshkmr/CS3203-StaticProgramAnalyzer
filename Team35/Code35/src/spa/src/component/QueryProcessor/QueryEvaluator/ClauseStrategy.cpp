@@ -115,7 +115,7 @@ WithStrategy::DetermineClauseCommand(Clause *clause, QueryEvaluatorTable *table)
   } else if (with_clause->left_is_synonym) {
     return DetermineSingleSynonymCommand(clause, true);
   } else if (with_clause->right_is_synonym) {
-    return DetermineSingleSynonymCommand(clause, true);
+    return DetermineSingleSynonymCommand(clause, false);
   } else {
     // Cross product.
   }
