@@ -226,6 +226,7 @@ bool Cluster::TraverseScopedCluster(PKBRelRefs rel_ref,
 }
 
 
+// todo: switching to case swithc makes it easier
 //bool TraverseIfClusterForAffects(Cluster* if_cluster,
 //                                 std::pair<int,int> target_range,
 //                                 PKB* pkb,
