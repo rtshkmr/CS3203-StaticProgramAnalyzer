@@ -18,8 +18,8 @@ bool AffectsExtractor::HasAffects() {
   std::vector<Entity*> all_assign_list = pkb_->GetDesignEntities(DesignEntity::kAssign);
 
   for (auto* assign : all_assign_list) {
-    AssignEntity* ae_to_check = dynamic_cast<AssignEntity*>(assign); // TODO: make more overloading methods;
-    if (HasAffects(ae_to_check->GetStatementNumber()->GetNum())) {
+    AssignEntity* ae_to_check = dynamic_cast<AssignEntity*>(assign);
+    if (HasAffects(ae_to_check)) {
       return true;
     }
   }
@@ -35,7 +35,7 @@ std::vector<Entity*> AffectsExtractor::GetAllAffects() {
   std::vector<Entity*> assign_list = pkb_->GetDesignEntities(DesignEntity::kAssign);
   for (auto* entity : assign_list) {
     AssignEntity* ae = dynamic_cast<AssignEntity*>(entity);
-    if (HasAffects(ae->GetStatementNumber()->GetNum())) { //TODO change to Entity type?
+    if (HasAffects(ae)) { //TODO change to Entity type?
       retList.push_back(entity);
     }
   }
@@ -52,7 +52,7 @@ std::vector<Entity*> AffectsExtractor::GetAllAffectedBy() {
   std::vector<Entity*> assign_list = pkb_->GetDesignEntities(DesignEntity::kAssign);
   for (auto* entity : assign_list) {
     AssignEntity* ae = dynamic_cast<AssignEntity*>(entity);
-    if (HasAffectedBy(ae->GetStatementNumber()->GetNum())) { //TODO change to Entity type?
+    if (HasAffectedBy(ae)) {
       retList.push_back(entity);
     }
   }
@@ -69,7 +69,7 @@ std::vector<std::tuple<Entity*, Entity*>> AffectsExtractor::GetAllPair() {
   std::vector<Entity*> assign_list = pkb_->GetDesignEntities(DesignEntity::kAssign);
   for (auto* entity : assign_list) {
     AssignEntity* ae = dynamic_cast<AssignEntity*>(entity);
-    std::vector<Entity*> all_affected_by_ae = GetAffects(ae->GetStatementNumber()->GetNum());
+    std::vector<Entity*> all_affected_by_ae = GetAffects(ae);
     for (auto* affected : all_affected_by_ae) {
       retList.push_back(std::make_tuple(entity, affected));
     }
@@ -157,12 +157,12 @@ std::vector<Entity*> AffectsExtractor::GetAffectedBy(AssignEntity* target_assign
 bool AffectsExtractor::HasAffects(AssignEntity* target_ae) {
   Procedure* target_proc = target_ae->GetProcedureNode();
 //  VariableName* target_var = const_cast<VariableName*>(target_ae->GetVariableObj()yyp->GetName());
-  VariableName* target_var = reinterpret_cast<VariableName*>(target_ae->GetVariableObj());
+  std::string target_var = target_ae->GetVariableString();
 
   //check against the entire procedure's assign
   // TODO: create new PKB API, Given Procedure, Get all assign (Uses / Modifies)
   std::vector<Entity*> affected_list =
-      pkb_->GetPatternEntities(DesignEntity::kVariable, target_var->GetName());
+      pkb_->GetPatternEntities(DesignEntity::kVariable, target_var);
 
   for (auto* assign : affected_list) {
     if (assign->GetEntityEnum() != EntityEnum::kAssignEntity) {
