@@ -361,6 +361,8 @@ void PSubsystem::PerformNewProcedureSteps(Procedure* procedure) {
 }
 
 void PSubsystem::SetStatementObject(Statement* statement) {
+  statement->SetProcedureNode(current_procedure_);
+
   if (dynamic_cast<ElseEntity*>(statement) != nullptr)
     return;
 

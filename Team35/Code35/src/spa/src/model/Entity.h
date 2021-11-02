@@ -34,6 +34,7 @@ class Entity {
 };
 
 class Container;
+class Procedure;
 
 /**
  * Statement is an abstract class and derived from Entity.
@@ -44,17 +45,20 @@ class Statement : public Entity {
  protected:
   LineNumber* line_number_;
   StatementNumber* statement_number_;
+  Procedure* procedure_node_;
   Container* parent_node_;
   Statement* before_node_;
  public:
   virtual ~Statement() {};
   void SetLineNumber(LineNumber* ln);
   void SetStatementNumber(StatementNumber* sn);
+  void SetProcedureNode(Procedure* procedure);
   void SetParentNode(Container* parent);
   void SetBeforeNode(Statement* before);
   StatementNumber* GetStatementNumber();
   LineNumber* GetLineNumber();
   std::string GetLineNumberString();
+  Procedure* GetProcedureNode();
   Container* GetParentNode();
   Statement* GetBeforeNode();
 };
