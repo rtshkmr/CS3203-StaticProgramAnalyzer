@@ -309,7 +309,6 @@ bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
         }
       }
     } else if (tag == ClusterTag::kWhileCluster) {
-//<<<<<<< HEAD
       //=================================== HANDLE WHILE CLUSTER =====================================
       bool is_target_in_while_cluster = child->CheckIfStmtNumInRange(target_range.second);
       if (is_target_in_while_cluster) {
@@ -411,28 +410,6 @@ Cluster* Cluster::FindNextSibling(ClusterTag target_tag) {
   }
   return nullptr;
 }
-//=======
-//
-//    } else { // it's a simple block:
-////      auto range = child->GetStartEndRange();
-////      // for every line number in this range, check if the lhs_var is modified by the line:
-////      bool lhs_is_modified = false;
-////      // start with offset of +1 to avoid counting the current thing...
-////      if(range.first + 1 == range.second)
-////      for(int line_num = range.first + 1; line_num <= range.second; line_num++) {
-////        // consider statement level:
-////        // if line_num is a read stmt, then will this convert that
-////        bool is_modified_stmt_level = pkb->HasRelationship(PKBRelRefs::kModifies,std::to_string(line_num),
-////                                                              pkb->GetNameFromEntity(lhs_var));
-////        bool is_call_stmt = pkb->GetRelationship(PKBRelRefs::kFollows, std::to_string(line_num - 1));
-////        bool is_modified_by_proc_calls = false;
-////         //
-////         if(lhs_is_modified) break;
-//      }
-//    }
-//  return false;
-//  }
-//>>>>>>> pkb/affects-extraction
 
 // default destructors:
 Cluster::~Cluster() = default;
