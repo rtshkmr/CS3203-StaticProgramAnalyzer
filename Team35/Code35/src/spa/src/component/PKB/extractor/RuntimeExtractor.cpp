@@ -3,6 +3,7 @@
 RuntimeExtractor::RuntimeExtractor(PKB* pkb) {
   pkb_ = pkb;
   affects_extractor_.SetPKB(pkb);
+  next_bip_extractor_ = NextBipExtractor(pkb);
 }
 
 std::vector<Entity*> RuntimeExtractor::GetNextT(int target) {
@@ -30,15 +31,23 @@ std::vector<Entity*> RuntimeExtractor::GetAffectedByT(int target) {
   return affects_t_extractor_.GetAffectedByT(target);
 }
 
+std::vector<Entity*> RuntimeExtractor::GetNextBip(std::string target) {
+  return next_bip_extractor_.GetNextBip(target);
+}
+
+std::vector<Entity*> RuntimeExtractor::GetPrevBip(std::string target) {
+  return next_bip_extractor_.GetPrevBip(target);
+}
+
 std::vector<Entity*> RuntimeExtractor::GetNextT(DesignEntity de) {
-  if (de != DesignEntity::kStmt) {
+  if (de != DesignEntity::kStmt && de != DesignEntity::kProgLine) {
     return std::vector<Entity*>{};
   }
   return next_t_extractor_.GetAllNextTLHS(std::vector<Procedure*>{}, std::vector<Statement*>{});
 }
 
 std::vector<Entity*> RuntimeExtractor::GetPrevT(DesignEntity de) {
-  if (de != DesignEntity::kStmt) {
+  if (de != DesignEntity::kStmt && de != DesignEntity::kProgLine) {
     return std::vector<Entity*>{};
   }
   return next_t_extractor_.GetAllNextTRHS(std::vector<Procedure*>{}, std::vector<Statement*>{});
@@ -49,15 +58,33 @@ std::vector<Entity*> RuntimeExtractor::GetAffectedBy(DesignEntity de) { return s
 std::vector<Entity*> RuntimeExtractor::GetAffectsT(DesignEntity de) { return std::vector<Entity*>(); }
 std::vector<Entity*> RuntimeExtractor::GetAffectedByT(DesignEntity de) { return std::vector<Entity*>(); }
 
+std::vector<Entity*> RuntimeExtractor::GetNextBip(DesignEntity de) {
+  if (de != DesignEntity::kStmt && de != DesignEntity::kProgLine) {
+    return std::vector<Entity*>{};
+  }
+  return next_bip_extractor_.GetAllNextBipRHS();
+}
+
+std::vector<Entity*> RuntimeExtractor::GetPrevBip(DesignEntity de) {
+  if (de != DesignEntity::kStmt && de != DesignEntity::kProgLine) {
+    return std::vector<Entity*>{};
+  }
+  return next_bip_extractor_.GetAllNextBipLHS();
+}
+
 std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetNextT(DesignEntity first, DesignEntity second) {
-  if (first != DesignEntity::kStmt || second != DesignEntity::kStmt) {
+  bool not_stmt = first != DesignEntity::kStmt || second != DesignEntity::kStmt;
+  bool not_prog_line = first != DesignEntity::kProgLine || second != DesignEntity::kProgLine;
+  if (not_stmt && not_prog_line) {
     return std::vector<std::tuple<Entity*, Entity*>>{};
   }
   return next_t_extractor_.GetAllNextT(std::vector<Procedure*>{}, std::vector<Statement*>{});
 }
 
 std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetPrevT(DesignEntity first, DesignEntity second) {
-  if (first != DesignEntity::kStmt || second != DesignEntity::kStmt) {
+  bool not_stmt = first != DesignEntity::kStmt || second != DesignEntity::kStmt;
+  bool not_prog_line = first != DesignEntity::kProgLine || second != DesignEntity::kProgLine;
+  if (not_stmt && not_prog_line) {
     return std::vector<std::tuple<Entity*, Entity*>>{};
   }
   return next_t_extractor_.GetAllPrevT(std::vector<Procedure*>{}, std::vector<Statement*>{});
@@ -76,15 +103,33 @@ std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetAffectedByT(Desig
   return std::vector<std::tuple<Entity*, Entity*>>();
 }
 
+std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetNextBip(DesignEntity first, DesignEntity second) {
+  bool not_stmt = first != DesignEntity::kStmt || second != DesignEntity::kStmt;
+  bool not_prog_line = first != DesignEntity::kProgLine || second != DesignEntity::kProgLine;
+  if (not_stmt && not_prog_line) {
+    return std::vector<std::tuple<Entity*, Entity*>>{};
+  }
+  return next_bip_extractor_.GetAllNextBip();
+}
+
+std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetPrevBip(DesignEntity first, DesignEntity second) {
+  bool not_stmt = first != DesignEntity::kStmt || second != DesignEntity::kStmt;
+  bool not_prog_line = first != DesignEntity::kProgLine || second != DesignEntity::kProgLine;
+  if (not_stmt && not_prog_line) {
+    return std::vector<std::tuple<Entity*, Entity*>>{};
+  }
+  return next_bip_extractor_.GetAllPrevBip();
+}
+
 bool RuntimeExtractor::HasAffects() { return false; }
 bool RuntimeExtractor::HasAffectedBy() { return false; }
 
-bool RuntimeExtractor::HasNextT(int target) {
-  return false;
+bool RuntimeExtractor::HasNextBip() {
+  return next_bip_extractor_.HasNextBip();
 }
 
-bool RuntimeExtractor::HasPrevT(int target) {
-  return false;
+bool RuntimeExtractor::HasPrevBip() {
+  return next_bip_extractor_.HasPrevBip();
 }
 
 bool RuntimeExtractor::HasAffects(int target) {
@@ -103,6 +148,14 @@ bool RuntimeExtractor::HasAffectedByT(int target) {
   return false;
 }
 
+bool RuntimeExtractor::HasNextBip(std::string first) {
+  return next_bip_extractor_.HasNextBip(first);
+}
+
+bool RuntimeExtractor::HasPrevBip(std::string first) {
+  return next_bip_extractor_.HasPrevBip(first);
+}
+
 bool RuntimeExtractor::HasNextT(int first, int second) {
   return next_t_extractor_.HasNextT(first, second,
                                     std::vector<Procedure*>{},
@@ -113,6 +166,10 @@ bool RuntimeExtractor::HasAffects(int first, int second) { return false; }
 bool RuntimeExtractor::HasAffectedBy(int first, int second) { return false; }
 bool RuntimeExtractor::HasAffectsT(int first, int second) { return false; }
 bool RuntimeExtractor::HasAffectedByT(int first, int second) { return false; }
+
+bool RuntimeExtractor::HasNextBip(std::string first, std::string second) {
+  return next_bip_extractor_.HasNextBip(first, second);
+}
 
 void RuntimeExtractor::Delete() {
   next_t_extractor_.Delete();

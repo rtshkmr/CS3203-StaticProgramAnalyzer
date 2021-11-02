@@ -7,7 +7,6 @@
 #include <list>
 #include <datatype/DataType.h>
 #include <set>
-#include "CFG.h"
 
 enum class EntityEnum {
   kNone = 0,

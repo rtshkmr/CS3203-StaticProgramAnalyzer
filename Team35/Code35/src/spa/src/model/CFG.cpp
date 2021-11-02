@@ -295,25 +295,24 @@ bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
     } else if (tag == ClusterTag::kWhileCluster) {
 
     } else { // it's a simple block:
-      auto range = child->GetStartEndRange();
-      // for every line number in this range, check if the lhs_var is modified by the line:
-      bool lhs_is_modified = false;
-      // start with offset of +1 to avoid counting the current thing...
-      if(range.first + 1 == range.second)
-      for(int line_num = range.first + 1; line_num <= range.second; line_num++) {
-        // consider statement level:
-        // if line_num is a read stmt, then will this convert that
-        bool is_modified_stmt_level = pkb->HasRelationship(PKBRelRefs::kModifies,std::to_string(line_num),
-                                                              pkb->GetNameFromEntity(lhs_var));
-        bool is_call_stmt = pkb->GetRelationship(PKBRelRefs::kFollows, std::to_string(line_num - 1));
-        bool is_modified_by_proc_calls = false;
-         //
-         if(lhs_is_modified) break;
+//      auto range = child->GetStartEndRange();
+//      // for every line number in this range, check if the lhs_var is modified by the line:
+//      bool lhs_is_modified = false;
+//      // start with offset of +1 to avoid counting the current thing...
+//      if(range.first + 1 == range.second)
+//      for(int line_num = range.first + 1; line_num <= range.second; line_num++) {
+//        // consider statement level:
+//        // if line_num is a read stmt, then will this convert that
+//        bool is_modified_stmt_level = pkb->HasRelationship(PKBRelRefs::kModifies,std::to_string(line_num),
+//                                                              pkb->GetNameFromEntity(lhs_var));
+//        bool is_call_stmt = pkb->GetRelationship(PKBRelRefs::kFollows, std::to_string(line_num - 1));
+//        bool is_modified_by_proc_calls = false;
+//         //
+//         if(lhs_is_modified) break;
       }
     }
-  }
   return false;
-}
+  }
 
 // default destructors:
 Cluster::~Cluster() = default;
@@ -359,4 +358,25 @@ std::set<Block*> Block::GetNextBlocks() const {
 
 std::set<Block*> Block::GetPrevBlocks() const {
   return this->prev_blocks_;
+}
+
+std::list<int> Block::GetCFGLastStmts() {
+  std::list<int> last_stmts = std::list<int>{};
+  for (Block* next_block: next_blocks_) {
+    int next = next_block->GetStartEndRange().first;
+    if (isWhile && next == start_ + 1) {
+      continue;
+    }
+    if (next == -1) { // exit block
+      assert(next_block->GetNextBlocks().empty());
+      last_stmts.push_back(end_);
+      continue;
+    }
+    std::list<int> next_last_stmts = next_block->GetCFGLastStmts();
+    last_stmts.insert(last_stmts.end(), next_last_stmts.begin(), next_last_stmts.end());
+  }
+  if (next_blocks_.empty() || (next_blocks_.size() == 1 && isWhile)) {
+    last_stmts.push_back(end_);
+  }
+  return last_stmts;
 }

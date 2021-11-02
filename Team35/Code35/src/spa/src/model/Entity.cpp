@@ -4,6 +4,7 @@
 
 #include <list>
 #include "Entity.h"
+#include "CFG.h"
 
 EntityEnum Entity::GetEntityEnum() {
   return type;

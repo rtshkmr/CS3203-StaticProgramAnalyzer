@@ -39,10 +39,6 @@ add_library(spa ${srcs} ${headers}
         src/component/QueryProcessor/QueryEvaluator/ClauseStrategy.h src/component/QueryProcessor/QueryEvaluator/ClauseStrategy.cpp
         src/component/QueryProcessor/QueryProjector.h src/component/QueryProcessor/QueryProjector.cpp
         src/component/QueryProcessor/QuerySystemController.h src/component/QueryProcessor/QuerySystemController.cpp
-        src/component/SourceProcessor/Extractors/UsesExtractor.cpp src/component/SourceProcessor/Extractors/UsesExtractor.h
-        src/component/SourceProcessor/Extractors/ModifiesExtractor.cpp src/component/SourceProcessor/Extractors/ModifiesExtractor.h
-        src/component/SourceProcessor/Extractors/ParentTExtractor.cpp src/component/SourceProcessor/Extractors/ParentTExtractor.h
-        src/component/SourceProcessor/Extractors/FollowsTExtractor.cpp src/component/SourceProcessor/Extractors/FollowsTExtractor.h
         src/util/Logger.cpp src/util/Logger.h
         src/util/util.h
         src/util/TimeUtil.cpp src/util/TimeUtil.h
@@ -50,13 +46,14 @@ add_library(spa ${srcs} ${headers}
         src/component/PKB/extractor/RuntimeExtractor.cpp src/component/PKB/extractor/RuntimeExtractor.h
         src/component/PKB/extractor/NextTExtractor.cpp src/component/PKB/extractor/NextTExtractor.h
         src/component/SourceProcessor/Extractors/NextExtractor.cpp src/component/SourceProcessor/Extractors/NextExtractor
-        src/component/SourceProcessor/Extractors/CallsTExtractor.cpp 
-        src/component/SourceProcessor/Extractors/CallsTExtractor.h
         src/component/PKB/DBManager.cpp src/component/PKB/DBManager.h
         src/component/PKB/extractor/AffectsExtractor.cpp src/component/PKB/extractor/AffectsExtractor.h
         src/component/PKB/extractor/AffectsTExtractor.cpp src/component/PKB/extractor/AffectsTExtractor.h
-        src/util/Utility.cpp src/util/Utility.h)
-
+        src/util/Utility.cpp src/util/Utility.h
+        src/util/Utility.cpp src/util/Utility.h src/component/PKB/extractor/NextBipExtractor.cpp src/component/PKB/extractor/NextBipExtractor.h
+        src/component/SourceProcessor/Extractors/TransitiveExtractor.h
+        src/component/SourceProcessor/Extractors/VariableTExtractor.cpp src/component/SourceProcessor/Extractors/VariableTExtractor.h
+        )
 
 # this makes the headers accessible for other projects which uses spa lib
 target_include_directories(spa PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
