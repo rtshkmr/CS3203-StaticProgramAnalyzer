@@ -36,7 +36,6 @@ std::vector<Entity*> AffectsExtractor::GetAffects(int target) {
  */
 bool AffectsExtractor::HasAffects(AssignEntity* first_stmt, AssignEntity* second_stmt) {
   // get the modified variable v from the lhs of first statement
-  assert(first_stmt->GetEntityEnum() == EntityEnum::kAssignEntity);
   Variable* modified_var = first_stmt->GetVariableObj();
   std::vector<Variable*> vars_used_by_second_stmt =
       second_stmt->GetControlVariables(); // todo: this is named wrongly, should be GetExpr Var for this
