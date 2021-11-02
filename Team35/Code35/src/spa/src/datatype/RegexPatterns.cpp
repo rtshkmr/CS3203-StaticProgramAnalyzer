@@ -38,10 +38,10 @@ std::regex RegexPatterns::GetUnaryBooleanOperatorPattern() {
   return std::regex(R"(!)");
 }
 std::regex RegexPatterns::GetNamePattern() {
-  return std::regex(R"(^[[:alpha:]]+([0-9]+|[[:alpha:]]+)*)");
+  return std::regex(R"(^[[:alpha:]]+([0-9]+|[[:alpha:]]+)*)", std::regex_constants::optimize);
 }
 std::regex RegexPatterns::GetIntegerPattern() {
-  return std::regex(R"(^(0|[1-9][0-9]*)$)");
+  return std::regex(R"(^(0|[1-9][0-9]*)$)", std::regex_constants::optimize);
 }
 
 std::regex RegexPatterns::GetIntegerPatternNonTerminating() {
