@@ -15,17 +15,24 @@ class AffectsExtractor {
     }
   };
  public:
-  std::vector<Entity*> GetAffects(int target);
-  std::vector<Entity*> GetAffectedBy(int target);
+  bool HasAffects();
   std::vector<Entity*> GetAllAffects();
   std::vector<Entity*> GetAllAffectedBy();
   std::vector<std::tuple<Entity*, Entity*>> GetAllPair();
-  bool HasAffects();
+
+  std::vector<Entity*> GetAffects(int target);
+  std::vector<Entity*> GetAffectedBy(int target);
   bool HasAffects(int target);
   bool HasAffectedBy(int target);
   bool HasAffects(int first, int second);
   bool HasAffectedBy(int first, int second);
-  bool HasAffects(AssignEntity* first_stmt, AssignEntity* second_stmt);
+
+  std::vector<Entity*> GetAffects(AssignEntity* target);
+  std::vector<Entity*> GetAffectedBy(AssignEntity* target);
+  bool HasAffects(AssignEntity* target);
+  bool HasAffectedBy(AssignEntity* target);
+  bool HasAffects(AssignEntity* first_stmt, AssignEntity* second_stmt); //also used by HasAffectedBy(second, first)
+
   void SetPKB(PKB* pkb);
   void Delete();
  private:

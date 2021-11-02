@@ -37,3 +37,35 @@ TEST_CASE("2.PKB.Affects") {
     REQUIRE(has_affects_3_5);
   }
 }
+
+TEST_CASE("2.PKB.Affects.adv_spa_lecture") {
+  PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/adv_spa_lecture_source.txt");
+  DBManager* dbm = new DBManager(pkb);
+
+  REQUIRE(dbm->HasRelationship(PKBRelRefs::kAffects, "2", "6"));
+  REQUIRE(dbm->HasRelationship(PKBRelRefs::kAffects, "4", "8"));
+  REQUIRE(dbm->HasRelationship(PKBRelRefs::kAffects, "4", "10"));
+  REQUIRE(dbm->HasRelationship(PKBRelRefs::kAffects, "6", "6"));
+  REQUIRE(dbm->HasRelationship(PKBRelRefs::kAffects, "1", "4"));
+  REQUIRE(dbm->HasRelationship(PKBRelRefs::kAffects, "1", "8"));
+  REQUIRE(dbm->HasRelationship(PKBRelRefs::kAffects, "1", "10"));
+  REQUIRE(dbm->HasRelationship(PKBRelRefs::kAffects, "1", "12"));
+  REQUIRE(dbm->HasRelationship(PKBRelRefs::kAffects, "2", "10"));
+  REQUIRE(dbm->HasRelationship(PKBRelRefs::kAffects, "9", "10"));
+
+
+  REQUIRE_FALSE(dbm->HasRelationship(PKBRelRefs::kAffects, "9", "11"));
+  REQUIRE_FALSE(dbm->HasRelationship(PKBRelRefs::kAffects, "9", "12"));
+  REQUIRE_FALSE(dbm->HasRelationship(PKBRelRefs::kAffects, "2", "3"));
+  REQUIRE_FALSE(dbm->HasRelationship(PKBRelRefs::kAffects, "9", "6"));
+
+}
+
+TEST_CASE("2.PKB.Affects.Non_BIP_Tester") {
+  // The classic test given in lecture where Modifies is abstracted out into another procedure
+  PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/affects_source.txt");
+  DBManager* dbm = new DBManager(pkb);
+
+  REQUIRE(dbm->HasRelationship(PKBRelRefs::kAffects, "1", "5"));
+  REQUIRE_FALSE(dbm->HasRelationship(PKBRelRefs::kAffects, "6", "8"));
+}
