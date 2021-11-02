@@ -17,10 +17,10 @@ class NextBipTExtractor : public RuntimeColleague {
   bool HasRelationship(RelDirection dir, std::string first, std::string second) override;
   void SetMediator(RuntimeMediator* rtm);
  private:
-  PKB* pkb_;
-  RuntimeMediator* rtm_;
+  PKB* pkb_{};
+  RuntimeMediator* rtm_{};
   void PopulateRelationships();
-  PKBRelRefs GetPKBRelRef(RelDirection dir);
+  static PKBRelRefs GetPKBRelRef(RelDirection dir);
 };
 
 #endif //AUTOTESTER_CODE35_SRC_SPA_SRC_COMPONENT_PKB_EXTRACTOR_NEXTBIPTEXTRACTOR_H_

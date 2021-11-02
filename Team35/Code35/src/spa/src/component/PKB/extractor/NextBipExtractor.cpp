@@ -19,79 +19,42 @@ NextBipExtractor::NextBipExtractor(PKB* pkb) {
  * @param target Statement number of the first argument of NextBip.
  * @return Vector of Entities that are NextBip of the target.
  */
-std::vector<Entity*> NextBipExtractor::GetNextBip(const std::string& target) {
+std::vector<Entity*> NextBipExtractor::GetRelationship(RelDirection dir, std::string target) {
   PopulateBipMaps();
-  return pkb_->GetRelationship(PKBRelRefs::kNextBip, target);
-}
-
-/**
- * Gets all s from NextBip(s, target).
- * @param target Target statement number.
- * @return Vector of entities satisfying the relationship.
- */
-std::vector<Entity*> NextBipExtractor::GetPrevBip(const std::string& target) {
-  PopulateBipMaps();
-  return pkb_->GetRelationship(PKBRelRefs::kPrevBip, target);
-}
-
-std::vector<Entity*> NextBipExtractor::GetRelationship(PKBRelRefs rel, const std::string& target) {
-  std::vector<Entity*> result = pkb_->GetRelationship(rel, target);
-  if (result.empty()) {
-    PopulateBipMaps();
-    return pkb_->GetRelationship(rel, target);
-  } else {
-    return result;
-  }
+  return pkb_->GetRelationship(GetPKBRelRef(dir), target);
 }
 
 /**
  * Gets all rhs of NextBip(s, s)
  * @return Vector of entities satisfying the relationship.
  */
-std::vector<Entity*> NextBipExtractor::GetAllNextBipRHS() {
+std::vector<Entity*> NextBipExtractor::GetFirstEntityOfRelationship(RelDirection dir) {
   PopulateBipMaps();
-  return pkb_->GetFirstEntityOfRelationship(PKBRelRefs::kNextBip, DesignEntity::kStmt);
+  return pkb_->GetFirstEntityOfRelationship(GetPKBRelRef(dir), DesignEntity::kStmt);
 }
 
-/**
- * Gets all lhs of NextBip(s, s)
- * @return Vector of entities satisfying the relationship.
- */
-std::vector<Entity*> NextBipExtractor::GetAllNextBipLHS() {
+std::vector<std::tuple<Entity*, Entity*>> NextBipExtractor::GetRelationshipByTypes(RelDirection dir) {
   PopulateBipMaps();
-  return pkb_->GetFirstEntityOfRelationship(PKBRelRefs::kPrevBip, DesignEntity::kStmt);
+  return pkb_->GetRelationshipByTypes(GetPKBRelRef(dir), DesignEntity::kStmt, DesignEntity::kStmt);
 }
-std::vector<std::tuple<Entity*, Entity*>> NextBipExtractor::GetAllNextBip() {
+
+bool NextBipExtractor::HasRelationship(RelDirection dir) {
   PopulateBipMaps();
-  return pkb_->GetRelationshipByTypes(PKBRelRefs::kNextBip, DesignEntity::kStmt, DesignEntity::kStmt);
+  return pkb_->HasRelationship(GetPKBRelRef(dir));
 }
-std::vector<std::tuple<Entity*, Entity*>> NextBipExtractor::GetAllPrevBip() {
+
+bool NextBipExtractor::HasRelationship(RelDirection dir, std::string target) {
   PopulateBipMaps();
-  return pkb_->GetRelationshipByTypes(PKBRelRefs::kPrevBip, DesignEntity::kStmt, DesignEntity::kStmt);
+  return pkb_->HasRelationship(GetPKBRelRef(dir), target);
 }
-bool NextBipExtractor::HasNextBip() {
+
+bool NextBipExtractor::HasRelationship(RelDirection dir, std::string first, std::string second) {
   PopulateBipMaps();
-  return pkb_->HasRelationship(PKBRelRefs::kNextBip);
-}
-bool NextBipExtractor::HasPrevBip() {
-  PopulateBipMaps();
-  return pkb_->HasRelationship(PKBRelRefs::kPrevBip);
-}
-bool NextBipExtractor::HasNextBip(std::string target) {
-  PopulateBipMaps();
-  return pkb_->HasRelationship(PKBRelRefs::kNextBip, target);
-}
-bool NextBipExtractor::HasPrevBip(std::string target) {
-  PopulateBipMaps();
-  return pkb_->HasRelationship(PKBRelRefs::kPrevBip, target);
-}
-bool NextBipExtractor::HasNextBip(std::string first, std::string second) {
-  PopulateBipMaps();
-  return pkb_->HasRelationship(PKBRelRefs::kNextBip, first, second);
+  return pkb_->HasRelationship(GetPKBRelRef(dir), first, second);
 }
 
 void NextBipExtractor::PopulateBipMaps() {
-  if (populated_) return;
+  if (pkb_->HasRelationship(PKBRelRefs::kNextBip)) return;
   next_bip_map_ = pkb_->ConvertStringToEntityMapping(pkb_->GetRelationshipMap(PKBRelRefs::kNext));
   prev_bip_map_ = pkb_->ConvertStringToEntityMapping(pkb_->GetRelationshipMap(PKBRelRefs::kPrevious));
   for (Entity* call_entity : call_list_) {
@@ -107,7 +70,6 @@ void NextBipExtractor::PopulateBipMaps() {
   }
   pkb_->PopulateRelationship<Entity, Entity>(next_bip_map_, PKBRelRefs::kNextBip);
   pkb_->PopulateRelationship<Entity, Entity>(prev_bip_map_, PKBRelRefs::kPrevBip);
-  populated_ = true;
 }
 
 std::list<Entity*> NextBipExtractor::GetRelFromMap(Entity* target, PKBRelRefs rel) {
@@ -210,4 +172,8 @@ std::list<int> NextBipExtractor::HandleCallLastStmt(const std::list<int> &last_s
   nested_last_stmts.sort();
   nested_last_stmts.unique();
   return nested_last_stmts;
+}
+
+PKBRelRefs NextBipExtractor::GetPKBRelRef(RelDirection dir) {
+  return dir == RelDirection::kForward ? PKBRelRefs::kNextBip : PKBRelRefs::kPrevBip;
 }

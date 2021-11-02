@@ -70,6 +70,8 @@ class RuntimeExtractor : public RuntimeMediator {
   std::vector<Entity*> GetAffectedByT(DesignEntity de);
   std::vector<Entity*> GetNextBip(DesignEntity de);
   std::vector<Entity*> GetPrevBip(DesignEntity de);
+  std::vector<Entity*> GetNextBipT(DesignEntity de);
+  std::vector<Entity*> GetPrevBipT(DesignEntity de);
 
   std::vector<std::tuple<Entity*, Entity*>> GetNextT(DesignEntity first, DesignEntity second);
   std::vector<std::tuple<Entity*, Entity*>> GetPrevT(DesignEntity first, DesignEntity second);
@@ -79,11 +81,12 @@ class RuntimeExtractor : public RuntimeMediator {
   std::vector<std::tuple<Entity*, Entity*>> GetAffectedByT(DesignEntity first, DesignEntity second);
   std::vector<std::tuple<Entity*, Entity*>> GetNextBip(DesignEntity first, DesignEntity second);
   std::vector<std::tuple<Entity*, Entity*>> GetPrevBip(DesignEntity first, DesignEntity second);
+  std::vector<std::tuple<Entity*, Entity*>> GetNextBipT(DesignEntity first, DesignEntity second);
+  std::vector<std::tuple<Entity*, Entity*>> GetPrevBipT(DesignEntity first, DesignEntity second);
 
   bool HasAffects();
   bool HasAffectedBy();
   bool HasNextBip();
-  bool HasPrevBip();
 
   bool HasAffects(int first);
   bool HasAffectedBy(int first);
@@ -91,6 +94,8 @@ class RuntimeExtractor : public RuntimeMediator {
   bool HasAffectedByT(int first);
   bool HasNextBip(std::string first);
   bool HasPrevBip(std::string first);
+  bool HasNextBipT(std::string first);
+  bool HasPrevBipT(std::string first);
 
   bool HasNextT(int first, int second);
   bool HasAffects(int first, int second);
@@ -98,6 +103,7 @@ class RuntimeExtractor : public RuntimeMediator {
   bool HasAffectsT(int first, int second);
   bool HasAffectedByT(int first, int second);
   bool HasNextBip(std::string first, std::string second);
+  bool HasNextBipT(std::string first, std::string second);
 };
 
 #endif //AUTOTESTER_CODE35_SRC_SPA_SRC_COMPONENT_PKB_RUNTIMEEXTRACTOR_H_

@@ -39,13 +39,15 @@ bool NextBipTExtractor::HasRelationship(RelDirection dir, std::string first, std
 
 void NextBipTExtractor::PopulateRelationships() {
   if (pkb_->HasRelationship(PKBRelRefs::kNextBipT)) return;
-  TransitiveExtractor extractor = TransitiveExtractor<Entity>();
   auto* t_map = new std::unordered_map<Entity*, std::list<Entity*>*>{};
   auto* reverse_t_map = new std::unordered_map<Entity*, std::list<Entity*>*>{};
-  // if (!pkb_->HasRelationship(PKBRelRefs::kNextBip))
-  // rte hasrel for nextbip
+  if (!pkb_->HasRelationship(PKBRelRefs::kNextBip)) {
+     rtm_->HasRelationship(PKBRelRefs::kNextBip);
+  }
   auto non_t_string_map = pkb_->GetRelationshipMap(PKBRelRefs::kNextBip);
   auto* non_t_map = pkb_->ConvertStringToEntityMapping(non_t_string_map);
+  TransitiveExtractor extractor = TransitiveExtractor<Entity>();
+  extractor.AllowCyclicRelationships();
   extractor.Extract(t_map, reverse_t_map, non_t_map);
   pkb_->PopulateRelationship(t_map, PKBRelRefs::kNextBipT);
   pkb_->PopulateRelationship(reverse_t_map, PKBRelRefs::kPrevBipT);
