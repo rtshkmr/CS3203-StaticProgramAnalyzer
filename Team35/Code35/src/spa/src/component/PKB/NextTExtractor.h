@@ -3,6 +3,7 @@
 
 #include <model/Entity.h>
 #include <unordered_map>
+#include <component/PKB/extractor/RuntimeColleague.h>
 
 class NextTExtractor {
  public:

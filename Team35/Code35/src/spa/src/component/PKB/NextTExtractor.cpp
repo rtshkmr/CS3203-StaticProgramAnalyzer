@@ -1,6 +1,5 @@
 #include <cassert>
 #include <utility>
-#include <component/PKB/extractor/RuntimeColleague.h>
 #include "NextTExtractor.h"
 
 void NextTExtractor::Delete() {}
@@ -524,7 +523,7 @@ std::vector<Entity*> NextTExtractor::GetPrevT(int target,
                                               std::vector<Statement*> stmt_list) {
   map_to_populate_ = &prev_t_map_;
   first_args_ = &next_t_rhs_stmts_;
-  rel_direction_ = RelDirection::kForward;
+  rel_direction_ = RelDirection::kReverse;
 
   return GetRel(target, proc_list, std::move(stmt_list));
 }
