@@ -19,8 +19,17 @@ class NextBipTExtractor : public RuntimeColleague {
  private:
   PKB* pkb_{};
   RuntimeMediator* rtm_{};
+  std::unordered_map<Entity*, std::list<Entity*>*> t_map_;
+  std::unordered_map<Entity*, std::list<Entity*>*> reverse_t_map_;
+  std::unordered_map<Entity*, std::list<Entity*>*> non_t_map_;
+
   void PopulateRelationships();
   static PKBRelRefs GetPKBRelRef(RelDirection dir);
+  void PopulateNextBipT();
+  void ExtractRelationships(Entity* first_arg,
+                            Entity* second_arg,
+                            std::vector<Entity*>* visited_nodes);
+  void AddRelationship(Entity* key, Entity* value);
 };
 
 #endif //AUTOTESTER_CODE35_SRC_SPA_SRC_COMPONENT_PKB_EXTRACTOR_NEXTBIPTEXTRACTOR_H_
