@@ -1,0 +1,625 @@
+procedure First {
+ if (! (17>=g)) then {
+     print i;
+
+     read i;
+
+     a = (8);
+
+     print e;
+
+ } else {
+     print i;
+
+     read d;
+
+     read b;
+
+ } if (! ((! (! ((g==f) || (d>=16)))) || ((k>2) || ((8<=a) || (15!=6))))) then {
+     print l;
+
+     read g;
+
+     b = ((5) % 16 / ((23) / j));
+
+     read l;
+
+     read h;
+
+     l = ((c));
+
+     read l;
+
+     h = ((((3))) % 27 * l);
+
+ } else {
+     read l;
+
+     print f;
+
+     print i;
+
+     g = (7) % (28 - 29) * (16) % 18 * (d);
+
+     print d;
+
+     print h;
+
+     read c;
+
+     while (! (! ((17>8) && ((b>=i) && ((i==25) && (26>5)))))) {
+         l = ((16));
+
+         print a;
+
+         read i;
+
+         read j;
+
+}
+
+     e = (28) % (7) * k * (20);
+
+ } print l;
+ print k;
+ print j;
+ a = f / k;
+ f = ((2));
+ while (((! (1<=1)) && (16==12)) || (12>i)) {
+     d = 27 * l + 1 * b;
+
+     read a;
+
+     print i;
+
+}
+ if ((8==e) && (26==k)) then {
+     read e;
+
+     b = (((d - (a)) - j) / (5) + 21);
+
+     read j;
+
+     print l;
+
+     print a;
+
+     d = (a + ((30)) % 11 + 9) * ((9));
+
+ } else {
+     read l;
+
+ } f = ((l) % e);
+ print b;
+ d = (a * (i) * (17) / ((j)));
+ read d;
+ read e;
+ read k;
+ read k;
+ e = (e);
+ read h;
+ print d;
+ read f;
+ read b;
+ a = (26);
+ print f;
+ read c;
+ print g;
+ c = ((a - k * 7) - (k % c) % h);
+ print e;
+ g = (((7)));
+ read j;
+ print j;
+ read h;
+ read b;
+ read j;
+ if ((2>=a) && (k<e)) then {
+     read l;
+
+     if (! (((! (b<20)) && (14<11)) || ((k!=b) || ((21>=c) || (e!=14))))) then {
+         i = a % (i + (j)) - ((12) % h % (i) / j) % (27);
+
+         print g;
+
+         print g;
+
+   } else {
+         read a;
+
+   }
+     i = (a / (26));
+
+ } else {
+     d = (j) - c * 2;
+
+     g = l % f * ((3));
+
+     print e;
+
+     print f;
+
+     b = (23 - (f)) + l - 16 + ((29 % a / b));
+
+     d = (27) % 13 + ((e)) - c * (a);
+
+     print i;
+
+     print j;
+
+     read j;
+
+ } c = (14);
+ print h;
+ read f;
+ read c;
+ print c;
+ e = 13 % ((20 % ((12)) % 12));
+ print g;
+ print h;
+ print a;
+ e = ((d % j));
+ a = 15 / (26) / 28 / l + 18;
+ print f;
+ l = ((27));
+ read e;
+ print g;
+ read e;
+ print a;
+ a = ((b / 11) / 27) * (26);
+ read f;
+ read k;
+ while ((! (d<=j)) || ((h<d) && ((k>h) && (2<=29)))) {
+     i = ((a));
+
+     read i;
+
+     b = k % e;
+
+     read g;
+
+     while (((25<e) && (j<19)) && (b<=26)) {
+         print i;
+
+         a = ((((29)) % 14));
+
+         read f;
+
+         read i;
+
+         print i;
+
+         print l;
+
+         read k;
+
+         f = ((23) * a);
+
+         k = ((e));
+
+}
+
+     b = 5 * (20) * b + (27 + 2);
+
+     print h;
+
+     print f;
+
+}
+ print l;
+ read a;
+ print j;
+ if (((((d<=7) && (i<=c)) && (i!=a)) || (f<4)) || ((b>=18) || (((15<c) || (e==30)) && (c<h)))) then {
+     read b;
+
+     while ((i!=i) || (! (25>c))) {
+         read a;
+
+         print i;
+
+         k = 2 / (2) % (16);
+
+         read f;
+
+         read b;
+
+         c = (((9) / a) - k % 21 + b % 11 % 16);
+
+         read l;
+
+         print j;
+
+         print j;
+
+}
+
+     read f;
+
+     while ((! (12!=b)) && (20>=j)) {
+         read h;
+
+         print b;
+
+         read h;
+
+         e = (k - (a % j) * f);
+
+         read a;
+
+         d = 5 - 6 - (13);
+
+         read c;
+
+         read b;
+
+         print b;
+
+}
+
+     while ((! (i==h)) && (! ((f==i) || (8==d)))) {
+         print b;
+
+         f = (2) - f % 22 / 23 + f + 14 % (29) % ((i)) % (1);
+
+         c = (24);
+
+}
+
+     if (! (! (27!=b))) then {
+         print b;
+
+         c = ((f)) - ((j * 23) % k) * (10);
+
+         read k;
+
+         l = g * (d) / (((25))) - (2 / j) + 24 + i;
+
+         read d;
+
+         read j;
+
+   } else {
+         read c;
+
+         print l;
+
+         k = (22 / 1) + (c * e * (l));
+
+         a = (((29)));
+
+         read c;
+
+         read f;
+
+         read a;
+
+         read l;
+
+         j = (((d)));
+
+         a = i / (30);
+
+   }
+     a = 14 - 21 / e - ((29) / i) + 6 % k;
+
+ } else {
+     f = (g + h);
+
+     d = 30 / (27) / b * (4) - (14) * f;
+
+     if ((((8==1) && (4==h)) && ((! (l==g)) || ((! (d<h)) && (12==13)))) && ((8<20) || ((g>=14) && (e!=c)))) then {
+         read l;
+
+         read f;
+
+         read h;
+
+         e = ((9)) + k;
+
+         print g;
+
+         read i;
+
+         read h;
+
+         print k;
+
+         c = ((i - 12));
+
+         a = ((((((5))))) * g);
+
+   } else {
+         print b;
+
+   }
+     print l;
+
+     print j;
+
+     read h;
+
+     j = (b);
+
+     print d;
+
+     f = (b) * ((30)) * 15 % (16 + d - k % 7 + 24);
+
+ } e = 15 * (a) - c % (b) + (14 * h) - l % ((6)) / d;
+ h = (j);
+ print e;
+ print h;
+ print j;
+ a = ((11)) + ((h) * e * 16) - (10);
+ read b;
+ read k;
+ h = (l);
+ if (! (! (4!=8))) then {
+     print a;
+
+     if (! (! (! ((! (27!=13)) || ((c==12) || (i!=d)))))) then {
+         print g;
+
+         l = ((d + 12));
+
+         print k;
+
+         b = (((i) * d));
+
+         e = ((19));
+
+         read g;
+
+   } else {
+         l = ((d));
+
+         print i;
+
+         read i;
+
+         read e;
+
+         read c;
+
+         read a;
+
+         k = (j % ((h)) % 21);
+
+         b = ((14) - (9 + l) % (23) - 10 + c % (c));
+
+         print f;
+
+   }
+     while ((a!=c) || (16<=f)) {
+         read f;
+
+         print e;
+
+         h = 14 + 20 + (f) * j;
+
+         print c;
+
+         print a;
+
+         read h;
+
+         print l;
+
+         e = (i / b);
+
+}
+
+     while (! (! ((3>19) || (10!=g)))) {
+         print j;
+
+         print d;
+
+         i = 1 * (d) % (8) - f / 27;
+
+         print a;
+
+         print h;
+
+}
+
+     print j;
+
+     read c;
+
+     h = g - (k);
+
+     if (((23<=23) && ((g<5) || (i>=j))) || (d!=f)) then {
+         i = (26);
+
+         b = ((6));
+
+   } else {
+         print b;
+
+         f = (27 / (17) % (h - 10 + 6)) * (16) * (g);
+
+         c = (b);
+
+         h = (1) / ((14)) / (k);
+
+         f = ((4));
+
+         print k;
+
+   }
+     print b;
+
+     if (((23==25) || (4==22)) || (e!=15)) then {
+         e = (((14))) - h * 24 - (30) - 12;
+
+         e = a % (d - 7);
+
+         a = (((13 % h))) % (20) - (2);
+
+         print i;
+
+         f = ((k - 28) / ((6)) % g * i);
+
+   } else {
+         print j;
+
+         print l;
+
+   }
+ } else {
+     read k;
+
+     b = (b);
+
+     if (((c>9) && (! (11>8))) && (! ((b!=d) && (2==20)))) then {
+         h = 20 % (h + 16) / (d) / ((18));
+
+         read f;
+
+         read j;
+
+         b = (((j)) % d);
+
+   } else {
+         read b;
+
+   }
+     if (((j<=i) && (16<e)) && (14>1)) then {
+         print h;
+
+         read j;
+
+         b = (i);
+
+         g = (8 * (b));
+
+         print l;
+
+         read b;
+
+         print j;
+
+         print c;
+
+         read a;
+
+   } else {
+         c = (((((i) / 23 / 25))));
+
+         print i;
+
+         a = ((22 * l % 4) + 10 - b);
+
+         read g;
+
+         print f;
+
+         print b;
+
+         j = (g - ((18)));
+
+         read j;
+
+         read a;
+
+   }
+     while (((! (b<=c)) && (! (13<=10))) && ((18<h) || (5<c))) {
+         print k;
+
+         print j;
+
+}
+
+     print d;
+
+     h = (c);
+
+     print a;
+
+     print k;
+
+     read f;
+
+ } i = ((d) - (23));
+ l = (e * e);
+ read i;
+ b = (((21 - (e))));
+ read k;
+ read a;
+ while ((29<17) && ((19>k) || (b>=j))) {
+     print e;
+
+     if ((((3<=h) && (j>f)) || ((19<=f) || (h>j))) && (h>c)) then {
+         read c;
+
+         a = ((28)) + 21 * 10 + 18 * k % (30 - (e)) * l;
+
+         c = ((g / k + 4) + e) * ((a) / f * e * 13);
+
+         g = a - (b);
+
+         read a;
+
+         read h;
+
+         b = (10);
+
+         k = (k) / 6 / 30;
+
+   } else {
+         d = f + 4 + (b * (4));
+
+   }
+     while ((((k<=29) && (8!=a)) && (g>28)) || (((27<3) || (29>k)) || (11!=a))) {
+         print l;
+
+         print b;
+
+         c = (4) - (1);
+
+         print h;
+
+         print e;
+
+         read c;
+
+         print i;
+
+         d = 25 * ((c / 3));
+
+         read b;
+
+         print l;
+
+}
+
+     d = 30 + a / (e) + b * d;
+
+     a = ((19)) % (d + (16));
+
+     print k;
+
+}
+ e = ((d) / (21 % 2 - (13) + d));
+ j = (l) % 9 - (l) % c % k * (e) % a;
+ j = (17 - b * ((12)));
+ print f;
+ read g;
+ read c;
+ read h;
+ read l;
+ read g;
+ read j;
+ read e;
+ read f;
+ l = (((30) % (5)) * 26 + c);
+ read e;
+ print l;
+ print k;
+ j = (29) / 19 - 4 + ((24) - e / (8) - e + 22 + ((26)));
+ read c;
+ read d;
+ read d;
+ print f;
+ print k;
+ read c;
+ print b;
+}

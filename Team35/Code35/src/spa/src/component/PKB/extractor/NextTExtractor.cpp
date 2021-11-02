@@ -1,6 +1,7 @@
 #include <cassert>
 #include <utility>
 #include "NextTExtractor.h"
+#include "model/CFG.h"
 
 void NextTExtractor::Delete() {}
 

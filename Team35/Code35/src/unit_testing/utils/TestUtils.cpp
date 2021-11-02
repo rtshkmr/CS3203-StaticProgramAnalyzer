@@ -73,3 +73,9 @@ bool TestUtils::AreVectorsEqual(std::vector<std::tuple<Entity*, Entity*>> as, st
   }
   return as.size() == bs.size();
 }
+
+void TestUtils::AddStatementList(Container* container, const std::list<Statement*>& stmt_list) {
+  for (Statement* stmt: stmt_list) {
+    container->AddStatement(stmt);
+  }
+}

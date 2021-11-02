@@ -1,6 +1,9 @@
 #include "catch.hpp"
 #include "component/SourceProcessor/SourceProcessor.h"
 #include "component/SourceProcessor/Parser.h"
+#include "../../util/TestUtil.h"
+
+using namespace test_util;
 
 TEST_CASE("SP to PKB basic retrieval") {
   PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/basic_source.txt");
@@ -98,57 +101,30 @@ TEST_CASE("SP to PKB relationships tests") {
 
   PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/mixed_loops_source.txt");
 
-  std::vector<std::tuple<EntityEnum, std::string>> source_tuples = {
-      std::make_tuple(EntityEnum::kAssignEntity, "-1000000"), // placeholder
-      std::make_tuple(EntityEnum::kAssignEntity, "1"),
-      std::make_tuple(EntityEnum::kReadEntity, "2"),
-      std::make_tuple(EntityEnum::kIfEntity, "3"),
-      std::make_tuple(EntityEnum::kAssignEntity, "4"),
-      std::make_tuple(EntityEnum::kAssignEntity, "5"),
-      std::make_tuple(EntityEnum::kWhileEntity, "6"),
-      std::make_tuple(EntityEnum::kReadEntity, "7"),
-      std::make_tuple(EntityEnum::kIfEntity, "8"),
-      std::make_tuple(EntityEnum::kAssignEntity, "9"),
-      std::make_tuple(EntityEnum::kAssignEntity, "10"),
-      std::make_tuple(EntityEnum::kIfEntity, "11"),
-      std::make_tuple(EntityEnum::kAssignEntity, "12"),
-      std::make_tuple(EntityEnum::kPrintEntity, "13"),
-      std::make_tuple(EntityEnum::kAssignEntity, "14"),
-      std::make_tuple(EntityEnum::kPrintEntity, "15"),
-      std::make_tuple(EntityEnum::kAssignEntity, "16"),
-      std::make_tuple(EntityEnum::kPrintEntity, "17"),
-      std::make_tuple(EntityEnum::kPrintEntity, "18"),
-      std::make_tuple(EntityEnum::kIfEntity, "19"),
-      std::make_tuple(EntityEnum::kPrintEntity, "20"),
-      std::make_tuple(EntityEnum::kPrintEntity, "21"),
-      std::make_tuple(EntityEnum::kPrintEntity, "22"),
-      std::make_tuple(EntityEnum::kAssignEntity, "23")
-  };
-
   SECTION("Follows") {
     std::vector<std::list<std::tuple<EntityEnum, std::string>>> expected_get_follows_lists = {
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[2]},    //1
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[3]},      //2
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[19]},     //3
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[5]},  //4
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[6]},   //5
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[2]},    //1
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[3]},      //2
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[19]},     //3
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[5]},  //4
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[6]},   //5
         std::list<std::tuple<EntityEnum, std::string>>(),                                             //6
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[8]},      //7
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[8]},      //7
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //8
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[10]}, //9
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[11]},     //10
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[16]}, //11
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[13]},  //12
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[14]}, //13
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[10]}, //9
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[11]},     //10
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[16]}, //11
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[13]},  //12
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[14]}, //13
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //14
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //15
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //16
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //17
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //18
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[22]},  //19
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[22]},  //19
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //20
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //21
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[23]}, //22
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[23]}, //22
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //23
         std::list<std::tuple<EntityEnum, std::string>>{}, //out of bounds check
     };
@@ -171,50 +147,50 @@ TEST_CASE("SP to PKB relationships tests") {
   SECTION("Follows*") {
     std::vector<std::list<std::tuple<EntityEnum, std::string>>> expected_get_followsT_lists = {
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[2],
-            source_tuples[3],
-            source_tuples[19],
-            source_tuples[22],
-            source_tuples[23],},    //1
+            ml_source_tuples[2],
+            ml_source_tuples[3],
+            ml_source_tuples[19],
+            ml_source_tuples[22],
+            ml_source_tuples[23],},    //1
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[3],
-            source_tuples[19],
-            source_tuples[22],
-            source_tuples[23],},      //2
+            ml_source_tuples[3],
+            ml_source_tuples[19],
+            ml_source_tuples[22],
+            ml_source_tuples[23],},      //2
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[19],
-            source_tuples[22],
-            source_tuples[23],},     //3
+            ml_source_tuples[19],
+            ml_source_tuples[22],
+            ml_source_tuples[23],},     //3
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[5],
-            source_tuples[6],},  //4
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[6]},   //5
+            ml_source_tuples[5],
+            ml_source_tuples[6],},  //4
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[6]},   //5
         std::list<std::tuple<EntityEnum, std::string>>(),                                             //6
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[8]},      //7
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[8]},      //7
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //8
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[10],
-            source_tuples[11],
-            source_tuples[16],}, //9
+            ml_source_tuples[10],
+            ml_source_tuples[11],
+            ml_source_tuples[16],}, //9
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[11],
-            source_tuples[16],},     //10
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[16]}, //11
+            ml_source_tuples[11],
+            ml_source_tuples[16],},     //10
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[16]}, //11
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[13],
-            source_tuples[14],},  //12
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[14]}, //13
+            ml_source_tuples[13],
+            ml_source_tuples[14],},  //12
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[14]}, //13
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //14
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //15
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //16
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //17
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //18
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[22],
-            source_tuples[23],},  //19
+            ml_source_tuples[22],
+            ml_source_tuples[23],},  //19
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //20
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //21
-        std::list<std::tuple<EntityEnum, std::string>>{source_tuples[23]}, //22
+        std::list<std::tuple<EntityEnum, std::string>>{ml_source_tuples[23]}, //22
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //23
         std::list<std::tuple<EntityEnum, std::string>>{}, //out of bounds check
     };
@@ -224,13 +200,7 @@ TEST_CASE("SP to PKB relationships tests") {
       std::string stmt_no_str = std::to_string(i);
       std::list<std::tuple<EntityEnum, std::string>> expected_get_followsT_list = expected_get_followsT_lists[i - 1];
       std::vector<Entity*> actual_list = pkb->GetRelationship(PKBRelRefs::kFollowsT, stmt_no_str);
-      int j = 0;
-      for (auto expected_followsT : expected_get_followsT_list) {
-        Entity* actual_followsT_entity = actual_list[j];
-        CHECK(pkb->GetNameFromEntity(actual_followsT_entity) == std::get<1>(expected_followsT));
-        CHECK(actual_followsT_entity->GetEntityEnum() == std::get<0>(expected_followsT));
-        j += 1;
-      }
+      CHECK(AreEntityListsEqual(expected_get_followsT_list, actual_list));
     }
   }
 
@@ -239,30 +209,30 @@ TEST_CASE("SP to PKB relationships tests") {
         std::list<std::tuple<EntityEnum, std::string>>{},    //1
         std::list<std::tuple<EntityEnum, std::string>>{},      //2
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[4],
-            source_tuples[5],
-            source_tuples[6],
-            source_tuples[18],},     //3
+            ml_source_tuples[4],
+            ml_source_tuples[5],
+            ml_source_tuples[6],
+            ml_source_tuples[18],},     //3
         std::list<std::tuple<EntityEnum, std::string>>{},  //4
         std::list<std::tuple<EntityEnum, std::string>>{},   //5
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[7],
-            source_tuples[8],},                                             //6
+            ml_source_tuples[7],
+            ml_source_tuples[8],},                                             //6
         std::list<std::tuple<EntityEnum, std::string>>{},      //7
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[9],
-            source_tuples[10],
-            source_tuples[11],
-            source_tuples[16],
-            source_tuples[17],
+            ml_source_tuples[9],
+            ml_source_tuples[10],
+            ml_source_tuples[11],
+            ml_source_tuples[16],
+            ml_source_tuples[17],
         },                                             //8
         std::list<std::tuple<EntityEnum, std::string>>{}, //9
         std::list<std::tuple<EntityEnum, std::string>>{},     //10
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[12],
-            source_tuples[13],
-            source_tuples[14],
-            source_tuples[15],}, //11
+            ml_source_tuples[12],
+            ml_source_tuples[13],
+            ml_source_tuples[14],
+            ml_source_tuples[15],}, //11
         std::list<std::tuple<EntityEnum, std::string>>{},  //12
         std::list<std::tuple<EntityEnum, std::string>>{}, //13
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //14
@@ -271,8 +241,8 @@ TEST_CASE("SP to PKB relationships tests") {
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //17
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //18
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[20],
-            source_tuples[21],},  //19
+            ml_source_tuples[20],
+            ml_source_tuples[21],},  //19
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //20
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //21
         std::list<std::tuple<EntityEnum, std::string>>{}, //22
@@ -301,54 +271,54 @@ TEST_CASE("SP to PKB relationships tests") {
         std::list<std::tuple<EntityEnum, std::string>>{},    //1
         std::list<std::tuple<EntityEnum, std::string>>{},      //2
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[4],
-            source_tuples[5],
-            source_tuples[6],
-            source_tuples[7],
-            source_tuples[8],
-            source_tuples[9],
-            source_tuples[10],
-            source_tuples[11],
-            source_tuples[12],
-            source_tuples[13],
-            source_tuples[14],
-            source_tuples[15],
-            source_tuples[16],
-            source_tuples[17],
-            source_tuples[18],},     //3
+            ml_source_tuples[4],
+            ml_source_tuples[5],
+            ml_source_tuples[6],
+            ml_source_tuples[7],
+            ml_source_tuples[8],
+            ml_source_tuples[9],
+            ml_source_tuples[10],
+            ml_source_tuples[11],
+            ml_source_tuples[12],
+            ml_source_tuples[13],
+            ml_source_tuples[14],
+            ml_source_tuples[15],
+            ml_source_tuples[16],
+            ml_source_tuples[17],
+            ml_source_tuples[18],},     //3
         std::list<std::tuple<EntityEnum, std::string>>{},  //4
         std::list<std::tuple<EntityEnum, std::string>>{},   //5
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[7],
-            source_tuples[8],
-            source_tuples[9],
-            source_tuples[10],
-            source_tuples[11],
-            source_tuples[12],
-            source_tuples[13],
-            source_tuples[14],
-            source_tuples[15],
-            source_tuples[16],
-            source_tuples[17],},                                             //6
+            ml_source_tuples[7],
+            ml_source_tuples[8],
+            ml_source_tuples[9],
+            ml_source_tuples[10],
+            ml_source_tuples[11],
+            ml_source_tuples[12],
+            ml_source_tuples[13],
+            ml_source_tuples[14],
+            ml_source_tuples[15],
+            ml_source_tuples[16],
+            ml_source_tuples[17],},                                             //6
         std::list<std::tuple<EntityEnum, std::string>>{},      //7
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[9],
-            source_tuples[10],
-            source_tuples[11],
-            source_tuples[12],
-            source_tuples[13],
-            source_tuples[14],
-            source_tuples[15],
-            source_tuples[16],
-            source_tuples[17],
+            ml_source_tuples[9],
+            ml_source_tuples[10],
+            ml_source_tuples[11],
+            ml_source_tuples[12],
+            ml_source_tuples[13],
+            ml_source_tuples[14],
+            ml_source_tuples[15],
+            ml_source_tuples[16],
+            ml_source_tuples[17],
         },                                             //8
         std::list<std::tuple<EntityEnum, std::string>>{}, //9
         std::list<std::tuple<EntityEnum, std::string>>{},     //10
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[12],
-            source_tuples[13],
-            source_tuples[14],
-            source_tuples[15],}, //11
+            ml_source_tuples[12],
+            ml_source_tuples[13],
+            ml_source_tuples[14],
+            ml_source_tuples[15],}, //11
         std::list<std::tuple<EntityEnum, std::string>>{},  //12
         std::list<std::tuple<EntityEnum, std::string>>{}, //13
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //14
@@ -357,8 +327,8 @@ TEST_CASE("SP to PKB relationships tests") {
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //17
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //18
         std::list<std::tuple<EntityEnum, std::string>>{
-            source_tuples[20],
-            source_tuples[21],},  //19
+            ml_source_tuples[20],
+            ml_source_tuples[21],},  //19
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //20
         std::list<std::tuple<EntityEnum, std::string>>{},                                             //21
         std::list<std::tuple<EntityEnum, std::string>>{}, //22
@@ -372,13 +342,7 @@ TEST_CASE("SP to PKB relationships tests") {
       std::string stmt_no_str = std::to_string(i);
       std::list<std::tuple<EntityEnum, std::string>> expected_get_parentT_list = expected_get_parentT_lists[i - 1];
       std::vector<Entity*> actual_list = pkb->GetRelationship(PKBRelRefs::kParentT, stmt_no_str);
-      int j = 0;
-      for (auto expected_parentT : expected_get_parentT_list) {
-        Entity* actual_parentT_entity = actual_list[j];
-        CHECK(pkb->GetNameFromEntity(actual_parentT_entity) == std::get<1>(expected_parentT));
-        CHECK(actual_parentT_entity->GetEntityEnum() == std::get<0>(expected_parentT));
-        j += 1;
-      }
+      CHECK(AreEntityListsEqual(expected_get_parentT_list, actual_list));
     }
   }
 
@@ -415,105 +379,6 @@ TEST_CASE("SP to PKB relationships tests") {
     CHECK(pkb->GetRelationship(PKBRelRefs::kUses, "7").empty());
   }
 
-  SECTION("Uses container") {
-    // 1 container
-    std::list<std::tuple<EntityEnum, std::string>>
-        expected_list_var1 = std::list<std::tuple<EntityEnum, std::string>>{
-      std::make_tuple(EntityEnum::kVariableEntity, "fileName"),
-        std::make_tuple(EntityEnum::kVariableEntity, "pr0cessSuccessfuI"),
-        std::make_tuple(EntityEnum::kVariableEntity, "SyntaxErr0rFound")
-    };
-    std::vector<Entity*> actual_uses_list_1 = pkb->GetRelationship(PKBRelRefs::kUses, "19");
-    int j = 0;
-    for (auto expected_uses : expected_list_var1) {
-      Entity* actual_uses = actual_uses_list_1.at(j);
-      CHECK(actual_uses->GetEntityEnum() == std::get<0>(expected_uses));
-      CHECK(pkb->GetNameFromEntity(actual_uses) == std::get<1>(expected_uses));
-      j += 1;
-    }
-
-    // inner container
-    std::list<std::tuple<EntityEnum, std::string>>
-        expected_list_var2 = std::list<std::tuple<EntityEnum, std::string>>{
-        std::make_tuple(EntityEnum::kVariableEntity, "byte"),
-        std::make_tuple(EntityEnum::kVariableEntity, "psubsystem"),
-        std::make_tuple(EntityEnum::kVariableEntity, "ProcessStmtNow"),
-        std::make_tuple(EntityEnum::kVariableEntity, "cont1nueREad1ng"),
-    };
-    std::vector<Entity*> actual_uses_list_2 = pkb->GetRelationship(PKBRelRefs::kUses, "11");
-    j = 0;
-    for (auto expected_uses : expected_list_var2) {
-      Entity* actual_uses = actual_uses_list_2.at(j);
-      CHECK(actual_uses->GetEntityEnum() == std::get<0>(expected_uses));
-      CHECK(pkb->GetNameFromEntity(actual_uses) == std::get<1>(expected_uses));
-      j += 1;
-    }
-
-    // middle container
-    std::list<std::tuple<EntityEnum, std::string>>
-        expected_list_var3 = std::list<std::tuple<EntityEnum, std::string>>{
-        std::make_tuple(EntityEnum::kVariableEntity, "fileName"),
-        std::make_tuple(EntityEnum::kVariableEntity, "byte"),
-        std::make_tuple(EntityEnum::kVariableEntity, "chara"),
-        std::make_tuple(EntityEnum::kVariableEntity, "SyntaxErr0rFound"),
-        std::make_tuple(EntityEnum::kVariableEntity, "psubsystem"),
-        std::make_tuple(EntityEnum::kVariableEntity, "ProcessStmtNow"),
-        std::make_tuple(EntityEnum::kVariableEntity, "cont1nueREad1ng"),
-    };
-    std::vector<Entity*> actual_uses_list_3 = pkb->GetRelationship(PKBRelRefs::kUses, "6");
-    j = 0;
-    for (auto expected_uses : expected_list_var3) {
-      Entity* actual_uses = actual_uses_list_3.at(j);
-      CHECK(actual_uses->GetEntityEnum() == std::get<0>(expected_uses));
-      CHECK(pkb->GetNameFromEntity(actual_uses) == std::get<1>(expected_uses));
-      j += 1;
-    }
-
-    // outer container
-    std::list<std::tuple<EntityEnum, std::string>>
-        expected_list_var4 = std::list<std::tuple<EntityEnum, std::string>>{
-        std::make_tuple(EntityEnum::kVariableEntity, "fileName"),
-        std::make_tuple(EntityEnum::kVariableEntity, "InvalidFileName"),
-        std::make_tuple(EntityEnum::kVariableEntity, "byte"),
-        std::make_tuple(EntityEnum::kVariableEntity, "chara"),
-        std::make_tuple(EntityEnum::kVariableEntity, "SyntaxErr0rFound"),
-        std::make_tuple(EntityEnum::kVariableEntity, "psubsystem"),
-        std::make_tuple(EntityEnum::kVariableEntity, "ProcessStmtNow"),
-        std::make_tuple(EntityEnum::kVariableEntity, "cont1nueREad1ng"),
-    };
-    std::vector<Entity*> actual_uses_list_4 = pkb->GetRelationship(PKBRelRefs::kUses, "3");
-    j = 0;
-    for (auto expected_uses : expected_list_var4) {
-      Entity* actual_uses = actual_uses_list_4.at(j);
-      CHECK(actual_uses->GetEntityEnum() == std::get<0>(expected_uses));
-      CHECK(pkb->GetNameFromEntity(actual_uses) == std::get<1>(expected_uses));
-      j += 1;
-    }
-
-    // procedure container
-    std::list<std::tuple<EntityEnum, std::string>>
-    expected_list_var5 = std::list<std::tuple<EntityEnum, std::string>>{
-      std::make_tuple(EntityEnum::kVariableEntity, "fileName"),
-      std::make_tuple(EntityEnum::kVariableEntity, "byte"),
-      std::make_tuple(EntityEnum::kVariableEntity, "chara"),
-      std::make_tuple(EntityEnum::kVariableEntity, "psubsystem"),
-      std::make_tuple(EntityEnum::kVariableEntity, "ProcessStmtNow"),
-      std::make_tuple(EntityEnum::kVariableEntity, "cont1nueREad1ng"),
-      std::make_tuple(EntityEnum::kVariableEntity, "SyntaxErr0rFound"),
-      std::make_tuple(EntityEnum::kVariableEntity, "InvalidFileName"),
-      std::make_tuple(EntityEnum::kVariableEntity, "pr0cessSuccessfuI"),
-      };
-    std::vector<Entity*> actual_uses_list_5 = pkb->GetRelationship(PKBRelRefs::kUsesC, "Parser");
-
-    j = 0;
-    for (auto expected_uses : expected_list_var5) {
-      Entity* actual_uses = actual_uses_list_5.at(j);
-      CHECK(actual_uses->GetEntityEnum() == std::get<0>(expected_uses));
-      CHECK(pkb->GetNameFromEntity(actual_uses) == std::get<1>(expected_uses));
-      j += 1;
-    }
-  }
-
   SECTION("Modifies statement") {
     // var on lhs
     std::vector<Entity*> mappings1 = pkb->GetRelationship(PKBRelRefs::kModifies,"1");
@@ -541,80 +406,6 @@ TEST_CASE("SP to PKB relationships tests") {
 
     // print
     CHECK(pkb->GetRelationship(PKBRelRefs::kModifies, "20").empty());
-  }
-
-  SECTION("Modifies container") {
-    // 1 container all print
-    CHECK(pkb->GetRelationship(PKBRelRefs::kModifies, "19").empty());
-
-    // inner container
-    std::list<std::tuple<EntityEnum, std::string>>
-    expected_list_var2 = std::list<std::tuple<EntityEnum, std::string>>{
-      std::make_tuple(EntityEnum::kVariableEntity, "psubsystem"),
-      std::make_tuple(EntityEnum::kVariableEntity, "chara"),
-      };
-    std::vector<Entity*> actual_list_var2 = pkb->GetRelationship(PKBRelRefs::kModifies, "11");
-    int i = 0;
-    for (auto expected_modifies : expected_list_var2) {
-      Entity* actual_modifies = actual_list_var2.at(i);
-      CHECK(actual_modifies->GetEntityEnum() == std::get<0>(expected_modifies));
-      CHECK(pkb->GetNameFromEntity(actual_modifies) == std::get<1>(expected_modifies));
-      i += 1;
-    }
-
-    // middle container
-    std::list<std::tuple<EntityEnum, std::string>>
-    expected_list_var3 = std::list<std::tuple<EntityEnum, std::string>>{
-      std::make_tuple(EntityEnum::kVariableEntity, "byte"),
-      std::make_tuple(EntityEnum::kVariableEntity, "chara"),
-      std::make_tuple(EntityEnum::kVariableEntity, "lastByte"),
-      std::make_tuple(EntityEnum::kVariableEntity, "fileName"),
-      std::make_tuple(EntityEnum::kVariableEntity, "psubsystem"),
-      };
-    std::vector<Entity*> actual_list_var3 = pkb->GetRelationship(PKBRelRefs::kModifies, "6");
-    i = 0;
-    for (auto expected_modifies : expected_list_var3) {
-      Entity* actual_modifies = actual_list_var3.at(i);
-      CHECK(actual_modifies->GetEntityEnum() == std::get<0>(expected_modifies));
-      CHECK(pkb->GetNameFromEntity(actual_modifies) == std::get<1>(expected_modifies));
-      i += 1;
-    }
-
-    // outer container
-    std::list<std::tuple<EntityEnum, std::string>>
-    expected_list_var4 = std::list<std::tuple<EntityEnum, std::string>>{
-      std::make_tuple(EntityEnum::kVariableEntity, "chara"),
-      std::make_tuple(EntityEnum::kVariableEntity, "byte"),
-      std::make_tuple(EntityEnum::kVariableEntity, "lastByte"),
-      std::make_tuple(EntityEnum::kVariableEntity, "fileName"),
-      std::make_tuple(EntityEnum::kVariableEntity, "psubsystem"),
-    };
-    std::vector<Entity*> actual_list_var4 = pkb->GetRelationship(PKBRelRefs::kModifies, "3");
-    i = 0;
-    for (auto expected_modifies : expected_list_var4) {
-      Entity* actual_modifies = actual_list_var4.at(i);
-      CHECK(actual_modifies->GetEntityEnum() == std::get<0>(expected_modifies));
-      CHECK(pkb->GetNameFromEntity(actual_modifies) == std::get<1>(expected_modifies));
-      i += 1;
-    }
-
-    // procedure container
-    std::list<std::tuple<EntityEnum, std::string>>
-    expected_list_var5 = std::list<std::tuple<EntityEnum, std::string>>{
-      std::make_tuple(EntityEnum::kVariableEntity, "psubsystem"),
-      std::make_tuple(EntityEnum::kVariableEntity, "chara"),
-      std::make_tuple(EntityEnum::kVariableEntity, "byte"),
-      std::make_tuple(EntityEnum::kVariableEntity, "lastByte"),
-      std::make_tuple(EntityEnum::kVariableEntity, "fileName"),
-      };
-    std::vector<Entity*> actual_list_var5 = pkb->GetRelationship(PKBRelRefs::kModifiesContainer, "Parser");
-    i = 0;
-    for (auto expected_modifies : expected_list_var5) {
-      Entity* actual_modifies = actual_list_var5.at(i);
-      CHECK(actual_modifies->GetEntityEnum() == std::get<0>(expected_modifies));
-      CHECK(pkb->GetNameFromEntity(actual_modifies) == std::get<1>(expected_modifies));
-      i += 1;
-    }
   }
 
   SECTION("Parent Else Block") {
@@ -715,144 +506,36 @@ TEST_CASE("SP to PKB relationships tests") {
 
       CHECK(pkb->GetRelationship(PKBRelRefs::kFollowedBy, "20").empty());
       CHECK(pkb->GetRelationship(PKBRelRefs::kFollowedBy, "21").empty());
-
-      std::vector<Entity*> ContainersUsing_fileName = pkb->GetRelationship(PKBRelRefs::kUsedByC, "fileName");
-      std::vector<Entity*> ProcedureUsing_fileName;
-      for (auto container : ContainersUsing_fileName) {
-        if (container->GetEntityEnum() == EntityEnum::kProcedureEntity) {
-          ProcedureUsing_fileName.push_back(container);
-        }
-      }
-      CHECK(ProcedureUsing_fileName.size() == 1);
-      CHECK(pkb->GetNameFromEntity(ProcedureUsing_fileName[0]) == "Parser");
-
-      std::vector<Entity*> ContainersUsing_chara = pkb->GetRelationship(PKBRelRefs::kUsedByC, "chara");
-      std::vector<Entity*> ProcedureUsing_chara;
-      for (auto container : ContainersUsing_chara) {
-        if (container->GetEntityEnum() == EntityEnum::kProcedureEntity) {
-          ProcedureUsing_chara.push_back(container);
-        }
-      }
-      CHECK(ProcedureUsing_chara.size() == 1);
-      CHECK(pkb->GetNameFromEntity(ProcedureUsing_chara[0]) == "Parser");
-
-      std::vector<Entity*> ContainersUsing_psubsystem = pkb->GetRelationship(PKBRelRefs::kUsedByC, "psubsystem");
-      std::vector<Entity*> ProcedureUsing_psubsystem;
-      for (auto container : ContainersUsing_psubsystem) {
-        if (container->GetEntityEnum() == EntityEnum::kProcedureEntity) {
-          ProcedureUsing_psubsystem.push_back(container);
-        }
-      }
-      CHECK(ProcedureUsing_psubsystem.size() == 1);
-      CHECK(pkb->GetNameFromEntity(ContainersUsing_psubsystem[0]) == "Parser");
-
-      std::vector<Entity*> ContainersUsing_SyntaxErr0rFound = pkb->GetRelationship(PKBRelRefs::kUsedByC, "SyntaxErr0rFound");
-      std::vector<Entity*> ProcedureUsing_SyntaxErr0rFound;
-      for (auto container : ContainersUsing_SyntaxErr0rFound) {
-        if (container->GetEntityEnum() == EntityEnum::kProcedureEntity) {
-          ProcedureUsing_SyntaxErr0rFound.push_back(container);
-        }
-      }
-      CHECK(ProcedureUsing_SyntaxErr0rFound.size() == 1);
-      CHECK(pkb->GetNameFromEntity(ContainersUsing_SyntaxErr0rFound[0]) == "Parser");
-
-
-
-      std::vector<Entity*> ContainersModifying_fileName = pkb->GetRelationship(PKBRelRefs::kModifiedByContainer, "fileName");
-      std::vector<Entity*> ProcedureModifying_fileName;
-      for (auto container : ContainersModifying_fileName) {
-        if (container->GetEntityEnum() == EntityEnum::kProcedureEntity) {
-          ProcedureModifying_fileName.push_back(container);
-        }
-      }
-      CHECK(ProcedureModifying_fileName.size() == 1);
-      CHECK(pkb->GetNameFromEntity(ProcedureModifying_fileName[0]) == "Parser");
-
-      std::vector<Entity*> ContainersModifying_chara = pkb->GetRelationship(PKBRelRefs::kModifiedByContainer, "chara");
-      std::vector<Entity*> ProcedureModifying_chara;
-      for (auto container : ContainersModifying_chara) {
-        if (container->GetEntityEnum() == EntityEnum::kProcedureEntity) {
-          ProcedureModifying_chara.push_back(container);
-        }
-      }
-      CHECK(ProcedureModifying_chara.size() == 1);
-      CHECK(pkb->GetNameFromEntity(ProcedureModifying_chara[0]) == "Parser");
-
-      std::vector<Entity*> ContainersModifying_psubsystem = pkb->GetRelationship(PKBRelRefs::kModifiedByContainer, "psubsystem");
-      std::vector<Entity*> ProcedureModifying_psubsystem;
-      for (auto container : ContainersModifying_psubsystem) {
-        if (container->GetEntityEnum() == EntityEnum::kProcedureEntity) {
-          ProcedureModifying_psubsystem.push_back(container);
-        }
-      }
-      CHECK(ProcedureModifying_psubsystem.size() == 1);
-      CHECK(pkb->GetNameFromEntity(ContainersModifying_psubsystem[0]) == "Parser");
-
-      std::vector<Entity*> ContainersModifying_lastByte = pkb->GetRelationship(PKBRelRefs::kModifiedByContainer, "lastByte");
-      std::vector<Entity*> ProcedureModifying_lastByte;
-      for (auto container : ContainersModifying_lastByte) {
-        if (container->GetEntityEnum() == EntityEnum::kProcedureEntity) {
-          ProcedureModifying_lastByte.push_back(container);
-        }
-      }
-      CHECK(ProcedureModifying_lastByte.size() == 1);
-      CHECK(pkb->GetNameFromEntity(ContainersModifying_lastByte[0]) == "Parser");
   }
 }
 
 TEST_CASE("CFG and Next relationship tests") {
   PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/mixed_loops2_source.txt");
-  std::vector<std::tuple<EntityEnum, std::string>> source_tuples = {
-      {EntityEnum::kAssignEntity, "-1000000"}, // placeholder
-      {EntityEnum::kAssignEntity, "1"},
-      {EntityEnum::kReadEntity, "2"},
-      {EntityEnum::kIfEntity, "3"},
-      {EntityEnum::kAssignEntity, "4"},
-      {EntityEnum::kAssignEntity, "5"},
-      {EntityEnum::kWhileEntity, "6"},
-      {EntityEnum::kWhileEntity, "7"},
-      {EntityEnum::kReadEntity, "8"},
-      {EntityEnum::kIfEntity, "9"},
-      {EntityEnum::kAssignEntity, "10"},
-      {EntityEnum::kAssignEntity, "11"},
-      {EntityEnum::kIfEntity, "12"},
-      {EntityEnum::kAssignEntity, "13"},
-      {EntityEnum::kPrintEntity, "14"},
-      {EntityEnum::kAssignEntity, "15"},
-      {EntityEnum::kPrintEntity, "16"},
-      {EntityEnum::kAssignEntity, "17"},
-      {EntityEnum::kPrintEntity, "18"},
-      {EntityEnum::kIfEntity, "19"},
-      {EntityEnum::kPrintEntity, "20"},
-      {EntityEnum::kPrintEntity, "21"},
-      {EntityEnum::kPrintEntity, "22"},
-      {EntityEnum::kAssignEntity, "23"}
-  };
 
   SECTION("Next relationships") {
     std::vector<std::vector<std::tuple<EntityEnum, std::string>>> expected_next_lists = {
-        {source_tuples[2]},//1
-        {source_tuples[3]},//2
-        {source_tuples[4], source_tuples[6]},//3
-        {source_tuples[5]},//4
-        {source_tuples[19]},//5
-        {source_tuples[7], source_tuples[19]},//6
-        {source_tuples[6], source_tuples[8]},//7
-        {source_tuples[9]},//8
-        {source_tuples[10], source_tuples[18]},//9
-        {source_tuples[11]},//10
-        {source_tuples[12]},//11
-        {source_tuples[13], source_tuples[16]},//12
-        {source_tuples[14]},//13
-        {source_tuples[15]},//14
-        {source_tuples[17]},//15
-        {source_tuples[17]},//16
-        {source_tuples[7]},//17
-        {source_tuples[7]},//18
-        {source_tuples[20], source_tuples[21]},//19
-        {source_tuples[22]},//20
-        {source_tuples[22]},//21
-        {source_tuples[23]},//22
+        {ml2_source_tuples[2]},//1
+        {ml2_source_tuples[3]},//2
+        {ml2_source_tuples[4], ml2_source_tuples[6]},//3
+        {ml2_source_tuples[5]},//4
+        {ml2_source_tuples[19]},//5
+        {ml2_source_tuples[7], ml2_source_tuples[19]},//6
+        {ml2_source_tuples[6], ml2_source_tuples[8]},//7
+        {ml2_source_tuples[9]},//8
+        {ml2_source_tuples[10], ml2_source_tuples[18]},//9
+        {ml2_source_tuples[11]},//10
+        {ml2_source_tuples[12]},//11
+        {ml2_source_tuples[13], ml2_source_tuples[16]},//12
+        {ml2_source_tuples[14]},//13
+        {ml2_source_tuples[15]},//14
+        {ml2_source_tuples[17]},//15
+        {ml2_source_tuples[17]},//16
+        {ml2_source_tuples[7]},//17
+        {ml2_source_tuples[7]},//18
+        {ml2_source_tuples[20], ml2_source_tuples[21]},//19
+        {ml2_source_tuples[22]},//20
+        {ml2_source_tuples[22]},//21
+        {ml2_source_tuples[23]},//22
         {},//23
     };
 

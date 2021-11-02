@@ -83,7 +83,7 @@ Cluster* Cluster::GetNextSiblingCluster() {
   Cluster* parent_cluster = this->GetParentCluster();
   if (parent_cluster != nullptr) { // i.e. not outmost cluster:
     std::list<Cluster*> siblings = parent_cluster->GetNestedClusters();
-    std::list<Cluster*>::iterator itr = std::find(siblings.begin(), siblings.end(), this);
+    auto itr = std::find(siblings.begin(), siblings.end(), this);
     if (itr != end(siblings)) { // i.e. this exists, i can find myself using my parent
       int next_sibling_idx = std::distance(siblings.begin(), itr) + 1;
       if (next_sibling_idx >= siblings.size()) {
@@ -97,6 +97,40 @@ Cluster* Cluster::GetNextSiblingCluster() {
     }
   } else {
     return nullptr;
+  }
+}
+
+/**
+ * Finds the next sibling that is either an if-cluster or a while cluster.
+ * @return nullptr if no such sibling exists
+ */
+Cluster* Cluster::FindNextSiblingCluster() {
+  Cluster* next_sibling = this->GetNextSiblingCluster();
+  while (next_sibling) {
+    const ClusterTag next_sibling_tag = next_sibling->GetClusterTag();
+    if (next_sibling_tag == ClusterTag::kWhileCluster || next_sibling_tag == ClusterTag::kIfCluster) {
+      return next_sibling;
+    } else {
+      next_sibling = next_sibling->GetNextSiblingCluster();
+    }
+  }
+  return nullptr;
+}
+
+/**
+ * Finds the next sibling cluster that matches the container type indicated (i.e. either a
+ * @param container_type
+ * @return nullptr if no such cluster exists
+ */
+Cluster* Cluster::FindNextSiblingCluster(ClusterTag container_type) {
+  assert(container_type == ClusterTag::kIfCluster || container_type == ClusterTag::kWhileCluster);
+  Cluster* next_sibling_cluster = this->FindNextSiblingCluster();
+  while (next_sibling_cluster) {
+    if (next_sibling_cluster->GetClusterTag() == container_type) {
+      return next_sibling_cluster;
+    } else {
+      next_sibling_cluster = next_sibling_cluster->GetNextSiblingCluster();
+    }
   }
   return nullptr;
 }
@@ -147,7 +181,7 @@ void Cluster::UpdateRange(Cluster* nested_cluster) {
   bool this_cluster_range_is_unassigned = this->start_ == end_ && this->start_ == -1;
   if (this_cluster_range_is_unassigned) {
     bool this_has_nested_clusters = !this->nested_clusters_.empty();
-    if(this_has_nested_clusters){
+    if (this_has_nested_clusters) {
       int start_of_first_nested_cluster = this->nested_clusters_.front()->start_;
       int end_of_last_nested_cluster = this->nested_clusters_.back()->end_;
       this->start_ = start_of_first_nested_cluster;
@@ -159,12 +193,13 @@ void Cluster::UpdateRange(Cluster* nested_cluster) {
   } else { // there are nested clusters within, assume the start and end range already updated
     bool new_cluster_appears_before_this = new_cluster_end + 1 == this->start_;
     bool new_cluster_appears_after_this = new_cluster_start == this->end_ + 1;
-    if(new_cluster_appears_before_this){
+    if (new_cluster_appears_before_this) {
       this->start_ = new_cluster_start;
     } else if (new_cluster_appears_after_this) {
       this->end_ = new_cluster_end;
     } else {
-      throw std::invalid_argument("[UpdateClusterRange] An input is only valid if statement numbers are continuous with existing ones");
+      throw std::invalid_argument(
+          "[UpdateClusterRange] An input is only valid if statement numbers are continuous with existing ones");
     }
   }
 }
@@ -173,13 +208,14 @@ std::pair<int, int> Cluster::GetStartEndRange() const {
 }
 
 void Cluster::UpdateClusterRange() {
-  if(nested_clusters_.empty()) {
+  if (nested_clusters_.empty()) {
     return;
   }
-  for(auto nested_cluster : this->nested_clusters_) {
+  for (auto nested_cluster: this->nested_clusters_) {
     nested_cluster->UpdateClusterRange();
-    bool nested_cluster_range_already_considered = this->start_ <= nested_cluster->start_ && this->end_ >= nested_cluster->end_;
-    if(!nested_cluster_range_already_considered) {
+    bool nested_cluster_range_already_considered =
+        this->start_ <= nested_cluster->start_ && this->end_ >= nested_cluster->end_;
+    if (!nested_cluster_range_already_considered) {
       this->UpdateRange(nested_cluster);
     }
   }
@@ -194,6 +230,89 @@ ClusterTag Cluster::GetClusterTag() const {
 void Cluster::SetClusterTag(ClusterTag cluster_tag) {
   this->cluster_tag_ = cluster_tag;
 }
+
+/**
+ * Traverses cluster from first to second statement number, using the given pkb to retrieve
+ * data where necessary. Is recursive in nature, where we try to call on a small subproblem by
+ * restricting the start statement number where possible. This public subroutine calls on other
+ * private subroutines.
+ * @param rel_ref
+ * @param scoped_cluster
+ * @param first_stmt
+ * @param second_stmt
+ * @param pkb
+ * @return
+ */
+bool Cluster::TraverseScopedCluster(PKBRelRefs rel_ref,
+                                    Cluster* scoped_cluster,
+                                    int first_stmt,
+                                    int second_stmt,
+                                    PKB* pkb) {
+  switch (rel_ref) {
+    case PKBRelRefs::kAffects: {
+      return TraverseScopedClusterForAffects(scoped_cluster, first_stmt, second_stmt, pkb, nullptr);
+    };
+    default: {
+      return false;
+    };
+
+  }
+  return false;
+}
+
+/**
+ * Traverses a scoped cluster moving from first_stmt towards second_stmt and checks if the lhs_var remains unmodified along the way
+ * @param scoped_cluster
+ * @param first_stmt
+ * @param second_stmt
+ * @param pkb
+ * @param lhs_var
+ * @return true if there's a control flow between first and second stmt that does not modify lhs_var along the way
+ */
+bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
+                                              int first_stmt,
+                                              int second_stmt,
+                                              PKB* pkb,
+                                              Variable* lhs_var) {
+  // get all the children:
+  std::list<Cluster*> children = scoped_cluster->nested_clusters_;
+  for (auto child: children) {
+    ClusterTag tag = child->GetClusterTag();
+    bool is_not_if_or_while_cluster_constituents = tag != ClusterTag::kIfCond
+        && tag != ClusterTag::kIfBody && tag != ClusterTag::kElseBody && tag != ClusterTag::kWhileCond
+        && tag != ClusterTag::kWhileBody;
+    assert(is_not_if_or_while_cluster_constituents); // genuinely don't know if this is a valid assumption
+
+    if (tag == ClusterTag::kIfCluster) {
+      // need to consider different branches:
+      std::list<Cluster*> cluster_constituents = child->GetNestedClusters();
+      // conditional don't modify shit, ignore it
+      Cluster* if_cond = cluster_constituents.front();
+      assert(if_cond->GetClusterTag() == ClusterTag::kIfCond);
+      // check the if body block || else body block for the same
+      //
+
+    } else if (tag == ClusterTag::kWhileCluster) {
+
+    } else { // it's a simple block:
+//      auto range = child->GetStartEndRange();
+//      // for every line number in this range, check if the lhs_var is modified by the line:
+//      bool lhs_is_modified = false;
+//      // start with offset of +1 to avoid counting the current thing...
+//      if(range.first + 1 == range.second)
+//      for(int line_num = range.first + 1; line_num <= range.second; line_num++) {
+//        // consider statement level:
+//        // if line_num is a read stmt, then will this convert that
+//        bool is_modified_stmt_level = pkb->HasRelationship(PKBRelRefs::kModifies,std::to_string(line_num),
+//                                                              pkb->GetNameFromEntity(lhs_var));
+//        bool is_call_stmt = pkb->GetRelationship(PKBRelRefs::kFollows, std::to_string(line_num - 1));
+//        bool is_modified_by_proc_calls = false;
+//         //
+//         if(lhs_is_modified) break;
+      }
+    }
+  return false;
+  }
 
 // default destructors:
 Cluster::~Cluster() = default;
@@ -221,7 +340,7 @@ void Block::PatchEmptyBlocks(Block* redundant, Block* to) {
     throw std::invalid_argument("Redundant block is non empty");
   }
 
-  for (auto* block : redundant->prev_blocks_) {
+  for (auto* block: redundant->prev_blocks_) {
     block->next_blocks_.erase(redundant);
     block->AddNextBlock(to);
   }
@@ -239,4 +358,25 @@ std::set<Block*> Block::GetNextBlocks() const {
 
 std::set<Block*> Block::GetPrevBlocks() const {
   return this->prev_blocks_;
+}
+
+std::list<int> Block::GetCFGLastStmts() {
+  std::list<int> last_stmts = std::list<int>{};
+  for (Block* next_block: next_blocks_) {
+    int next = next_block->GetStartEndRange().first;
+    if (isWhile && next == start_ + 1) {
+      continue;
+    }
+    if (next == -1) { // exit block
+      assert(next_block->GetNextBlocks().empty());
+      last_stmts.push_back(end_);
+      continue;
+    }
+    std::list<int> next_last_stmts = next_block->GetCFGLastStmts();
+    last_stmts.insert(last_stmts.end(), next_last_stmts.begin(), next_last_stmts.end());
+  }
+  if (next_blocks_.empty() || (next_blocks_.size() == 1 && isWhile)) {
+    last_stmts.push_back(end_);
+  }
+  return last_stmts;
 }

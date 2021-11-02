@@ -42,7 +42,13 @@ PKB* SourceProcessor::ProcessSourceFile(std::string file_name) {
   }
 
   PKB* new_pkb = new PKB();
-  new_pkb->PopulateDataStructures(* deliverable);
+  try {
+    new_pkb->PopulateDataStructures(* deliverable);
+  } catch (PKBException e) {
+    std::cerr << "PKB error\n";
+    std::cerr << e.what() << std::endl;
+    Terminate(std::string("Unfortunately, there was an unknown exception thrown due to an invalid SIMPLE program."));
+  }
   return new_pkb;
 }
 

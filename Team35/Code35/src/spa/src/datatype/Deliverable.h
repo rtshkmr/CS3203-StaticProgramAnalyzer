@@ -10,7 +10,7 @@
  * the source file.
  */
 class Deliverable {
- public: //TODO: create getters before turning private
+ public:
   Deliverable() = default;
   // Adding of Procedure, Variable, ConstantValue are added using pointers to the list in EntityFactory.
   void AddStatement(Statement* stmt);
@@ -52,20 +52,29 @@ class Deliverable {
   std::list<PrintEntity*>* GetPrintList();
   std::list<ReadEntity*>* GetReadList();
 
-  //root-node of AST
-  Program* program_;
+  std::unordered_map<Statement*, std::list<Statement*>*>* GetFollowsMap();
+  std::unordered_map<Statement*, std::list<Statement*>*>* GetFollowsTMap();
+  std::unordered_map<Statement*, std::list<Statement*>*>* GetParentMap();
+  std::unordered_map<Statement*, std::list<Statement*>*>* GetParentTMap();
+  std::unordered_map<Statement*, std::list<Variable*>*>* GetUseSMap();
+  std::unordered_map<Container*, std::list<Variable*>*>* GetUseCMap();
+  std::unordered_map<Statement*, std::list<Variable*>*>* GetModifiesSMap();
+  std::unordered_map<Container*, std::list<Variable*>*>* GetModifiesCMap();
+  std::unordered_map<Procedure*, std::list<Procedure*>*>* GetCallsMap();
+  std::unordered_map<Procedure*, std::list<Procedure*>*>* GetCallsTMap();
+  std::unordered_map<Statement*, std::list<Statement*>*>* GetNextMap();
 
-  // EntityTables
-  std::list<Procedure*> proc_list_;
-  std::list<Variable*> var_list_;
-  std::list<Constant*> const_list_;
-  std::vector<Statement*> stmt_list_;
-  std::list<IfEntity*> if_list_;
-  std::list<WhileEntity*> while_list_;
-  std::list<AssignEntity*> assign_list_;
-  std::list<CallEntity*> call_list_;
-  std::list<PrintEntity*> print_list_;
-  std::list<ReadEntity*> read_list_;
+  std::unordered_map<Statement*, std::list<Statement*>*>* GetFollowedByMap();
+  std::unordered_map<Statement*, std::list<Statement*>*>* GetFollowedByTMap();
+  std::unordered_map<Statement*, std::list<Statement*>*>* GetChildMap();
+  std::unordered_map<Statement*, std::list<Statement*>*>* GetChildTMap();
+  std::unordered_map<Variable*, std::list<Statement*>*>* GetUsedBySMap();
+  std::unordered_map<Variable*, std::list<Container*>*>* GetUsedByCMap();
+  std::unordered_map<Variable*, std::list<Statement*>*>* GetModifiedBySMap();
+  std::unordered_map<Variable*, std::list<Container*>*>* GetModifiedByCMap();
+  std::unordered_map<Procedure*, std::list<Procedure*>*>* GetCalledByMap();
+  std::unordered_map<Procedure*, std::list<Procedure*>*>* GetCalledByTMap();
+  std::unordered_map<Statement*, std::list<Statement*>*>* GetPrevMap();
 
   // RelationshipTables
   std::unordered_map<Statement*, std::list<Statement*>*> follow_hash_; // to store Follows
@@ -98,6 +107,21 @@ class Deliverable {
   std::unordered_map<Statement*, std::list<Statement*>*> previous_hash_;  // to store Previous (reverse of Next)
 
  private:
+  //root-node of AST
+  Program* program_;
+
+  // EntityTables
+  std::list<Procedure*> proc_list_;
+  std::list<Variable*> var_list_;
+  std::list<Constant*> const_list_;
+  std::vector<Statement*> stmt_list_;
+  std::list<IfEntity*> if_list_;
+  std::list<WhileEntity*> while_list_;
+  std::list<AssignEntity*> assign_list_;
+  std::list<CallEntity*> call_list_;
+  std::list<PrintEntity*> print_list_;
+  std::list<ReadEntity*> read_list_;
+
   template<typename X, typename Y>
   void AddRelationshipToMap(std::unordered_map<X, std::list<Y>*>* map, X key, Y value);
 };
