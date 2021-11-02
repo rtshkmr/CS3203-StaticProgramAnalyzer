@@ -1,5 +1,7 @@
 #include <cassert>
 #include "AffectsExtractor.h"
+#include "../../../model/CFG.h"
+
 
 void AffectsExtractor::SetPKB(PKB* pkb) {
   this->pkb_ = pkb;
@@ -11,6 +13,8 @@ void AffectsExtractor::SetPKB(PKB* pkb) {
  * @return
  */
 std::vector<Entity*> AffectsExtractor::GetAffects(int target) {
+  std::string target_string = std::to_string(target);
+
   // retrieve the entity that target points to
   // possible to have no such targets
 
@@ -93,12 +97,13 @@ bool AffectsExtractor::HasAffects() {
 bool AffectsExtractor::HasAffects(int target) {
   AssignEntity* target_ae = GetAssignEntityFromStmtNum(target);
   Procedure* target_proc = target_ae->GetProcedureNode();
-  VariableName* target_var = const_cast<VariableName*>(target_ae->GetVariable()->GetName());
+//  VariableName* target_var = const_cast<VariableName*>(target_ae->GetVariableObj()yyp->GetName());
+  VariableName* target_var = reinterpret_cast<VariableName*>(target_ae->GetVariableObj());
 
   //check against the entire procedure's assign
   // TODO: create new PKB API, Given Procedure, Get all assign (Uses / Modifies)
   std::vector<Entity*> affected_list =
-      pkb_->GetPatternEntities(DesignEntity::kVariable, target_var->getName());
+      pkb_->GetPatternEntities(DesignEntity::kVariable, target_var->GetName());
 
   for (auto* assign : affected_list) {
     if (assign->GetEntityEnum() != EntityEnum::kAssignEntity) {
@@ -154,55 +159,43 @@ bool AffectsExtractor::HasAffectedBy(int first, int second) {
  */
 bool AffectsExtractor::HasAffects(AssignEntity* first_stmt, AssignEntity* second_stmt) {
   // get the modified variable v from the lhs of first statement
-  assert(first_stmt->GetEntityEnum() == EntityEnum::kAssignEntity);
-  Variable* modified_var = first_stmt->GetVariable();
-  std::vector<Variable*> vars_used_by_second_stmt = second_stmt->GetControlVariables(); // todo: this is named wrongly, should be GetExpr Var for this
+  Variable* modified_var = first_stmt->GetVariableObj();
+  std::vector<Variable*> vars_used_by_second_stmt =
+      second_stmt->GetControlVariables(); // todo: this is named wrongly, should be GetExpr Var for this
   // check Uses(second_stmt, v)
   bool var_is_used = false;
-  for(auto* var : vars_used_by_second_stmt) {
-    if(modified_var == var) {
+  for (auto* var: vars_used_by_second_stmt) {
+    if (modified_var == var) {
       var_is_used = true;
       break;
     }
   }
-  if(!var_is_used) return false;
+  if (!var_is_used) return false;
   // check nextT, (just as a guarantee)
   return HasValidUnmodifiedPath(first_stmt, second_stmt);
-
-  //  helper function for traversing:
-  //   * get proc cluster,
-  //   *
-
-  // is this where the TA hint is to use a last modified table? we can pre-calculate the next used for every statement
-  return false;
 }
 
 /*
- * Traversal function for Affects:
- *
- * 1. Get the innermost cluster that contains the first_stmt
- * 2. Need to see if it's a while block body or not
+ * Verifies whether there exists a valid unmodified path between two assignment statements.
  *
  * */
 bool AffectsExtractor::HasValidUnmodifiedPath(AssignEntity* first_stmt, AssignEntity* second_stmt) {
-//  int first_stmt_num = first_stmt->()->GetNum();
-//  int second_stmt_num = second_stmt->GetStatementNumber()->GetNum();
-  int first_stmt_num = 4;
-  int second_stmt_num = 5;
+  int first_stmt_num = first_stmt->GetStatementNumber()->GetNum();
+  int second_stmt_num = second_stmt->GetStatementNumber()->GetNum();
   std::vector<Entity*> proc_entities = this->pkb_->GetDesignEntities(DesignEntity::kProcedure);
-  Cluster* scoped_cluster = nullptr;
-  for(auto entity : proc_entities) {
+  Cluster* scoped_cluster;
+  for (auto entity: proc_entities) {
     auto* proc = dynamic_cast<Procedure*>(entity);
     assert(proc);
     scoped_cluster = proc->GetInnermostCluster(first_stmt_num, second_stmt_num, nullptr);
-    if(scoped_cluster) break;
+    if (scoped_cluster) break;
   }
-
-  // now we have a starting node to work with, it's a graph traversal via some traversal helper function:
-  // look at nested children, if the current block doesn't modify the variable we looking at
-  // then can update the helper function to refine the block pointer
-
-  return false;
+  // call the boolean traversal helper function here, pass in the lhs argument that we're looking at
+  std::string lhs_var = first_stmt->GetVariableString();
+  return Cluster::TraverseScopedCluster(PKBRelRefs::kAffects,
+                                        scoped_cluster,
+                                        std::make_pair(first_stmt_num, second_stmt_num),
+                                        pkb_, lhs_var);
 }
 
 /**
@@ -243,8 +236,8 @@ std::set<AssignEntity*, AffectsExtractor::AssignEntityComparator> AffectsExtract
 
   // Have a PQ per var.
   for (Variable* var: rhs_varlist) {
-    VariableName* variable_name = const_cast<VariableName*>(var->GetName());
-    std::vector<Entity*> ent = pkb_->GetRelationship(PKBRelRefs::kModifiedBy, variable_name->getName());
+    VariableName* variable_name = const_cast<VariableName*>(var->GetVariableName());
+    std::vector<Entity*> ent = pkb_->GetRelationship(PKBRelRefs::kModifiedBy, variable_name->GetName());
 
     //filter vector<Entity> into only AssignEntity as it can only take assign in LHS
     for (Entity* e: ent) {

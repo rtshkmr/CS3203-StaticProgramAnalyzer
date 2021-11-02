@@ -112,7 +112,9 @@ class Variable : public Entity {
  public:
   Variable(VariableName* variableName);
 
-  const VariableName* GetName();
+  const VariableName* GetVariableName();
+
+  const std::string GetName() const;
 
   void AddStatement(Statement* stmt);
 

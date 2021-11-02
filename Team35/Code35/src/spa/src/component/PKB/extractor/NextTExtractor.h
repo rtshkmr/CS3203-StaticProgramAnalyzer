@@ -3,6 +3,7 @@
 
 #include <model/Entity.h>
 #include <unordered_map>
+#include "model/CFG.h"
 
 enum class RelDirection {
   kNext,

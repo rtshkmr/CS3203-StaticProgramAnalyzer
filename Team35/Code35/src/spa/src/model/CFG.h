@@ -34,11 +34,7 @@ class Cluster {
   int start_ = -1;
   int end_ = -1;
   Cluster* parent_cluster_;
-  static bool TraverseScopedClusterForAffects(Cluster* scoped_cluster,
-                                              int first_stmt,
-                                              int second_stmt,
-                                              PKB* pkb,
-                                              Variable* lhs_var);
+
  public:
   Cluster() {};
   int size() const;
@@ -68,10 +64,16 @@ class Cluster {
     end_ = end;
   };
   std::list<Cluster*> nested_clusters_;
-  Cluster* FindNextSiblingCluster();
-  Cluster* FindNextSiblingCluster(ClusterTag container_type);
-  // traversal logic:
-  static bool TraverseScopedCluster(PKBRelRefs rel_ref, Cluster* scoped_cluster, int first_stmt, int second_stmt, PKB* pkb);
+  Cluster* GetClusterConstituent(ClusterTag constituent_tag);
+  Cluster* FindNextSibling(ClusterTag target_tag);
+  static bool TraverseScopedCluster(PKBRelRefs pkb_rel_refs, Cluster* scoped_cluster,
+                                    std::pair<int, int> target_range,
+                                    PKB* pkb,
+                                    const std::string& lhs_var);
+  static bool TraverseScopedClusterForAffects(Cluster* scoped_cluster,
+                                              std::pair<int, int> target_range,
+                                              PKB* pkb,
+                                              const std::string& lhs_var);
 };
 
 class Block : public Cluster {

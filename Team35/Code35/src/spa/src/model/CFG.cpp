@@ -100,41 +100,6 @@ Cluster* Cluster::GetNextSiblingCluster() {
   }
 }
 
-/**
- * Finds the next sibling that is either an if-cluster or a while cluster.
- * @return nullptr if no such sibling exists
- */
-Cluster* Cluster::FindNextSiblingCluster() {
-  Cluster* next_sibling = this->GetNextSiblingCluster();
-  while (next_sibling) {
-    const ClusterTag next_sibling_tag = next_sibling->GetClusterTag();
-    if (next_sibling_tag == ClusterTag::kWhileCluster || next_sibling_tag == ClusterTag::kIfCluster) {
-      return next_sibling;
-    } else {
-      next_sibling = next_sibling->GetNextSiblingCluster();
-    }
-  }
-  return nullptr;
-}
-
-/**
- * Finds the next sibling cluster that matches the container type indicated (i.e. either a
- * @param container_type
- * @return nullptr if no such cluster exists
- */
-Cluster* Cluster::FindNextSiblingCluster(ClusterTag container_type) {
-  assert(container_type == ClusterTag::kIfCluster || container_type == ClusterTag::kWhileCluster);
-  Cluster* next_sibling_cluster = this->FindNextSiblingCluster();
-  while (next_sibling_cluster) {
-    if (next_sibling_cluster->GetClusterTag() == container_type) {
-      return next_sibling_cluster;
-    } else {
-      next_sibling_cluster = next_sibling_cluster->GetNextSiblingCluster();
-    }
-  }
-  return nullptr;
-}
-
 Cluster* Cluster::GetPrevSiblingCluster() {
   Cluster* parent_cluster = this->GetParentCluster();
   if (parent_cluster != nullptr) { // i.e. not outmost cluster:
@@ -234,23 +199,23 @@ void Cluster::SetClusterTag(ClusterTag cluster_tag) {
 /**
  * Traverses cluster from first to second statement number, using the given pkb to retrieve
  * data where necessary. Is recursive in nature, where we try to call on a small subproblem by
- * restricting the start statement number where possible. This public subroutine calls on other
- * private subroutines.
- * @param rel_ref
+ * restricting the start statement number where possible. The goal is to find any valid unmodidied path between the
+ * first and the second values in the target range (non - inclusive range).
+ * @param pkb_rel_refs
  * @param scoped_cluster
- * @param first_stmt
- * @param second_stmt
+ * @param target_range
  * @param pkb
+ * @param lhs_var
  * @return
  */
 bool Cluster::TraverseScopedCluster(PKBRelRefs rel_ref,
                                     Cluster* scoped_cluster,
-                                    int first_stmt,
-                                    int second_stmt,
-                                    PKB* pkb) {
+                                    std::pair<int, int> target_range,
+                                    PKB* pkb,
+                                    const std::string& lhs_var) {
   switch (rel_ref) {
     case PKBRelRefs::kAffects: {
-      return TraverseScopedClusterForAffects(scoped_cluster, first_stmt, second_stmt, pkb, nullptr);
+      return Cluster::TraverseScopedClusterForAffects(scoped_cluster, target_range, pkb, lhs_var);
     };
     default: {
       return false;
@@ -261,58 +226,213 @@ bool Cluster::TraverseScopedCluster(PKBRelRefs rel_ref,
 }
 
 /**
- * Traverses a scoped cluster moving from first_stmt towards second_stmt and checks if the lhs_var remains unmodified along the way
- * @param scoped_cluster
- * @param first_stmt
- * @param second_stmt
+ * Treats the child as a normal block and traverses it to check if the lhs_var has been modified.
+ * @param child
+ * @param target_range
  * @param pkb
  * @param lhs_var
- * @return true if there's a control flow between first and second stmt that does not modify lhs_var along the way
+ * @return
+ */
+std::pair<bool, bool> TraverseNormalBlockForAffects(Cluster* child,
+                                                    std::pair<int, int> target_range,
+                                                    PKB* pkb,
+                                                    const std::string& lhs_var) {
+  // =================================== HANDLE CHILDREN THAT ARE SIMPLE BLOCKS =======================
+//  assert(child->GetClusterTag() == ClusterTag::kNormalBlock);
+  bool child_does_not_modify_var = true;
+  bool is_second_stmt_checked = false;
+  auto child_range = child->GetStartEndRange();
+  for (int stmt_num = child_range.first;
+       stmt_num <= std::min(child_range.second, target_range.second);
+       stmt_num++) { // bring this inside
+    if (stmt_num <= target_range.first) continue; // skip what you can
+    child_does_not_modify_var = !pkb->HasRelationship(PKBRelRefs::kModifies, std::to_string(stmt_num), lhs_var);
+    is_second_stmt_checked = (stmt_num == target_range.second);
+    if (!child_does_not_modify_var) break; // break this for loop for normal block if child actually modifies var
+  }
+  return std::make_pair(child_does_not_modify_var, is_second_stmt_checked);
+//      ========================  END OF TRAVERSING NORMAL BLOCK FOR AFFECTS =============
+}
+
+/**
+ * Traverses a scoped cluster moving from first_stmt towards second_stmt in the target range and checks if the lhs_var remains unmodified along the way
+ * @param scoped_cluster a scoped cluster is guaranteed to have the target second statement inside it.
+ * @param target_range the first item in pair is just a starting point and the second item in pair is always the second statement that we work towards. Note that we are always checking b/w the target range i.e [first+1, second - 1] to see if they form up a valid unmod path. If second is inside this child, then we assert that second does modified the var
+ * @param pkb
+ * @param lhs_var
+ * @return
  */
 bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
-                                              int first_stmt,
-                                              int second_stmt,
+                                              std::pair<int, int> target_range,
                                               PKB* pkb,
-                                              Variable* lhs_var) {
-  // get all the children:
+                                              const std::string& lhs_var) {
+  assert(scoped_cluster->CheckIfStmtNumInRange(target_range.second));
+  bool scoped_cluster_does_not_modify_var = true;
   std::list<Cluster*> children = scoped_cluster->nested_clusters_;
   for (auto child: children) {
+    auto child_range = child->GetStartEndRange();
     ClusterTag tag = child->GetClusterTag();
-    bool is_not_if_or_while_cluster_constituents = tag != ClusterTag::kIfCond
-        && tag != ClusterTag::kIfBody && tag != ClusterTag::kElseBody && tag != ClusterTag::kWhileCond
-        && tag != ClusterTag::kWhileBody;
-    assert(is_not_if_or_while_cluster_constituents); // genuinely don't know if this is a valid assumption
+    bool child_is_cond_block = tag == ClusterTag::kIfCond || tag == ClusterTag::kWhileCond;
+    bool child_does_not_contain_first_stmt = child_range.second < target_range.first;
+    if (child_does_not_contain_first_stmt || child_is_cond_block) continue; // skips this child
 
+    // =========================== HANDLE IF CLUSTER ====================================
     if (tag == ClusterTag::kIfCluster) {
       // need to consider different branches:
-      std::list<Cluster*> cluster_constituents = child->GetNestedClusters();
-      // conditional don't modify shit, ignore it
-      Cluster* if_cond = cluster_constituents.front();
-      assert(if_cond->GetClusterTag() == ClusterTag::kIfCond);
-      // check the if body block || else body block for the same
-      //
-
+      Cluster* if_body = child->GetClusterConstituent(ClusterTag::kIfBody);
+      Cluster* else_body = child->GetClusterConstituent(ClusterTag::kElseBody);
+      auto if_body_range = if_body->GetStartEndRange();
+      auto else_body_range = else_body->GetStartEndRange();
+      bool is_target_in_if_cluster = child->CheckIfStmtNumInRange(target_range.second);
+      if (is_target_in_if_cluster) {
+        // case 1: child contains second statement, identify if it's if body or else body
+        bool is_target_in_if_body = if_body->CheckIfStmtNumInRange(target_range.second);
+        bool is_target_in_else_body = else_body->CheckIfStmtNumInRange(target_range.second);
+        assert(is_target_in_else_body ^ is_target_in_if_body);
+        int new_start = is_target_in_if_body ? if_body_range.first : else_body_range.first;
+        auto new_target_range = std::make_pair(new_start, target_range.second);
+        return TraverseScopedClusterForAffects((is_target_in_if_body
+                                                ? if_body
+                                                : else_body),
+                                               new_target_range,
+                                               pkb,
+                                               lhs_var);
+      } else {
+        // case 2: child does not contain second statement, then just have to at least one that gives unmod path
+        bool if_body_is_unmodified_path = TraverseScopedClusterForAffects(if_body, if_body_range, pkb, lhs_var);
+        if (if_body_is_unmodified_path) continue;
+        bool else_body_is_unmodified_path = TraverseScopedClusterForAffects(else_body, else_body_range, pkb, lhs_var);
+        bool has_no_unmod_path = !if_body_is_unmodified_path && !else_body_is_unmodified_path;
+        if(has_no_unmod_path) {
+          scoped_cluster_does_not_modify_var = false;
+          break; // breaks outer for loop
+        }
+      }
     } else if (tag == ClusterTag::kWhileCluster) {
-
-    } else { // it's a simple block:
-//      auto range = child->GetStartEndRange();
-//      // for every line number in this range, check if the lhs_var is modified by the line:
-//      bool lhs_is_modified = false;
-//      // start with offset of +1 to avoid counting the current thing...
-//      if(range.first + 1 == range.second)
-//      for(int line_num = range.first + 1; line_num <= range.second; line_num++) {
-//        // consider statement level:
-//        // if line_num is a read stmt, then will this convert that
-//        bool is_modified_stmt_level = pkb->HasRelationship(PKBRelRefs::kModifies,std::to_string(line_num),
-//                                                              pkb->GetNameFromEntity(lhs_var));
-//        bool is_call_stmt = pkb->GetRelationship(PKBRelRefs::kFollows, std::to_string(line_num - 1));
-//        bool is_modified_by_proc_calls = false;
-//         //
-//         if(lhs_is_modified) break;
+//<<<<<<< HEAD
+      //=================================== HANDLE WHILE CLUSTER =====================================
+      bool is_target_in_while_cluster = child->CheckIfStmtNumInRange(target_range.second);
+      if (is_target_in_while_cluster) {
+        // the first thing in the while cluster will be the cond, so it's okay to say that it's been checked:
+        auto new_target_range = std::make_pair(child_range.first - 1, target_range.second);
+        return TraverseScopedClusterForAffects(child, new_target_range, pkb, lhs_var);
+      }
+    } else if (tag == ClusterTag::kWhileBody) {
+      assert(child->CheckIfStmtNumInRange(target_range.second)); // will only enter a while body if the second statement is inside it, else will just skip
+      // iterate into the while body:
+      target_range.first = child_range.first - 1;
+      return TraverseScopedClusterForAffects(child, target_range, pkb, lhs_var);
+    } else if (tag == ClusterTag::kIfBody || tag == ClusterTag::kElseBody) {
+      bool child_is_normal_block = child->nested_clusters_.empty();
+      if (child_is_normal_block) {
+        auto traversal_results = TraverseNormalBlockForAffects(child, target_range, pkb, lhs_var);
+        if (!traversal_results.first) { // i.e. child modifies variable:
+          scoped_cluster_does_not_modify_var =
+              traversal_results.second; // check if it was target second stmt that modded it.
+          break;
+        } else {
+          // update target start to equal the value that I've already checked until
+          target_range.first = std::min(child_range.second, target_range.second);
+        }
+      } else {
+        // todo: test this case: have to call in if{while{...}}else{..}
+        target_range.first = child_range.first - 1;
+        return TraverseScopedClusterForAffects(child, target_range, pkb, lhs_var);
+      }
+    } else { // it's a simple block, no alternative paths to consider:
+      assert(child->GetClusterTag() == ClusterTag::kNormalBlock);
+      // first: child does not modify? second: is second stmt checked:
+      auto traversal_results = TraverseNormalBlockForAffects(child, target_range, pkb, lhs_var);
+      if (!traversal_results.first) { // i.e. child modifies variable:
+        scoped_cluster_does_not_modify_var =
+            traversal_results.second; // check if it was target second stmt that modded it.
+        break;
+      } else {
+        target_range.first = std::min(child_range.second, target_range.second);
       }
     }
-  return false;
   }
+  return scoped_cluster_does_not_modify_var;
+}
+
+/**
+ * Retrieves the correct tagged constituent from within a container cluster (if or while cluster)
+ * @return
+ */
+Cluster* Cluster::GetClusterConstituent(ClusterTag constituent_tag) {
+  auto constituents = this->GetNestedClusters();
+  Cluster* first_constituent = constituents.front();
+  switch (constituent_tag) {
+    case ClusterTag::kIfCond: {
+      assert(cluster_tag_ == ClusterTag::kIfCluster);
+      assert(first_constituent->GetClusterTag() == ClusterTag::kIfCond);
+      return first_constituent;
+    };
+    case ClusterTag::kIfBody: {
+      assert(cluster_tag_ == ClusterTag::kIfCluster);
+      assert(first_constituent->GetClusterTag() == ClusterTag::kIfCond);
+      return first_constituent->FindNextSibling(ClusterTag::kIfBody);
+    };
+    case ClusterTag::kElseBody: {
+      assert(cluster_tag_ == ClusterTag::kIfCluster);
+      assert(first_constituent->GetClusterTag() == ClusterTag::kIfCond);
+      return first_constituent->FindNextSibling(ClusterTag::kElseBody);
+    };
+    case ClusterTag::kWhileCond: {
+      assert(cluster_tag_ == ClusterTag::kWhileCluster);
+      assert(first_constituent->GetClusterTag() == ClusterTag::kWhileCond);
+      return first_constituent;
+    };
+    case ClusterTag::kWhileBody: {
+      assert(cluster_tag_ == ClusterTag::kWhileCluster);
+      assert(first_constituent->GetClusterTag() == ClusterTag::kWhileCond);
+      return first_constituent->FindNextSibling(ClusterTag::kWhileBody);
+    };
+    default: {
+      assert(false);
+    }
+  }
+}
+
+/**
+ * Retrieves the next sibling that matches the target cluster tag
+ * @param target_tag
+ * @return
+ */
+Cluster* Cluster::FindNextSibling(ClusterTag target_tag) {
+  Cluster* next_sibling = this->GetNextSiblingCluster();
+  while (next_sibling) {
+    const ClusterTag next_sibling_tag = next_sibling->GetClusterTag();
+    if (next_sibling_tag == target_tag) {
+      return next_sibling;
+    } else {
+      next_sibling = next_sibling->GetNextSiblingCluster();
+    }
+  }
+  return nullptr;
+}
+//=======
+//
+//    } else { // it's a simple block:
+////      auto range = child->GetStartEndRange();
+////      // for every line number in this range, check if the lhs_var is modified by the line:
+////      bool lhs_is_modified = false;
+////      // start with offset of +1 to avoid counting the current thing...
+////      if(range.first + 1 == range.second)
+////      for(int line_num = range.first + 1; line_num <= range.second; line_num++) {
+////        // consider statement level:
+////        // if line_num is a read stmt, then will this convert that
+////        bool is_modified_stmt_level = pkb->HasRelationship(PKBRelRefs::kModifies,std::to_string(line_num),
+////                                                              pkb->GetNameFromEntity(lhs_var));
+////        bool is_call_stmt = pkb->GetRelationship(PKBRelRefs::kFollows, std::to_string(line_num - 1));
+////        bool is_modified_by_proc_calls = false;
+////         //
+////         if(lhs_is_modified) break;
+//      }
+//    }
+//  return false;
+//  }
+//>>>>>>> pkb/affects-extraction
 
 // default destructors:
 Cluster::~Cluster() = default;

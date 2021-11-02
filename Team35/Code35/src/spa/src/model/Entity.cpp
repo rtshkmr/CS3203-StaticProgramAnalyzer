@@ -53,20 +53,23 @@ const void Procedure::SetBlockTail(Block* block_tail) {
  * @return
  */
 Cluster* Procedure::GetInnermostCluster(int first_stmt, int second_stmt, Cluster* prev_cluster) {
-  const Cluster* current_cluster = prev_cluster ? prev_cluster : this -> GetClusterRoot();
-  if(!current_cluster->CheckIfStatementsInRange(first_stmt, second_stmt)) {
+  const Cluster* current_cluster = prev_cluster ? prev_cluster : this->GetClusterRoot();
+  if (!current_cluster->CheckIfStatementsInRange(first_stmt, second_stmt)) {
     return nullptr; // invariant: either prev cluster is null_ptr or it is a cluster that is guaranteed to contain these lines
   } else { // look into nested children
-    auto nested_clusters = current_cluster ->GetNestedClusters();
-    if(nested_clusters.empty()) {
-      return prev_cluster;
+    auto nested_clusters = current_cluster->GetNestedClusters();
+    if (nested_clusters.empty()) {
+      return prev_cluster->GetClusterTag() == ClusterTag::kNormalBlock
+             ? prev_cluster->GetParentCluster() // if normal block is chosen, return its parent cluster!
+             : prev_cluster;
+//      return prev_cluster;
     } else {
       auto cluster_iter = nested_clusters.begin();
-      while (!(*cluster_iter)->CheckIfStmtNumInRange(first_stmt)) {
+      while (!(* cluster_iter)->CheckIfStmtNumInRange(first_stmt)) {
         std::advance(cluster_iter, 1);
       }
-      Cluster* cluster_containing_start_stmt = *cluster_iter;
-      if(cluster_containing_start_stmt->CheckIfStatementsInRange(first_stmt, second_stmt)) {
+      Cluster* cluster_containing_start_stmt = * cluster_iter;
+      if (cluster_containing_start_stmt->CheckIfStatementsInRange(first_stmt, second_stmt)) {
         return GetInnermostCluster(first_stmt, second_stmt, cluster_containing_start_stmt); // recurse into it
       } else {
         return const_cast<Cluster*>(current_cluster);
@@ -80,7 +83,7 @@ Variable::Variable(VariableName* vName) {
   variable_name_ = vName;
 }
 
-const VariableName* Variable::GetName() {
+const VariableName* Variable::GetVariableName() {
   return variable_name_;
 }
 
@@ -102,8 +105,11 @@ std::vector<std::set<Statement*>> Variable::GetStatementTable() {
 std::vector<Variable*> Variable::SortVariableVector(std::vector<Variable*> var_list) {
   std::vector<Variable*> var_list_copy = var_list;
   std::sort(var_list_copy.begin(), var_list_copy.end(),
-            [](Variable* a, Variable* b) { return * a->GetName() < * b->GetName(); });
+            [](Variable* a, Variable* b) { return * a->GetVariableName() < * b->GetVariableName(); });
   return var_list_copy;
+}
+const std::string Variable::GetName() const {
+  return variable_name_->GetName();
 }
 
 Constant::Constant(ConstantValue* cv) {
@@ -136,14 +142,12 @@ Procedure* Program::GetProcForLineNum(int line_num) {
   std::list<Procedure*>* proc_list = this->GetProcedureList();
   for (Procedure* proc: * proc_list) {  // todo: optimise finding procedure of target stmt
     auto* cluster_root = const_cast<Cluster*>(proc->GetClusterRoot());
-    if(cluster_root->CheckIfStatementInRange(line_num)) {
+    if (cluster_root->CheckIfStatementInRange(line_num)) {
       return proc;
     }
   }
   return nullptr;
 }
-
-
 
 /**
  * Given a target line number, returns the procedure cluster that contains this line number
@@ -151,12 +155,12 @@ Procedure* Program::GetProcForLineNum(int line_num) {
  * @return
  */
 Cluster* Program::GetProcClusterForLineNum(int line_num) {
-    Procedure* proc = this->GetProcForLineNum(line_num);
-    if(proc) {
-      return const_cast<Cluster*>(proc->GetClusterRoot());
-    } else {
-      return nullptr;
-    }
+  Procedure* proc = this->GetProcForLineNum(line_num);
+  if (proc) {
+    return const_cast<Cluster*>(proc->GetClusterRoot());
+  } else {
+    return nullptr;
+  }
 }
 
 void Statement::SetStatementNumber(StatementNumber* sn) {
