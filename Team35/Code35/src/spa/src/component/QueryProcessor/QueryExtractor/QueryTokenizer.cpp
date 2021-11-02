@@ -9,7 +9,7 @@
 // note: order of regex evaluation matters! always retrieve key-values based on defined insertion_order.
 std::vector<std::string> insertion_order = {"*", "STRING_QUOTE", "INTEGER", "SUCH_THAT", "PROG_LINE",
                                             "stmt#", "IDENT", ";", "SPACINGS", "(", ")", ",", "_", "<", ">", ".", "="};
-static std::map<std::string, std::regex> spec_table {
+static std::unordered_map<std::string, std::regex> spec_table {
     {"*", std::regex("^[*]")},
     {"STRING_QUOTE", std::regex("^\"")},
     {"INTEGER", RegexPatterns::GetIntegerPatternNonTerminating()},
@@ -77,8 +77,13 @@ Token QueryTokenizer::GetNextToken() {
   }
   std::string curr_string = query.substr(cursor);
   std::smatch match;
+//  Token basic_match;
   for (auto const& sp: insertion_order) {
     auto spec = * spec_table.find(sp);
+//    if (HasBasicTokenMatch(curr_string, Token)) {
+//      cursor++;
+//      return Token(basic_match, GetPqlTokenType(spec.first));
+//    }
     if (!std::regex_search(curr_string, match, spec.second)) {
       continue;
     }
@@ -90,6 +95,11 @@ Token QueryTokenizer::GetNextToken() {
   }
 
   throw PQLTokenizeException("No patterns matched. Error in tokenizing pql.");
+}
+
+bool QueryTokenizer::HasBasicTokenMatch(std::string curr_string) {
+  static std::unordered_set<std::string> basic_tokens { "*", ";", "(", ")", ",", "_", "<", ">", ".", "=" };
+  return basic_tokens.find(curr_string) != basic_tokens.end();
 }
 
 /**
