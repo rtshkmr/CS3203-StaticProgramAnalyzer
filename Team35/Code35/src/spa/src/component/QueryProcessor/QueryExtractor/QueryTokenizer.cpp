@@ -35,6 +35,7 @@ static std::unordered_map<std::string, TokenTag> spec_type_to_tag_table {
   {"=", TokenTag::kEquals}
 };
 
+static std::regex string_end_regex("^[^\"]*");
 /**
  * Gets correct TokenTag specific to PQL applications by consulting spec_type_to_tag_table.
  * Note that this function does not check that the token is of SPACINGS type, as such tokens have already been dropped.
@@ -113,7 +114,7 @@ std::string QueryTokenizer::SkipTokenizerTillStringQuoteDelimiter() {
   }
   std::string curr_string = query.substr(cursor);
   std::smatch match;
-  if (!std::regex_search(curr_string, match, std::regex("^[^\"]*"), std::regex_constants::match_continuous)) {
+  if (!std::regex_search(curr_string, match, string_end_regex, std::regex_constants::match_continuous)) {
     throw PQLTokenizeException("could not find string quote delimiter in query stream.");
   }
   std::string matched_str = match[0].str();
