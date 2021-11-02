@@ -7,34 +7,34 @@ NextBipTExtractor::NextBipTExtractor(PKB* pkb) {
   pkb_ = pkb;
 }
 
-std::vector<Entity*> NextBipTExtractor::GetRelationship(PKBRelRefs ref, const std::string &target) {
+std::vector<Entity*> NextBipTExtractor::GetRelationship(RelDirection dir, std::string target) {
   PopulateRelationships();
-  return pkb_->GetRelationship(ref, target);
+  return pkb_->GetRelationship(GetPKBRelRef(dir), target);
 }
 
-std::vector<Entity*> NextBipTExtractor::GetFirstEntityOfRelationship(PKBRelRefs ref) {
+std::vector<Entity*> NextBipTExtractor::GetFirstEntityOfRelationship(RelDirection dir) {
   PopulateRelationships();
-  return pkb_->GetFirstEntityOfRelationship(ref, DesignEntity::kStmt);
+  return pkb_->GetFirstEntityOfRelationship(GetPKBRelRef(dir), DesignEntity::kStmt);
 }
 
-std::vector<std::tuple<Entity*, Entity*>> NextBipTExtractor::GetRelationshipByTypes(PKBRelRefs ref) {
+std::vector<std::tuple<Entity*, Entity*>> NextBipTExtractor::GetRelationshipByTypes(RelDirection dir) {
   PopulateRelationships();
-  return pkb_->GetRelationshipByTypes(ref, DesignEntity::kStmt, DesignEntity::kStmt);
+  return pkb_->GetRelationshipByTypes(GetPKBRelRef(dir), DesignEntity::kStmt, DesignEntity::kStmt);
 }
 
-bool NextBipTExtractor::HasRelationship(PKBRelRefs ref) {
+bool NextBipTExtractor::HasRelationship(RelDirection dir) {
   PopulateRelationships();
-  return pkb_->HasRelationship(ref);
+  return pkb_->HasRelationship(GetPKBRelRef(dir));
 }
 
-bool NextBipTExtractor::HasRelationship(PKBRelRefs ref, std::string target) {
+bool NextBipTExtractor::HasRelationship(RelDirection dir, std::string target) {
   PopulateRelationships();
-  return pkb_->HasRelationship(ref, std::move(target));
+  return pkb_->HasRelationship(GetPKBRelRef(dir), std::move(target));
 }
 
-bool NextBipTExtractor::HasRelationship(PKBRelRefs ref, std::string first, std::string second) {
+bool NextBipTExtractor::HasRelationship(RelDirection dir, std::string first, std::string second) {
   PopulateRelationships();
-  return pkb_->HasRelationship(ref, std::move(first), std::move(second));
+  return pkb_->HasRelationship(GetPKBRelRef(dir), std::move(first), std::move(second));
 }
 
 void NextBipTExtractor::PopulateRelationships() {
@@ -49,4 +49,12 @@ void NextBipTExtractor::PopulateRelationships() {
   extractor.Extract(t_map, reverse_t_map, non_t_map);
   pkb_->PopulateRelationship(t_map, PKBRelRefs::kNextBipT);
   pkb_->PopulateRelationship(reverse_t_map, PKBRelRefs::kPrevBipT);
+}
+
+PKBRelRefs NextBipTExtractor::GetPKBRelRef(RelDirection dir) {
+  return dir == RelDirection::kForward ? PKBRelRefs::kNextBipT : PKBRelRefs::kPrevBipT;
+}
+
+void NextBipTExtractor::SetMediator(RuntimeMediator* rtm) {
+  rtm_ = rtm;
 }

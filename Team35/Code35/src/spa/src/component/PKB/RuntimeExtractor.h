@@ -4,6 +4,8 @@
 #include <model/Entity.h>
 #include <component/QueryProcessor/types/Types.h>
 #include <component/PKB/extractor/NextBipExtractor.h>
+#include <component/PKB/extractor/NextBipTExtractor.h>
+#include <component/PKB/extractor/RuntimeMediator.h>
 #include "PKB.h"
 #include "NextTExtractor.h"
 #include "AffectsExtractor.h"
@@ -13,15 +15,42 @@
  * This class acts as a facade for runtime extraction of relationships, for the DBManager to query. It abstracts out
  * the separate classes responsible for specific relationship extraction.
  */
-class RuntimeExtractor {
+class RuntimeExtractor : public RuntimeMediator {
+ public:
+  explicit RuntimeExtractor(PKB* pkb);
+  std::vector<Entity*> GetRelationship(PKBRelRefs ref, std::string target) override;
+  std::vector<Entity*> GetFirstEntityOfRelationship(PKBRelRefs ref, DesignEntity de) override;
+  std::vector<std::tuple<Entity*, Entity*>> GetRelationshipByTypes(PKBRelRefs ref, DesignEntity first, DesignEntity second) override;
+  bool HasRelationship(PKBRelRefs ref) override;
+  bool HasRelationship(PKBRelRefs ref, std::string first) override;
+  bool HasRelationship(PKBRelRefs ref, std::string first, std::string second) override;
+  bool HasRelationship(PKBRelRefs ref, DesignEntity first, DesignEntity second) override;
+
+  void Delete();
+
+  static bool IsRuntimeRelationship(PKBRelRefs ref);
+
  private:
   PKB* pkb_;
   NextTExtractor next_t_extractor_ = NextTExtractor();
   AffectsExtractor affects_extractor_ = AffectsExtractor();
   AffectsTExtractor affects_t_extractor_ = AffectsTExtractor();
   NextBipExtractor next_bip_extractor_;
- public:
-  explicit RuntimeExtractor(PKB* pkb);
+  NextBipTExtractor next_bip_t_extractor_;
+
+  static inline std::unordered_set<PKBRelRefs> runtime_relationships = {
+      PKBRelRefs::kNextT,
+      PKBRelRefs::kPreviousT,
+      PKBRelRefs::kAffects,
+      PKBRelRefs::kAffectedBy,
+      PKBRelRefs::kAffectsT,
+      PKBRelRefs::kAffectedByT,
+      PKBRelRefs::kNextBip,
+      PKBRelRefs::kPrevBip,
+      PKBRelRefs::kNextBipT,
+      PKBRelRefs::kPrevBipT
+  };
+
   std::vector<Entity*> GetNextT(int target);
   std::vector<Entity*> GetPrevT(int target);
   std::vector<Entity*> GetAffects(int target);
@@ -30,6 +59,8 @@ class RuntimeExtractor {
   std::vector<Entity*> GetAffectedByT(int target);
   std::vector<Entity*> GetNextBip(std::string target);
   std::vector<Entity*> GetPrevBip(std::string target);
+  std::vector<Entity*> GetNextBipT(std::string target);
+  std::vector<Entity*> GetPrevBipT(std::string target);
 
   std::vector<Entity*> GetNextT(DesignEntity de);
   std::vector<Entity*> GetPrevT(DesignEntity de);
@@ -67,8 +98,6 @@ class RuntimeExtractor {
   bool HasAffectsT(int first, int second);
   bool HasAffectedByT(int first, int second);
   bool HasNextBip(std::string first, std::string second);
-
-  void Delete();
 };
 
 #endif //AUTOTESTER_CODE35_SRC_SPA_SRC_COMPONENT_PKB_RUNTIMEEXTRACTOR_H_

@@ -4,11 +4,6 @@
 #include <model/Entity.h>
 #include <unordered_map>
 
-enum class RelDirection {
-  kNext,
-  kPrev
-};
-
 class NextTExtractor {
  public:
   int GetNextTSize();

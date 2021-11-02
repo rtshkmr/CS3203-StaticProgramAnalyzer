@@ -1,5 +1,6 @@
 #include <cassert>
 #include <utility>
+#include <component/PKB/extractor/RuntimeColleague.h>
 #include "NextTExtractor.h"
 
 void NextTExtractor::Delete() {}
@@ -46,7 +47,7 @@ std::vector<Entity*> NextTExtractor::GetNextT(int target,
                                               std::vector<Statement*> stmt_list) {
   map_to_populate_ = &next_t_map_;
   first_args_ = &next_t_lhs_stmts_;
-  rel_direction_ = RelDirection::kNext;
+  rel_direction_ = RelDirection::kForward;
 
   return GetRel(target, proc_list, std::move(stmt_list));
 }
@@ -140,9 +141,9 @@ std::list<Statement*> NextTExtractor::MakeStmtList(int first_stmt, int last_stmt
 std::list<Block*> NextTExtractor::GetFollowingBlocksAfterWhile(Block* block) {
   std::list<Block*> following_blocks;
   for (Block* following_block: GetFollowingBlocks(block)) {
-    bool is_prev_block = rel_direction_ == RelDirection::kPrev
+    bool is_prev_block = rel_direction_ == RelDirection::kReverse
         && (following_block->GetStartEndRange().first < block->GetStartEndRange().first);
-    bool is_next_block = rel_direction_ == RelDirection::kNext
+    bool is_next_block = rel_direction_ == RelDirection::kForward
         && (following_block->GetStartEndRange().first != block->GetStartEndRange().first + 1);
     if (is_next_block || is_prev_block) {
       following_blocks.push_back(following_block);
@@ -189,7 +190,7 @@ std::list<Statement*> NextTExtractor::RecurseFollowingBlocks(Block* block, int t
 
 int NextTExtractor::GetBlockTarget(Block* block, int target) {
   std::pair<int, int> range = block->GetStartEndRange();
-  if (rel_direction_ == RelDirection::kNext) {
+  if (rel_direction_ == RelDirection::kForward) {
     return target < range.first ? range.first : target;
   } else {
     return target > range.second ? range.second : target;
@@ -197,7 +198,7 @@ int NextTExtractor::GetBlockTarget(Block* block, int target) {
 }
 
 std::set<Block*> NextTExtractor::GetFollowingBlocks(Block* block) {
-  if (rel_direction_ == RelDirection::kNext) {
+  if (rel_direction_ == RelDirection::kForward) {
     return block->GetNextBlocks();
   } else {
     return block->GetPrevBlocks();
@@ -207,7 +208,7 @@ std::set<Block*> NextTExtractor::GetFollowingBlocks(Block* block) {
 void NextTExtractor::AddRelationshipsFollowingBlock(const std::list<Statement*> &rel_stmts, Block* block) {
   int block_end;
   std::pair<int, int> range = block->GetStartEndRange();
-  if (rel_direction_ == RelDirection::kNext) {
+  if (rel_direction_ == RelDirection::kForward) {
     block_end = range.second;
   } else {
     block_end = range.first;
@@ -221,7 +222,7 @@ void NextTExtractor::AddRelationshipsFollowingBlock(const std::list<Statement*> 
 
 void NextTExtractor::AddRelationshipsInBlock(std::list<Statement*> rel_stmts, Block* block, int target) {
   std::pair<int, int> range = block->GetStartEndRange();
-  if (rel_direction_ == RelDirection::kNext) {
+  if (rel_direction_ == RelDirection::kForward) {
     for (int i = range.second - 1; i >= target; --i) {
       rel_stmts.push_back(stmt_list_[i]);
       AddRelationships(stmt_list_[i - 1], rel_stmts);
@@ -235,7 +236,7 @@ void NextTExtractor::AddRelationshipsInBlock(std::list<Statement*> rel_stmts, Bl
 }
 
 std::list<Statement*> NextTExtractor::AddBlockStmtToRelList(std::list<Statement*> rel_list, Block* block) {
-  if (rel_direction_ == RelDirection::kNext) {
+  if (rel_direction_ == RelDirection::kForward) {
     rel_list.push_back(stmt_list_[block->GetStartEndRange().first - 1]);
   } else {
     rel_list.push_back(stmt_list_[block->GetStartEndRange().second - 1]);
@@ -523,7 +524,7 @@ std::vector<Entity*> NextTExtractor::GetPrevT(int target,
                                               std::vector<Statement*> stmt_list) {
   map_to_populate_ = &prev_t_map_;
   first_args_ = &next_t_rhs_stmts_;
-  rel_direction_ = RelDirection::kPrev;
+  rel_direction_ = RelDirection::kForward;
 
   return GetRel(target, proc_list, std::move(stmt_list));
 }
