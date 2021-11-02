@@ -10,6 +10,7 @@ class NextExtractor {
  private:
   Deliverable* deliverable_;
   std::vector<int>* visited_blocks_;
+  std::vector<Statement*> stmt_list_;
 
   void ExtractBlock(Block* block);
 };

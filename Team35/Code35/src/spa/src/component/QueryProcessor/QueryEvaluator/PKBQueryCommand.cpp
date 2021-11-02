@@ -11,13 +11,13 @@ PKBRelRefs PKBQueryCommand::GetPKBRelRef(RelRef relation, bool order_of_values_u
     case RelRef::kParent:
       return order_of_values_unchanged_from_clause ? PKBRelRefs::kParent : PKBRelRefs::kChild;
     case RelRef::kModifiesP:
-      return order_of_values_unchanged_from_clause ? PKBRelRefs::kModifiesContainer : PKBRelRefs::kModifiedByContainer;
+      return order_of_values_unchanged_from_clause ? PKBRelRefs::kModifies : PKBRelRefs::kModifiedBy;
     case RelRef::kModifiesS:
       return order_of_values_unchanged_from_clause ? PKBRelRefs::kModifies : PKBRelRefs::kModifiedBy;
     case RelRef::kUsesS:
       return order_of_values_unchanged_from_clause ? PKBRelRefs::kUses : PKBRelRefs::kUsedBy;
     case RelRef::kUsesP:
-      return order_of_values_unchanged_from_clause ? PKBRelRefs::kUsesC : PKBRelRefs::kUsedByC;
+      return order_of_values_unchanged_from_clause ? PKBRelRefs::kUses : PKBRelRefs::kUsedBy;
     case RelRef::kFollowsT:
       return order_of_values_unchanged_from_clause ? PKBRelRefs::kFollowsT : PKBRelRefs::kFollowedByT;
     case RelRef::kCalls:
