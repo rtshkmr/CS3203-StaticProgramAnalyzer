@@ -32,7 +32,7 @@ class RuntimeExtractor : public RuntimeMediator {
 
  private:
   PKB* pkb_;
-  NextTExtractor next_t_extractor_ = NextTExtractor();
+  NextTExtractor next_t_extractor_;
   AffectsExtractor affects_extractor_ = AffectsExtractor();
   AffectsTExtractor affects_t_extractor_ = AffectsTExtractor();
   NextBipExtractor next_bip_extractor_;
@@ -57,10 +57,10 @@ class RuntimeExtractor : public RuntimeMediator {
   std::vector<Entity*> GetAffectedBy(int target);
   std::vector<Entity*> GetAffectsT(int target);
   std::vector<Entity*> GetAffectedByT(int target);
-  std::vector<Entity*> GetNextBip(std::string target);
-  std::vector<Entity*> GetPrevBip(std::string target);
-  std::vector<Entity*> GetNextBipT(std::string target);
-  std::vector<Entity*> GetPrevBipT(std::string target);
+  std::vector<Entity*> GetNextBip(int target);
+  std::vector<Entity*> GetPrevBip(int target);
+  std::vector<Entity*> GetNextBipT(int target);
+  std::vector<Entity*> GetPrevBipT(int target);
 
   std::vector<Entity*> GetNextT(DesignEntity de);
   std::vector<Entity*> GetPrevT(DesignEntity de);
@@ -92,18 +92,16 @@ class RuntimeExtractor : public RuntimeMediator {
   bool HasAffectedBy(int first);
   bool HasAffectsT(int first);
   bool HasAffectedByT(int first);
-  bool HasNextBip(std::string first);
-  bool HasPrevBip(std::string first);
-  bool HasNextBipT(std::string first);
-  bool HasPrevBipT(std::string first);
+  bool HasNextBip(int first);
+  bool HasPrevBip(int first);
 
   bool HasNextT(int first, int second);
   bool HasAffects(int first, int second);
   bool HasAffectedBy(int first, int second);
   bool HasAffectsT(int first, int second);
   bool HasAffectedByT(int first, int second);
-  bool HasNextBip(std::string first, std::string second);
-  bool HasNextBipT(std::string first, std::string second);
+  bool HasNextBip(int first, int second);
+  bool HasNextBipT(int first, int second);
 };
 
 #endif //AUTOTESTER_CODE35_SRC_SPA_SRC_COMPONENT_PKB_RUNTIMEEXTRACTOR_H_

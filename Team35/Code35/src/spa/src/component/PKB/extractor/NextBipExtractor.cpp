@@ -19,9 +19,9 @@ NextBipExtractor::NextBipExtractor(PKB* pkb) {
  * @param target Statement number of the first argument of NextBip.
  * @return Vector of Entities that are NextBip of the target.
  */
-std::vector<Entity*> NextBipExtractor::GetRelationship(RelDirection dir, std::string target) {
+std::vector<Entity*> NextBipExtractor::GetRelationship(RelDirection dir, int target) {
   PopulateBipMaps();
-  return pkb_->GetRelationship(GetPKBRelRef(dir), target);
+  return pkb_->GetRelationship(GetPKBRelRef(dir), std::to_string(target));
 }
 
 /**
@@ -43,14 +43,14 @@ bool NextBipExtractor::HasRelationship(RelDirection dir) {
   return pkb_->HasRelationship(GetPKBRelRef(dir));
 }
 
-bool NextBipExtractor::HasRelationship(RelDirection dir, std::string target) {
+bool NextBipExtractor::HasRelationship(RelDirection dir, int target) {
   PopulateBipMaps();
-  return pkb_->HasRelationship(GetPKBRelRef(dir), target);
+  return pkb_->HasRelationship(GetPKBRelRef(dir), std::to_string(target));
 }
 
-bool NextBipExtractor::HasRelationship(RelDirection dir, std::string first, std::string second) {
+bool NextBipExtractor::HasRelationship(RelDirection dir, int first, int second) {
   PopulateBipMaps();
-  return pkb_->HasRelationship(GetPKBRelRef(dir), first, second);
+  return pkb_->HasRelationship(GetPKBRelRef(dir), std::to_string(first), std::to_string(second));
 }
 
 void NextBipExtractor::PopulateBipMaps() {

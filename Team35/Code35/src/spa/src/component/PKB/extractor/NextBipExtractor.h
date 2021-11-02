@@ -10,12 +10,12 @@ class NextBipExtractor : public RuntimeColleague {
  public:
   NextBipExtractor() = default;
   explicit NextBipExtractor(PKB* pkb);
-  std::vector<Entity*> GetRelationship(RelDirection dir, std::string target) override;
+  std::vector<Entity*> GetRelationship(RelDirection dir, int target) override;
   std::vector<Entity*> GetFirstEntityOfRelationship(RelDirection dir) override;
   std::vector<std::tuple<Entity*, Entity*>> GetRelationshipByTypes(RelDirection dir) override;
   bool HasRelationship(RelDirection dir) override;
-  bool HasRelationship(RelDirection dir, std::string target) override;
-  bool HasRelationship(RelDirection dir, std::string first, std::string second) override;
+  bool HasRelationship(RelDirection dir, int target) override;
+  bool HasRelationship(RelDirection dir, int first, int second) override;
 
  private:
   PKB* pkb_{};

@@ -16,21 +16,14 @@ class TransitiveExtractor {
   void Extract(std::unordered_map<U*, std::list<U*>*>* t_map,
                std::unordered_map<U*, std::list<U*>*>* reverse_t_map,
                std::unordered_map<U*, std::list<U*>*>* non_t_map);
-  void AllowCyclicRelationships();
  private:
   std::unordered_map<U*, std::list<U*>*>* t_map_; // transitive relationship map
   std::unordered_map<U*, std::list<U*>*>* reverse_t_map_; // transitive reverse relationship map
   std::unordered_map<U*, std::list<U*>*>* non_t_map_; // non-transitive relationship map
-  bool cycle_allowed_ = false;
 
   std::list<U*>* GetExtractions(U* first_arg, std::vector<U*>* visited_nodes);
   void AddRelationship(U* key, U* value);
 };
-
-template<class U>
-void TransitiveExtractor<U>::AllowCyclicRelationships() {
-  cycle_allowed_ = true;
-}
 
 /**
  * Extracts transitive relationships into t_map and reverse_t_map from non transitive relationships in non_t_map.
@@ -89,7 +82,7 @@ std::list<U*>* TransitiveExtractor<U>::GetExtractions(U* first_arg, std::vector<
   for (U* second_arg: *non_t_list) {
     std::list<U*>* extracted_ts = GetExtractions(second_arg, visited_nodes);
     for (U* extracted_t: *extracted_ts) {
-      if (!cycle_allowed_ && extracted_t == first_arg) {
+      if (extracted_t == first_arg) {
         throw SemanticException("Cyclic relationship detected.");
       }
       AddRelationship(first_arg, extracted_t);
