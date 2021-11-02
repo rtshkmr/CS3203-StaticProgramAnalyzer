@@ -1,3 +1,423 @@
+1 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with pr1.procName = pr1.procName
+none
+5000
+2 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with pr1.procName = c1.procName
+none
+5000
+3 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with pr1.procName = v1.varName
+none
+5000
+4 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with pr1.procName = r1.varName
+none
+5000
+5 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with pr1.procName = p1.varName
+none
+5000
+6 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with pr1.procName = const.value
+none
+5000
+7 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with pr1.procName = s1.stmt#
+none
+5000
+8 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with pr1.procName = r1.stmt#
+none
+5000
+9 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with pr1.procName = p1.stmt#
+none
+5000
+10 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with pr1.procName = c1.stmt#
+none
+5000
+11 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with pr1.procName = w1.stmt#
+none
+5000
+12 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with pr1.procName = if1.stmt#
+none
+5000
+13 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with pr1.procName = a1.stmt#
+none
+5000
+14 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with c1.procName = pr1.procName
+none
+5000
+15 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with c1.procName = c1.procName
+none
+5000
+16 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with c1.procName = v1.varName
+none
+5000
+17 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with c1.procName = r1.varName
+none
+5000
+18 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with c1.procName = p1.varName
+none
+5000
+19 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with c1.procName = const.value
+none
+5000
+20 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with c1.procName = s1.stmt#
+none
+5000
+21 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with c1.procName = r1.stmt#
+none
+5000
+22 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with c1.procName = p1.stmt#
+none
+5000
+23 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with c1.procName = c1.stmt#
+none
+5000
+24 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with c1.procName = w1.stmt#
+none
+5000
+25 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with c1.procName = if1.stmt#
+none
+5000
+26 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with c1.procName = a1.stmt#
+none
+5000
+27 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with v1.varName = pr1.procName
+none
+5000
+28 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with v1.varName = c1.procName
+none
+5000
+29 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with v1.varName = v1.varName
+none
+5000
+30 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with v1.varName = r1.varName
+none
+5000
+31 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with v1.varName = p1.varName
+none
+5000
+32 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with v1.varName = const.value
+none
+5000
+33 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with v1.varName = s1.stmt#
+none
+5000
+34 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with v1.varName = r1.stmt#
+none
+5000
+35 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with v1.varName = p1.stmt#
+none
+5000
+36 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with v1.varName = c1.stmt#
+none
+5000
+37 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with v1.varName = w1.stmt#
+none
+5000
+38 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with v1.varName = if1.stmt#
+none
+5000
+39 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with v1.varName = a1.stmt#
+none
+5000
+40 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with r1.varName = pr1.procName
+none
+5000
+41 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with r1.varName = c1.procName
+none
+5000
+42 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with r1.varName = v1.varName
+none
+5000
+43 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with r1.varName = r1.varName
+none
+5000
+44 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with r1.varName = p1.varName
+none
+5000
+45 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with r1.varName = const.value
+none
+5000
+46 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with r1.varName = s1.stmt#
+none
+5000
+47 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with r1.varName = r1.stmt#
+none
+5000
+48 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with r1.varName = p1.stmt#
+none
+5000
+49 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with r1.varName = c1.stmt#
+none
+5000
+50 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with r1.varName = w1.stmt#
+none
+5000
+51 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with r1.varName = if1.stmt#
+none
+5000
+52 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with r1.varName = a1.stmt#
+none
+5000
+53 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with p1.varName = pr1.procName
+none
+5000
+54 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with p1.varName = c1.procName
+none
+5000
+55 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with p1.varName = v1.varName
+none
+5000
+56 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with p1.varName = r1.varName
+none
+5000
+57 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with p1.varName = p1.varName
+none
+5000
+58 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with p1.varName = const.value
+none
+5000
+59 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with p1.varName = s1.stmt#
+none
+5000
+60 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with p1.varName = r1.stmt#
+none
+5000
+61 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with p1.varName = p1.stmt#
+none
+5000
+62 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with p1.varName = c1.stmt#
+none
+5000
+63 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with p1.varName = w1.stmt#
+none
+5000
+64 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with p1.varName = if1.stmt#
+none
+5000
+65 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with p1.varName = a1.stmt#
+none
+5000
+66 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with const.value = pr1.procName
+none
+5000
+67 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with const.value = c1.procName
+none
+5000
+68 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with const.value = v1.varName
+none
+5000
+69 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with const.value = r1.varName
+none
+5000
+70 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with const.value = p1.varName
+none
+5000
+71 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with const.value = const.value
+none
+5000
+72 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with const.value = s1.stmt#
+none
+5000
+73 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with const.value = r1.stmt#
+none
+5000
+74 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with const.value = p1.stmt#
+none
+5000
+75 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with const.value = c1.stmt#
+none
+5000
+76 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with const.value = w1.stmt#
+none
+5000
+77 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with const.value = if1.stmt#
+none
+5000
+78 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with const.value = a1.stmt#
+none
+5000
+79 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with s1.stmt# = pr1.procName
+none
+5000
+80 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with s1.stmt# = c1.procName
+none
+5000
+81 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with s1.stmt# = v1.varName
+none
+5000
+82 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with s1.stmt# = r1.varName
+none
+5000
+83 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with s1.stmt# = p1.varName
+none
+5000
+84 - synonym cross
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select s1 with s1.stmt# = const.value
+none
+5000
 85 - synonym cross
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
 Select s1 with s1.stmt# = s1.stmt#
