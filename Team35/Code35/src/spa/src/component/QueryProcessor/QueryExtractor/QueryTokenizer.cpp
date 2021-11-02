@@ -13,7 +13,7 @@ std::vector<std::string> insertion_order = { "SPACINGS", "IDENT", "INTEGER" };
 static std::unordered_map<std::string, std::regex> spec_table {
     {"INTEGER", RegexPatterns::GetIntegerPatternNonTerminating()},
     {"IDENT", RegexPatterns::GetNamePattern()}, // IDENT is TokenTag:kName
-    {"SPACINGS", std::regex(R"(^[\n\r\s\t]+)")},
+    {"SPACINGS", std::regex(R"(^[\s\n\r\t]+)")},
 };
 
 static std::unordered_map<std::string, TokenTag> spec_type_to_tag_table {
