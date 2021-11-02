@@ -13,7 +13,7 @@ std::vector<std::string> insertion_order = { "SPACINGS", "IDENT", "INTEGER" };
 static std::unordered_map<std::string, std::regex> spec_table {
     {"INTEGER", RegexPatterns::GetIntegerPatternNonTerminating()},
     {"IDENT", RegexPatterns::GetNamePattern()}, // IDENT is TokenTag:kName
-    {"SPACINGS", std::regex(R"(^[\s\n\r\t]+)")},
+    {"SPACINGS", std::regex(R"(^[\s\n\r\t]+)", std::regex_constants::optimize)},
 };
 
 static std::unordered_map<std::string, TokenTag> spec_type_to_tag_table {
@@ -35,7 +35,7 @@ static std::unordered_map<std::string, TokenTag> spec_type_to_tag_table {
   {"=", TokenTag::kEquals}
 };
 
-static std::regex string_end_regex("^[^\"]*");
+static std::regex string_end_regex("^[^\"]*", std::regex_constants::optimize);
 /**
  * Gets correct TokenTag specific to PQL applications by consulting spec_type_to_tag_table.
  * Note that this function does not check that the token is of SPACINGS type, as such tokens have already been dropped.
