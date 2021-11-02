@@ -92,8 +92,8 @@ bool NextBipExtractor::HasNextBip(std::string first, std::string second) {
 
 void NextBipExtractor::PopulateBipMaps() {
   if (populated_) return;
-  next_bip_map_ = ConvertPKBMap(pkb_->GetRelationshipMap(PKBRelRefs::kNext));
-  prev_bip_map_ = ConvertPKBMap(pkb_->GetRelationshipMap(PKBRelRefs::kPrevious));
+  next_bip_map_ = pkb_->ConvertStringToEntityMapping(pkb_->GetRelationshipMap(PKBRelRefs::kNext));
+  prev_bip_map_ = pkb_->ConvertStringToEntityMapping(pkb_->GetRelationshipMap(PKBRelRefs::kPrevious));
   for (Entity* call_entity : call_list_) {
     if (auto* call_statement = dynamic_cast<Statement*>(call_entity)) {
       std::list<Entity*> next_entities = GetRelFromMap(call_entity, PKBRelRefs::kNextBip);
@@ -210,16 +210,4 @@ std::list<int> NextBipExtractor::HandleCallLastStmt(const std::list<int> &last_s
   nested_last_stmts.sort();
   nested_last_stmts.unique();
   return nested_last_stmts;
-}
-
-std::unordered_map<Entity*, std::list<Entity*>*>* NextBipExtractor::ConvertPKBMap(const std::unordered_map<std::string,
-                                                                                  std::vector<Entity*>>& pkb_map) {
-  auto* bip_map = new std::unordered_map<Entity*, std::list<Entity*>*>{};
-  for (auto [key, value] : pkb_map) {
-    Entity* first_arg = stmt_list_[Utility::ConvertStringToInt(key) - 1];
-    auto* second_arg = new std::list<Entity*>{};
-    second_arg->insert(second_arg->end(), value.begin(), value.end());
-    bip_map->insert({first_arg, second_arg});
-  }
-  return bip_map;
 }
