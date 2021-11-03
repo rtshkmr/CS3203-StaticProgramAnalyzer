@@ -237,18 +237,12 @@ bool AffectsExtractor::HasAffects(AssignEntity* first_stmt, AssignEntity* second
  *
  * */
 bool AffectsExtractor::HasValidUnmodifiedPath(AssignEntity* first_stmt, AssignEntity* second_stmt) {
+  Procedure* proc = first_stmt->GetProcedureNode();
   if (first_stmt->GetProcedureNode() != second_stmt->GetProcedureNode()) return false;
   int first_stmt_num = first_stmt->GetStatementNumber()->GetNum();
   int second_stmt_num = second_stmt->GetStatementNumber()->GetNum();
   std::vector<Entity*> proc_entities = this->pkb_->GetDesignEntities(DesignEntity::kProcedure);
-  Cluster* scoped_cluster;
-  for (auto entity: proc_entities) {
-    auto* proc = dynamic_cast<Procedure*>(entity);
-    assert(proc);
-    scoped_cluster = proc->GetInnermostCluster(first_stmt_num, second_stmt_num, nullptr);
-    if (scoped_cluster) break;
-  }
-  // call the boolean traversal helper function here, pass in the lhs argument that we're looking at
+  Cluster* scoped_cluster =  proc->GetInnermostCluster(first_stmt_num, second_stmt_num, nullptr);;
   std::string lhs_var = first_stmt->GetVariableString();
   return Cluster::TraverseScopedCluster(PKBRelRefs::kAffects,
                                         scoped_cluster,

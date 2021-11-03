@@ -296,31 +296,27 @@ std::pair<bool, bool> TraverseNormalBlockForAffects(Cluster* child,
 //      ========================  END OF TRAVERSING NORMAL BLOCK FOR AFFECTS =============
 }
 
-
 bool Cluster::CheckScopeClusterForAffects(Cluster* scoped_cluster,
-                                            std::pair<int, int> target_range,
-                                            PKB* pkb,
-                                            const std::string& lhs_var) {
-
-  // extra check for first > second.
-  // re-evaluate to while.cond line -> second
+                                          std::pair<int, int> target_range,
+                                          PKB* pkb,
+                                          const std::string& lhs_var) {
   if (target_range.first >= target_range.second) {
-    // only way for this to be true is if first and second is in a while loop.
-    // concept: first -> while_cond not modified + while_cond -> second not modified
-
-    // method 1 - find the closest while that contains both.
-    //TODO - check if method 1 works; exist find the outer most while.
-
     Cluster* current_scope = scoped_cluster;
-    while (current_scope && current_scope->start_ <= target_range.second && current_scope->cluster_tag_ != ClusterTag::kWhileCluster) {
+    while (current_scope
+        && current_scope->start_ <= target_range.second
+        && current_scope->GetClusterTag() != ClusterTag::kWhileCluster) {
       current_scope = current_scope->GetParentCluster();
     }
     if (!current_scope) return false;
-    // auto true for first criteria if second is already last line.
-    // cannot have the same cond for second_criteria as start_ is definitely a cond stmt (not assign stmt)
-    bool first_criteria = (target_range.second == current_scope->end_) ? true : TraverseScopedClusterForAffects(current_scope, {target_range.first, current_scope->end_}, pkb, lhs_var);
-    bool second_criteria =  TraverseScopedClusterForAffects(current_scope, {current_scope->start_, target_range.second}, pkb, lhs_var);
-    return first_criteria && second_criteria;
+    auto current_scope_range = current_scope->GetStartEndRange();
+    bool while_start_to_first_stmt_is_unmodified = (target_range.second == current_scope_range.second)
+        || TraverseScopedClusterForAffects(current_scope,
+                                           {target_range.first, current_scope_range.second},
+                                           pkb,
+                                           lhs_var);
+    bool second_stmt_to_while_end_is_unmodified =
+        TraverseScopedClusterForAffects(current_scope, {current_scope->start_, target_range.second}, pkb, lhs_var);
+    return while_start_to_first_stmt_is_unmodified && second_stmt_to_while_end_is_unmodified;
   } else {
     TraverseScopedClusterForAffects(scoped_cluster, target_range, pkb, lhs_var);
   }
@@ -375,7 +371,7 @@ bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
         if (if_body_is_unmodified_path) continue;
         bool else_body_is_unmodified_path = TraverseScopedClusterForAffects(else_body, else_body_range, pkb, lhs_var);
         bool has_no_unmod_path = !if_body_is_unmodified_path && !else_body_is_unmodified_path;
-        if(has_no_unmod_path) {
+        if (has_no_unmod_path) {
           scoped_cluster_does_not_modify_var = false;
           break; // breaks outer for loop
         }
