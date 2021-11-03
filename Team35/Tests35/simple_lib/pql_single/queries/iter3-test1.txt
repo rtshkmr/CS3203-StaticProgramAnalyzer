@@ -350,43 +350,43 @@ none
 5000
 71 - synonym cross
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
-Select const with const.value = const.value
-0, 1, 2, 5, 26
+Select const1 with const1.value = const2.value
+0, 1, 2, 5, 6, 10, 26
 5000
 72 - synonym cross
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
-Select s1 with const.value = s1.stmt#
-none
+Select const1 with const1.value = s1.stmt#
+1, 2, 5, 26
 5000
 73 - synonym cross
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
-Select s1 with const.value = r1.stmt#
-none
+Select const1 with const1.value = r1.stmt#
+1, 2
 5000
 74 - synonym cross
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
-Select s1 with const.value = p1.stmt#
+Select const1 with const1.value = p1.stmt#
 none
 5000
 75 - synonym cross
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
-Select s1 with const.value = c1.stmt#
+Select const1 with const1.value = c1.stmt#
 none
 5000
 76 - synonym cross
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
-Select s1 with const.value = w1.stmt#
-none
+Select const1 with const1.value = w1.stmt#
+6
 5000
 77 - synonym cross
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
-Select s1 with const.value = if1.stmt#
-none
+Select const1 with const1.value = if1.stmt#
+10
 5000
 78 - synonym cross
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
-Select s1 with const.value = a1.stmt#
-none
+Select const1 with const1.value = a1.stmt#
+5
 5000
 79 - synonym cross
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
@@ -416,8 +416,9 @@ none
 84 - synonym cross
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
 Select s1 with s1.stmt# = const.value
-none
+1, 2, 5, 6, 10, 26
 5000
+
 85 - synonym cross
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
 Select s1 with s1.stmt# = s1.stmt#

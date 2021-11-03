@@ -7,7 +7,7 @@ procedure First {
 procedure Second {
     x = 0;
     i = 5;
-    while ((! (d<=j)) || ((j<d) && ((x>Third) && (2<=0)))) {
+    while ((! (d<=j)) || ((6<d) && ((x>Third) && (2<=0)))) {
         x = x + 2 * y;
         call Third;
         while ((i!=i) || (! (2>d))) {
@@ -15,7 +15,7 @@ procedure Second {
                 read x;
                 v = 5;
             } else {
-                y = x * z + 1 * x;
+                y = x * z + 10 * x;
                 print Third;
                 read First;
             }
