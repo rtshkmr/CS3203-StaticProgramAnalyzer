@@ -71,6 +71,7 @@ void PKB::PopulateEntities(DesignEntity design_entity, T& entity_list) {
     std::unordered_map<Attribute, std::string> attributes = GetAttributesFromEntity(entity);
     for (std::pair<Attribute, std::string> attribute: attributes) {
       attribute_to_entity_map_[{design_entity, attribute.first}][attribute.second].push_back(entity);
+      entity_to_attribute_type_map_[entity][attribute.second] = attribute.first;
       attribute_string_to_entity_map_[attribute.second].insert(entity);
     }
     if (pattern_entities_.find(design_entity) != pattern_entities_.end()) {
@@ -155,8 +156,8 @@ std::vector<Entity*> PKB::GetEntitiesWithAttributeValue(DesignEntity design_enti
   return attribute_to_entity_map_[{design_entity, attribute}][value];
 }
 
-std::vector<entity_pair> PKB::GetEntitiesWithMatchingAttributes(DesignEntity type_one, DesignEntity type_two) {
-  return entities_with_matching_attributes_map_[{type_one, type_two}];
+std::vector<entity_pair> PKB::GetEntitiesWithMatchingAttributes(type_attribute_pair type_one, type_attribute_pair type_two) {
+  return entities_with_matching_attributes_map_[type_one][type_two];
 }
 
 bool PKB::HasRelationship(PKBRelRefs ref) {
@@ -179,9 +180,11 @@ void PKB::ProcessEntitiesWithMatchingAttributes() {
   for (std::pair<std::string, std::unordered_set<Entity*>> kv : attribute_string_to_entity_map_) {
     for (Entity* entity_one : kv.second) {
       DesignEntity design_entity_one = GetDesignEntityFromEntity(entity_one);
+      Attribute attribute_one = entity_to_attribute_type_map_[entity_one][kv.first];
       for (Entity* entity_two : kv.second) {
         DesignEntity design_entity_two = GetDesignEntityFromEntity(entity_two);
-        entities_with_matching_attributes_map_[{design_entity_one, design_entity_two}]
+        Attribute attribute_two = entity_to_attribute_type_map_[entity_two][kv.first];
+        entities_with_matching_attributes_map_[{design_entity_one, attribute_one}][{design_entity_two, attribute_two}]
           .push_back({entity_one, entity_two});
       }
     }
