@@ -166,7 +166,7 @@ std::list<Statement*> NextTExtractor::GetRelFromCluster(Cluster* cluster, int ta
   } else {
     Cluster* cluster_head = nested_clusters.front();
     auto* head_block = dynamic_cast<Block*>(cluster_head);
-    if (head_block->isWhile) {
+    if (head_block && head_block->isWhile) {
       GetRelFromWhile(cluster, target);
     } else {
       Cluster* t_cluster = GetTargetCluster(cluster, target);
@@ -496,7 +496,7 @@ bool NextTExtractor::HasNextTInCluster(Cluster* cluster, int first, int second) 
     return HasNextTByTraversal(dynamic_cast<Block*>(cluster), first, second);
   } else {
     auto* first_block = dynamic_cast<Block*>(nested_clusters.front());
-    if (first_block->isWhile) {
+    if (first_block && first_block->isWhile) {
       if (cluster->CheckIfStmtNumInRange(second)) {
         next_t_2d_array_[first - 1][second - 1] = 1;
         return true;
@@ -526,6 +526,9 @@ bool NextTExtractor::HasNextTByTraversal(Block* block, int first, int second) {
       next_t_2d_array_[first - 1][block->GetStartEndRange().first - 1] = 1;
     }
     for (Block* next_block: block->GetNextBlocks()) {
+      if (next_block->GetStartEndRange().first == -1) {
+        continue;
+      }
       if (next_t_2d_array_[first - 1][next_block->GetStartEndRange().first - 1] != 1) {
         result = result || HasNextTByTraversal(next_block, first, second);
       }

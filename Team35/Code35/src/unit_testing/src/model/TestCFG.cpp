@@ -91,15 +91,15 @@ TEST_CASE("1.CFG.Cluster") {
     auto* root_cluster = const_cast<Cluster*>(procedure->GetClusterRoot());
     Cluster* w1_cluster = root_cluster->GetNestedClusters().front();
     Cluster* w1_cond_cluster = w1_cluster->GetNestedClusters().front();
-    Block* w1_block =dynamic_cast<Block*>(w1_cond_cluster);
+    auto* w1_block =dynamic_cast<Block*>(w1_cond_cluster);
     REQUIRE(w1_block->isWhile);
-    Cluster* w2_cluster = w1_cond_cluster->GetNextSiblingCluster();
+    Cluster* w2_cluster = w1_cond_cluster->GetNextSiblingCluster()->GetNestedClusters().front();
     Cluster* w2_cond_cluster = w2_cluster->GetNestedClusters().front();
-    Block* w2_block =dynamic_cast<Block*>(w2_cond_cluster);
+    auto* w2_block =dynamic_cast<Block*>(w2_cond_cluster);
     REQUIRE(w2_block->isWhile);
-    Cluster* w3_cluster = w2_cond_cluster->GetNextSiblingCluster();
+    Cluster* w3_cluster = w2_cond_cluster->GetNextSiblingCluster()->GetNestedClusters().front();
     Cluster* w3_cond_cluster = w3_cluster->GetNestedClusters().front();
-    Block* w3_block =dynamic_cast<Block*>(w3_cond_cluster);
+    auto* w3_block =dynamic_cast<Block*>(w3_cond_cluster);
     REQUIRE(w3_block->isWhile);
   }
 }
