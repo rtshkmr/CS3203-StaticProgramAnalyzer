@@ -222,23 +222,23 @@ TEST_CASE("NextBipTExtractor more procedures") {
       CHECK(AreEntityListsEqual(expected_lists, entities));
     }
   }
-  //
-  //  SECTION("Get LHS") {
-  //    std::vector<Entity*> next = rte.GetFirstEntityOfRelationship(PKBRelRefs::kNextBipT, DesignEntity::kStmt);
-  //    std::list<std::tuple<EntityEnum, std::string>> expected_list;
-  //    for (int i = 1; i <= 19; ++i) {
-  //      expected_list.push_back(tp_source_tuples[i]);
-  //    }
-  //    CHECK(AreEntityListsEqual(expected_list, next));
-  //  }
-  //  SECTION("Get RHS") {
-  //    std::vector<Entity*> next = rte.GetFirstEntityOfRelationship(PKBRelRefs::kPrevBipT, DesignEntity::kStmt);
-  //    std::list<std::tuple<EntityEnum, std::string>> expected_list;
-  //    for (int i = 2; i <= 20; ++i) {
-  //      expected_list.push_back(tp_source_tuples[i]);
-  //    }
-  //    CHECK(AreEntityListsEqual(expected_list, next));
-  //  }
+
+  SECTION("Get LHS") {
+    std::vector<Entity*> next = rte.GetFirstEntityOfRelationship(PKBRelRefs::kNextBipT, DesignEntity::kStmt);
+    std::list<std::tuple<EntityEnum, std::string>> expected_list;
+    for (int i = 1; i <= 19; ++i) {
+      expected_list.push_back(tp_source_tuples[i]);
+    }
+    CHECK(AreEntityListsEqual(expected_list, next));
+  }
+  SECTION("Get RHS") {
+    std::vector<Entity*> next = rte.GetFirstEntityOfRelationship(PKBRelRefs::kPrevBipT, DesignEntity::kStmt);
+    std::list<std::tuple<EntityEnum, std::string>> expected_list;
+    for (int i = 2; i <= 20; ++i) {
+      expected_list.push_back(tp_source_tuples[i]);
+    }
+    CHECK(AreEntityListsEqual(expected_list, next));
+  }
 
   SECTION("Get all pairs") {
     std::vector<std::tuple<Entity*, Entity*>>
