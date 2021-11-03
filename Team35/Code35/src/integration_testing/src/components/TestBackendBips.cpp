@@ -65,36 +65,85 @@ TEST_CASE("NextBipExtractor basic integration") {
 
 TEST_CASE("NextBipExtractor more procedures") {
   PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/three_procs_source.txt");
+  RuntimeExtractor rte = RuntimeExtractor(pkb);
+  std::vector<std::list<std::tuple<EntityEnum, std::string>>> expected_next_bip_lists = {
+      {tp_source_tuples[2]},//1
+      {tp_source_tuples[3], tp_source_tuples[5]},//2
+      {tp_source_tuples[4]},//3
+      {tp_source_tuples[7]},//4
+      {tp_source_tuples[6]},//5
+      {tp_source_tuples[17]},//6
+      {tp_source_tuples[8], tp_source_tuples[11]},//7
+      {tp_source_tuples[9], tp_source_tuples[6]},//8
+      {tp_source_tuples[10]},//9
+      {tp_source_tuples[8]},//10
+      {tp_source_tuples[12]},//11
+      {tp_source_tuples[13], tp_source_tuples[15]},//12
+      {tp_source_tuples[14]},//13
+      {tp_source_tuples[17]},//14
+      {tp_source_tuples[16]},//15
+      {tp_source_tuples[17]},//16
+      {tp_source_tuples[18]},//17
+      {tp_source_tuples[19], tp_source_tuples[6], tp_source_tuples[1]},//18
+      {tp_source_tuples[18]},//19
+      {},//20
+  };
 
   SECTION("call") {
-    std::vector<std::list<std::tuple<EntityEnum, std::string>>> expected_next_bip_lists = {
-        {tp_source_tuples[2]},//1
-        {tp_source_tuples[3], tp_source_tuples[5]},//2
-        {tp_source_tuples[4]},//3
-        {tp_source_tuples[7]},//4
-        {tp_source_tuples[6]},//5
-        {tp_source_tuples[17]},//6
-        {tp_source_tuples[8], tp_source_tuples[11]},//7
-        {tp_source_tuples[9], tp_source_tuples[6]},//8
-        {tp_source_tuples[10]},//9
-        {tp_source_tuples[8]},//10
-        {tp_source_tuples[12]},//11
-        {tp_source_tuples[13], tp_source_tuples[15]},//12
-        {tp_source_tuples[14]},//13
-        {tp_source_tuples[17]},//14
-        {tp_source_tuples[16]},//15
-        {tp_source_tuples[17]},//16
-        {tp_source_tuples[18]},//17
-        {tp_source_tuples[19], tp_source_tuples[6], tp_source_tuples[1]},//18
-        {tp_source_tuples[18]},//19
-        {},//20
-    };
-
-    NextBipExtractor next_bip_extractor = NextBipExtractor(pkb);
     for (int i = 0; i < expected_next_bip_lists.size(); ++i) {
-      std::vector<Entity*> entities = next_bip_extractor.GetRelationship(RelDirection::kForward, i + 1);
+      std::vector<Entity*> entities = rte.GetRelationship(PKBRelRefs::kNextBip, std::to_string(i + 1));
       CHECK(AreEntityListsEqual(expected_next_bip_lists[i], entities));
     }
+  }
+
+  SECTION("Get LHS") {
+    std::vector<Entity*> next = rte.GetFirstEntityOfRelationship(PKBRelRefs::kNextBip, DesignEntity::kStmt);
+    std::list<std::tuple<EntityEnum, std::string>> expected_list;
+    for (int i = 1; i <= 19; ++i) {
+      expected_list.push_back(tp_source_tuples[i]);
+    }
+    CHECK(AreEntityListsEqual(expected_list, next));
+  }
+  SECTION("Get RHS") {
+    std::vector<Entity*> next = rte.GetFirstEntityOfRelationship(PKBRelRefs::kPrevBip, DesignEntity::kStmt);
+    std::list<std::tuple<EntityEnum, std::string>> expected_list;
+    for (int i = 2; i <= 20; ++i) {
+      expected_list.push_back(tp_source_tuples[i]);
+    }
+    CHECK(AreEntityListsEqual(expected_list, next));
+  }
+
+  SECTION("Get all pairs") {
+    std::vector<std::tuple<Entity*, Entity*>>
+        next = rte.GetRelationshipByTypes(PKBRelRefs::kNextBip, DesignEntity::kStmt, DesignEntity::kProgLine);
+    std::list<std::tuple<std::tuple<EntityEnum, std::string>, std::tuple<EntityEnum, std::string>>>
+        expected_forward_list;
+    std::list<std::tuple<std::tuple<EntityEnum, std::string>, std::tuple<EntityEnum, std::string>>>
+        expected_reverse_list;
+    for (int i = 0; i < expected_next_bip_lists.size(); ++i) {
+      for (auto tuple : expected_next_bip_lists[i]) {
+        expected_forward_list.emplace_back(tp_source_tuples[i + 1], tuple);
+        expected_reverse_list.emplace_back(tuple, tp_source_tuples[i + 1]);
+      }
+    }
+    CHECK(AreAllPairsEqual(expected_forward_list, next));
+    std::vector<std::tuple<Entity*, Entity*>>
+        prev = rte.GetRelationshipByTypes(PKBRelRefs::kPrevBip, DesignEntity::kProgLine, DesignEntity::kProgLine);
+    CHECK(AreAllPairsEqual(expected_reverse_list, prev));
+  }
+
+  SECTION("Has Relationship") {
+    CHECK(rte.HasRelationship(PKBRelRefs::kNextBip));
+    CHECK(rte.HasRelationship(PKBRelRefs::kPrevBip));
+    CHECK(rte.HasRelationship(PKBRelRefs::kNextBip, "19"));
+    CHECK(rte.HasRelationship(PKBRelRefs::kNextBip, "7", "11"));
+    CHECK(rte.HasRelationship(PKBRelRefs::kNextBip, "18", "1"));
+    CHECK(rte.HasRelationship(PKBRelRefs::kPrevBip, "11", "7"));
+    CHECK(rte.HasRelationship(PKBRelRefs::kPrevBip, "8", "7"));
+    CHECK(rte.HasRelationship(PKBRelRefs::kPrevBip, "18", "17"));
+    CHECK_FALSE(rte.HasRelationship(PKBRelRefs::kNextBip, "6", "7"));
+    CHECK_FALSE(rte.HasRelationship(PKBRelRefs::kNextBip, "6", "5"));
+    CHECK_FALSE(rte.HasRelationship(PKBRelRefs::kPrevBip, "8", "1"));
   }
 }
 
@@ -147,7 +196,7 @@ TEST_CASE("NextBipTExtractor basic integration") {
     };
     RuntimeExtractor rte = RuntimeExtractor(pkb);
     for (int i = 0; i < 23; ++i) {
-      std::vector<Entity*> next = rte.GetRelationship(PKBRelRefs::kNextBipT, std::to_string(i+1));
+      std::vector<Entity*> next = rte.GetRelationship(PKBRelRefs::kNextBipT, std::to_string(i + 1));
       CHECK(next.size() == expected_tuple_indices[i].size());
       std::list<std::tuple<EntityEnum, std::string>> expected_list;
       for (int j : expected_tuple_indices[i]) {
@@ -160,17 +209,66 @@ TEST_CASE("NextBipTExtractor basic integration") {
 
 TEST_CASE("NextBipTExtractor more procedures") {
   PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/three_procs_source.txt");
+  RuntimeExtractor rte = RuntimeExtractor(pkb);
 
   SECTION("call") {
     std::list<std::tuple<EntityEnum, std::string>> expected_lists;
     for (int i = 0; i < 19; ++i) {
       expected_lists.push_back(tp_source_tuples[i + 1]);
     }
-    RuntimeExtractor rte = RuntimeExtractor(pkb);
     for (int i = 0; i < 19; ++i) {
       std::string stmt_num = std::to_string(i + 1);
       std::vector<Entity*> entities = rte.GetRelationship(PKBRelRefs::kNextBipT, stmt_num);
       CHECK(AreEntityListsEqual(expected_lists, entities));
     }
+  }
+  //
+  //  SECTION("Get LHS") {
+  //    std::vector<Entity*> next = rte.GetFirstEntityOfRelationship(PKBRelRefs::kNextBipT, DesignEntity::kStmt);
+  //    std::list<std::tuple<EntityEnum, std::string>> expected_list;
+  //    for (int i = 1; i <= 19; ++i) {
+  //      expected_list.push_back(tp_source_tuples[i]);
+  //    }
+  //    CHECK(AreEntityListsEqual(expected_list, next));
+  //  }
+  //  SECTION("Get RHS") {
+  //    std::vector<Entity*> next = rte.GetFirstEntityOfRelationship(PKBRelRefs::kPrevBipT, DesignEntity::kStmt);
+  //    std::list<std::tuple<EntityEnum, std::string>> expected_list;
+  //    for (int i = 2; i <= 20; ++i) {
+  //      expected_list.push_back(tp_source_tuples[i]);
+  //    }
+  //    CHECK(AreEntityListsEqual(expected_list, next));
+  //  }
+
+  SECTION("Get all pairs") {
+    std::vector<std::tuple<Entity*, Entity*>>
+        next = rte.GetRelationshipByTypes(PKBRelRefs::kNextBipT, DesignEntity::kStmt, DesignEntity::kProgLine);
+    std::list<std::tuple<std::tuple<EntityEnum, std::string>, std::tuple<EntityEnum, std::string>>>
+        expected_forward_list;
+    std::list<std::tuple<std::tuple<EntityEnum, std::string>, std::tuple<EntityEnum, std::string>>>
+        expected_reverse_list;
+    for (int i = 0; i < 19; ++i) {
+      for (int j = 0; j < 19; ++j) {
+        expected_forward_list.emplace_back(tp_source_tuples[i + 1], tp_source_tuples[j + 1]);
+        expected_reverse_list.emplace_back(tp_source_tuples[j + 1], tp_source_tuples[i + 1]);
+      }
+    }
+    CHECK(AreAllPairsEqual(expected_forward_list, next));
+    std::vector<std::tuple<Entity*, Entity*>>
+        prev = rte.GetRelationshipByTypes(PKBRelRefs::kPrevBipT, DesignEntity::kProgLine, DesignEntity::kProgLine);
+    CHECK(AreAllPairsEqual(expected_reverse_list, prev));
+  }
+
+  SECTION("Has Relationship") {
+    CHECK(rte.HasRelationship(PKBRelRefs::kNextBipT));
+    CHECK(rte.HasRelationship(PKBRelRefs::kPrevBipT));
+    CHECK(rte.HasRelationship(PKBRelRefs::kNextBipT, "19"));
+    CHECK(rte.HasRelationship(PKBRelRefs::kNextBipT, "7", "11"));
+    CHECK(rte.HasRelationship(PKBRelRefs::kNextBipT, "6", "1"));
+    CHECK(rte.HasRelationship(PKBRelRefs::kPrevBipT, "2", "7"));
+    CHECK(rte.HasRelationship(PKBRelRefs::kPrevBipT, "19", "7"));
+    CHECK(rte.HasRelationship(PKBRelRefs::kPrevBipT, "18", "18"));
+    CHECK_FALSE(rte.HasRelationship(PKBRelRefs::kNextBipT, "19", "20"));
+    CHECK_FALSE(rte.HasRelationship(PKBRelRefs::kNextBipT, "0", "1"));
   }
 }

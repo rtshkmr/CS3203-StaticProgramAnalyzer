@@ -143,7 +143,17 @@ const std::unordered_set<PKBRelRefs> second_param_is_stmt = {
   PKBRelRefs::kUsedBy,
   PKBRelRefs::kModifiedBy,
   PKBRelRefs::kNext,
-  PKBRelRefs::kPrevious
+  PKBRelRefs::kPrevious,
+  PKBRelRefs::kNextT,
+  PKBRelRefs::kPreviousT,
+  PKBRelRefs::kAffects,
+  PKBRelRefs::kAffectedBy,
+  PKBRelRefs::kAffectsT,
+  PKBRelRefs::kAffectedByT,
+  PKBRelRefs::kNextBip,
+  PKBRelRefs::kPrevBip,
+  PKBRelRefs::kNextBipT,
+  PKBRelRefs::kPrevBipT
 };
 
 const std::unordered_set<PKBRelRefs> second_param_is_var = {
