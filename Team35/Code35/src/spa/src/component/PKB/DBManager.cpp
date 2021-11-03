@@ -287,7 +287,6 @@ std::vector<Entity*> DBManager::GetEntitiesWithAttributeValue(DesignEntity desig
   return pkb_->GetEntitiesWithAttributeValue(design_entity, attribute, value);
 }
 
-std::vector<entity_pair> DBManager::GetEntitiesWithMatchingAttributes(DesignEntity type_one, DesignEntity type_two) {
+std::vector<entity_pair> DBManager::GetEntitiesWithMatchingAttributes(type_attribute_pair type_one, type_attribute_pair type_two) {
   return pkb_->GetEntitiesWithMatchingAttributes(type_one, type_two);
 }
-

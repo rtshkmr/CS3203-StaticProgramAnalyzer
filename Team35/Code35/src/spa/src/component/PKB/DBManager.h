@@ -46,9 +46,9 @@ class DBManager {
   // Returns a vector of entities of type de whose attribute attribute matches the value
   std::vector<Entity*> GetEntitiesWithAttributeValue(DesignEntity de, Attribute attribute, std::string value);
 
-  // Returns a vector of 2-tuples of entities in which the first element of the tuple is of type de1,
-  // the second elements is of type de2, and they have matching attribute values
-  std::vector<entity_pair> GetEntitiesWithMatchingAttributes(DesignEntity type_one, DesignEntity type_two);
+  // Returns a vector of 2-tuples of entities in which the type and attribute of the first element is defined by type_one,
+  // and that of the second elements is defined by de2
+  std::vector<entity_pair> GetEntitiesWithMatchingAttributes(type_attribute_pair type_one, type_attribute_pair type_two);
 
   // Check if relationship exists
   bool HasRelationship(PKBRelRefs ref);
