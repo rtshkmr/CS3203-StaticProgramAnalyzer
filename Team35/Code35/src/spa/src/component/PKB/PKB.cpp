@@ -195,7 +195,7 @@ void PKB::ProcessEntitiesWithMatchingAttributes() {
       DesignEntity design_entity_one = GetDesignEntityFromEntity(entity_one);
       auto first_entity_types = GetApplicableTypes(design_entity_one);
       Attribute attribute_one = entity_to_attribute_type_map_[entity_one][kv.first];
-      for (int j = i + 1; j < entities.size(); j++) {
+      for (int j = i; j < entities.size(); j++) {
         Entity* entity_two = entities[j];
         DesignEntity design_entity_two = GetDesignEntityFromEntity(entity_two);
         auto second_entity_types = GetApplicableTypes(design_entity_two);
