@@ -340,6 +340,7 @@ class Group {
   bool ContainsTargetSynonym();
   std::vector<Synonym*> GetTargetSynonyms();
   void UpdateHasTargetSynonymAttr();
+  int GetGroupSize();
 };
 
 #endif //AUTOTESTER_TYPES_H

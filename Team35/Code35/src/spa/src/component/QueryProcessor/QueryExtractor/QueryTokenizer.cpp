@@ -13,7 +13,7 @@ std::vector<std::string> insertion_order = { "SPACINGS", "IDENT", "INTEGER" };
 static std::unordered_map<std::string, std::regex> spec_table {
     {"INTEGER", RegexPatterns::GetIntegerPatternNonTerminating()},
     {"IDENT", RegexPatterns::GetNamePattern()}, // IDENT is TokenTag:kName
-    {"SPACINGS", std::regex(R"(^[\n\r\s\t]+)")},
+    {"SPACINGS", std::regex(R"(^[\s\n\r\t]+)", std::regex_constants::optimize)},
 };
 
 static std::unordered_map<std::string, TokenTag> spec_type_to_tag_table {
@@ -35,6 +35,7 @@ static std::unordered_map<std::string, TokenTag> spec_type_to_tag_table {
   {"=", TokenTag::kEquals}
 };
 
+static std::regex string_end_regex("^[^\"]*", std::regex_constants::optimize);
 /**
  * Gets correct TokenTag specific to PQL applications by consulting spec_type_to_tag_table.
  * Note that this function does not check that the token is of SPACINGS type, as such tokens have already been dropped.
@@ -75,7 +76,7 @@ Token QueryTokenizer::GetNextToken() {
   std::smatch match;
   for (auto const& sp: insertion_order) {
     auto spec = * spec_table.find(sp);
-    if (!std::regex_search(curr_string, match, spec.second)) {
+    if (!std::regex_search(curr_string, match, spec.second, std::regex_constants::match_continuous)) {
       continue;
     }
     cursor += match[0].str().size();
@@ -113,7 +114,7 @@ std::string QueryTokenizer::SkipTokenizerTillStringQuoteDelimiter() {
   }
   std::string curr_string = query.substr(cursor);
   std::smatch match;
-  if (!std::regex_search(curr_string, match, std::regex("^[^\"]*"))) {
+  if (!std::regex_search(curr_string, match, string_end_regex, std::regex_constants::match_continuous)) {
     throw PQLTokenizeException("could not find string quote delimiter in query stream.");
   }
   std::string matched_str = match[0].str();

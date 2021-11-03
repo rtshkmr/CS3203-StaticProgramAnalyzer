@@ -33,7 +33,7 @@ TEST_CASE("3.QueryOptimizer.All non-boolean groups") {
   }
 }
 
-TEST_CASE("3.QueryOptimizer.All boolean groups") {
+TEST_CASE("3.QueryOptimizer.All boolean groups of different sizes; reordering occurs") {
   std::string query = "stmt s1; assign a1; if if1; variable v1; procedure pr1, pr2; prog_line pl;"
                       "Select BOOLEAN such that Modifies(pr1, v1) pattern if1(v1, _, _) such that Uses(a1, v1)"
                       "pattern a1(_, _) such that Calls(pr1, pr2) pattern if1(_,_,_) such that Next(2, 3)";
@@ -42,17 +42,11 @@ TEST_CASE("3.QueryOptimizer.All boolean groups") {
   // 2 groups, both are boolean since they don't contain target synonym.
   std::vector<Group*> groups = query_extractor.GetGroupsList();
   REQUIRE(groups.size() == 2);
-  // QueryOptimizer should not modify the group order of boolean groups (does nothing for this groups list)
-  std::vector<std::string> memory_addresses;
-  for (Group* g : groups) {
-    std::string mem_addr = GetMemoryAddress(g);
-    memory_addresses.push_back(mem_addr);
-  }
+  REQUIRE(groups[0]->GetGroupSize() > groups[1]->GetGroupSize());
+  // QueryOptimizer will place the boolean group with lesser clauses first.
   auto query_optimizer = QueryOptimizer(true);
   query_optimizer.ReorderGroups(&groups);
-  for (int i = 0; i < groups.size(); i++) {
-    REQUIRE(GetMemoryAddress(groups[i]) == memory_addresses[i]);
-  }
+  REQUIRE(groups[0]->GetGroupSize() < groups[1]->GetGroupSize());
 }
 
 TEST_CASE("3.QueryOptimizer.Some boolean and some non-boolean groups; boolean groups should come first") {
