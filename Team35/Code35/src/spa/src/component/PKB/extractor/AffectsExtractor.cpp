@@ -162,7 +162,7 @@ bool AffectsExtractor::HasAffects(AssignEntity* target_ae) {
   //check against the entire procedure's assign
   // TODO: create new PKB API, Given Procedure, Get all assign (Uses / Modifies)
   std::vector<Entity*> affected_list =
-      pkb_->GetPatternEntities(DesignEntity::kAssign, target_var);
+      pkb_->GetRelationship(PKBRelRefs::kUsedBy, target_var);
 
   for (auto* assign : affected_list) {
     if (assign->GetEntityEnum() != EntityEnum::kAssignEntity) {
