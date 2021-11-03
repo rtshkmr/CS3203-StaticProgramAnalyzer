@@ -176,7 +176,7 @@ bool RuntimeExtractor::HasRelationship(PKBRelRefs ref, DesignEntity first, Desig
 }
 
 std::vector<Entity*> RuntimeExtractor::GetNextT(int target) {
-  return next_t_extractor_.GetRelationship(RelDirection::kReverse, target);
+  return next_t_extractor_.GetRelationship(RelDirection::kForward, target);
 }
 
 std::vector<Entity*> RuntimeExtractor::GetPrevT(int target) {
@@ -263,18 +263,18 @@ std::vector<Entity*> RuntimeExtractor::GetPrevBipT(DesignEntity de) {
 }
 
 std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetNextT(DesignEntity first, DesignEntity second) {
-  bool not_stmt = first != DesignEntity::kStmt || second != DesignEntity::kStmt;
-  bool not_prog_line = first != DesignEntity::kProgLine || second != DesignEntity::kProgLine;
-  if (not_stmt && not_prog_line) {
+  bool valid_first = first == DesignEntity::kStmt || first == DesignEntity::kProgLine;
+  bool valid_second = second == DesignEntity::kStmt || second == DesignEntity::kProgLine;
+  if (!valid_first && !valid_second) {
     return std::vector<std::tuple<Entity*, Entity*>>{};
   }
   return next_t_extractor_.GetRelationshipByTypes(RelDirection::kForward);
 }
 
 std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetPrevT(DesignEntity first, DesignEntity second) {
-  bool not_stmt = first != DesignEntity::kStmt || second != DesignEntity::kStmt;
-  bool not_prog_line = first != DesignEntity::kProgLine || second != DesignEntity::kProgLine;
-  if (not_stmt && not_prog_line) {
+  bool valid_first = first == DesignEntity::kStmt || first == DesignEntity::kProgLine;
+  bool valid_second = second == DesignEntity::kStmt || second == DesignEntity::kProgLine;
+  if (!valid_first && !valid_second) {
     return std::vector<std::tuple<Entity*, Entity*>>{};
   }
   return next_t_extractor_.GetRelationshipByTypes(RelDirection::kReverse);
@@ -294,35 +294,36 @@ std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetAffectedByT(Desig
 }
 
 std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetNextBip(DesignEntity first, DesignEntity second) {
-  bool not_stmt = first != DesignEntity::kStmt || second != DesignEntity::kStmt;
-  bool not_prog_line = first != DesignEntity::kProgLine || second != DesignEntity::kProgLine;
-  if (not_stmt && not_prog_line) {
+  bool valid_first = first == DesignEntity::kStmt || first == DesignEntity::kProgLine;
+  bool valid_second = second == DesignEntity::kStmt || second == DesignEntity::kProgLine;
+  if (!valid_first && !valid_second) {
     return std::vector<std::tuple<Entity*, Entity*>>{};
   }
   return next_bip_extractor_.GetRelationshipByTypes(RelDirection::kForward);
 }
 
 std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetPrevBip(DesignEntity first, DesignEntity second) {
-  bool not_stmt = first != DesignEntity::kStmt || second != DesignEntity::kStmt;
-  bool not_prog_line = first != DesignEntity::kProgLine || second != DesignEntity::kProgLine;
-  if (not_stmt && not_prog_line) {
+  bool valid_first = first == DesignEntity::kStmt || first == DesignEntity::kProgLine;
+  bool valid_second = second == DesignEntity::kStmt || second == DesignEntity::kProgLine;
+  if (!valid_first && !valid_second) {
     return std::vector<std::tuple<Entity*, Entity*>>{};
   }
   return next_bip_extractor_.GetRelationshipByTypes(RelDirection::kReverse);
 }
 
-std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetNextBipT(DesignEntity first, DesignEntity second) {  bool not_stmt = first != DesignEntity::kStmt || second != DesignEntity::kStmt;
-  bool not_prog_line = first != DesignEntity::kProgLine || second != DesignEntity::kProgLine;
-  if (not_stmt && not_prog_line) {
+std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetNextBipT(DesignEntity first, DesignEntity second) {
+  bool valid_first = first == DesignEntity::kStmt || first == DesignEntity::kProgLine;
+  bool valid_second = second == DesignEntity::kStmt || second == DesignEntity::kProgLine;
+  if (!valid_first && !valid_second) {
     return std::vector<std::tuple<Entity*, Entity*>>{};
   }
   return next_bip_t_extractor_.GetRelationshipByTypes(RelDirection::kForward);
 }
 
 std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetPrevBipT(DesignEntity first, DesignEntity second) {
-  bool not_stmt = first != DesignEntity::kStmt || second != DesignEntity::kStmt;
-  bool not_prog_line = first != DesignEntity::kProgLine || second != DesignEntity::kProgLine;
-  if (not_stmt && not_prog_line) {
+  bool valid_first = first == DesignEntity::kStmt || first == DesignEntity::kProgLine;
+  bool valid_second = second == DesignEntity::kStmt || second == DesignEntity::kProgLine;
+  if (!valid_first && !valid_second) {
     return std::vector<std::tuple<Entity*, Entity*>>{};
   }
   return next_bip_t_extractor_.GetRelationshipByTypes(RelDirection::kReverse);
