@@ -133,7 +133,7 @@ TEST_CASE("2.PKB.Affects.adv_spa_lecture") {
     CHECK_FALSE(dbm->HasRelationship(PKBRelRefs::kAffects, "5")); //[not assign stmt] call stmt
     CHECK(dbm->HasRelationship(PKBRelRefs::kAffects, "6"));
     CHECK_FALSE(dbm->HasRelationship(PKBRelRefs::kAffects, "7")); //[not assign stmt] if cond
-    //CHECK(dbm->HasRelationship(PKBRelRefs::kAffects, "8"));
+    CHECK(dbm->HasRelationship(PKBRelRefs::kAffects, "8"));
     CHECK(dbm->HasRelationship(PKBRelRefs::kAffects, "9"));
     CHECK(dbm->HasRelationship(PKBRelRefs::kAffects, "10"));
     CHECK(dbm->HasRelationship(PKBRelRefs::kAffects, "11"));
@@ -156,7 +156,7 @@ TEST_CASE("2.PKB.Affects.adv_spa_lecture") {
     CHECK_FALSE(dbm->HasRelationship(PKBRelRefs::kAffectedBy, "5")); //[not assign stmt] call stmt
     CHECK(dbm->HasRelationship(PKBRelRefs::kAffectedBy, "6")); //Affects(6,6), Affects(2,6) is true.
     CHECK_FALSE(dbm->HasRelationship(PKBRelRefs::kAffectedBy, "7")); //[not assign stmt] if cond
-    //CHECK(dbm->HasRelationship(PKBRelRefs::kAffectedBy, "8")); //Affects(1,8), Affects(4,8) is true
+    CHECK(dbm->HasRelationship(PKBRelRefs::kAffectedBy, "8")); //Affects(1,8), Affects(4,8) is true
     CHECK_FALSE(dbm->HasRelationship(PKBRelRefs::kAffectedBy, "9")); // first z stmt
     CHECK(dbm->HasRelationship(PKBRelRefs::kAffectedBy, "10")); //Affects(9,10), Affects(8,10), Affects(2,10), Affects(6,10) is true
     CHECK(dbm->HasRelationship(PKBRelRefs::kAffectedBy, "11")); //Affects(10,11) is true
@@ -180,7 +180,7 @@ TEST_CASE("2.PKB.Affects.adv_spa_lecture") {
   }
   
   SECTION ("7 - Get Affects : (#, a1) ") {
-    //CHECK(dbm->GetRelationship(PKBRelRefs::kAffects, "1").size() == 4); // {4,8,10,12}
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffects, "1").size() == 4); // {4,8,10,12}
     CHECK(dbm->GetRelationship(PKBRelRefs::kAffects, "2").size() == 2); // {6,10}
     CHECK(dbm->GetRelationship(PKBRelRefs::kAffects, "3").empty()); //[not assign stmt] while cond
     CHECK(dbm->GetRelationship(PKBRelRefs::kAffects, "4").size() == 4); // {4,8,10,12}

@@ -70,6 +70,10 @@ class Cluster {
                                     std::pair<int, int> target_range,
                                     PKB* pkb,
                                     const std::string& lhs_var);
+  static bool CheckScopeClusterForAffects(Cluster* scoped_cluster,
+                                              std::pair<int, int> target_range,
+                                              PKB* pkb,
+                                              const std::string& lhs_var);
   static bool TraverseScopedClusterForAffects(Cluster* scoped_cluster,
                                               std::pair<int, int> target_range,
                                               PKB* pkb,

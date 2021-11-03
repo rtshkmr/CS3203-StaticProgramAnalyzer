@@ -219,7 +219,7 @@ bool Cluster::TraverseScopedCluster(PKBRelRefs rel_ref,
                                     const std::string& lhs_var) {
   switch (rel_ref) {
     case PKBRelRefs::kAffects: {
-      return Cluster::TraverseScopedClusterForAffects(scoped_cluster, target_range, pkb, lhs_var);
+      return Cluster::CheckScopeClusterForAffects(scoped_cluster, target_range, pkb, lhs_var);
     };
     default: {
       return false;
@@ -294,6 +294,36 @@ std::pair<bool, bool> TraverseNormalBlockForAffects(Cluster* child,
   }
   return std::make_pair(child_does_not_modify_var, is_second_stmt_checked);
 //      ========================  END OF TRAVERSING NORMAL BLOCK FOR AFFECTS =============
+}
+
+
+bool Cluster::CheckScopeClusterForAffects(Cluster* scoped_cluster,
+                                            std::pair<int, int> target_range,
+                                            PKB* pkb,
+                                            const std::string& lhs_var) {
+
+  // extra check for first > second.
+  // re-evaluate to while.cond line -> second
+  if (target_range.first >= target_range.second) {
+    // only way for this to be true is if first and second is in a while loop.
+    // concept: first -> while_cond not modified + while_cond -> second not modified
+
+    // method 1 - find the closest while that contains both.
+    //TODO - check if method 1 works; exist find the outer most while.
+
+    Cluster* current_scope = scoped_cluster;
+    while (current_scope && current_scope->start_ <= target_range.second && current_scope->cluster_tag_ != ClusterTag::kWhileCluster) {
+      current_scope = current_scope->GetParentCluster();
+    }
+    if (!current_scope) return false;
+    // auto true for first criteria if second is already last line.
+    // cannot have the same cond for second_criteria as start_ is definitely a cond stmt (not assign stmt)
+    bool first_criteria = (target_range.second == current_scope->end_) ? true : TraverseScopedClusterForAffects(current_scope, {target_range.first, current_scope->end_}, pkb, lhs_var);
+    bool second_criteria =  TraverseScopedClusterForAffects(current_scope, {current_scope->start_, target_range.second}, pkb, lhs_var);
+    return first_criteria && second_criteria;
+  } else {
+    TraverseScopedClusterForAffects(scoped_cluster, target_range, pkb, lhs_var);
+  }
 }
 
 /**

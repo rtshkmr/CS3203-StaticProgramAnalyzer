@@ -135,7 +135,20 @@ std::vector<Entity*> AffectsExtractor::GetAffects(AssignEntity* target) {
   // For each remaining stmt, x after target stmt, add to result vector if
   // HasAffects(target, x)
 
-  return std::vector<Entity*>();
+  //return std::vector<Entity*>();
+
+  //TODO Remove naive soln
+  std::vector<Entity*> retList = {};
+
+  std::vector<Entity*> assign_list = pkb_->GetDesignEntities(DesignEntity::kAssign);
+  for (auto* entity : assign_list) {
+    AssignEntity* ae = dynamic_cast<AssignEntity*>(entity);
+    if (HasAffects(target, ae)) {
+      retList.push_back(entity);
+    }
+  }
+  retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
+  return retList;
 }
 
 std::vector<Entity*> AffectsExtractor::GetAffectedBy(AssignEntity* target_assign_entity) {
@@ -224,6 +237,7 @@ bool AffectsExtractor::HasAffects(AssignEntity* first_stmt, AssignEntity* second
  *
  * */
 bool AffectsExtractor::HasValidUnmodifiedPath(AssignEntity* first_stmt, AssignEntity* second_stmt) {
+  if (first_stmt->GetProcedureNode() != second_stmt->GetProcedureNode()) return false;
   int first_stmt_num = first_stmt->GetStatementNumber()->GetNum();
   int second_stmt_num = second_stmt->GetStatementNumber()->GetNum();
   std::vector<Entity*> proc_entities = this->pkb_->GetDesignEntities(DesignEntity::kProcedure);
