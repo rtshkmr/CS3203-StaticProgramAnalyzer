@@ -159,7 +159,7 @@ class PKB {
 
   std::unordered_map<
     std::string,
-    std::unordered_set<Entity*>
+    std::set<Entity*>
   > attribute_string_to_entity_map_;
 
   std::unordered_map<
