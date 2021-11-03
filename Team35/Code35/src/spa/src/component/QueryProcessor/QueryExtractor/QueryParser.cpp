@@ -60,12 +60,11 @@ std::vector<Token> QueryParser::ParseSynonyms() {
  */
 void QueryParser::ParseDeclaration() {
   std::string design_entity = lookahead.GetTokenString();
-  // validate designEntity since alphabet is known.
-  if (!regex_match(design_entity, RegexPatterns::GetDesignEntityPattern())) {
+  DesignEntity de = GetDesignEntity(design_entity);
+  if (de == DesignEntity::kInvalid) {
     throw PQLParseException("A synonym of unknown Design Entity type " + design_entity + " was declared.");
   }
   // advance lookahead after parsing designEntity.
-  DesignEntity de = GetDesignEntity(design_entity);
   if (de == DesignEntity::kProgLine) {
     Eat(TokenTag::kProgLine);
   } else {
