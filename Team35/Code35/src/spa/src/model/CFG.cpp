@@ -186,7 +186,11 @@ void Cluster::UpdateClusterRange() {
   }
 }
 bool Cluster::CheckIfStatementsInRange(int first_stmt, int second_stmt) const {
-  return first_stmt >= start_ && second_stmt <= end_;
+  if (first_stmt < second_stmt) {
+    return first_stmt >= start_ && second_stmt <= end_;
+  } else {
+    return second_stmt >= start_ && first_stmt <= end_;
+  }
 }
 
 ClusterTag Cluster::GetClusterTag() const {
