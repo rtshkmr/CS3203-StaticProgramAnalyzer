@@ -225,18 +225,20 @@ TEST_CASE("2.PKB.Affects.adv_spa_lecture") {
     CHECK(dbm->GetRelationship(PKBRelRefs::kAffectedBy, "18").empty()); //[not assign stmt] call stmt
   }
   
-  SECTION ("9 - Get Affects : (a1, a2) ") {
-    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffects, DesignEntity::kAssign).size() == 19);
-    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffects, DesignEntity::kStmt).size() == 19);
+  SECTION ("9 - Get Affects : (a1, _) ") {
+    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffects, DesignEntity::kAssign).size() == 9);
+    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffects, DesignEntity::kStmt).size() == 9);
   }
   
-  SECTION ("10 - Get AffectedBy : (a1, a2) ") {
-    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffectedBy, DesignEntity::kAssign).size() == 19);
-    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffectedBy, DesignEntity::kStmt).size() == 19);
+  SECTION ("10 - Get AffectedBy : (_, a2) ") {
+    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffectedBy, DesignEntity::kAssign).size() == 7);
+    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffectedBy, DesignEntity::kStmt).size() == 7);
   }
 
-  SECTION ("11 - Get Affects / AffectedBy GetRelationshipByTypes") {
-    // TODO
+  SECTION ("11 - Get Affects By Both Type : (a1, a2) ") {
+    //TODO Fix this.
+    //CHECK(dbm->GetRelationshipByTypes(PKBRelRefs::kAffectedBy, DesignEntity::kAssign, DesignEntity::kAssign,
+    //                                  std::vector<Entity*>{}, std::vector<Entity*>{}, ScopeIndication::kNoScope).size() == 19);
   }
 }
 
@@ -413,17 +415,19 @@ TEST_CASE("2.PKB.Affects.mixed_loops_source") {
     CHECK(dbm->GetRelationship(PKBRelRefs::kAffectedBy, "23").empty());
   }
 
-  SECTION ("9 - Get Affects : (a1, a2) ") {
+  SECTION ("9 - Get Affects : (a1, _) ") {
     CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffects, DesignEntity::kAssign).size() == 6);
     CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffects, DesignEntity::kStmt).size() == 6);
   }
 
-  SECTION ("10 - Get AffectedBy : (a1, a2) ") {
-    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffectedBy, DesignEntity::kAssign).size() == 6);
-    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffectedBy, DesignEntity::kStmt).size() == 6);
+  SECTION ("10 - Get AffectedBy : (_, a2) ") {
+    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffectedBy, DesignEntity::kAssign).size() == 3);
+    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffectedBy, DesignEntity::kStmt).size() == 3);
   }
 
-  SECTION ("11 - Get Affects / AffectedBy GetRelationshipByTypes") {
-    // TODO
+  SECTION ("11 - Get Affects By Both Type : (a1, a2) ") {
+    //TODO Fix this.
+    //CHECK(dbm->GetRelationshipByTypes(PKBRelRefs::kAffectedBy, DesignEntity::kAssign, DesignEntity::kAssign,
+    //                                  std::vector<Entity*>{}, std::vector<Entity*>{}, ScopeIndication::kNoScope).size() == 6);
   }
 }
