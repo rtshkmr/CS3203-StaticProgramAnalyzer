@@ -7,15 +7,17 @@ procedure First {
 procedure Second {
     x = 0;
     i = 5;
-    while ((! (d<=j)) || ((h<d) && ((k>h) && (2<=0)))) {
+    while ((! (d<=j)) || ((j<d) && ((x>Third) && (2<=0)))) {
         x = x + 2 * y;
         call Third;
-        while ((i!=i) || (! (25>c))) {
+        while ((i!=i) || (! (2>d))) {
             if (x >= y) then {
                 read x;
                 v = 5;
             } else {
                 y = x * z + 1 * x;
+                print Third;
+                read First;
             }
             print x;
             z = x % 1;

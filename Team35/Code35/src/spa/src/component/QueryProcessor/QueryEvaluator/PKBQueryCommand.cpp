@@ -163,12 +163,10 @@ PKBQueryReceiver::QueryPKBByValueForBoolean(PKBRelRefs rel, std::string first_va
 }
 
 IntermediateTable *
-PKBQueryReceiver::QueryAttributeMatch(DesignEntity first_design_entity, DesignEntity second_design_entity) {
+PKBQueryReceiver::QueryAttributeMatch(type_attribute_pair first_attr_pair, type_attribute_pair second_attr_pair) {
   IntermediateTable *table = new IntermediateTable();
-  // TODO: Support needed in DBManager
-  std::vector<std::tuple<Entity*, Entity*>> result;
-//  std::vector<std::tuple<Entity*, Entity*>> result = db_manager->
-//          GetEntitiesWithMatchingAttributes(first_design_entity, second_design_entity);
+  std::vector<std::tuple<Entity*, Entity*>> result = db_manager->
+          GetEntitiesWithMatchingAttributes(first_attr_pair, second_attr_pair);
   table->InsertData(result);
   return table;
 }
@@ -176,9 +174,7 @@ PKBQueryReceiver::QueryAttributeMatch(DesignEntity first_design_entity, DesignEn
 IntermediateTable *
 PKBQueryReceiver::QueryEntityAttributeMatch(DesignEntity design_entity, Attribute attribute, std::string value) {
   IntermediateTable *table = new IntermediateTable();
-  // TODO: Support needed in DBManager
-  std::vector<std::tuple<Entity*, Entity*>> result;
-//  std::vector<Entity*> result = db_manager->GetEntitiesWithAttributeValue(design_entity, attribute, value);
+  std::vector<Entity*> result = db_manager->GetEntitiesWithAttributeValue(design_entity, attribute, value);
   table->InsertData(result);
   return table;
 }
@@ -282,7 +278,9 @@ void QueryWithTwoSynonymCommand::SetReceiver(PKBQueryReceiver *receiver) {
 
 IntermediateTable * QueryWithTwoSynonymCommand::ExecuteQuery(Clause *clause) {
   auto* with = dynamic_cast<With *>(clause);
-  return this->receiver->QueryAttributeMatch(with->GetFirstSynonymType(), with->GetSecondSynonymType());
+  auto first_attr_pair = std::make_tuple(with->GetFirstSynonymType(), with->left_attribute);
+  auto second_attr_pair = std::make_tuple(with->GetSecondSynonymType(), with->right_attribute);
+  return this->receiver->QueryAttributeMatch(first_attr_pair, second_attr_pair);
 }
 
 QueryWithOneSynonymCommand::QueryWithOneSynonymCommand(Clause *clause) : clause(clause), receiver(nullptr) {}

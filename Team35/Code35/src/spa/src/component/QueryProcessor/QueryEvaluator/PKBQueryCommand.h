@@ -23,7 +23,7 @@ class PKBQueryReceiver {
     IntermediateTable *QueryRelRefExistence(PKBRelRefs rel);
     IntermediateTable *QueryDesignEntity(DesignEntity design_entity);
     IntermediateTable *QueryPatternByValue(DesignEntity design_entity, std::string value);
-    IntermediateTable *QueryAttributeMatch(DesignEntity first_design_entity, DesignEntity second_design_entity);
+    IntermediateTable *QueryAttributeMatch(type_attribute_pair first_attr_pair, type_attribute_pair second_attr_pair);
     IntermediateTable *QueryEntityAttributeMatch(DesignEntity design_entity, Attribute attribute, std::string value);
 };
 
