@@ -107,7 +107,7 @@ TEST_CASE("NextBipExtractor more procedures") {
   SECTION("Get RHS") {
     std::vector<Entity*> next = rte.GetFirstEntityOfRelationship(PKBRelRefs::kPrevBip, DesignEntity::kStmt);
     std::list<std::tuple<EntityEnum, std::string>> expected_list;
-    for (int i = 2; i <= 20; ++i) {
+    for (int i = 1; i <= 19; ++i) {
       expected_list.push_back(tp_source_tuples[i]);
     }
     CHECK(AreEntityListsEqual(expected_list, next));
@@ -234,7 +234,7 @@ TEST_CASE("NextBipTExtractor more procedures") {
   SECTION("Get RHS") {
     std::vector<Entity*> next = rte.GetFirstEntityOfRelationship(PKBRelRefs::kPrevBipT, DesignEntity::kStmt);
     std::list<std::tuple<EntityEnum, std::string>> expected_list;
-    for (int i = 2; i <= 20; ++i) {
+    for (int i = 1; i <= 19; ++i) {
       expected_list.push_back(tp_source_tuples[i]);
     }
     CHECK(AreEntityListsEqual(expected_list, next));
