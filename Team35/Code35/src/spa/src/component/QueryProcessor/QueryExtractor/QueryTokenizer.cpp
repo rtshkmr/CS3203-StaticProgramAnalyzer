@@ -79,7 +79,7 @@ Token QueryTokenizer::GetNextToken() {
   std::smatch match;
   for (auto const& sp: insertion_order) {
     auto spec = * spec_table.find(sp);
-    if (!std::regex_search(curr_string, match, spec.second)) {
+    if (!std::regex_search(curr_string, match, spec.second, std::regex_constants::match_continuous)) {
       continue;
     }
     cursor += match[0].str().size();
@@ -103,7 +103,7 @@ std::string QueryTokenizer::SkipTokenizerTillStringQuoteDelimiter() {
   }
   std::string curr_string = query.substr(cursor);
   std::smatch match;
-  if (!std::regex_search(curr_string, match, std::regex("^[^\"]*"))) {
+  if (!std::regex_search(curr_string, match, std::regex("^[^\"]*")), std::regex_constants::match_continuous) {
     throw PQLTokenizeException("could not find string quote delimiter in query stream.");
   }
   std::string matched_str = match[0].str();

@@ -43,6 +43,13 @@ class DBManager {
   // Getting entities for pattern matching
   std::vector<Entity*> GetPatternEntities(DesignEntity de, std::string stmtRef);
 
+  // Returns a vector of entities of type de whose attribute attribute matches the value
+  std::vector<Entity*> GetEntitiesWithAttributeValue(DesignEntity de, Attribute attribute, std::string value);
+
+  // Returns a vector of 2-tuples of entities in which the first element of the tuple is of type de1,
+  // the second elements is of type de2, and they have matching attribute values
+  std::vector<entity_pair> GetEntitiesWithMatchingAttributes(DesignEntity type_one, DesignEntity type_two);
+
   // Check if relationship exists
   bool HasRelationship(PKBRelRefs ref);
   bool HasRelationship(PKBRelRefs ref, DesignEntity first, DesignEntity second);

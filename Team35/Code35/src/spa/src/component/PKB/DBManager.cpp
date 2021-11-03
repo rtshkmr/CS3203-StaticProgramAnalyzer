@@ -283,4 +283,11 @@ std::string DBManager::GetNameFromEntity(Entity* entity) {
   return PKB::GetNameFromEntity(entity);
 }
 
+std::vector<Entity*> DBManager::GetEntitiesWithAttributeValue(DesignEntity design_entity, Attribute attribute, std::string value) {
+  return pkb_->GetEntitiesWithAttributeValue(design_entity, attribute, value);
+}
+
+std::vector<entity_pair> DBManager::GetEntitiesWithMatchingAttributes(DesignEntity type_one, DesignEntity type_two) {
+  return pkb_->GetEntitiesWithMatchingAttributes(type_one, type_two);
+}
 
