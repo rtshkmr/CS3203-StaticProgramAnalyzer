@@ -118,3 +118,13 @@ variable v1;
 Select v1 such that Modifies(-1, v1)
 none
 5000
+25 - Ambiguous query due to wildcard (invalid)
+variable v1;
+Select v1 such that Modifies(_, v1)
+none
+5000
+26 - Ambiguous query due to wildcard (invalid)
+variable v1;
+Select v1 such that Uses(_, v1)
+none
+5000
