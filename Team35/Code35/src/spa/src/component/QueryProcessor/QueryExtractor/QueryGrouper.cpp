@@ -2,9 +2,36 @@
 #include "QueryGrouper.h"
 
 /**
+ * Gives a basic grouping for all the clauses, where all clauses are in the same group.
+ * This method should be called when running the unoptimized version of the program.
+ * @param clauses a vector of Clause pointers.
+ * @param groups a vector of Group pointers, that is to be modified in-place.
+ */
+void QueryGrouper::BasicGroupClauses(std::vector<Clause*>* clauses, std::vector<Group*>* groups,
+                                     std::unordered_map<std::string, Synonym*>* target_synonyms_map) {
+  std::vector<std::string> tgt_synonyms_in_this_group;
+  std::unordered_set<std::string> tgt_synonyms_seen;
+  Group* g = new Group();
+  for (auto cl : *clauses) {
+    g->AddClauseToVector(cl);
+    for (auto tgt_syn : cl->GetAllSynonymNamesOfClause()) {
+      bool is_tgt_syn = target_synonyms_map->find(tgt_syn) != target_synonyms_map->end();
+      bool is_tgt_seen = tgt_synonyms_seen.find(tgt_syn) != tgt_synonyms_seen.end();
+      if (is_tgt_syn && !is_tgt_seen) {
+        tgt_synonyms_seen.insert(tgt_syn);
+        tgt_synonyms_in_this_group.push_back(tgt_syn);
+      }
+    }
+  }
+  groups->push_back(g);
+  // populate group's metadata
+  QueryGrouper::UpdateGroupMetadata(g, &tgt_synonyms_in_this_group, target_synonyms_map);
+}
+
+/**
  * Groups multiple queries that should be evaluated together, based on existence of common synonyms.
  */
-void QueryGrouper::GroupClauses(std::vector<Clause*>* clauses, std::vector<Group*>* groups,
+void QueryGrouper::AdvancedGroupClauses(std::vector<Clause*>* clauses, std::vector<Group*>* groups,
                                 std::vector<std::pair<Synonym*, Attribute>>* target_syn_attrs_list,
                                     std::unordered_map<std::string, Synonym*>* target_synonyms_map,
                                     std::unordered_map<std::string, std::vector<int>>* map_of_syn_to_clause_indices) {

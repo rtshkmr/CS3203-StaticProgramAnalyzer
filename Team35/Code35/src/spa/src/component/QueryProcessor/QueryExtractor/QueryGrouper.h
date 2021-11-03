@@ -19,10 +19,12 @@ class QueryGrouper {
   static void UpdateGroupMetadata(Group* group, std::vector<std::string>* tgt_synonyms_in_group,
                                   std::unordered_map<std::string, Synonym*>* tgt_synonyms_map);
  public:
-  static void GroupClauses(std::vector<Clause*>* clauses, std::vector<Group*>* groups,
+  static void AdvancedGroupClauses(std::vector<Clause*>* clauses, std::vector<Group*>* groups,
                            std::vector<std::pair<Synonym*, Attribute>>* target_syn_attrs_list,
                            std::unordered_map<std::string, Synonym*>* target_synonyms_map,
                            std::unordered_map<std::string, std::vector<int>>* map_of_syn_to_clause_indices);
+  static void BasicGroupClauses(std::vector<Clause*>* clauses, std::vector<Group*>* groups,
+                                std::unordered_map<std::string, Synonym*>* target_synonyms_map);
 };
 
 #endif //AUTOTESTER_QUERYGROUPER_H

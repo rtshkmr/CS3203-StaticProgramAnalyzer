@@ -1,5 +1,27 @@
 #include "QueryOptimizer.h"
+#include "QueryGrouper.h"
 #include <algorithm>
+
+void QueryOptimizer::Optimize() {
+  PopulateSynAdjacencyList();
+  QueryGrouper::AdvancedGroupClauses(& clauses, & groups, & target_syn_attrs_list, &target_synonyms_map,
+                                     & map_of_syn_to_clause_indices);
+  ReorderGroups();
+}
+
+void QueryOptimizer::PopulateSynAdjacencyList() {
+  for (int i = 0; i < clauses.size(); i++) {
+    std::vector<std::string> syns = clauses[i]->GetAllSynonymNamesOfClause();
+    for (std::string s : syns) {
+      if (this->map_of_syn_to_clause_indices.find(s) != this->map_of_syn_to_clause_indices.end()) {
+        this->map_of_syn_to_clause_indices.at(s).push_back(i);
+      } else {
+        std::vector<int> v { i };
+        this->map_of_syn_to_clause_indices.insert(std::make_pair(s, v));
+      }
+    }
+  }
+}
 
 /**
  * Updates the ordering of Groups in the given list of Groups based on the following heuristic:
@@ -7,17 +29,13 @@
  * Since we need to sort boolean groups by order of size, this optimization has loglinear time complexity in the
  * number of boolean groups.
  */
-void QueryOptimizer::ReorderGroups(std::vector<Group*>* groups) {
-  if (!this->are_optimizations_enabled) {
-    return;
-  }
-
+void QueryOptimizer::ReorderGroups() {
   std::vector<Group*> boolean_groups;
-  boolean_groups.reserve(groups->size());
+  boolean_groups.reserve(this->groups.size());
   std::vector<Group*> non_boolean_groups;
-  non_boolean_groups.reserve(groups->size());
+  non_boolean_groups.reserve(this->groups.size());
 
-  for (Group* g : *groups) {
+  for (Group* g : this->groups) {
     if (g->ContainsTargetSynonym()) {
       non_boolean_groups.push_back(g);
     } else {
@@ -31,6 +49,6 @@ void QueryOptimizer::ReorderGroups(std::vector<Group*>* groups) {
   std::sort(boolean_groups.begin(), boolean_groups.end(), comparator);
 
   boolean_groups.insert(boolean_groups.end(), non_boolean_groups.begin(), non_boolean_groups.end());
-  groups->swap(boolean_groups);
+  this->groups.swap(boolean_groups);
 }
 
