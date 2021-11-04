@@ -37,10 +37,15 @@ class QueryOptimizer {
     std::vector<std::pair<Synonym*, Attribute>>& target_syn_attrs_list;
     std::unordered_map<std::string, Synonym*>& target_synonyms_map;
     std::unordered_map<std::string, std::vector<int>> map_of_syn_to_clause_indices;
+    // for caching seen queries
+    std::unordered_set<SuchThat, SuchThatHash, SuchThatComparator> seen_suchthat_set;
+    std::unordered_set<Pattern, PatternHash, PatternComparator> seen_pattern_set;
+    std::unordered_set<With, WithHash, WithComparator> seen_with_set;
     bool HasClauseBeenSeen(Clause* cl);
     void SeeClause(Clause* cl);
     void PopulateSynAdjacencyList();
-    void PopulateUniqueWeightedClausesList();
+    void PopulateWeightedClausesList();
+    void RemoveDuplicateClauses();
     void ReorderGroups();
     void ReorderClausesWithinWeightedGroups();
     void UpdateClauseWeights();
