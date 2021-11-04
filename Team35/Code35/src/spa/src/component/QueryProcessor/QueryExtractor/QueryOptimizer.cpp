@@ -35,8 +35,9 @@ int QueryOptimizer::GetNumberOfSynonymsPenalty(Clause* cl) {
 }
 
 void QueryOptimizer::Optimize() {
+  RemoveDuplicateClauses();
   PopulateSynAdjacencyList();
-  PopulateUniqueWeightedClausesList();
+  PopulateWeightedClausesList();
   QueryGrouper::AdvancedGroupClauses(& weighted_clauses, & weighted_groups, & target_syn_attrs_list, &target_synonyms_map,
                                      & map_of_syn_to_clause_indices);
   UpdateClauseWeights();
@@ -44,6 +45,17 @@ void QueryOptimizer::Optimize() {
   PopulateGroupsList();
   ReorderGroups();
   FreeWeightedLists();
+}
+
+void QueryOptimizer::RemoveDuplicateClauses() {
+  std::vector<Clause*> temp;
+  for (auto cl : clauses) {
+    if (!HasClauseBeenSeen(cl)) {
+      temp.push_back(cl);
+      SeeClause(cl);
+    }
+  }
+  clauses.assign(temp.begin(), temp.end());
 }
 
 // populate intermediate data structure used for advanced grouping algorithm.
@@ -62,23 +74,43 @@ void QueryOptimizer::PopulateSynAdjacencyList() {
 }
 
 /**
- * creates a list of weighted clauses from the original list of clauses; in the process dropping duplicate clauses.
+ * creates a list of weighted clauses from the original list of clauses.
  */
-void QueryOptimizer::PopulateUniqueWeightedClausesList() {
+void QueryOptimizer::PopulateWeightedClausesList() {
   for (auto cl : clauses) {
-    if (!HasClauseBeenSeen(cl)) {
-      weighted_clauses.push_back(new WeightedClause(cl));
-      SeeClause(cl);
-    }
+    weighted_clauses.push_back(new WeightedClause(cl));
   }
 }
 
 bool QueryOptimizer::HasClauseBeenSeen(Clause* cl) {
-  return false;
+  bool is_seen;
+  if (typeid(*cl) == typeid(SuchThat)) {
+    SuchThat* such_that = dynamic_cast<SuchThat *>(cl);
+    seen_suchthat_set.find(*such_that);
+    is_seen = seen_suchthat_set.find(*such_that) != seen_suchthat_set.end();
+  } else if (typeid(*cl) == typeid(Pattern)) {
+    Pattern* pattern = dynamic_cast<Pattern *>(cl);
+    seen_pattern_set.find(*pattern);
+    is_seen = seen_pattern_set.find(*pattern) != seen_pattern_set.end();
+  } else {
+    With* with = dynamic_cast<With *>(cl);
+    seen_with_set.find(*with);
+    is_seen = seen_with_set.find(*with) != seen_with_set.end();
+  }
+  return is_seen;
 }
 
 void QueryOptimizer::SeeClause(Clause* cl) {
-
+  if (typeid(*cl) == typeid(SuchThat)) {
+    SuchThat* such_that = dynamic_cast<SuchThat *>(cl);
+    seen_suchthat_set.insert(*such_that);
+  } else if (typeid(*cl) == typeid(Pattern)) {
+    Pattern* pattern = dynamic_cast<Pattern *>(cl);
+    seen_pattern_set.insert(*pattern);
+  } else {
+    With* with = dynamic_cast<With *>(cl);
+    seen_with_set.insert(*with);
+  }
 }
 
 /**
