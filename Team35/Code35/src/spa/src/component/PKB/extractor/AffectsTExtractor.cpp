@@ -1,4 +1,5 @@
 #include <cassert>
+#include <util/Utility.h>
 #include "../../../model/CFG.h"
 #include "AffectsTExtractor.h"
 
@@ -60,17 +61,17 @@ std::vector<std::tuple<Entity*, Entity*>> AffectsTExtractor::GetRelationshipByTy
   if (!isCached) InitCache();
   std::unordered_map<int, std::list<int>*>* mapToCheck = (dir == RelDirection::kForward) ? &affects_t_map_ : &affected_by_t_map_;
 
-  std::vector<std::tuple<int, std::vector<Entity*>>> intermediate_vector = {};
+  std::vector<std::tuple<Entity*, Entity*>> intermediate_table = {};
   for (auto pair : *mapToCheck) {
     std::vector<Entity*> this_key_entity = GetRelationship(RelDirection::kForward, pair.first);
-    intermediate_vector.push_back(std::make_tuple(pair.first, this_key_entity));
+    AssignEntity* ae = Utility::GetAssignEntityFromStmtNum(pkb_, pair.first);
+
+    for (auto val: this_key_entity) {
+      intermediate_table.push_back(std::make_tuple(ae, val));
+    }
   }
 
-  //convert pair.first intermediate vector
-  std::vector<std::tuple<Entity*, std::vector<Entity*>>> intermediate_vector2 = ConvertIntToEntity(intermediate_vector);
-
-
-  return CreateIntermediateTable(intermediate_vector2);
+  return intermediate_table;
 }
 
 bool AffectsTExtractor::HasRelationship(RelDirection dir) {
@@ -90,11 +91,7 @@ bool AffectsTExtractor::HasRelationship(RelDirection dir, int target) {
 bool AffectsTExtractor::HasRelationship(RelDirection dir, int first, int second) {
   if (!isCached) InitCache();
 
-  if (dir == RelDirection::kReverse) {
-    int tmp = first;
-    first = second;
-    second = tmp;
-  }
+  std::unordered_map<int, std::list<int>*>* mapToCheck = (dir == RelDirection::kForward) ? &affects_t_map_ : &affected_by_t_map_;
 
   std::set<int> checked = {};
   std::list<int> toCheck = {first};
@@ -109,8 +106,8 @@ bool AffectsTExtractor::HasRelationship(RelDirection dir, int first, int second)
       continue; //already checked before.
     }
 
-    auto itr = affects_t_map_.find(check);
-    if (itr == affects_t_map_.end()) {
+    auto itr = mapToCheck->find(check);
+    if (itr == mapToCheck->end()) {
       continue; //no value found.
     }
 
@@ -142,8 +139,8 @@ void AffectsTExtractor::InitCache() {
     AssignEntity* ae2 = dynamic_cast<AssignEntity*>(std::get<1>(pair));
     assert(ae1 && ae2);
 
-    AddRelationshipToMap(&affects_t_map_, ae1->GetStatementNumber()->GetNum(), ae2->GetStatementNumber()->GetNum());
-    AddRelationshipToMap(&affected_by_t_map_, ae2->GetStatementNumber()->GetNum(), ae1->GetStatementNumber()->GetNum());
+    Deliverable::AddRelationshipToMap(&affects_t_map_, ae1->GetStatementNumber()->GetNum(), ae2->GetStatementNumber()->GetNum());
+    Deliverable::AddRelationshipToMap(&affected_by_t_map_, ae2->GetStatementNumber()->GetNum(), ae1->GetStatementNumber()->GetNum());
   }
   isCached = true;
 }
@@ -151,56 +148,7 @@ void AffectsTExtractor::InitCache() {
 std::vector<Entity*> AffectsTExtractor::ConvertIntToEntity(std::set<int> set_to_convert) {
   std::vector<Entity*> retList = {};
   for (auto item : set_to_convert) {
-    retList.push_back(GetAssignEntityFromStmtNum(item));
+    retList.push_back(Utility::GetAssignEntityFromStmtNum(pkb_, item));
   }
   return retList;
-}
-
-std::vector<std::tuple<Entity*, std::vector<Entity*>>> AffectsTExtractor::ConvertIntToEntity(std::vector<std::tuple<int,std::vector<Entity*>>> vector_to_convert) {
-  std::vector<std::tuple<Entity*, std::vector<Entity*>>> retList = {};
-  for (std::tuple<int,std::vector<Entity*>> pair : vector_to_convert) {
-    AssignEntity* ae = GetAssignEntityFromStmtNum(std::get<0>(pair));
-    retList.push_back(std::make_tuple(ae, std::get<1>(pair)));
-  }
-  return retList;
-}
-
-std::vector<std::tuple<Entity*, Entity*>> AffectsTExtractor::CreateIntermediateTable(std::vector<std::tuple<Entity*,
-                                                                                                            std::vector<
-                                                                                                                Entity*>>> vector_to_convert) {
-  std::vector<std::tuple<Entity*, Entity*>> retList = {};
-
-  for (auto pair : vector_to_convert) {
-    for (auto element : std::get<1>(pair)) {
-      retList.push_back(std::make_tuple(std::get<0>(pair), element));
-    }
-  }
-  return retList;
-}
-
-//TODO: Reference from AffectsExtractor?
-AssignEntity* AffectsTExtractor::GetAssignEntityFromStmtNum(int target) {
-  std::vector<Entity*> ae_vec_target =
-      pkb_->GetPatternEntities(DesignEntity::kAssign, std::to_string(target));
-
-  if (ae_vec_target.size() == 0) //target given is not an assign entity.
-    return nullptr;
-
-  assert (ae_vec_target.size() == 1); // must be 1
-  return dynamic_cast<AssignEntity*>(ae_vec_target[0]);
-}
-
-//TODO: Reference from Deliverables?
-template <typename X, typename Y>
-void AffectsTExtractor::AddRelationshipToMap(std::unordered_map<X, std::list<Y>*>* map, X key, Y value) {
-  if (map->count(key)) {
-    std::list<Y>* values = map->find(key)->second;
-    if (std::find(values->begin(), values->end(), value) == values->end()) {
-      values->push_back(value);
-    }
-  } else {
-    auto* list = new std::list<Y>();
-    list->push_back(value);
-    map->insert(std::make_pair(key, list));
-  }
 }

@@ -2,6 +2,7 @@
  * This class contains any generic utility methods implementation.
  */
 
+#include <cassert>
 #include <exception/SpaException.h>
 #include "Utility.h"
 
@@ -23,4 +24,21 @@ int Utility::ConvertStringToInt(const std::string& input) {
     throw SyntaxException("Constant is not valid. Numbers mixed with letters.");
   }
   return value;
+}
+
+/**
+ * Using the StmtRef, retrieve AssignEntity pointer from PKB.
+ * @param pkb The pkb to check from.
+ * @param target The StmtRef to be checked.
+ * @return The AssignEntity pointer if found; nullptr otherwise.
+ */
+AssignEntity* Utility::GetAssignEntityFromStmtNum(PKB* pkb, int target) {
+  std::vector<Entity*> ae_vec_target =
+      pkb->GetPatternEntities(DesignEntity::kAssign, std::to_string(target));
+
+  if (ae_vec_target.size() == 0) //target given is not an assign entity.
+    return nullptr;
+
+  assert (ae_vec_target.size() == 1); // must be 1
+  return dynamic_cast<AssignEntity*>(ae_vec_target[0]);
 }

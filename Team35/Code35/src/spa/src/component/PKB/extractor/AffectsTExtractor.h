@@ -26,12 +26,6 @@ class AffectsTExtractor : RuntimeColleague {
   std::unordered_map<int, std::list<int>*> affected_by_t_map_ = {};
   void InitCache();
   std::vector<Entity*> ConvertIntToEntity(std::set<int> set_to_convert);
-  std::vector<std::tuple<Entity*, std::vector<Entity*>>> ConvertIntToEntity(std::vector<std::tuple<int, std::vector<Entity*>>> vector_to_convert);
-  std::vector<std::tuple<Entity*, Entity*>> CreateIntermediateTable(std::vector<std::tuple<Entity*, std::vector<Entity*>>> vector_to_convert);
-  AssignEntity* GetAssignEntityFromStmtNum(int target);
-
-  template <typename X, typename Y>
-  void AddRelationshipToMap(std::unordered_map<X, std::list<Y>*>* map, X key, Y value);
 };
 
 #endif //AUTOTESTER_CODE35_SRC_SPA_SRC_COMPONENT_PKB_AFFECTSTEXTRACTOR_H_
