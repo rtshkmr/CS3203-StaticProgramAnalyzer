@@ -38,5 +38,23 @@ class SingleSynonymPresentCommand : public ClauseCommand {
     void Execute(Clause *clause) override;
 };
 
+class DoubleSynonymNonePresentCommand : public ClauseCommand {
+  private:
+    ClauseCommandExecutor *executor;
+  public:
+    explicit DoubleSynonymNonePresentCommand();
+    void SetExecutor(ClauseCommandExecutor *executor) override;
+    void Execute(Clause *clause) override;
+};
+
+class SingleSynonymNonePresentCommand : public ClauseCommand {
+  private:
+    ClauseCommandExecutor *executor;
+    bool synonym_is_first_param;
+  public:
+    explicit SingleSynonymNonePresentCommand(bool synonym_is_first_param);
+    void SetExecutor(ClauseCommandExecutor *executor) override;
+    void Execute(Clause *clause) override;
+};
 
 #endif //AUTOTESTER_CLAUSECOMMAND_H

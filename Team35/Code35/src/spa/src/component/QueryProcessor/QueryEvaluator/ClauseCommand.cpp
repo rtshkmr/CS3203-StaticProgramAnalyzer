@@ -34,3 +34,26 @@ void SingleSynonymPresentCommand::SetExecutor(ClauseCommandExecutor *executor_to
 void SingleSynonymPresentCommand::Execute(Clause *clause) {
   this->executor->SingleSynonymIntersection(clause, synonym_is_first_param);
 }
+
+
+DoubleSynonymNonePresentCommand::DoubleSynonymNonePresentCommand() : executor(nullptr) {}
+
+void DoubleSynonymNonePresentCommand::SetExecutor(ClauseCommandExecutor *executor_to_set) {
+  delete this->executor;
+  this->executor = executor_to_set;
+}
+
+void DoubleSynonymNonePresentCommand::Execute(Clause *clause) {
+  this->executor->DoubleSynonymCross(clause);
+}
+
+SingleSynonymNonePresentCommand::SingleSynonymNonePresentCommand(bool synonym_is_first_param) : synonym_is_first_param(synonym_is_first_param), executor(nullptr) {}
+
+void SingleSynonymNonePresentCommand::SetExecutor(ClauseCommandExecutor *executor_to_set) {
+  delete this->executor;
+  this->executor = executor_to_set;
+}
+
+void SingleSynonymNonePresentCommand::Execute(Clause *clause) {
+  this->executor->SingleSynonymCross(clause, synonym_is_first_param);
+}

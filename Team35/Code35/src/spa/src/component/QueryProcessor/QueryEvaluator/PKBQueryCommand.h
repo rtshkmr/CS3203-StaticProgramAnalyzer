@@ -12,6 +12,9 @@
 class PKBQueryReceiver {
   private:
     DBManager *db_manager;
+
+    void PopulateAssignDoubleSynonym(IntermediateTable *table);
+    void PopulatePatternDoubleSynonym(IntermediateTable *table, DesignEntity design_entity);
   public:
     explicit PKBQueryReceiver(DBManager *db_manager);
 
@@ -27,7 +30,6 @@ class PKBQueryReceiver {
     IntermediateTable *QueryEntityAttributeMatch(DesignEntity design_entity, Attribute attribute, std::string value);
 };
 
-// TODO: change the set receiver method to be in the base class.
 class PKBQueryCommand {
   public:
     virtual void SetReceiver(PKBQueryReceiver *receiver) = 0;
