@@ -126,18 +126,6 @@ bool AffectsExtractor::HasAffectedBy(int first, int second) {
 }
 
 std::vector<Entity*> AffectsExtractor::GetAffects(AssignEntity* target) {
-
-  // retrieve the entity that target points to
-  // possible to have no such targets
-
-  // assert that the target entity can only be an assignment statement
-
-  // For each remaining stmt, x after target stmt, add to result vector if
-  // HasAffects(target, x)
-
-  //return std::vector<Entity*>();
-
-  //TODO Remove naive soln
   std::vector<Entity*> retList = {};
 
   std::vector<Entity*> assign_list = pkb_->GetDesignEntities(DesignEntity::kAssign);

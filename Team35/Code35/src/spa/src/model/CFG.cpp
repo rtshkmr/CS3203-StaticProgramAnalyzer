@@ -229,43 +229,6 @@ bool Cluster::TraverseScopedCluster(PKBRelRefs rel_ref,
   return false;
 }
 
-// todo: switching to case swithc makes it easier
-//bool TraverseIfClusterForAffects(Cluster* if_cluster,
-//                                 std::pair<int,int> target_range,
-//                                 PKB* pkb,
-//                                 const std::string& lhs_var) {
-//  // need to consider different branches:
-//  Cluster* if_body = child->GetClusterConstituent(ClusterTag::kIfBody);
-//  Cluster* else_body = child->GetClusterConstituent(ClusterTag::kElseBody);
-//  auto if_body_range = if_body->GetStartEndRange();
-//  auto else_body_range = else_body->GetStartEndRange();
-//  bool is_target_in_if_cluster = child->CheckIfStmtNumInRange(target_range.second);
-//  if (is_target_in_if_cluster) {
-//    // case 1: child contains second statement, identify if it's if body or else body
-//    bool is_target_in_if_body = if_body->CheckIfStmtNumInRange(target_range.second);
-//    bool is_target_in_else_body = else_body->CheckIfStmtNumInRange(target_range.second);
-//    assert(is_target_in_else_body ^ is_target_in_if_body);
-//    int new_start = is_target_in_if_body ? if_body_range.first : else_body_range.first;
-//    auto new_target_range = std::make_pair(new_start, target_range.second);
-//    return TraverseScopedClusterForAffects((is_target_in_if_body
-//                                            ? if_body
-//                                            : else_body),
-//                                           new_target_range,
-//                                           pkb,
-//                                           lhs_var);
-//  } else {
-//    // case 2: child does not contain second statement, then just have to at least one that gives unmod path
-//    bool if_body_is_unmodified_path = TraverseScopedClusterForAffects(if_body, if_body_range, pkb, lhs_var);
-//    if (if_body_is_unmodified_path) continue;
-//    bool else_body_is_unmodified_path = TraverseScopedClusterForAffects(else_body, else_body_range, pkb, lhs_var);
-//    bool has_no_unmod_path = !if_body_is_unmodified_path && !else_body_is_unmodified_path;
-//    if(has_no_unmod_path) {
-//      scoped_cluster_does_not_modify_var = false;
-//      break; // breaks outer for loop
-//    }
-//  }
-//
-//}
 
 /**
  * Treats the child as a normal block and traverses it to check if the lhs_var has been modified.
