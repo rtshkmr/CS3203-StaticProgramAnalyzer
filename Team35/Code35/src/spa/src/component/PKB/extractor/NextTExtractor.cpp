@@ -84,7 +84,7 @@ std::vector<Entity*> NextTExtractor::GetRelationship(RelDirection dir,
  * Gets all Entities that can be on the LHS/RHS of the relationship, i.e. Next*(_, s).
  * @return all Entities that can be on the LHS/RHS of the relationship.
  */
-std::vector<Entity*> NextTExtractor::GetFirstEntityOfRelationship(RelDirection dir) {
+std::vector<Entity*> NextTExtractor::GetFirstEntityOfRelationship(RelDirection dir, DesignEntity de) {
   if (dir == RelDirection::kReverse) {
     if (!prev_t_populated_) {
       PopulateAllPrevT(proc_list_);
@@ -98,7 +98,9 @@ std::vector<Entity*> NextTExtractor::GetFirstEntityOfRelationship(RelDirection d
   }
 }
 
-std::vector<std::tuple<Entity*, Entity*>> NextTExtractor::GetRelationshipByTypes(RelDirection dir) {
+std::vector<std::tuple<Entity*, Entity*>> NextTExtractor::GetRelationshipByTypes(RelDirection dir,
+                                                                                 DesignEntity first,
+                                                                                 DesignEntity second) {
   return dir == RelDirection::kForward ? GetAllNextT() : GetAllPrevT();
 }
 

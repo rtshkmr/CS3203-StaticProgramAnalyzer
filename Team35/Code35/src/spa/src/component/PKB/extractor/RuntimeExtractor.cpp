@@ -202,7 +202,7 @@ bool RuntimeExtractor::HasRelationship(PKBRelRefs ref, std::string first, std::s
 bool RuntimeExtractor::HasRelationship(PKBRelRefs ref, DesignEntity first, DesignEntity second) {
   switch (ref) {
     case PKBRelRefs::kNextT:  // fallthrough
-    case PKBRelRefs::kPreviousT: return pkb_->HasRelationship(PKBRelRefs::kNext);
+    case PKBRelRefs::kPreviousT: return pkb_->HasRelationship(PKBRelRefs::kNext); // TODO
     case PKBRelRefs::kAffects: return HasAffects();
     case PKBRelRefs::kAffectedBy: return HasAffectedBy();
     case PKBRelRefs::kAffectsT: return HasAffects();
@@ -257,7 +257,7 @@ std::vector<Entity*> RuntimeExtractor::GetPrevBipT(int target) {
 
 std::vector<Entity*> RuntimeExtractor::GetNextT(DesignEntity de) {
   if (next_design_entities.count(de) == 1) {
-    return next_t_extractor_.GetFirstEntityOfRelationship(RelDirection::kForward);
+    return next_t_extractor_.GetFirstEntityOfRelationship(RelDirection::kForward, de);
   } else {
     return std::vector<Entity*>{};
   }
@@ -265,7 +265,7 @@ std::vector<Entity*> RuntimeExtractor::GetNextT(DesignEntity de) {
 
 std::vector<Entity*> RuntimeExtractor::GetPrevT(DesignEntity de) {
   if (next_design_entities.count(de) == 1) {
-    return next_t_extractor_.GetFirstEntityOfRelationship(RelDirection::kReverse);
+    return next_t_extractor_.GetFirstEntityOfRelationship(RelDirection::kReverse, de);
   } else {
     return std::vector<Entity*>{};
   }
@@ -288,14 +288,14 @@ std::vector<Entity*> RuntimeExtractor::GetAffectedBy(DesignEntity de) {
 }
 std::vector<Entity*> RuntimeExtractor::GetAffectsT(DesignEntity de) {
   if (de == DesignEntity::kStmt || de == DesignEntity::kAssign) {
-    return affects_t_extractor_.GetFirstEntityOfRelationship(RelDirection::kForward);
+    return affects_t_extractor_.GetFirstEntityOfRelationship(RelDirection::kForward, de);
   } else {
     return std::vector<Entity*>();
   }
 }
 std::vector<Entity*> RuntimeExtractor::GetAffectedByT(DesignEntity de) {
   if (de == DesignEntity::kStmt || de == DesignEntity::kAssign) {
-    return affects_t_extractor_.GetFirstEntityOfRelationship(RelDirection::kReverse);
+    return affects_t_extractor_.GetFirstEntityOfRelationship(RelDirection::kReverse, de);
   } else {
     return std::vector<Entity*>();
   }
@@ -303,7 +303,7 @@ std::vector<Entity*> RuntimeExtractor::GetAffectedByT(DesignEntity de) {
 
 std::vector<Entity*> RuntimeExtractor::GetNextBip(DesignEntity de) {
   if (next_design_entities.count(de) == 1) {
-    return next_bip_extractor_.GetFirstEntityOfRelationship(RelDirection::kForward);
+    return next_bip_extractor_.GetFirstEntityOfRelationship(RelDirection::kForward, de);
   } else {
     return std::vector<Entity*>{};
   }
@@ -311,7 +311,7 @@ std::vector<Entity*> RuntimeExtractor::GetNextBip(DesignEntity de) {
 
 std::vector<Entity*> RuntimeExtractor::GetPrevBip(DesignEntity de) {
   if (next_design_entities.count(de) == 1) {
-    return next_bip_extractor_.GetFirstEntityOfRelationship(RelDirection::kReverse);
+    return next_bip_extractor_.GetFirstEntityOfRelationship(RelDirection::kReverse, de);
   } else {
     return std::vector<Entity*>{};
   }
@@ -319,7 +319,7 @@ std::vector<Entity*> RuntimeExtractor::GetPrevBip(DesignEntity de) {
 
 std::vector<Entity*> RuntimeExtractor::GetNextBipT(DesignEntity de) {
   if (next_design_entities.count(de) == 1) {
-    return next_bip_t_extractor_.GetFirstEntityOfRelationship(RelDirection::kForward);
+    return next_bip_t_extractor_.GetFirstEntityOfRelationship(RelDirection::kForward, de);
   } else {
     return std::vector<Entity*>{};
   }
@@ -327,7 +327,7 @@ std::vector<Entity*> RuntimeExtractor::GetNextBipT(DesignEntity de) {
 
 std::vector<Entity*> RuntimeExtractor::GetPrevBipT(DesignEntity de) {
   if (next_design_entities.count(de) == 1) {
-    return next_bip_t_extractor_.GetFirstEntityOfRelationship(RelDirection::kReverse);
+    return next_bip_t_extractor_.GetFirstEntityOfRelationship(RelDirection::kReverse, de);
   } else {
     return std::vector<Entity*>{};
   }
@@ -339,7 +339,7 @@ std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetNextT(DesignEntit
   if (!valid_first && !valid_second) {
     return std::vector<std::tuple<Entity*, Entity*>>{};
   }
-  return next_t_extractor_.GetRelationshipByTypes(RelDirection::kForward);
+  return next_t_extractor_.GetRelationshipByTypes(RelDirection::kForward, first, second);
 }
 
 std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetPrevT(DesignEntity first, DesignEntity second) {
@@ -348,7 +348,7 @@ std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetPrevT(DesignEntit
   if (!valid_first && !valid_second) {
     return std::vector<std::tuple<Entity*, Entity*>>{};
   }
-  return next_t_extractor_.GetRelationshipByTypes(RelDirection::kReverse);
+  return next_t_extractor_.GetRelationshipByTypes(RelDirection::kReverse, first, second);
 }
 
 std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetAffects(DesignEntity first, DesignEntity second) {
@@ -388,7 +388,7 @@ std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetNextBip(DesignEnt
   if (!valid_first && !valid_second) {
     return std::vector<std::tuple<Entity*, Entity*>>{};
   }
-  return next_bip_extractor_.GetRelationshipByTypes(RelDirection::kForward);
+  return next_bip_extractor_.GetRelationshipByTypes(RelDirection::kForward, first, second);
 }
 
 std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetPrevBip(DesignEntity first, DesignEntity second) {
@@ -397,7 +397,7 @@ std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetPrevBip(DesignEnt
   if (!valid_first && !valid_second) {
     return std::vector<std::tuple<Entity*, Entity*>>{};
   }
-  return next_bip_extractor_.GetRelationshipByTypes(RelDirection::kReverse);
+  return next_bip_extractor_.GetRelationshipByTypes(RelDirection::kReverse, first, second);
 }
 
 std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetNextBipT(DesignEntity first, DesignEntity second) {
@@ -406,7 +406,7 @@ std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetNextBipT(DesignEn
   if (!valid_first && !valid_second) {
     return std::vector<std::tuple<Entity*, Entity*>>{};
   }
-  return next_bip_t_extractor_.GetRelationshipByTypes(RelDirection::kForward);
+  return next_bip_t_extractor_.GetRelationshipByTypes(RelDirection::kForward, first, second);
 }
 
 std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetPrevBipT(DesignEntity first, DesignEntity second) {
@@ -415,7 +415,7 @@ std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetPrevBipT(DesignEn
   if (!valid_first && !valid_second) {
     return std::vector<std::tuple<Entity*, Entity*>>{};
   }
-  return next_bip_t_extractor_.GetRelationshipByTypes(RelDirection::kReverse);
+  return next_bip_t_extractor_.GetRelationshipByTypes(RelDirection::kReverse, first, second);
 }
 
 bool RuntimeExtractor::HasNextBip() {

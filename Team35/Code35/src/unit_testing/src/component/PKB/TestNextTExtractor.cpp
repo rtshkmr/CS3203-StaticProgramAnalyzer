@@ -54,12 +54,12 @@ TEST_CASE("2.PKB.NextTExtractor basic conditions") {
     NextTExtractor next_t_extractor{};
     CHECK(next_t_extractor.GetRelationship(RelDirection::kReverse, 1, proc_list).empty());
     CHECK_FALSE(next_t_extractor.HasRelationship(RelDirection::kForward, 1, 2));
-    CHECK(next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kForward).empty());
-    CHECK(next_t_extractor.GetRelationshipByTypes(RelDirection::kForward).empty());
+    CHECK(next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kForward, DesignEntity::kProgLine).empty());
+    CHECK(next_t_extractor.GetRelationshipByTypes(RelDirection::kForward, DesignEntity::kProgLine, DesignEntity::kProgLine).empty());
 
     CHECK(next_t_extractor.GetRelationship(RelDirection::kReverse, 1, proc_list).empty());
-    CHECK(next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kReverse).empty());
-    CHECK(next_t_extractor.GetRelationshipByTypes(RelDirection::kReverse).empty());
+    CHECK(next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kReverse, DesignEntity::kProgLine).empty());
+    CHECK(next_t_extractor.GetRelationshipByTypes(RelDirection::kReverse, DesignEntity::kProgLine, DesignEntity::kProgLine).empty());
   }
 
   SECTION("single level statement list") {
@@ -84,11 +84,14 @@ TEST_CASE("2.PKB.NextTExtractor basic conditions") {
     CHECK(next_t_extractor.HasRelationship(RelDirection::kForward, 2, 3));
     CHECK_FALSE(next_t_extractor.HasRelationship(RelDirection::kForward, 2, 1));
     std::vector<Entity*> expected_lhs = {s1, s2};
-    std::vector<Entity*> actual_lhs = next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kForward);
+    std::vector<Entity*> actual_lhs = next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kForward,
+                                                                                    DesignEntity::kProgLine);
     CHECK(TestUtils::AreVectorsEqual(actual_lhs, expected_lhs));
     std::vector<std::tuple<Entity*, Entity*>> expected_all = {{s1, s2}, {s1, s3}, {s2, s3}};
     std::vector<std::tuple<Entity*, Entity*>>
-        actual_all = next_t_extractor.GetRelationshipByTypes(RelDirection::kForward);
+        actual_all = next_t_extractor.GetRelationshipByTypes(RelDirection::kForward,
+                                                             DesignEntity::kProgLine,
+                                                             DesignEntity::kProgLine);
     CHECK(TestUtils::AreVectorsEqual(actual_all, expected_all));
 
     std::vector<Entity*> expected_p1 = {s1, s2};
@@ -99,11 +102,14 @@ TEST_CASE("2.PKB.NextTExtractor basic conditions") {
     CHECK(TestUtils::AreVectorsEqual(actual_p1, expected_p1));
     CHECK(next_t_extractor.GetPrevTSize() == 2);
     std::vector<Entity*> expected_rhs = {s2, s3};
-    std::vector<Entity*> actual_rhs = next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kReverse);
+    std::vector<Entity*> actual_rhs = next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kReverse,
+                                                                                    DesignEntity::kProgLine);
     CHECK(TestUtils::AreVectorsEqual(actual_rhs, expected_rhs));
     std::vector<std::tuple<Entity*, Entity*>> expected_all_p = {{s2, s1}, {s3, s1}, {s3, s2}};
     std::vector<std::tuple<Entity*, Entity*>>
-        actual_all_p = next_t_extractor.GetRelationshipByTypes(RelDirection::kReverse);
+        actual_all_p = next_t_extractor.GetRelationshipByTypes(RelDirection::kReverse,
+                                                               DesignEntity::kProgLine,
+                                                               DesignEntity::kProgLine);
     CHECK(TestUtils::AreVectorsEqual(actual_all_p, expected_all_p));
   }
 
@@ -141,7 +147,8 @@ TEST_CASE("2.PKB.NextTExtractor basic conditions") {
 
     NextTExtractor next_t_extractor(proc_list, stmt_list);
     std::vector<Entity*> expected_lhs = {s1, s2, s3, s4, s5, s6};
-    std::vector<Entity*> actual_lhs = next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kForward);
+    std::vector<Entity*> actual_lhs = next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kForward,
+                                                                                    DesignEntity::kProgLine);
     CHECK(TestUtils::AreVectorsEqual(actual_lhs, expected_lhs));
     CHECK(next_t_extractor.HasRelationship(RelDirection::kForward, 2, 7));
     CHECK(next_t_extractor.HasRelationship(RelDirection::kForward, 1, 6));
@@ -173,7 +180,9 @@ TEST_CASE("2.PKB.NextTExtractor basic conditions") {
                                                               {s2, s7}, {s3, s4}, {s3, s7}, {s4, s7}, {s5, s6},
                                                               {s5, s7}, {s6, s7}};
     std::vector<std::tuple<Entity*, Entity*>>
-        actual_all = next_t_extractor.GetRelationshipByTypes(RelDirection::kForward);
+        actual_all = next_t_extractor.GetRelationshipByTypes(RelDirection::kForward,
+                                                             DesignEntity::kProgLine,
+                                                             DesignEntity::kProgLine);
     CHECK(TestUtils::AreVectorsEqual(actual_all, expected_all));
 
     std::vector<Entity*> expected_p2 = {s1};
@@ -196,14 +205,17 @@ TEST_CASE("2.PKB.NextTExtractor basic conditions") {
     CHECK(TestUtils::AreVectorsEqual(actual_p7, expected_p7));
     CHECK(next_t_extractor.GetPrevTSize() == 6);
     std::vector<Entity*> expected_rhs = {s2, s3, s4, s5, s6, s7};
-    std::vector<Entity*> actual_rhs = next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kReverse);
+    std::vector<Entity*> actual_rhs = next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kReverse,
+                                                                                    DesignEntity::kProgLine);
     CHECK(TestUtils::AreVectorsEqual(actual_rhs, expected_rhs));
     std::vector<std::tuple<Entity*, Entity*>> expected_all_p = {{s2, s1}, {s3, s1}, {s4, s1}, {s5, s1}, {s6, s1},
                                                                 {s7, s1}, {s3, s2}, {s4, s2}, {s5, s2}, {s6, s2},
                                                                 {s7, s2}, {s4, s3}, {s7, s3}, {s7, s4}, {s6, s5},
                                                                 {s7, s5}, {s7, s6}};
     std::vector<std::tuple<Entity*, Entity*>>
-        actual_all_p = next_t_extractor.GetRelationshipByTypes(RelDirection::kReverse);
+        actual_all_p = next_t_extractor.GetRelationshipByTypes(RelDirection::kReverse,
+                                                               DesignEntity::kProgLine,
+                                                               DesignEntity::kProgLine);
     CHECK(TestUtils::AreVectorsEqual(actual_all_p, expected_all_p));
   }
 
@@ -251,7 +263,8 @@ TEST_CASE("2.PKB.NextTExtractor basic conditions") {
     CHECK(next_t_extractor.HasRelationship(RelDirection::kForward, 5, 6));
     CHECK_FALSE(next_t_extractor.HasRelationship(RelDirection::kForward, 3, 1));
     std::vector<Entity*> expected_lhs = {s1, s2, s3, s4, s5};
-    std::vector<Entity*> actual_lhs = next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kForward);
+    std::vector<Entity*> actual_lhs = next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kForward,
+                                                                                    DesignEntity::kProgLine);
     CHECK(TestUtils::AreVectorsEqual(actual_lhs, expected_lhs));
     std::vector<Entity*> actual_s4 = next_t_extractor.GetRelationship(RelDirection::kForward, 4, proc_list);
     CHECK(TestUtils::AreVectorsEqual(actual_s4, expected_s1));
@@ -264,7 +277,9 @@ TEST_CASE("2.PKB.NextTExtractor basic conditions") {
                                                               {s4, s2}, {s4, s3}, {s4, s4}, {s4, s5}, {s4, s6},
                                                               {s5, s2}, {s5, s3}, {s5, s4}, {s5, s5}, {s5, s6}};
     std::vector<std::tuple<Entity*, Entity*>>
-        actual_all = next_t_extractor.GetRelationshipByTypes(RelDirection::kForward);
+        actual_all = next_t_extractor.GetRelationshipByTypes(RelDirection::kForward,
+                                                             DesignEntity::kProgLine,
+                                                             DesignEntity::kProgLine);
     CHECK(TestUtils::AreVectorsEqual(actual_all, expected_all));
 
     std::vector<Entity*> expected_p6 = {s1, s2, s3, s4, s5};
@@ -280,7 +295,8 @@ TEST_CASE("2.PKB.NextTExtractor basic conditions") {
     CHECK(TestUtils::AreVectorsEqual(actual_p6, expected_p6));
     CHECK(next_t_extractor.GetPrevTSize() == 5);
     std::vector<Entity*> expected_rhs = {s2, s3, s4, s5, s6};
-    std::vector<Entity*> actual_rhs = next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kReverse);
+    std::vector<Entity*> actual_rhs = next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kReverse,
+                                                                                    DesignEntity::kProgLine);
     CHECK(TestUtils::AreVectorsEqual(actual_rhs, expected_rhs));
     std::vector<std::tuple<Entity*, Entity*>> expected_all_p = {{s2, s1}, {s3, s1}, {s4, s1}, {s5, s1}, {s6, s1},
                                                                 {s2, s2}, {s3, s2}, {s4, s2}, {s5, s2}, {s6, s2},
@@ -288,7 +304,9 @@ TEST_CASE("2.PKB.NextTExtractor basic conditions") {
                                                                 {s2, s4}, {s3, s4}, {s4, s4}, {s5, s4}, {s6, s4},
                                                                 {s2, s5}, {s3, s5}, {s4, s5}, {s5, s5}, {s6, s5}};
     std::vector<std::tuple<Entity*, Entity*>>
-        actual_all_p = next_t_extractor.GetRelationshipByTypes(RelDirection::kReverse);
+        actual_all_p = next_t_extractor.GetRelationshipByTypes(RelDirection::kReverse,
+                                                               DesignEntity::kProgLine,
+                                                               DesignEntity::kProgLine);
     CHECK(TestUtils::AreVectorsEqual(actual_all_p, expected_all_p));
   }
 
@@ -316,7 +334,8 @@ TEST_CASE("2.PKB.NextTExtractor basic conditions") {
     NextTExtractor next_t_extractor(proc_list, stmt_list);
 
     std::vector<Entity*> expected_s1 = {s1, s2, s3};
-    std::vector<Entity*> actual_lhs = next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kForward);
+    std::vector<Entity*> actual_lhs = next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kForward,
+                                                                                    DesignEntity::kProgLine);
     CHECK(TestUtils::AreVectorsEqual(actual_lhs, expected_s1));
     std::vector<Entity*> actual_s2 = next_t_extractor.GetRelationship(RelDirection::kReverse, 2, proc_list);
     CHECK(TestUtils::AreVectorsEqual(actual_s2, expected_s1));
@@ -406,14 +425,17 @@ TEST_CASE("2.PKB.NextTExtractor basic conditions") {
     std::vector<Entity*> actual_s3 = next_t_extractor.GetRelationship(RelDirection::kForward, 3, proc_list);
     CHECK(TestUtils::AreVectorsEqual(actual_s3, expected_s3));
     std::vector<Entity*> expected_lhs = {s1, s2, s3, s5};
-    std::vector<Entity*> actual_lhs = next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kForward);
+    std::vector<Entity*> actual_lhs = next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kForward,
+                                                                                    DesignEntity::kProgLine);
     CHECK(TestUtils::AreVectorsEqual(actual_lhs, expected_lhs));
     std::vector<std::tuple<Entity*, Entity*>> expected_all = {{s1, s2}, {s1, s3}, {s1, s1},
                                                               {s2, s2}, {s2, s3}, {s2, s1},
                                                               {s3, s2}, {s3, s3}, {s3, s1},
                                                               {s5, s6}, {s5, s7}};
     std::vector<std::tuple<Entity*, Entity*>>
-        actual_all = next_t_extractor.GetRelationshipByTypes(RelDirection::kForward);
+        actual_all = next_t_extractor.GetRelationshipByTypes(RelDirection::kForward,
+                                                             DesignEntity::kProgLine,
+                                                             DesignEntity::kProgLine);
     CHECK(TestUtils::AreVectorsEqual(actual_all, expected_all));
 
     std::vector<Entity*> expected_p1 = {s1, s2, s3};
@@ -431,14 +453,17 @@ TEST_CASE("2.PKB.NextTExtractor basic conditions") {
     CHECK(TestUtils::AreVectorsEqual(actual_p7, expected_p6));
     CHECK(next_t_extractor.GetPrevTSize() == 5);
     std::vector<Entity*> expected_rhs = {s1, s2, s3, s6, s7};
-    std::vector<Entity*> actual_rhs = next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kReverse);
+    std::vector<Entity*> actual_rhs = next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kReverse,
+                                                                                    DesignEntity::kProgLine);
     CHECK(TestUtils::AreVectorsEqual(actual_rhs, expected_rhs));
     std::vector<std::tuple<Entity*, Entity*>> expected_all_p = {{s2, s1}, {s3, s1}, {s1, s1},
                                                                 {s2, s2}, {s3, s2}, {s1, s2},
                                                                 {s2, s3}, {s3, s3}, {s1, s3},
                                                                 {s6, s5}, {s7, s5}};
     std::vector<std::tuple<Entity*, Entity*>>
-        actual_all_p = next_t_extractor.GetRelationshipByTypes(RelDirection::kReverse);
+        actual_all_p = next_t_extractor.GetRelationshipByTypes(RelDirection::kReverse,
+                                                               DesignEntity::kProgLine,
+                                                               DesignEntity::kProgLine);
     CHECK(TestUtils::AreVectorsEqual(actual_all_p, expected_all_p));
   }
 }
@@ -542,14 +567,17 @@ TEST_CASE("2.PKB.NextTExtractor nested containers") {
     CHECK(TestUtils::AreVectorsEqual(actual_p8, expected_p8));
     CHECK(next_t_extractor.GetPrevTSize() == 7);
     std::vector<Entity*> expected_rhs = {s2, s3, s4, s5, s6, s7, s8};
-    std::vector<Entity*> actual_rhs = next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kReverse);
+    std::vector<Entity*> actual_rhs = next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kReverse,
+                                                                                    DesignEntity::kProgLine);
     CHECK(TestUtils::AreVectorsEqual(actual_rhs, expected_rhs));
     std::vector<std::tuple<Entity*, Entity*>> expected_all_p = {{s2, s1}, {s3, s1}, {s4, s1}, {s5, s1}, {s6, s1},
                                                                 {s7, s1}, {s8, s1}, {s3, s2}, {s4, s2}, {s5, s2},
                                                                 {s6, s2}, {s8, s2}, {s8, s3}, {s8, s5}, {s8, s6},
                                                                 {s8, s7}, {s5, s4}, {s6, s4}, {s8, s4}};
     std::vector<std::tuple<Entity*, Entity*>>
-        actual_all_p = next_t_extractor.GetRelationshipByTypes(RelDirection::kReverse);
+        actual_all_p = next_t_extractor.GetRelationshipByTypes(RelDirection::kReverse,
+                                                               DesignEntity::kProgLine,
+                                                               DesignEntity::kProgLine);
     CHECK(TestUtils::AreVectorsEqual(actual_all_p, expected_all_p));
 
     std::vector<Entity*> expected_s1 = {s2, s3, s4, s5, s6, s7, s8};
@@ -586,10 +614,13 @@ TEST_CASE("2.PKB.NextTExtractor nested containers") {
                                                               {s2, s6}, {s2, s8}, {s3, s8}, {s5, s8}, {s6, s8},
                                                               {s7, s8}, {s4, s5}, {s4, s6}, {s4, s8}};
     std::vector<std::tuple<Entity*, Entity*>>
-        actual_all = next_t_extractor.GetRelationshipByTypes(RelDirection::kForward);
+        actual_all = next_t_extractor.GetRelationshipByTypes(RelDirection::kForward,
+                                                             DesignEntity::kProgLine,
+                                                             DesignEntity::kProgLine);
     CHECK(TestUtils::AreVectorsEqual(actual_all, expected_all));
     std::vector<Entity*> expected_lhs = {s1, s2, s3, s4, s5, s6, s7};
-    std::vector<Entity*> actual_lhs = next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kForward);
+    std::vector<Entity*> actual_lhs = next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kForward,
+                                                                                    DesignEntity::kProgLine);
     CHECK(TestUtils::AreVectorsEqual(actual_lhs, expected_lhs));
   }
 
@@ -652,7 +683,8 @@ TEST_CASE("2.PKB.NextTExtractor nested containers") {
     CHECK(TestUtils::AreVectorsEqual(actual_s5, expected_s1));
     CHECK(next_t_extractor.GetNextTSize() == 5);
     std::vector<Entity*> expected_lhs = {s1, s2, s3, s4, s5};
-    std::vector<Entity*> actual_lhs = next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kForward);
+    std::vector<Entity*> actual_lhs = next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kForward,
+                                                                                    DesignEntity::kProgLine);
     CHECK(TestUtils::AreVectorsEqual(actual_lhs, expected_lhs));
 
     std::vector<Entity*> expected_p1 = {s1, s2, s3, s4, s5};
@@ -670,7 +702,8 @@ TEST_CASE("2.PKB.NextTExtractor nested containers") {
     CHECK(TestUtils::AreVectorsEqual(actual_p6, expected_p1));
     CHECK(next_t_extractor.GetPrevTSize() == 6);
     std::vector<Entity*> expected_rhs = {s1, s2, s3, s4, s5, s6};
-    std::vector<Entity*> actual_rhs = next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kReverse);
+    std::vector<Entity*> actual_rhs = next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kReverse,
+                                                                                    DesignEntity::kProgLine);
     CHECK(TestUtils::AreVectorsEqual(actual_rhs, expected_rhs));
   }
 
@@ -776,7 +809,8 @@ TEST_CASE("2.PKB.NextTExtractor nested containers") {
     CHECK(TestUtils::AreVectorsEqual(actual_p12, expected_p12));
     CHECK(next_t_extractor.GetPrevTSize() == 11);
     std::vector<Entity*> expected_rhs = {s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12};
-    std::vector<Entity*> actual_rhs = next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kReverse);
+    std::vector<Entity*> actual_rhs = next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kReverse,
+                                                                                    DesignEntity::kProgLine);
     CHECK(TestUtils::AreVectorsEqual(actual_rhs, expected_rhs));
 
     std::vector<Entity*> expected_s1 = {s2, s3, s4, s5, s6, s7};
@@ -823,7 +857,8 @@ TEST_CASE("2.PKB.NextTExtractor nested containers") {
     CHECK_FALSE(next_t_extractor.HasRelationship(RelDirection::kForward, 12, 1));
     CHECK_FALSE(next_t_extractor.HasRelationship(RelDirection::kForward, 2, 5));
     std::vector<Entity*> expected_lhs = {s1, s2, s3, s5, s6, s7, s8, s9, s10, s11};
-    std::vector<Entity*> actual_lhs = next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kForward);
+    std::vector<Entity*> actual_lhs = next_t_extractor.GetFirstEntityOfRelationship(RelDirection::kForward,
+                                                                                    DesignEntity::kProgLine);
     CHECK(TestUtils::AreVectorsEqual(actual_lhs, expected_lhs));
   }
 }
