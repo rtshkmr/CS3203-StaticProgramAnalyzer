@@ -245,17 +245,17 @@ std::pair<bool, bool> TraverseNormalBlockForAffects(Cluster* child,
   // =================================== HANDLE CHILDREN THAT ARE SIMPLE BLOCKS =======================
 //  assert(child->GetClusterTag() == ClusterTag::kNormalBlock);
   bool child_does_not_modify_var = true;
-  bool is_second_stmt_checked = false;
+  bool is_only_second_stmt_modifying = false;
   auto child_range = child->GetStartEndRange();
   for (int stmt_num = child_range.first;
        stmt_num <= std::min(child_range.second, target_range.second);
        stmt_num++) { // bring this inside
     if (stmt_num <= target_range.first) continue; // skip what you can
     child_does_not_modify_var = !pkb->HasRelationship(PKBRelRefs::kModifies, std::to_string(stmt_num), lhs_var);
-    is_second_stmt_checked = (stmt_num == target_range.second);
+    is_only_second_stmt_modifying = (!child_does_not_modify_var && stmt_num == target_range.second);
     if (!child_does_not_modify_var) break; // break this for loop for normal block if child actually modifies var
   }
-  return std::make_pair(child_does_not_modify_var, is_second_stmt_checked);
+  return std::make_pair(child_does_not_modify_var, is_only_second_stmt_modifying);
 //      ========================  END OF TRAVERSING NORMAL BLOCK FOR AFFECTS =============
 }
 
