@@ -1,6 +1,7 @@
 #include <cassert>
 #include <utility>
 #include "NextTExtractor.h"
+#include "model/CFG.h"
 
 NextTExtractor::NextTExtractor(PKB* pkb) {
   pkb_ = pkb;
@@ -140,13 +141,13 @@ std::vector<Entity*> NextTExtractor::GetRel(int target,
   if (is_out_of_bounds) {
     return std::vector<Entity*>{};
   } else if (map_to_populate_->count(stmt_list[target - 1]) == 1) {
-    return ltov(*map_to_populate_->find(stmt_list[target - 1])->second);
+    return ConvertListToVector(*map_to_populate_->find(stmt_list[target - 1])->second);
   }
 
   Cluster* proc_cluster = GetProcCluster(proc_list, target);
   if (proc_cluster) {
     Cluster* t_cluster = GetTargetCluster(proc_cluster, target);
-    return ltov(GetRelFromCluster(t_cluster, target));
+    return ConvertListToVector(GetRelFromCluster(t_cluster, target));
   }
   return std::vector<Entity*>{};
 }
@@ -340,6 +341,7 @@ void NextTExtractor::AddRelationshipsWithDup(Statement* first_arg, const std::li
   first_args_->push_back(first_arg);
 }
 
+//// todo: deprecate this, use Program::GetProcClusterForLineNum instead @jx
 Cluster* NextTExtractor::GetProcCluster(const std::vector<Procedure*> &proc_list, int target) {
   for (Procedure* proc: proc_list) {  // todo: optimise finding procedure of target stmt
     auto* proc_cluster = const_cast<Cluster*>(proc->GetClusterRoot());
@@ -401,11 +403,9 @@ std::list<Statement*>* NextTExtractor::MakeUniqueList(int s1_num, const std::lis
   return new_list;
 }
 
-std::vector<Entity*> NextTExtractor::ltov(std::list<Statement*> l) {
-  std::vector<Entity*> v;
-  v.reserve(l.size());
-  std::copy(std::begin(l), std::end(l), std::back_inserter(v));
-  return v;
+std::vector<Entity*> NextTExtractor::ConvertListToVector(std::list<Statement*> list) {
+  std::vector<Entity*> vector {std::make_move_iterator(std::begin(list)), std::make_move_iterator(std::end(list))};
+  return vector;
 }
 
 void NextTExtractor::PopulateAllNextT(const std::vector<Procedure*> &proc_list) {

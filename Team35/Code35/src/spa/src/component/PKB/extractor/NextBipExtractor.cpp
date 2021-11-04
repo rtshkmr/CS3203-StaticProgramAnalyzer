@@ -2,6 +2,7 @@
 
 #include <utility>
 #include <util/Utility.h>
+#include "model/CFG.h"
 
 /**
  * This class extracts all NextBip in the first query and populates the pkb.

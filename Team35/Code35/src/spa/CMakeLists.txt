@@ -43,17 +43,17 @@ add_library(spa ${srcs} ${headers}
         src/util/util.h
         src/util/TimeUtil.cpp src/util/TimeUtil.h
         ../unit_testing/utils/PKBStub.cpp ../unit_testing/utils/PKBStub.h src/model/CFG.cpp src/model/CFG.h
-        src/component/PKB/RuntimeExtractor.cpp src/component/PKB/RuntimeExtractor.h
-        src/component/PKB/NextTExtractor.cpp src/component/PKB/NextTExtractor.h
+        src/component/PKB/extractor/RuntimeExtractor.cpp src/component/PKB/extractor/RuntimeExtractor.h
+        src/component/PKB/extractor/NextTExtractor.cpp src/component/PKB/extractor/NextTExtractor.h
         src/component/SourceProcessor/Extractors/NextExtractor.cpp src/component/SourceProcessor/Extractors/NextExtractor
         src/component/PKB/DBManager.cpp src/component/PKB/DBManager.h
-        src/component/PKB/AffectsExtractor.cpp src/component/PKB/AffectsExtractor.h
-        src/component/PKB/AffectsTExtractor.cpp src/component/PKB/AffectsTExtractor.h
+        src/component/PKB/extractor/AffectsExtractor.cpp src/component/PKB/extractor/AffectsExtractor.h
+        src/component/PKB/extractor/AffectsTExtractor.cpp src/component/PKB/extractor/AffectsTExtractor.h
+        src/util/Utility.cpp src/util/Utility.h
         src/util/Utility.cpp src/util/Utility.h src/component/PKB/extractor/NextBipExtractor.cpp src/component/PKB/extractor/NextBipExtractor.h
         src/component/SourceProcessor/Extractors/TransitiveExtractor.h
         src/component/SourceProcessor/Extractors/VariableTExtractor.cpp src/component/SourceProcessor/Extractors/VariableTExtractor.h
         src/component/PKB/extractor/NextBipTExtractor.cpp src/component/PKB/extractor/NextBipTExtractor.h src/component/PKB/extractor/RuntimeColleague.h src/component/PKB/extractor/RuntimeMediator.h)
-
 
 # this makes the headers accessible for other projects which uses spa lib
 target_include_directories(spa PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)

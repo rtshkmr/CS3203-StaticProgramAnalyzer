@@ -161,7 +161,7 @@ VariableName::VariableName(std::string vName) {
  * Gets the name of the variable.
  * @return [Not Null] The variable name
  */
-std::string VariableName::getName() {
+std::string VariableName::GetName() const{
   return name_;
 }
 

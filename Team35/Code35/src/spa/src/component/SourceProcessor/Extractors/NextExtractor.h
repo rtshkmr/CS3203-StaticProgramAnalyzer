@@ -2,6 +2,7 @@
 #define AUTOTESTER_CODE35_SRC_SPA_SRC_COMPONENT_SOURCEPROCESSOR_EXTRACTORS_NEXTEXTRACTOR_H_
 
 #include <datatype/Deliverable.h>
+#include "model/CFG.h"
 
 class NextExtractor {
  public:

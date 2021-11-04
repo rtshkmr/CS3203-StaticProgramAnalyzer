@@ -75,7 +75,7 @@ bool ClauseCommandExecutor::HasAssignPatternRelationship(Entity *assign_entity, 
 
   for (auto current_entity: intermediate_table) {
     AssignEntity *current_assign_entity = dynamic_cast<AssignEntity *>(current_entity);
-    Variable *current_variable_entity = current_assign_entity->GetVariable();
+    Variable *current_variable_entity = current_assign_entity->GetVariableObj();
     if (current_assign_entity == assign_entity && variable_entity == current_variable_entity &&
         HasExpressionMatch(pattern, current_assign_entity)) {
       has_relationship = true;
@@ -328,11 +328,11 @@ bool ClauseCommandExecutor::HasPatternValueMatch(Entity *stmt_entity_in_table, s
 
   if (typeid(*stmt_entity_in_table) == typeid(AssignEntity)) {
     AssignEntity *assign_entity = dynamic_cast<AssignEntity *>(stmt_entity_in_table);
-    std::string variable_value_in_table = const_cast<VariableName*>(variable_to_check[0]->GetName())->getName();
+    std::string variable_value_in_table = const_cast<VariableName*>(variable_to_check[0]->GetVariableName())->GetName();
     return (value == "_" || value == variable_value_in_table) && HasExpressionMatch(pattern, assign_entity);
   } else {
     for (auto variable : variable_to_check) {
-      std::string variable_value_in_table = const_cast<VariableName*>(variable->GetName())->getName();
+      std::string variable_value_in_table = const_cast<VariableName*>(variable->GetVariableName())->GetName();
       if (value == "_" || variable_value_in_table == value) return true;
     }
     return false;
@@ -343,7 +343,7 @@ std::vector<Variable *> ClauseCommandExecutor::RetrieveVariablesFromStmt(Entity 
   std::vector<Variable *> variable_to_check;
   if (typeid(*stmt_entity) == typeid(AssignEntity)) {
     AssignEntity *assign_entity = dynamic_cast<AssignEntity *>(stmt_entity);
-    variable_to_check.push_back(assign_entity->GetVariable());
+    variable_to_check.push_back(assign_entity->GetVariableObj());
   } else if (typeid(*stmt_entity) == typeid(IfEntity)) {
     IfEntity *if_entity = dynamic_cast<IfEntity *>(stmt_entity);
     for (auto variable : if_entity->GetControlVariables()) {
