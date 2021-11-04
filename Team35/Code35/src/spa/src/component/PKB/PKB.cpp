@@ -336,3 +336,4 @@ std::unordered_map<Entity*,
   }
   return entity_map;
 }
+
