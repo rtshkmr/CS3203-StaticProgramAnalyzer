@@ -100,13 +100,15 @@ class AssignEntity : public Statement {
                std::vector<Variable*> expr_variables,
                std::vector<Constant*> expr_constants);
 
-  Variable* GetVariable();
+  Variable* GetVariableObj();
+  std::string GetVariableString();
 
   AssignmentExpression* GetAssignmentExpr();
 
   std::vector<Variable*> GetControlVariables();
 
   std::vector<Constant*> GetExpressionConstants();
+
 };
 
 /**

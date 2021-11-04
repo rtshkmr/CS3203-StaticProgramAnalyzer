@@ -1,5 +1,9 @@
 #include "Deliverable.h"
 
+void Deliverable::AddProcedure(Procedure* proc) {
+  proc_list_.push_back(proc);
+}
+
 void Deliverable::AddStatement(Statement* stmt) {
   stmt_list_.push_back(stmt);
 }
@@ -113,20 +117,6 @@ void Deliverable::AddCallsTransitiveRelationshipForList(Procedure* p1, std::list
 void Deliverable::AddNextRelationship(Statement* s1, Statement* s2) {
   AddRelationshipToMap(&next_hash_, s1, s2);
   AddRelationshipToMap(&previous_hash_, s2, s1);
-}
-
-template <typename X, typename Y>
-void Deliverable::AddRelationshipToMap(std::unordered_map<X, std::list<Y>*>* map, X key, Y value) {
-  if (map->count(key)) {
-    std::list<Y>* values = map->find(key)->second;
-    if (std::find(values->begin(), values->end(), value) == values->end()) {
-      values->push_back(value);
-    }
-  } else {
-    auto* list = new std::list<Y>();
-    list->push_back(value);
-    map->insert(std::make_pair(key, list));
-  }
 }
 
 void Deliverable::SetProgram(Program* program) {

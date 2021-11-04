@@ -55,15 +55,16 @@ TEST_CASE("1.FollowsTExtractor.Extract FollowsT basic conditions") {
     auto* proc1 = new Procedure(new ProcedureName("proc1"));
     TestUtils::AddStatementList(proc1, {assign_1_, assign_3_, read_x_, print_y_, assign_4_, assign_5_});
 
-    deliverable->GetProcList()->push_back(proc1);
     deliverable->AddFollowRelationship(assign_1_, assign_3_);
     deliverable->AddFollowRelationship(assign_3_, read_x_);
     deliverable->AddFollowRelationship(read_x_, print_y_);
     deliverable->AddFollowRelationship(print_y_, assign_4_);
     deliverable->AddFollowRelationship(assign_4_, assign_5_);
 
-    auto statement_extractor = TransitiveExtractor<Statement>(deliverable);
-    statement_extractor.Extract(&deliverable->follows_T_hash_, &deliverable->follow_hash_, TransitiveRel::kFollows);
+    auto statement_extractor = TransitiveExtractor<Statement>();
+    statement_extractor.Extract(deliverable->GetFollowsTMap(),
+                                deliverable->GetFollowedByTMap(),
+                                deliverable->GetFollowsMap());
 
     // Follows*(1, _)
     std::list<Statement*>
@@ -111,15 +112,16 @@ TEST_CASE("1.FollowsTExtractor.Extract FollowsT basic conditions") {
     TestUtils::AddStatementList(if_1_, {assign_1_, read_y_, assign_3_});
     if_1_->SetElseEntity(else_1_);
 
-    deliverable->GetProcList()->push_back(proc2);
     deliverable->AddFollowRelationship(assign_1_, read_y_);
     deliverable->AddFollowRelationship(read_y_, assign_3_);
     deliverable->AddFollowRelationship(if_1_, print_y_);
     deliverable->AddFollowRelationship(assign_5_, assign_6_);
     deliverable->AddFollowRelationship(assign_6_, assign_7_);
 
-    auto statement_extractor = TransitiveExtractor<Statement>(deliverable);
-    statement_extractor.Extract(&deliverable->follows_T_hash_, &deliverable->follow_hash_, TransitiveRel::kFollows);
+    auto statement_extractor = TransitiveExtractor<Statement>();
+    statement_extractor.Extract(deliverable->GetFollowsTMap(),
+                                deliverable->GetFollowedByTMap(),
+                                deliverable->GetFollowsMap());
 
     // Follows*(1, _)
     std::list<Statement*> expected_follows_1 = std::list<Statement*>{print_y_};
@@ -156,13 +158,14 @@ TEST_CASE("1.FollowsTExtractor.Extract FollowsT basic conditions") {
     TestUtils::AddStatementList(while_3_, {read_z_, assign_5_});
     TestUtils::AddStatementList(proc2, {assign_1_, print_i_, while_3_});
 
-    deliverable->GetProcList()->push_back(proc2);
     deliverable->AddFollowRelationship(assign_1_, print_i_);
     deliverable->AddFollowRelationship(print_i_, while_3_);
     deliverable->AddFollowRelationship(read_z_, assign_5_);
 
-    auto statement_extractor = TransitiveExtractor<Statement>(deliverable);
-    statement_extractor.Extract(&deliverable->follows_T_hash_, &deliverable->follow_hash_, TransitiveRel::kFollows);
+    auto statement_extractor = TransitiveExtractor<Statement>();
+    statement_extractor.Extract(deliverable->GetFollowsTMap(),
+                                deliverable->GetFollowedByTMap(),
+                                deliverable->GetFollowsMap());
 
     // Follows*(1, _)
     std::list<Statement*> expected_follows_1 = std::list<Statement*>{print_i_, while_3_};
@@ -199,15 +202,15 @@ TEST_CASE("1.FollowsTExtractor.Extract FollowsT basic conditions") {
     TestUtils::AddStatementList(proc3, {assign_1_, call4, print_y_});
     TestUtils::AddStatementList(proc4, {assign_4_, assign_5_, assign_6_});
 
-    deliverable->GetProcList()->push_back(proc3);
-    deliverable->GetProcList()->push_back(proc4);
     deliverable->AddFollowRelationship(assign_1_, call4);
     deliverable->AddFollowRelationship(call4, print_y_);
     deliverable->AddFollowRelationship(assign_4_, assign_5_);
     deliverable->AddFollowRelationship(assign_5_, assign_6_);
 
-    auto statement_extractor = TransitiveExtractor<Statement>(deliverable);
-    statement_extractor.Extract(&deliverable->follows_T_hash_, &deliverable->follow_hash_, TransitiveRel::kFollows);
+    auto statement_extractor = TransitiveExtractor<Statement>();
+    statement_extractor.Extract(deliverable->GetFollowsTMap(),
+                                deliverable->GetFollowedByTMap(),
+                                deliverable->GetFollowsMap());
 
     // Follows*(1, _)
     std::list<Statement*> expected_follows_1 = std::list<Statement*>{call4, print_y_};
@@ -308,7 +311,6 @@ TEST_CASE("1.FollowsTExtractor.Extract FollowsT nested containers") {
     if_1_->SetElseEntity(else_1_);
     TestUtils::AddStatementList(proc2, {if_1_, print_n_});
 
-    deliverable->GetProcList()->push_back(proc2);
     deliverable->AddFollowRelationship(if_1_, print_n_);
     deliverable->AddFollowRelationship(assign_1_, read_x_);
     deliverable->AddFollowRelationship(read_x_, assign_2_);
@@ -331,8 +333,10 @@ TEST_CASE("1.FollowsTExtractor.Extract FollowsT nested containers") {
     deliverable->AddFollowRelationship(read_z_, read_i_);
     deliverable->AddFollowRelationship(read_i_, read_n_);
 
-    auto statement_extractor = TransitiveExtractor<Statement>(deliverable);
-    statement_extractor.Extract(&deliverable->follows_T_hash_, &deliverable->follow_hash_, TransitiveRel::kFollows);
+    auto statement_extractor = TransitiveExtractor<Statement>();
+    statement_extractor.Extract(deliverable->GetFollowsTMap(),
+                                deliverable->GetFollowedByTMap(),
+                                deliverable->GetFollowsMap());
 
     // Follows*(1, _)
     std::list<Statement*> expected_follows_1 = std::list<Statement*>{print_n_};
@@ -399,7 +403,6 @@ TEST_CASE("1.FollowsTExtractor.Extract FollowsT nested containers") {
     TestUtils::AddStatementList(while_1_, {assign_1_, assign_2_, while_2_, read_y_});
     TestUtils::AddStatementList(proc3, {while_1_, read_z_});
 
-    deliverable->GetProcList()->push_back(proc3);
     deliverable->AddFollowRelationship(while_1_, read_z_);
     deliverable->AddFollowRelationship(assign_1_, assign_2_);
     deliverable->AddFollowRelationship(assign_2_, while_2_);
@@ -412,8 +415,10 @@ TEST_CASE("1.FollowsTExtractor.Extract FollowsT nested containers") {
     deliverable->AddFollowRelationship(assign_5_, assign_6_);
     deliverable->AddFollowRelationship(assign_6_, assign_7_);
 
-    auto statement_extractor = TransitiveExtractor<Statement>(deliverable);
-    statement_extractor.Extract(&deliverable->follows_T_hash_, &deliverable->follow_hash_, TransitiveRel::kFollows);
+    auto statement_extractor = TransitiveExtractor<Statement>();
+    statement_extractor.Extract(deliverable->GetFollowsTMap(),
+                                deliverable->GetFollowedByTMap(),
+                                deliverable->GetFollowsMap());
 
     // Follows*(1, _)
     std::list<Statement*> expected_follows_1 = std::list<Statement*>{read_z_};
@@ -464,8 +469,6 @@ TEST_CASE("1.FollowsTExtractor.Extract FollowsT nested containers") {
     TestUtils::AddStatementList(while_1_, {print_x_, print_y_, print_z_});
     TestUtils::AddStatementList(proc4, {if_4_, while_1_});
 
-    deliverable->GetProcList()->push_back(proc4);
-
     deliverable->AddFollowRelationship(if_4_, while_1_);
     deliverable->AddFollowRelationship(assign_1_, assign_2_);
     deliverable->AddFollowRelationship(assign_2_, assign_3_);
@@ -476,8 +479,10 @@ TEST_CASE("1.FollowsTExtractor.Extract FollowsT nested containers") {
     deliverable->AddFollowRelationship(print_x_, print_y_);
     deliverable->AddFollowRelationship(print_y_, print_z_);
 
-    auto statement_extractor = TransitiveExtractor<Statement>(deliverable);
-    statement_extractor.Extract(&deliverable->follows_T_hash_, &deliverable->follow_hash_, TransitiveRel::kFollows);
+    auto statement_extractor = TransitiveExtractor<Statement>();
+    statement_extractor.Extract(deliverable->GetFollowsTMap(),
+                                deliverable->GetFollowedByTMap(),
+                                deliverable->GetFollowsMap());
 
     // Follows*(1, _)
     std::list<Statement*> expected_follows_1 = std::list<Statement*>{while_1_};
@@ -544,8 +549,6 @@ TEST_CASE("1.FollowsTExtractor.Extract FollowsT nested containers") {
     if_2_->SetElseEntity(else_2_);
     TestUtils::AddStatementList(proc4, {if_1_, while_3_});
 
-    deliverable->GetProcList()->push_back(proc4);
-
     deliverable->AddFollowRelationship(if_1_, while_3_);
     deliverable->AddFollowRelationship(assign_1_, assign_2_);
     deliverable->AddFollowRelationship(assign_2_, while_1_);
@@ -569,8 +572,10 @@ TEST_CASE("1.FollowsTExtractor.Extract FollowsT nested containers") {
     deliverable->AddFollowRelationship(print_x_, print_y_);
     deliverable->AddFollowRelationship(print_y_, print_z_);
 
-    auto statement_extractor = TransitiveExtractor<Statement>(deliverable);
-    statement_extractor.Extract(&deliverable->follows_T_hash_, &deliverable->follow_hash_, TransitiveRel::kFollows);
+    auto statement_extractor = TransitiveExtractor<Statement>();
+    statement_extractor.Extract(deliverable->GetFollowsTMap(),
+                                deliverable->GetFollowedByTMap(),
+                                deliverable->GetFollowsMap());
 
     // Follows*(1, _)
     std::list<Statement*> expected_follows_1 = std::list<Statement*>{while_3_};

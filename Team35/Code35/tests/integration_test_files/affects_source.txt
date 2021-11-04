@@ -1,0 +1,23 @@
+procedure alpha1 {
+    x = 1;
+    if (i!=2) then {
+        x = a + 1;
+    } else {
+        a = b;
+    }
+    a = x;
+}
+
+procedure alpha2 {
+    x = 1;
+    call beta2;
+    a = x;
+}
+
+procedure beta2 {
+    if (i!=2) then {
+        x = a + 1;
+    } else {
+        a = b;
+    }
+}

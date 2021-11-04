@@ -41,9 +41,9 @@ TEST_CASE("1.EntityFactory.CreateEntity") {
     Entity* actual_read_entity = entity_factory.CreateEntity(read_tokens);
     auto* actual_casted_read = dynamic_cast<ReadEntity*>(actual_read_entity);
     auto* actual_read_var = actual_casted_read->GetVariable();
-    auto* actual_read_variable_name = const_cast<VariableName*>(actual_read_var->GetName());
+    auto* actual_read_variable_name = const_cast<VariableName*>(actual_read_var->GetVariableName());
 
-    CHECK(actual_read_variable_name->getName() == "x");
+    CHECK(actual_read_variable_name->GetName() == "x");
 
     Entity* duplicate_read = entity_factory.CreateEntity(read_tokens);
     auto* dup_casted_read = dynamic_cast<ReadEntity*>(duplicate_read);
@@ -61,9 +61,9 @@ TEST_CASE("1.EntityFactory.CreateEntity") {
     Entity* actual_print_entity = entity_factory.CreateEntity(print_tokens);
     auto* actual_casted_print = dynamic_cast<PrintEntity*>(actual_print_entity);
     auto* actual_print_var = actual_casted_print->GetVariable();
-    auto* actual_print_variable_name = const_cast<VariableName*>(actual_print_var->GetName());
+    auto* actual_print_variable_name = const_cast<VariableName*>(actual_print_var->GetVariableName());
 
-    CHECK(actual_print_variable_name->getName() == "x");
+    CHECK(actual_print_variable_name->GetName() == "x");
 
     Entity* duplicate_print = entity_factory.CreateEntity(print_tokens);
     auto* dup_casted_print = dynamic_cast<PrintEntity*>(duplicate_print);
@@ -103,16 +103,16 @@ TEST_CASE("1.EntityFactory.CreateEntity") {
     };
     Entity* actual_assign_entity = entity_factory.CreateEntity(assign_tokens);
     auto* actual_casted_assign = dynamic_cast<AssignEntity*>(actual_assign_entity);
-    auto* actual_ass_var = actual_casted_assign->GetVariable();
-    auto* actual_assign_variable_name = const_cast<VariableName*>(actual_ass_var->GetName());
+    auto* actual_ass_var = actual_casted_assign->GetVariableObj();
+    auto* actual_assign_variable_name = const_cast<VariableName*>(actual_ass_var->GetVariableName());
     auto actual_assign_expr = actual_casted_assign->GetAssignmentExpr()->GetExpressionString();
 
-    CHECK(actual_assign_variable_name->getName() == "y");
+    CHECK(actual_assign_variable_name->GetName() == "y");
     CHECK(actual_assign_expr == "8");
 
     Entity* duplicate_ass = entity_factory.CreateEntity(assign_tokens);
     auto* dup_casted_ass = dynamic_cast<AssignEntity*>(duplicate_ass);
-    auto* dup_ass_var = dup_casted_ass->GetVariable();
+    auto* dup_ass_var = dup_casted_ass->GetVariableObj();
     CHECK(actual_ass_var == dup_ass_var);
   }
 

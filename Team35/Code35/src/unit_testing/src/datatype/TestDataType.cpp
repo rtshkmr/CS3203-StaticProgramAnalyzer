@@ -127,9 +127,9 @@ TEST_CASE("1.DataType.VariableName") {
     VariableName vn2 = VariableName("M");
     VariableName vn3 = VariableName("Unc13S00");
 
-    REQUIRE(vn.getName() == "helloW0r1d");
-    REQUIRE(vn2.getName() == "M");
-    REQUIRE(vn3.getName() == "Unc13S00");
+    REQUIRE(vn.GetName() == "helloW0r1d");
+    REQUIRE(vn2.GetName() == "M");
+    REQUIRE(vn3.GetName() == "Unc13S00");
     REQUIRE_THROWS_AS(VariableName(""), std::invalid_argument); //blank name
     REQUIRE_THROWS_AS(VariableName("          "), std::invalid_argument); //blank name with space
     REQUIRE_THROWS_AS(VariableName("!@#$"), std::invalid_argument); //name with symbols

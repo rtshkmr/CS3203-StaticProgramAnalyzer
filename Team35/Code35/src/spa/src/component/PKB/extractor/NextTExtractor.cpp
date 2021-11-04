@@ -1,20 +1,28 @@
 #include <cassert>
 #include <utility>
 #include "NextTExtractor.h"
+#include "model/CFG.h"
 
-void NextTExtractor::Delete() {}
-
-/**
- * Initializes next_t_array using a procedure list to get the total number of stmts in the program.
- */
-void NextTExtractor::Init(const std::vector<Statement*> &stmt_list) {
-  if (initialized_) return;
-  initialized_ = true;
-  stmt_list_ = stmt_list;
-
-  int total = stmt_list.size();
+NextTExtractor::NextTExtractor(PKB* pkb) {
+  pkb_ = pkb;
+  for (Entity* entity : pkb->GetDesignEntities(DesignEntity::kProcedure)) {
+    proc_list_.push_back(dynamic_cast<Procedure*>(entity));
+  }
+  for (Entity* entity : pkb->GetDesignEntities(DesignEntity::kStmt)) {
+    stmt_list_.push_back(dynamic_cast<Statement*>(entity));
+  }
+  int total = stmt_list_.size();
   next_t_2d_array_ = std::vector<std::vector<int>>(total, std::vector<int>(total));
 }
+
+NextTExtractor::NextTExtractor(std::vector<Procedure*> proc_list, std::vector<Statement*> stmt_list) {
+  proc_list_ = std::move(proc_list);
+  stmt_list_ = std::move(stmt_list);
+  int total = stmt_list_.size();
+  next_t_2d_array_ = std::vector<std::vector<int>>(total, std::vector<int>(total));
+}
+
+void NextTExtractor::Delete() {}
 
 /**
  * @return size of next_t_map
@@ -26,12 +34,10 @@ int NextTExtractor::GetNextTSize() {
 int NextTExtractor::GetPrevTSize() {
   return prev_t_map_.size();
 }
-
 /**
  * Extracts list of Next* of the target from the CFG. Caches Next* relationships for blocks traversed.
  *
  * @param target String of the statement number to look for.
- * @param proc_list List of procedures to get the target from.
  * @return List of Entities that are Next* of the target.
  *
  * pseudocode
@@ -41,14 +47,91 @@ int NextTExtractor::GetPrevTSize() {
  * return next* of recursed block
  * add list of next* to this block
  */
-std::vector<Entity*> NextTExtractor::GetNextT(int target,
-                                              const std::vector<Procedure*> &proc_list,
-                                              std::vector<Statement*> stmt_list) {
-  map_to_populate_ = &next_t_map_;
-  first_args_ = &next_t_lhs_stmts_;
-  rel_direction_ = RelDirection::kNext;
+std::vector<Entity*> NextTExtractor::GetRelationship(RelDirection dir, int target) {
+  rel_direction_ = dir;
+  if (dir == RelDirection::kForward) {
+    map_to_populate_ = &next_t_map_;
+    first_args_ = &next_t_lhs_stmts_;
+  } else {
+    map_to_populate_ = &prev_t_map_;
+    first_args_ = &next_t_rhs_stmts_;
+  }
+  return GetRel(target, proc_list_, stmt_list_);
+}
 
-  return GetRel(target, proc_list, std::move(stmt_list));
+/**
+ * Extracts list of Next* of the target from the CFG of the procedures provided in the proc_list.
+ *
+ * @param target String of the statement number to look for.
+ * @param proc_list List of procedures to get the target from.
+ * @return List of Entities that are Next* of the target.
+ */
+std::vector<Entity*> NextTExtractor::GetRelationship(RelDirection dir,
+                                                     int target,
+                                                     const std::vector<Procedure*> &proc_list) {
+  rel_direction_ = dir;
+  if (dir == RelDirection::kForward) {
+    map_to_populate_ = &next_t_map_;
+    first_args_ = &next_t_lhs_stmts_;
+  } else {
+    map_to_populate_ = &prev_t_map_;
+    first_args_ = &next_t_rhs_stmts_;
+  }
+  return GetRel(target, proc_list, stmt_list_);
+}
+
+/**
+ * Gets all Entities that can be on the LHS/RHS of the relationship, i.e. Next*(_, s).
+ * @return all Entities that can be on the LHS/RHS of the relationship.
+ */
+std::vector<Entity*> NextTExtractor::GetFirstEntityOfRelationship(RelDirection dir) {
+  if (dir == RelDirection::kReverse) {
+    if (!prev_t_populated_) {
+      PopulateAllPrevT(proc_list_);
+    }
+    return next_t_rhs_stmts_;
+  } else {
+    if (!next_t_populated_) {
+      PopulateAllNextT(proc_list_);
+    }
+    return next_t_lhs_stmts_;
+  }
+}
+
+std::vector<std::tuple<Entity*, Entity*>> NextTExtractor::GetRelationshipByTypes(RelDirection dir) {
+  return dir == RelDirection::kForward ? GetAllNextT() : GetAllPrevT();
+}
+
+bool NextTExtractor::HasRelationship(RelDirection dir) {
+  return pkb_->HasRelationship(PKBRelRefs::kNext);
+}
+
+bool NextTExtractor::HasRelationship(RelDirection dir, int target) {
+  return pkb_->HasRelationship(PKBRelRefs::kNext, std::to_string(target));
+}
+
+/**
+ * Returns true if Next*(first, second).
+ */
+bool NextTExtractor::HasRelationship(RelDirection dir, int first, int second) {
+  int total_stmt = stmt_list_.size();
+  if (first > total_stmt || first <= 0 || second > total_stmt || second <= 0) {
+    return false;
+  }
+  if (next_t_2d_array_[first - 1][second - 1] == 1) {
+    return true;
+  }
+
+  Cluster* proc_cluster = GetProcCluster(proc_list_, first);
+  if (proc_cluster) {
+    if (proc_cluster->CheckIfStmtNumInRange(second)) {
+      Cluster* t_cluster = GetTargetCluster(proc_cluster, first);
+      return HasNextTInFirstCluster(t_cluster, first, second);
+    } else {  // first and second not in the same procedure
+      return false;
+    }
+  }
+  return false;
 }
 
 std::vector<Entity*> NextTExtractor::GetRel(int target,
@@ -58,14 +141,13 @@ std::vector<Entity*> NextTExtractor::GetRel(int target,
   if (is_out_of_bounds) {
     return std::vector<Entity*>{};
   } else if (map_to_populate_->count(stmt_list[target - 1]) == 1) {
-    return ltov(*map_to_populate_->find(stmt_list[target - 1])->second);
+    return ConvertListToVector(*map_to_populate_->find(stmt_list[target - 1])->second);
   }
 
-  Init(stmt_list);
   Cluster* proc_cluster = GetProcCluster(proc_list, target);
   if (proc_cluster) {
     Cluster* t_cluster = GetTargetCluster(proc_cluster, target);
-    return ltov(GetRelFromCluster(t_cluster, target));
+    return ConvertListToVector(GetRelFromCluster(t_cluster, target));
   }
   return std::vector<Entity*>{};
 }
@@ -85,7 +167,7 @@ std::list<Statement*> NextTExtractor::GetRelFromCluster(Cluster* cluster, int ta
   } else {
     Cluster* cluster_head = nested_clusters.front();
     auto* head_block = dynamic_cast<Block*>(cluster_head);
-    if (head_block->isWhile) {
+    if (head_block && head_block->isWhile) {
       GetRelFromWhile(cluster, target);
     } else {
       Cluster* t_cluster = GetTargetCluster(cluster, target);
@@ -140,9 +222,9 @@ std::list<Statement*> NextTExtractor::MakeStmtList(int first_stmt, int last_stmt
 std::list<Block*> NextTExtractor::GetFollowingBlocksAfterWhile(Block* block) {
   std::list<Block*> following_blocks;
   for (Block* following_block: GetFollowingBlocks(block)) {
-    bool is_prev_block = rel_direction_ == RelDirection::kPrev
+    bool is_prev_block = rel_direction_ == RelDirection::kReverse
         && (following_block->GetStartEndRange().first < block->GetStartEndRange().first);
-    bool is_next_block = rel_direction_ == RelDirection::kNext
+    bool is_next_block = rel_direction_ == RelDirection::kForward
         && (following_block->GetStartEndRange().first != block->GetStartEndRange().first + 1);
     if (is_next_block || is_prev_block) {
       following_blocks.push_back(following_block);
@@ -189,7 +271,7 @@ std::list<Statement*> NextTExtractor::RecurseFollowingBlocks(Block* block, int t
 
 int NextTExtractor::GetBlockTarget(Block* block, int target) {
   std::pair<int, int> range = block->GetStartEndRange();
-  if (rel_direction_ == RelDirection::kNext) {
+  if (rel_direction_ == RelDirection::kForward) {
     return target < range.first ? range.first : target;
   } else {
     return target > range.second ? range.second : target;
@@ -197,21 +279,13 @@ int NextTExtractor::GetBlockTarget(Block* block, int target) {
 }
 
 std::set<Block*> NextTExtractor::GetFollowingBlocks(Block* block) {
-  if (rel_direction_ == RelDirection::kNext) {
-    return block->GetNextBlocks();
-  } else {
-    return block->GetPrevBlocks();
-  }
+  return rel_direction_ == RelDirection::kForward ? block->GetNextBlocks() : block->GetPrevBlocks();
 }
 
 void NextTExtractor::AddRelationshipsFollowingBlock(const std::list<Statement*> &rel_stmts, Block* block) {
   int block_end;
   std::pair<int, int> range = block->GetStartEndRange();
-  if (rel_direction_ == RelDirection::kNext) {
-    block_end = range.second;
-  } else {
-    block_end = range.first;
-  }
+  block_end = rel_direction_ == RelDirection::kForward ? range.second : range.first;
   if (GetFollowingBlocks(block).size() >= 2) { // if block because while was handled separately
     AddRelationshipsWithDup(stmt_list_[block_end - 1], rel_stmts);
   } else {
@@ -221,7 +295,7 @@ void NextTExtractor::AddRelationshipsFollowingBlock(const std::list<Statement*> 
 
 void NextTExtractor::AddRelationshipsInBlock(std::list<Statement*> rel_stmts, Block* block, int target) {
   std::pair<int, int> range = block->GetStartEndRange();
-  if (rel_direction_ == RelDirection::kNext) {
+  if (rel_direction_ == RelDirection::kForward) {
     for (int i = range.second - 1; i >= target; --i) {
       rel_stmts.push_back(stmt_list_[i]);
       AddRelationships(stmt_list_[i - 1], rel_stmts);
@@ -235,7 +309,7 @@ void NextTExtractor::AddRelationshipsInBlock(std::list<Statement*> rel_stmts, Bl
 }
 
 std::list<Statement*> NextTExtractor::AddBlockStmtToRelList(std::list<Statement*> rel_list, Block* block) {
-  if (rel_direction_ == RelDirection::kNext) {
+  if (rel_direction_ == RelDirection::kForward) {
     rel_list.push_back(stmt_list_[block->GetStartEndRange().first - 1]);
   } else {
     rel_list.push_back(stmt_list_[block->GetStartEndRange().second - 1]);
@@ -267,6 +341,7 @@ void NextTExtractor::AddRelationshipsWithDup(Statement* first_arg, const std::li
   first_args_->push_back(first_arg);
 }
 
+//// todo: deprecate this, use Program::GetProcClusterForLineNum instead @jx
 Cluster* NextTExtractor::GetProcCluster(const std::vector<Procedure*> &proc_list, int target) {
   for (Procedure* proc: proc_list) {  // todo: optimise finding procedure of target stmt
     auto* proc_cluster = const_cast<Cluster*>(proc->GetClusterRoot());
@@ -328,53 +403,29 @@ std::list<Statement*>* NextTExtractor::MakeUniqueList(int s1_num, const std::lis
   return new_list;
 }
 
-std::vector<Entity*> NextTExtractor::ltov(std::list<Statement*> l) {
-  std::vector<Entity*> v;
-  v.reserve(l.size());
-  std::copy(std::begin(l), std::end(l), std::back_inserter(v));
-  return v;
-}
-
-/**
- * Gets all Entities that can be on the LHS of the relationship, i.e. Next*(s, _).
- * @param proc_list Full list of procedures.
- * @param stmt_list Full list of statements.
- * @return all Entities that can be on the LHS of the relationship.
- */
-std::vector<Entity*> NextTExtractor::GetAllNextTLHS(const std::vector<Procedure*> &proc_list,
-                                                    const std::vector<Statement*> &stmt_list) {
-  if (next_t_populated_) {
-    return next_t_lhs_stmts_;
-  }
-  Init(stmt_list);
-
-  PopulateAllNextT(proc_list);
-  return next_t_lhs_stmts_;
+std::vector<Entity*> NextTExtractor::ConvertListToVector(std::list<Statement*> list) {
+  std::vector<Entity*> vector {std::make_move_iterator(std::begin(list)), std::make_move_iterator(std::end(list))};
+  return vector;
 }
 
 void NextTExtractor::PopulateAllNextT(const std::vector<Procedure*> &proc_list) {
   for (Procedure* proc: proc_list) {
     int first_stmt = const_cast<Cluster*>(proc->GetClusterRoot())->GetStartEndRange().first;
-    GetNextT(first_stmt, {proc}, stmt_list_);
+    GetRelationship(RelDirection::kForward, first_stmt, {proc});
   }
   next_t_populated_ = true;
 }
 
 /**
  * Gets all Entity pairs that are in a Next* relationship, i.e. Next*(s1, s2).
- * @param proc_list Full list of procedures.
- * @param stmt_list Full list of statements.
  * @return all Entity pairs that are in a Next* relationship.
  */
-std::vector<std::tuple<Entity*, Entity*>> NextTExtractor::GetAllNextT(const std::vector<Procedure*> &proc_list,
-                                                                      const std::vector<Statement*> &stmt_list) {
+std::vector<std::tuple<Entity*, Entity*>> NextTExtractor::GetAllNextT() {
   if (got_all_next_prev_t_) {
     return all_next_t_;
   }
-  Init(stmt_list);
-
   if (!next_t_populated_) {
-    PopulateAllNextT(proc_list);
+    PopulateAllNextT(proc_list_);
   }
   for (auto pair: next_t_map_) {
     for (Statement* stmt: *pair.second) {
@@ -384,34 +435,6 @@ std::vector<std::tuple<Entity*, Entity*>> NextTExtractor::GetAllNextT(const std:
   }
   got_all_next_prev_t_ = true;
   return all_next_t_;
-}
-
-/**
- * Returns true if Next*(first, second).
- */
-bool NextTExtractor::HasNextT(int first,
-                              int second,
-                              const std::vector<Procedure*> &proc_list,
-                              const std::vector<Statement*> &stmt_list) {
-  int total_stmt = stmt_list.size();
-  if (first > total_stmt || first <= 0 || second > total_stmt || second <= 0) {
-    return false;
-  }
-  Init(stmt_list);
-  if (next_t_2d_array_[first - 1][second - 1] == 1) {
-    return true;
-  }
-
-  Cluster* proc_cluster = GetProcCluster(proc_list, first);
-  if (proc_cluster) {
-    if (proc_cluster->CheckIfStmtNumInRange(second)) {
-      Cluster* t_cluster = GetTargetCluster(proc_cluster, first);
-      return HasNextTInFirstCluster(t_cluster, first, second);
-    } else {  // first and second not in the same procedure
-      return false;
-    }
-  }
-  return false;
 }
 
 /**
@@ -473,7 +496,7 @@ bool NextTExtractor::HasNextTInCluster(Cluster* cluster, int first, int second) 
     return HasNextTByTraversal(dynamic_cast<Block*>(cluster), first, second);
   } else {
     auto* first_block = dynamic_cast<Block*>(nested_clusters.front());
-    if (first_block->isWhile) {
+    if (first_block && first_block->isWhile) {
       if (cluster->CheckIfStmtNumInRange(second)) {
         next_t_2d_array_[first - 1][second - 1] = 1;
         return true;
@@ -503,6 +526,9 @@ bool NextTExtractor::HasNextTByTraversal(Block* block, int first, int second) {
       next_t_2d_array_[first - 1][block->GetStartEndRange().first - 1] = 1;
     }
     for (Block* next_block: block->GetNextBlocks()) {
+      if (next_block->GetStartEndRange().first == -1) {
+        continue;
+      }
       if (next_t_2d_array_[first - 1][next_block->GetStartEndRange().first - 1] != 1) {
         result = result || HasNextTByTraversal(next_block, first, second);
       }
@@ -511,63 +537,24 @@ bool NextTExtractor::HasNextTByTraversal(Block* block, int first, int second) {
   }
 }
 
-/**
- * Extracts list of Next* that has target on the rhs, by dfs up the cfg.
- * @param target Statement number.
- * @param proc_list Full list of procedures.
- * @param stmt_list Full list of statements.
- * @return list of Next* that has target on the rhs.
- */
-std::vector<Entity*> NextTExtractor::GetPrevT(int target,
-                                              const std::vector<Procedure*> &proc_list,
-                                              std::vector<Statement*> stmt_list) {
-  map_to_populate_ = &prev_t_map_;
-  first_args_ = &next_t_rhs_stmts_;
-  rel_direction_ = RelDirection::kPrev;
-
-  return GetRel(target, proc_list, std::move(stmt_list));
-}
-
-/**
- * Gets all Entities that can be on the RHS of the relationship, i.e. Next*(_, s).
- * @param proc_list Full list of procedures.
- * @param stmt_list Full list of statements.
- * @return all Entities that can be on the RHS of the relationship.
- */
-std::vector<Entity*> NextTExtractor::GetAllNextTRHS(const std::vector<Procedure*> &proc_list,
-                                                    const std::vector<Statement*> &stmt_list) {
-  if (prev_t_populated_) {
-    return next_t_rhs_stmts_;
-  }
-  Init(stmt_list);
-
-  PopulateAllPrevT(proc_list);
-  return next_t_rhs_stmts_;
-}
-
 void NextTExtractor::PopulateAllPrevT(const std::vector<Procedure*> &proc_list) {
   for (Procedure* proc: proc_list) {
     int last_stmt = const_cast<Cluster*>(proc->GetClusterRoot())->GetStartEndRange().second;
-    GetPrevT(last_stmt, {proc}, stmt_list_);
+    GetRelationship(RelDirection::kReverse, last_stmt, {proc});
   }
   prev_t_populated_ = true;
 }
 
 /**
  * Gets all Entity pairs that are in a Next* relationship, i.e. Next*(s1, s2).
- * @param proc_list Full list of procedures.
- * @param stmt_list Full list of statements.
  * @return all Entity pairs in reverse order i.e. <s2, s1> of Next*(s1, s2).
  */
-std::vector<std::tuple<Entity*, Entity*>> NextTExtractor::GetAllPrevT(const std::vector<Procedure*> &proc_list,
-                                                                      const std::vector<Statement*> &stmt_list) {
+std::vector<std::tuple<Entity*, Entity*>> NextTExtractor::GetAllPrevT() {
   if (got_all_next_prev_t_) {
     return all_prev_t_;
   }
-  Init(stmt_list);
-
   if (!prev_t_populated_) {
-    PopulateAllPrevT(proc_list);
+    PopulateAllPrevT(proc_list_);
   }
   for (auto pair: prev_t_map_) {
     for (Statement* stmt: *pair.second) {

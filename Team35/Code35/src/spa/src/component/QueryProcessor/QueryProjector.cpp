@@ -106,7 +106,7 @@ std::vector<std::vector<std::string>> QueryProjector::StringifyTable(std::vector
           else {
             temp = dynamic_cast<Variable*>(entity);
           }
-          var_string = const_cast<VariableName*>(temp->GetName())->getName();
+          var_string = temp->GetNameInString();
           stringified_column.push_back(var_string);
         }
         break;
@@ -233,3 +233,4 @@ std::vector<std::string> QueryProjector::JoinTuples(std::vector<std::vector<std:
   }
   return tuples;
 }
+

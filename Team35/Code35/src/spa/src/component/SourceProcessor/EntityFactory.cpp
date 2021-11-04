@@ -227,7 +227,7 @@ Procedure* EntityFactory::RetrieveProcedure(std::string proc_name) {
 Variable* EntityFactory::RetrieveVariable(std::string var_name) {
   VariableName temp_var_name = VariableName(var_name);
   for (auto const& var: * var_list_) {
-    if (* var->GetName() == temp_var_name) { // uses the overloaded ==
+    if (* var->GetVariableName() == temp_var_name) { // uses the overloaded ==
       return var;
     }
   }

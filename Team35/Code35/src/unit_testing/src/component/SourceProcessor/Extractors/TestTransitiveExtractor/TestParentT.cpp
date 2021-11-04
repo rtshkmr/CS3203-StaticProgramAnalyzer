@@ -36,13 +36,10 @@ TEST_CASE("1.TransitiveExtractor.Extract ParentT basic conditions") {
      */
     auto* proc1 = new Procedure(new ProcedureName("proc1"));
     TestUtils::AddStatementList(proc1, {assign_1_, assign_3_, read_x_, print_y_, assign_4_, assign_5_});
-
-    deliverable->proc_list_.push_back(proc1);
-
-    auto statement_extractor = TransitiveExtractor<Statement>(deliverable);
-    statement_extractor.Extract(&deliverable->parent_to_child_T_hash_,
-                                &deliverable->parent_to_child_hash_,
-                                TransitiveRel::kParent);
+    auto statement_extractor = TransitiveExtractor<Statement>();
+    statement_extractor.Extract(deliverable->GetParentTMap(),
+                                deliverable->GetChildTMap(),
+                                deliverable->GetChildMap());
 
     // no parent
     std::unordered_map<Statement*, std::list<Statement*>*> ptct = deliverable->parent_to_child_T_hash_;
@@ -66,16 +63,15 @@ TEST_CASE("1.TransitiveExtractor.Extract ParentT basic conditions") {
     TestUtils::AddStatementList(if_1_, {assign_1_, read_y_});
     TestUtils::AddStatementList(proc2, {if_1_, print_y_});
     if_1_->SetElseEntity(else_1_);
-    deliverable->proc_list_.push_back(proc2);
     deliverable->AddParentRelationship(if_1_, assign_1_);
     deliverable->AddParentRelationship(if_1_, read_y_);
     deliverable->AddParentRelationship(if_1_, assign_5_);
     deliverable->AddParentRelationship(if_1_, assign_6_);
 
-    auto statement_extractor = TransitiveExtractor<Statement>(deliverable);
-    statement_extractor.Extract(&deliverable->parent_to_child_T_hash_,
-                                &deliverable->parent_to_child_hash_,
-                                TransitiveRel::kParent);
+    auto statement_extractor = TransitiveExtractor<Statement>();
+    statement_extractor.Extract(deliverable->GetParentTMap(),
+                                deliverable->GetChildTMap(),
+                                deliverable->GetParentMap());
 
     // Parent*(1, _)
     std::list<Statement*> expected_children_1 = std::list<Statement*>{assign_1_, read_y_, assign_5_, assign_6_};
@@ -97,15 +93,13 @@ TEST_CASE("1.TransitiveExtractor.Extract ParentT basic conditions") {
     TestUtils::AddStatementList(while_3_, {read_z_, assign_5_});
     TestUtils::AddStatementList(proc2, {assign_1_, print_i_, while_3_});
 
-    deliverable->proc_list_.push_back(proc2);
     deliverable->AddParentRelationship(while_3_, read_z_);
     deliverable->AddParentRelationship(while_3_, assign_5_);
 
-    auto statement_extractor = TransitiveExtractor<Statement>(deliverable);
-    statement_extractor.Extract(&deliverable->parent_to_child_T_hash_,
-                                &deliverable->parent_to_child_hash_,
-                                TransitiveRel::kParent);
-
+    auto statement_extractor = TransitiveExtractor<Statement>();
+    statement_extractor.Extract(deliverable->GetParentTMap(),
+                                deliverable->GetChildTMap(),
+                                deliverable->GetParentMap());
     // Parent*(2, _)
     std::list<Statement*> expected_children_1 = std::list<Statement*>{read_z_, assign_5_};
     std::list<Statement*>* actual_children_1 = deliverable->parent_to_child_T_hash_.find(while_3_)->second;
@@ -139,16 +133,14 @@ TEST_CASE("1.TransitiveExtractor.Extract ParentT basic conditions") {
     TestUtils::AddStatementList(while_1_, {print_y_});
     TestUtils::AddStatementList(proc4, {while_1_, assign_4_});
     if_2_->SetElseEntity(else_2_);
-    deliverable->proc_list_.push_back(proc3);
-    deliverable->proc_list_.push_back(proc4);
     deliverable->AddParentRelationship(if_2_, assign_2_);
     deliverable->AddParentRelationship(if_2_, read_y_);
     deliverable->AddParentRelationship(while_1_, print_y_);
 
-    auto statement_extractor = TransitiveExtractor<Statement>(deliverable);
-    statement_extractor.Extract(&deliverable->parent_to_child_T_hash_,
-                                &deliverable->parent_to_child_hash_,
-                                TransitiveRel::kParent);
+    auto statement_extractor = TransitiveExtractor<Statement>();
+    statement_extractor.Extract(deliverable->GetParentTMap(),
+                                deliverable->GetChildTMap(),
+                                deliverable->GetParentMap());
 
     // Parent*(3, _)
     std::list<Statement*> expected_children_1 = std::list<Statement*>{assign_2_, read_y_};
@@ -215,7 +207,6 @@ TEST_CASE("1.TransitiveExtractor.Extract ParentT nested containers") {
     if_1_->SetElseEntity(else_1_);
     if_2_->SetElseEntity(else_2_);
     if_3_->SetElseEntity(else_3_);
-    deliverable->proc_list_.push_back(proc2);
     deliverable->AddParentRelationship(if_1_, assign_1_);
     deliverable->AddParentRelationship(if_1_, assign_3_);
     deliverable->AddParentRelationship(if_1_, if_2_);
@@ -225,10 +216,10 @@ TEST_CASE("1.TransitiveExtractor.Extract ParentT nested containers") {
     deliverable->AddParentRelationship(if_3_, assign_5_);
     deliverable->AddParentRelationship(if_3_, read_z_);
 
-    auto statement_extractor = TransitiveExtractor<Statement>(deliverable);
-    statement_extractor.Extract(&deliverable->parent_to_child_T_hash_,
-                                &deliverable->parent_to_child_hash_,
-                                TransitiveRel::kParent);
+    auto statement_extractor = TransitiveExtractor<Statement>();
+    statement_extractor.Extract(deliverable->GetParentTMap(),
+                                deliverable->GetChildTMap(),
+                                deliverable->GetParentMap());
 
     // Parent*(1, _)
     std::list<Statement*> expected_children_1 =
@@ -279,7 +270,7 @@ TEST_CASE("1.TransitiveExtractor.Extract ParentT nested containers") {
     if_1_->SetElseEntity(else_1_);
     if_2_->SetElseEntity(else_2_);
     if_3_->SetElseEntity(else_3_);
-    deliverable->proc_list_.push_back(proc2);
+    deliverable->AddProcedure(proc2);
     deliverable->AddParentRelationship(if_1_, assign_1_);
     deliverable->AddParentRelationship(if_1_, if_2_);
     deliverable->AddParentRelationship(if_1_, print_i_);
@@ -289,10 +280,10 @@ TEST_CASE("1.TransitiveExtractor.Extract ParentT nested containers") {
     deliverable->AddParentRelationship(if_3_, assign_5_);
     deliverable->AddParentRelationship(if_3_, read_z_);
 
-    auto statement_extractor = TransitiveExtractor<Statement>(deliverable);
-    statement_extractor.Extract(&deliverable->parent_to_child_T_hash_,
-                                &deliverable->parent_to_child_hash_,
-                                TransitiveRel::kParent);
+    auto statement_extractor = TransitiveExtractor<Statement>{};
+    statement_extractor.Extract(deliverable->GetParentTMap(),
+                                deliverable->GetChildTMap(),
+                                deliverable->GetParentMap());
 
     // Parent*(1, _)
     std::list<Statement*> expected_children_1 =
@@ -335,7 +326,6 @@ TEST_CASE("1.TransitiveExtractor.Extract ParentT nested containers") {
     TestUtils::AddStatementList(while_1_, {assign_1_, while_2_, read_y_});
     TestUtils::AddStatementList(proc3, {while_1_, read_z_});
 
-    deliverable->proc_list_.push_back(proc3);
     deliverable->AddParentRelationship(while_1_, assign_1_);
     deliverable->AddParentRelationship(while_1_, while_2_);
     deliverable->AddParentRelationship(while_1_, read_y_);
@@ -344,10 +334,10 @@ TEST_CASE("1.TransitiveExtractor.Extract ParentT nested containers") {
     deliverable->AddParentRelationship(while_2_, read_x_);
     deliverable->AddParentRelationship(while_3_, assign_5_);
 
-    auto statement_extractor = TransitiveExtractor<Statement>(deliverable);
-    statement_extractor.Extract(&deliverable->parent_to_child_T_hash_,
-                                &deliverable->parent_to_child_hash_,
-                                TransitiveRel::kParent);
+    auto statement_extractor = TransitiveExtractor<Statement>();
+    statement_extractor.Extract(deliverable->GetParentTMap(),
+                                deliverable->GetChildTMap(),
+                                deliverable->GetParentMap());
 
     // Parent*(1, _)
     std::list<Statement*> expected_children_1 =
@@ -400,7 +390,6 @@ TEST_CASE("1.TransitiveExtractor.Extract ParentT nested containers") {
     if_1_->SetElseEntity(else_1_);
     if_2_->SetElseEntity(else_2_);
 
-    deliverable->proc_list_.push_back(proc4);
     deliverable->AddParentRelationship(if_1_, assign_1_);
     deliverable->AddParentRelationship(if_1_, while_1_);
     deliverable->AddParentRelationship(if_1_, while_2_);
@@ -414,10 +403,10 @@ TEST_CASE("1.TransitiveExtractor.Extract ParentT nested containers") {
     deliverable->AddParentRelationship(while_3_, print_x_);
     deliverable->AddParentRelationship(while_3_, if_2_);
 
-    auto statement_extractor = TransitiveExtractor<Statement>(deliverable);
-    statement_extractor.Extract(&deliverable->parent_to_child_T_hash_,
-                                &deliverable->parent_to_child_hash_,
-                                TransitiveRel::kParent);
+    auto statement_extractor = TransitiveExtractor<Statement>();
+    statement_extractor.Extract(deliverable->GetParentTMap(),
+                                deliverable->GetChildTMap(),
+                                deliverable->GetParentMap());
 
     // Parent*(1, _)
     std::list<Statement*> expected_children_1 =
