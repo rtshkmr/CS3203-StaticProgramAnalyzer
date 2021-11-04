@@ -8,6 +8,7 @@ RuntimeExtractor::RuntimeExtractor(PKB* pkb) {
   next_bip_extractor_ = NextBipExtractor(pkb);
   next_bip_t_extractor_ = NextBipTExtractor(pkb);
   next_bip_t_extractor_.SetMediator(this);
+  affects_t_extractor_ = AffectsTExtractor(this, pkb);
 }
 
 /**
@@ -131,8 +132,8 @@ bool RuntimeExtractor::HasRelationship(PKBRelRefs ref) {
     case PKBRelRefs::kPreviousT: return pkb_->HasRelationship(PKBRelRefs::kNext);
     case PKBRelRefs::kAffects: return HasAffects();
     case PKBRelRefs::kAffectedBy: return HasAffectedBy();
-    case PKBRelRefs::kAffectsT: return HasAffects();
-    case PKBRelRefs::kAffectedByT: return HasAffectedBy();
+    case PKBRelRefs::kAffectsT: return HasAffectsT();
+    case PKBRelRefs::kAffectedByT: return HasAffectedByT();
     case PKBRelRefs::kNextBip: // fallthrough
     case PKBRelRefs::kPrevBip: // fallthrough
     case PKBRelRefs::kNextBipT: // fallthrough
@@ -231,11 +232,11 @@ std::vector<Entity*> RuntimeExtractor::GetAffectedBy(int target) {
 }
 
 std::vector<Entity*> RuntimeExtractor::GetAffectsT(int target) {
-  return affects_t_extractor_.GetAffectsT(target);
+  return affects_t_extractor_.GetRelationship(RelDirection::kForward, target);
 }
 
 std::vector<Entity*> RuntimeExtractor::GetAffectedByT(int target) {
-  return affects_t_extractor_.GetAffectedByT(target);
+  return affects_t_extractor_.GetRelationship(RelDirection::kReverse, target);
 }
 
 std::vector<Entity*> RuntimeExtractor::GetNextBip(int target) {
@@ -285,8 +286,20 @@ std::vector<Entity*> RuntimeExtractor::GetAffectedBy(DesignEntity de) {
     return std::vector<Entity*>{};
   }
 }
-std::vector<Entity*> RuntimeExtractor::GetAffectsT(DesignEntity de) { return std::vector<Entity*>(); }
-std::vector<Entity*> RuntimeExtractor::GetAffectedByT(DesignEntity de) { return std::vector<Entity*>(); }
+std::vector<Entity*> RuntimeExtractor::GetAffectsT(DesignEntity de) {
+  if (de == DesignEntity::kStmt || de == DesignEntity::kAssign) {
+    return affects_t_extractor_.GetFirstEntityOfRelationship(RelDirection::kForward);
+  } else {
+    return std::vector<Entity*>();
+  }
+}
+std::vector<Entity*> RuntimeExtractor::GetAffectedByT(DesignEntity de) {
+  if (de == DesignEntity::kStmt || de == DesignEntity::kAssign) {
+    return affects_t_extractor_.GetFirstEntityOfRelationship(RelDirection::kReverse);
+  } else {
+    return std::vector<Entity*>();
+  }
+}
 
 std::vector<Entity*> RuntimeExtractor::GetNextBip(DesignEntity de) {
   if (next_design_entities.count(de) == 1) {
@@ -361,6 +374,14 @@ bool RuntimeExtractor::HasAffectedBy() {
   return affects_extractor_.HasAffects(); // Can be replace with (_,_)
 }
 
+bool RuntimeExtractor::HasAffectsT() {
+  return affects_t_extractor_.HasRelationship(RelDirection::kForward);
+}
+
+bool RuntimeExtractor::HasAffectedByT() {
+  return affects_t_extractor_.HasRelationship(RelDirection::kReverse);
+}
+
 std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetNextBip(DesignEntity first, DesignEntity second) {
   bool valid_first = next_design_entities.count(first) == 1;
   bool valid_second = next_design_entities.count(second) == 1;
@@ -410,11 +431,11 @@ bool RuntimeExtractor::HasAffectedBy(int target) {
 }
 
 bool RuntimeExtractor::HasAffectsT(int target) {
-  return false;
+  return affects_t_extractor_.HasRelationship(RelDirection::kForward, target);
 }
 
 bool RuntimeExtractor::HasAffectedByT(int target) {
-  return false;
+  return affects_t_extractor_.HasRelationship(RelDirection::kReverse, target);
 }
 
 bool RuntimeExtractor::HasNextBip(int first) {
@@ -437,8 +458,12 @@ bool RuntimeExtractor::HasAffectedBy(int first, int second) {
   return affects_extractor_.HasAffectedBy(first, second);
 }
 
-bool RuntimeExtractor::HasAffectsT(int first, int second) { return false; }
-bool RuntimeExtractor::HasAffectedByT(int first, int second) { return false; }
+bool RuntimeExtractor::HasAffectsT(int first, int second) {
+  return affects_t_extractor_.HasRelationship(RelDirection::kForward, first, second);
+}
+bool RuntimeExtractor::HasAffectedByT(int first, int second) {
+  return affects_t_extractor_.HasRelationship(RelDirection::kReverse, first, second);
+}
 
 bool RuntimeExtractor::HasNextBip(int first, int second) {
   return next_bip_extractor_.HasRelationship(RelDirection::kForward, first, second);
