@@ -43,7 +43,6 @@ void QueryOptimizer::Optimize() {
   ReorderClausesWithinWeightedGroups();
   PopulateGroupsList();
   ReorderGroups();
-  // free memory for weighted
   FreeWeightedLists();
 }
 
@@ -114,8 +113,8 @@ void QueryOptimizer::UpdateClauseWeights() {
 
 void QueryOptimizer::UpdateClauseWeight(WeightedClause* cl) {
   int total_weight = 0;
-  // total_weight += GetTypePenalty(cl->clause);
-  // total_weight += GetNumberOfSynonymsPenalty(cl->clause);
+  total_weight += GetTypePenalty(cl->clause);
+  total_weight += GetNumberOfSynonymsPenalty(cl->clause);
   cl->UpdateClauseWeight(total_weight);
 }
 
