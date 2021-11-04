@@ -106,7 +106,7 @@ std::vector<std::vector<std::string>> QueryProjector::StringifyTable(std::vector
           else {
             temp = dynamic_cast<Variable*>(entity);
           }
-          var_string = const_cast<VariableName*>(dynamic_cast<Variable*>(entity)->GetVariableName())->GetName();
+          var_string = temp->GetNameInString();
           stringified_column.push_back(var_string);
         }
         break;
