@@ -26,16 +26,13 @@ PKBRelRefs PKBQueryCommand::GetPKBRelRef(RelRef relation, bool order_of_values_u
       return order_of_values_unchanged_from_clause ? PKBRelRefs::kCallsT : PKBRelRefs::kCalledByT;
     case RelRef::kNext:
       return order_of_values_unchanged_from_clause ? PKBRelRefs::kNext : PKBRelRefs::kPrevious;
-//                            case RelRef::kNextT:
-//                              return PKBRelRefs::kNextT;
-//                            case RelRef::kAffects:
-//                              return PKBRelRefs::kAffects;
-//                              case RelRef::kAffectsT:
-//                                return PKBRelRefs::kAffectsT;
-//                                case RelRef::kWildcard:
-//                                  return PKBRelRefs::kWildcard;
-//                                  default:
-//                                    return PKBRelRefs::kWildcard
+    case RelRef::kNextT:
+      return order_of_values_unchanged_from_clause ? PKBRelRefs::kNextT : PKBRelRefs::kPreviousT;
+    case RelRef::kAffects:
+      return order_of_values_unchanged_from_clause ? PKBRelRefs::kAffects : PKBRelRefs::kAffectedBy;
+    case RelRef::kAffectsT:
+      return order_of_values_unchanged_from_clause ? PKBRelRefs::kAffectsT : PKBRelRefs::kAffectedByT;
+//    default:return PKBRelRefs::kWildcard;
   }
 }
 

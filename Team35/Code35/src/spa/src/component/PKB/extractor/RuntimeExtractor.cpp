@@ -449,5 +449,5 @@ void RuntimeExtractor::Delete() {
 }
 
 bool RuntimeExtractor::IsRuntimeRelationship(PKBRelRefs ref) {
-  return runtime_relationships.count(ref);
+  return runtime_relationships.count(ref) == 1;
 }
