@@ -4,11 +4,18 @@
 
 void QueryOptimizer::Optimize() {
   PopulateSynAdjacencyList();
-  QueryGrouper::AdvancedGroupClauses(& clauses, & groups, & target_syn_attrs_list, &target_synonyms_map,
+  PopulateWeightedClausesList();
+  QueryGrouper::AdvancedGroupClauses(& weighted_clauses, & weighted_groups, & target_syn_attrs_list, &target_synonyms_map,
                                      & map_of_syn_to_clause_indices);
+  UpdateClauseWeights();
+  ReorderClausesWithinWeightedGroups();
+  PopulateGroupsList();
   ReorderGroups();
+  // free memory for weighted
+  // FreeWeightedGroupsList();
 }
 
+// populate intermediate data structure used for advanced grouping algorithm.
 void QueryOptimizer::PopulateSynAdjacencyList() {
   for (int i = 0; i < clauses.size(); i++) {
     std::vector<std::string> syns = clauses[i]->GetAllSynonymNamesOfClause();
@@ -20,6 +27,12 @@ void QueryOptimizer::PopulateSynAdjacencyList() {
         this->map_of_syn_to_clause_indices.insert(std::make_pair(s, v));
       }
     }
+  }
+}
+
+void QueryOptimizer::PopulateWeightedClausesList() {
+  for (auto cl : clauses) {
+    weighted_clauses.push_back(new WeightedClause(cl));
   }
 }
 
@@ -52,3 +65,33 @@ void QueryOptimizer::ReorderGroups() {
   this->groups.swap(boolean_groups);
 }
 
+// TODO: make grouping algorithm work with a vector of weightedgroups. The only thing special about weightedgroup
+// is that it works with weightedclauses. weightedclause contains the clause obj itself as an attribute, and
+// has a penalty/scoring system, lower the better
+// getter method that will calculate the organic clause penalty based on type/nSyns (default method is called: updateWeight)
+//  // ReorderClauses method will take the vector of weighted groups, call updateWeight()),
+// but has another field for subgroup penalty. -> ie based on subgrouping.
+// ReorderClauses method will take the vector of weighted groups, and sort each group of clauses based on
+// getScore() method call, which will take default score + penalty on the fly.
+// finally, we loop over each group, and for each weightedclause, we just need to clear vector<grooups*>, and rebuild it based on new order.
+void QueryOptimizer::ReorderClausesWithinWeightedGroups() {
+  auto comparator = [](WeightedClause* const& c1, WeightedClause* const& c2) -> bool {
+    return c1->GetWeight() < c2->GetWeight();
+  };
+  for (int i = 0; i < weighted_groups.size(); i++) {
+    std::sort(weighted_groups[i]->weighted_clauses.begin(),weighted_groups[i]->weighted_clauses.end(), comparator);
+  }
+}
+
+void QueryOptimizer::UpdateClauseWeights() {
+
+}
+
+void QueryOptimizer::PopulateGroupsList() {
+  for (WeightedGroup* w_g : weighted_groups) {
+    std::vector<WeightedClause*> w_c = w_g->weighted_clauses;
+    Group* g = w_g->group;
+    for (auto w_cl : w_c) g->AddClauseToVector(w_cl->clause);
+    groups.push_back(g);
+  }
+}

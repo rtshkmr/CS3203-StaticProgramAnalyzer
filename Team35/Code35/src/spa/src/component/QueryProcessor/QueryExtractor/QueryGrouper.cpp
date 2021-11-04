@@ -1,5 +1,6 @@
 #include <queue>
 #include "QueryGrouper.h"
+#include "QueryOptimizer.h"
 
 /**
  * Gives a basic grouping for all the clauses, where all clauses are in the same group.
@@ -31,10 +32,11 @@ void QueryGrouper::BasicGroupClauses(std::vector<Clause*>* clauses, std::vector<
 /**
  * Groups multiple queries that should be evaluated together, based on existence of common synonyms.
  */
-void QueryGrouper::AdvancedGroupClauses(std::vector<Clause*>* clauses, std::vector<Group*>* groups,
-                                std::vector<std::pair<Synonym*, Attribute>>* target_syn_attrs_list,
-                                    std::unordered_map<std::string, Synonym*>* target_synonyms_map,
-                                    std::unordered_map<std::string, std::vector<int>>* map_of_syn_to_clause_indices) {
+void QueryGrouper::AdvancedGroupClauses(std::vector<WeightedClause*>* weighted_clauses,
+                                        std::vector<WeightedGroup*>* weighted_groups,
+                                        std::vector<std::pair<Synonym*, Attribute>>* target_syn_attrs_list,
+                                        std::unordered_map<std::string, Synonym*>* target_synonyms_map,
+                                        std::unordered_map<std::string, std::vector<int>>* map_of_syn_to_clause_indices) {
   // First create groups for clauses containing target synonyms (and their 'neighbouring' synonyms).
   std::unordered_set<int> visited_clauses;
   std::unordered_set<std::string> visited_target_synonyms;
@@ -45,36 +47,42 @@ void QueryGrouper::AdvancedGroupClauses(std::vector<Clause*>* clauses, std::vect
       continue;
     }
     // dfs starting from this target synonym
-    QueryGrouper::DfsFromSynonym(target_synonyms_map, clauses, groups, tgt_syn->GetName(), &visited_clauses,
-                                   &visited_target_synonyms, &visited_synonyms, map_of_syn_to_clause_indices);
+    QueryGrouper::DfsFromSynonym(target_synonyms_map, weighted_clauses, weighted_groups, tgt_syn->GetName(),
+                                 &visited_clauses, &visited_target_synonyms, &visited_synonyms,
+                                 map_of_syn_to_clause_indices);
   }
   // create groups for unvisited clauses
-  for (int index_of_cl = 0; index_of_cl < clauses->size(); index_of_cl++) {
+  for (int index_of_cl = 0; index_of_cl < weighted_clauses->size(); index_of_cl++) {
     if (visited_clauses.find(index_of_cl) != visited_clauses.end()) {
       continue;
     }
-    std::vector<std::string> clause_syn_names = (*clauses)[index_of_cl]->GetAllSynonymNamesOfClause();
+    std::vector<std::string> clause_syn_names = (*weighted_clauses)[index_of_cl]->clause->GetAllSynonymNamesOfClause();
     // if cl has no syns -> add to its own group; and add to visited
     if (clause_syn_names.size() == 0) {
       Group* g = new Group();
-      g->AddClauseToVector((*clauses)[index_of_cl]);
-      groups->push_back(g);
+      WeightedGroup* w_g = new WeightedGroup(g);
+      w_g->weighted_clauses.push_back((*weighted_clauses)[index_of_cl]);
+      weighted_groups->push_back(w_g);
       visited_clauses.insert(index_of_cl);
     } else {
       // same dfs routine with either arg treated as 'tgt syn'
-      QueryGrouper::DfsFromSynonym(target_synonyms_map, clauses, groups, clause_syn_names[0], &visited_clauses,
-                                     &visited_target_synonyms, &visited_synonyms, map_of_syn_to_clause_indices);
+      QueryGrouper::DfsFromSynonym(target_synonyms_map, weighted_clauses, weighted_groups, clause_syn_names[0],
+                                   &visited_clauses, &visited_target_synonyms, &visited_synonyms,
+                                   map_of_syn_to_clause_indices);
     }
   }
 }
 
 void QueryGrouper::DfsFromSynonym(std::unordered_map<std::string, Synonym*>* tgt_synonyms_map,
-                                    std::vector<Clause*>* clauses, std::vector<Group*>* groups, std::string tgt_syn,
+                                    std::vector<WeightedClause*>* weighted_clauses,
+                                    std::vector<WeightedGroup*>* weighted_groups, std::string tgt_syn,
                                     std::unordered_set<int>* visited_clauses,
                                     std::unordered_set<std::string>* visited_tgt_synonyms,
                                     std::unordered_set<std::string>* visited_synonyms,
                                     std::unordered_map<std::string, std::vector<int>>* map_of_syn_to_clause_indices) {
   Group* g = new Group();
+  WeightedGroup* w_g = new WeightedGroup(g);
+  int subgroup_score = QueryOptimizer::GetSubgroupPenalty();
   std::vector<std::string> tgt_synonyms_in_this_group;
   bool is_starting_syn_a_target_syn = tgt_synonyms_map->find(tgt_syn) != tgt_synonyms_map->end();
   if (is_starting_syn_a_target_syn) {
@@ -94,16 +102,15 @@ void QueryGrouper::DfsFromSynonym(std::unordered_map<std::string, Synonym*>* tgt
       cl_with_tgt_syns = map_of_syn_to_clause_indices->at(curr_tgt_syn);
     }
     std::vector<int> subgroup;
+    subgroup_score++;
     for (auto cl_idx : cl_with_tgt_syns) {
       if (visited_clauses->find(cl_idx) != visited_clauses->end()) {
         continue;
       }
       subgroup.push_back(cl_idx);
-    }
-    // TODO: sort_with_comparator(subgroup) for optimization in iter 3
-    for (auto cl_idx : subgroup) {
+
       visited_clauses->insert(cl_idx);
-      std::vector<std::string> clause_syn_names = (*clauses)[cl_idx]->GetAllSynonymNamesOfClause();
+      std::vector<std::string> clause_syn_names = (*weighted_clauses)[cl_idx]->clause->GetAllSynonymNamesOfClause();
       for (std::string clause_syn_name : clause_syn_names) {
         if (visited_synonyms->find(clause_syn_name) != visited_synonyms->end()) {
           continue;
@@ -115,13 +122,15 @@ void QueryGrouper::DfsFromSynonym(std::unordered_map<std::string, Synonym*>* tgt
         visited_synonyms->insert(clause_syn_name);
         q.push(clause_syn_name);
       }
-      // push each clause in subgroup into group
-      g->AddClauseToVector(clauses->at(cl_idx));
+      // save subgroup score and push each clause in subgroup into group
+      WeightedClause* weighted_cl = weighted_clauses->at(cl_idx);
+      weighted_cl->subgroup_penalty += subgroup_score;
+      w_g->weighted_clauses.push_back(weighted_cl);
     }
   }
-  groups->push_back(g);
+  weighted_groups->push_back(w_g);
   // populate group's metadata
-  QueryGrouper::UpdateGroupMetadata(g, &tgt_synonyms_in_this_group, tgt_synonyms_map);
+  QueryGrouper::UpdateGroupMetadata(w_g, &tgt_synonyms_in_this_group, tgt_synonyms_map);
 }
 
 void QueryGrouper::UpdateGroupMetadata(Group* group, std::vector<std::string>* tgt_synonyms_in_grp,
@@ -130,4 +139,12 @@ void QueryGrouper::UpdateGroupMetadata(Group* group, std::vector<std::string>* t
     group->AddSynToTargetSyns(tgt_syns_map->at(item));
   }
   group->UpdateHasTargetSynonymAttr();
+}
+
+void QueryGrouper::UpdateGroupMetadata(WeightedGroup* weighted_group, std::vector<std::string>* tgt_synonyms_in_grp,
+                                       std::unordered_map<std::string, Synonym*>* tgt_syns_map) {
+  for (auto item : *tgt_synonyms_in_grp) {
+    weighted_group->group->AddSynToTargetSyns(tgt_syns_map->at(item));
+  }
+  weighted_group->group->UpdateHasTargetSynonymAttr();
 }
