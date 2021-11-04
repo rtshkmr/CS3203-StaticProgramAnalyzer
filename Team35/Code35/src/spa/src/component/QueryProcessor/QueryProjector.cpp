@@ -233,3 +233,4 @@ std::vector<std::string> QueryProjector::JoinTuples(std::vector<std::vector<std:
   }
   return tuples;
 }
+
