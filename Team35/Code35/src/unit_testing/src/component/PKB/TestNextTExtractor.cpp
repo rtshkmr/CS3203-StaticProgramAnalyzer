@@ -27,6 +27,7 @@ TEST_CASE("2.PKB.NextTExtractor basic conditions") {
   auto* b4 = new Block();
   auto* b5 = new Block();
   auto* b6 = new Block();
+  auto* exit_block = new Block();
   auto* c1 = new Cluster();
   auto* c2 = new Cluster();
   auto* c3 = new Cluster();
@@ -66,7 +67,9 @@ TEST_CASE("2.PKB.NextTExtractor basic conditions") {
     b1->AddStmt(StatementNumber(1));
     b1->AddStmt(StatementNumber(2));
     b1->AddStmt(StatementNumber(3));
+    b1->AddNextBlock(exit_block);
     proc1->SetBlockRoot(b1);
+    proc1->SetBlockTail(exit_block);
     proc1->SetClusterRoot(b1);
 
     proc_list.push_back(proc1);
@@ -136,8 +139,10 @@ TEST_CASE("2.PKB.NextTExtractor basic conditions") {
     b2->AddNextBlock(b4);
     b3->AddNextBlock(b5);
     b4->AddNextBlock(b5);
+    b5->AddNextBlock(exit_block);
     AddChildClusters(c2, {b2, b3, b4});
     AddChildClusters(c1, {b1, c2, b5});
+    proc1->SetBlockTail(exit_block);
     proc1->SetBlockRoot(b1);
     proc1->SetClusterRoot(c1);
     c1->UpdateClusterRange();
@@ -239,7 +244,9 @@ TEST_CASE("2.PKB.NextTExtractor basic conditions") {
     b2->AddNextBlock(b3);
     b2->AddNextBlock(b4);
     b3->AddNextBlock(b2);
+    b4->AddNextBlock(exit_block);
     proc1->SetBlockRoot(b1);
+    proc1->SetBlockTail(exit_block);
     AddChildClusters(c2, {b2, b3});
     AddChildClusters(c1, {b1, c2, b4});
     c1->UpdateClusterRange();
@@ -321,12 +328,14 @@ TEST_CASE("2.PKB.NextTExtractor basic conditions") {
     b2->AddStmt(StatementNumber(3));
     b1->isWhile = true;
     b1->AddNextBlock(b2);
+    b1->AddNextBlock(exit_block);
     b2->AddNextBlock(b1);
     AddChildClusters(c2, {b1, b2});
     AddChildClusters(c1, {c2});
     c1->UpdateClusterRange();
     CHECK(c1->GetStartEndRange() == std::make_pair(1, 3));
     proc1->SetBlockRoot(b1);
+    proc1->SetBlockTail(exit_block);
     proc1->SetClusterRoot(c1);
     proc_list.push_back(proc1);
     stmt_list = {s1, s2, s3};
@@ -382,9 +391,15 @@ TEST_CASE("2.PKB.NextTExtractor basic conditions") {
     b5->AddStmt(StatementNumber(6));
     b6->AddStmt(StatementNumber(7));
     b1->AddNextBlock(b2);
+    b1->AddNextBlock(exit_block);
     b2->AddNextBlock(b1);
+    auto* ex2 = new Block();
+    b3->AddNextBlock(ex2);
     b4->AddNextBlock(b5);
     b4->AddNextBlock(b6);
+    auto* ex3 = new Block();
+    b5->AddNextBlock(ex3);
+    b6->AddNextBlock(ex3);
     AddChildClusters(c2, {b1, b2});
     AddChildClusters(c1, {c2});
     AddChildClusters(c3, {b3});
@@ -396,10 +411,13 @@ TEST_CASE("2.PKB.NextTExtractor basic conditions") {
     CHECK(c4->GetStartEndRange() == std::make_pair(5, 7));
     proc1->SetBlockRoot(b1);
     proc1->SetClusterRoot(c1);
+    proc1->SetBlockTail(exit_block);
     proc2->SetBlockRoot(b3);
     proc2->SetClusterRoot(c3);
+    proc2->SetBlockTail(ex2);
     proc3->SetBlockRoot(b4);
     proc3->SetClusterRoot(c4);
+    proc3->SetBlockTail(ex3);
     proc_list = {proc1, proc2, proc3};
     stmt_list = {s1, s2, s3, s4, s5, s6, s7};
 
@@ -483,6 +501,7 @@ TEST_CASE("2.PKB.NextTExtractor nested containers") {
   auto* b10 = new Block();
   auto* b11 = new Block();
   auto* b12 = new Block();
+  auto* ex = new Block();
   auto* c0 = new Cluster();
   auto* c1 = new Cluster();
   auto* c2 = new Cluster();
@@ -534,7 +553,9 @@ TEST_CASE("2.PKB.NextTExtractor nested containers") {
     b5->AddNextBlock(b8);
     b6->AddNextBlock(b8);
     b7->AddNextBlock(b8);
+    b8->AddNextBlock(ex);
     proc1->SetBlockRoot(b1);
+    proc1->SetBlockTail(ex);
     AddChildClusters(c3, {b4, b5, b6});
     AddChildClusters(c2, {b2, b3, c3});
     AddChildClusters(c1, {b1, c2, b7, b8});
@@ -650,7 +671,9 @@ TEST_CASE("2.PKB.NextTExtractor nested containers") {
     b4->AddNextBlock(b5);
     b4->AddNextBlock(b2);
     b5->AddNextBlock(b4);
+    b6->AddNextBlock(ex);
     proc1->SetBlockRoot(b1);
+    proc1->SetBlockTail(ex);
     AddChildClusters(c4, {b4, b5});
     AddChildClusters(c3, {b2, b3, c4});
     AddChildClusters(c2, {b1, c3});
@@ -750,8 +773,10 @@ TEST_CASE("2.PKB.NextTExtractor nested containers") {
     b2->AddNextBlock(b3);
     b2->AddNextBlock(b4);
     b3->AddNextBlock(b2);
+    b4->AddNextBlock(ex);
     b5->AddNextBlock(b6);
     b6->AddNextBlock(b7);
+    b6->AddNextBlock(ex);
     b7->AddNextBlock(b6);
     b8->AddNextBlock(b9);
     b8->AddNextBlock(b12);
@@ -759,6 +784,8 @@ TEST_CASE("2.PKB.NextTExtractor nested containers") {
     b9->AddNextBlock(b11);
     b10->AddNextBlock(b8);
     b11->AddNextBlock(b8);
+    auto* ex2 = new Block();
+    b12->AddNextBlock(ex2);
     AddChildClusters(c3, {b6, b7});
     AddChildClusters(c2, {b2, b3});
     AddChildClusters(c1, {b1, c2, b4, b5, c3});
@@ -767,9 +794,11 @@ TEST_CASE("2.PKB.NextTExtractor nested containers") {
     AddChildClusters(c5, {b8, c6});
     AddChildClusters(c4, {c5, b12});
     proc1->SetBlockRoot(b1);
+    proc1->SetBlockTail(ex);
     proc1->SetClusterRoot(c0);
     proc2->SetClusterRoot(c4);
     proc2->SetBlockRoot(b8);
+    proc2->SetBlockTail(ex2);
     UpdateRanges({c6, c5, c4, c3, c2, c1, c0});
     proc_list.push_back(proc1);
     proc_list.push_back(proc2);
