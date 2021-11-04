@@ -11,6 +11,30 @@
 #include "AffectsExtractor.h"
 #include "AffectsTExtractor.h"
 
+const std::unordered_set<PKBRelRefs> runtime_relationships = {
+    PKBRelRefs::kNextT,
+    PKBRelRefs::kPreviousT,
+    PKBRelRefs::kAffects,
+    PKBRelRefs::kAffectedBy,
+    PKBRelRefs::kAffectsT,
+    PKBRelRefs::kAffectedByT,
+    PKBRelRefs::kNextBip,
+    PKBRelRefs::kPrevBip,
+    PKBRelRefs::kNextBipT,
+    PKBRelRefs::kPrevBipT
+};
+
+const std::unordered_set<DesignEntity> next_design_entities = {
+    DesignEntity::kRead,
+    DesignEntity::kPrint,
+    DesignEntity::kCall,
+    DesignEntity::kWhile,
+    DesignEntity::kIf,
+    DesignEntity::kAssign,
+    DesignEntity::kStmt,
+    DesignEntity::kProgLine
+};
+
 /**
  * This class acts as a facade for runtime extraction of relationships, for the DBManager to query. It abstracts out
  * the separate classes responsible for specific relationship extraction.
@@ -41,19 +65,6 @@ class RuntimeExtractor : public RuntimeMediator {
   AffectsTExtractor affects_t_extractor_ = AffectsTExtractor();
   NextBipExtractor next_bip_extractor_;
   NextBipTExtractor next_bip_t_extractor_;
-
-  static inline std::unordered_set<PKBRelRefs> runtime_relationships = {
-      PKBRelRefs::kNextT,
-      PKBRelRefs::kPreviousT,
-      PKBRelRefs::kAffects,
-      PKBRelRefs::kAffectedBy,
-      PKBRelRefs::kAffectsT,
-      PKBRelRefs::kAffectedByT,
-      PKBRelRefs::kNextBip,
-      PKBRelRefs::kPrevBip,
-      PKBRelRefs::kNextBipT,
-      PKBRelRefs::kPrevBipT
-  };
 
   std::vector<Entity*> GetNextT(int target);
   std::vector<Entity*> GetPrevT(int target);
