@@ -431,3 +431,11 @@ TEST_CASE("2.PKB.Affects.mixed_loops_source") {
     //                                  std::vector<Entity*>{}, std::vector<Entity*>{}, ScopeIndication::kNoScope).size() == 6);
   }
 }
+
+//TODO - for debug
+TEST_CASE("debug for sys test") {
+  PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../../Tests35/simple_lib/pql_single/affects.txt");
+  DBManager* dbm = new DBManager(pkb);
+  bool checker = dbm->HasRelationship(PKBRelRefs::kAffects, "13", "15");
+  REQUIRE_FALSE(checker);
+}
