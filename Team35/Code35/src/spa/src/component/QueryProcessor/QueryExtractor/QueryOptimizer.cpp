@@ -2,6 +2,38 @@
 #include "QueryGrouper.h"
 #include <algorithm>
 
+static const int subgroup_penalty = 70;
+static const int per_synonym_penalty = 15;
+static const int type_with_penalty = 0;
+static const int type_default_penalty = 10;
+static const std::unordered_map<RelRef, int> type_relref_penalty = {
+        {RelRef::kParent, 10}, {RelRef::kFollows, 10}, {RelRef::kModifiesS, 10}, {RelRef::kUsesS, 10},
+        {RelRef::kModifiesP, 20}, {RelRef::kUsesP, 20}, {RelRef::kCalls, 20}, {RelRef::kNext, 30},
+        {RelRef::kFollowsT, 90}, {RelRef::kParentT, 90}, {RelRef::kCallsT, 90}, {RelRef::kNextT, 100},
+        {RelRef::kAffects, 110}, {RelRef::kAffectsT, 120}
+};
+
+int QueryOptimizer::GetSubgroupPenalty() {
+  return subgroup_penalty;
+}
+
+int QueryOptimizer::GetTypePenalty(Clause* cl) {
+  if (typeid(*cl) == typeid(SuchThat)) {
+    auto* such_that = dynamic_cast<SuchThat *>(cl);
+    bool is_known_relref = type_relref_penalty.find(such_that->rel_ref) != type_relref_penalty.end();
+    return is_known_relref ? type_relref_penalty.at(such_that->rel_ref) : type_default_penalty;
+  } else if (typeid(*cl) == typeid(Pattern)) {
+    return type_default_penalty;
+  } else {
+    return type_with_penalty;
+  }
+};
+
+int QueryOptimizer::GetNumberOfSynonymsPenalty(Clause* cl) {
+  int num_syns = cl->GetAllSynonymNamesOfClause().size();
+  return num_syns * per_synonym_penalty;
+}
+
 void QueryOptimizer::Optimize() {
   PopulateSynAdjacencyList();
   PopulateWeightedClausesList();
@@ -12,7 +44,7 @@ void QueryOptimizer::Optimize() {
   PopulateGroupsList();
   ReorderGroups();
   // free memory for weighted
-  // FreeWeightedGroupsList();
+  FreeWeightedLists();
 }
 
 // populate intermediate data structure used for advanced grouping algorithm.
@@ -65,15 +97,6 @@ void QueryOptimizer::ReorderGroups() {
   this->groups.swap(boolean_groups);
 }
 
-// TODO: make grouping algorithm work with a vector of weightedgroups. The only thing special about weightedgroup
-// is that it works with weightedclauses. weightedclause contains the clause obj itself as an attribute, and
-// has a penalty/scoring system, lower the better
-// getter method that will calculate the organic clause penalty based on type/nSyns (default method is called: updateWeight)
-//  // ReorderClauses method will take the vector of weighted groups, call updateWeight()),
-// but has another field for subgroup penalty. -> ie based on subgrouping.
-// ReorderClauses method will take the vector of weighted groups, and sort each group of clauses based on
-// getScore() method call, which will take default score + penalty on the fly.
-// finally, we loop over each group, and for each weightedclause, we just need to clear vector<grooups*>, and rebuild it based on new order.
 void QueryOptimizer::ReorderClausesWithinWeightedGroups() {
   auto comparator = [](WeightedClause* const& c1, WeightedClause* const& c2) -> bool {
     return c1->GetWeight() < c2->GetWeight();
@@ -84,7 +107,16 @@ void QueryOptimizer::ReorderClausesWithinWeightedGroups() {
 }
 
 void QueryOptimizer::UpdateClauseWeights() {
+  for (auto cl : weighted_clauses) {
+    UpdateClauseWeight(cl);
+  }
+}
 
+void QueryOptimizer::UpdateClauseWeight(WeightedClause* cl) {
+  int total_weight = 0;
+  // total_weight += GetTypePenalty(cl->clause);
+  // total_weight += GetNumberOfSynonymsPenalty(cl->clause);
+  cl->UpdateClauseWeight(total_weight);
 }
 
 void QueryOptimizer::PopulateGroupsList() {
@@ -94,4 +126,11 @@ void QueryOptimizer::PopulateGroupsList() {
     for (auto w_cl : w_c) g->AddClauseToVector(w_cl->clause);
     groups.push_back(g);
   }
+}
+
+void QueryOptimizer::FreeWeightedLists() {
+  weighted_clauses.clear();
+  weighted_clauses.shrink_to_fit();
+  weighted_groups.clear();
+  weighted_groups.shrink_to_fit();
 }
