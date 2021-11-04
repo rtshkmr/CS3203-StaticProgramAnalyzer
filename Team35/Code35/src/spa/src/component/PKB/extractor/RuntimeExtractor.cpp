@@ -94,8 +94,8 @@ bool RuntimeExtractor::HasRelationship(PKBRelRefs ref) {
     case PKBRelRefs::kPreviousT: return pkb_->HasRelationship(PKBRelRefs::kNext);
     case PKBRelRefs::kAffects: return HasAffects();
     case PKBRelRefs::kAffectedBy: return HasAffectedBy();
-    case PKBRelRefs::kAffectsT: return HasAffects();
-    case PKBRelRefs::kAffectedByT: return HasAffectedBy();
+    case PKBRelRefs::kAffectsT: return HasAffectsT();
+    case PKBRelRefs::kAffectedByT: return HasAffectedByT();
     case PKBRelRefs::kNextBip: // fallthrough
     case PKBRelRefs::kPrevBip: // fallthrough
     case PKBRelRefs::kNextBipT: // fallthrough
@@ -316,6 +316,14 @@ bool RuntimeExtractor::HasAffects() {
 
 bool RuntimeExtractor::HasAffectedBy() {
   return affects_extractor_.HasAffects(); // Can be replace with (_,_)
+}
+
+bool RuntimeExtractor::HasAffectsT() {
+  return affects_t_extractor_.HasRelationship(RelDirection::kForward);
+}
+
+bool RuntimeExtractor::HasAffectedByT() {
+  return affects_t_extractor_.HasRelationship(RelDirection::kReverse);
 }
 
 std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetNextBip(DesignEntity first, DesignEntity second) {

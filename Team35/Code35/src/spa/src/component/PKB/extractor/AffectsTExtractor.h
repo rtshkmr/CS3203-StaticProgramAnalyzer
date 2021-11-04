@@ -14,7 +14,7 @@ class AffectsTExtractor : RuntimeColleague {
   std::vector<Entity*> GetRelationship(RelDirection dir, int target) {return {};};
   std::vector<Entity*> GetFirstEntityOfRelationship(RelDirection dir) {return {}; };
   std::vector<std::tuple<Entity*, Entity*>> GetRelationshipByTypes(RelDirection dir) {return {};};
-  bool HasRelationship(RelDirection dir) {return false;};
+  bool HasRelationship(RelDirection dir);
   bool HasRelationship(RelDirection dir, int target);
   bool HasRelationship(RelDirection dir, int first, int second);
   std::vector<Entity*> GetAffectsT(int target);

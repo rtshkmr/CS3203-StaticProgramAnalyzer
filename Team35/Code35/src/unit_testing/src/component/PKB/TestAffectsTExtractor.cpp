@@ -130,4 +130,13 @@ TEST_CASE("2.PKB.AffectsT.adv_spa_lecture") {
     CHECK_FALSE(dbm->HasRelationship(PKBRelRefs::kAffectedByT, "17")); //[not assign stmt] read stmt
     CHECK_FALSE(dbm->HasRelationship(PKBRelRefs::kAffectedByT, "18")); //[not assign stmt] call stmt
   }
+
+
+  SECTION ("5 - Has AffectsT : (_,_)") {
+    CHECK(dbm->HasRelationship(PKBRelRefs::kAffectsT));
+  }
+
+  SECTION ("6 - Has AffectedByT : (_,_)") {
+    CHECK(dbm->HasRelationship(PKBRelRefs::kAffectedByT));
+  }
 }

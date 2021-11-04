@@ -7,6 +7,11 @@ AffectsTExtractor::AffectsTExtractor(RuntimeMediator* rte, PKB* pkb) {
   this->pkb_ = pkb;
 }
 
+bool AffectsTExtractor::HasRelationship(RelDirection dir) {
+  if (!isCached) InitCache();
+  return affects_t_map_.size() > 0;
+}
+
 bool AffectsTExtractor::HasRelationship(RelDirection dir, int target) {
   if (!isCached) InitCache();
 

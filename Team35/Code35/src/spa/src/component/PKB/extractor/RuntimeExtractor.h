@@ -86,6 +86,8 @@ class RuntimeExtractor : public RuntimeMediator {
 
   bool HasAffects();
   bool HasAffectedBy();
+  bool HasAffectsT();
+  bool HasAffectedByT();
   bool HasNextBip();
 
   bool HasAffects(int first);
