@@ -103,8 +103,8 @@ void PSubsystem::CloseProcedureBlock() {
     current_procedure_ = nullptr;
     Block* last_block = block_stack_.top();
     block_stack_.pop();
-    // put the block root into the
     Cluster* outermost_cluster = cluster_stack_.top();
+    outermost_cluster->SetClusterTag(ClusterTag::kProcedureCluster);
     if(!Block::IsExitBlock(last_block)) {
       outermost_cluster->AddChildClusterToBack(last_block);
       outermost_cluster->UpdateClusterRange();
@@ -129,6 +129,10 @@ void PSubsystem::CloseElseBlock() {
     block_stack_.pop(); //pop the if_body block
 
     Block* if_cond_block = block_stack_.top();
+
+    else_body_block->SetClusterTag(ClusterTag::kElseBody);
+    if_body_block->SetClusterTag(ClusterTag::kIfBody);
+    if_cond_block->SetClusterTag(ClusterTag::kIfCond);
 
     if (Block::IsExitBlock(else_body_block)) {
       Block::PatchEmptyBlocks(else_body_block, block_if_else_exit);
@@ -170,6 +174,8 @@ void PSubsystem::CloseWhileBlock() {
   block_stack_.pop(); // link the last stmt to the while_cond_block block, and pop it.
   //todo: change from Block* to ConditionalBlock*
   Block* while_cond_block = dynamic_cast<Block*>(block_stack_.top());
+  while_cond_block->SetClusterTag(ClusterTag::kWhileCond);
+  while_body_block->SetClusterTag(ClusterTag::kWhileBody);
   assert(while_cond_block);
 
   bool is_currently_in_nested_cluster = cluster_stack_.size() > 1;
@@ -329,6 +335,8 @@ void PSubsystem::PerformNewProcedureSteps(Procedure* procedure) {
 }
 
 void PSubsystem::SetStatementObject(Statement* statement) {
+  statement->SetProcedureNode(current_procedure_);
+
   if (dynamic_cast<ElseEntity*>(statement) != nullptr)
     return;
 
@@ -389,12 +397,15 @@ void PSubsystem::HandleIfStmt(Entity* entity) {
   current_node_ = if_entity;
   Statement* conditional_statement = dynamic_cast<Statement*>(entity);
   ConditionalBlock* block_if_cond = CreateConditionalBlock(conditional_statement);
+  block_if_cond->SetClusterTag(ClusterTag::kIfCond);
   CreateBodyBlock(block_if_cond);
   AddControlVariableRelationships(if_entity->GetControlVariables());
   Cluster* if_cluster = new Cluster();
+  if_cluster->SetClusterTag(ClusterTag::kIfCluster);
   cluster_stack_.push(if_cluster);
   if_cluster->AddChildClusterToFront(block_if_cond);
   Cluster* if_body_cluster = new Cluster();
+  if_body_cluster->SetClusterTag(ClusterTag::kIfBody);
   if_cluster->AddChildClusterToBack(if_body_cluster);
   cluster_stack_.push(if_body_cluster);
 
@@ -418,6 +429,7 @@ void PSubsystem::HandleElseStmt(Entity* entity) {
   current_node_ = if_entity;
   CreateBodyBlock();
   Cluster* else_body_cluster = new Cluster();
+  else_body_cluster->SetClusterTag(ClusterTag::kElseBody);
   cluster_stack_.top()->AddChildClusterToBack(else_body_cluster);
   cluster_stack_.push(else_body_cluster);
 }
@@ -432,13 +444,16 @@ void PSubsystem::HandleWhileStmt(Entity* entity) {
 
   Statement* conditional_statement = dynamic_cast<Statement*>(entity);
   ConditionalBlock* block_while_cond = CreateConditionalBlock(conditional_statement);
+  block_while_cond->SetClusterTag(ClusterTag::kWhileCond);
   block_while_cond->isWhile = true;
   CreateBodyBlock(block_while_cond);
   AddControlVariableRelationships(while_entity->GetControlVariables());
   Cluster* while_cluster = new Cluster();
+  while_cluster->SetClusterTag(ClusterTag::kWhileCluster);
   cluster_stack_.push(while_cluster);
   while_cluster->AddChildClusterToFront(block_while_cond);
   Cluster* while_body_cluster = new Cluster();
+  while_body_cluster->SetClusterTag(ClusterTag::kWhileBody);
   while_cluster->AddChildClusterToBack(while_body_cluster);
   cluster_stack_.push(while_body_cluster);
 }
@@ -466,7 +481,6 @@ ConditionalBlock* PSubsystem::CreateConditionalBlock(Statement* conditional_stat
     }
     block_stack_.push(static_cast<Block* const>(conditional_block));
   } else {
-    // todo: need to convert this to dynamic_cast by adding a virtual destructor as WeiJie advised?
     conditional_block = static_cast<ConditionalBlock*>(block_stack_.top());
   }
   return conditional_block;
@@ -509,10 +523,10 @@ void PSubsystem::HandleAssignStmt(Entity* entity) {
   AssignEntity* assign_entity = dynamic_cast<AssignEntity*>(entity);
   assert(assign_entity);
   deliverable_->AddAssignEntity(assign_entity);
-  deliverable_->AddModifiesRelationship(assign_entity, assign_entity->GetVariable());
-  deliverable_->AddModifiesRelationship(current_procedure_, assign_entity->GetVariable());  //procedure level
+  deliverable_->AddModifiesRelationship(assign_entity, assign_entity->GetVariableObj());
+  deliverable_->AddModifiesRelationship(current_procedure_, assign_entity->GetVariableObj());  //procedure level
   if (current_procedure_ != current_node_)
-    deliverable_->AddModifiesRelationship(current_node_, assign_entity->GetVariable());  //container level
+    deliverable_->AddModifiesRelationship(current_node_, assign_entity->GetVariableObj());  //container level
 
   // todo: add these variables into the respective sets in cluster/block
   for (Variable* v: assign_entity->GetControlVariables()) {

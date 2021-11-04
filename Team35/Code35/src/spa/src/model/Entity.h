@@ -7,7 +7,6 @@
 #include <list>
 #include <datatype/DataType.h>
 #include <set>
-#include "CFG.h"
 
 enum class EntityEnum {
   kNone = 0,
@@ -35,6 +34,7 @@ class Entity {
 };
 
 class Container;
+class Procedure;
 
 /**
  * Statement is an abstract class and derived from Entity.
@@ -45,16 +45,20 @@ class Statement : public Entity {
  protected:
   LineNumber* line_number_;
   StatementNumber* statement_number_;
+  Procedure* procedure_node_;
   Container* parent_node_;
   Statement* before_node_;
  public:
   virtual ~Statement() {};
   void SetLineNumber(LineNumber* ln);
   void SetStatementNumber(StatementNumber* sn);
+  void SetProcedureNode(Procedure* procedure);
   void SetParentNode(Container* parent);
   void SetBeforeNode(Statement* before);
   StatementNumber* GetStatementNumber();
   LineNumber* GetLineNumber();
+  std::string GetLineNumberString();
+  Procedure* GetProcedureNode();
   Container* GetParentNode();
   Statement* GetBeforeNode();
 };
@@ -89,9 +93,8 @@ class Procedure : public Entity, public Container {
   const Block* block_tail_ = nullptr;
  public:
   Procedure(ProcedureName* procedureName);
-
   const ProcedureName* GetName();
-
+  Cluster* GetInnermostCluster(int first_stmt, int second_stmt, Cluster* prev_cluster);
   const void SetClusterRoot(Cluster* cluster);
   const void SetBlockRoot(Block* block_root);
   const void SetBlockTail(Block* block_tail);
@@ -109,7 +112,11 @@ class Variable : public Entity {
  public:
   Variable(VariableName* variableName);
 
-  const VariableName* GetName();
+  const VariableName* GetVariableName();
+
+  const std::string GetName() const;
+
+  std::string GetNameInString();
 
   void AddStatement(Statement* stmt);
 
@@ -142,6 +149,9 @@ class Program {
   Program(Procedure* p);
 
   std::list<Procedure*>* GetProcedureList();
+  Cluster* GetProcClusterForLineNum(int line_num);
+  Procedure* GetProcForLineNum(int line_num);
+  Cluster* GetEncapsulatingCluster(int first_stmt, int second_stmt, Cluster* prev_cluster);
 
   void AddProcedure(Procedure* p);
 };

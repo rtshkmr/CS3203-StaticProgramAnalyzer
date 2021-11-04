@@ -1,7 +1,7 @@
 #include "catch.hpp"
 #include <component/PKB/extractor/NextBipExtractor.h>
 #include <component/PKB/extractor/NextBipTExtractor.h>
-#include <component/PKB/RuntimeExtractor.h>
+#include <component/PKB/extractor/RuntimeExtractor.h>
 #include "component/SourceProcessor/SourceProcessor.h"
 #include "../../util/TestUtil.h"
 

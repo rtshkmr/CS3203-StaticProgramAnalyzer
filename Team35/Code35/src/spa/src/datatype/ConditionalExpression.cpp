@@ -42,5 +42,5 @@ std::vector<Variable*> ConditionalExpression::GetVariableList() {
  */
 bool ConditionalExpression::CheckExist(Variable* var) {
   return std::binary_search(var_list_.begin(), var_list_.end(), var,
-                            [](Variable* a, Variable* b) { return *a->GetName() < *b->GetName(); });
+                            [](Variable* a, Variable* b) { return * a->GetVariableName() < * b->GetVariableName(); });
 }

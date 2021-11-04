@@ -5,29 +5,18 @@ ClauseCommandExecutor::ClauseCommandExecutor(QueryEvaluatorTable *table, Interme
 group_table(table), table(intermediate_table) {}
 
 /**
- * The 2 synonyms in the such that clause are already in the group_table. This only restricts rows in the group table
- * and does not add new rows.
- * @param clause The current clause being evaluated.
+ * The 2 synonyms in the clause are already in the group_table. This only restricts rows in the group table
+ * and does not add new rows. The check is then dispatched according to the type of the clause to check if there
+ * is a valid case based on the conditions in the clause and decides if the row should be deleted.
+ * @param clause
  */
-void ClauseCommandExecutor::SuchThatTwoSynonym(Clause *clause) {
-  auto *such_that_clause = dynamic_cast<SuchThat *>(clause);
+void ClauseCommandExecutor::DoubleSynonymIntersection(Clause *clause) {
   int delete_count = 0;
+  int table_size = group_table->GetRowSize();
 
-  std::vector<Entity *> first_stmt_list = group_table->GetColumn(such_that_clause->first_synonym);
-  std::vector<Entity *> second_stmt_list = group_table->GetColumn(such_that_clause->second_synonym);
-  std::vector<std::tuple<Entity *, Entity *>> intermediate_table = table->GetRelationshipsByType();
+  for (int i = 0; i < table_size; i++) {
+    bool relationship_holds = DoubleSynonymIntersectionCheck(clause, i - delete_count);
 
-  for (int i = 0; i < first_stmt_list.size(); i++) {
-    Entity* first_entity = first_stmt_list[i];
-    Entity* second_entity = second_stmt_list[i];
-
-    bool relationship_holds = false;
-    for (auto result: intermediate_table) {
-      if (std::get<0>(result) == first_entity && std::get<1>(result) == second_entity) {
-        relationship_holds = true;
-        break;
-      }
-    }
     if (!relationship_holds) {
       group_table->DeleteRow(i - delete_count);
       delete_count++;
@@ -35,49 +24,69 @@ void ClauseCommandExecutor::SuchThatTwoSynonym(Clause *clause) {
   }
 }
 
-/**
- * The 2 synonyms in the pattern clause are already in the group_table. This only restricts rows in the group table
- * and does not add new rows. We only need to check the assign synonym as well as the expression.
- * Assume the intermediate table gives a vector of Entity*.
- * @param clause The current clause being evaluated.
- */
-void ClauseCommandExecutor::PatternTwoSynonym(Clause *clause) {
-  auto *pattern_clause = dynamic_cast<Pattern *>(clause);
-  Synonym *first_clause = pattern_clause->first_synonym;
-  Synonym *second_clause = pattern_clause->second_synonym;
-
-  std::vector<Entity *> first_entity_stmt_list = group_table->GetColumn(first_clause);
-  std::vector<Entity *> variable_list = group_table->GetColumn(second_clause);
-  std::vector<Entity *> intermediate_table = table->GetRelationships();
-
-  int delete_count = 0;
-
-  // For each row in the group table
-  for (int i = 0; i < first_entity_stmt_list.size(); i++) {
-    Entity *current_entity = first_entity_stmt_list[i];
-    bool has_relationship;
-    if (typeid(*current_entity) == typeid(AssignEntity)) {
-      has_relationship = HasAssignPatternRelationship(current_entity, variable_list[i], pattern_clause);
-    } else {
-      has_relationship = HasWhileOrIfPatternRelationship(current_entity, variable_list[i]);
-    }
-
-    if (!has_relationship) {
-      group_table->DeleteRow(i - delete_count);
-      delete_count++;
-    }
+bool ClauseCommandExecutor::DoubleSynonymIntersectionCheck(Clause *clause, int index) {
+  if (typeid(*clause) == typeid(SuchThat)) {
+    return SuchThatDoubleSynonymIntersection(dynamic_cast<SuchThat *>(clause), index);
+  } else if (typeid(*clause) == typeid(Pattern)) {
+    return PatternDoubleSynonymIntersection(dynamic_cast<Pattern *>(clause), index);
+  } else {
+    return WithDoubleSynonymIntersection(dynamic_cast<With *>(clause), index);
   }
 }
+
+bool ClauseCommandExecutor::SuchThatDoubleSynonymIntersection(SuchThat *clause, int index) {
+  Synonym *first_syn = clause->first_synonym;
+  Synonym *second_syn = clause->second_synonym;
+  Entity* first_entity = group_table->GetColumn(first_syn)[index];
+  Entity* second_entity = group_table->GetColumn(second_syn)[index];
+  std::vector<std::tuple<Entity *, Entity *>> intermediate_table = table->GetRelationshipsByType();
+  for (auto result: intermediate_table) {
+    if (std::get<0>(result) == first_entity && std::get<1>(result) == second_entity) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool ClauseCommandExecutor::PatternDoubleSynonymIntersection(Pattern *clause, int index) {
+  Synonym *first_synonym = clause->first_synonym;
+  Synonym *second_synonym = clause->second_synonym;
+  std::vector<Entity *> first_entity_stmt_list = group_table->GetColumn(first_synonym);
+  std::vector<Entity *> variable_list = group_table->GetColumn(second_synonym);
+  Entity *current_entity = first_entity_stmt_list[index];
+
+  if (typeid(*current_entity) == typeid(AssignEntity)) {
+    return HasAssignPatternRelationship(current_entity, variable_list[index], clause);
+  } else {
+    return HasWhileOrIfPatternRelationship(current_entity, variable_list[index]);
+  }
+}
+
+bool ClauseCommandExecutor::WithDoubleSynonymIntersection(With *with_clause, int index) {
+  std::vector<Entity *> first_stmt_list = group_table->GetColumn(with_clause->first_synonym);
+  std::vector<Entity *> second_stmt_list = group_table->GetColumn(with_clause->second_synonym);
+  Entity* first_entity = first_stmt_list[index];
+  Entity* second_entity = second_stmt_list[index];
+  std::string first_entity_value = RetrieveEntityAttribute(first_entity, with_clause->left_attribute);
+  std::string second_entity_value = RetrieveEntityAttribute(second_entity, with_clause->right_attribute);
+  return first_entity_value == second_entity_value;
+}
+
 
 bool ClauseCommandExecutor::HasAssignPatternRelationship(Entity *assign_entity, Entity *variable_entity, Pattern *pattern) {
   std::vector<Entity *> intermediate_table = table->GetRelationships();
   bool has_relationship = false;
 
   for (auto current_entity: intermediate_table) {
+//<<<<<<< HEAD
+//    auto *current_assign_entity = dynamic_cast<AssignEntity *>(current_entity);
+//    Variable *current_variable_entity = current_assign_entity->GetVariable();
+//=======
     AssignEntity *current_assign_entity = dynamic_cast<AssignEntity *>(current_entity);
-    Variable *current_variable_entity = current_assign_entity->GetVariable();
+    Variable *current_variable_entity = current_assign_entity->GetVariableObj();
+//>>>>>>> master
     if (current_assign_entity == assign_entity && variable_entity == current_variable_entity &&
-        HasExpressionMatch(pattern, current_assign_entity)) {
+    HasExpressionMatch(pattern, current_assign_entity)) {
       has_relationship = true;
       break;
     }
@@ -88,113 +97,117 @@ bool ClauseCommandExecutor::HasAssignPatternRelationship(Entity *assign_entity, 
 bool ClauseCommandExecutor::HasWhileOrIfPatternRelationship(Entity *left_entity, Entity *variable_entity) {
   std::vector<Entity *> intermediate_table = table->GetRelationships();
   bool has_relationship = false;
-
   for (auto first_entity: intermediate_table) {
     std::vector<Variable*> control_variables;
     if (typeid(*left_entity) == typeid(WhileEntity)) {
-      WhileEntity *current_entity = dynamic_cast<WhileEntity *>(first_entity);
+      auto *current_entity = dynamic_cast<WhileEntity *>(first_entity);
       control_variables = current_entity->GetControlVariables();
     } else {
-      IfEntity *current_entity = dynamic_cast<IfEntity *>(first_entity);
+      auto *current_entity = dynamic_cast<IfEntity *>(first_entity);
       control_variables = current_entity->GetControlVariables();
     }
-
     for (auto current_variable_entity : control_variables) {
       if (left_entity == first_entity && variable_entity == current_variable_entity) {
         has_relationship = true;
       }
     }
-
     if (has_relationship) break;
   }
   return has_relationship;
 }
 
-void ClauseCommandExecutor::SuchThatTwoSynonymOneInTable(Clause *clause, bool first_syn_in) {
-  auto *such_that_clause = dynamic_cast<SuchThat *>(clause);
-  Synonym *synonym_in_table = first_syn_in ? such_that_clause->first_synonym : such_that_clause->second_synonym;
-  Synonym *new_synonym = first_syn_in ? such_that_clause->second_synonym : such_that_clause->first_synonym;
-
-  group_table->AddColumn(new_synonym); // Add a new column in the group_table first
-
-  std::vector<Entity *> targetSynonymList = group_table->GetColumn(synonym_in_table);
-  std::vector<std::tuple<Entity *, Entity *>> intermediate_table = table->GetRelationshipsByType();
-  unsigned long number_of_times_to_traverse = targetSynonymList.size();
-  int target_synonym_list_reference = 0;
-
-  for (int i = 0; i < number_of_times_to_traverse; i++) {    // For each synonym in the table
-    Entity *curr_entity = targetSynonymList[target_synonym_list_reference];
-
-    bool hasValidRelationship = false;
-    int number_of_repeats = 0;
-
-    //
-    for (auto iter: intermediate_table) {
-      Entity *entity_to_be_compared = first_syn_in ? std::get<0>(iter) : std::get<1>(iter);
-      Entity *entity_to_be_added = first_syn_in ? std::get<1>(iter) : std::get<0>(iter);
-      if (curr_entity == entity_to_be_compared) {
-        // Add new row for each col in table
-        group_table->AddMultipleRowForAllColumn(new_synonym, i, entity_to_be_added, number_of_repeats);
-
-        hasValidRelationship = true;
-        number_of_repeats++;
-      }
+std::string ClauseCommandExecutor::RetrieveEntityAttribute(Entity *entity, Attribute attribute) {
+  switch (attribute) {
+  case (Attribute::kStmtNumber):
+    return std::to_string(const_cast<StatementNumber*>(dynamic_cast<Statement *>(entity)->GetStatementNumber())->GetNum());
+  case Attribute::kProcName :
+    if (typeid(*entity) == typeid(Procedure)) {
+      return const_cast<ProcedureName*>(dynamic_cast<Procedure *>(entity)->GetName())->getName();
+    } else {
+      return const_cast<ProcedureName*>(dynamic_cast<CallEntity *>(entity)->GetProcedure()->GetName())->getName();
     }
-
-    if (number_of_repeats > 0) {
-      i += number_of_repeats - 1;
-      number_of_times_to_traverse += number_of_repeats - 1;
+  case Attribute::kValue:
+    return std::to_string(const_cast<ConstantValue*>(dynamic_cast<Constant *>(entity)->GetValue())->Get());
+  case Attribute::kVarName:
+    if (typeid(*entity) == typeid(Variable)) {
+      return dynamic_cast<Variable*>(entity)->GetNameInString();
+    } else if (typeid(*entity) == typeid(ReadEntity)) {
+      return dynamic_cast<ReadEntity *>(entity)->GetVariable()->GetNameInString();
+    } else {
+      return dynamic_cast<PrintEntity *>(entity)->GetVariable()->GetNameInString();
     }
-
-    // If there are no valid relationships, delete currRow from table.
-    if (!hasValidRelationship) {
-      group_table->DeleteRow(i);
-      i--;
-      number_of_times_to_traverse--;
-    }
-    target_synonym_list_reference++;
+  default:
+    return "";
   }
 }
 
 /**
- * Pattern clause contains assign and variable synonym, however, either might not be in the table.
- * Assume the Intermediate table returns a vector of entity, and this entity is always assign entity.
- * @param clause
- * @param first_syn_in
+ * Takes in a clause with two synonyms, one in the table and the other not, then adds or deletes rows according to the
+ * type of clause and its respective evaluation.
+ * @param clause The current clause being evaluated, irregardless of association with group type.
+ * @param first_syn_in True if the first synonym of the clause is in the table, false if the second synonym is in
+ * the table.
  */
-void ClauseCommandExecutor::PatternTwoSynonymOneInTable(Clause *clause, bool first_syn_in) {
-  auto *pattern_clause = dynamic_cast<Pattern *>(clause);
-  Synonym *synonym_in_table = first_syn_in ? pattern_clause->first_synonym : pattern_clause->second_synonym;
-  Synonym *new_synonym = first_syn_in ? pattern_clause->second_synonym : pattern_clause->first_synonym;
-
-  std::vector<Entity *> entity_list_in_table = group_table->GetColumn(synonym_in_table);
-  std::vector<Entity *> intermediate_table = table->GetRelationships();
-  unsigned long table_size = entity_list_in_table.size();
-  group_table->AddColumn(new_synonym);
+void ClauseCommandExecutor::DoubleSynonymExpansion(Clause *clause, bool first_syn_in) {
   int group_table_pointer = 0;
-
-  for (int table_index = 0; table_index < table_size; table_index++) {
-    Entity *entity_in_table = entity_list_in_table[table_index];
-    int repeat_count = 0;
-    bool has_relation = false;
-
-    // Entity could be stmt entity or variable
-    if (first_syn_in) {
-      std::tuple<bool, int> tuple = PatternRowAdditionForVariable(group_table_pointer, new_synonym, entity_in_table, pattern_clause);
-      has_relation = std::get<0>(tuple);
-      repeat_count = std::get<1>(tuple);
-    } else {
-      std::tuple<bool, int> tuple = PatternRowAdditionForStmt(group_table_pointer, new_synonym, entity_in_table, pattern_clause);
-      has_relation = std::get<0>(tuple);
-      repeat_count = std::get<1>(tuple);
-    }
-
+  int table_size = group_table->GetRowSize();
+  Synonym* new_synonym = first_syn_in ? clause->second_synonym : clause->first_synonym;
+  group_table->AddColumn(new_synonym);
+  for (int i = 0; i < table_size; i++) {
+    // Send to dispatcher to reallocate the work that returns repeat_count and has_relation.
+    std::tuple<bool, int> tuple = DoubleSynonymExpansionCheck(clause, first_syn_in, group_table_pointer);
+    bool has_relation = std::get<0>(tuple);
+    int repeat_count = std::get<1>(tuple);
     if (repeat_count > 0) group_table_pointer += repeat_count - 1;
     if (!has_relation) {
       group_table->DeleteRow(group_table_pointer);
       group_table_pointer--;
     }
     group_table_pointer++;
+  }
+}
+
+std::tuple<bool, int> ClauseCommandExecutor::DoubleSynonymExpansionCheck(Clause *clause, bool first_syn_in, int index) {
+  if (typeid(*clause) == typeid(SuchThat)) {
+    return SuchThatRowAddition(dynamic_cast<SuchThat*>(clause), first_syn_in, index);
+  } else if (typeid(*clause) == typeid(Pattern)) {
+    return PatternRowAddition(dynamic_cast<Pattern*>(clause), first_syn_in, index);
+  } else {
+    return WithRowAddition(dynamic_cast<With *>(clause), first_syn_in, index);
+  }
+}
+
+std::tuple<bool, int> ClauseCommandExecutor::SuchThatRowAddition(SuchThat *clause, bool first_syn_in, int index) {
+  Synonym *synonym_in_table = first_syn_in ? clause->first_synonym : clause->second_synonym;
+  Synonym *new_synonym = first_syn_in ? clause->second_synonym : clause->first_synonym;
+  std::vector<Entity *> target_synonym_list = group_table->GetColumn(synonym_in_table);
+  Entity *curr_entity = target_synonym_list[index];
+  std::vector<std::tuple<Entity *, Entity *>> intermediate_table = table->GetRelationshipsByType();
+
+  int number_of_repeats = 0;
+  bool has_valid_relationship = false;
+  for (auto iter: intermediate_table) {
+    Entity *entity_to_be_compared = first_syn_in ? std::get<0>(iter) : std::get<1>(iter);
+    Entity *entity_to_be_added = first_syn_in ? std::get<1>(iter) : std::get<0>(iter);
+    // Add new row for each col in table
+    if (curr_entity == entity_to_be_compared) {
+      group_table->AddMultipleRowForAllColumn(new_synonym, index, entity_to_be_added, number_of_repeats);
+      has_valid_relationship = true;
+      number_of_repeats++;
+    }
+  }
+  return std::make_tuple(has_valid_relationship, number_of_repeats);
+}
+
+std::tuple<bool, int> ClauseCommandExecutor::PatternRowAddition(Pattern *pattern_clause, bool first_syn_in, int index) {
+  Synonym *synonym_in_table = first_syn_in ? pattern_clause->first_synonym : pattern_clause->second_synonym;
+  Synonym *new_synonym = first_syn_in ? pattern_clause->second_synonym : pattern_clause->first_synonym;
+  std::vector<Entity *> entity_list_in_table = group_table->GetColumn(synonym_in_table);
+  Entity *entity_in_table = entity_list_in_table[index];
+  if (first_syn_in) {
+    return PatternRowAdditionForVariable(index, new_synonym, entity_in_table, pattern_clause);
+  } else {
+    return PatternRowAdditionForStmt(index, new_synonym, entity_in_table, pattern_clause);
   }
 }
 
@@ -207,33 +220,29 @@ void ClauseCommandExecutor::PatternTwoSynonymOneInTable(Clause *clause, bool fir
  * @return
  */
 std::tuple<bool, int>
-ClauseCommandExecutor::PatternRowAdditionForStmt(int index, Synonym *synonym_column_to_add, Entity *entity_in_table, Pattern *pattern) {
+ClauseCommandExecutor::PatternRowAdditionForStmt(int index, Synonym *synonym_column_to_add, Entity *variable_in_table,
+                                                 Pattern *pattern) {
   std::vector<Entity *> intermediate_table = table->GetRelationships();
   int repeat_count = 0;
   bool has_relation = false;
-
   for (auto stmt_entity : intermediate_table) {
-    bool stmt_contains_variable = false;
     std::vector<Variable *> variable_to_check = RetrieveVariablesFromStmt(stmt_entity);
-
+    // Need to check that the variable and expression matches, then add the stmt
     for (auto variable : variable_to_check) {
-      // Need to check that the variable and expression matches
-      bool match_found = false;
+      bool match_found;
       if (typeid(*stmt_entity) == typeid(AssignEntity)) {
-        match_found = variable == entity_in_table && HasExpressionMatch(pattern, dynamic_cast<AssignEntity *>(stmt_entity));
+        match_found = variable == variable_in_table &&
+                HasExpressionMatch(pattern, dynamic_cast<AssignEntity *>(stmt_entity));
       } else {
-        match_found = variable == entity_in_table;
+        match_found = variable == variable_in_table;
       }
       if (match_found) {
-        stmt_contains_variable = true;
         has_relation = true;
-
         group_table->AddMultipleRowForAllColumn(synonym_column_to_add, index, stmt_entity, repeat_count);
         repeat_count++;
       }
     }
   }
-
   return std::make_tuple(has_relation, repeat_count);
 }
 
@@ -253,7 +262,7 @@ ClauseCommandExecutor::PatternRowAdditionForVariable(int index, Synonym *synonym
   bool has_relation = false;
 
   for (auto stmt_entity : intermediate_table) {
-    bool match_found = false;
+    bool match_found;
     if (typeid(*stmt_entity) == typeid(AssignEntity)) {
       match_found = stmt_entity == entity_in_table && HasExpressionMatch(pattern, dynamic_cast<AssignEntity *>(stmt_entity));
     } else {
@@ -276,63 +285,94 @@ ClauseCommandExecutor::PatternRowAdditionForVariable(int index, Synonym *synonym
   return std::make_tuple(has_relation, repeat_count);
 }
 
-void ClauseCommandExecutor::SuchThatOneSynonym(Clause *clause, bool first_syn_in) {
-  auto *such_that_clause = dynamic_cast<SuchThat *>(clause);
-  std::vector<Entity *> entity_list_to_compare = table->GetRelationships();
-  Synonym *syn_in_table = first_syn_in ? such_that_clause->first_synonym : such_that_clause->second_synonym;
-  std::vector<Entity *> list_of_entity_in_table = group_table->GetColumn(syn_in_table);
-  int delete_count = 0;
+std::tuple<bool, int>
+ClauseCommandExecutor::WithRowAddition(With *with_clause, bool first_syn_in, int index) {
+  Synonym *synonym_in_table = first_syn_in ? with_clause->first_synonym : with_clause->second_synonym;
+  Synonym *new_synonym = first_syn_in ? with_clause->second_synonym : with_clause->first_synonym;
+  std::vector<std::tuple<Entity *, Entity *>> intermediate_table = table->GetRelationshipsByType();
+  std::vector<Entity *> entity_list_in_table = group_table->GetColumn(synonym_in_table);
+  int number_of_repeats = 0;
+  bool has_valid_relationship = false;
 
-  for (int i = 0; i < list_of_entity_in_table.size(); i++) {
-    Entity *curr_entity_in_table = list_of_entity_in_table[i];
-
-    bool containsRelationship = false;
-
-    for (auto entity_to_compare : entity_list_to_compare) {
-      if (entity_to_compare == curr_entity_in_table) {
-        containsRelationship = true;
-        break;
-      }
-    }
-
-    if (!containsRelationship) {
-      group_table->DeleteRow(i - delete_count);
-      delete_count++;
+  for (auto iter : intermediate_table) {
+    Entity *entity_to_be_compared = first_syn_in ? std::get<0>(iter) : std::get<1>(iter);
+    Entity *entity_to_be_added = first_syn_in ? std::get<1>(iter) : std::get<0>(iter);
+    if (entity_list_in_table[index] == entity_to_be_compared) {
+      group_table->AddMultipleRowForAllColumn(new_synonym, index, entity_to_be_added, number_of_repeats);
+      number_of_repeats++;
+      has_valid_relationship = true;
     }
   }
+  return std::make_tuple(has_valid_relationship, number_of_repeats);
 }
 
-/**
- * Check all stmt entity and check if the value provided matches the value of the Variable(s) in the stmt entity.
- * @param clause
- */
-void ClauseCommandExecutor::PatternOneSynonym(Clause *clause) {
-  auto *pattern_clause = dynamic_cast<Pattern *>(clause);
-  std::vector<Entity *> assign_entity_in_table_list = group_table->GetColumn(pattern_clause->first_synonym);
-  std::string left_side_value = pattern_clause->left_hand_side;
-  unsigned long table_size = assign_entity_in_table_list.size();
+void ClauseCommandExecutor::SingleSynonymIntersection(Clause *clause, bool first_syn_in) {
   int delete_count = 0;
+  int table_size = group_table->GetRowSize();
 
   for (int i = 0; i < table_size; i++) {
-    Entity *current_assign_stmt = assign_entity_in_table_list[i];
+    bool relationship_exists = SingleSynonymIntersectionCheck(clause, first_syn_in, i - delete_count);
 
-    if (!HasPatternValueMatch(current_assign_stmt, left_side_value, pattern_clause)) {
+    if (!relationship_exists) {
       group_table->DeleteRow(i - delete_count);
       delete_count++;
     }
   }
 }
 
-bool ClauseCommandExecutor::HasPatternValueMatch(Entity *stmt_entity_in_table, std::string value, Pattern *pattern) {
+bool ClauseCommandExecutor::SingleSynonymIntersectionCheck(Clause *clause, bool first_syn_in, int index) {
+  if (typeid(*clause) == typeid(SuchThat)) {
+    return SuchThatSingleSynonymIntersection(dynamic_cast<SuchThat *>(clause), first_syn_in, index);
+  } else if (typeid(*clause) == typeid(Pattern)) {
+    return PatternSingleSynonymIntersection(dynamic_cast<Pattern *>(clause), index);
+  } else {
+    return WithSingleSynonymIntersection(dynamic_cast<With *>(clause), first_syn_in, index);
+  }
+}
+
+bool ClauseCommandExecutor::SuchThatSingleSynonymIntersection(SuchThat *clause, bool first_syn_in, int index) {
+  std::vector<Entity *> entity_list_to_compare = table->GetRelationships();
+  Synonym *syn_in_table = first_syn_in ? clause->first_synonym : clause->second_synonym;
+  Entity *curr_entity_in_table = group_table->GetColumn(syn_in_table)[index];
+
+  for (auto entity_to_compare : entity_list_to_compare) {
+    if (entity_to_compare == curr_entity_in_table) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool ClauseCommandExecutor::PatternSingleSynonymIntersection(Pattern *clause, int index) {
+  std::vector<Entity *> assign_entity_in_table_list = group_table->GetColumn(clause->first_synonym);
+  std::string left_side_value = clause->left_hand_side;
+  Entity *current_assign_stmt = assign_entity_in_table_list[index];
+  return HasPatternValueMatch(current_assign_stmt, left_side_value, clause);
+}
+
+bool ClauseCommandExecutor::WithSingleSynonymIntersection(With *with_clause, bool first_syn_in, int index) {
+  std::vector<Entity *> entity_list_to_compare = table->GetRelationships();
+  Synonym *syn_in_table = first_syn_in ? with_clause->first_synonym : with_clause->second_synonym;
+  Entity *curr_entity_in_table = group_table->GetColumn(syn_in_table)[index];
+
+  for (auto entity_to_compare : entity_list_to_compare) {
+    if (entity_to_compare == curr_entity_in_table) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool ClauseCommandExecutor::HasPatternValueMatch(Entity *stmt_entity_in_table, const std::string& value, Pattern *pattern) {
   std::vector<Variable *> variable_to_check = RetrieveVariablesFromStmt(stmt_entity_in_table);
 
   if (typeid(*stmt_entity_in_table) == typeid(AssignEntity)) {
     AssignEntity *assign_entity = dynamic_cast<AssignEntity *>(stmt_entity_in_table);
-    std::string variable_value_in_table = const_cast<VariableName*>(variable_to_check[0]->GetName())->getName();
+    std::string variable_value_in_table = const_cast<VariableName*>(variable_to_check[0]->GetVariableName())->GetName();
     return (value == "_" || value == variable_value_in_table) && HasExpressionMatch(pattern, assign_entity);
   } else {
     for (auto variable : variable_to_check) {
-      std::string variable_value_in_table = const_cast<VariableName*>(variable->GetName())->getName();
+      std::string variable_value_in_table = const_cast<VariableName*>(variable->GetVariableName())->GetName();
       if (value == "_" || variable_value_in_table == value) return true;
     }
     return false;
@@ -343,14 +383,14 @@ std::vector<Variable *> ClauseCommandExecutor::RetrieveVariablesFromStmt(Entity 
   std::vector<Variable *> variable_to_check;
   if (typeid(*stmt_entity) == typeid(AssignEntity)) {
     AssignEntity *assign_entity = dynamic_cast<AssignEntity *>(stmt_entity);
-    variable_to_check.push_back(assign_entity->GetVariable());
+    variable_to_check.push_back(assign_entity->GetVariableObj());
   } else if (typeid(*stmt_entity) == typeid(IfEntity)) {
-    IfEntity *if_entity = dynamic_cast<IfEntity *>(stmt_entity);
+    auto *if_entity = dynamic_cast<IfEntity *>(stmt_entity);
     for (auto variable : if_entity->GetControlVariables()) {
       variable_to_check.push_back(variable);
     }
   } else if (typeid(*stmt_entity) == typeid(WhileEntity)) {
-    WhileEntity *if_entity = dynamic_cast<WhileEntity *>(stmt_entity);
+    auto *if_entity = dynamic_cast<WhileEntity *>(stmt_entity);
     for (auto variable : if_entity->GetControlVariables()) {
       variable_to_check.push_back(variable);
     }

@@ -1,9 +1,17 @@
 #include <list>
 #include <cassert>
+#include <model/Statement.h>
 #include "QueryProjector.h"
 
-QueryProjector::QueryProjector(std::vector<Synonym*> target_synonyms_list)
-    : target_synonym_list(target_synonyms_list) {}
+QueryProjector::QueryProjector(std::vector<std::pair<Synonym*, Attribute>> target_syn_attr_list)
+    : target_syn_attr_list(target_syn_attr_list) {
+  for (auto p : target_syn_attr_list) {
+    if (syn_to_attrs_map.find(p.first->GetName()) == syn_to_attrs_map.end()) {
+      syn_to_attrs_map[p.first->GetName()] = std::vector<Attribute>();
+    }
+    syn_to_attrs_map[p.first->GetName()].push_back(p.second);
+  }
+}
 
 /**
  * Formats the UnformattedQueryResult into the requirements for the TestWrapper.
@@ -20,11 +28,11 @@ QueryProjector::QueryProjector(std::vector<Synonym*> target_synonyms_list)
 std::vector<std::string> QueryProjector::FormatQuery(UnformattedQueryResult unformatted_results) {
   std::vector<QueryEvaluatorTable*> table_references = unformatted_results.GetTables();
 
-  if (!unformatted_results.GetBooleanResult() && !target_synonym_list.empty()) {
+  if (!unformatted_results.GetBooleanResult() && !target_syn_attr_list.empty()) {
     return std::vector<std::string>{};
   }
   // boolean synonym
-  if (target_synonym_list.empty()) {
+  if (target_syn_attr_list.empty()) {
     std::vector<std::string> wrapped_boolean =
         std::vector<std::string>{unformatted_results.GetBooleanResult() ? "TRUE" : "FALSE"};
     return wrapped_boolean;
@@ -35,22 +43,32 @@ std::vector<std::string> QueryProjector::FormatQuery(UnformattedQueryResult unfo
   for (QueryEvaluatorTable* table : table_references) {
     // Get the unique list of results for that table
     std::vector<Synonym*> table_target_list = table->GetTargetSynonymList();
-    result_synonym_order.insert(result_synonym_order.end(), table_target_list.begin(), table_target_list.end());
-
-    std::vector<std::vector<Entity*>> entity_table = table->GetResults();
-    std::vector<std::vector<std::string>> stringified_table = StringifyTable(table_target_list, entity_table);
+    std::vector<std::vector<Entity*>> temp_table = table->GetResults();
+    std::vector<std::pair<Synonym*, Attribute>> table_target_syn_list;
+    std::vector<std::vector<Entity*>> entity_table;
+    for (int i = 0; i < table_target_list.size(); i++) {
+      auto t = table_target_list[i];
+      auto column = temp_table[i];
+      auto attrs = syn_to_attrs_map[t->GetName()];
+      for (auto a : attrs) {
+        table_target_syn_list.push_back({t, a});
+        entity_table.push_back(column);
+      }
+    }
+    for (auto item : table_target_syn_list) {
+      result_synonym_order.push_back(item.first);
+    }
+    std::vector<std::vector<std::string>> stringified_table = StringifyTable(table_target_syn_list, entity_table);
     unordered_results.push_back(stringified_table);
   }
 
-  if (target_synonym_list.size() == 1) {
-    std::vector<std::string> query_ans = unordered_results.front()[0];
-    query_ans.erase(std::unique(query_ans.begin(), query_ans.end()), query_ans.end());
-    return query_ans;
+  std::vector<std::string> query_ans;
+  if (target_syn_attr_list.size() == 1) {
+    query_ans = unordered_results.front()[0];
+  } else {
+    // need to cross product for multiple synonyms.
+    query_ans = FormatMultipleTables(unordered_results, result_synonym_order, target_syn_attr_list);
   }
-  // else need to cross product for multiple synonyms.
-  std::vector<std::string> query_ans = FormatMultipleTables(unordered_results,
-                                                            result_synonym_order,
-                                                            target_synonym_list);
   query_ans.erase(std::unique(query_ans.begin(), query_ans.end()), query_ans.end());
   return query_ans;
 }
@@ -62,45 +80,56 @@ std::vector<std::string> QueryProjector::FormatQuery(UnformattedQueryResult unfo
  * @param entity_table Vector of vector of Entities.
  * @return Stringified table.
  */
-std::vector<std::vector<std::string>> QueryProjector::StringifyTable(std::vector<Synonym*> synonyms,
+std::vector<std::vector<std::string>> QueryProjector::StringifyTable(std::vector<std::pair<Synonym*, Attribute>> syn_attrs,
                                                                      std::vector<std::vector<Entity*>> entity_table) {
   std::vector<std::vector<std::string>> stringified_table;
-  for (int i = 0; i < synonyms.size(); ++i) {
+  for (int i = 0; i < syn_attrs.size(); ++i) {
     std::vector<std::string> stringified_column;
     std::vector<Entity*> entity_column = entity_table[i];
-    switch (synonyms[i]->GetType()) {
-      case DesignEntity::kStmt:
-      case DesignEntity::kRead:
-      case DesignEntity::kPrint:
-      case DesignEntity::kCall:
-      case DesignEntity::kWhile:
-      case DesignEntity::kIf:
-      case DesignEntity::kAssign:
-      case DesignEntity::kProgLine:
+    switch (syn_attrs[i].second) {
+      case Attribute::kStmtNumber:
         for (Entity* entity: entity_column) {
           int statement_num = dynamic_cast<Statement*>(entity)->GetStatementNumber()->GetNum();
           stringified_column.push_back(std::to_string(statement_num));
         }
         break;
-      case DesignEntity::kVariable:
+      case Attribute::kVarName:
         for (Entity* entity: entity_column) {
-          std::string var_string = const_cast<VariableName*>(dynamic_cast<Variable*>(entity)->GetName())->getName();
+          std::string var_string;
+          Variable* temp;
+          if (syn_attrs[i].first->GetType() == DesignEntity::kPrint) {
+            temp = dynamic_cast<PrintEntity*>(entity)->GetVariable();
+          }
+          else if (syn_attrs[i].first->GetType() == DesignEntity::kRead) {
+            temp = dynamic_cast<ReadEntity*>(entity)->GetVariable();
+          }
+          else {
+            temp = dynamic_cast<Variable*>(entity);
+          }
+          var_string = temp->GetNameInString();
           stringified_column.push_back(var_string);
         }
         break;
-      case DesignEntity::kConstant:
+      case Attribute::kProcName:
+        for (Entity* entity: entity_column) {
+          std::string proc_string;
+          Procedure* temp;
+          if (syn_attrs[i].first->GetType() == DesignEntity::kCall) {
+            temp = dynamic_cast<CallEntity*>(entity)->GetProcedure();
+          } else {
+            temp = dynamic_cast<Procedure*>(entity);
+          }
+          proc_string = const_cast<ProcedureName*>(temp->GetName())->getName();
+          stringified_column.push_back(proc_string);
+        }
+        break;
+      case Attribute::kValue:
         for (Entity* entity: entity_column) {
           int constant_int = const_cast<ConstantValue*>(dynamic_cast<Constant*>(entity)->GetValue())->Get();
           stringified_column.push_back(std::to_string(constant_int));
         }
         break;
-      case DesignEntity::kProcedure:
-        for (Entity* entity: entity_column) {
-          std::string proc_string = const_cast<ProcedureName*>(dynamic_cast<Procedure*>(entity)->GetName())->getName();
-          stringified_column.push_back(proc_string);
-        }
-        break;
-      case DesignEntity::kInvalid:break;
+      case Attribute::kInvalid: break;
     }
     stringified_table.push_back(stringified_column);
   }
@@ -109,14 +138,14 @@ std::vector<std::vector<std::string>> QueryProjector::StringifyTable(std::vector
 
 std::vector<std::string> QueryProjector::FormatMultipleTables(std::vector<std::vector<std::vector<std::string>>> tables,
                                                               std::vector<Synonym*> table_synonym_order,
-                                                              std::vector<Synonym*> target_synonym_list) {
+                                                              std::vector<std::pair<Synonym*, Attribute>> tgt_syn_attrs) {
   std::vector<std::vector<std::string>> crossed_table = tables[0];  // vector of tables of columns
   for (int i = 1; i < tables.size(); ++i) {
     std::vector<std::vector<std::string>> current_table = tables[i];
     crossed_table = CrossProductTables(crossed_table, current_table);
   }
 
-  std::vector<std::vector<std::string>> ordered_table = ReorderTable(std::move(target_synonym_list),
+  std::vector<std::vector<std::string>> ordered_table = ReorderTable(std::move(tgt_syn_attrs),
                                                                      std::move(table_synonym_order),
                                                                      crossed_table);
   std::vector<std::string> query_ans = JoinTuples(ordered_table);
@@ -160,13 +189,14 @@ std::vector<std::vector<std::string>> QueryProjector::CrossProductTables(std::ve
  * @param table Table to reorder.
  * @return Reordered table.
  */
-std::vector<std::vector<std::string>> QueryProjector::ReorderTable(std::vector<Synonym*> desired_order,
+std::vector<std::vector<std::string>> QueryProjector::ReorderTable(std::vector<std::pair<Synonym*, Attribute>> desired_order,
                                                                    std::vector<Synonym*> current_order,
                                                                    std::vector<std::vector<std::string>> table) {
   std::vector<std::vector<std::string>> reordered_table(desired_order.size());
 
   int i = 0;
-  for (Synonym* syn: desired_order) {
+  for (auto p: desired_order) {
+    Synonym* syn = p.first;
     if (i < current_order.size() && *current_order[i] == *syn) {
       reordered_table[i] = table[i];
     } else {

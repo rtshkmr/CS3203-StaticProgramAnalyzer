@@ -18,10 +18,20 @@ constexpr auto L = [](auto msg) {
 void PKB::PopulateDataStructures(Deliverable d) {
   L("... PKB will be populated by Deliverable object from SourceProcessor\n");
 
+  std::list<Constant*> constants;
+  std::unordered_set<std::string> seen = {};
+  for (Constant* constant : *d.GetConstantList()) {
+    std::string c_string = GetNameFromEntity(constant);
+    if (seen.find(c_string) == seen.end()) {
+      constants.push_back(constant);
+      seen.insert(c_string);
+    }
+  }
+
   // Populate Entities
   PopulateEntities(DesignEntity::kProcedure, *d.GetProcList());
   PopulateEntities(DesignEntity::kVariable, *d.GetVariableList());
-  PopulateEntities(DesignEntity::kConstant, *d.GetConstantList());
+  PopulateEntities(DesignEntity::kConstant, constants);
   PopulateEntities(DesignEntity::kCall, *d.GetCallList());
   PopulateEntities(DesignEntity::kPrint, *d.GetPrintList());
   PopulateEntities(DesignEntity::kRead, *d.GetReadList());
@@ -72,6 +82,7 @@ void PKB::PopulateEntities(DesignEntity design_entity, T& entity_list) {
     std::unordered_map<Attribute, std::string> attributes = GetAttributesFromEntity(entity);
     for (std::pair<Attribute, std::string> attribute: attributes) {
       attribute_to_entity_map_[{design_entity, attribute.first}][attribute.second].push_back(entity);
+      entity_to_attribute_type_map_[entity][attribute.second] = attribute.first;
       attribute_string_to_entity_map_[attribute.second].insert(entity);
     }
     if (pattern_entities_.find(design_entity) != pattern_entities_.end()) {
@@ -93,7 +104,7 @@ void PKB::PopulateEntities(DesignEntity design_entity, T& entity_list) {
         } break;
         case EntityEnum::kAssignEntity: {
           AssignEntity* assign_entity = reinterpret_cast<AssignEntity*>(entity);
-          pattern_variables.push_back(assign_entity->GetVariable());
+          pattern_variables.push_back(assign_entity->GetVariableObj());
         } break;
         default: {
           throw PKBException("Invalid EntityEnum in pattern entity.");
@@ -113,13 +124,13 @@ std::unordered_map<std::string, std::vector<Entity*>> PKB::GetRelationshipMap(PK
 }
 
 std::vector<Entity*> PKB::GetRelationship(PKBRelRefs ref, std::string entity) {
-    return relationship_table_[ref][entity];
+  return relationship_table_[ref][entity];
 }
 
 std::vector<std::tuple<Entity*, Entity*>> PKB::GetRelationshipByTypes(PKBRelRefs ref, DesignEntity d1, DesignEntity d2) {
-    if (d1 == DesignEntity::kProgLine) d1 = DesignEntity::kStmt;
-    if (d2 == DesignEntity::kProgLine) d2 = DesignEntity::kStmt;
-    return relationship_by_types_table_[ref][{d1, d2}];
+  if (d1 == DesignEntity::kProgLine) d1 = DesignEntity::kStmt;
+  if (d2 == DesignEntity::kProgLine) d2 = DesignEntity::kStmt;
+  return relationship_by_types_table_[ref][{d1, d2}];
 }
 
 std::vector<Entity*> PKB::GetFirstEntityOfRelationship(PKBRelRefs ref, DesignEntity d1, DesignEntity d2) {
@@ -129,23 +140,23 @@ std::vector<Entity*> PKB::GetFirstEntityOfRelationship(PKBRelRefs ref, DesignEnt
 }
 
 std::vector<Entity*> PKB::GetFirstEntityOfRelationship(PKBRelRefs ref, DesignEntity d) {
-    if (d == DesignEntity::kProgLine) d = DesignEntity::kStmt;
-    if (second_param_is_stmt.find(ref) != second_param_is_stmt.end()) {
-      return first_param_by_types_table_[ref][{d, DesignEntity::kStmt}];
+  if (d == DesignEntity::kProgLine) d = DesignEntity::kStmt;
+  if (second_param_is_stmt.find(ref) != second_param_is_stmt.end()) {
+    return first_param_by_types_table_[ref][{d, DesignEntity::kStmt}];
+  } else {
+    if (second_param_is_var.find(ref) != second_param_is_var.end()) {
+      return first_param_by_types_table_[ref][{d, DesignEntity::kVariable}];
+    } else if (second_param_is_proc.find(ref) != second_param_is_proc.end()) {
+      return first_param_by_types_table_[ref][{d, DesignEntity::kProcedure}];
     } else {
-      if (second_param_is_var.find(ref) != second_param_is_var.end()) {
-        return first_param_by_types_table_[ref][{d, DesignEntity::kVariable}];
-      } else if (second_param_is_proc.find(ref) != second_param_is_proc.end()) {
-        return first_param_by_types_table_[ref][{d, DesignEntity::kProcedure}];
-      } else {
-        return std::vector<Entity*>{};
-      }
+      return std::vector<Entity*>{};
     }
+  }
 }
 
 std::vector<Entity*> PKB::GetDesignEntities(DesignEntity de) {
-    if (de == DesignEntity::kProgLine) de = DesignEntity::kStmt;
-    return type_to_entity_map_[de];
+  if (de == DesignEntity::kProgLine) de = DesignEntity::kStmt;
+  return type_to_entity_map_[de];
 }
 
 std::vector<Entity*> PKB::GetPatternEntities(DesignEntity de, std::string var_or_stmt) {
@@ -156,8 +167,9 @@ std::vector<Entity*> PKB::GetEntitiesWithAttributeValue(DesignEntity design_enti
   return attribute_to_entity_map_[{design_entity, attribute}][value];
 }
 
-std::vector<entity_pair> PKB::GetEntitiesWithMatchingAttributes(DesignEntity type_one, DesignEntity type_two) {
-  return entities_with_matching_attributes_map_[{type_one, type_two}];
+std::vector<entity_pair> PKB::GetEntitiesWithMatchingAttributes(type_attribute_pair type_one, type_attribute_pair type_two) {
+  auto hi = entities_with_matching_attributes_map_[type_one][type_two];
+  return entities_with_matching_attributes_map_[type_one][type_two];
 }
 
 bool PKB::HasRelationship(PKBRelRefs ref) {
@@ -177,13 +189,26 @@ bool PKB::HasRelationship(PKBRelRefs ref, std::string e1, std::string e2) {
 }
 
 void PKB::ProcessEntitiesWithMatchingAttributes() {
-  for (std::pair<std::string, std::unordered_set<Entity*>> kv : attribute_string_to_entity_map_) {
-    for (Entity* entity_one : kv.second) {
+  for (auto kv : attribute_string_to_entity_map_) {
+    std::vector<Entity*> entities(kv.second.begin(), kv.second.end());
+    for (int i = 0; i < entities.size(); i++) {
+      Entity* entity_one = entities[i];
       DesignEntity design_entity_one = GetDesignEntityFromEntity(entity_one);
-      for (Entity* entity_two : kv.second) {
+      auto first_entity_types = GetApplicableTypes(design_entity_one);
+      Attribute attribute_one = entity_to_attribute_type_map_[entity_one][kv.first];
+      for (int j = i; j < entities.size(); j++) {
+        Entity* entity_two = entities[j];
         DesignEntity design_entity_two = GetDesignEntityFromEntity(entity_two);
-        entities_with_matching_attributes_map_[{design_entity_one, design_entity_two}]
-          .push_back({entity_one, entity_two});
+        auto second_entity_types = GetApplicableTypes(design_entity_two);
+        Attribute attribute_two = entity_to_attribute_type_map_[entity_two][kv.first];
+        for (auto first_type : first_entity_types) {
+          for (auto second_type : second_entity_types) {
+            entities_with_matching_attributes_map_[{first_type, attribute_one}][{second_type, attribute_two}]
+              .push_back({entity_one, entity_two});
+            entities_with_matching_attributes_map_[{second_type, attribute_two}][{first_type, attribute_one}]
+              .push_back({entity_two, entity_one});
+          }
+        }
       }
     }
   }
@@ -191,53 +216,53 @@ void PKB::ProcessEntitiesWithMatchingAttributes() {
 
 
 std::string PKB::GetNameFromEntity(Entity* entity) {
-    EntityEnum e = entity->GetEntityEnum();
-    if (e == EntityEnum::kProcedureEntity) {
-        Procedure* proc = dynamic_cast<Procedure*>(entity);
-        ProcedureName* proc_name = const_cast<ProcedureName*>(proc->GetName());
-        return proc_name->getName();
-    } else if (e == EntityEnum::kVariableEntity) {
-        Variable* var = dynamic_cast<Variable*>(entity);
-        VariableName* variable_name = const_cast<VariableName*>(var->GetName());
-        return variable_name->getName();
-    } else if (e == EntityEnum::kConstantEntity) {
-      Constant* constant = dynamic_cast<Constant*>(entity);
-      ConstantValue* cv = const_cast<ConstantValue*>(constant->GetValue());
-      return std::to_string(cv->Get());
-    } else if (Statement* stmt = dynamic_cast<Statement*>(entity)) {
-      auto* k_number = const_cast<StatementNumber*>(stmt->GetStatementNumber());
-      return std::to_string(k_number->GetNum());
-    } else {
-      throw PKBException("Invalid entity type encountered.");
-    }
+  EntityEnum e = entity->GetEntityEnum();
+  if (e == EntityEnum::kProcedureEntity) {
+    Procedure* proc = dynamic_cast<Procedure*>(entity);
+    ProcedureName* proc_name = const_cast<ProcedureName*>(proc->GetName());
+    return proc_name->getName();
+  } else if (e == EntityEnum::kVariableEntity) {
+    Variable* var = dynamic_cast<Variable*>(entity);
+    VariableName* variable_name = const_cast<VariableName*>(var->GetVariableName());
+    return variable_name->GetName();
+  } else if (e == EntityEnum::kConstantEntity) {
+    Constant* constant = dynamic_cast<Constant*>(entity);
+    ConstantValue* cv = const_cast<ConstantValue*>(constant->GetValue());
+    return std::to_string(cv->Get());
+  } else if (Statement* stmt = dynamic_cast<Statement*>(entity)) {
+    auto* k_number = const_cast<StatementNumber*>(stmt->GetStatementNumber());
+    return std::to_string(k_number->GetNum());
+  } else {
+    throw PKBException("Invalid entity type encountered.");
+  }
 }
 
 
 DesignEntity PKB::GetDesignEntityFromEntity(Entity* entity) {
-    EntityEnum entity_enum = entity->GetEntityEnum();
-    switch (entity_enum) {
-        case (EntityEnum::kIfEntity):
-            return DesignEntity::kIf;
-        case (EntityEnum::kWhileEntity):
-            return DesignEntity::kWhile;
-        case (EntityEnum::kAssignEntity):
-            return DesignEntity::kAssign;
-        case (EntityEnum::kCallEntity):
-            return DesignEntity::kCall;
-        case (EntityEnum::kPrintEntity):
-            return DesignEntity::kPrint;
-        case (EntityEnum::kReadEntity):
-            return DesignEntity::kRead;
-        case (EntityEnum::kProcedureEntity):
-            return DesignEntity::kProcedure;
-        case (EntityEnum::kVariableEntity):
-            return DesignEntity::kVariable;
-        case (EntityEnum::kConstantEntity):
-            return DesignEntity::kConstant;
-        case (EntityEnum::kElseEntity):
-        case (EntityEnum::kNone):
-            return DesignEntity::kInvalid;
-    }
+  EntityEnum entity_enum = entity->GetEntityEnum();
+  switch (entity_enum) {
+    case (EntityEnum::kIfEntity):
+      return DesignEntity::kIf;
+    case (EntityEnum::kWhileEntity):
+      return DesignEntity::kWhile;
+    case (EntityEnum::kAssignEntity):
+      return DesignEntity::kAssign;
+    case (EntityEnum::kCallEntity):
+      return DesignEntity::kCall;
+    case (EntityEnum::kPrintEntity):
+      return DesignEntity::kPrint;
+    case (EntityEnum::kReadEntity):
+      return DesignEntity::kRead;
+    case (EntityEnum::kProcedureEntity):
+      return DesignEntity::kProcedure;
+    case (EntityEnum::kVariableEntity):
+      return DesignEntity::kVariable;
+    case (EntityEnum::kConstantEntity):
+      return DesignEntity::kConstant;
+    case (EntityEnum::kElseEntity):
+    case (EntityEnum::kNone):
+      return DesignEntity::kInvalid;
+  }
 }
 
 std::vector<Attribute> PKB::GetAttributeTypes(Entity* entity) {
@@ -250,7 +275,7 @@ std::vector<Attribute> PKB::GetAttributeTypes(Entity* entity) {
     case (EntityEnum::kConstantEntity):
       return std::vector<Attribute> {Attribute::kValue};
     case (EntityEnum::kElseEntity):
-    case (EntityEnum::kNone): 
+    case (EntityEnum::kNone):
       return std::vector<Attribute> {Attribute::kInvalid};
     case (EntityEnum::kIfEntity):
     case (EntityEnum::kWhileEntity):

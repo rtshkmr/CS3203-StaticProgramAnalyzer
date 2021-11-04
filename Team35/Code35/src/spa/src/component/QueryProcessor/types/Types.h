@@ -94,6 +94,7 @@ enum class ScopeIndication {
 DesignEntity GetDesignEntity(std::string reference);
 RelRef GetRelRef(std::string reference);
 Attribute GetAttribute(std::string attr_string);
+Attribute GetDefaultAttribute(DesignEntity de);
 
 const std::unordered_set<DesignEntity> stmt_design_entities_ = {
   DesignEntity::kRead,
@@ -172,21 +173,20 @@ class Synonym {
  private:
   std::string name;
   DesignEntity type;
-  Attribute return_attribute = Attribute::kStmtNumber;
  public:
   Synonym() {};
   Synonym(std::string name, DesignEntity type) : name(name), type(type) {};
-  Synonym(std::string name, DesignEntity type, Attribute attr) : name(name), type(type), return_attribute(attr) {};
   std::string GetName() { return name; };
   DesignEntity GetType() { return type; };
-  Attribute GetAttribute() { return return_attribute; };
-  void SetAttribute(Attribute attr) { return_attribute = attr; };
   bool operator==(const Synonym& other) const;
 };
 
+// TODO: Need to refactor this to use the .cpp file instead, also the method name needs to be capitalized.
 struct Clause {
   std::string left_hand_side;
   std::string right_hand_side;
+  bool left_is_synonym;
+  bool right_is_synonym;
   virtual std::vector<std::string> GetAllSynonymNamesOfClause() { return {}; };
   Synonym* first_synonym;
   Synonym* second_synonym;
@@ -200,8 +200,6 @@ struct With : Clause {
   Attribute right_attribute;
   bool left_is_prog_line;
   bool right_is_prog_line;
-  bool left_is_synonym;
-  bool right_is_synonym;
   With() {};
   With(bool l_is_syn, bool r_is_syn, std::string lhs, std::string rhs, Attribute left_attr, Attribute right_attr,
        bool left_is_pl, bool right_is_pl) {
@@ -246,12 +244,19 @@ struct With : Clause {
       return false;
     }
   }
+  bool HasEqualValue() {
+    return this->left_hand_side == this->right_hand_side;
+  }
+  DesignEntity GetFirstSynonymType() {
+    return this->first_synonym->GetType();
+  }
+  DesignEntity GetSecondSynonymType() {
+    return this->second_synonym->GetType();
+  }
 };
 
 struct SuchThat : Clause {
   RelRef rel_ref;
-  bool left_is_synonym;
-  bool right_is_synonym;
   SuchThat() {};
   SuchThat(std::string lhs, std::string rhs, RelRef rf, bool lhs_is_syn, bool rhs_is_syn) {
     left_hand_side = lhs;
@@ -286,14 +291,14 @@ struct SuchThat : Clause {
 struct Pattern : Clause {
   std::string assign_synonym;
   DesignEntity pattern_type;
-  bool left_is_synonym;
   bool is_exact = false;
-  Pattern() {};
+  Pattern() { right_is_synonym = false; };
   Pattern(std::string lhs, std::string rhs, std::string assn_syn, bool lhs_is_syn, bool is_ext) {
     left_hand_side = lhs;
     right_hand_side = rhs;
     assign_synonym = assn_syn;
     left_is_synonym = lhs_is_syn;
+    right_is_synonym = false;
     is_exact = is_ext;
   }
   Pattern(std::string lhs, std::string rhs, DesignEntity de, bool lhs_is_syn, bool is_ext) {
@@ -301,6 +306,7 @@ struct Pattern : Clause {
     right_hand_side = rhs;
     pattern_type = de;
     left_is_synonym = lhs_is_syn;
+    right_is_synonym = false;
     is_exact = is_ext;
   }
   std::vector<std::string> GetAllSynonymNamesOfClause() {
@@ -344,6 +350,7 @@ class Group {
   bool ContainsTargetSynonym();
   std::vector<Synonym*> GetTargetSynonyms();
   void UpdateHasTargetSynonymAttr();
+  int GetGroupSize();
 };
 
 #endif //AUTOTESTER_TYPES_H

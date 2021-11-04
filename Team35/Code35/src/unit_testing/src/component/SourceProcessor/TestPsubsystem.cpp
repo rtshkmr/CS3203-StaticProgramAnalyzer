@@ -23,7 +23,7 @@ TEST_CASE("1.PSubsystem.Basic Single Line Creation") {
 
     VariableName vname("x");
     REQUIRE(deliverable->GetVariableList()->size() == 1);
-    REQUIRE(* (* deliverable->GetVariableList()->front()).GetName() == vname);
+    REQUIRE(* (* deliverable->GetVariableList()->front()).GetVariableName() == vname);
 
     REQUIRE(deliverable->GetConstantList()->size() == 1);
     ConstantValue* constant_list_front = const_cast<ConstantValue*>(deliverable->GetConstantList()->front()->GetValue());
@@ -34,7 +34,7 @@ TEST_CASE("1.PSubsystem.Basic Single Line Creation") {
     AssignEntity* assign_entity = static_cast<AssignEntity*>(* (deliverable->GetStatementList()->begin()));
     AssignEntity* assign_entity2 = deliverable->GetAssignList()->front();
     REQUIRE(assign_entity == assign_entity2);
-    REQUIRE(* assign_entity->GetVariable()->GetName() == vname);
+    REQUIRE(* assign_entity->GetVariableObj()->GetVariableName() == vname);
     REQUIRE(assign_entity->GetAssignmentExpr()->CheckExact("x + 100"));
     ConstantValue* expression_constant_front = const_cast<ConstantValue*>(
       assign_entity->GetExpressionConstants().front()->GetValue());

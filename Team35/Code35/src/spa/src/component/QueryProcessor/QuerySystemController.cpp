@@ -28,7 +28,7 @@ std::vector<std::string> QuerySystemController::Evaluate(std::string* query, PKB
 
   L("[EXIT] Query Evaluator Evaluate Query ");
 
-  QueryProjector query_projector = QueryProjector(query_extractor.GetTargetSynonymsList());
+  QueryProjector query_projector = QueryProjector(query_extractor.GetTargetSynAttrPairs());
   std::vector<std::string> populated_result_list = query_projector.FormatQuery(unformatted_results);
   L("[EXIT] Query System Controller EVALUATE ");
 

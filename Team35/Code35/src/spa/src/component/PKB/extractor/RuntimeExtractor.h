@@ -6,7 +6,7 @@
 #include <component/PKB/extractor/NextBipExtractor.h>
 #include <component/PKB/extractor/NextBipTExtractor.h>
 #include <component/PKB/extractor/RuntimeMediator.h>
-#include "PKB.h"
+#include "component/PKB/PKB.h"
 #include "NextTExtractor.h"
 #include "AffectsExtractor.h"
 #include "AffectsTExtractor.h"
