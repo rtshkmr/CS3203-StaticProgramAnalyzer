@@ -316,7 +316,7 @@ bool Cluster::CheckScopeClusterForAffects(Cluster* scoped_cluster,
                                            lhs_var);
     bool while_start_to_second_stmt_is_unmodified =
         TraverseScopedClusterForAffects(current_scope, {current_scope->start_, target_range.second}, pkb, lhs_var);
-    return while_start_to_first_stmt_is_unmodified && second_stmt_to_while_end_is_unmodified;
+    return first_stmt_to_while_end_is_unmodified && while_start_to_second_stmt_is_unmodified;
   } else {
     TraverseScopedClusterForAffects(scoped_cluster, target_range, pkb, lhs_var);
   }
