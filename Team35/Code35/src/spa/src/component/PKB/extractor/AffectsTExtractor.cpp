@@ -56,6 +56,23 @@ std::vector<Entity*> AffectsTExtractor::GetFirstEntityOfRelationship(RelDirectio
   return ConvertIntToEntity(return_set);
 }
 
+std::vector<std::tuple<Entity*, Entity*>> AffectsTExtractor::GetRelationshipByTypes(RelDirection dir) {
+  if (!isCached) InitCache();
+  std::unordered_map<int, std::list<int>*>* mapToCheck = (dir == RelDirection::kForward) ? &affects_t_map_ : &affected_by_t_map_;
+
+  std::vector<std::tuple<int, std::vector<Entity*>>> intermediate_vector = {};
+  for (auto pair : *mapToCheck) {
+    std::vector<Entity*> this_key_entity = GetRelationship(RelDirection::kForward, pair.first);
+    intermediate_vector.push_back(std::make_tuple(pair.first, this_key_entity));
+  }
+
+  //convert pair.first intermediate vector
+  std::vector<std::tuple<Entity*, std::vector<Entity*>>> intermediate_vector2 = ConvertIntToEntity(intermediate_vector);
+
+
+  return CreateIntermediateTable(intermediate_vector2);
+}
+
 bool AffectsTExtractor::HasRelationship(RelDirection dir) {
   if (!isCached) InitCache();
   return affects_t_map_.size() > 0;
@@ -141,6 +158,28 @@ std::vector<Entity*> AffectsTExtractor::ConvertIntToEntity(std::set<int> set_to_
   std::vector<Entity*> retList = {};
   for (auto item : set_to_convert) {
     retList.push_back(GetAssignEntityFromStmtNum(item));
+  }
+  return retList;
+}
+
+std::vector<std::tuple<Entity*, std::vector<Entity*>>> AffectsTExtractor::ConvertIntToEntity(std::vector<std::tuple<int,std::vector<Entity*>>> vector_to_convert) {
+  std::vector<std::tuple<Entity*, std::vector<Entity*>>> retList = {};
+  for (std::tuple<int,std::vector<Entity*>> pair : vector_to_convert) {
+    AssignEntity* ae = GetAssignEntityFromStmtNum(std::get<0>(pair));
+    retList.push_back(std::make_tuple(ae, std::get<1>(pair)));
+  }
+  return retList;
+}
+
+std::vector<std::tuple<Entity*, Entity*>> AffectsTExtractor::CreateIntermediateTable(std::vector<std::tuple<Entity*,
+                                                                                                            std::vector<
+                                                                                                                Entity*>>> vector_to_convert) {
+  std::vector<std::tuple<Entity*, Entity*>> retList = {};
+
+  for (auto pair : vector_to_convert) {
+    for (auto element : std::get<1>(pair)) {
+      retList.push_back(std::make_tuple(std::get<0>(pair), element));
+    }
   }
   return retList;
 }

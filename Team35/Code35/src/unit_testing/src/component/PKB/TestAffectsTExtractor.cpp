@@ -3,6 +3,37 @@
 #include <component/PKB/DBManager.h>
 #include "../../../utils/TestUtils.h"
 
+TEST_CASE("2.PKB.AffectsT.Negative Testing") {
+
+  PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/adv_spa_lecture_source.txt");
+  DBManager* dbm = new DBManager(pkb);
+
+  SECTION ("0 - Negative Testing") {
+    REQUIRE_FALSE(dbm->HasRelationship(PKBRelRefs::kAffectsT, "-1", "0"));
+    REQUIRE_FALSE(dbm->HasRelationship(PKBRelRefs::kAffectsT, "0", "100"));
+    REQUIRE_FALSE(dbm->HasRelationship(PKBRelRefs::kAffectsT, "99", "100"));
+
+    REQUIRE_FALSE(dbm->HasRelationship(PKBRelRefs::kAffectedByT, "-1", "0"));
+    REQUIRE_FALSE(dbm->HasRelationship(PKBRelRefs::kAffectedByT, "0", "100"));
+    REQUIRE_FALSE(dbm->HasRelationship(PKBRelRefs::kAffectedByT, "99", "100"));
+
+    REQUIRE_FALSE(dbm->HasRelationship(PKBRelRefs::kAffectsT, "-1"));
+    REQUIRE_FALSE(dbm->HasRelationship(PKBRelRefs::kAffectsT, "0"));
+    REQUIRE_FALSE(dbm->HasRelationship(PKBRelRefs::kAffectsT, "100"));
+
+    REQUIRE_FALSE(dbm->HasRelationship(PKBRelRefs::kAffectedByT, "-1"));
+    REQUIRE_FALSE(dbm->HasRelationship(PKBRelRefs::kAffectedByT, "0"));
+    REQUIRE_FALSE(dbm->HasRelationship(PKBRelRefs::kAffectedByT, "100"));
+
+    REQUIRE(dbm->GetRelationship(PKBRelRefs::kAffectsT, "-1").empty());
+    REQUIRE(dbm->GetRelationship(PKBRelRefs::kAffectsT, "0").empty());
+    REQUIRE(dbm->GetRelationship(PKBRelRefs::kAffectsT, "100").empty());
+
+    REQUIRE(dbm->GetRelationship(PKBRelRefs::kAffectedByT, "-1").empty());
+    REQUIRE(dbm->GetRelationship(PKBRelRefs::kAffectedByT, "0").empty());
+    REQUIRE(dbm->GetRelationship(PKBRelRefs::kAffectedByT, "100").empty());
+  }
+}
 
 TEST_CASE("2.PKB.AffectsT.adv_spa_lecture") {
   /**
@@ -199,5 +230,10 @@ TEST_CASE("2.PKB.AffectsT.adv_spa_lecture") {
     CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffectedByT, DesignEntity::kStmt).size() == 7);
   }
 
+  SECTION ("11 - Get Affects By Both Type : (a1, a2) ") {
+    //TODO Fix this.
+    //CHECK(dbm->GetRelationshipByTypes(PKBRelRefs::kAffectsT, DesignEntity::kAssign, DesignEntity::kAssign,
+    //                                  std::vector<Entity*>{}, std::vector<Entity*>{}, ScopeIndication::kNoScope).size() == 28);
+  }
 
 }

@@ -13,7 +13,7 @@ class AffectsTExtractor : RuntimeColleague {
   explicit AffectsTExtractor(RuntimeMediator* rte, PKB* pkb);
   std::vector<Entity*> GetRelationship(RelDirection dir, int target);
   std::vector<Entity*> GetFirstEntityOfRelationship(RelDirection dir);
-  std::vector<std::tuple<Entity*, Entity*>> GetRelationshipByTypes(RelDirection dir) {return {};};
+  std::vector<std::tuple<Entity*, Entity*>> GetRelationshipByTypes(RelDirection dir);
   bool HasRelationship(RelDirection dir);
   bool HasRelationship(RelDirection dir, int target);
   bool HasRelationship(RelDirection dir, int first, int second);
@@ -28,7 +28,8 @@ class AffectsTExtractor : RuntimeColleague {
   std::unordered_map<int, std::list<int>*> affected_by_t_map_ = {};
   void InitCache();
   std::vector<Entity*> ConvertIntToEntity(std::set<int> set_to_convert);
-
+  std::vector<std::tuple<Entity*, std::vector<Entity*>>> ConvertIntToEntity(std::vector<std::tuple<int, std::vector<Entity*>>> vector_to_convert);
+  std::vector<std::tuple<Entity*, Entity*>> CreateIntermediateTable(std::vector<std::tuple<Entity*, std::vector<Entity*>>> vector_to_convert);
   AssignEntity* GetAssignEntityFromStmtNum(int target);
 
   template <typename X, typename Y>
