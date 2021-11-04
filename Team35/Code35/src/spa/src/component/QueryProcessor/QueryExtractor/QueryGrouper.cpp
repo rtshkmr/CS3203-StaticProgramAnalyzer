@@ -83,6 +83,7 @@ void QueryGrouper::DfsFromSynonym(std::unordered_map<std::string, Synonym*>* tgt
   Group* g = new Group();
   WeightedGroup* w_g = new WeightedGroup(g);
   int subgroup_score = QueryOptimizer::GetSubgroupPenalty();
+  int subgroup_count = 1;
   std::vector<std::string> tgt_synonyms_in_this_group;
   bool is_starting_syn_a_target_syn = tgt_synonyms_map->find(tgt_syn) != tgt_synonyms_map->end();
   if (is_starting_syn_a_target_syn) {
@@ -102,7 +103,7 @@ void QueryGrouper::DfsFromSynonym(std::unordered_map<std::string, Synonym*>* tgt
       cl_with_tgt_syns = map_of_syn_to_clause_indices->at(curr_tgt_syn);
     }
     std::vector<int> subgroup;
-    subgroup_score++;
+    subgroup_count++;
     for (auto cl_idx : cl_with_tgt_syns) {
       if (visited_clauses->find(cl_idx) != visited_clauses->end()) {
         continue;
@@ -124,7 +125,7 @@ void QueryGrouper::DfsFromSynonym(std::unordered_map<std::string, Synonym*>* tgt
       }
       // save subgroup score and push each clause in subgroup into group
       WeightedClause* weighted_cl = weighted_clauses->at(cl_idx);
-      weighted_cl->subgroup_penalty += subgroup_score;
+      weighted_cl->subgroup_penalty += subgroup_score * subgroup_count;
       w_g->weighted_clauses.push_back(weighted_cl);
     }
   }
