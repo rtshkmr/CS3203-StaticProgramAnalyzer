@@ -1,4 +1,4 @@
-#include <component/PKB/RuntimeExtractor.h>
+#include <component/PKB/extractor/RuntimeExtractor.h>
 #include "catch.hpp"
 #include "component/SourceProcessor/SourceProcessor.h"
 #include "component/SourceProcessor/Parser.h"
