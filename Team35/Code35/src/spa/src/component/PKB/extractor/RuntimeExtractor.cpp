@@ -58,6 +58,23 @@ std::vector<Entity*> RuntimeExtractor::GetFirstEntityOfRelationship(PKBRelRefs r
 }
 
 /**
+ * Gets relationships for 1 type-specified entity, e.g. Affects(s, _) where s are entities in the scoped vector.
+ * @param ref
+ * @param scoped_entities
+ * @return
+ */
+std::vector<Entity*> RuntimeExtractor::GetScopedFirstEntities(PKBRelRefs ref, std::vector<Entity*> scoped_entities) {
+  std::vector<Entity*> results;
+  for (Entity* entity : scoped_entities) {
+    std::string name = PKB::GetNameFromEntity(entity);
+    if (HasRelationship(ref, name)) {
+      results.push_back(entity);
+    }
+  }
+  return results;
+}
+
+/**
  * Gets relationships for 2 type-specified entities, e.g. Uses(p, v)
  * @param ref Relationship type
  * @param first Type of first entity
@@ -80,6 +97,27 @@ std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetRelationshipByTyp
     case PKBRelRefs::kPrevBipT: return GetPrevBipT(first, second);
     default: return std::vector<std::tuple<Entity*, Entity*>>{};
   }
+}
+
+/**
+ * Gets relationships for 2 type-specified entities, e.g. Affects(a, b) where a and b are entities in the scoped vectors.
+ * @param ref Relationship type
+ * @param left_entities Scoped entities on the LHS of the relationship
+ * @param right_entities Scoped entities on the RHS of the relationship
+ * @return All possible combinations of entities in the relationship in the scope.
+ */
+std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetAllRelationshipsScoped(PKBRelRefs ref,
+                                                                                      std::vector<Entity*> left_entities,
+                                                                                      std::vector<Entity*> right_entities) {
+  std::vector<std::tuple<Entity*, Entity*>> results;
+  for (int i = 0; i < left_entities.size(); ++i) {
+    std::string left_name = PKB::GetNameFromEntity(left_entities[i]);
+    std::string right_name = PKB::GetNameFromEntity(right_entities[i]);
+    if (HasRelationship(ref, left_name, right_name)) {
+      results.push_back({left_entities[i], right_entities[i]});
+    }
+  }
+  return results;
 }
 
 /**
