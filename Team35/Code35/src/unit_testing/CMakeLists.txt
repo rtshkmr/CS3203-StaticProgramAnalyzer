@@ -31,7 +31,7 @@ add_executable(unit_testing ${srcs}
         src/component/PKB/TestAffectsBy.cpp
         src/component/SourceProcessor/Extractors/TestVariableTExtractor.cpp
         src/component/SourceProcessor/Extractors/TestTransitiveExtractor/TestCallsT.cpp
-        )
+        src/component/PKB/TestAffectsTExtractor.cpp)
 
 target_link_libraries(unit_testing spa)
 SET(CMAKE_BUILD_TYPE Debug)

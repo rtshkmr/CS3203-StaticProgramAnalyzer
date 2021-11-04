@@ -34,7 +34,7 @@ class RuntimeExtractor : public RuntimeMediator {
   PKB* pkb_;
   NextTExtractor next_t_extractor_;
   AffectsExtractor affects_extractor_ = AffectsExtractor();
-  AffectsTExtractor affects_t_extractor_ = AffectsTExtractor();
+  AffectsTExtractor affects_t_extractor_;
   NextBipExtractor next_bip_extractor_;
   NextBipTExtractor next_bip_t_extractor_;
 

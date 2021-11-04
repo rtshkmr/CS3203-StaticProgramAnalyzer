@@ -8,6 +8,7 @@ RuntimeExtractor::RuntimeExtractor(PKB* pkb) {
   next_bip_extractor_ = NextBipExtractor(pkb);
   next_bip_t_extractor_ = NextBipTExtractor(pkb);
   next_bip_t_extractor_.SetMediator(this);
+  affects_t_extractor_ = AffectsTExtractor(this, pkb);
 }
 
 /**
@@ -393,8 +394,12 @@ bool RuntimeExtractor::HasAffectedBy(int first, int second) {
   return affects_extractor_.HasAffectedBy(first, second);
 }
 
-bool RuntimeExtractor::HasAffectsT(int first, int second) { return false; }
-bool RuntimeExtractor::HasAffectedByT(int first, int second) { return false; }
+bool RuntimeExtractor::HasAffectsT(int first, int second) {
+  return affects_t_extractor_.HasRelationship(RelDirection::kForward, first, second);
+}
+bool RuntimeExtractor::HasAffectedByT(int first, int second) {
+  return affects_t_extractor_.HasRelationship(RelDirection::kReverse, first, second);
+}
 
 bool RuntimeExtractor::HasNextBip(int first, int second) {
   return next_bip_extractor_.HasRelationship(RelDirection::kForward, first, second);
