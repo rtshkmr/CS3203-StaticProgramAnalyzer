@@ -152,8 +152,8 @@ bool RuntimeExtractor::HasRelationship(PKBRelRefs ref) {
 bool RuntimeExtractor::HasRelationship(PKBRelRefs ref, std::string first) {
   int target_num = Utility::ConvertStringToInt(first);
   switch (ref) {
-    case PKBRelRefs::kNextT: // fallthrough
-    case PKBRelRefs::kPreviousT: return pkb_->HasRelationship(PKBRelRefs::kNext, first);
+    case PKBRelRefs::kNextT: return pkb_->HasRelationship(PKBRelRefs::kNext, first);
+    case PKBRelRefs::kPreviousT: return pkb_->HasRelationship(PKBRelRefs::kPrevious, first);
     case PKBRelRefs::kAffects: return HasAffects(target_num);
     case PKBRelRefs::kAffectedBy: return HasAffectedBy(target_num);
     case PKBRelRefs::kAffectsT: return HasAffectsT(target_num);

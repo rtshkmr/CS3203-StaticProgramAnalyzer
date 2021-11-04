@@ -220,14 +220,16 @@ std::list<Statement*> NextTExtractor::MakeStmtList(int first_stmt, int last_stmt
   return w_statements;
 }
 
-std::list<Block*> NextTExtractor::GetFollowingBlocksAfterWhile(Block* block) {
+std::list<Block*> NextTExtractor::GetFollowingBlocksAfterWhile(Block* w_block) {
   std::list<Block*> following_blocks;
-  for (Block* following_block: GetFollowingBlocks(block)) {
+  int block_start = w_block->GetStartEndRange().first;
+  for (Block* following_block: GetFollowingBlocks(w_block)) {
+    int following_block_start = following_block->GetStartEndRange().first;
     bool is_prev_block = rel_direction_ == RelDirection::kReverse
-        && (following_block->GetStartEndRange().first < block->GetStartEndRange().first);
+        && (following_block_start < block_start);
     bool is_next_block = rel_direction_ == RelDirection::kForward
-        && (following_block->GetStartEndRange().first != block->GetStartEndRange().first + 1);
-    if (is_next_block || is_prev_block) {
+        && (following_block_start != block_start + 1);
+    if (following_block_start != -1 && (is_next_block || is_prev_block)) {
       following_blocks.push_back(following_block);
     }
   }
@@ -240,6 +242,9 @@ std::list<Block*> NextTExtractor::GetFollowingBlocksAfterWhile(Block* block) {
  * @return List of Statements that Next* the Statement at the end of this block, or the target Statement.
  */
 std::list<Statement*> NextTExtractor::GetRelByTraversal(Block* block, int target) {
+  if (block->GetStartEndRange().first == -1) {
+    return GetValueFromMap(rel_table_[rel_direction_], target);
+  }
   if (rel_table_[rel_direction_].count(stmt_list_[target - 1]) == 1) {
     return *rel_table_[rel_direction_].find(stmt_list_[target - 1])->second;
   }
@@ -526,8 +531,13 @@ void NextTExtractor::PopulateRelationshipMap(const std::vector<Procedure*> &proc
   }
   for (Procedure* proc: proc_list) {
     std::pair<int, int> range = const_cast<Cluster*>(proc->GetClusterRoot())->GetStartEndRange();
-    int edge_stmt = rel_direction_ == RelDirection::kForward ? range.first : range.second;
-    GetRelationship(rel_direction_, edge_stmt, {proc});
+    if (rel_direction_ == RelDirection::kForward) {
+      GetRelationship(rel_direction_, range.first, {proc});
+    } else {
+      for (Block* tail_block : proc->GetTailBlocks()) {
+        GetRelationship(rel_direction_, tail_block->GetStartEndRange().second, {proc});
+      }
+    }
   }
   if (rel_direction_ == RelDirection::kForward) {
     next_t_populated_ = true;
@@ -548,7 +558,7 @@ void NextTExtractor::AddRelByTypes(RelDirection dir, Entity* first_arg, Entity* 
       {first_de, DesignEntity::kStmt},
       {DesignEntity::kStmt, DesignEntity::kStmt}
   };
-  for (const type_combo& types : first_combis) {
+  for (const type_combo &types : first_combis) {
     rel_by_types_table_[rel_direction_][types].emplace_back(first_arg, second_arg);
   }
   std::vector<type_combo> second_combis = {
@@ -557,7 +567,7 @@ void NextTExtractor::AddRelByTypes(RelDirection dir, Entity* first_arg, Entity* 
       {second_de, DesignEntity::kStmt},
       {DesignEntity::kStmt, DesignEntity::kStmt}
   };
-  for (const type_combo& types : first_combis) {
+  for (const type_combo &types : first_combis) {
     rel_by_types_table_[other_direction][types].emplace_back(second_arg, first_arg);
   }
 }

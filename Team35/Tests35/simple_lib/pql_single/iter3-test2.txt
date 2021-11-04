@@ -52,4 +52,13 @@ procedure Third {
     z = 5;
     v = z;
     print v;
+        if (you == me) then {
+                while (aa>=aa) {
+             while (bb>=bb) {
+            read y;
+        }
+        }
+        } else {
+            print v;
+        }
 }

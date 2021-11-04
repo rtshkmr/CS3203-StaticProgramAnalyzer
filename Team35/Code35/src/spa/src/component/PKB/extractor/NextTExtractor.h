@@ -63,7 +63,7 @@ class NextTExtractor : public RuntimeColleague {
   std::list<Statement*> RecurseFollowingBlocks(Block* block, int target);
   std::list<Statement*> AddBlockStmtToRelList(std::list<Statement*> rel_list, Block* block);
   std::set<Block*> GetFollowingBlocks(Block* block);
-  std::list<Block*> GetFollowingBlocksAfterWhile(Block* block);
+  std::list<Block*> GetFollowingBlocksAfterWhile(Block* w_block);
   void AddRelationshipsInBlock(std::list<Statement*> rel_stmts, Block* block, int target);
   void AddRelationshipsFollowingBlock(const std::list<Statement*> &rel_stmts, Block* block);
   int GetBlockTarget(Block* block, int target);
