@@ -2,15 +2,15 @@
 #include "QueryGrouper.h"
 #include <algorithm>
 
-static const int subgroup_penalty = 70;
+static const int subgroup_penalty = 50;
 static const int per_synonym_penalty = 15;
 static const int type_with_penalty = 0;
 static const int type_default_penalty = 10;
 static const std::unordered_map<RelRef, int> type_relref_penalty = {
         {RelRef::kParent, 10}, {RelRef::kFollows, 10}, {RelRef::kModifiesS, 10}, {RelRef::kUsesS, 10},
         {RelRef::kModifiesP, 20}, {RelRef::kUsesP, 20}, {RelRef::kCalls, 20}, {RelRef::kNext, 30},
-        {RelRef::kFollowsT, 90}, {RelRef::kParentT, 90}, {RelRef::kCallsT, 90}, {RelRef::kNextT, 100},
-        {RelRef::kAffects, 110}, {RelRef::kAffectsT, 120}
+        {RelRef::kFollowsT, 900}, {RelRef::kParentT, 900}, {RelRef::kCallsT, 900}, {RelRef::kNextT, 1000},
+        {RelRef::kAffects, 1100}, {RelRef::kAffectsT, 1200}
 };
 
 int QueryOptimizer::GetSubgroupPenalty() {
@@ -36,7 +36,7 @@ int QueryOptimizer::GetNumberOfSynonymsPenalty(Clause* cl) {
 
 void QueryOptimizer::Optimize() {
   PopulateSynAdjacencyList();
-  PopulateWeightedClausesList();
+  PopulateUniqueWeightedClausesList();
   QueryGrouper::AdvancedGroupClauses(& weighted_clauses, & weighted_groups, & target_syn_attrs_list, &target_synonyms_map,
                                      & map_of_syn_to_clause_indices);
   UpdateClauseWeights();
@@ -61,10 +61,24 @@ void QueryOptimizer::PopulateSynAdjacencyList() {
   }
 }
 
-void QueryOptimizer::PopulateWeightedClausesList() {
+/**
+ * creates a list of weighted clauses from the original list of clauses; in the process dropping duplicate clauses.
+ */
+void QueryOptimizer::PopulateUniqueWeightedClausesList() {
   for (auto cl : clauses) {
-    weighted_clauses.push_back(new WeightedClause(cl));
+    if (!HasClauseBeenSeen(cl)) {
+      weighted_clauses.push_back(new WeightedClause(cl));
+      SeeClause(cl);
+    }
   }
+}
+
+bool QueryOptimizer::HasClauseBeenSeen(Clause* cl) {
+  return false;
+}
+
+void QueryOptimizer::SeeClause(Clause* cl) {
+
 }
 
 /**
