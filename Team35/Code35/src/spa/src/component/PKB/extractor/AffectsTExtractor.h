@@ -11,7 +11,7 @@ class AffectsTExtractor : RuntimeColleague {
  public:
   AffectsTExtractor() = default;
   explicit AffectsTExtractor(RuntimeMediator* rte, PKB* pkb);
-  std::vector<Entity*> GetRelationship(RelDirection dir, int target) {return {};};
+  std::vector<Entity*> GetRelationship(RelDirection dir, int target);
   std::vector<Entity*> GetFirstEntityOfRelationship(RelDirection dir) {return {}; };
   std::vector<std::tuple<Entity*, Entity*>> GetRelationshipByTypes(RelDirection dir) {return {};};
   bool HasRelationship(RelDirection dir);
@@ -27,6 +27,9 @@ class AffectsTExtractor : RuntimeColleague {
   std::unordered_map<int, std::list<int>*> affects_t_map_ = {};
   std::unordered_map<int, std::list<int>*> affected_by_t_map_ = {};
   void InitCache();
+  std::vector<Entity*> ConvertIntToEntity(std::set<int> set_to_convert);
+
+  AssignEntity* GetAssignEntityFromStmtNum(int target);
 
   template <typename X, typename Y>
   void AddRelationshipToMap(std::unordered_map<X, std::list<Y>*>* map, X key, Y value);

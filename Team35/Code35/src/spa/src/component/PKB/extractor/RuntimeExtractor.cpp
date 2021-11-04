@@ -194,11 +194,11 @@ std::vector<Entity*> RuntimeExtractor::GetAffectedBy(int target) {
 }
 
 std::vector<Entity*> RuntimeExtractor::GetAffectsT(int target) {
-  return affects_t_extractor_.GetAffectsT(target);
+  return affects_t_extractor_.GetRelationship(RelDirection::kForward, target);
 }
 
 std::vector<Entity*> RuntimeExtractor::GetAffectedByT(int target) {
-  return affects_t_extractor_.GetAffectedByT(target);
+  return affects_t_extractor_.GetRelationship(RelDirection::kReverse, target);
 }
 
 std::vector<Entity*> RuntimeExtractor::GetNextBip(int target) {

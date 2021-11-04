@@ -19,6 +19,7 @@ TEST_CASE("2.PKB.AffectsT.adv_spa_lecture") {
    * Transitive:
    * (1,11),
    * (2,11), (2,12),
+   * (4,11),
    * (6,11), (6,12),
    * (8,11),
    * (9,11), (9,12)
@@ -49,6 +50,7 @@ TEST_CASE("2.PKB.AffectsT.adv_spa_lecture") {
     CHECK(dbm->HasRelationship(PKBRelRefs::kAffectsT, "1", "11"));
     CHECK(dbm->HasRelationship(PKBRelRefs::kAffectsT, "2", "11"));
     CHECK(dbm->HasRelationship(PKBRelRefs::kAffectsT, "2", "12"));
+    CHECK(dbm->HasRelationship(PKBRelRefs::kAffectsT, "4", "11"));
     CHECK(dbm->HasRelationship(PKBRelRefs::kAffectsT, "6", "11"));
     CHECK(dbm->HasRelationship(PKBRelRefs::kAffectsT, "6", "12"));
     CHECK(dbm->HasRelationship(PKBRelRefs::kAffectsT, "8", "11"));
@@ -76,6 +78,7 @@ TEST_CASE("2.PKB.AffectsT.adv_spa_lecture") {
     CHECK(dbm->HasRelationship(PKBRelRefs::kAffectedByT, "11", "1"));
     CHECK(dbm->HasRelationship(PKBRelRefs::kAffectedByT, "11", "2"));
     CHECK(dbm->HasRelationship(PKBRelRefs::kAffectedByT, "12", "2"));
+    CHECK(dbm->HasRelationship(PKBRelRefs::kAffectedByT, "11", "4"));
     CHECK(dbm->HasRelationship(PKBRelRefs::kAffectedByT, "11", "6"));
     CHECK(dbm->HasRelationship(PKBRelRefs::kAffectedByT, "12", "6"));
     CHECK(dbm->HasRelationship(PKBRelRefs::kAffectedByT, "11", "8"));
@@ -138,5 +141,51 @@ TEST_CASE("2.PKB.AffectsT.adv_spa_lecture") {
 
   SECTION ("6 - Has AffectedByT : (_,_)") {
     CHECK(dbm->HasRelationship(PKBRelRefs::kAffectedByT));
+  }
+
+  SECTION ("7 - Get AffectsT : (#, a1) ") {
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectsT, "1").size() == 5); // {4,8,10,11,12}
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectsT, "2").size() == 4); // {6,10,11,12}
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectsT, "3").empty()); //[not assign stmt] while cond
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectsT, "4").size() == 5); // {4,8,10,11,12}
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectsT, "5").empty()); //[not assign stmt] call stmt
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectsT, "6").size() == 4); // {6,10,11,12}
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectsT, "7").empty()); //[not assign stmt] if cond
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectsT, "8").size() == 3); // {10,11,12}
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectsT, "9").size() == 3); // {10,11,12}
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectsT, "10").size() == 2); // {11, 12}
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectsT, "11").size() == 1); // {12}
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectsT, "12").empty()); //last stmt, not affecting
+
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectsT, "13").size() == 1); // {14}
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectsT, "14").empty()); // no assign variable uses it. print uses in it Line 15
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectsT, "15").empty()); //[not assign stmt] print stmt
+
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectsT, "16").empty()); //[not assign stmt] read stmt
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectsT, "17").empty()); //[not assign stmt] read stmt
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectsT, "18").empty()); //[not assign stmt] call stmt
+  }
+
+  SECTION ("8 - Get AffectedByT : (a2, #) ") {
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectedByT, "1").empty()); // first x stmt
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectedByT, "2").empty()); // first i stmt
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectedByT, "3").empty()); //[not assign stmt] while cond
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectedByT, "4").size() == 2); //{1,4}
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectedByT, "5").empty()); //[not assign stmt] call stmt
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectedByT, "6").size() == 2); // {2,6}
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectedByT, "7").empty()); //[not assign stmt] if cond
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectedByT, "8").size() == 2); // {4,1}
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectedByT, "9").empty()); // first z stmt
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectedByT, "10").size() == 6); // {9,8,4,1,6,2}
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectedByT, "11").size() == 7); //{1,2,4,6,8,9,10}
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectedByT, "12").size() == 8); // {2,6,9,8,4,1,11,10}
+
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectedByT, "13").empty()); // first z stmt
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectedByT, "14").size() == 1); //Affects(13,14) is true
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectedByT, "15").empty()); //[not assign stmt] print stmt
+
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectedByT, "16").empty()); //[not assign stmt] read stmt
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectedByT, "17").empty()); //[not assign stmt] read stmt
+    CHECK(dbm->GetRelationship(PKBRelRefs::kAffectedByT, "18").empty()); //[not assign stmt] call stmt
   }
 }

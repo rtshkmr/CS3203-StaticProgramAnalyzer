@@ -7,6 +7,43 @@ AffectsTExtractor::AffectsTExtractor(RuntimeMediator* rte, PKB* pkb) {
   this->pkb_ = pkb;
 }
 
+std::vector<Entity*> AffectsTExtractor::GetRelationship(RelDirection dir, int target) {
+  if (!isCached) InitCache();
+
+  std::set<int> return_set = {};
+  std::unordered_map<int, std::list<int>*>* mapToCheck = (dir == RelDirection::kForward) ? &affects_t_map_ : &affected_by_t_map_;
+
+  std::list<int> toCheck = {target};
+  while (toCheck.size() > 0) {
+    int check = toCheck.front();
+    toCheck.pop_front();
+
+    //before size
+    size_t before = return_set.size();
+    return_set.insert(check);
+    if (return_set.size() == before) {
+      continue; //already checked before.
+    }
+
+    auto itr = mapToCheck->find(check);
+    if (itr == mapToCheck->end()) {
+      continue; //no value found.
+    }
+
+    std::list<int>* values = itr->second;
+    for (int val : *values) {
+      toCheck.push_back(val);
+    }
+  }
+
+  //check if HasAffects(self,self) exist, if not, delete
+  if (!HasRelationship(RelDirection::kForward, target, target)) {
+    return_set.erase(target);
+  }
+
+  return ConvertIntToEntity(return_set);
+}
+
 bool AffectsTExtractor::HasRelationship(RelDirection dir) {
   if (!isCached) InitCache();
   return affects_t_map_.size() > 0;
@@ -86,6 +123,26 @@ void AffectsTExtractor::InitCache() {
     AddRelationshipToMap(&affected_by_t_map_, ae2->GetStatementNumber()->GetNum(), ae1->GetStatementNumber()->GetNum());
   }
   isCached = true;
+}
+
+std::vector<Entity*> AffectsTExtractor::ConvertIntToEntity(std::set<int> set_to_convert) {
+  std::vector<Entity*> retList = {};
+  for (auto item : set_to_convert) {
+    retList.push_back(GetAssignEntityFromStmtNum(item));
+  }
+  return retList;
+}
+
+//TODO: Reference from AffectsExtractor?
+AssignEntity* AffectsTExtractor::GetAssignEntityFromStmtNum(int target) {
+  std::vector<Entity*> ae_vec_target =
+      pkb_->GetPatternEntities(DesignEntity::kAssign, std::to_string(target));
+
+  if (ae_vec_target.size() == 0) //target given is not an assign entity.
+    return nullptr;
+
+  assert (ae_vec_target.size() == 1); // must be 1
+  return dynamic_cast<AssignEntity*>(ae_vec_target[0]);
 }
 
 //TODO: Reference from Deliverables?
