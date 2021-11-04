@@ -247,7 +247,8 @@ std::tuple<std::string, bool, bool, bool> QueryParser::ParseStmtOrEntRef() {
  * @returns a tuple of values corresponding to Clause object, bool isTargetSynonym.
  */
 std::pair<Clause*, bool> QueryParser::ParseRelRef() {
-  std::unordered_set<std::string> relRefs = {"Follows", "Parent", "Uses", "Modifies", "Calls", "Next", "Affects"};
+  std::unordered_set<std::string> relRefs = {"Follows", "Parent", "Uses", "Modifies",
+                                             "Calls", "Next", "NextBip", "Affects"};
   std::unordered_set<std::string>::const_iterator got = relRefs.find(lookahead.GetTokenString());
   if (got == relRefs.end()) {
     throw PQLParseException("Invalid relRef in such that clause.");

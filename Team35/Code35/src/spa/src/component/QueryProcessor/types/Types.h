@@ -67,6 +67,8 @@ enum class RelRef {
   kFollowsT,
   kNext,
   kNextT,
+  kNextBip,
+  kNextBipT,
   kAffects,
   kAffectsT,
   kInvalid

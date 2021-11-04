@@ -858,6 +858,73 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that Next; should pass") {
   }
 }
 
+TEST_CASE("3.QueryExtractor.Single well-formed such that NextBip; should pass") {
+  SECTION("NextBip with lhs INTEGER + rhs INTEGER") {
+    std::string query = "procedure p; Select p such that NextBip(2, 3)";
+    auto query_extractor = QueryExtractor(& query);
+    query_extractor.ExtractQuery(true);
+    std::vector<Group*> actual_groups = query_extractor.GetGroupsList();
+    REQUIRE(actual_groups.size() == 2);
+    Group* actual_group = actual_groups[0];
+
+    Clause* expected_cl = new SuchThat("2", "3", RelRef::kNextBip, false, false);
+    std::vector<Clause*> clauses;
+    clauses.push_back(expected_cl);
+    Group* expected_group = new Group(clauses, false);;
+
+    REQUIRE(AreGroupsEqual(expected_group, actual_group));
+  }
+
+  SECTION("NextBip* containing prog_line syn + INTEGER") {
+    std::string query = "assign a; prog_line n; Select a such that NextBip* (60, n)";
+    auto query_extractor = QueryExtractor(& query);
+    query_extractor.ExtractQuery(true);
+    std::vector<Group*> actual_groups = query_extractor.GetGroupsList();
+    REQUIRE(actual_groups.size() == 2);
+    Group* actual_group = actual_groups[0];
+
+    Clause* expected_cl = new SuchThat("60", "n", RelRef::kNextBipT, false, true);
+    std::vector<Clause*> clauses;
+    clauses.push_back(expected_cl);
+    Group* expected_group = new Group(clauses, false);;
+
+    REQUIRE(AreGroupsEqual(expected_group, actual_group));
+  }
+
+  SECTION("NextBip containing generic stmt syn + INTEGER") {
+    std::string query = "assign a; stmt n; Select a such that NextBip (60, n)";
+    auto query_extractor = QueryExtractor(& query);
+    query_extractor.ExtractQuery(true);
+    std::vector<Group*> actual_groups = query_extractor.GetGroupsList();
+    REQUIRE(actual_groups.size() == 2);
+    Group* actual_group = actual_groups[0];
+
+    Clause* expected_cl = new SuchThat("60", "n", RelRef::kNextBip, false, true);
+    std::vector<Clause*> clauses;
+    clauses.push_back(expected_cl);
+    Group* expected_group = new Group(clauses, false);;
+
+    REQUIRE(AreGroupsEqual(expected_group, actual_group));
+  }
+
+  SECTION("NextBip* containing stmt subtype syn + INTEGER") {
+    // assign is an example of a syn that is considered a type of stmt
+    std::string query = "assign a; Select a such that NextBip* (60, a)";
+    auto query_extractor = QueryExtractor(& query);
+    query_extractor.ExtractQuery();
+    std::vector<Group*> actual_groups = query_extractor.GetGroupsList();
+    REQUIRE(actual_groups.size() == 1);
+    Group* actual_group = actual_groups[0];
+
+    Clause* expected_cl = new SuchThat("60", "a", RelRef::kNextBipT, false, true);
+    std::vector<Clause*> clauses;
+    clauses.push_back(expected_cl);
+    Group* expected_group = new Group(clauses, true);;
+
+    REQUIRE(AreGroupsEqual(expected_group, actual_group));
+  }
+}
+
 TEST_CASE("3.QueryExtractor.Single well-formed such that Affects; should pass") {
   SECTION("Affects with lhs INTEGER + rhs INTEGER") {
     std::string query = "assign a; Select a such that Affects(2, 3)";
