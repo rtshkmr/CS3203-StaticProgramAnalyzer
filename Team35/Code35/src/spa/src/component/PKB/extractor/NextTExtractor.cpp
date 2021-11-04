@@ -71,30 +71,35 @@ std::vector<Entity*> NextTExtractor::GetRelationship(RelDirection dir,
  * @return all Entities that can be on the LHS/RHS of the relationship.
  */
 std::vector<Entity*> NextTExtractor::GetFirstEntityOfRelationship(RelDirection dir, DesignEntity de) {
+  if (de == DesignEntity::kProgLine) {
+    de = DesignEntity::kStmt;
+  }
   rel_direction_ = dir;
   PopulateRelationshipMap(proc_list_);
-  return first_arg_table_[rel_direction_];
+  return first_arg_table_[rel_direction_][de];
 }
 
 std::vector<std::tuple<Entity*, Entity*>> NextTExtractor::GetRelationshipByTypes(RelDirection dir,
                                                                                  DesignEntity first,
                                                                                  DesignEntity second) {
+  if (first == DesignEntity::kProgLine) {
+    first = DesignEntity::kStmt;
+  }
+  if (second == DesignEntity::kProgLine) {
+    second = DesignEntity::kStmt;
+  }
   rel_direction_ = dir;
   if (got_all_pairs_) {
-    return all_pairs_table_[rel_direction_];
+    return rel_by_types_table_[rel_direction_][{first, second}];
   }
   PopulateRelationshipMap(proc_list_);
-  RelDirection other_direction = rel_direction_ == RelDirection::kForward
-                                 ? RelDirection::kReverse
-                                 : RelDirection::kForward;
   for (auto pair: rel_table_[rel_direction_]) {
     for (Statement* stmt: *pair.second) {
-      all_pairs_table_[rel_direction_].emplace_back(pair.first, stmt);
-      all_pairs_table_[other_direction].emplace_back(stmt, pair.first);
+      AddRelByTypes(rel_direction_, pair.first, stmt);
     }
   }
   got_all_pairs_ = true;
-  return all_pairs_table_[rel_direction_];
+  return rel_by_types_table_[rel_direction_][{first, second}];
 }
 
 bool NextTExtractor::HasRelationship(RelDirection dir) {
@@ -322,7 +327,9 @@ void NextTExtractor::AddRelationships(Statement* first_arg, std::list<Statement*
   auto* list = new std::list<Statement*>();
   list->insert(list->begin(), second_args.begin(), second_args.end());
   rel_table_[rel_direction_].insert({first_arg, list});
-  first_arg_table_[rel_direction_].push_back(first_arg);
+  DesignEntity de = PKB::GetDesignEntityFromEntity(first_arg);
+  first_arg_table_[rel_direction_][de].push_back(first_arg);
+  first_arg_table_[rel_direction_][DesignEntity::kStmt].push_back(first_arg);
 }
 
 /**
@@ -334,7 +341,9 @@ void NextTExtractor::AddRelationshipsWithDup(Statement* first_arg, const std::li
   int first_arg_num = first_arg->GetStatementNumber()->GetNum();
   auto* list = MakeUniqueList(first_arg_num, second_args);
   rel_table_[rel_direction_].insert({first_arg, list});
-  first_arg_table_[rel_direction_].push_back(first_arg);
+  DesignEntity de = PKB::GetDesignEntityFromEntity(first_arg);
+  first_arg_table_[rel_direction_][de].push_back(first_arg);
+  first_arg_table_[rel_direction_][DesignEntity::kStmt].push_back(first_arg);
 }
 
 //// todo: deprecate this, use Program::GetProcClusterForLineNum instead @jx
@@ -504,6 +513,11 @@ bool NextTExtractor::HasNextTByTraversal(Block* block, int first, int second) {
   }
 }
 
+/**
+ * Only populates the relationship map in the rel_table_ for the current rel_direction_,
+ * by getting all relationships for all procedures.
+ * @param proc_list List of procedures to get relationships from.
+ */
 void NextTExtractor::PopulateRelationshipMap(const std::vector<Procedure*> &proc_list) {
   bool forward_and_populated = rel_direction_ == RelDirection::kForward && next_t_populated_;
   bool reverse_and_populated = rel_direction_ == RelDirection::kReverse && prev_t_populated_;
@@ -511,12 +525,39 @@ void NextTExtractor::PopulateRelationshipMap(const std::vector<Procedure*> &proc
     return;
   }
   for (Procedure* proc: proc_list) {
-    int first_stmt = const_cast<Cluster*>(proc->GetClusterRoot())->GetStartEndRange().first;
-    GetRelationship(rel_direction_, first_stmt, {proc});
+    std::pair<int, int> range = const_cast<Cluster*>(proc->GetClusterRoot())->GetStartEndRange();
+    int edge_stmt = rel_direction_ == RelDirection::kForward ? range.first : range.second;
+    GetRelationship(rel_direction_, edge_stmt, {proc});
   }
   if (rel_direction_ == RelDirection::kForward) {
     next_t_populated_ = true;
   } else {
     prev_t_populated_ = true;
+  }
+}
+
+void NextTExtractor::AddRelByTypes(RelDirection dir, Entity* first_arg, Entity* second_arg) {
+  RelDirection other_direction = rel_direction_ == RelDirection::kForward
+                                 ? RelDirection::kReverse
+                                 : RelDirection::kForward;
+  DesignEntity first_de = PKB::GetDesignEntityFromEntity(first_arg);
+  DesignEntity second_de = PKB::GetDesignEntityFromEntity(second_arg);
+  std::vector<type_combo> first_combis = {
+      {first_de, second_de},
+      {DesignEntity::kStmt, second_de},
+      {first_de, DesignEntity::kStmt},
+      {DesignEntity::kStmt, DesignEntity::kStmt}
+  };
+  for (const type_combo& types : first_combis) {
+    rel_by_types_table_[rel_direction_][types].emplace_back(first_arg, second_arg);
+  }
+  std::vector<type_combo> second_combis = {
+      {second_de, first_de},
+      {DesignEntity::kStmt, first_de},
+      {second_de, DesignEntity::kStmt},
+      {DesignEntity::kStmt, DesignEntity::kStmt}
+  };
+  for (const type_combo& types : first_combis) {
+    rel_by_types_table_[other_direction][types].emplace_back(second_arg, first_arg);
   }
 }

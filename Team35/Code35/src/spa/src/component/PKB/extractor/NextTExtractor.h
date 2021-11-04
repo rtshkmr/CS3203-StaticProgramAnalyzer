@@ -33,8 +33,9 @@ class NextTExtractor : public RuntimeColleague {
   bool initialized_ = false;
   RelDirection rel_direction_;
   std::unordered_map<RelDirection, std::unordered_map<Statement*, std::list<Statement*>*>> rel_table_;
-  std::unordered_map<RelDirection, std::vector<Entity*>> first_arg_table_;
-  std::unordered_map<RelDirection, std::vector<std::tuple<Entity*, Entity*>>> all_pairs_table_;
+  std::unordered_map<RelDirection, std::unordered_map<DesignEntity, std::vector<Entity*>>> first_arg_table_;
+  std::unordered_map<RelDirection,
+                     std::unordered_map<type_combo, std::vector<entity_pair>, type_combo_hash>> rel_by_types_table_;
 
   bool next_t_populated_ = false;
   bool prev_t_populated_ = false;
@@ -67,6 +68,7 @@ class NextTExtractor : public RuntimeColleague {
   void AddRelationshipsFollowingBlock(const std::list<Statement*> &rel_stmts, Block* block);
   int GetBlockTarget(Block* block, int target);
   std::list<Statement*> MakeStmtList(int first_stmt, int last_stmt);
+  void AddRelByTypes(RelDirection dir, Entity* first_arg, Entity* second_arg);
 };
 
 #endif //AUTOTESTER_CODE35_SRC_SPA_SRC_COMPONENT_PKB_NEXTTEXTRACTOR_H_
