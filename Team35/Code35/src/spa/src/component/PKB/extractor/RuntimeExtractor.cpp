@@ -246,8 +246,20 @@ std::vector<Entity*> RuntimeExtractor::GetAffectedBy(DesignEntity de) {
     return std::vector<Entity*>{};
   }
 }
-std::vector<Entity*> RuntimeExtractor::GetAffectsT(DesignEntity de) { return std::vector<Entity*>(); }
-std::vector<Entity*> RuntimeExtractor::GetAffectedByT(DesignEntity de) { return std::vector<Entity*>(); }
+std::vector<Entity*> RuntimeExtractor::GetAffectsT(DesignEntity de) {
+  if (de == DesignEntity::kStmt || de == DesignEntity::kAssign) {
+    return affects_t_extractor_.GetFirstEntityOfRelationship(RelDirection::kForward);
+  } else {
+    return std::vector<Entity*>();
+  }
+}
+std::vector<Entity*> RuntimeExtractor::GetAffectedByT(DesignEntity de) {
+  if (de == DesignEntity::kStmt || de == DesignEntity::kAssign) {
+    return affects_t_extractor_.GetFirstEntityOfRelationship(RelDirection::kReverse);
+  } else {
+    return std::vector<Entity*>();
+  }
+}
 
 std::vector<Entity*> RuntimeExtractor::GetNextBip(DesignEntity de) {
   if (de != DesignEntity::kStmt && de != DesignEntity::kProgLine) {

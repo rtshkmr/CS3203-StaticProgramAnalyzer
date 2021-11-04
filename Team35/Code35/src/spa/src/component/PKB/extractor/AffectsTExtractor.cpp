@@ -44,6 +44,18 @@ std::vector<Entity*> AffectsTExtractor::GetRelationship(RelDirection dir, int ta
   return ConvertIntToEntity(return_set);
 }
 
+std::vector<Entity*> AffectsTExtractor::GetFirstEntityOfRelationship(RelDirection dir) {
+  if (!isCached) InitCache();
+  std::unordered_map<int, std::list<int>*>* mapToCheck = (dir == RelDirection::kForward) ? &affects_t_map_ : &affected_by_t_map_;
+
+  std::set<int> return_set = {};
+  for (auto pair : *mapToCheck) {
+    return_set.insert(pair.first);
+  }
+
+  return ConvertIntToEntity(return_set);
+}
+
 bool AffectsTExtractor::HasRelationship(RelDirection dir) {
   if (!isCached) InitCache();
   return affects_t_map_.size() > 0;

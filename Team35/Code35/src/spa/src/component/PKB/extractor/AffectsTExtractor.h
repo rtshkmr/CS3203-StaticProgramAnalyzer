@@ -12,7 +12,7 @@ class AffectsTExtractor : RuntimeColleague {
   AffectsTExtractor() = default;
   explicit AffectsTExtractor(RuntimeMediator* rte, PKB* pkb);
   std::vector<Entity*> GetRelationship(RelDirection dir, int target);
-  std::vector<Entity*> GetFirstEntityOfRelationship(RelDirection dir) {return {}; };
+  std::vector<Entity*> GetFirstEntityOfRelationship(RelDirection dir);
   std::vector<std::tuple<Entity*, Entity*>> GetRelationshipByTypes(RelDirection dir) {return {};};
   bool HasRelationship(RelDirection dir);
   bool HasRelationship(RelDirection dir, int target);

@@ -188,4 +188,16 @@ TEST_CASE("2.PKB.AffectsT.adv_spa_lecture") {
     CHECK(dbm->GetRelationship(PKBRelRefs::kAffectedByT, "17").empty()); //[not assign stmt] read stmt
     CHECK(dbm->GetRelationship(PKBRelRefs::kAffectedByT, "18").empty()); //[not assign stmt] call stmt
   }
+
+  SECTION ("9 - Get AffectsT : (a1, _) ") {
+    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffectsT, DesignEntity::kAssign).size() == 9);
+    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffectsT, DesignEntity::kStmt).size() == 9);
+  }
+
+  SECTION ("10 - Get AffectedByT : (_, a2) ") {
+    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffectedByT, DesignEntity::kAssign).size() == 7);
+    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffectedByT, DesignEntity::kStmt).size() == 7);
+  }
+
+
 }
