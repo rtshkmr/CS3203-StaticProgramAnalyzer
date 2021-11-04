@@ -367,13 +367,8 @@ bool ClauseCommandExecutor::HasPatternValueMatch(Entity *stmt_entity_in_table, c
   std::vector<Variable *> variable_to_check = RetrieveVariablesFromStmt(stmt_entity_in_table);
 
   if (typeid(*stmt_entity_in_table) == typeid(AssignEntity)) {
-//<<<<<<< HEAD
-//    auto *assign_entity = dynamic_cast<AssignEntity *>(stmt_entity_in_table);
-//    std::string variable_value_in_table = const_cast<VariableName*>(variable_to_check[0]->GetName())->getName();
-//=======
     AssignEntity *assign_entity = dynamic_cast<AssignEntity *>(stmt_entity_in_table);
     std::string variable_value_in_table = const_cast<VariableName*>(variable_to_check[0]->GetVariableName())->GetName();
-//>>>>>>> master
     return (value == "_" || value == variable_value_in_table) && HasExpressionMatch(pattern, assign_entity);
   } else {
     for (auto variable : variable_to_check) {
@@ -387,13 +382,8 @@ bool ClauseCommandExecutor::HasPatternValueMatch(Entity *stmt_entity_in_table, c
 std::vector<Variable *> ClauseCommandExecutor::RetrieveVariablesFromStmt(Entity *stmt_entity) {
   std::vector<Variable *> variable_to_check;
   if (typeid(*stmt_entity) == typeid(AssignEntity)) {
-//<<<<<<< HEAD
-//    auto *assign_entity = dynamic_cast<AssignEntity *>(stmt_entity);
-//    variable_to_check.push_back(assign_entity->GetVariable());
-//=======
     AssignEntity *assign_entity = dynamic_cast<AssignEntity *>(stmt_entity);
     variable_to_check.push_back(assign_entity->GetVariableObj());
-//>>>>>>> master
   } else if (typeid(*stmt_entity) == typeid(IfEntity)) {
     auto *if_entity = dynamic_cast<IfEntity *>(stmt_entity);
     for (auto variable : if_entity->GetControlVariables()) {
