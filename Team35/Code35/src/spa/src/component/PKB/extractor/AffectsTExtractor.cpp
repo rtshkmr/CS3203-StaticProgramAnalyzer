@@ -7,6 +7,15 @@ AffectsTExtractor::AffectsTExtractor(RuntimeMediator* rte, PKB* pkb) {
   this->pkb_ = pkb;
 }
 
+bool AffectsTExtractor::HasRelationship(RelDirection dir, int target) {
+  if (!isCached) InitCache();
+
+  std::unordered_map<int, std::list<int>*>* mapToCheck = (dir == RelDirection::kForward) ? &affects_t_map_ : &affected_by_t_map_;
+  auto itr = mapToCheck->find(target);
+  return itr != mapToCheck->end();
+
+}
+
 bool AffectsTExtractor::HasRelationship(RelDirection dir, int first, int second) {
   if (!isCached) InitCache();
 

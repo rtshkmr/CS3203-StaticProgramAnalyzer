@@ -367,11 +367,11 @@ bool RuntimeExtractor::HasAffectedBy(int target) {
 }
 
 bool RuntimeExtractor::HasAffectsT(int target) {
-  return false;
+  return affects_t_extractor_.HasRelationship(RelDirection::kForward, target);
 }
 
 bool RuntimeExtractor::HasAffectedByT(int target) {
-  return false;
+  return affects_t_extractor_.HasRelationship(RelDirection::kReverse, target);
 }
 
 bool RuntimeExtractor::HasNextBip(int first) {
