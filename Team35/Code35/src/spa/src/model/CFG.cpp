@@ -309,12 +309,12 @@ bool Cluster::CheckScopeClusterForAffects(Cluster* scoped_cluster,
     }
     if (!current_scope) return false;
     auto current_scope_range = current_scope->GetStartEndRange();
-    bool while_start_to_first_stmt_is_unmodified = (target_range.second == current_scope_range.second)
+    bool first_stmt_to_while_end_is_unmodified = (target_range.second == current_scope_range.second)
         || TraverseScopedClusterForAffects(current_scope,
                                            {target_range.first, current_scope_range.second},
                                            pkb,
                                            lhs_var);
-    bool second_stmt_to_while_end_is_unmodified =
+    bool while_start_to_second_stmt_is_unmodified =
         TraverseScopedClusterForAffects(current_scope, {current_scope->start_, target_range.second}, pkb, lhs_var);
     return while_start_to_first_stmt_is_unmodified && second_stmt_to_while_end_is_unmodified;
   } else {
