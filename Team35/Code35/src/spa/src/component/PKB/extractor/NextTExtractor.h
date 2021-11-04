@@ -3,38 +3,29 @@
 
 #include <model/Entity.h>
 #include <unordered_map>
+#include <component/PKB/extractor/RuntimeColleague.h>
+#include <component/PKB/PKB.h>
 
-enum class RelDirection {
-  kNext,
-  kPrev
-};
-
-class NextTExtractor {
+class NextTExtractor : public RuntimeColleague {
  public:
+  NextTExtractor() = default;
+  explicit NextTExtractor(PKB* pkb);
+  NextTExtractor(std::vector<Procedure*> proc_list, std::vector<Statement*> stmt_list);
   int GetNextTSize();
   int GetPrevTSize();
   void Delete();
-  std::vector<Entity*> GetNextT(int target,
-                                const std::vector<Procedure*> &proc_list,
-                                std::vector<Statement*> stmt_list);
-  std::vector<Entity*> GetAllNextTLHS(const std::vector<Procedure*> &proc_list,
-                                      const std::vector<Statement*> &stmt_list);
-  std::vector<std::tuple<Entity*, Entity*>> GetAllNextT(const std::vector<Procedure*> &proc_list,
-                                                        const std::vector<Statement*> &stmt_list);
-  bool HasNextT(int first,
-                int second,
-                const std::vector<Procedure*> &proc_list,
-                const std::vector<Statement*> &stmt_list);
+  std::vector<Entity*> GetRelationship(RelDirection dir, int target) override;
+  std::vector<Entity*> GetRelationship(RelDirection dir, int target, const std::vector<Procedure*> &proc_list);
+  std::vector<Entity*> GetFirstEntityOfRelationship(RelDirection dir) override;
+  std::vector<std::tuple<Entity*, Entity*>> GetRelationshipByTypes(RelDirection dir) override;
+  bool HasRelationship(RelDirection dir) override;
+  bool HasRelationship(RelDirection dir, int target) override;
+  bool HasRelationship(RelDirection dir, int first, int second) override;
 
-  std::vector<Entity*> GetPrevT(int target,
-                                const std::vector<Procedure*> &proc_list,
-                                std::vector<Statement*> stmt_list);
-  std::vector<Entity*> GetAllNextTRHS(const std::vector<Procedure*> &proc_list,
-                                      const std::vector<Statement*> &stmt_list);
-  std::vector<std::tuple<Entity*, Entity*>> GetAllPrevT(const std::vector<Procedure*> &proc_list,
-                                                        const std::vector<Statement*> &stmt_list);
  private:
-  std::vector<Statement*> stmt_list_;
+  PKB* pkb_{};
+  std::vector<Statement*> stmt_list_{};
+  std::vector<Procedure*> proc_list_{};
 
   // state
   bool initialized_ = false;
@@ -55,12 +46,13 @@ class NextTExtractor {
   bool prev_t_populated_ = false;
   std::vector<std::tuple<Entity*, Entity*>> all_prev_t_;  // reverse of all_next_t
 
-  void Init(const std::vector<Statement*> &stmt_list);
+  std::vector<std::tuple<Entity*, Entity*>> GetAllNextT();
+  std::vector<std::tuple<Entity*, Entity*>> GetAllPrevT();
   static Cluster* GetProcCluster(const std::vector<Procedure*> &proc_list, int target);
   std::list<Statement*> GetValueFromMap(std::unordered_map<Statement*, std::list<Statement*>*> map, int stmt_num);
   static Cluster* GetTargetCluster(Cluster* p_cluster, int target_num);
   static Block* GetNextBlockAfterWhile(Block* w_block);
-  static std::vector<Entity*> ltov(std::list<Statement*> l);
+  static std::vector<Entity*> ConvertListToVector(std::list<Statement*> list);
   void PopulateAllNextT(const std::vector<Procedure*> &proc_list);
   bool HasNextTInFirstCluster(Cluster* cluster, int first, int second);
   bool IsNextTDownstream(int first, int second);

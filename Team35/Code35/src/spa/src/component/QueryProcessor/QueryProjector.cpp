@@ -95,6 +95,7 @@ std::vector<std::vector<std::string>> QueryProjector::StringifyTable(std::vector
         break;
       case Attribute::kVarName:
         for (Entity* entity: entity_column) {
+//<<<<<<< HEAD
           std::string var_string;
           Variable* temp;
           if (syn_attrs[i].first->GetType() == DesignEntity::kPrint) {
@@ -106,7 +107,11 @@ std::vector<std::vector<std::string>> QueryProjector::StringifyTable(std::vector
           else {
             temp = dynamic_cast<Variable*>(entity);
           }
-          var_string = const_cast<VariableName*>(temp->GetName())->getName();
+          var_string = const_cast<VariableName*>(dynamic_cast<Variable*>(entity)->GetVariableName())->GetName();
+//          var_string = const_cast<VariableName*>(temp->GetName())->getName();
+//=======
+//          std::string var_string = const_cast<VariableName*>(dynamic_cast<Variable*>(entity)->GetVariableName())->GetName();
+//>>>>>>> master
           stringified_column.push_back(var_string);
         }
         break;

@@ -78,7 +78,7 @@ class VariableName {
  public:
   VariableName(std::string vName);
 
-  std::string getName();
+  std::string GetName() const;
 
   bool operator<(const VariableName& other) const;
 

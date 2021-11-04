@@ -88,7 +88,7 @@ AssignEntity::AssignEntity(Variable* var,
   }
 }
 
-Variable* AssignEntity::GetVariable() {
+Variable* AssignEntity::GetVariableObj() {
   return assigned_to_;
 }
 
@@ -102,6 +102,9 @@ vector<Variable*> AssignEntity::GetControlVariables() {
 
 vector<Constant*> AssignEntity::GetExpressionConstants() {
   return expr_constants;
+}
+std::string AssignEntity::GetVariableString() {
+  return assigned_to_->GetName();
 }
 
 CallEntity::CallEntity(Procedure* proc_name) {

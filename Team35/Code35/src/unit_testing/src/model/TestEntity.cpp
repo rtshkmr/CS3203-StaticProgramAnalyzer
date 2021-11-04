@@ -11,12 +11,12 @@ TEST_CASE("1.Model.Entity.Variable") {
   Variable* var_vtester = new Variable(variable_vtester);
   Variable* var_xtester = new Variable(variable_xtester);
 
-  SECTION("GetName") {
-    REQUIRE(var_vtester->GetName() == variable_vtester);
-    REQUIRE(var_xtester->GetName() == variable_xtester);
+  SECTION("GetVariableName") {
+    REQUIRE(var_vtester->GetVariableName() == variable_vtester);
+    REQUIRE(var_xtester->GetVariableName() == variable_xtester);
 
-    REQUIRE_FALSE(var_vtester->GetName() == variable_xtester);
-    REQUIRE_FALSE(var_xtester->GetName() == variable_vtester);
+    REQUIRE_FALSE(var_vtester->GetVariableName() == variable_xtester);
+    REQUIRE_FALSE(var_xtester->GetVariableName() == variable_vtester);
   }
 
   SECTION("Casting to Entity and back") {
@@ -43,7 +43,7 @@ TEST_CASE("1.Model.Entity.Procedure") {
   Procedure* proc_vtester = new Procedure(pname_vtester);
   Procedure* proc_xtester = new Procedure(pname_xtester);
 
-  SECTION("GetName") {
+  SECTION("GetVariableName") {
     REQUIRE(proc_vtester->GetName() == pname_vtester);
     REQUIRE(proc_xtester->GetName() == pname_xtester);
 
