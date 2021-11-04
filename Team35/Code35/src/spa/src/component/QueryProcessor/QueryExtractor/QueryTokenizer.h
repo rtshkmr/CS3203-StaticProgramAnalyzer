@@ -15,6 +15,7 @@ class QueryTokenizer {
   std::string query;
   std::int16_t cursor = 0;
   TokenTag GetPqlTokenType(std::string type);
+  std::pair<bool, Token> EvaluateExactTokenMatch(std::string curr_string);
  public:
   QueryTokenizer() {};
   void SetQueryString(std::string* query) { this->query = * query; };

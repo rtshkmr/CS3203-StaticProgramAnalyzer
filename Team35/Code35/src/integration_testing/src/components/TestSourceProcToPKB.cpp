@@ -24,10 +24,9 @@ TEST_CASE("SP to PKB basic retrieval") {
 
   SECTION("Constant") {
     std::vector<Entity*> const_list = pkb->GetDesignEntities(DesignEntity::kConstant);
-    REQUIRE(const_list.size() == 3);
+    REQUIRE(const_list.size() == 2);
     REQUIRE(pkb->GetNameFromEntity(const_list.at(0)) == "1");
     REQUIRE(pkb->GetNameFromEntity(const_list.at(1)) == "3");
-    REQUIRE(pkb->GetNameFromEntity(const_list.at(2)) == "3");
   }
 
   SECTION("Statement") {

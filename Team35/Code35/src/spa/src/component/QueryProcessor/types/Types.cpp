@@ -25,8 +25,8 @@ RelRef GetRelRef(std::string reference) {
 }
 
 static std::unordered_map<std::string, Attribute> _attribute_map = {{"procName", Attribute::kProcName},
-                                                                    {"varName", Attribute::kProcName},
-                                                                    {"value", Attribute::kProcName},
+                                                                    {"varName", Attribute::kVarName},
+                                                                    {"value", Attribute::kValue},
                                                                     {"stmt#", Attribute::kStmtNumber}};
 Attribute GetAttribute(std::string attr_string) {
   std::unordered_map<std::string, Attribute>::const_iterator iter = _attribute_map.find(attr_string);
@@ -34,6 +34,19 @@ Attribute GetAttribute(std::string attr_string) {
     return iter->second;
   }
   return Attribute::kInvalid;
+}
+
+Attribute GetDefaultAttribute(DesignEntity de) {
+  switch (de) {
+    case DesignEntity::kProcedure:
+      return Attribute::kProcName;
+    case DesignEntity::kVariable:
+      return Attribute::kVarName;
+    case DesignEntity::kConstant:
+      return Attribute::kValue;
+    default:
+      return Attribute::kStmtNumber;
+  }
 }
 
 static std::unordered_map<std::string, DesignEntity> _de_map = {{"stmt", DesignEntity::kStmt},
@@ -82,4 +95,8 @@ std::vector<Synonym*> Group::GetTargetSynonyms() {
 
 void Group::UpdateHasTargetSynonymAttr() {
   has_target_synonym = target_synonyms.size() > 0 ? true : false;
+}
+
+int Group::GetGroupSize() {
+  return clauses.size();
 }

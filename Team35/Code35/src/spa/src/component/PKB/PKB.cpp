@@ -18,10 +18,20 @@ constexpr auto L = [](auto msg) {
 void PKB::PopulateDataStructures(Deliverable d) {
   L("... PKB will be populated by Deliverable object from SourceProcessor\n");
 
+  std::list<Constant*> constants;
+  std::unordered_set<std::string> seen = {};
+  for (Constant* constant : *d.GetConstantList()) {
+    std::string c_string = GetNameFromEntity(constant);
+    if (seen.find(c_string) == seen.end()) {
+      constants.push_back(constant);
+      seen.insert(c_string);
+    }
+  }
+
   // Populate Entities
   PopulateEntities(DesignEntity::kProcedure, *d.GetProcList());
   PopulateEntities(DesignEntity::kVariable, *d.GetVariableList());
-  PopulateEntities(DesignEntity::kConstant, *d.GetConstantList());
+  PopulateEntities(DesignEntity::kConstant, constants);
   PopulateEntities(DesignEntity::kCall, *d.GetCallList());
   PopulateEntities(DesignEntity::kPrint, *d.GetPrintList());
   PopulateEntities(DesignEntity::kRead, *d.GetReadList());
@@ -72,6 +82,7 @@ void PKB::PopulateEntities(DesignEntity design_entity, T& entity_list) {
     std::unordered_map<Attribute, std::string> attributes = GetAttributesFromEntity(entity);
     for (std::pair<Attribute, std::string> attribute: attributes) {
       attribute_to_entity_map_[{design_entity, attribute.first}][attribute.second].push_back(entity);
+      entity_to_attribute_type_map_[entity][attribute.second] = attribute.first;
       attribute_string_to_entity_map_[attribute.second].insert(entity);
     }
     if (pattern_entities_.find(design_entity) != pattern_entities_.end()) {
@@ -156,8 +167,9 @@ std::vector<Entity*> PKB::GetEntitiesWithAttributeValue(DesignEntity design_enti
   return attribute_to_entity_map_[{design_entity, attribute}][value];
 }
 
-std::vector<entity_pair> PKB::GetEntitiesWithMatchingAttributes(DesignEntity type_one, DesignEntity type_two) {
-  return entities_with_matching_attributes_map_[{type_one, type_two}];
+std::vector<entity_pair> PKB::GetEntitiesWithMatchingAttributes(type_attribute_pair type_one, type_attribute_pair type_two) {
+  auto hi = entities_with_matching_attributes_map_[type_one][type_two];
+  return entities_with_matching_attributes_map_[type_one][type_two];
 }
 
 bool PKB::HasRelationship(PKBRelRefs ref) {
@@ -177,13 +189,26 @@ bool PKB::HasRelationship(PKBRelRefs ref, std::string e1, std::string e2) {
 }
 
 void PKB::ProcessEntitiesWithMatchingAttributes() {
-  for (std::pair<std::string, std::unordered_set<Entity*>> kv : attribute_string_to_entity_map_) {
-    for (Entity* entity_one : kv.second) {
+  for (auto kv : attribute_string_to_entity_map_) {
+    std::vector<Entity*> entities(kv.second.begin(), kv.second.end());
+    for (int i = 0; i < entities.size(); i++) {
+      Entity* entity_one = entities[i];
       DesignEntity design_entity_one = GetDesignEntityFromEntity(entity_one);
-      for (Entity* entity_two : kv.second) {
+      auto first_entity_types = GetApplicableTypes(design_entity_one);
+      Attribute attribute_one = entity_to_attribute_type_map_[entity_one][kv.first];
+      for (int j = i; j < entities.size(); j++) {
+        Entity* entity_two = entities[j];
         DesignEntity design_entity_two = GetDesignEntityFromEntity(entity_two);
-        entities_with_matching_attributes_map_[{design_entity_one, design_entity_two}]
-            .push_back({entity_one, entity_two});
+        auto second_entity_types = GetApplicableTypes(design_entity_two);
+        Attribute attribute_two = entity_to_attribute_type_map_[entity_two][kv.first];
+        for (auto first_type : first_entity_types) {
+          for (auto second_type : second_entity_types) {
+            entities_with_matching_attributes_map_[{first_type, attribute_one}][{second_type, attribute_two}]
+              .push_back({entity_one, entity_two});
+            entities_with_matching_attributes_map_[{second_type, attribute_two}][{first_type, attribute_one}]
+              .push_back({entity_two, entity_one});
+          }
+        }
       }
     }
   }

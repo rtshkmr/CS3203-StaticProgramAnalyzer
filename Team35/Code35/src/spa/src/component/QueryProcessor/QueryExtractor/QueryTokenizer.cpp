@@ -6,36 +6,23 @@
 #include <datatype/RegexPatterns.h>
 #include <exception/SpaException.h>
 
-// note: order of regex evaluation matters! always retrieve key-values based on defined insertion_order.
-std::vector<std::string> insertion_order = {"*", "STRING_QUOTE", "INTEGER", "SUCH_THAT", "PROG_LINE",
-                                            "stmt#", "IDENT", ";", "SPACINGS", "(", ")", ",", "_", "<", ">", ".", "="};
-static std::map<std::string, std::regex> spec_table {
-    {"*", std::regex("^[*]")},
-    {"STRING_QUOTE", std::regex("^\"")},
+static std::unordered_set<std::string> exact_tokens { "*", ";", "(", ")", ",", "_", "<", ">", ".", "=",
+                                                      "stmt#", "prog_line", "such that", "\"" };
+
+std::vector<std::string> insertion_order = { "SPACINGS", "IDENT", "INTEGER" };
+static std::unordered_map<std::string, std::regex> spec_table {
     {"INTEGER", RegexPatterns::GetIntegerPatternNonTerminating()},
-    {"SUCH_THAT", std::regex("^such that")},
-    {"PROG_LINE", std::regex("^prog_line")},
-    {"stmt#", std::regex("^stmt#")},
     {"IDENT", RegexPatterns::GetNamePattern()}, // IDENT is TokenTag:kName
-    {";", std::regex("^;")},
-    {"SPACINGS", std::regex(R"(^[\n\r\s\t]+)")},
-    {"(", std::regex("^[(]")},
-    {")", std::regex("^[)]")},
-    {",", std::regex("^,")},
-    {"_", std::regex("^_")},
-    {"<", std::regex("^[<]")},
-    {">", std::regex("^[>]")},
-    {".", std::regex("^[.]")},
-    {"=", std::regex("^[=]")},
+    {"SPACINGS", std::regex(R"(^[\s\n\r\t]+)", std::regex_constants::optimize)},
 };
 
 static std::unordered_map<std::string, TokenTag> spec_type_to_tag_table {
   {"stmt#", TokenTag::kStmtHash},
   {"*", TokenTag::kTimes},
-  {"STRING_QUOTE", TokenTag::kStringQuote},
+  {"\"", TokenTag::kStringQuote},
   {"INTEGER", TokenTag::kInteger},
-  {"PROG_LINE", TokenTag::kProgLine},
-  {"SUCH_THAT", TokenTag::kSuchThat},
+  {"prog_line", TokenTag::kProgLine},
+  {"such that", TokenTag::kSuchThat},
   {"IDENT", TokenTag::kName},
   {";", TokenTag::kSemicolon},
   {"(", TokenTag::kOpenBracket},
@@ -48,6 +35,7 @@ static std::unordered_map<std::string, TokenTag> spec_type_to_tag_table {
   {"=", TokenTag::kEquals}
 };
 
+static std::regex string_end_regex("^[^\"]*", std::regex_constants::optimize);
 /**
  * Gets correct TokenTag specific to PQL applications by consulting spec_type_to_tag_table.
  * Note that this function does not check that the token is of SPACINGS type, as such tokens have already been dropped.
@@ -76,10 +64,19 @@ Token QueryTokenizer::GetNextToken() {
     return Token("", TokenTag::kInvalid);
   }
   std::string curr_string = query.substr(cursor);
+  // try matching known exact tokens first
+  bool has_exact_token_match;
+  Token exact_token = Token("", TokenTag::kInvalid);
+  std::tie(has_exact_token_match, exact_token) = EvaluateExactTokenMatch(curr_string);
+  if (has_exact_token_match) {
+    cursor += exact_token.GetTokenString().size();
+    return exact_token;
+  }
+  // not an exact token, so we need to evaluate with known regex patterns
   std::smatch match;
   for (auto const& sp: insertion_order) {
     auto spec = * spec_table.find(sp);
-    if (!std::regex_search(curr_string, match, spec.second)) {
+    if (!std::regex_search(curr_string, match, spec.second, std::regex_constants::match_continuous)) {
       continue;
     }
     cursor += match[0].str().size();
@@ -90,6 +87,20 @@ Token QueryTokenizer::GetNextToken() {
   }
 
   throw PQLTokenizeException("No patterns matched. Error in tokenizing pql.");
+}
+
+std::pair<bool, Token> QueryTokenizer::EvaluateExactTokenMatch(std::string curr_string) {
+  std::string match;
+  std::unordered_set<std::string>::const_iterator got;
+  // "such that" / "prog_line" are 9 chars long, "stmt#" is 5, "\"" is 2. Rest are 1.
+  std::vector<int> lengths = {1, 2, 5, 9};
+  for (int i : lengths) {
+    match = curr_string.substr(0, i);
+    got = exact_tokens.find(match);
+    if (got != exact_tokens.end()) return {true, Token(match, spec_type_to_tag_table.at(match))};
+  }
+  // curr_string does not start with an exact token, return dummy
+  return {false, Token("", TokenTag::kInvalid)};
 }
 
 /**
@@ -103,7 +114,7 @@ std::string QueryTokenizer::SkipTokenizerTillStringQuoteDelimiter() {
   }
   std::string curr_string = query.substr(cursor);
   std::smatch match;
-  if (!std::regex_search(curr_string, match, std::regex("^[^\"]*"))) {
+  if (!std::regex_search(curr_string, match, string_end_regex, std::regex_constants::match_continuous)) {
     throw PQLTokenizeException("could not find string quote delimiter in query stream.");
   }
   std::string matched_str = match[0].str();
