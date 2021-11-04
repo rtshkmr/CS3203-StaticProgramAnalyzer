@@ -136,7 +136,9 @@ std::vector<Entity*> AffectsTExtractor::GetAffectedByT(int target) {
 }
 
 void AffectsTExtractor::Delete() {
-
+  isCached = false;
+  affects_t_map_ = {};
+  affected_by_t_map_ = {};
 }
 
 void AffectsTExtractor::InitCache() {
