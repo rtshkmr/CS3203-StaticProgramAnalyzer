@@ -1,10 +1,12 @@
 #include <cassert>
 #include <utility>
+#include <util/Utility.h>
 #include "NextTExtractor.h"
 #include "model/CFG.h"
 
 NextTExtractor::NextTExtractor(PKB* pkb) {
   pkb_ = pkb;
+  program_ = pkb->GetProgram();
   for (Entity* entity : pkb->GetDesignEntities(DesignEntity::kProcedure)) {
     proc_list_.push_back(dynamic_cast<Procedure*>(entity));
   }
@@ -17,6 +19,10 @@ NextTExtractor::NextTExtractor(PKB* pkb) {
 
 NextTExtractor::NextTExtractor(std::vector<Procedure*> proc_list, std::vector<Statement*> stmt_list) {
   proc_list_ = std::move(proc_list);
+  program_ = new Program(proc_list_[0]);
+  for (int i = 1; i < proc_list_.size(); ++i) {
+    program_->AddProcedure(proc_list_[i]);
+  }
   stmt_list_ = std::move(stmt_list);
   int total = stmt_list_.size();
   next_t_2d_array_ = std::vector<std::vector<int>>(total, std::vector<int>(total));
@@ -123,7 +129,7 @@ bool NextTExtractor::HasRelationship(RelDirection dir, int first, int second) {
     return true;
   }
 
-  Cluster* proc_cluster = GetProcCluster(proc_list_, first);
+  Cluster* proc_cluster = program_->GetProcClusterForLineNum(first);
   if (proc_cluster) {
     if (proc_cluster->CheckIfStmtNumInRange(second)) {
       Cluster* t_cluster = GetTargetCluster(proc_cluster, first);
@@ -142,13 +148,13 @@ std::vector<Entity*> NextTExtractor::GetRel(int target,
   if (is_out_of_bounds) {
     return std::vector<Entity*>{};
   } else if (rel_table_[rel_direction_].count(stmt_list[target - 1]) == 1) {
-    return ConvertListToVector(*rel_table_[rel_direction_].find(stmt_list[target - 1])->second);
+    return Utility::ConvertListToVector(*rel_table_[rel_direction_].find(stmt_list[target - 1])->second);
   }
 
-  Cluster* proc_cluster = GetProcCluster(proc_list, target);
+  Cluster* proc_cluster = program_->GetProcClusterForLineNum(target);
   if (proc_cluster) {
     Cluster* t_cluster = GetTargetCluster(proc_cluster, target);
-    return ConvertListToVector(GetRelFromCluster(t_cluster, target));
+    return Utility::ConvertListToVector(GetRelFromCluster(t_cluster, target));
   }
   return std::vector<Entity*>{};
 }
@@ -351,17 +357,6 @@ void NextTExtractor::AddRelationshipsWithDup(Statement* first_arg, const std::li
   first_arg_table_[rel_direction_][DesignEntity::kStmt].push_back(first_arg);
 }
 
-//// todo: deprecate this, use Program::GetProcClusterForLineNum instead @jx
-Cluster* NextTExtractor::GetProcCluster(const std::vector<Procedure*> &proc_list, int target) {
-  for (Procedure* proc: proc_list) {  // todo: optimise finding procedure of target stmt
-    auto* proc_cluster = const_cast<Cluster*>(proc->GetClusterRoot());
-    if (proc_cluster->CheckIfStmtNumInRange(target)) {
-      return proc_cluster;
-    }
-  }
-  return nullptr;
-}
-
 /**
  * Traverses the cluster on surface level and returns the outermost cluster with the target number.
  */
@@ -411,11 +406,6 @@ std::list<Statement*>* NextTExtractor::MakeUniqueList(int s1_num, const std::lis
     }
   }
   return new_list;
-}
-
-std::vector<Entity*> NextTExtractor::ConvertListToVector(std::list<Statement*> list) {
-  std::vector<Entity*> vector{std::make_move_iterator(std::begin(list)), std::make_move_iterator(std::end(list))};
-  return vector;
 }
 
 /**

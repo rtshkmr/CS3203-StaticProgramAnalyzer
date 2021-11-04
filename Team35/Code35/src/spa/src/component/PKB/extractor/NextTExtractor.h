@@ -26,6 +26,7 @@ class NextTExtractor : public RuntimeColleague {
 
  private:
   PKB* pkb_{};
+  Program* program_{};
   std::vector<Statement*> stmt_list_{};
   std::vector<Procedure*> proc_list_{};
 
@@ -43,11 +44,9 @@ class NextTExtractor : public RuntimeColleague {
   // 2d array of first stmt (row) to second stmt (col). 1 indicates existence of next* relationship, 0 otherwise.
   std::vector<std::vector<int>> next_t_2d_array_;
 
-  static Cluster* GetProcCluster(const std::vector<Procedure*> &proc_list, int target);
   std::list<Statement*> GetValueFromMap(std::unordered_map<Statement*, std::list<Statement*>*> map, int stmt_num);
   static Cluster* GetTargetCluster(Cluster* p_cluster, int target_num);
   static Block* GetNextBlockAfterWhile(Block* w_block);
-  static std::vector<Entity*> ConvertListToVector(std::list<Statement*> list);
   void PopulateRelationshipMap(const std::vector<Procedure*> &proc_list);
   bool HasNextTInFirstCluster(Cluster* cluster, int first, int second);
   bool IsNextTDownstream(int first, int second);

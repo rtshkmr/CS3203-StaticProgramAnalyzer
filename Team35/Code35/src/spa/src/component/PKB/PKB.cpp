@@ -18,6 +18,8 @@ constexpr auto L = [](auto msg) {
 void PKB::PopulateDataStructures(Deliverable d) {
   L("... PKB will be populated by Deliverable object from SourceProcessor\n");
 
+  program_ = d.GetProgram();
+
   std::list<Constant*> constants;
   std::unordered_set<std::string> seen = {};
   for (Constant* constant : *d.GetConstantList()) {
@@ -335,4 +337,8 @@ std::unordered_map<Entity*,
     entity_map->insert({first_arg, second_arg});
   }
   return entity_map;
+}
+
+Program* PKB::GetProgram() {
+  return program_;
 }
