@@ -1,4 +1,5 @@
 #include "PKBQueryCommand.h"
+#include <cassert>
 
 PKBQueryReceiver::PKBQueryReceiver(DBManager *db_manager) : db_manager(db_manager) {}
 
@@ -26,16 +27,12 @@ PKBRelRefs PKBQueryCommand::GetPKBRelRef(RelRef relation, bool order_of_values_u
       return order_of_values_unchanged_from_clause ? PKBRelRefs::kCallsT : PKBRelRefs::kCalledByT;
     case RelRef::kNext:
       return order_of_values_unchanged_from_clause ? PKBRelRefs::kNext : PKBRelRefs::kPrevious;
-//                            case RelRef::kNextT:
-//                              return PKBRelRefs::kNextT;
-//                            case RelRef::kAffects:
-//                              return PKBRelRefs::kAffects;
-//                              case RelRef::kAffectsT:
-//                                return PKBRelRefs::kAffectsT;
-//                                case RelRef::kWildcard:
-//                                  return PKBRelRefs::kWildcard;
-//                                  default:
-//                                    return PKBRelRefs::kWildcard
+    case RelRef::kNextT:
+      return order_of_values_unchanged_from_clause ? PKBRelRefs::kNextT : PKBRelRefs::kPreviousT;
+    case RelRef::kAffects:
+      return order_of_values_unchanged_from_clause ? PKBRelRefs::kAffects : PKBRelRefs::kAffectedBy;
+    case RelRef::kAffectsT:
+      return order_of_values_unchanged_from_clause ? PKBRelRefs::kAffectsT : PKBRelRefs::kAffectedByT;
   }
 }
 
@@ -102,19 +99,54 @@ IntermediateTable *PKBQueryReceiver::QueryDesignEntity(DesignEntity design_entit
   IntermediateTable *table = new IntermediateTable();
   switch(design_entity) {
     case DesignEntity::kAssign:
-      table->InsertData(db_manager->GetDesignEntities(DesignEntity::kAssign));
+      PopulateAssignDoubleSynonym(table);
       break;
     case DesignEntity::kWhile:
-      table->InsertData(db_manager->GetDesignEntities(DesignEntity::kWhile));
+      PopulatePatternDoubleSynonym(table, DesignEntity::kWhile);
       break;
     case DesignEntity::kIf:
-      table->InsertData(db_manager->GetDesignEntities(DesignEntity::kIf));
+      PopulatePatternDoubleSynonym(table, DesignEntity::kIf);
       break;
     default:
       break;
   }
   return table;
+}
 
+void PKBQueryReceiver::PopulateAssignDoubleSynonym(IntermediateTable *table) {
+  std::vector<Entity*> assign_entity_list = db_manager->GetDesignEntities(DesignEntity::kAssign);
+  table->InsertData(assign_entity_list);
+  std::vector<std::tuple<Entity*, Entity*>> entity_pair_list;
+  for (auto assign : assign_entity_list) {
+    auto assign_entity = dynamic_cast<AssignEntity*>(assign);
+    auto curr_pair = std::make_tuple(assign, assign_entity->GetVariableObj());
+    entity_pair_list.push_back(curr_pair);
+  }
+  table->InsertData(entity_pair_list);
+}
+
+void PKBQueryReceiver::PopulatePatternDoubleSynonym(IntermediateTable *table, DesignEntity design_entity) {
+  std::vector<std::tuple<Entity*, Entity*>> entity_pair_list;
+  if (design_entity == DesignEntity::kWhile) {
+    std::vector<Entity*> entity_list = db_manager->GetDesignEntities(DesignEntity::kWhile);
+    table->InsertData(entity_list);
+    for (auto entity : entity_list) {
+      auto while_entity = dynamic_cast<WhileEntity*>(entity);
+      for (auto variable : while_entity->GetControlVariables()) {
+        entity_pair_list.emplace_back(entity, variable);
+      }
+    }
+  } else {
+    assert(design_entity == DesignEntity::kIf);
+    std::vector<Entity*> entity_list = db_manager->GetDesignEntities(DesignEntity::kIf);
+    table->InsertData(entity_list);
+    for (auto entity : entity_list) {
+      auto if_entity = dynamic_cast<IfEntity*>(entity);
+      for (auto variable : if_entity->GetControlVariables()) {
+        entity_pair_list.emplace_back(entity, variable);
+      }
+    }
+  }
 }
 
 IntermediateTable *PKBQueryReceiver::QueryPatternByValue(DesignEntity design_entity, std::string value) {
