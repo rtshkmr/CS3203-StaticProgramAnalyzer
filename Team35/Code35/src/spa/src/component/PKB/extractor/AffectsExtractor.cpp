@@ -242,7 +242,7 @@ bool AffectsExtractor::HasValidUnmodifiedPath(AssignEntity* first_stmt, AssignEn
   int first_stmt_num = first_stmt->GetStatementNumber()->GetNum();
   int second_stmt_num = second_stmt->GetStatementNumber()->GetNum();
   std::vector<Entity*> proc_entities = this->pkb_->GetDesignEntities(DesignEntity::kProcedure);
-  Cluster* scoped_cluster =  proc->GetInnermostCluster(first_stmt_num, second_stmt_num, nullptr);;
+  Cluster* scoped_cluster =  proc->GetInnermostCluster(first_stmt_num, second_stmt_num, nullptr);
   std::string lhs_var = first_stmt->GetVariableString();
   return Cluster::TraverseScopedCluster(PKBRelRefs::kAffects,
                                         scoped_cluster,
