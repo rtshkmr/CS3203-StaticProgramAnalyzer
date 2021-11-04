@@ -182,7 +182,7 @@ TEST_CASE("1.Model.Statement.AssignEntity") {
   AssignEntity* assign_entity = new AssignEntity(var_x, expression, expr_var, expr_constants);
 
   SECTION ("Check Elements") {
-    REQUIRE(assign_entity->GetVariable() == var_x);
+    REQUIRE(assign_entity->GetVariableObj() == var_x);
     REQUIRE(assign_entity->GetAssignmentExpr()->GetExpressionString()
                 == AssignmentExpression(expression).GetExpressionString());
 

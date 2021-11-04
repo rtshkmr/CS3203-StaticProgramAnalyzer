@@ -3,6 +3,7 @@
 
 #include <model/Entity.h>
 #include <unordered_map>
+#include "model/CFG.h"
 
 enum class RelDirection {
   kNext,
@@ -60,7 +61,7 @@ class NextTExtractor {
   std::list<Statement*> GetValueFromMap(std::unordered_map<Statement*, std::list<Statement*>*> map, int stmt_num);
   static Cluster* GetTargetCluster(Cluster* p_cluster, int target_num);
   static Block* GetNextBlockAfterWhile(Block* w_block);
-  static std::vector<Entity*> ltov(std::list<Statement*> l);
+  static std::vector<Entity*> ConvertListToVector(std::list<Statement*> list);
   void PopulateAllNextT(const std::vector<Procedure*> &proc_list);
   bool HasNextTInFirstCluster(Cluster* cluster, int first, int second);
   bool IsNextTDownstream(int first, int second);

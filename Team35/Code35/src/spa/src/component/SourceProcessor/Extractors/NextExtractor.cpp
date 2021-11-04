@@ -1,5 +1,6 @@
 #include <cassert>
 #include "NextExtractor.h"
+#include "./model/CFG.h"
 
 /**
  * Extracts Next relationships into the deliverable using the CFG generated.

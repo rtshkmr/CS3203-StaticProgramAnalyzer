@@ -4,7 +4,7 @@
 #include <model/Entity.h>
 #include <component/QueryProcessor/types/Types.h>
 #include <component/PKB/extractor/NextBipExtractor.h>
-#include "PKB.h"
+#include "component/PKB/PKB.h"
 #include "NextTExtractor.h"
 #include "AffectsExtractor.h"
 #include "AffectsTExtractor.h"

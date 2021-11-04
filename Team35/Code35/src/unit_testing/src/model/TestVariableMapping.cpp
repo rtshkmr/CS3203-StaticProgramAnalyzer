@@ -11,8 +11,8 @@ void MatchRequiredWithAnswer(std::vector<std::tuple<std::string, std::vector<std
     std::vector<std::vector<int>> table = std::get<1>(tup);
 
     for (auto i = var_list.begin(); i != var_list.end(); ++i) {
-      VariableName v_name = *(*i)->GetName();
-      if (v_name.getName() == var) {
+      VariableName v_name = * (* i)->GetVariableName();
+      if (v_name.GetName() == var) {
         std::vector<std::set<Statement*>> var_stmt_table = (*i)->GetStatementTable();
 
         for (int j = 0; j < table.size(); j++) {

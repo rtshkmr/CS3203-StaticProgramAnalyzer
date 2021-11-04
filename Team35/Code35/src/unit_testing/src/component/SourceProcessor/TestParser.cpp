@@ -1,5 +1,6 @@
 #include "catch.hpp"
 #include "component/SourceProcessor/Parser.h"
+#include "model/CFG.h"
 
 bool IsCorrectRange(std::pair<int, int> range, int start, int end) {
   return range.first == start && range.second == end;
