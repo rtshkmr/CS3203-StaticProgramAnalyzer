@@ -17,8 +17,6 @@ class AffectsTExtractor : RuntimeColleague {
   bool HasRelationship(RelDirection dir);
   bool HasRelationship(RelDirection dir, int target);
   bool HasRelationship(RelDirection dir, int first, int second);
-  std::vector<Entity*> GetAffectsT(int target);
-  std::vector<Entity*> GetAffectedByT(int target);
   void Delete();
  private:
   RuntimeMediator* rte_ = nullptr;
