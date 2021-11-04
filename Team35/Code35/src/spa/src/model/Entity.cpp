@@ -140,7 +140,7 @@ void Program::AddProcedure(Procedure* p) {
  */
 Procedure* Program::GetProcForLineNum(int line_num) {
   std::list<Procedure*>* proc_list = this->GetProcedureList();
-  for (Procedure* proc: * proc_list) {  // todo: optimise finding procedure of target stmt
+  for (Procedure* proc: * proc_list) { 
     auto* cluster_root = const_cast<Cluster*>(proc->GetClusterRoot());
     if (cluster_root->CheckIfStatementInRange(line_num)) {
       return proc;
