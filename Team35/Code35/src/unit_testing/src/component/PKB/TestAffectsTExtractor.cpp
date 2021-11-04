@@ -3,6 +3,23 @@
 #include <component/PKB/DBManager.h>
 #include "../../../utils/TestUtils.h"
 
+TEST_CASE("2.PKB.Affects.AffectsT.Equivalance") {
+  PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/adv_spa_lecture_source.txt");
+  DBManager* dbm = new DBManager(pkb);
+
+  for (int i = 0; i <= 18; i++) { //TOTAL 18 LINES
+    CHECK(dbm->HasRelationship(PKBRelRefs::kAffects, std::to_string(i)) == dbm->HasRelationship(PKBRelRefs::kAffectsT, std::to_string(i)));
+    CHECK(dbm->HasRelationship(PKBRelRefs::kAffectedBy, std::to_string(i)) == dbm->HasRelationship(PKBRelRefs::kAffectedByT, std::to_string(i)));
+  }
+
+  CHECK(dbm->HasRelationship(PKBRelRefs::kAffects) == dbm->HasRelationship(PKBRelRefs::kAffectsT));
+  CHECK(dbm->HasRelationship(PKBRelRefs::kAffectedBy) == dbm->HasRelationship(PKBRelRefs::kAffectedByT));
+  CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffects, DesignEntity::kAssign).size() ==
+        dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffectsT, DesignEntity::kAssign).size());
+  CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffectedBy, DesignEntity::kAssign).size() ==
+      dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffectedByT, DesignEntity::kAssign).size());
+}
+
 TEST_CASE("2.PKB.AffectsT.Negative Testing") {
 
   PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/adv_spa_lecture_source.txt");
@@ -237,3 +254,5 @@ TEST_CASE("2.PKB.AffectsT.adv_spa_lecture") {
   }
 
 }
+
+//mixed_loop_source is not a good test case as it does not have any transitive relationship.
