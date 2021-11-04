@@ -43,7 +43,6 @@ class AffectsExtractor {
   std::unordered_map<Statement*, std::list<Statement*>*> affects_map_;
   std::unordered_map<Statement*, std::list<Statement*>*> affected_by_map_;
   bool HasValidUnmodifiedPath(AssignEntity* first_stmt, AssignEntity* second_stmt);
-  AssignEntity* GetAssignEntityFromStmtNum(int target);
   std::set<AssignEntity*, AssignEntityComparator> GetPotentialAffectedBy(AssignEntity* target);
 };
 

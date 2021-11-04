@@ -1,4 +1,5 @@
 #include <cassert>
+#include <util/Utility.h>
 #include "AffectsExtractor.h"
 #include "../../../model/CFG.h"
 
@@ -84,7 +85,7 @@ std::vector<std::tuple<Entity*, Entity*>> AffectsExtractor::GetAllPair() {
  * @return
  */
 std::vector<Entity*> AffectsExtractor::GetAffects(int target) {
-  AssignEntity* target_ae = GetAssignEntityFromStmtNum(target);
+  AssignEntity* target_ae = Utility::GetAssignEntityFromStmtNum(pkb_, target);
   return target_ae ? GetAffects(target_ae) : std::vector<Entity*>();
 }
 
@@ -92,7 +93,7 @@ std::vector<Entity*> AffectsExtractor::GetAffects(int target) {
  * Returns a list of Entity (ie. s1) that is: Affects(s1, target)
  */
 std::vector<Entity*> AffectsExtractor::GetAffectedBy(int target) {
-  AssignEntity* target_ae = GetAssignEntityFromStmtNum(target);
+  AssignEntity* target_ae = Utility::GetAssignEntityFromStmtNum(pkb_, target);
   return target_ae ? GetAffectedBy(target_ae) : std::vector<Entity*>();
 }
 
@@ -100,7 +101,7 @@ std::vector<Entity*> AffectsExtractor::GetAffectedBy(int target) {
  * For Affects(#,_)
  */
 bool AffectsExtractor::HasAffects(int target) {
-  AssignEntity* target_ae = GetAssignEntityFromStmtNum(target);
+  AssignEntity* target_ae = Utility::GetAssignEntityFromStmtNum(pkb_, target);
   return target_ae ? HasAffects(target_ae) : false;
 }
 
@@ -108,7 +109,7 @@ bool AffectsExtractor::HasAffects(int target) {
  * For Affects(_,#)
  */
 bool AffectsExtractor::HasAffectedBy(int target) {
-  AssignEntity* target_ae = GetAssignEntityFromStmtNum(target);
+  AssignEntity* target_ae = Utility::GetAssignEntityFromStmtNum(pkb_, target);
   return target_ae ? HasAffectedBy(target_ae) : false;
 }
 
@@ -116,8 +117,8 @@ bool AffectsExtractor::HasAffectedBy(int target) {
  * Affects(#1, #2)
  */
 bool AffectsExtractor::HasAffects(int first, int second) {
-  AssignEntity* ae_first = GetAssignEntityFromStmtNum(first);
-  AssignEntity* ae_second = GetAssignEntityFromStmtNum(second);
+  AssignEntity* ae_first = Utility::GetAssignEntityFromStmtNum(pkb_, first);
+  AssignEntity* ae_second = Utility::GetAssignEntityFromStmtNum(pkb_, second);
   return ae_first && ae_second ? HasAffects(ae_first, ae_second) : false;
 }
 
@@ -236,17 +237,6 @@ bool AffectsExtractor::HasValidUnmodifiedPath(AssignEntity* first_stmt, AssignEn
                                         scoped_cluster,
                                         std::make_pair(first_stmt_num, second_stmt_num),
                                         pkb_, lhs_var);
-}
-
-AssignEntity* AffectsExtractor::GetAssignEntityFromStmtNum(int target) {
-  std::vector<Entity*> ae_vec_target =
-      pkb_->GetPatternEntities(DesignEntity::kAssign, std::to_string(target));
-
-  if (ae_vec_target.size() == 0) //target given is not an assign entity.
-    return nullptr;
-
-  assert (ae_vec_target.size() == 1); // must be 1
-  return dynamic_cast<AssignEntity*>(ae_vec_target[0]);
 }
 
 std::set<AssignEntity*, AffectsExtractor::AssignEntityComparator> AffectsExtractor::GetPotentialAffectedBy(AssignEntity* target) {
