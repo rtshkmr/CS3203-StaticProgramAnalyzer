@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <util/Logger.h>
+#include <util/Utility.h>
 
 constexpr auto L = [](auto msg) {
   LOG
@@ -296,4 +297,17 @@ std::vector<DesignEntity> PKB::GetApplicableTypes(DesignEntity de) {
     types.push_back(DesignEntity::kStmt);
   }
   return types;
+}
+
+std::unordered_map<Entity*,
+                   std::list<Entity*>*>* PKB::ConvertStringToEntityMapping(const std::unordered_map<std::string,
+                                                                                                    std::vector<Entity*>> &pkb_map) {
+  auto* entity_map = new std::unordered_map<Entity*, std::list<Entity*>*>{};
+  for (auto[key, value] : pkb_map) {
+    Entity* first_arg = type_to_entity_map_[DesignEntity::kStmt][Utility::ConvertStringToInt(key) - 1];
+    auto* second_arg = new std::list<Entity*>{};
+    second_arg->insert(second_arg->end(), value.begin(), value.end());
+    entity_map->insert({first_arg, second_arg});
+  }
+  return entity_map;
 }

@@ -105,6 +105,9 @@ class PKB {
   template <typename X, typename Y>
   void PopulateRelationship(std::unordered_map<X*, std::list<Y*>*>* hash, PKBRelRefs ref);
 
+  std::unordered_map<Entity*, std::list<Entity*>*>* ConvertStringToEntityMapping(const std::unordered_map<std::string,
+                                                                                 std::vector<Entity*>>& pkb_map);
+
  private:
   std::unordered_map<DesignEntity, std::vector<Entity*>> type_to_entity_map_;
 
@@ -202,7 +205,10 @@ void PKB::PopulateRelationship(std::unordered_map<X*, std::list<Y*>*>* hash, PKB
       for (DesignEntity type1 : first_types) {
         for (DesignEntity type2 : second_types) {
           relationship_by_types_table_[ref][{type1, type2}].push_back({first_entity, entity});
-          first_param_by_types_table_[ref][{type1, type2}].push_back(first_entity);
+          std::vector<Entity*> first_params = first_param_by_types_table_[ref][{type1, type2}];
+          if (std::find(first_params.begin(), first_params.end(), first_entity) == first_params.end()) {
+            first_param_by_types_table_[ref][{type1, type2}].push_back(first_entity);
+          }
         }
       }
     }

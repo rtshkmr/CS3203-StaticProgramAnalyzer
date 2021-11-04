@@ -1,0 +1,9 @@
+procedure while {
+    while (a == b) {
+        while (c == d) {
+            while (e ==f) {
+                a = a + 1;
+            }
+        }
+    }
+}

@@ -1,3 +1,4 @@
+#include <component/PKB/extractor/RuntimeExtractor.h>
 #include "catch.hpp"
 #include "component/SourceProcessor/SourceProcessor.h"
 #include "component/SourceProcessor/Parser.h"
@@ -513,7 +514,7 @@ TEST_CASE("CFG and Next relationship tests") {
   PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/mixed_loops2_source.txt");
 
   SECTION("Next relationships") {
-    std::vector<std::vector<std::tuple<EntityEnum, std::string>>> expected_next_lists = {
+    std::vector<std::list<std::tuple<EntityEnum, std::string>>> expected_next_lists = {
         {ml2_source_tuples[2]},//1
         {ml2_source_tuples[3]},//2
         {ml2_source_tuples[4], ml2_source_tuples[6]},//3
@@ -542,23 +543,107 @@ TEST_CASE("CFG and Next relationship tests") {
     for (int i = 0; i < 23; ++i) {
       std::vector<Entity*> next = pkb->GetRelationship(PKBRelRefs::kNext, std::to_string(i+1));
       CHECK(next.size() == expected_next_lists[i].size());
-      if (next.size() == 1) {
-        CHECK(next[0]->GetEntityEnum() == std::get<0>(expected_next_lists[i][0]));
-        CHECK(dynamic_cast<Statement*>(next[0])->GetStatementNumber()->GetNum() == stoi(std::get<1>(expected_next_lists[i][0])));
-      } else if (next.size() == 2) {
-        bool one_enum_or_the_other1 = (next[0]->GetEntityEnum() == std::get<0>(expected_next_lists[i][1]))
-            || (next[0]->GetEntityEnum() == std::get<0>(expected_next_lists[i][0]));
-        CHECK(one_enum_or_the_other1);
-        bool one_num_or_the_other1 = dynamic_cast<Statement*>(next[0])->GetStatementNumber()->GetNum() == stoi(std::get<1>(expected_next_lists[i][0]))
-            || dynamic_cast<Statement*>(next[0])->GetStatementNumber()->GetNum() == stoi(std::get<1>(expected_next_lists[i][1]));
-        CHECK(one_num_or_the_other1);
-        bool one_enum_or_the_other2 = (next[1]->GetEntityEnum() == std::get<0>(expected_next_lists[i][1]))
-            || (next[1]->GetEntityEnum() == std::get<0>(expected_next_lists[i][0]));
-        CHECK(one_enum_or_the_other2);
-        bool one_num_or_the_other2 = dynamic_cast<Statement*>(next[1])->GetStatementNumber()->GetNum() == stoi(std::get<1>(expected_next_lists[i][0]))
-            || dynamic_cast<Statement*>(next[1])->GetStatementNumber()->GetNum() == stoi(std::get<1>(expected_next_lists[i][1]));
-        CHECK(one_num_or_the_other2);
+      CHECK(AreEntityListsEqual(expected_next_lists[i], next));
+    }
+  }
+}
+
+TEST_CASE("Next* relationship tests") {
+  SECTION("No relationship") {
+    RuntimeExtractor empty_rte = RuntimeExtractor(new PKB());
+    CHECK(empty_rte.GetRelationship(PKBRelRefs::kNextT, "2").empty());
+    CHECK(empty_rte.GetRelationship(PKBRelRefs::kPreviousT, "5").empty());
+    CHECK(empty_rte.GetFirstEntityOfRelationship(PKBRelRefs::kNextT, DesignEntity::kProgLine).empty());
+    CHECK(empty_rte.GetFirstEntityOfRelationship(PKBRelRefs::kPreviousT, DesignEntity::kProgLine).empty());
+    CHECK(empty_rte.GetRelationshipByTypes(PKBRelRefs::kNextT, DesignEntity::kStmt, DesignEntity::kProgLine).empty());
+    CHECK_FALSE(empty_rte.HasRelationship(PKBRelRefs::kNextT));
+    CHECK_FALSE(empty_rte.HasRelationship(PKBRelRefs::kNextT, "1"));
+    CHECK_FALSE(empty_rte.HasRelationship(PKBRelRefs::kNextT, "2", "3"));
+  }
+
+  PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/mixed_loops2_source.txt");
+  RuntimeExtractor rte = RuntimeExtractor(pkb);
+  std::vector<std::vector<int>> expected_nextt_tuples = {
+      {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23},
+      {3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23},
+      {4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23},
+      {5, 19, 20, 21, 22, 23},
+      {19, 20, 21, 22, 23},
+      {6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23}, //6
+      {6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23}, //7
+      {6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23}, //8
+      {6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23}, //9
+      {6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23}, //10
+      {6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23}, //11
+      {6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23}, //12
+      {6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23}, //13
+      {6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23}, //14
+      {6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23}, //15
+      {6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23}, //16
+      {6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23}, //17
+      {6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23}, //18
+      {20, 21, 22, 23},
+      {22, 23},
+      {22, 23},
+      {23},
+      {}
+  };
+
+  SECTION("Next* relationships") {
+    for (int i = 0; i < 23; ++i) {
+      std::vector<Entity*> next = rte.GetRelationship(PKBRelRefs::kNextT, std::to_string(i+1));
+      CHECK(next.size() == expected_nextt_tuples[i].size());
+      std::list<std::tuple<EntityEnum, std::string>> expected_list;
+      for (int j : expected_nextt_tuples[i]) {
+        expected_list.push_back(ml2_source_tuples[j]);
+      }
+      CHECK(AreEntityListsEqual(expected_list, next));
+    }
+  }
+
+  SECTION("Get LHS") {
+    std::vector<Entity*> next = rte.GetFirstEntityOfRelationship(PKBRelRefs::kNextT, DesignEntity::kStmt);
+    std::list<std::tuple<EntityEnum, std::string>> expected_list;
+    for (int i = 1; i <= 22; ++i) {
+      expected_list.push_back(ml2_source_tuples[i]);
+    }
+    CHECK(AreEntityListsEqual(expected_list, next));
+  }
+  SECTION("Get RHS") {
+    std::vector<Entity*> next = rte.GetFirstEntityOfRelationship(PKBRelRefs::kPreviousT, DesignEntity::kStmt);
+    std::list<std::tuple<EntityEnum, std::string>> expected_list;
+    for (int i = 2; i <= 23; ++i) {
+      expected_list.push_back(ml2_source_tuples[i]);
+    }
+    CHECK(AreEntityListsEqual(expected_list, next));
+  }
+
+  SECTION("Get all pairs") {
+    std::vector<std::tuple<Entity*, Entity*>> next = rte.GetRelationshipByTypes(PKBRelRefs::kNextT, DesignEntity::kStmt, DesignEntity::kProgLine);
+    std::list<std::tuple<std::tuple<EntityEnum, std::string>, std::tuple<EntityEnum, std::string>>> expected_forward_list;
+    std::list<std::tuple<std::tuple<EntityEnum, std::string>, std::tuple<EntityEnum, std::string>>> expected_reverse_list;
+    for (int i = 0; i < expected_nextt_tuples.size(); ++i) {
+      for (int j = 0; j < expected_nextt_tuples[i].size(); ++j) {
+        expected_forward_list.emplace_back(ml2_source_tuples[i + 1], ml2_source_tuples[expected_nextt_tuples[i][j]]);
+        expected_reverse_list.emplace_back(ml2_source_tuples[expected_nextt_tuples[i][j]], ml2_source_tuples[i + 1]);
       }
     }
+    CHECK(AreAllPairsEqual(expected_forward_list, next));
+    std::vector<std::tuple<Entity*, Entity*>> prev = rte.GetRelationshipByTypes(PKBRelRefs::kPreviousT, DesignEntity::kProgLine, DesignEntity::kProgLine);
+    CHECK(AreAllPairsEqual(expected_reverse_list, prev));
+  }
+
+  SECTION("Has Relationship") {
+    CHECK(rte.HasRelationship(PKBRelRefs::kNextT));
+    CHECK(rte.HasRelationship(PKBRelRefs::kPreviousT));
+    CHECK(rte.HasRelationship(PKBRelRefs::kNextT, "22"));
+    CHECK(rte.HasRelationship(PKBRelRefs::kNextT, "1", "23"));
+    CHECK(rte.HasRelationship(PKBRelRefs::kPreviousT, "23", "1"));
+    CHECK(rte.HasRelationship(PKBRelRefs::kPreviousT, "7", "7"));
+    CHECK(rte.HasRelationship(PKBRelRefs::kPreviousT, "10", "2"));
+    CHECK_FALSE(rte.HasRelationship(PKBRelRefs::kNextT, "4", "6"));
+    CHECK_FALSE(rte.HasRelationship(PKBRelRefs::kNextT, "6", "5"));
+    CHECK_FALSE(rte.HasRelationship(PKBRelRefs::kNextT, "21", "21"));
+    CHECK_FALSE(rte.HasRelationship(PKBRelRefs::kPreviousT, "21", "21"));
   }
 }

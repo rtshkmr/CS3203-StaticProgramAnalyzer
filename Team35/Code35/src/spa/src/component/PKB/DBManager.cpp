@@ -26,16 +26,10 @@ void DBManager::PopulateDataStructures(Deliverable d) {
  * @return Entities that are on the RHS of the relationship with this entity.
  */
 std::vector<Entity*> DBManager::GetRelationship(PKBRelRefs ref, std::string entity) {
-  switch (ref) {
-    case PKBRelRefs::kNextT: return runtime_extractor_->GetNextT(Utility::ConvertStringToInt(entity));
-    case PKBRelRefs::kPreviousT: return runtime_extractor_->GetPrevT(Utility::ConvertStringToInt(entity));
-    case PKBRelRefs::kAffects: return runtime_extractor_->GetAffects(Utility::ConvertStringToInt(entity));
-    case PKBRelRefs::kAffectedBy: return runtime_extractor_->GetAffectedBy(Utility::ConvertStringToInt(entity));
-    case PKBRelRefs::kAffectsT: return runtime_extractor_->GetAffectsT(Utility::ConvertStringToInt(entity));
-    case PKBRelRefs::kAffectedByT: return runtime_extractor_->GetAffectedByT(Utility::ConvertStringToInt(entity));
-    case PKBRelRefs::kNextBip: return runtime_extractor_->GetNextBip(entity);
-    case PKBRelRefs::kPrevBip: return runtime_extractor_->GetPrevBip(entity);
-    default: return pkb_->GetRelationship(ref, entity);
+  if (RuntimeExtractor::IsRuntimeRelationship(ref)) {
+    return runtime_extractor_->GetRelationship(ref, entity);
+  } else {
+    return pkb_->GetRelationship(ref, entity);
   }
 }
 
@@ -46,16 +40,10 @@ std::vector<Entity*> DBManager::GetRelationship(PKBRelRefs ref, std::string enti
  * @return All entities that can be on the LHS of the relationship.
  */
 std::vector<Entity*> DBManager::GetFirstEntityOfRelationship(PKBRelRefs ref, DesignEntity de) {
-  switch (ref) {
-    case PKBRelRefs::kNextT: return runtime_extractor_->GetNextT(de);
-    case PKBRelRefs::kPreviousT: return runtime_extractor_->GetPrevT(de);
-    case PKBRelRefs::kAffects: return runtime_extractor_->GetAffects(de);
-    case PKBRelRefs::kAffectedBy: return runtime_extractor_->GetAffectedBy(de);
-    case PKBRelRefs::kAffectsT: return runtime_extractor_->GetAffectsT(de);
-    case PKBRelRefs::kAffectedByT: return runtime_extractor_->GetAffectedByT(de);
-    case PKBRelRefs::kNextBip: return runtime_extractor_->GetNextBip(de);
-    case PKBRelRefs::kPrevBip: return runtime_extractor_->GetPrevBip(de);
-    default: return pkb_->GetFirstEntityOfRelationship(ref, de);
+  if (RuntimeExtractor::IsRuntimeRelationship(ref)) {
+    return runtime_extractor_->GetFirstEntityOfRelationship(ref, de);
+  } else {
+    return pkb_->GetFirstEntityOfRelationship(ref, de);
   }
 }
 
@@ -111,16 +99,10 @@ std::vector<Entity*> DBManager::GetFirstEntityOfRelationship(PKBRelRefs ref,
 std::vector<std::tuple<Entity*, Entity*>> DBManager::GetRelationshipByTypes(PKBRelRefs ref,
                                                                             DesignEntity first,
                                                                             DesignEntity second) {
-  switch (ref) {
-    case PKBRelRefs::kNextT: return runtime_extractor_->GetNextT(first, second);
-    case PKBRelRefs::kPreviousT: return runtime_extractor_->GetPrevT(first, second);
-    case PKBRelRefs::kAffects: return runtime_extractor_->GetAffects(first, second);
-    case PKBRelRefs::kAffectedBy: return runtime_extractor_->GetAffectedBy(first, second);
-    case PKBRelRefs::kAffectsT: return runtime_extractor_->GetAffectsT(first, second);
-    case PKBRelRefs::kAffectedByT: return runtime_extractor_->GetAffectedByT(first, second);
-    case PKBRelRefs::kNextBip: return runtime_extractor_->GetNextBip(first, second);
-    case PKBRelRefs::kPrevBip: return runtime_extractor_->GetPrevBip(first, second);
-    default: return pkb_->GetRelationshipByTypes(ref, first, second);
+  if (RuntimeExtractor::IsRuntimeRelationship(ref)) {
+    return runtime_extractor_->GetRelationshipByTypes(ref, first, second);
+  } else {
+    return pkb_->GetRelationshipByTypes(ref, first, second);
   }
 }
 
@@ -176,16 +158,10 @@ std::vector<Entity*> DBManager::GetRelationshipByTypes(PKBRelRefs ref,
  * @return true if any relationship exists.
  */
 bool DBManager::HasRelationship(PKBRelRefs ref) {
-  switch (ref) {
-    case PKBRelRefs::kNextT:  // fallthrough
-    case PKBRelRefs::kPreviousT: return pkb_->HasRelationship(PKBRelRefs::kNext);
-    case PKBRelRefs::kAffects: return runtime_extractor_->HasAffects();
-    case PKBRelRefs::kAffectedBy: return runtime_extractor_->HasAffectedBy();
-    case PKBRelRefs::kAffectsT: return runtime_extractor_->HasAffects();
-    case PKBRelRefs::kAffectedByT: return runtime_extractor_->HasAffectedBy();
-    case PKBRelRefs::kNextBip: return runtime_extractor_->HasNextBip();
-    case PKBRelRefs::kPrevBip: return runtime_extractor_->HasPrevBip();
-    default: return pkb_->HasRelationship(ref);
+  if (RuntimeExtractor::IsRuntimeRelationship(ref)) {
+    return runtime_extractor_->HasRelationship(ref);
+  } else {
+    return pkb_->HasRelationship(ref);
   }
 }
 
@@ -197,16 +173,10 @@ bool DBManager::HasRelationship(PKBRelRefs ref) {
  * @return true if any relationship with the specified types exists.
  */
 bool DBManager::HasRelationship(PKBRelRefs ref, DesignEntity first, DesignEntity second) {
-  switch (ref) {
-    case PKBRelRefs::kNextT:  // fallthrough
-    case PKBRelRefs::kPreviousT: return pkb_->HasRelationship(PKBRelRefs::kNext);
-    case PKBRelRefs::kAffects: return runtime_extractor_->HasAffects();
-    case PKBRelRefs::kAffectedBy: return runtime_extractor_->HasAffectedBy();
-    case PKBRelRefs::kAffectsT: return runtime_extractor_->HasAffects();
-    case PKBRelRefs::kAffectedByT: return runtime_extractor_->HasAffectedBy();
-    case PKBRelRefs::kNextBip: return runtime_extractor_->HasNextBip();
-    case PKBRelRefs::kPrevBip: return runtime_extractor_->HasPrevBip();
-    default: return pkb_->HasRelationship(ref, first, second);
+  if (RuntimeExtractor::IsRuntimeRelationship(ref)) {
+    return runtime_extractor_->HasRelationship(ref, first, second);
+  } else {
+    return pkb_->HasRelationship(ref, first, second);
   }
 }
 
@@ -218,16 +188,10 @@ bool DBManager::HasRelationship(PKBRelRefs ref, DesignEntity first, DesignEntity
  * @throws SyntaxException - when it is not an integer or outside of 2^32-1
  */
 bool DBManager::HasRelationship(PKBRelRefs ref, std::string entity) {
-  switch (ref) {
-    case PKBRelRefs::kNextT: // fallthrough
-    case PKBRelRefs::kPreviousT: return pkb_->HasRelationship(PKBRelRefs::kNext, entity);
-    case PKBRelRefs::kAffects: return runtime_extractor_->HasAffects(Utility::ConvertStringToInt(entity));
-    case PKBRelRefs::kAffectedBy: return runtime_extractor_->HasAffectedBy(Utility::ConvertStringToInt(entity));
-    case PKBRelRefs::kAffectsT: return runtime_extractor_->HasAffectsT(Utility::ConvertStringToInt(entity));
-    case PKBRelRefs::kAffectedByT: return runtime_extractor_->HasAffectedByT(Utility::ConvertStringToInt(entity));
-    case PKBRelRefs::kNextBip: return runtime_extractor_->HasNextBip(entity);
-    case PKBRelRefs::kPrevBip: return runtime_extractor_->HasPrevBip(entity);
-    default: return pkb_->HasRelationship(ref, entity);
+  if (RuntimeExtractor::IsRuntimeRelationship(ref)) {
+    return runtime_extractor_->HasRelationship(ref, entity);
+  } else {
+    return pkb_->HasRelationship(ref, entity);
   }
 }
 
@@ -240,30 +204,10 @@ bool DBManager::HasRelationship(PKBRelRefs ref, std::string entity) {
  * @throws SyntaxException - when it is not an integer or outside of 2^32-1
  */
 bool DBManager::HasRelationship(PKBRelRefs ref, std::string first, std::string second) {
-  switch (ref) {
-    case PKBRelRefs::kNextT:
-      return runtime_extractor_->HasNextT(Utility::ConvertStringToInt(first),
-                                          Utility::ConvertStringToInt(second));
-    case PKBRelRefs::kPreviousT:
-      return runtime_extractor_->HasNextT(Utility::ConvertStringToInt(second),
-                                          Utility::ConvertStringToInt(first));
-    case PKBRelRefs::kAffects:
-      return runtime_extractor_->HasAffects(Utility::ConvertStringToInt(first),
-                                            Utility::ConvertStringToInt(second));
-    case PKBRelRefs::kAffectedBy:
-      return runtime_extractor_->HasAffectedBy(Utility::ConvertStringToInt(first),
-                                               Utility::ConvertStringToInt(second));
-    case PKBRelRefs::kAffectsT:
-      return runtime_extractor_->HasAffectsT(Utility::ConvertStringToInt(first),
-                                             Utility::ConvertStringToInt(second));
-    case PKBRelRefs::kAffectedByT:
-      return runtime_extractor_->HasAffectedByT(Utility::ConvertStringToInt(first),
-                                                Utility::ConvertStringToInt(second));
-    case PKBRelRefs::kNextBip:
-      return runtime_extractor_->HasNextBip(first, second);
-    case PKBRelRefs::kPrevBip:
-      return runtime_extractor_->HasNextBip(second, first);
-    default: return pkb_->HasRelationship(ref, first, second);
+  if (RuntimeExtractor::IsRuntimeRelationship(ref)) {
+    return runtime_extractor_->HasRelationship(ref, first, second);
+  } else {
+    return pkb_->HasRelationship(ref, first, second);
   }
 }
 

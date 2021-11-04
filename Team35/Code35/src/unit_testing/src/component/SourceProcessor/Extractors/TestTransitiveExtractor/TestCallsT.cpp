@@ -14,8 +14,10 @@ TEST_CASE("1.TransitiveExtractor.Extract CallsT positive tests") {
   Procedure* proc4 = GetProc4();
 
   SECTION("No Calls") {
-    auto procedure_extractor = TransitiveExtractor<Procedure>(deliverable);
-    procedure_extractor.Extract(&deliverable->calls_T_hash_, &deliverable->calls_hash_, TransitiveRel::kCalls);
+    auto procedure_extractor = TransitiveExtractor<Procedure>();
+    procedure_extractor.Extract(deliverable->GetCallsTMap(),
+                                deliverable->GetCalledByTMap(),
+                                deliverable->GetCallsMap());
     CHECK(deliverable->calls_T_hash_.empty());
   }
 
@@ -35,8 +37,10 @@ TEST_CASE("1.TransitiveExtractor.Extract CallsT positive tests") {
     deliverable->AddCallsRelationship(proc3, proc2);
     deliverable->AddCallsRelationship(proc3, proc4);
 
-    auto procedure_extractor = TransitiveExtractor<Procedure>(deliverable);
-    procedure_extractor.Extract(&deliverable->calls_T_hash_, &deliverable->calls_hash_, TransitiveRel::kCalls);
+    auto procedure_extractor = TransitiveExtractor<Procedure>();
+    procedure_extractor.Extract(deliverable->GetCallsTMap(),
+                                deliverable->GetCalledByTMap(),
+                                deliverable->GetCallsMap());
 
     std::list<Procedure*>* actual_proc_list1 = deliverable->calls_T_hash_.find(proc1)->second;
     std::list<Procedure*>* actual_proc_list3 = deliverable->calls_T_hash_.find(proc3)->second;
@@ -82,8 +86,10 @@ TEST_CASE("1.TransitiveExtractor.Extract CallsT positive tests") {
     deliverable->AddCallsRelationship(proc2, proc3);
     deliverable->AddCallsRelationship(proc3, proc4);
 
-    auto procedure_extractor = TransitiveExtractor<Procedure>(deliverable);
-    procedure_extractor.Extract(&deliverable->calls_T_hash_, &deliverable->calls_hash_, TransitiveRel::kCalls);
+    auto procedure_extractor = TransitiveExtractor<Procedure>();
+    procedure_extractor.Extract(deliverable->GetCallsTMap(),
+                                deliverable->GetCalledByTMap(),
+                                deliverable->GetCallsMap());
 
     std::list<Procedure*>* actual_proc_list1 = deliverable->calls_T_hash_.find(proc1)->second;
     std::list<Procedure*>* actual_proc_list2 = deliverable->calls_T_hash_.find(proc2)->second;
@@ -134,10 +140,10 @@ TEST_CASE("1.TransitiveExtractor.Extract CallsT negative tests") {
      */
     deliverable->AddCallsRelationship(proc1, proc2);
     deliverable->AddCallsRelationship(proc2, proc1);
-    auto procedure_extractor = TransitiveExtractor<Procedure>(deliverable);
-    CHECK_THROWS_AS(procedure_extractor.Extract(&deliverable->calls_T_hash_,
-                                                &deliverable->calls_hash_,
-                                                TransitiveRel::kCalls), SemanticException);
+    auto procedure_extractor = TransitiveExtractor<Procedure>();
+    CHECK_THROWS_AS(procedure_extractor.Extract(deliverable->GetCallsTMap(),
+                                                deliverable->GetCalledByTMap(),
+                                                deliverable->GetCallsMap()), SemanticException);
   }
 
   SECTION("Transitive cyclic Call 1") {
@@ -152,10 +158,10 @@ TEST_CASE("1.TransitiveExtractor.Extract CallsT negative tests") {
     deliverable->AddCallsRelationship(proc1, proc2);
     deliverable->AddCallsRelationship(proc2, proc3);
     deliverable->AddCallsRelationship(proc3, proc1);
-    auto procedure_extractor = TransitiveExtractor<Procedure>(deliverable);
-    CHECK_THROWS_AS(procedure_extractor.Extract(&deliverable->calls_T_hash_,
-                                                &deliverable->calls_hash_,
-                                                TransitiveRel::kCalls), SemanticException);
+    auto procedure_extractor = TransitiveExtractor<Procedure>();
+    CHECK_THROWS_AS(procedure_extractor.Extract(deliverable->GetCallsTMap(),
+                                                deliverable->GetCalledByTMap(),
+                                                deliverable->GetCallsMap()), SemanticException);
   }
 
   SECTION("Transitive cyclic Call 2") {
@@ -178,9 +184,9 @@ TEST_CASE("1.TransitiveExtractor.Extract CallsT negative tests") {
     deliverable->AddCallsRelationship(proc3, proc5);
     deliverable->AddCallsRelationship(proc4, proc3);
     deliverable->AddCallsRelationship(proc5, proc2);
-    auto procedure_extractor = TransitiveExtractor<Procedure>(deliverable);
-    CHECK_THROWS_AS(procedure_extractor.Extract(&deliverable->calls_T_hash_,
-                                                &deliverable->calls_hash_,
-                                                TransitiveRel::kCalls), SemanticException);
+    auto procedure_extractor = TransitiveExtractor<Procedure>();
+    CHECK_THROWS_AS(procedure_extractor.Extract(deliverable->GetCallsTMap(),
+                                                deliverable->GetCalledByTMap(),
+                                                deliverable->GetCallsMap()), SemanticException);
   }
 }

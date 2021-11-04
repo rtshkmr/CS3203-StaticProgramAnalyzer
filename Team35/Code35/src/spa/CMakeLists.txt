@@ -53,7 +53,7 @@ add_library(spa ${srcs} ${headers}
         src/util/Utility.cpp src/util/Utility.h src/component/PKB/extractor/NextBipExtractor.cpp src/component/PKB/extractor/NextBipExtractor.h
         src/component/SourceProcessor/Extractors/TransitiveExtractor.h
         src/component/SourceProcessor/Extractors/VariableTExtractor.cpp src/component/SourceProcessor/Extractors/VariableTExtractor.h
-        )
+        src/component/PKB/extractor/NextBipTExtractor.cpp src/component/PKB/extractor/NextBipTExtractor.h src/component/PKB/extractor/RuntimeColleague.h src/component/PKB/extractor/RuntimeMediator.h)
 
 # this makes the headers accessible for other projects which uses spa lib
 target_include_directories(spa PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)

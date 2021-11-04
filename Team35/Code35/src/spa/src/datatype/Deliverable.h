@@ -13,6 +13,7 @@ class Deliverable {
  public:
   Deliverable() = default;
   // Adding of Procedure, Variable, ConstantValue are added using pointers to the list in EntityFactory.
+  void AddProcedure(Procedure* proc);
   void AddStatement(Statement* stmt);
 
   void AddIfEntity(IfEntity* if_entity);
@@ -76,6 +77,9 @@ class Deliverable {
   std::unordered_map<Procedure*, std::list<Procedure*>*>* GetCalledByTMap();
   std::unordered_map<Statement*, std::list<Statement*>*>* GetPrevMap();
 
+  template<typename X, typename Y>
+  static void AddRelationshipToMap(std::unordered_map<X, std::list<Y>*>* map, X key, Y value);
+
   // RelationshipTables
   std::unordered_map<Statement*, std::list<Statement*>*> follow_hash_; // to store Follows
   std::unordered_map<Statement*, std::list<Statement*>*> follows_T_hash_; // to store Follows*
@@ -121,9 +125,20 @@ class Deliverable {
   std::list<CallEntity*> call_list_;
   std::list<PrintEntity*> print_list_;
   std::list<ReadEntity*> read_list_;
-
-  template<typename X, typename Y>
-  void AddRelationshipToMap(std::unordered_map<X, std::list<Y>*>* map, X key, Y value);
 };
+
+template <typename X, typename Y>
+void Deliverable::AddRelationshipToMap(std::unordered_map<X, std::list<Y>*>* map, X key, Y value) {
+  if (map->count(key)) {
+    std::list<Y>* values = map->find(key)->second;
+    if (std::find(values->begin(), values->end(), value) == values->end()) {
+      values->push_back(value);
+    }
+  } else {
+    auto* list = new std::list<Y>();
+    list->push_back(value);
+    map->insert(std::make_pair(key, list));
+  }
+}
 
 #endif //AUTOTESTER_DELIVERABLE_H
