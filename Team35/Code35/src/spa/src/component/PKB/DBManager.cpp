@@ -130,7 +130,6 @@ std::vector<std::tuple<Entity*, Entity*>> DBManager::GetRelationshipByTypes(PKBR
     const bool pkb_ref = preprocessed_rel_refs.find(ref) != preprocessed_rel_refs.end();
     if (pkb_ref) {
       if (scope_indication == ScopeIndication::kAllScope) {
-        assert(left_scoped_entities.size() == right_scoped_entities.size());
         std::vector<std::tuple<Entity*, Entity*>> results(left_scoped_entities.size());
         for (int i = 0; i < left_scoped_entities.size(); i++) {
           if (pkb_->HasRelationship(
