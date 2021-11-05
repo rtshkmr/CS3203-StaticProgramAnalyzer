@@ -19,6 +19,7 @@ class QueryExtractor {
   std::list<Synonym*> synonyms;
   std::vector<std::pair<Synonym*, Attribute>> target_syn_attrs;
   std::unordered_map<std::string, Synonym*> target_synonyms_map;
+  bool was_query_boolean = false;
  public:
   explicit QueryExtractor(std::string* query) : query(* query) {};
   void ExtractQuery();
@@ -26,6 +27,7 @@ class QueryExtractor {
   std::vector<Group*> GetGroupsList() { return groups; };
   std::list<Synonym*> GetSynonymsList() { return synonyms; }; // TODO: deprecate or convert to private.
   std::vector<std::pair<Synonym*, Attribute>> GetTargetSynAttrPairs() { return target_syn_attrs; };
+  bool WasQueryBoolean() { return was_query_boolean; };
 };
 
 #endif //INC_21S1_CP_SPA_TEAM_35_QUERYEXTRACTOR_H
