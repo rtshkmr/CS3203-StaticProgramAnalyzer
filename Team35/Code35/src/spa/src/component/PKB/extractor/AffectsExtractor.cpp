@@ -48,7 +48,12 @@ std::vector<Entity*> AffectsExtractor::GetAllAffects() {
     }
   }
   retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
-  cacheIndication = ScopeIndication::kLeftScope;
+
+  if (cacheIndication == ScopeIndication::kNoScope) {
+    cacheIndication = ScopeIndication::kLeftScope;
+  } else if (cacheIndication == ScopeIndication::kRightScope) {
+    cacheIndication = ScopeIndication::kAllScope;
+  }
   return retList;
 }
 
@@ -73,7 +78,12 @@ std::vector<Entity*> AffectsExtractor::GetAllAffectedBy() {
     }
   }
   retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
-  cacheIndication = ScopeIndication::kRightScope;
+
+  if (cacheIndication == ScopeIndication::kNoScope) {
+    cacheIndication = ScopeIndication::kRightScope;
+  } else if (cacheIndication == ScopeIndication::kLeftScope) {
+    cacheIndication = ScopeIndication::kAllScope;
+  }
   return retList;
 }
 
@@ -168,7 +178,9 @@ std::vector<Entity*> AffectsExtractor::GetAffects(AssignEntity* target) {
     return retList;
   }
 
-  std::vector<Entity*> assign_list = pkb_->GetDesignEntities(DesignEntity::kAssign);
+  std::vector<Entity*> assign_list = (cacheIndication == ScopeIndication::kRightScope)
+      ? GetAllAffectedBy() : pkb_->GetDesignEntities(DesignEntity::kAssign);
+
   for (auto* entity : assign_list) {
     AssignEntity* ae = dynamic_cast<AssignEntity*>(entity);
     if (HasAffects(target, ae)) {
