@@ -12,7 +12,7 @@ void AffectsExtractor::SetPKB(PKB* pkb) {
  * For Affects(_,_)
  */
 bool AffectsExtractor::HasAffects() {
-  //TODO: Check cache size > 0;
+  if(affects_map_.size() > 0) return true;
 
   //TODO: Change optimised Affects(_,_)
 
@@ -33,6 +33,13 @@ bool AffectsExtractor::HasAffects() {
 std::vector<Entity*> AffectsExtractor::GetAllAffects() {
   std::vector<Entity*> retList = {};
 
+  if (cacheIndication == ScopeIndication::kLeftScope || cacheIndication == ScopeIndication::kAllScope) {
+    for (auto pair : affects_map_) {
+      retList.push_back(pair.first);
+    }
+    return retList;
+  }
+
   std::vector<Entity*> assign_list = pkb_->GetDesignEntities(DesignEntity::kAssign);
   for (auto* entity : assign_list) {
     AssignEntity* ae = dynamic_cast<AssignEntity*>(entity);
@@ -41,6 +48,7 @@ std::vector<Entity*> AffectsExtractor::GetAllAffects() {
     }
   }
   retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
+  cacheIndication = ScopeIndication::kLeftScope;
   return retList;
 }
 
@@ -50,6 +58,13 @@ std::vector<Entity*> AffectsExtractor::GetAllAffects() {
 std::vector<Entity*> AffectsExtractor::GetAllAffectedBy() {
   std::vector<Entity*> retList = {};
 
+  if (cacheIndication == ScopeIndication::kRightScope || cacheIndication == ScopeIndication::kAllScope) {
+    for (auto pair : affected_by_map_) {
+      retList.push_back(pair.first);
+    }
+    return retList;
+  }
+
   std::vector<Entity*> assign_list = pkb_->GetDesignEntities(DesignEntity::kAssign);
   for (auto* entity : assign_list) {
     AssignEntity* ae = dynamic_cast<AssignEntity*>(entity);
@@ -58,6 +73,7 @@ std::vector<Entity*> AffectsExtractor::GetAllAffectedBy() {
     }
   }
   retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
+  cacheIndication = ScopeIndication::kRightScope;
   return retList;
 }
 
@@ -66,6 +82,17 @@ std::vector<Entity*> AffectsExtractor::GetAllAffectedBy() {
  */
 std::vector<std::tuple<Entity*, Entity*>> AffectsExtractor::GetAllPair() {
   std::vector<std::tuple<Entity*, Entity*>> retList = {};
+
+  if (cacheIndication == ScopeIndication::kAllScope) {
+    std::vector<std::tuple<Entity*, Entity*>> intermediate_table = {};
+    for (auto pair : affects_map_) {
+      std::vector<Entity*> this_key_entity = GetAffects(pair.first);
+      for (auto val: this_key_entity) {
+        intermediate_table.push_back(std::make_tuple(pair.first, val));
+      }
+    }
+    return retList;
+  }
 
   std::vector<Entity*> assign_list = pkb_->GetDesignEntities(DesignEntity::kAssign);
   for (auto* entity : assign_list) {
@@ -76,6 +103,7 @@ std::vector<std::tuple<Entity*, Entity*>> AffectsExtractor::GetAllPair() {
     }
   }
   retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
+  cacheIndication = ScopeIndication::kAllScope;
   return retList;
 }
 
@@ -129,6 +157,17 @@ bool AffectsExtractor::HasAffectedBy(int first, int second) {
 std::vector<Entity*> AffectsExtractor::GetAffects(AssignEntity* target) {
   std::vector<Entity*> retList = {};
 
+  if (cacheIndication == ScopeIndication::kAllScope) {
+    auto itr = affects_map_.find(target);
+    if (itr != affects_map_.end()) {
+      std::list<AssignEntity*>* values = itr->second;
+      for (AssignEntity* val : *values) {
+        retList.push_back(val);
+      }
+    }
+    return retList;
+  }
+
   std::vector<Entity*> assign_list = pkb_->GetDesignEntities(DesignEntity::kAssign);
   for (auto* entity : assign_list) {
     AssignEntity* ae = dynamic_cast<AssignEntity*>(entity);
@@ -142,6 +181,18 @@ std::vector<Entity*> AffectsExtractor::GetAffects(AssignEntity* target) {
 
 std::vector<Entity*> AffectsExtractor::GetAffectedBy(AssignEntity* target_assign_entity) {
   std::vector<Entity*> return_list = {};
+
+  if (cacheIndication == ScopeIndication::kAllScope) {
+    auto itr = affected_by_map_.find(target_assign_entity);
+    if (itr != affected_by_map_.end()) {
+      std::list<AssignEntity*>* values = itr->second;
+      for (AssignEntity* val : *values) {
+        return_list.push_back(val);
+      }
+    }
+    return return_list;
+  }
+
 
   std::set<AssignEntity*, AffectsExtractor::AssignEntityComparator> affected_set = GetPotentialAffectedBy(target_assign_entity);
 
@@ -157,6 +208,16 @@ std::vector<Entity*> AffectsExtractor::GetAffectedBy(AssignEntity* target_assign
 }
 
 bool AffectsExtractor::HasAffects(AssignEntity* target_ae) {
+  auto itr = affects_map_.find(target_ae);
+  if (itr != affects_map_.end()) {
+    std::list<AssignEntity*>* values = itr->second;
+    if (values->size() > 0) {
+      return true;
+    } else if (cacheIndication == ScopeIndication::kAllScope || cacheIndication == ScopeIndication::kLeftScope) {
+      return false;
+    }
+  }
+
   Procedure* target_proc = target_ae->GetProcedureNode();
 //  VariableName* target_var = const_cast<VariableName*>(target_ae->GetVariableObj()yyp->GetName());
   std::string target_var = target_ae->GetVariableString();
@@ -184,6 +245,17 @@ bool AffectsExtractor::HasAffects(AssignEntity* target_ae) {
 }
 
 bool AffectsExtractor::HasAffectedBy(AssignEntity* target_assign_entity) {
+
+  auto iter = affected_by_map_.find(target_assign_entity);
+  if (iter != affected_by_map_.end()) {
+    std::list<AssignEntity*>* values = iter->second;
+    if (values->size() > 0) {
+      return true;
+    } else if (cacheIndication == ScopeIndication::kAllScope || cacheIndication == ScopeIndication::kRightScope) {
+      return false;
+    }
+  }
+
   std::set<AssignEntity*, AffectsExtractor::AssignEntityComparator> affected_set = GetPotentialAffectedBy(target_assign_entity);
 
   std::set<AssignEntity*, AffectsExtractor::AssignEntityComparator>::iterator itr;
@@ -204,6 +276,23 @@ bool AffectsExtractor::HasAffectedBy(AssignEntity* target_assign_entity) {
  * @return
  */
 bool AffectsExtractor::HasAffects(AssignEntity* first_stmt, AssignEntity* second_stmt) {
+
+  //check positive cache
+  auto itr = affects_map_.find(first_stmt);
+  if (itr != affects_map_.end()) {
+    std::list<AssignEntity*>* values = itr->second;
+    auto itr2 = std::find(values->begin(), values->end(), second_stmt);
+    if (itr2 != values->end()) return true;
+  }
+
+  //check negative cache
+  itr = not_affects_map_.find(first_stmt);
+  if (itr != not_affects_map_.end()) {
+    std::list<AssignEntity*>* values = itr->second;
+    auto itr2 = std::find(values->begin(), values->end(), second_stmt);
+    if (itr2 != values->end()) return false;
+  }
+
   // get the modified variable v from the lhs of first statement
   Variable* modified_var = first_stmt->GetVariableObj();
   std::vector<Variable*> vars_used_by_second_stmt =
@@ -217,8 +306,16 @@ bool AffectsExtractor::HasAffects(AssignEntity* first_stmt, AssignEntity* second
     }
   }
   if (!var_is_used) return false;
-  // check nextT, (just as a guarantee)
-  return HasValidUnmodifiedPath(first_stmt, second_stmt);
+
+  bool ret = HasValidUnmodifiedPath(first_stmt, second_stmt);
+  if (ret) {
+    Deliverable::AddRelationshipToMap(&affects_map_, first_stmt, second_stmt);
+    Deliverable::AddRelationshipToMap(&affected_by_map_, second_stmt, first_stmt);
+  } else {
+    Deliverable::AddRelationshipToMap(&not_affects_map_, first_stmt, second_stmt);
+    Deliverable::AddRelationshipToMap(&not_affected_by_map_, second_stmt, first_stmt);
+  }
+  return ret;
 }
 
 /*
@@ -263,6 +360,10 @@ std::set<AssignEntity*, AffectsExtractor::AssignEntityComparator> AffectsExtract
 }
 
 void AffectsExtractor::Delete() {
-
+  this->cacheIndication = ScopeIndication::kNoScope;
+  affects_map_ = {};
+  affected_by_map_ = {};
+  not_affects_map_ = {};
+  not_affected_by_map_ = {};
 }
 
