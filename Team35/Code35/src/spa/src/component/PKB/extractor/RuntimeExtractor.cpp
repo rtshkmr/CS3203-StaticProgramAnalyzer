@@ -205,8 +205,8 @@ bool RuntimeExtractor::HasRelationship(PKBRelRefs ref, DesignEntity first, Desig
     case PKBRelRefs::kPreviousT: return pkb_->HasRelationship(PKBRelRefs::kNext); // TODO
     case PKBRelRefs::kAffects: return HasAffects();
     case PKBRelRefs::kAffectedBy: return HasAffectedBy();
-    case PKBRelRefs::kAffectsT: return HasAffects();
-    case PKBRelRefs::kAffectedByT: return HasAffectedBy();
+    case PKBRelRefs::kAffectsT: return HasAffectsT();
+    case PKBRelRefs::kAffectedByT: return HasAffectedByT();
     case PKBRelRefs::kNextBip: // fallthrough
     case PKBRelRefs::kPrevBip: // fallthrough
     case PKBRelRefs::kNextBipT: // fallthrough
