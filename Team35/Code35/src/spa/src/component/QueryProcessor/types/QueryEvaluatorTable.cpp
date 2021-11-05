@@ -142,7 +142,7 @@ void QueryEvaluatorTable::CrossProductSingleColumn(Synonym *synonym, const std::
   int original_number_of_rows = GetRowSize();
   for (auto value : values) {
     if (number_of_repeat > 0) {
-      DuplicateTableForCrossProduct(original_number_of_rows);
+      DuplicateTableForCrossProduct(original_number_of_rows, synonym);
     }
     InsertValuesForCrossProduct(synonym, value, original_number_of_rows);
     current_index += original_number_of_rows;
@@ -159,8 +159,9 @@ QueryEvaluatorTable::QueryEvaluatorTable(std::vector<Synonym *> target_list) {
   target_synonym_list = std::move(target_list);
 }
 
-void QueryEvaluatorTable::DuplicateTableForCrossProduct(int original_size) {
+void QueryEvaluatorTable::DuplicateTableForCrossProduct(int original_size, Synonym *synonym_to_add) {
   for (auto & iter : synonym_to_entity_map) {
+    if (iter.first == synonym_to_add) continue;
     std::vector<Entity *> current_column = iter.second;
     for (int i = 0; i < original_size; i++) {
       current_column.push_back(current_column[i]);

@@ -428,7 +428,7 @@ void ClauseCommandExecutor::DoubleSynonymCross(Clause *clause) {
 void ClauseCommandExecutor::SingleSynonymCross(Clause *clause, bool syn_is_first_param) {
   Synonym *new_synonym = syn_is_first_param ? clause->first_synonym : clause->second_synonym;
   std::vector<Entity*> entity_list = table->GetRelationships();
-  if (typeid(*clause) == typeid(Pattern*) && typeid(*clause->first_synonym) == typeid(AssignEntity)) {
+  if (typeid(*clause) == typeid(Pattern) && new_synonym->GetType() == DesignEntity::kAssign) {
     entity_list = FilterAssignSingleClause(entity_list, clause, syn_is_first_param);
   }
   std::vector<std::vector<Entity*>> final_entity_list = {entity_list};
