@@ -77,7 +77,8 @@ class Cluster {
   static bool TraverseScopedClusterForAffects(Cluster* scoped_cluster,
                                               std::pair<int, int> target_range,
                                               PKB* pkb,
-                                              const std::string& lhs_var);
+                                              const std::string& lhs_var,
+                                              const std::pair<int, int> goal_range);
 };
 
 class Block : public Cluster {

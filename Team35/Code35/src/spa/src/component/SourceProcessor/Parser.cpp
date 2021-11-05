@@ -26,10 +26,6 @@ void Parser::Parse(const std::string& file_name) {
     // read char by char, delimiter = { ; }
 
     while (source_file.get(byte)) {
-      if (byte == '\n') {
-        continue;
-      }
-
       if (byte == '\t' || byte == '\a' || byte == '\n' || byte == '\v' || byte == '\r' || byte == '\f') {
         byte = ' ';
       }
