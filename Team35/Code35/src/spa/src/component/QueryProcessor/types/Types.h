@@ -51,7 +51,8 @@ enum class PKBRelRefs {
   kNextBip,
   kPrevBip,
   kNextBipT,
-  kPrevBipT
+  kPrevBipT,
+  kInvalid
 };
 
 enum class RelRef {
