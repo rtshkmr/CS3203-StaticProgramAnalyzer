@@ -31,12 +31,12 @@ Select r1 such that Modifies(r1, _) with p1.varName = r1.varName
 7 - Mix - all 3 clause, rhs encountered
 stmt s1; assign a1; variable v1; procedure pr1; prog_line pl; print p1; read r1; while w1;
 Select v1 pattern w1("d", _) with w1.stmt# = pl such that Uses(pl, v1)
-d, j, x, Third, i
+d, j, x, Third, i, v, y, z
 5000
 8 - Mix - all 3 clause, lhs encountered
-stmt s1; assign a1; variable v1; procedure pr1; prog_line pl; print p1; read r1;
+stmt s1; assign a1; variable v1; procedure pr1; prog_line pl; print p1; read r1; while w1;
 Select v1 pattern w1("d", _) with pl = w1.stmt# such that Uses(pl, v1)
-d, j, x, Third, i
+d, j, x, Third, i, v, y, z
 5000
 9 - Mix - all 3 clause, looped
 stmt s1; assign a1; variable v1; procedure pr1; prog_line pl; print p1; read r1;
@@ -56,5 +56,5 @@ x
 12 - INVALID, no while stmt
 stmt s1; assign a1; variable v1; procedure pr1; prog_line pl; print p1; read r1;
 Select v1 pattern w1("d", _) with w1.stmt# = pl such that Uses(pl, v1)
-d, j, x, Third, i
+none
 5000

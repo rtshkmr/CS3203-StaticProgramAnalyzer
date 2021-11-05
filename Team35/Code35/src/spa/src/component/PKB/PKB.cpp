@@ -168,7 +168,10 @@ std::vector<Entity*> PKB::GetEntitiesWithAttributeValue(DesignEntity design_enti
 }
 
 std::vector<entity_pair> PKB::GetEntitiesWithMatchingAttributes(type_attribute_pair type_one, type_attribute_pair type_two) {
-  auto hi = entities_with_matching_attributes_map_[type_one][type_two];
+  if (std::get<0>(type_one) == DesignEntity::kProgLine)
+    type_one = {DesignEntity::kStmt, Attribute::kStmtNumber};
+  if (std::get<0>(type_two) == DesignEntity::kProgLine)
+    type_two = {DesignEntity::kStmt, Attribute::kStmtNumber};
   return entities_with_matching_attributes_map_[type_one][type_two];
 }
 
