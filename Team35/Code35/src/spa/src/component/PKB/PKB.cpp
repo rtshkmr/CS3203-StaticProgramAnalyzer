@@ -333,6 +333,7 @@ std::vector<DesignEntity> PKB::GetApplicableTypes(DesignEntity de) {
   std::vector<DesignEntity> types {de};
   if (stmt_design_entities_.find(de) != stmt_design_entities_.end()) {
     types.push_back(DesignEntity::kStmt);
+    types.push_back(DesignEntity::kProgLine);
   }
   return types;
 }
