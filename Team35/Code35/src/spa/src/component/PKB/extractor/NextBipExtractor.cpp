@@ -29,12 +29,14 @@ std::vector<Entity*> NextBipExtractor::GetRelationship(RelDirection dir, int tar
  * Gets all rhs of NextBip(s, s)
  * @return Vector of entities satisfying the relationship.
  */
-std::vector<Entity*> NextBipExtractor::GetFirstEntityOfRelationship(RelDirection dir) {
+std::vector<Entity*> NextBipExtractor::GetFirstEntityOfRelationship(RelDirection dir, DesignEntity de) {
   PopulateBipMaps();
   return pkb_->GetFirstEntityOfRelationship(GetPKBRelRef(dir), DesignEntity::kStmt);
 }
 
-std::vector<std::tuple<Entity*, Entity*>> NextBipExtractor::GetRelationshipByTypes(RelDirection dir) {
+std::vector<std::tuple<Entity*, Entity*>> NextBipExtractor::GetRelationshipByTypes(RelDirection dir,
+                                                                                   DesignEntity first,
+                                                                                   DesignEntity second) {
   PopulateBipMaps();
   return pkb_->GetRelationshipByTypes(GetPKBRelRef(dir), DesignEntity::kStmt, DesignEntity::kStmt);
 }

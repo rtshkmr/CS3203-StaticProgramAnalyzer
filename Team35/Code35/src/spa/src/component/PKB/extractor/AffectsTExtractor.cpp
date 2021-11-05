@@ -45,7 +45,7 @@ std::vector<Entity*> AffectsTExtractor::GetRelationship(RelDirection dir, int ta
   return ConvertIntToEntity(return_set);
 }
 
-std::vector<Entity*> AffectsTExtractor::GetFirstEntityOfRelationship(RelDirection dir) {
+std::vector<Entity*> AffectsTExtractor::GetFirstEntityOfRelationship(RelDirection dir, DesignEntity de) {
   if (!isCached) InitCache();
   std::unordered_map<int, std::list<int>*>* mapToCheck = (dir == RelDirection::kForward) ? &affects_t_map_ : &affected_by_t_map_;
 
@@ -57,7 +57,9 @@ std::vector<Entity*> AffectsTExtractor::GetFirstEntityOfRelationship(RelDirectio
   return ConvertIntToEntity(return_set);
 }
 
-std::vector<std::tuple<Entity*, Entity*>> AffectsTExtractor::GetRelationshipByTypes(RelDirection dir) {
+std::vector<std::tuple<Entity*, Entity*>> AffectsTExtractor::GetRelationshipByTypes(RelDirection dir,
+                                                                                    DesignEntity first,
+                                                                                    DesignEntity second) {
   if (!isCached) InitCache();
   std::unordered_map<int, std::list<int>*>* mapToCheck = (dir == RelDirection::kForward) ? &affects_t_map_ : &affected_by_t_map_;
 
