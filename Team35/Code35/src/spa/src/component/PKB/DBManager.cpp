@@ -112,17 +112,8 @@ std::vector<std::tuple<Entity*, Entity*>> DBManager::GetRelationshipByTypes(PKBR
                                                                             std::vector<Entity*> left_scoped_entities,
                                                                             std::vector<Entity*> right_scoped_entities,
                                                                             ScopeIndication scope_indication) {
-//  kNoScope:
-//  kLeftScope:
-//  (1, 2, 3)
-//  GetRelationship(ref, 1, s)
-//
-//  kAllScope:
-//    1. Iterate through left and right by index and check HasRElationship for each
-//    2. Get all of the relationship and find the intersection
 
 
-  // If there is no scope, return the unscoped_entities from PKB/RuntimeExtractor
   if (scope_indication == ScopeIndication::kNoScope) {
     return GetRelationshipByTypes(ref, first_de, second_de);
   } else {
@@ -145,16 +136,9 @@ std::vector<std::tuple<Entity*, Entity*>> DBManager::GetRelationshipByTypes(PKBR
         for (Entity* entity : scoped_entities) {
           std::vector<entity_pair> pairs;
           if (scope_indication == ScopeIndication::kLeftScope)
-            pairs = pkb_->GetRelationshipByFirst(ref, GetNameFromEntity(entity));
+            pairs = pkb_->GetRelationshipByFirst(ref, GetNameFromEntity(entity), {first_de, second_de});
           if (scope_indication == ScopeIndication::kRightScope)
-            pairs = pkb_->GetRelationshipBySecond(ref, GetNameFromEntity(entity));
-          for (entity_pair pair : pairs) {
-            if (GetDesignEntityFromEntity(std::get<0>(pair)) != first_de)
-              continue;
-            if (GetDesignEntityFromEntity(std::get<1>(pair)) != second_de)
-              continue;
-            results.insert(results.end(), pairs.begin(), pairs.end());
-          }
+            pairs = pkb_->GetRelationshipBySecond(ref, GetNameFromEntity(entity), {first_de, second_de});
         }
         return results;
       }
