@@ -42,3 +42,12 @@ AssignEntity* Utility::GetAssignEntityFromStmtNum(PKB* pkb, int target) {
   assert (ae_vec_target.size() == 1); // must be 1
   return dynamic_cast<AssignEntity*>(ae_vec_target[0]);
 }
+
+/**
+ * Checks if the input DesignEntity enum can be a Assign-type.
+ * @param de DesignEntity to be checked.
+ * @return true if it is; false otherwise.
+ */
+bool Utility::isAssignDesignEntity(DesignEntity de) {
+  return de == DesignEntity::kAssign || de == DesignEntity::kStmt || de == DesignEntity::kProgLine;
+}
