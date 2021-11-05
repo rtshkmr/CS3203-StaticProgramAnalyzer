@@ -33,6 +33,7 @@ PKBRelRefs PKBQueryCommand::GetPKBRelRef(RelRef relation, bool order_of_values_u
       return order_of_values_unchanged_from_clause ? PKBRelRefs::kAffects : PKBRelRefs::kAffectedBy;
     case RelRef::kAffectsT:
       return order_of_values_unchanged_from_clause ? PKBRelRefs::kAffectsT : PKBRelRefs::kAffectedByT;
+//    default:return PKBRelRefs::kWildcard;
   }
 }
 
