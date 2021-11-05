@@ -440,13 +440,13 @@ TEST_CASE("debug for sys test") {
   REQUIRE_FALSE(checker);
 
   SECTION ("9 - Get Affects : (a1, _) ") {
-    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffects, DesignEntity::kAssign).size() == 18);
-    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffects, DesignEntity::kStmt).size() == 18);
+    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffects, DesignEntity::kAssign).size() == 17);
+    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffects, DesignEntity::kStmt).size() == 17);
   }
 
   SECTION ("10 - Get AffectedBy : (_, a2) ") {
-    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffectedBy, DesignEntity::kAssign).size() == 14);
-    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffectedBy, DesignEntity::kStmt).size() == 14);
+    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffectedBy, DesignEntity::kAssign).size() == 13);
+    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffectedBy, DesignEntity::kStmt).size() == 13);
   }
 
   SECTION("debb") {
@@ -454,6 +454,6 @@ TEST_CASE("debug for sys test") {
     affects_extractor.SetPKB(pkb);
 
     int max_pairs = affects_extractor.GetAllPair().size();
-    CHECK(max_pairs == 35);
+    CHECK(max_pairs == 33);
   }
 }

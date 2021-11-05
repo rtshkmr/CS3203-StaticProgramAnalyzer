@@ -386,7 +386,7 @@ bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
       bool is_target_in_while_cluster = child->CheckIfStmtNumInRange(target_range.second);
       if (is_target_in_while_cluster || target_range.first > child_range.first) {
         // the first thing in the while cluster will be the cond, so it's okay to say that it's been checked:
-        auto new_target_range = std::make_pair(std::max(child_range.first, target_range.first), child_range.second);
+        auto new_target_range = std::make_pair(std::max(child_range.first, target_range.first), std::min(child_range.second, target_range.second));
         if(TraverseScopedClusterForAffects(child, new_target_range, pkb, lhs_var, goal_second_stmt)) {
           continue;
         } else {
@@ -422,7 +422,7 @@ bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
         scoped_cluster_does_not_modify_var =
             traversal_results.second; // check if it was target second stmt that modded it.
         break;
-      } else if (target_range.second == goal_second_stmt) { //not modified and reached goal statement.
+      } else if (child->GetStartEndRange().second == goal_second_stmt) { //not modified and reached goal statement.
         return true;
       } else {
         if (child->GetClusterTag() == ClusterTag::kNormalBlock) {
