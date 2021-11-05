@@ -10,6 +10,8 @@
 #include "NextTExtractor.h"
 #include "AffectsExtractor.h"
 #include "AffectsTExtractor.h"
+#include "AffectsBipExtractor.h"
+#include "AffectsBipTExtractor.h"
 
 const std::unordered_set<PKBRelRefs> runtime_relationships = {
     PKBRelRefs::kNextT,
@@ -21,7 +23,11 @@ const std::unordered_set<PKBRelRefs> runtime_relationships = {
     PKBRelRefs::kNextBip,
     PKBRelRefs::kPrevBip,
     PKBRelRefs::kNextBipT,
-    PKBRelRefs::kPrevBipT
+    PKBRelRefs::kPrevBipT,
+    PKBRelRefs::kAffectsBip,
+    PKBRelRefs::kAffectedByBip,
+    PKBRelRefs::kAffectsBipT,
+    PKBRelRefs::kAffectedByBipT
 };
 
 const std::unordered_set<DesignEntity> next_design_entities = {
@@ -65,6 +71,8 @@ class RuntimeExtractor : public RuntimeMediator {
   AffectsTExtractor affects_t_extractor_;
   NextBipExtractor next_bip_extractor_;
   NextBipTExtractor next_bip_t_extractor_;
+  AffectsBipExtractor affects_bip_extractor_;
+  AffectsBipTExtractor affects_bip_t_extractor_;
 
   std::vector<Entity*> GetNextT(int target);
   std::vector<Entity*> GetPrevT(int target);

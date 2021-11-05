@@ -9,6 +9,8 @@ RuntimeExtractor::RuntimeExtractor(PKB* pkb) {
   next_bip_t_extractor_ = NextBipTExtractor(pkb);
   next_bip_t_extractor_.SetMediator(this);
   affects_t_extractor_ = AffectsTExtractor(this, pkb);
+  affects_bip_extractor_ = AffectsBipExtractor(this, pkb);
+  affects_bip_t_extractor_ = AffectsBipTExtractor(this, pkb); 
 }
 
 /**
@@ -30,6 +32,10 @@ std::vector<Entity*> RuntimeExtractor::GetRelationship(PKBRelRefs ref, std::stri
     case PKBRelRefs::kPrevBip: return GetPrevBip(target_num);
     case PKBRelRefs::kNextBipT: return GetNextBipT(target_num);
     case PKBRelRefs::kPrevBipT: return GetPrevBipT(target_num);
+    case PKBRelRefs::kAffectsBip: return affects_bip_extractor_.GetRelationship(RelDirection::kForward, target_num);
+    case PKBRelRefs::kAffectedByBip: return affects_bip_extractor_.GetRelationship(RelDirection::kReverse, target_num);
+    case PKBRelRefs::kAffectsBipT: return affects_bip_t_extractor_.GetRelationship(RelDirection::kForward, target_num);
+    case PKBRelRefs::kAffectedByBipT: return affects_bip_t_extractor_.GetRelationship(RelDirection::kReverse, target_num);
     default: return std::vector<Entity*>{};
   }
 }
@@ -54,6 +60,10 @@ std::vector<Entity*> RuntimeExtractor::GetFirstEntityOfRelationship(PKBRelRefs r
     case PKBRelRefs::kPrevBip: return GetPrevBip(de);
     case PKBRelRefs::kNextBipT: return GetNextBipT(de);
     case PKBRelRefs::kPrevBipT: return GetPrevBipT(de);
+    case PKBRelRefs::kAffectsBip: return affects_bip_extractor_.GetFirstEntityOfRelationship(RelDirection::kForward, de);
+    case PKBRelRefs::kAffectedByBip: return affects_bip_extractor_.GetFirstEntityOfRelationship(RelDirection::kReverse, de);
+    case PKBRelRefs::kAffectsBipT: return affects_bip_t_extractor_.GetFirstEntityOfRelationship(RelDirection::kForward, de);
+    case PKBRelRefs::kAffectedByBipT: return affects_bip_t_extractor_.GetFirstEntityOfRelationship(RelDirection::kReverse, de);
     default: return std::vector<Entity*>{};
   }
 }
@@ -96,6 +106,10 @@ std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetRelationshipByTyp
     case PKBRelRefs::kPrevBip: return GetPrevBip(first, second);
     case PKBRelRefs::kNextBipT: return GetNextBipT(first, second);
     case PKBRelRefs::kPrevBipT: return GetPrevBipT(first, second);
+    case PKBRelRefs::kAffectsBip: return affects_bip_extractor_.GetRelationshipByTypes(RelDirection::kForward, first, second);
+    case PKBRelRefs::kAffectedByBip: return affects_bip_extractor_.GetRelationshipByTypes(RelDirection::kReverse, first, second);
+    case PKBRelRefs::kAffectsBipT: return affects_bip_t_extractor_.GetRelationshipByTypes(RelDirection::kForward, first, second);
+    case PKBRelRefs::kAffectedByBipT: return affects_bip_t_extractor_.GetRelationshipByTypes(RelDirection::kReverse, first, second);
     default: return std::vector<std::tuple<Entity*, Entity*>>{};
   }
 }
@@ -138,6 +152,10 @@ bool RuntimeExtractor::HasRelationship(PKBRelRefs ref) {
     case PKBRelRefs::kPrevBip: // fallthrough
     case PKBRelRefs::kNextBipT: // fallthrough
     case PKBRelRefs::kPrevBipT: return HasNextBip();
+    case PKBRelRefs::kAffectsBip: return affects_bip_extractor_.HasRelationship(RelDirection::kForward);
+    case PKBRelRefs::kAffectedByBip: return affects_bip_extractor_.HasRelationship(RelDirection::kReverse);
+    case PKBRelRefs::kAffectsBipT: return affects_bip_t_extractor_.HasRelationship(RelDirection::kForward);
+    case PKBRelRefs::kAffectedByBipT: return affects_bip_t_extractor_.HasRelationship(RelDirection::kReverse);
     default: return false;
   }
 }
@@ -162,6 +180,10 @@ bool RuntimeExtractor::HasRelationship(PKBRelRefs ref, std::string first) {
     case PKBRelRefs::kPrevBip: return HasPrevBip(target_num);
     case PKBRelRefs::kNextBipT: return HasNextBip(target_num);
     case PKBRelRefs::kPrevBipT: return HasPrevBip(target_num);
+    case PKBRelRefs::kAffectsBip: return affects_bip_extractor_.HasRelationship(RelDirection::kForward, target_num);
+    case PKBRelRefs::kAffectedByBip: return affects_bip_extractor_.HasRelationship(RelDirection::kReverse, target_num);
+    case PKBRelRefs::kAffectsBipT: return affects_bip_t_extractor_.HasRelationship(RelDirection::kForward, target_num);
+    case PKBRelRefs::kAffectedByBipT: return affects_bip_t_extractor_.HasRelationship(RelDirection::kReverse, target_num);
     default: return false;
   }
 }
@@ -188,6 +210,10 @@ bool RuntimeExtractor::HasRelationship(PKBRelRefs ref, std::string first, std::s
     case PKBRelRefs::kPrevBip: return HasNextBip(second_num, first_num);
     case PKBRelRefs::kNextBipT: return HasNextBipT(first_num, second_num);
     case PKBRelRefs::kPrevBipT: return HasNextBipT(second_num, first_num);
+    case PKBRelRefs::kAffectsBip: return affects_bip_extractor_.HasRelationship(RelDirection::kForward, first_num, second_num);
+    case PKBRelRefs::kAffectedByBip: return affects_bip_extractor_.HasRelationship(RelDirection::kReverse, first_num, second_num);
+    case PKBRelRefs::kAffectsBipT: return affects_bip_t_extractor_.HasRelationship(RelDirection::kForward, first_num, second_num);
+    case PKBRelRefs::kAffectedByBipT: return affects_bip_t_extractor_.HasRelationship(RelDirection::kReverse, first_num, second_num);
     default: return false;
   }
 }
@@ -211,6 +237,10 @@ bool RuntimeExtractor::HasRelationship(PKBRelRefs ref, DesignEntity first, Desig
     case PKBRelRefs::kPrevBip: // fallthrough
     case PKBRelRefs::kNextBipT: // fallthrough
     case PKBRelRefs::kPrevBipT: return HasNextBip();
+    case PKBRelRefs::kAffectsBip: affects_bip_extractor_.HasRelationship(RelDirection::kForward);
+    case PKBRelRefs::kAffectedByBip: affects_bip_extractor_.HasRelationship(RelDirection::kReverse);
+    case PKBRelRefs::kAffectsBipT: affects_bip_t_extractor_.HasRelationship(RelDirection::kForward);
+    case PKBRelRefs::kAffectedByBipT: affects_bip_t_extractor_.HasRelationship(RelDirection::kReverse);
     default: return false;
   }
 }
