@@ -45,6 +45,14 @@ class PKB {
   // E.g. GetRelationship(kFollows, 1) returns a vector with one Entity with statement number 2
   std::vector<Entity*> GetRelationship(PKBRelRefs ref, std::string entity);
 
+  // Returns a vector of 2-tuples of entities in which the first element of the tuple is specified
+  // by entity and the second element is any element for which the ref relationship holds with entity
+  std::vector<entity_pair> GetRelationshipByFirst(PKBRelRefs ref, std::string entity);
+
+  // Returns a vector of 2-tuples of entities in which the second element of the tuple is specified
+  // by entity and the first element is any element for which the ref relationship holds with entity
+  std::vector<entity_pair> GetRelationshipBySecond(PKBRelRefs ref, std::string entity);
+
   // Returns a vector of 2-tuples of entities in which the first element of the tuple is of type de1,
   // the second elements is of type de2, and the ref relationship holds between them
   std::vector<entity_pair> GetRelationshipByTypes(PKBRelRefs ref, DesignEntity de1, DesignEntity de2);
@@ -146,6 +154,22 @@ class PKB {
   std::unordered_map<
     PKBRelRefs,
     std::unordered_map<
+      std::string,
+      std::vector<entity_pair>
+    >
+  > relationship_by_first_entity_table_;
+
+  std::unordered_map<
+    PKBRelRefs,
+    std::unordered_map<
+      std::string,
+      std::vector<entity_pair>
+    >
+  > relationship_by_second_entity_table_;
+
+  std::unordered_map<
+    PKBRelRefs,
+    std::unordered_map<
       type_combo,
       std::vector<Entity*>,
       type_combo_hash
@@ -217,6 +241,8 @@ void PKB::PopulateRelationship(std::unordered_map<X*, std::list<Y*>*>* hash, PKB
       Entity* entity = dynamic_cast<Entity*>(e);
       relationship_set_.insert({ref, k_string, GetNameFromEntity(entity)});
       relationship_table_[ref][k_string].push_back(entity);
+      relationship_by_first_entity_table_[ref][k_string].push_back({first_entity, entity});
+      relationship_by_second_entity_table_[ref][GetNameFromEntity(entity)].push_back({first_entity, entity});
 
       DesignEntity second_type = GetDesignEntityFromEntity(entity);
       second_types = GetApplicableTypes(second_type);

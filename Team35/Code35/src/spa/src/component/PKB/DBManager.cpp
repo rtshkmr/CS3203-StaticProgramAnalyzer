@@ -112,6 +112,16 @@ std::vector<std::tuple<Entity*, Entity*>> DBManager::GetRelationshipByTypes(PKBR
                                                                             std::vector<Entity*> left_scoped_entities,
                                                                             std::vector<Entity*> right_scoped_entities,
                                                                             ScopeIndication scope_indication) {
+//  kNoScope:
+//  kLeftScope:
+//  (1, 2, 3)
+//  GetRelationship(ref, 1, s)
+//
+//  kAllScope:
+//    1. Iterate through left and right by index and check HasRElationship for each
+//    2. Get all of the relationship and find the intersection
+
+
   // If there is no scope, return the unscoped_entities from PKB/RuntimeExtractor
   if (scope_indication == ScopeIndication::kNoScope) {
     return GetRelationshipByTypes(ref, first_de, second_de);
@@ -119,15 +129,30 @@ std::vector<std::tuple<Entity*, Entity*>> DBManager::GetRelationshipByTypes(PKBR
     // Check if pkb contains the relationship type
     const bool pkb_ref = preprocessed_rel_refs.find(ref) != preprocessed_rel_refs.end();
     if (pkb_ref) {
-      std::vector<std::tuple<Entity*, Entity*>> results(left_scoped_entities.size());
-      for (int i = 0; i < left_scoped_entities.size(); ++i) {
-        if (pkb_->HasRelationship(
-          ref,
-          GetNameFromEntity(left_scoped_entities[i]),
-          GetNameFromEntity(right_scoped_entities[i])))
-          results.emplace_back(left_scoped_entities[i], right_scoped_entities[i]);
+      if (scope_indication == ScopeIndication::kAllScope) {
+        assert(left_scoped_entities.size() == right_scoped_entities.size());
+        std::vector<std::tuple<Entity*, Entity*>> results(left_scoped_entities.size());
+        for (int i = 0; i < left_scoped_entities.size(); i++) {
+          if (pkb_->HasRelationship(
+            ref,
+            GetNameFromEntity(left_scoped_entities[i]),
+            GetNameFromEntity(right_scoped_entities[i])))
+            results.emplace_back(left_scoped_entities[i], right_scoped_entities[i]);
+        }
+        return results;
+      } else {
+        std::vector<entity_pair> results;
+        auto scoped_entities = scope_indication == ScopeIndication::kLeftScope ? left_scoped_entities : right_scoped_entities;
+        for (Entity* entity : scoped_entities) {
+          std::vector<entity_pair> pairs;
+          if (scope_indication == ScopeIndication::kLeftScope)
+            pairs = pkb_->GetRelationshipByFirst(ref, GetNameFromEntity(entity));
+          if (scope_indication == ScopeIndication::kRightScope)
+            pairs = pkb_->GetRelationshipBySecond(ref, GetNameFromEntity(entity));
+          results.insert(results.end(), pairs.begin(), pairs.end());
+        }
+        return results;
       }
-      return results;
     } else {
       // PKB does not contain the relationship type
       return runtime_extractor_->GetAllRelationshipsScoped(ref, left_scoped_entities, right_scoped_entities);
