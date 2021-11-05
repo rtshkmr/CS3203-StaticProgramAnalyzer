@@ -78,7 +78,7 @@ class Cluster {
                                               std::pair<int, int> target_range,
                                               PKB* pkb,
                                               const std::string& lhs_var,
-                                              const int goal_second_stmt);
+                                              const std::pair<int, int> goal_range);
 };
 
 class Block : public Cluster {
