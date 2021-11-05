@@ -238,6 +238,7 @@ std::tuple<std::string, bool, bool, bool> QueryParser::ParseStmtOrEntRef() {
     std::tie(tok, is_case_syn) = ParseEntRef(false);
     is_synonym = is_case_syn && IsValidSynonym(tok);
     is_target_synonym = is_synonym && target_synonyms_map.find(tok.GetTokenString()) != target_synonyms_map.end();
+    curr_lookahead = tok.GetTokenString();
   } else {
     std::tie(curr_lookahead, is_synonym, is_target_synonym) = ParseStmtRef();
   }
