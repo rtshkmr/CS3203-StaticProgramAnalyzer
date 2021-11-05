@@ -129,6 +129,14 @@ std::vector<Entity*> PKB::GetRelationship(PKBRelRefs ref, std::string entity) {
   return relationship_table_[ref][entity];
 }
 
+std::vector<entity_pair> PKB::GetRelationshipByFirst(PKBRelRefs ref, std::string entity, type_combo t_c) {
+  return relationship_by_first_entity_table_[ref][entity][t_c];
+}
+
+std::vector<entity_pair> PKB::GetRelationshipBySecond(PKBRelRefs ref, std::string entity, type_combo t_c) {
+  return relationship_by_second_entity_table_[ref][entity][t_c];
+}
+
 std::vector<std::tuple<Entity*, Entity*>> PKB::GetRelationshipByTypes(PKBRelRefs ref, DesignEntity d1, DesignEntity d2) {
   if (d1 == DesignEntity::kProgLine) d1 = DesignEntity::kStmt;
   if (d2 == DesignEntity::kProgLine) d2 = DesignEntity::kStmt;
@@ -325,6 +333,7 @@ std::vector<DesignEntity> PKB::GetApplicableTypes(DesignEntity de) {
   std::vector<DesignEntity> types {de};
   if (stmt_design_entities_.find(de) != stmt_design_entities_.end()) {
     types.push_back(DesignEntity::kStmt);
+    types.push_back(DesignEntity::kProgLine);
   }
   return types;
 }

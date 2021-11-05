@@ -80,7 +80,7 @@ bool QueryEvaluatorTable::DeleteRow(int index) {
 
 std::vector<Entity *> QueryEvaluatorTable::GetColumn(Synonym *synonym) {
   auto search = synonym_to_entity_map.find(synonym);
-  //assert search != synonym_to_entity_map.end()
+  if (search == synonym_to_entity_map.end()) return {};
   return search->second;
 }
 

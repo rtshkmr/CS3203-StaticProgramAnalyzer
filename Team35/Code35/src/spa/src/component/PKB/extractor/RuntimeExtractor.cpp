@@ -109,8 +109,32 @@ std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetRelationshipByTyp
  */
 std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetAllRelationshipsScoped(PKBRelRefs ref,
                                                                                       std::vector<Entity*> left_entities,
-                                                                                      std::vector<Entity*> right_entities) {
+                                                                                      std::vector<Entity*> right_entities,
+                                                                                      ScopeIndication scope_indication,
+                                                                                      type_combo types) {
+  DesignEntity type_one = std::get<0>(types);
+  DesignEntity type_two = std::get<1>(types);
   std::vector<std::tuple<Entity*, Entity*>> results;
+  if (scope_indication == ScopeIndication::kLeftScope || scope_indication == ScopeIndication::kRightScope) {
+    std::vector<Entity*> to_iter = scope_indication == ScopeIndication::kLeftScope ? left_entities : right_entities;
+    if (scope_indication == ScopeIndication::kRightScope) ref = ReverseRelationship(ref);
+    for (Entity* scoped_entity : to_iter) {
+      // todo: See if can replace the below with a single function that returns vector<entity_pair>
+      std::vector<Entity*> add = GetRelationship(ref, pkb_->GetNameFromEntity(scoped_entity));
+      for (Entity* unscoped_entity : add) {
+        DesignEntity unscoped_type = pkb_->GetDesignEntityFromEntity(unscoped_entity);
+        if (scope_indication == ScopeIndication::kLeftScope) {
+          if (unscoped_type == type_two || type_two == DesignEntity::kStmt || type_two == DesignEntity::kProgLine)
+            results.push_back({scoped_entity, unscoped_entity});
+        } else {
+          if (unscoped_type == type_one || type_one == DesignEntity::kStmt || type_one == DesignEntity::kProgLine)
+            results.push_back({unscoped_entity, scoped_entity});
+        }
+      }
+    }
+    return results;
+  }
+
   for (int i = 0; i < left_entities.size(); ++i) {
     std::string left_name = PKB::GetNameFromEntity(left_entities[i]);
     std::string right_name = PKB::GetNameFromEntity(right_entities[i]);
@@ -481,4 +505,20 @@ void RuntimeExtractor::Delete() {
 
 bool RuntimeExtractor::IsRuntimeRelationship(PKBRelRefs ref) {
   return runtime_relationships.count(ref) == 1;
+}
+
+PKBRelRefs RuntimeExtractor::ReverseRelationship(PKBRelRefs ref) {
+  switch (ref) {
+    case PKBRelRefs::kNextT: return PKBRelRefs::kPreviousT;
+    case PKBRelRefs::kPreviousT: return PKBRelRefs::kNextT;
+    case PKBRelRefs::kAffects: return PKBRelRefs::kAffectedBy;
+    case PKBRelRefs::kAffectedBy: return PKBRelRefs::kAffects;
+    case PKBRelRefs::kAffectsT: return PKBRelRefs::kAffectedByT;
+    case PKBRelRefs::kAffectedByT: return PKBRelRefs::kAffectsT;
+    case PKBRelRefs::kNextBip: return PKBRelRefs::kPrevBip;
+    case PKBRelRefs::kPrevBip: return PKBRelRefs::kNextBip;
+    case PKBRelRefs::kNextBipT: return PKBRelRefs::kPrevBipT;
+    case PKBRelRefs::kPrevBipT: return PKBRelRefs::kNextBipT;
+    default: return PKBRelRefs::kInvalid;
+  }
 }

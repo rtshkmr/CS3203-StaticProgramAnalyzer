@@ -1,7 +1,9 @@
 #include "PKBQueryCommand.h"
 #include <cassert>
+#include <utility>
 
-PKBQueryReceiver::PKBQueryReceiver(DBManager *db_manager) : db_manager(db_manager) {}
+PKBQueryReceiver::PKBQueryReceiver(DBManager *db_manager, QueryEvaluatorTable *table) : db_manager(db_manager), table(table) {}
+PKBQueryReceiver::PKBQueryReceiver(DBManager *db_manager) : db_manager(db_manager), table(nullptr) {}
 
 PKBRelRefs PKBQueryCommand::GetPKBRelRef(RelRef relation, bool order_of_values_unchanged_from_clause) {
   switch(relation) {
@@ -12,11 +14,9 @@ PKBRelRefs PKBQueryCommand::GetPKBRelRef(RelRef relation, bool order_of_values_u
     case RelRef::kParent:
       return order_of_values_unchanged_from_clause ? PKBRelRefs::kParent : PKBRelRefs::kChild;
     case RelRef::kModifiesP:
-      return order_of_values_unchanged_from_clause ? PKBRelRefs::kModifies : PKBRelRefs::kModifiedBy;
     case RelRef::kModifiesS:
       return order_of_values_unchanged_from_clause ? PKBRelRefs::kModifies : PKBRelRefs::kModifiedBy;
     case RelRef::kUsesS:
-      return order_of_values_unchanged_from_clause ? PKBRelRefs::kUses : PKBRelRefs::kUsedBy;
     case RelRef::kUsesP:
       return order_of_values_unchanged_from_clause ? PKBRelRefs::kUses : PKBRelRefs::kUsedBy;
     case RelRef::kFollowsT:
@@ -37,7 +37,7 @@ PKBRelRefs PKBQueryCommand::GetPKBRelRef(RelRef relation, bool order_of_values_u
       return order_of_values_unchanged_from_clause ? PKBRelRefs::kNextBip : PKBRelRefs::kPrevBip;
     case RelRef::kNextBipT:
       return order_of_values_unchanged_from_clause ? PKBRelRefs::kNextBipT : PKBRelRefs::kPrevBipT;
-//    default:return PKBRelRefs::kWildcard;
+    default:return PKBRelRefs::kInvalid;
   }
 }
 
@@ -49,12 +49,20 @@ PKBRelRefs PKBQueryCommand::GetPKBRelRef(RelRef relation, bool order_of_values_u
  * @param second_synonym The second synonym in the such that clause.
  * @return The intermediate table with the results.
  */
-IntermediateTable* PKBQueryReceiver::QueryPKBTwoSynonyms(PKBRelRefs rel, DesignEntity first_synonym, DesignEntity second_synonym) {
-  std::vector<std::tuple<Entity *, Entity *>> output = db_manager->GetRelationshipByTypes(rel, first_synonym, second_synonym);
-  IntermediateTable *table = new IntermediateTable();
+IntermediateTable* PKBQueryReceiver::QueryPKBTwoSynonyms(PKBRelRefs rel, Synonym *first_synonym, Synonym *second_synonym) {
 
-  table->InsertData(output);
-  return table;
+  std::vector<Entity*> first_list = table->GetColumn(first_synonym);
+  std::vector<Entity*> second_list =table->GetColumn(second_synonym);
+  ScopeIndication scoping = GetDoubleSynonymScoping(first_list, second_list);
+  std::vector<std::tuple<Entity *, Entity *>> output = db_manager->GetRelationshipByTypes(rel,
+                                                                                          first_synonym->GetType(),
+                                                                                          second_synonym->GetType(),
+                                                                                          first_list,
+                                                                                          second_list,
+                                                                                          scoping);
+  auto *intermediate_table = new IntermediateTable();
+  intermediate_table->InsertData(output);
+  return intermediate_table;
 }
 
 /**
@@ -66,18 +74,16 @@ IntermediateTable* PKBQueryReceiver::QueryPKBTwoSynonyms(PKBRelRefs rel, DesignE
  * @return The intermediate table with the results.
  */
 IntermediateTable *PKBQueryReceiver::QueryPKBByValue(PKBRelRefs rel, std::string value) {
-  std::vector<Entity *> output = db_manager->GetRelationship(rel, value);
-  IntermediateTable *table = new IntermediateTable();
+  std::vector<Entity *> output = db_manager->GetRelationship(rel, std::move(value));
+  auto *table = new IntermediateTable();
   table->InsertData(output);
   return table;
 }
 
 // E.g Uses(a1, _) should be kUsedBy instead of kUses
 IntermediateTable *PKBQueryReceiver::QueryEntityWithWildcard(PKBRelRefs rel, DesignEntity entity) {
-  std::vector<Entity *> scoped_list = db_manager->GetDesignEntities(entity);
-  // TODO: I don't understand this API
-  std::vector<Entity *> output = db_manager->GetFirstEntityOfRelationship(rel, entity, scoped_list, ScopeIndication::kNoScope);
-  IntermediateTable *table = new IntermediateTable();
+  std::vector<Entity *> output = db_manager->GetFirstEntityOfRelationship(rel, entity);
+  auto *table = new IntermediateTable();
   table->InsertData(output);
   return table;
 }
@@ -90,7 +96,7 @@ IntermediateTable *PKBQueryReceiver::QueryEntityWithWildcard(PKBRelRefs rel, Des
  */
 IntermediateTable *PKBQueryReceiver::QueryRelRefExistence(PKBRelRefs rel) {
   bool output = db_manager->HasRelationship(rel);
-  IntermediateTable *table = new IntermediateTable();
+  auto *table = new IntermediateTable();
   table->InsertData(output);
   return table;
 }
@@ -101,7 +107,7 @@ IntermediateTable *PKBQueryReceiver::QueryRelRefExistence(PKBRelRefs rel) {
  * @return The intermediate table with the results.
  */
 IntermediateTable *PKBQueryReceiver::QueryDesignEntity(DesignEntity design_entity) {
-  IntermediateTable *table = new IntermediateTable();
+  auto *table = new IntermediateTable();
   switch(design_entity) {
     case DesignEntity::kAssign:
       PopulateAssignDoubleSynonym(table);
@@ -125,7 +131,7 @@ void PKBQueryReceiver::PopulateAssignDoubleSynonym(IntermediateTable *table) {
   for (auto assign : assign_entity_list) {
     auto assign_entity = dynamic_cast<AssignEntity*>(assign);
     auto curr_pair = std::make_tuple(assign, assign_entity->GetVariableObj());
-    entity_pair_list.push_back(curr_pair);
+    entity_pair_list.emplace_back(curr_pair);
   }
   table->InsertData(entity_pair_list);
 }
@@ -154,8 +160,8 @@ void PKBQueryReceiver::PopulatePatternDoubleSynonym(IntermediateTable *table, De
   }
 }
 
-IntermediateTable *PKBQueryReceiver::QueryPatternByValue(DesignEntity design_entity, std::string value) {
-  IntermediateTable *table = new IntermediateTable();
+IntermediateTable *PKBQueryReceiver::QueryPatternByValue(DesignEntity design_entity, const std::string& value) {
+  auto *table = new IntermediateTable();
 
   if (value == "_") {
     // Returns std::vector<Entity*>
@@ -183,9 +189,9 @@ IntermediateTable *PKBQueryReceiver::QueryPatternByValue(DesignEntity design_ent
 
 //Returns true in the Intermediate table if the relationship contains at least some values. Used for value and wildcard.
 IntermediateTable *PKBQueryReceiver::QueryPKBByValueForBoolean(PKBRelRefs rel, std::string value) {
-  IntermediateTable *table = new IntermediateTable();
-  std::vector<Entity *> list = db_manager->GetRelationship(rel, value);
-  table->InsertData(list.size() != 0);
+  auto *table = new IntermediateTable();
+  std::vector<Entity *> list = db_manager->GetRelationship(rel, std::move(value));
+  table->InsertData(!list.empty());
   return table;
 }
 
@@ -193,15 +199,15 @@ IntermediateTable *PKBQueryReceiver::QueryPKBByValueForBoolean(PKBRelRefs rel, s
 // Such that uses(3, "x")
 IntermediateTable *
 PKBQueryReceiver::QueryPKBByValueForBoolean(PKBRelRefs rel, std::string first_value, std::string second_value) {
-  IntermediateTable *table = new IntermediateTable();
-  bool has_result = db_manager->HasRelationship(rel, first_value, second_value);
+  auto *table = new IntermediateTable();
+  bool has_result = db_manager->HasRelationship(rel, std::move(first_value), std::move(second_value));
   table->InsertData(has_result);
   return table;
 }
 
 IntermediateTable *
 PKBQueryReceiver::QueryAttributeMatch(type_attribute_pair first_attr_pair, type_attribute_pair second_attr_pair) {
-  IntermediateTable *table = new IntermediateTable();
+  auto *table = new IntermediateTable();
   std::vector<std::tuple<Entity*, Entity*>> result = db_manager->
           GetEntitiesWithMatchingAttributes(first_attr_pair, second_attr_pair);
   table->InsertData(result);
@@ -210,23 +216,37 @@ PKBQueryReceiver::QueryAttributeMatch(type_attribute_pair first_attr_pair, type_
 
 IntermediateTable *
 PKBQueryReceiver::QueryEntityAttributeMatch(DesignEntity design_entity, Attribute attribute, std::string value) {
-  IntermediateTable *table = new IntermediateTable();
-  std::vector<Entity*> result = db_manager->GetEntitiesWithAttributeValue(design_entity, attribute, value);
+  auto *table = new IntermediateTable();
+  std::vector<Entity*> result = db_manager->GetEntitiesWithAttributeValue(design_entity, attribute, std::move(value));
   table->InsertData(result);
   return table;
 }
 
+ScopeIndication
+PKBQueryReceiver::GetDoubleSynonymScoping(std::vector<Entity *> first_entity_list,
+                                          std::vector<Entity *> second_entity_list) {
+  if (!first_entity_list.empty() && !second_entity_list.empty()) {
+    return ScopeIndication::kAllScope;
+  } else if (!first_entity_list.empty()) {
+    return ScopeIndication::kLeftScope;
+  } else if (!second_entity_list.empty()) {
+    return ScopeIndication::kRightScope;
+  } else {
+    return ScopeIndication::kNoScope;
+  }
+}
+
 QuerySuchThatTwoSynonymCommand::QuerySuchThatTwoSynonymCommand(Clause *clause) : clause(clause), receiver(nullptr) {}
 
-void QuerySuchThatTwoSynonymCommand::SetReceiver(PKBQueryReceiver *receiver) {
+void QuerySuchThatTwoSynonymCommand::SetReceiver(PKBQueryReceiver *receiver_to_set) {
   delete this->receiver;
-  this->receiver = receiver;
+  this->receiver = receiver_to_set;
 }
 
 IntermediateTable * QuerySuchThatTwoSynonymCommand::ExecuteQuery(Clause *clause) {
   auto* such_that = dynamic_cast<SuchThat *>(clause);
   PKBRelRefs pkb_rel= GetPKBRelRef(such_that->rel_ref, true);
-  return this->receiver->QueryPKBTwoSynonyms(pkb_rel, such_that->first_synonym->GetType(), such_that->second_synonym->GetType());
+  return this->receiver->QueryPKBTwoSynonyms(pkb_rel, such_that->first_synonym, such_that->second_synonym);
 }
 
 

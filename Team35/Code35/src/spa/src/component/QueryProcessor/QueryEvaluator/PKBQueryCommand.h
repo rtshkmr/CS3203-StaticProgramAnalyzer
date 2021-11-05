@@ -2,6 +2,7 @@
 #define AUTOTESTER_PKBQUERYCOMMAND_H
 
 #include <component/QueryProcessor/types/IntermediateTable.h>
+#include <component/QueryProcessor/types/QueryEvaluatorTable.h>
 #include "component/PKB/DBManager.h"
 #include "model/Entity.h"
 #include "component/QueryProcessor/types/Types.h"
@@ -12,20 +13,24 @@
 class PKBQueryReceiver {
   private:
     DBManager *db_manager;
+    QueryEvaluatorTable *table;
 
     void PopulateAssignDoubleSynonym(IntermediateTable *table);
     void PopulatePatternDoubleSynonym(IntermediateTable *table, DesignEntity design_entity);
+    ScopeIndication GetDoubleSynonymScoping(std::vector<Entity *> first_entity_list,
+                                            std::vector<Entity *> second_entity_list);
   public:
-    explicit PKBQueryReceiver(DBManager *db_manager);
+    PKBQueryReceiver(DBManager *db_manager);
+    PKBQueryReceiver(DBManager *db_manager, QueryEvaluatorTable *table);
 
-    IntermediateTable *QueryPKBTwoSynonyms(PKBRelRefs rel, DesignEntity first_synonym, DesignEntity second_synonym);
+    IntermediateTable *QueryPKBTwoSynonyms(PKBRelRefs rel, Synonym *first_synonym, Synonym *second_synonym);
     IntermediateTable *QueryPKBByValue(PKBRelRefs rel, std::string value);
     IntermediateTable *QueryEntityWithWildcard(PKBRelRefs rel, DesignEntity entity);
     IntermediateTable *QueryPKBByValueForBoolean(PKBRelRefs rel, std::string value);
     IntermediateTable *QueryPKBByValueForBoolean(PKBRelRefs rel, std::string first_value, std::string second_value);
     IntermediateTable *QueryRelRefExistence(PKBRelRefs rel);
     IntermediateTable *QueryDesignEntity(DesignEntity design_entity);
-    IntermediateTable *QueryPatternByValue(DesignEntity design_entity, std::string value);
+    IntermediateTable *QueryPatternByValue(DesignEntity design_entity, const std::string& value);
     IntermediateTable *QueryAttributeMatch(type_attribute_pair first_attr_pair, type_attribute_pair second_attr_pair);
     IntermediateTable *QueryEntityAttributeMatch(DesignEntity design_entity, Attribute attribute, std::string value);
 };
@@ -35,7 +40,7 @@ class PKBQueryCommand {
     virtual void SetReceiver(PKBQueryReceiver *receiver) = 0;
     virtual IntermediateTable * ExecuteQuery(Clause *clause) = 0;
 
-    PKBRelRefs GetPKBRelRef(RelRef relation, bool order_of_values_unchanged_from_clause);
+    static PKBRelRefs GetPKBRelRef(RelRef relation, bool order_of_values_unchanged_from_clause);
 };
 
 class QuerySuchThatTwoSynonymCommand : public PKBQueryCommand {
