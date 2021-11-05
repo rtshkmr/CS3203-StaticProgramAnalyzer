@@ -311,6 +311,7 @@ bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
     ClusterTag tag = child->GetClusterTag();
     bool child_is_cond_block = tag == ClusterTag::kIfCond || tag == ClusterTag::kWhileCond;
     bool child_does_not_contain_first_stmt = child_range.second < target_range.first;
+    if (child_is_cond_block && child_range.second == target_range.first) target_range.first = target_range.first + 1;
     if (child_does_not_contain_first_stmt || child_is_cond_block) continue; // skips this child
 
     // =========================== HANDLE IF CLUSTER ====================================
@@ -421,7 +422,7 @@ bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
         scoped_cluster_does_not_modify_var =
             traversal_results.second; // check if it was target second stmt that modded it.
         break;
-      } else if (traversal_results.second) { //second returned successful and not modified.
+      } else if (target_range.second == goal_second_stmt) { //not modified and reached goal statement.
         return true;
       } else {
         if (child->GetClusterTag() == ClusterTag::kNormalBlock) {
