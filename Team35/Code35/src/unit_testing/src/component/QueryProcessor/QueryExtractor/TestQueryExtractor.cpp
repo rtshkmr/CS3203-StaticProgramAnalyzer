@@ -156,6 +156,20 @@ TEST_CASE("3.QueryExtractor.Extract multiple synonyms + select tuple of declared
   }
 }
 
+TEST_CASE("3.QueryExtractor.Select BOOLEAN but BOOLEAN is declared as a syn; should PASS") {
+  std::string query = "stmt BOOLEAN;\n"
+                      "Select BOOLEAN such that Follows(BOOLEAN,2)";
+
+  auto query_extractor = QueryExtractor(& query);
+  query_extractor.ExtractQuery();
+  std::list<Synonym*> synonyms = query_extractor.GetSynonymsList();
+  std::vector<Group*> groups = query_extractor.GetGroupsList();
+  auto target_syn_attrs = query_extractor.GetTargetSynAttrPairs();
+  REQUIRE(synonyms.size() == 1);
+  REQUIRE(groups.size() == 1);
+  REQUIRE(target_syn_attrs.size() == 1);
+}
+
 TEST_CASE("3.QueryExtractor.Single malformed such that with typo; should FAIL") {
   std::string query = "assign a; while w; Select a Such that Follows (w, a)";
   auto query_extractor = QueryExtractor(&query);

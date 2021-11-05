@@ -164,11 +164,13 @@ void QueryParser::ParseTuple() {
  */
 void QueryParser::ParseTarget() {
   if (lookahead.GetTokenTag() == TokenTag::kName && lookahead.GetTokenString().compare("BOOLEAN") == 0) {
-    // parse boolean
-    Eat(TokenTag::kName);
-  } else {
-    ParseTuple();
+    // parse boolean but only if there is no declared syn called 'BOOLEAN'
+    if (synonyms_name_set.find(lookahead.GetTokenString()) == synonyms_name_set.end()) {
+      Eat(TokenTag::kName);
+      return;
+    }
   }
+  ParseTuple();
 }
 
 // stmtRef: synonym | ‘_’ | INTEGER
