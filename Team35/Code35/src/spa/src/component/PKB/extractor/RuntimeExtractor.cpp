@@ -112,6 +112,8 @@ std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetAllRelationshipsS
                                                                                       std::vector<Entity*> right_entities,
                                                                                       ScopeIndication scope_indication,
                                                                                       type_combo types) {
+  DesignEntity type_one = std::get<0>(types);
+  DesignEntity type_two = std::get<1>(types);
   std::vector<std::tuple<Entity*, Entity*>> results;
   if (scope_indication == ScopeIndication::kLeftScope || scope_indication == ScopeIndication::kRightScope) {
     std::vector<Entity*> to_iter = scope_indication == ScopeIndication::kLeftScope ? left_entities : right_entities;
@@ -122,10 +124,10 @@ std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetAllRelationshipsS
       for (Entity* unscoped_entity : add) {
         DesignEntity unscoped_type = pkb_->GetDesignEntityFromEntity(unscoped_entity);
         if (scope_indication == ScopeIndication::kLeftScope) {
-          if (unscoped_type == std::get<1>(types))
+          if (unscoped_type == type_two || type_two == DesignEntity::kStmt || type_two == DesignEntity::kProgLine)
             results.push_back({scoped_entity, unscoped_entity});
         } else {
-          if (unscoped_type == std::get<0>(types))
+          if (unscoped_type == type_one || type_one == DesignEntity::kStmt || type_one == DesignEntity::kProgLine)
             results.push_back({unscoped_entity, scoped_entity});
         }
       }
