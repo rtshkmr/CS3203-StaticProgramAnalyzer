@@ -94,11 +94,10 @@ std::vector<std::tuple<Entity*, Entity*>> AffectsExtractor::GetAllPair() {
   std::vector<std::tuple<Entity*, Entity*>> retList = {};
 
   if (cacheIndication == ScopeIndication::kAllScope) {
-    std::vector<std::tuple<Entity*, Entity*>> intermediate_table = {};
     for (auto pair : affects_map_) {
       std::vector<Entity*> this_key_entity = GetAffects(pair.first);
       for (auto val: this_key_entity) {
-        intermediate_table.push_back(std::make_tuple(pair.first, val));
+        retList.push_back(std::make_tuple(pair.first, val));
       }
     }
     return retList;
