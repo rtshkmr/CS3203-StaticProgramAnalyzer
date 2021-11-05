@@ -1,0 +1,6 @@
+procedure A {
+    procedure B {
+       x = 1;
+    }
+    y = 1;
+}
