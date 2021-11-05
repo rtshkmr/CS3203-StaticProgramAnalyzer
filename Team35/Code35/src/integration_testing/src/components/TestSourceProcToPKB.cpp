@@ -1,4 +1,5 @@
 #include <component/PKB/extractor/RuntimeExtractor.h>
+#include <component/PKB/DBManager.h>
 #include "catch.hpp"
 #include "component/SourceProcessor/SourceProcessor.h"
 #include "component/SourceProcessor/Parser.h"
@@ -561,7 +562,7 @@ TEST_CASE("Next* relationship tests") {
   }
 
   PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/mixed_loops2_source.txt");
-  RuntimeExtractor rte = RuntimeExtractor(pkb);
+  auto dbm = DBManager(pkb);
   std::vector<std::vector<int>> expected_nextt_tuples = {
       {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23},
       {3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23},
@@ -590,7 +591,7 @@ TEST_CASE("Next* relationship tests") {
 
   SECTION("Next* relationships") {
     for (int i = 0; i < 23; ++i) {
-      std::vector<Entity*> next = rte.GetRelationship(PKBRelRefs::kNextT, std::to_string(i+1));
+      std::vector<Entity*> next = dbm.GetRelationship(PKBRelRefs::kNextT, std::to_string(i+1));
       CHECK(next.size() == expected_nextt_tuples[i].size());
       std::list<std::tuple<EntityEnum, std::string>> expected_list;
       for (int j : expected_nextt_tuples[i]) {
@@ -601,7 +602,7 @@ TEST_CASE("Next* relationship tests") {
   }
 
   SECTION("Get LHS") {
-    std::vector<Entity*> next = rte.GetFirstEntityOfRelationship(PKBRelRefs::kNextT, DesignEntity::kStmt);
+    std::vector<Entity*> next = dbm.GetFirstEntityOfRelationship(PKBRelRefs::kNextT, DesignEntity::kStmt);
     std::list<std::tuple<EntityEnum, std::string>> expected_list;
     for (int i = 1; i <= 22; ++i) {
       expected_list.push_back(ml2_source_tuples[i]);
@@ -609,7 +610,7 @@ TEST_CASE("Next* relationship tests") {
     CHECK(AreEntityListsEqual(expected_list, next));
   }
   SECTION("Get RHS") {
-    std::vector<Entity*> next = rte.GetFirstEntityOfRelationship(PKBRelRefs::kPreviousT, DesignEntity::kStmt);
+    std::vector<Entity*> next = dbm.GetFirstEntityOfRelationship(PKBRelRefs::kPreviousT, DesignEntity::kStmt);
     std::list<std::tuple<EntityEnum, std::string>> expected_list;
     for (int i = 2; i <= 23; ++i) {
       expected_list.push_back(ml2_source_tuples[i]);
@@ -618,7 +619,7 @@ TEST_CASE("Next* relationship tests") {
   }
 
   SECTION("Get all pairs") {
-    std::vector<std::tuple<Entity*, Entity*>> next = rte.GetRelationshipByTypes(PKBRelRefs::kNextT, DesignEntity::kStmt, DesignEntity::kProgLine);
+    std::vector<std::tuple<Entity*, Entity*>> next = dbm.GetRelationshipByTypes(PKBRelRefs::kNextT, DesignEntity::kStmt, DesignEntity::kProgLine);
     std::list<std::tuple<std::tuple<EntityEnum, std::string>, std::tuple<EntityEnum, std::string>>> expected_forward_list;
     std::list<std::tuple<std::tuple<EntityEnum, std::string>, std::tuple<EntityEnum, std::string>>> expected_reverse_list;
     for (int i = 0; i < expected_nextt_tuples.size(); ++i) {
@@ -628,21 +629,21 @@ TEST_CASE("Next* relationship tests") {
       }
     }
     CHECK(AreAllPairsEqual(expected_forward_list, next));
-    std::vector<std::tuple<Entity*, Entity*>> prev = rte.GetRelationshipByTypes(PKBRelRefs::kPreviousT, DesignEntity::kProgLine, DesignEntity::kProgLine);
+    std::vector<std::tuple<Entity*, Entity*>> prev = dbm.GetRelationshipByTypes(PKBRelRefs::kPreviousT, DesignEntity::kProgLine, DesignEntity::kProgLine);
     CHECK(AreAllPairsEqual(expected_reverse_list, prev));
   }
 
   SECTION("Has Relationship") {
-    CHECK(rte.HasRelationship(PKBRelRefs::kNextT));
-    CHECK(rte.HasRelationship(PKBRelRefs::kPreviousT));
-    CHECK(rte.HasRelationship(PKBRelRefs::kNextT, "22"));
-    CHECK(rte.HasRelationship(PKBRelRefs::kNextT, "1", "23"));
-    CHECK(rte.HasRelationship(PKBRelRefs::kPreviousT, "23", "1"));
-    CHECK(rte.HasRelationship(PKBRelRefs::kPreviousT, "7", "7"));
-    CHECK(rte.HasRelationship(PKBRelRefs::kPreviousT, "10", "2"));
-    CHECK_FALSE(rte.HasRelationship(PKBRelRefs::kNextT, "4", "6"));
-    CHECK_FALSE(rte.HasRelationship(PKBRelRefs::kNextT, "6", "5"));
-    CHECK_FALSE(rte.HasRelationship(PKBRelRefs::kNextT, "21", "21"));
-    CHECK_FALSE(rte.HasRelationship(PKBRelRefs::kPreviousT, "21", "21"));
+    CHECK(dbm.HasRelationship(PKBRelRefs::kNextT));
+    CHECK(dbm.HasRelationship(PKBRelRefs::kPreviousT));
+    CHECK(dbm.HasRelationship(PKBRelRefs::kNextT, "22"));
+    CHECK(dbm.HasRelationship(PKBRelRefs::kNextT, "1", "23"));
+    CHECK(dbm.HasRelationship(PKBRelRefs::kPreviousT, "23", "1"));
+    CHECK(dbm.HasRelationship(PKBRelRefs::kPreviousT, "7", "7"));
+    CHECK(dbm.HasRelationship(PKBRelRefs::kPreviousT, "10", "2"));
+    CHECK_FALSE(dbm.HasRelationship(PKBRelRefs::kNextT, "4", "6"));
+    CHECK_FALSE(dbm.HasRelationship(PKBRelRefs::kNextT, "6", "5"));
+    CHECK_FALSE(dbm.HasRelationship(PKBRelRefs::kNextT, "21", "21"));
+    CHECK_FALSE(dbm.HasRelationship(PKBRelRefs::kPreviousT, "21", "21"));
   }
 }
