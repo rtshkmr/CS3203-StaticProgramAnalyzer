@@ -119,17 +119,15 @@ std::vector<std::tuple<Entity*, Entity*>> DBManager::GetRelationshipByTypes(PKBR
     // Check if pkb contains the relationship type
     const bool pkb_ref = preprocessed_rel_refs.find(ref) != preprocessed_rel_refs.end();
     if (pkb_ref) {
-      // PKB contains the relationship type
-      std::vector<std::tuple<Entity*, Entity*>>
-          unscoped_entities = pkb_->GetRelationshipByTypes(ref, first_de, second_de);
-      // Scoped entities will always be a subset of unscoped entities
-      // Can simply check if lef_scoped_entities is smaller than unscoped_entities
-      // and return the smaller vector
-      if (left_scoped_entities.size() <= unscoped_entities.size()) {
-        return MergeScopedEntities(left_scoped_entities, right_scoped_entities);
-      } else {
-        return unscoped_entities;
+      std::vector<std::tuple<Entity*, Entity*>> results(left_scoped_entities.size());
+      for (int i = 0; i < left_scoped_entities.size(); ++i) {
+        if (pkb_->HasRelationship(
+          ref,
+          GetNameFromEntity(left_scoped_entities[i]),
+          GetNameFromEntity(right_scoped_entities[i])))
+          results.emplace_back(left_scoped_entities[i], right_scoped_entities[i]);
       }
+      return results;
     } else {
       // PKB does not contain the relationship type
       return runtime_extractor_->GetAllRelationshipsScoped(ref, left_scoped_entities, right_scoped_entities);
