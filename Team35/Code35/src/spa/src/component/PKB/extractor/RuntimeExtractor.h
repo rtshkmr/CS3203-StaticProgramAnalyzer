@@ -58,7 +58,8 @@ class RuntimeExtractor : public RuntimeMediator {
   std::vector<std::tuple<Entity*, Entity*>> GetAllRelationshipsScoped(PKBRelRefs ref,
                                                                       std::vector<Entity*> left_entities,
                                                                       std::vector<Entity*> right_entities,
-                                                                      ScopeIndication scope_indication);
+                                                                      ScopeIndication scope_indication,
+                                                                      type_combo types);
  private:
   PKB* pkb_;
   NextTExtractor next_t_extractor_;

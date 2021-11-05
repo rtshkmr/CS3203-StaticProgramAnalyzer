@@ -110,19 +110,23 @@ std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetRelationshipByTyp
 std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetAllRelationshipsScoped(PKBRelRefs ref,
                                                                                       std::vector<Entity*> left_entities,
                                                                                       std::vector<Entity*> right_entities,
-                                                                                      ScopeIndication scope_indication) {
+                                                                                      ScopeIndication scope_indication,
+                                                                                      type_combo types) {
   std::vector<std::tuple<Entity*, Entity*>> results;
   if (scope_indication == ScopeIndication::kLeftScope || scope_indication == ScopeIndication::kRightScope) {
     std::vector<Entity*> to_iter = scope_indication == ScopeIndication::kLeftScope ? left_entities : right_entities;
+    if (scope_indication == ScopeIndication::kRightScope) ref = ReverseRelationship(ref);
     for (Entity* scoped_entity : to_iter) {
       // todo: See if can replace the below with a single function that returns vector<entity_pair>
-      if (scope_indication == ScopeIndication::kRightScope) ref = ReverseRelationship(ref);
       std::vector<Entity*> add = GetRelationship(ref, pkb_->GetNameFromEntity(scoped_entity));
       for (Entity* unscoped_entity : add) {
+        DesignEntity unscoped_type = pkb_->GetDesignEntityFromEntity(unscoped_entity);
         if (scope_indication == ScopeIndication::kLeftScope) {
-          results.push_back({scoped_entity, unscoped_entity});
+          if (unscoped_type == std::get<1>(types))
+            results.push_back({scoped_entity, unscoped_entity});
         } else {
-          results.push_back({unscoped_entity, scoped_entity});
+          if (unscoped_type == std::get<0>(types))
+            results.push_back({unscoped_entity, scoped_entity});
         }
       }
     }
