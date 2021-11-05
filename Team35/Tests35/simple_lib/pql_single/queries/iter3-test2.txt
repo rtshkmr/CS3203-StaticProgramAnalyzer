@@ -68,8 +68,18 @@ stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr
 Select p1 such that Next*(p1, p2)
 14, 16, 21, 28, 36
 5000
-17 - Next* more on synonyms
+20 - Next* more on synonyms
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
 Select r1 such that Next*(c1, r1)
 11, 15
+5000
+21 - Next* more numbers
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select v2 such that Next*(_, 38)
+x, z, i, d, j, Third, First, y, v, a, you, me, aa, bb
+5000
+17 - Next* more numbers
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
+Select if2 such that Next*(19, 28)
+10, 19, 22, 29, 37
 5000
