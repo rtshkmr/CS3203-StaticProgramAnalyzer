@@ -436,7 +436,7 @@ TEST_CASE("2.PKB.Affects.mixed_loops_source") {
 TEST_CASE("debug for sys test") {
   PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../../Tests35/simple_lib/pql_single/affects.txt");
   DBManager* dbm = new DBManager(pkb);
-  bool checker = dbm->HasRelationship(PKBRelRefs::kAffects, "1", "13");
+  bool checker = dbm->HasRelationship(PKBRelRefs::kAffects, "4", "15");
   REQUIRE_FALSE(checker);
 
   SECTION ("9 - Get Affects : (a1, _) ") {
@@ -445,8 +445,8 @@ TEST_CASE("debug for sys test") {
   }
 
   SECTION ("10 - Get AffectedBy : (_, a2) ") {
-    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffectedBy, DesignEntity::kAssign).size() == 13);
-    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffectedBy, DesignEntity::kStmt).size() == 13);
+    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffectedBy, DesignEntity::kAssign).size() == 12);
+    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffectedBy, DesignEntity::kStmt).size() == 12);
   }
 
   SECTION("debb") {
@@ -454,6 +454,6 @@ TEST_CASE("debug for sys test") {
     affects_extractor.SetPKB(pkb);
 
     int max_pairs = affects_extractor.GetAllPair().size();
-    CHECK(max_pairs == 33);
+    CHECK(max_pairs == 39);
   }
 }

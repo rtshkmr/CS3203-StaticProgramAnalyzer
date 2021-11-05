@@ -252,7 +252,6 @@ std::pair<bool, bool> TraverseNormalBlockForAffects(Cluster* child,
        stmt_num <= std::min(child_range.second, target_range.second);
        stmt_num++) { // bring this inside
     if (stmt_num <= target_range.first) continue; // skip what you can
-    bool stmt_modifies_var = !pkb->HasRelationship(PKBRelRefs::kModifies, std::to_string(stmt_num), lhs_var);
     child_does_not_modify_var = !pkb->HasRelationship(PKBRelRefs::kModifies, std::to_string(stmt_num), lhs_var);
     bool is_goal_stmt = stmt_num == goal_stmt_num;
     is_modifier_the_goal_stmt = (!child_does_not_modify_var && is_goal_stmt);
@@ -400,6 +399,7 @@ bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
     } else if (tag == ClusterTag::kIfBody || tag == ClusterTag::kElseBody) {
       bool child_is_normal_block = child->nested_clusters_.empty();
       if (child_is_normal_block) {
+        target_range.first = target_range.first - 1;
         auto traversal_results = TraverseNormalBlockForAffects(child, target_range, pkb, lhs_var, goal_second_stmt);
         if (!traversal_results.first) { // i.e. child modifies variable:
           scoped_cluster_does_not_modify_var =
