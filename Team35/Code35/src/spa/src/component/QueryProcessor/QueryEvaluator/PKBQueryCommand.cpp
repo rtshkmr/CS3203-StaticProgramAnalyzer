@@ -82,9 +82,7 @@ IntermediateTable *PKBQueryReceiver::QueryPKBByValue(PKBRelRefs rel, std::string
 
 // E.g Uses(a1, _) should be kUsedBy instead of kUses
 IntermediateTable *PKBQueryReceiver::QueryEntityWithWildcard(PKBRelRefs rel, DesignEntity entity) {
-  std::vector<Entity *> scoped_list = db_manager->GetDesignEntities(entity);
-  // TODO: I don't understand this API
-  std::vector<Entity *> output = db_manager->GetFirstEntityOfRelationship(rel, entity, scoped_list, ScopeIndication::kNoScope);
+  std::vector<Entity *> output = db_manager->GetFirstEntityOfRelationship(rel, entity);
   auto *table = new IntermediateTable();
   table->InsertData(output);
   return table;
