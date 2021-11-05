@@ -145,7 +145,7 @@ std::vector<std::tuple<Entity*, Entity*>> DBManager::GetRelationshipByTypes(PKBR
       }
     } else {
       // PKB does not contain the relationship type
-      return runtime_extractor_->GetAllRelationshipsScoped(ref, left_scoped_entities, right_scoped_entities);
+      return runtime_extractor_->GetAllRelationshipsScoped(ref, left_scoped_entities, right_scoped_entities, scope_indication);
     }
   }
 }
