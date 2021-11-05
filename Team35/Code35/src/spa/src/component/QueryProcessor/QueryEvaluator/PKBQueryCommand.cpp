@@ -37,7 +37,7 @@ PKBRelRefs PKBQueryCommand::GetPKBRelRef(RelRef relation, bool order_of_values_u
       return order_of_values_unchanged_from_clause ? PKBRelRefs::kNextBip : PKBRelRefs::kPrevBip;
     case RelRef::kNextBipT:
       return order_of_values_unchanged_from_clause ? PKBRelRefs::kNextBipT : PKBRelRefs::kPrevBipT;
-//    default:return PKBRelRefs::kWildcard;
+    default:return PKBRelRefs::kInvalid;
   }
 }
 
