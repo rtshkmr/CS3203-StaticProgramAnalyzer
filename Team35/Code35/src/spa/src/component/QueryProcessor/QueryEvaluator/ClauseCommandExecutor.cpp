@@ -413,7 +413,7 @@ void ClauseCommandExecutor::DoubleSynonymCross(Clause *clause) {
   std::vector<Entity*> first_entity_list;
   std::vector<Entity*> second_entity_list;
   for (auto tuple : intermediate_table) {
-    if (typeid(*clause) == typeid(Pattern*) && typeid(*clause->first_synonym) == typeid(AssignEntity)) {
+    if (typeid(*clause) == typeid(Pattern) && first_syn->GetType() == DesignEntity::kAssign) {
       if (!HasAssignPatternRelationship(std::get<0>(tuple),
                                         std::get<1>(tuple), dynamic_cast<Pattern*>(clause))) continue;
     }
