@@ -100,6 +100,7 @@ class Procedure : public Entity, public Container {
   const void SetBlockTail(Block* block_tail);
   const Cluster* GetClusterRoot();
   const Block* GetBlockRoot();
+  std::set<Block*> GetTailBlocks();
 };
 
 /**

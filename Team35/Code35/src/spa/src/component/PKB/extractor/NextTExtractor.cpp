@@ -1,10 +1,12 @@
 #include <cassert>
 #include <utility>
+#include <util/Utility.h>
 #include "NextTExtractor.h"
 #include "model/CFG.h"
 
 NextTExtractor::NextTExtractor(PKB* pkb) {
   pkb_ = pkb;
+  program_ = pkb->GetProgram();
   for (Entity* entity : pkb->GetDesignEntities(DesignEntity::kProcedure)) {
     proc_list_.push_back(dynamic_cast<Procedure*>(entity));
   }
@@ -17,6 +19,10 @@ NextTExtractor::NextTExtractor(PKB* pkb) {
 
 NextTExtractor::NextTExtractor(std::vector<Procedure*> proc_list, std::vector<Statement*> stmt_list) {
   proc_list_ = std::move(proc_list);
+  program_ = new Program(proc_list_[0]);
+  for (int i = 1; i < proc_list_.size(); ++i) {
+    program_->AddProcedure(proc_list_[i]);
+  }
   stmt_list_ = std::move(stmt_list);
   int total = stmt_list_.size();
   next_t_2d_array_ = std::vector<std::vector<int>>(total, std::vector<int>(total));
@@ -28,11 +34,11 @@ void NextTExtractor::Delete() {}
  * @return size of next_t_map
  */
 int NextTExtractor::GetNextTSize() {
-  return next_t_map_.size();
+  return rel_table_[RelDirection::kForward].size();
 }
 
 int NextTExtractor::GetPrevTSize() {
-  return prev_t_map_.size();
+  return rel_table_[RelDirection::kReverse].size();
 }
 /**
  * Extracts list of Next* of the target from the CFG. Caches Next* relationships for blocks traversed.
@@ -49,13 +55,6 @@ int NextTExtractor::GetPrevTSize() {
  */
 std::vector<Entity*> NextTExtractor::GetRelationship(RelDirection dir, int target) {
   rel_direction_ = dir;
-  if (dir == RelDirection::kForward) {
-    map_to_populate_ = &next_t_map_;
-    first_args_ = &next_t_lhs_stmts_;
-  } else {
-    map_to_populate_ = &prev_t_map_;
-    first_args_ = &next_t_rhs_stmts_;
-  }
   return GetRel(target, proc_list_, stmt_list_);
 }
 
@@ -70,13 +69,6 @@ std::vector<Entity*> NextTExtractor::GetRelationship(RelDirection dir,
                                                      int target,
                                                      const std::vector<Procedure*> &proc_list) {
   rel_direction_ = dir;
-  if (dir == RelDirection::kForward) {
-    map_to_populate_ = &next_t_map_;
-    first_args_ = &next_t_lhs_stmts_;
-  } else {
-    map_to_populate_ = &prev_t_map_;
-    first_args_ = &next_t_rhs_stmts_;
-  }
   return GetRel(target, proc_list, stmt_list_);
 }
 
@@ -84,22 +76,36 @@ std::vector<Entity*> NextTExtractor::GetRelationship(RelDirection dir,
  * Gets all Entities that can be on the LHS/RHS of the relationship, i.e. Next*(_, s).
  * @return all Entities that can be on the LHS/RHS of the relationship.
  */
-std::vector<Entity*> NextTExtractor::GetFirstEntityOfRelationship(RelDirection dir) {
-  if (dir == RelDirection::kReverse) {
-    if (!prev_t_populated_) {
-      PopulateAllPrevT(proc_list_);
-    }
-    return next_t_rhs_stmts_;
-  } else {
-    if (!next_t_populated_) {
-      PopulateAllNextT(proc_list_);
-    }
-    return next_t_lhs_stmts_;
+std::vector<Entity*> NextTExtractor::GetFirstEntityOfRelationship(RelDirection dir, DesignEntity de) {
+  if (de == DesignEntity::kProgLine) {
+    de = DesignEntity::kStmt;
   }
+  rel_direction_ = dir;
+  PopulateRelationshipMap(proc_list_);
+  return first_arg_table_[rel_direction_][de];
 }
 
-std::vector<std::tuple<Entity*, Entity*>> NextTExtractor::GetRelationshipByTypes(RelDirection dir) {
-  return dir == RelDirection::kForward ? GetAllNextT() : GetAllPrevT();
+std::vector<std::tuple<Entity*, Entity*>> NextTExtractor::GetRelationshipByTypes(RelDirection dir,
+                                                                                 DesignEntity first,
+                                                                                 DesignEntity second) {
+  if (first == DesignEntity::kProgLine) {
+    first = DesignEntity::kStmt;
+  }
+  if (second == DesignEntity::kProgLine) {
+    second = DesignEntity::kStmt;
+  }
+  rel_direction_ = dir;
+  if (got_all_pairs_) {
+    return rel_by_types_table_[rel_direction_][{first, second}];
+  }
+  PopulateRelationshipMap(proc_list_);
+  for (auto pair: rel_table_[rel_direction_]) {
+    for (Statement* stmt: *pair.second) {
+      AddRelByTypes(rel_direction_, pair.first, stmt);
+    }
+  }
+  got_all_pairs_ = true;
+  return rel_by_types_table_[rel_direction_][{first, second}];
 }
 
 bool NextTExtractor::HasRelationship(RelDirection dir) {
@@ -114,6 +120,7 @@ bool NextTExtractor::HasRelationship(RelDirection dir, int target) {
  * Returns true if Next*(first, second).
  */
 bool NextTExtractor::HasRelationship(RelDirection dir, int first, int second) {
+  rel_direction_ = dir;
   int total_stmt = stmt_list_.size();
   if (first > total_stmt || first <= 0 || second > total_stmt || second <= 0) {
     return false;
@@ -122,7 +129,7 @@ bool NextTExtractor::HasRelationship(RelDirection dir, int first, int second) {
     return true;
   }
 
-  Cluster* proc_cluster = GetProcCluster(proc_list_, first);
+  Cluster* proc_cluster = program_->GetProcClusterForLineNum(first);
   if (proc_cluster) {
     if (proc_cluster->CheckIfStmtNumInRange(second)) {
       Cluster* t_cluster = GetTargetCluster(proc_cluster, first);
@@ -140,14 +147,14 @@ std::vector<Entity*> NextTExtractor::GetRel(int target,
   bool is_out_of_bounds = target > stmt_list.size() || target <= 0;
   if (is_out_of_bounds) {
     return std::vector<Entity*>{};
-  } else if (map_to_populate_->count(stmt_list[target - 1]) == 1) {
-    return ConvertListToVector(*map_to_populate_->find(stmt_list[target - 1])->second);
+  } else if (rel_table_[rel_direction_].count(stmt_list[target - 1]) == 1) {
+    return Utility::ConvertListToVector(*rel_table_[rel_direction_].find(stmt_list[target - 1])->second);
   }
 
-  Cluster* proc_cluster = GetProcCluster(proc_list, target);
+  Cluster* proc_cluster = program_->GetProcClusterForLineNum(target);
   if (proc_cluster) {
     Cluster* t_cluster = GetTargetCluster(proc_cluster, target);
-    return ConvertListToVector(GetRelFromCluster(t_cluster, target));
+    return Utility::ConvertListToVector(GetRelFromCluster(t_cluster, target));
   }
   return std::vector<Entity*>{};
 }
@@ -157,8 +164,8 @@ std::vector<Entity*> NextTExtractor::GetRel(int target,
  * Assumes that map entry is only updated once.
  */
 std::list<Statement*> NextTExtractor::GetRelFromCluster(Cluster* cluster, int target) {
-  if (map_to_populate_->count(stmt_list_[target - 1]) == 1) {
-    return *map_to_populate_->find(stmt_list_[target - 1])->second;
+  if (rel_table_[rel_direction_].count(stmt_list_[target - 1]) == 1) {
+    return *rel_table_[rel_direction_].find(stmt_list_[target - 1])->second;
   }
 
   std::list<Cluster*> nested_clusters = cluster->GetNestedClusters();
@@ -174,7 +181,7 @@ std::list<Statement*> NextTExtractor::GetRelFromCluster(Cluster* cluster, int ta
       return GetRelFromCluster(t_cluster, target);
     }
   }
-  return GetValueFromMap(*map_to_populate_, target);
+  return GetValueFromMap(rel_table_[rel_direction_], target);
 }
 
 /**
@@ -186,8 +193,8 @@ std::list<Statement*> NextTExtractor::GetRelFromCluster(Cluster* cluster, int ta
  * @return List of Statements that are Next* of the end of w_cluster.
  */
 std::list<Statement*> NextTExtractor::GetRelFromWhile(Cluster* w_cluster, int target) {
-  if (map_to_populate_->count(stmt_list_[target - 1]) == 1) {
-    return *map_to_populate_->find(stmt_list_[target - 1])->second;
+  if (rel_table_[rel_direction_].count(stmt_list_[target - 1]) == 1) {
+    return *rel_table_[rel_direction_].find(stmt_list_[target - 1])->second;
   }
 
   Block* w_block = dynamic_cast<Block*>(w_cluster->GetNestedClusters().front());
@@ -209,7 +216,7 @@ std::list<Statement*> NextTExtractor::GetRelFromWhile(Cluster* w_cluster, int ta
     AddRelationships(stmt_list_[i], w_statements);
   }
   // getting from the front or the back of w_cluster is the same
-  return GetValueFromMap(*map_to_populate_, w_cluster->GetStartEndRange().first);
+  return GetValueFromMap(rel_table_[rel_direction_], w_cluster->GetStartEndRange().first);
 }
 
 std::list<Statement*> NextTExtractor::MakeStmtList(int first_stmt, int last_stmt) {
@@ -219,14 +226,16 @@ std::list<Statement*> NextTExtractor::MakeStmtList(int first_stmt, int last_stmt
   return w_statements;
 }
 
-std::list<Block*> NextTExtractor::GetFollowingBlocksAfterWhile(Block* block) {
+std::list<Block*> NextTExtractor::GetFollowingBlocksAfterWhile(Block* w_block) {
   std::list<Block*> following_blocks;
-  for (Block* following_block: GetFollowingBlocks(block)) {
+  int block_start = w_block->GetStartEndRange().first;
+  for (Block* following_block: GetFollowingBlocks(w_block)) {
+    int following_block_start = following_block->GetStartEndRange().first;
     bool is_prev_block = rel_direction_ == RelDirection::kReverse
-        && (following_block->GetStartEndRange().first < block->GetStartEndRange().first);
+        && (following_block_start < block_start);
     bool is_next_block = rel_direction_ == RelDirection::kForward
-        && (following_block->GetStartEndRange().first != block->GetStartEndRange().first + 1);
-    if (is_next_block || is_prev_block) {
+        && (following_block_start != block_start + 1);
+    if (following_block_start != -1 && (is_next_block || is_prev_block)) {
       following_blocks.push_back(following_block);
     }
   }
@@ -239,8 +248,11 @@ std::list<Block*> NextTExtractor::GetFollowingBlocksAfterWhile(Block* block) {
  * @return List of Statements that Next* the Statement at the end of this block, or the target Statement.
  */
 std::list<Statement*> NextTExtractor::GetRelByTraversal(Block* block, int target) {
-  if (map_to_populate_->count(stmt_list_[target - 1]) == 1) {
-    return *map_to_populate_->find(stmt_list_[target - 1])->second;
+  if (block->GetStartEndRange().first == -1) {
+    return GetValueFromMap(rel_table_[rel_direction_], target);
+  }
+  if (rel_table_[rel_direction_].count(stmt_list_[target - 1]) == 1) {
+    return *rel_table_[rel_direction_].find(stmt_list_[target - 1])->second;
   }
   if (block->isWhile) {
     return GetRelFromWhile(block->GetParentCluster(), target);
@@ -250,7 +262,7 @@ std::list<Statement*> NextTExtractor::GetRelByTraversal(Block* block, int target
 
   AddRelationshipsFollowingBlock(following_t, block);
   AddRelationshipsInBlock(following_t, block, target);
-  return GetValueFromMap(*map_to_populate_, target);
+  return GetValueFromMap(rel_table_[rel_direction_], target);
 }
 
 std::list<Statement*> NextTExtractor::RecurseFollowingBlocks(Block* block, int target) {
@@ -322,11 +334,13 @@ std::list<Statement*> NextTExtractor::AddBlockStmtToRelList(std::list<Statement*
  * Assumes that next_t_map will only be updated once.
  */
 void NextTExtractor::AddRelationships(Statement* first_arg, std::list<Statement*> second_args) {
-  if (second_args.empty() || map_to_populate_->count(first_arg) == 1) return;
+  if (second_args.empty() || rel_table_[rel_direction_].count(first_arg) == 1) return;
   auto* list = new std::list<Statement*>();
   list->insert(list->begin(), second_args.begin(), second_args.end());
-  map_to_populate_->insert({first_arg, list});
-  first_args_->push_back(first_arg);
+  rel_table_[rel_direction_].insert({first_arg, list});
+  DesignEntity de = PKB::GetDesignEntityFromEntity(first_arg);
+  first_arg_table_[rel_direction_][de].push_back(first_arg);
+  first_arg_table_[rel_direction_][DesignEntity::kStmt].push_back(first_arg);
 }
 
 /**
@@ -334,22 +348,13 @@ void NextTExtractor::AddRelationships(Statement* first_arg, std::list<Statement*
  * Assumes that next_t_map will only be updated once.
  */
 void NextTExtractor::AddRelationshipsWithDup(Statement* first_arg, const std::list<Statement*> &second_args) {
-  if (second_args.empty() || map_to_populate_->count(first_arg) == 1) return;
+  if (second_args.empty() || rel_table_[rel_direction_].count(first_arg) == 1) return;
   int first_arg_num = first_arg->GetStatementNumber()->GetNum();
   auto* list = MakeUniqueList(first_arg_num, second_args);
-  map_to_populate_->insert({first_arg, list});
-  first_args_->push_back(first_arg);
-}
-
-//// todo: deprecate this, use Program::GetProcClusterForLineNum instead @jx
-Cluster* NextTExtractor::GetProcCluster(const std::vector<Procedure*> &proc_list, int target) {
-  for (Procedure* proc: proc_list) {  // todo: optimise finding procedure of target stmt
-    auto* proc_cluster = const_cast<Cluster*>(proc->GetClusterRoot());
-    if (proc_cluster->CheckIfStmtNumInRange(target)) {
-      return proc_cluster;
-    }
-  }
-  return nullptr;
+  rel_table_[rel_direction_].insert({first_arg, list});
+  DesignEntity de = PKB::GetDesignEntityFromEntity(first_arg);
+  first_arg_table_[rel_direction_][de].push_back(first_arg);
+  first_arg_table_[rel_direction_][DesignEntity::kStmt].push_back(first_arg);
 }
 
 /**
@@ -401,40 +406,6 @@ std::list<Statement*>* NextTExtractor::MakeUniqueList(int s1_num, const std::lis
     }
   }
   return new_list;
-}
-
-std::vector<Entity*> NextTExtractor::ConvertListToVector(std::list<Statement*> list) {
-  std::vector<Entity*> vector {std::make_move_iterator(std::begin(list)), std::make_move_iterator(std::end(list))};
-  return vector;
-}
-
-void NextTExtractor::PopulateAllNextT(const std::vector<Procedure*> &proc_list) {
-  for (Procedure* proc: proc_list) {
-    int first_stmt = const_cast<Cluster*>(proc->GetClusterRoot())->GetStartEndRange().first;
-    GetRelationship(RelDirection::kForward, first_stmt, {proc});
-  }
-  next_t_populated_ = true;
-}
-
-/**
- * Gets all Entity pairs that are in a Next* relationship, i.e. Next*(s1, s2).
- * @return all Entity pairs that are in a Next* relationship.
- */
-std::vector<std::tuple<Entity*, Entity*>> NextTExtractor::GetAllNextT() {
-  if (got_all_next_prev_t_) {
-    return all_next_t_;
-  }
-  if (!next_t_populated_) {
-    PopulateAllNextT(proc_list_);
-  }
-  for (auto pair: next_t_map_) {
-    for (Statement* stmt: *pair.second) {
-      all_next_t_.emplace_back(pair.first, stmt);
-      all_prev_t_.emplace_back(stmt, pair.first);
-    }
-  }
-  got_all_next_prev_t_ = true;
-  return all_next_t_;
 }
 
 /**
@@ -537,31 +508,56 @@ bool NextTExtractor::HasNextTByTraversal(Block* block, int first, int second) {
   }
 }
 
-void NextTExtractor::PopulateAllPrevT(const std::vector<Procedure*> &proc_list) {
-  for (Procedure* proc: proc_list) {
-    int last_stmt = const_cast<Cluster*>(proc->GetClusterRoot())->GetStartEndRange().second;
-    GetRelationship(RelDirection::kReverse, last_stmt, {proc});
-  }
-  prev_t_populated_ = true;
-}
-
 /**
- * Gets all Entity pairs that are in a Next* relationship, i.e. Next*(s1, s2).
- * @return all Entity pairs in reverse order i.e. <s2, s1> of Next*(s1, s2).
+ * Only populates the relationship map in the rel_table_ for the current rel_direction_,
+ * by getting all relationships for all procedures.
+ * @param proc_list List of procedures to get relationships from.
  */
-std::vector<std::tuple<Entity*, Entity*>> NextTExtractor::GetAllPrevT() {
-  if (got_all_next_prev_t_) {
-    return all_prev_t_;
+void NextTExtractor::PopulateRelationshipMap(const std::vector<Procedure*> &proc_list) {
+  bool forward_and_populated = rel_direction_ == RelDirection::kForward && next_t_populated_;
+  bool reverse_and_populated = rel_direction_ == RelDirection::kReverse && prev_t_populated_;
+  if (forward_and_populated || reverse_and_populated) {
+    return;
   }
-  if (!prev_t_populated_) {
-    PopulateAllPrevT(proc_list_);
-  }
-  for (auto pair: prev_t_map_) {
-    for (Statement* stmt: *pair.second) {
-      all_prev_t_.emplace_back(pair.first, stmt);
-      all_next_t_.emplace_back(stmt, pair.first);
+  for (Procedure* proc: proc_list) {
+    std::pair<int, int> range = const_cast<Cluster*>(proc->GetClusterRoot())->GetStartEndRange();
+    if (rel_direction_ == RelDirection::kForward) {
+      GetRelationship(rel_direction_, range.first, {proc});
+    } else {
+      for (Block* tail_block : proc->GetTailBlocks()) {
+        GetRelationship(rel_direction_, tail_block->GetStartEndRange().second, {proc});
+      }
     }
   }
-  got_all_next_prev_t_ = true;
-  return all_prev_t_;
+  if (rel_direction_ == RelDirection::kForward) {
+    next_t_populated_ = true;
+  } else {
+    prev_t_populated_ = true;
+  }
+}
+
+void NextTExtractor::AddRelByTypes(RelDirection dir, Entity* first_arg, Entity* second_arg) {
+  RelDirection other_direction = rel_direction_ == RelDirection::kForward
+                                 ? RelDirection::kReverse
+                                 : RelDirection::kForward;
+  DesignEntity first_de = PKB::GetDesignEntityFromEntity(first_arg);
+  DesignEntity second_de = PKB::GetDesignEntityFromEntity(second_arg);
+  std::vector<type_combo> first_combis = {
+      {first_de, second_de},
+      {DesignEntity::kStmt, second_de},
+      {first_de, DesignEntity::kStmt},
+      {DesignEntity::kStmt, DesignEntity::kStmt}
+  };
+  for (const type_combo &types : first_combis) {
+    rel_by_types_table_[rel_direction_][types].emplace_back(first_arg, second_arg);
+  }
+  std::vector<type_combo> second_combis = {
+      {second_de, first_de},
+      {DesignEntity::kStmt, first_de},
+      {second_de, DesignEntity::kStmt},
+      {DesignEntity::kStmt, DesignEntity::kStmt}
+  };
+  for (const type_combo &types : first_combis) {
+    rel_by_types_table_[other_direction][types].emplace_back(second_arg, first_arg);
+  }
 }
