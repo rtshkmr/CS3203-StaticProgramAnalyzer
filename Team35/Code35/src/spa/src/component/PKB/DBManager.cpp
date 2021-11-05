@@ -148,7 +148,13 @@ std::vector<std::tuple<Entity*, Entity*>> DBManager::GetRelationshipByTypes(PKBR
             pairs = pkb_->GetRelationshipByFirst(ref, GetNameFromEntity(entity));
           if (scope_indication == ScopeIndication::kRightScope)
             pairs = pkb_->GetRelationshipBySecond(ref, GetNameFromEntity(entity));
-          results.insert(results.end(), pairs.begin(), pairs.end());
+          for (entity_pair pair : pairs) {
+            if (GetDesignEntityFromEntity(std::get<0>(pair)) != first_de)
+              continue;
+            if (GetDesignEntityFromEntity(std::get<1>(pair)) != second_de)
+              continue;
+            results.insert(results.end(), pairs.begin(), pairs.end());
+          }
         }
         return results;
       }
