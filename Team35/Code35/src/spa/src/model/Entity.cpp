@@ -78,6 +78,10 @@ Cluster* Procedure::GetInnermostCluster(int first_stmt, int second_stmt, Cluster
   }
 }
 
+std::set<Block*> Procedure::GetTailBlocks() {
+  return block_tail_->GetPrevBlocks();
+}
+
 Variable::Variable(VariableName* vName) {
   type = EntityEnum::kVariableEntity;
   variable_name_ = vName;

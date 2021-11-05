@@ -111,7 +111,11 @@ class PKB {
   std::unordered_map<Entity*, std::list<Entity*>*>* ConvertStringToEntityMapping(const std::unordered_map<std::string,
                                                                                  std::vector<Entity*>>& pkb_map);
 
+  Program* GetProgram();
+
  private:
+  Program* program_;
+
   std::unordered_map<DesignEntity, std::vector<Entity*>> type_to_entity_map_;
 
   std::unordered_map<

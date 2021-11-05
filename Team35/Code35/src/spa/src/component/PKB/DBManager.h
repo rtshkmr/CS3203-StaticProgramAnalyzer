@@ -14,8 +14,6 @@ class DBManager {
   void TurnOffOptimization();
 
   // PKB API
-  // Population of PKB
-  void PopulateDataStructures(Deliverable d);
 
   // Getting relationships from PKB
   std::vector<Entity*> GetRelationship(PKBRelRefs ref, std::string entity);
@@ -23,15 +21,15 @@ class DBManager {
   std::vector<Entity*> GetFirstEntityOfRelationship(PKBRelRefs ref, DesignEntity de);
 
   std::vector<Entity*> GetFirstEntityOfRelationship(PKBRelRefs ref, DesignEntity de,
-                                                    std::vector<Entity *> scoped_entities,
+                                                    std::vector<Entity*> scoped_entities,
                                                     ScopeIndication scope_indication);
 
-  std::vector<Entity*> GetRelationshipByTypes(PKBRelRefs ref,
-                                              DesignEntity first_de,
-                                              DesignEntity second_de,
-                                              std::vector<Entity *> left_scoped_entities,
-                                              std::vector<Entity *> right_scoped_entities,
-                                              ScopeIndication scope_indication);
+  std::vector<std::tuple<Entity*, Entity*>> GetRelationshipByTypes(PKBRelRefs ref,
+                                                                   DesignEntity first_de,
+                                                                   DesignEntity second_de,
+                                                                   std::vector<Entity*> left_scoped_entities,
+                                                                   std::vector<Entity*> right_scoped_entities,
+                                                                   ScopeIndication scope_indication);
 
   std::vector<std::tuple<Entity*, Entity*>> GetRelationshipByTypes(PKBRelRefs ref,
                                                                    DesignEntity first,
@@ -48,7 +46,8 @@ class DBManager {
 
   // Returns a vector of 2-tuples of entities in which the type and attribute of the first element is defined by type_one,
   // and that of the second elements is defined by de2
-  std::vector<entity_pair> GetEntitiesWithMatchingAttributes(type_attribute_pair type_one, type_attribute_pair type_two);
+  std::vector<entity_pair> GetEntitiesWithMatchingAttributes(type_attribute_pair type_one,
+                                                             type_attribute_pair type_two);
 
   // Check if relationship exists
   bool HasRelationship(PKBRelRefs ref);
@@ -64,6 +63,8 @@ class DBManager {
   PKB* pkb_;
   RuntimeExtractor* runtime_extractor_;
   bool is_optimized_ = true;
+  static std::vector<std::tuple<Entity*, Entity*>> MergeScopedEntities(std::vector<Entity*> left_entities,
+                                                                       std::vector<Entity*> right_entities);
 };
 
 #endif //AUTOTESTER_CODE35_SRC_SPA_SRC_COMPONENT_PKB_DBMANAGER_H_
