@@ -351,8 +351,6 @@ bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
           if (if_body_is_unmodified_path) continue;
           scoped_cluster_does_not_modify_var = false;
           break; // breaks outer for loop
-        } else {
-          // do nothing. not involved in if. TODO. remove this
         }
 
         if (target_range.first < if_body_range.first) {
@@ -382,8 +380,8 @@ bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
       }
     } else if (tag == ClusterTag::kWhileCluster) {
       //=================================== HANDLE WHILE CLUSTER =====================================
-      bool is_target_in_while_cluster = child->CheckIfStmtNumInRange(target_range.second);
-      if (is_target_in_while_cluster || target_range.first > child_range.first) {
+      bool is_target_in_while_cluster = child->CheckIfStatementsInRange(target_range.first, target_range.second);
+      if (is_target_in_while_cluster) {
         // the first thing in the while cluster will be the cond, so it's okay to say that it's been checked:
         auto new_target_range = std::make_pair(std::max(child_range.first, target_range.first), std::min(child_range.second, target_range.second));
         if(TraverseScopedClusterForAffects(child, new_target_range, pkb, lhs_var, goal_range)) {

@@ -175,7 +175,6 @@ void PSubsystem::CloseWhileBlock() {
   //todo: change from Block* to ConditionalBlock*
   Block* while_cond_block = dynamic_cast<Block*>(block_stack_.top());
   while_cond_block->SetClusterTag(ClusterTag::kWhileCond);
-  //while_body_block->SetClusterTag(ClusterTag::kWhileBody); //FIXME INCORRECT BECAUSE IT MAY BE A SIMPLE BLOCK.
   assert(while_cond_block);
 
   bool is_currently_in_nested_cluster = cluster_stack_.size() > 1;

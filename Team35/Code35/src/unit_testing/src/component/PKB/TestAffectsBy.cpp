@@ -431,29 +431,3 @@ TEST_CASE("2.PKB.Affects.mixed_loops_source") {
     //                                  std::vector<Entity*>{}, std::vector<Entity*>{}, ScopeIndication::kNoScope).size() == 6);
   }
 }
-
-//TODO - for debug
-TEST_CASE("debug for sys test") {
-  PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../../Tests35/simple_lib/pql_single/affects.txt");
-  DBManager* dbm = new DBManager(pkb);
-  bool checker = dbm->HasRelationship(PKBRelRefs::kAffects, "4", "15");
-  REQUIRE_FALSE(checker);
-
-  SECTION ("9 - Get Affects : (a1, _) ") {
-    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffects, DesignEntity::kAssign).size() == 17);
-    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffects, DesignEntity::kStmt).size() == 17);
-  }
-
-  SECTION ("10 - Get AffectedBy : (_, a2) ") {
-    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffectedBy, DesignEntity::kAssign).size() == 12);
-    CHECK(dbm->GetFirstEntityOfRelationship(PKBRelRefs::kAffectedBy, DesignEntity::kStmt).size() == 12);
-  }
-
-  SECTION("debb") {
-    AffectsExtractor affects_extractor;
-    affects_extractor.SetPKB(pkb);
-
-    int max_pairs = affects_extractor.GetAllPair().size();
-    CHECK(max_pairs == 39);
-  }
-}
