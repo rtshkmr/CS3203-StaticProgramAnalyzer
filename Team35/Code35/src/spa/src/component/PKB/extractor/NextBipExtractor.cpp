@@ -180,3 +180,8 @@ std::list<int> NextBipExtractor::HandleCallLastStmt(const std::list<int> &last_s
 PKBRelRefs NextBipExtractor::GetPKBRelRef(RelDirection dir) {
   return dir == RelDirection::kForward ? PKBRelRefs::kNextBip : PKBRelRefs::kPrevBip;
 }
+
+void NextBipExtractor::Delete() {
+  delete(next_bip_map_);
+  delete(prev_bip_map_);
+}

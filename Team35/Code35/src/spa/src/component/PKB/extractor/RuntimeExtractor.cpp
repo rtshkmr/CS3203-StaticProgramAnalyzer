@@ -477,6 +477,7 @@ void RuntimeExtractor::Delete() {
   next_t_extractor_.Delete();
   affects_extractor_.Delete();
   affects_t_extractor_.Delete();
+  next_bip_extractor_.Delete();
 }
 
 bool RuntimeExtractor::IsRuntimeRelationship(PKBRelRefs ref) {
