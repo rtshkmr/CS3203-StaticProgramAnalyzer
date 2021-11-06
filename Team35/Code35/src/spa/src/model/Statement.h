@@ -46,6 +46,10 @@ class IfEntity : public Statement, public Container {
   void SetElseEntity(ElseEntity* else_entity);
 
   std::list<Statement*>* GetElseStmtList();
+
+  void AddStatementToElseEntity(Statement* statement);
+
+  int GetElseStatementListSize();
 };
 
 /**

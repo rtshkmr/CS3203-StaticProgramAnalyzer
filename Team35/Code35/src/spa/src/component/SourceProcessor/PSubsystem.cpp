@@ -349,9 +349,8 @@ void PSubsystem::SetStatementObject(Statement* statement) {
   if (current_node_type_ == NodeType::kElse) {
     auto* if_entity = dynamic_cast<IfEntity*>(current_node_);
     assert (if_entity != nullptr);
-    if_entity->GetElseStmtList()->push_back(statement);
-
-    if (if_entity->GetElseStmtList()->size() == 1)
+    if_entity->AddStatementToElseEntity(statement);
+    if (if_entity->GetElseStatementListSize() == 1)
       new_else = true;
   } else {
     current_node_->AddStatement(statement);
@@ -525,7 +524,6 @@ void PSubsystem::HandleAssignStmt(Entity* entity) {
   if (current_procedure_ != current_node_)
     deliverable_->AddModifiesRelationship(current_node_, assign_entity->GetVariableObj());  //container level
 
-  // todo: add these variables into the respective sets in cluster/block
   for (Variable* v: assign_entity->GetExprVariables()) {
     deliverable_->AddUsesRelationship(assign_entity, v);
     deliverable_->AddUsesRelationship(current_procedure_, v); //procedure level

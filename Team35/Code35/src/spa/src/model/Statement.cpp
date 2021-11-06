@@ -43,6 +43,12 @@ void IfEntity::SetElseEntity(ElseEntity* else_entity) {
 std::list<Statement*>* IfEntity::GetElseStmtList() {
   return else_entity_->GetStatementList();
 }
+void IfEntity::AddStatementToElseEntity(Statement* statement) {
+  else_entity_->AddStatement(statement);
+}
+int IfEntity::GetElseStatementListSize() {
+  return else_entity_->GetStatementList()->size();
+}
 
 ElseEntity::ElseEntity() {
   type = EntityEnum::kElseEntity;
