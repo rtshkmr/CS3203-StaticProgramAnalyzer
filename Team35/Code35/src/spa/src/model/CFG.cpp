@@ -269,21 +269,32 @@ bool Cluster::CheckScopeClusterForAffects(Cluster* scoped_cluster,
   const std::pair<int,int> goal_range = std::make_pair(target_range.first, target_range.second);
   if (target_range.first >= target_range.second) {
     Cluster* current_scope = scoped_cluster;
-    while (current_scope
-        && current_scope->start_ <= target_range.second
-        && current_scope->GetClusterTag() != ClusterTag::kWhileCluster) {
-      current_scope = current_scope->GetParentCluster();
+
+    bool found = false;
+    while (!found) {
+      while (current_scope
+          && current_scope->start_ <= target_range.second
+          && current_scope->GetClusterTag() != ClusterTag::kWhileCluster) {
+        current_scope = current_scope->GetParentCluster();
+      }
+      if (!current_scope) return false;
+      auto current_scope_range = current_scope->GetStartEndRange();
+      bool first_stmt_to_while_end_is_unmodified = (target_range.second == current_scope_range.second)
+          || TraverseScopedClusterForAffects(current_scope,
+                                             {target_range.first, current_scope_range.second},
+                                             pkb,
+                                             lhs_var, goal_range);
+      bool while_start_to_second_stmt_is_unmodified =
+          TraverseScopedClusterForAffects(current_scope, {current_scope->start_, target_range.second}, pkb, lhs_var, goal_range);
+      if (first_stmt_to_while_end_is_unmodified && while_start_to_second_stmt_is_unmodified) {
+        found = true;
+        break;
+      } else {
+        current_scope = current_scope->GetParentCluster();
+      }
     }
-    if (!current_scope) return false;
-    auto current_scope_range = current_scope->GetStartEndRange();
-    bool first_stmt_to_while_end_is_unmodified = (target_range.second == current_scope_range.second)
-        || TraverseScopedClusterForAffects(current_scope,
-                                           {target_range.first, current_scope_range.second},
-                                           pkb,
-                                           lhs_var, goal_range);
-    bool while_start_to_second_stmt_is_unmodified =
-        TraverseScopedClusterForAffects(current_scope, {current_scope->start_, target_range.second}, pkb, lhs_var, goal_range);
-    return first_stmt_to_while_end_is_unmodified && while_start_to_second_stmt_is_unmodified;
+    return found;
+
   } else {
     return TraverseScopedClusterForAffects(scoped_cluster, target_range, pkb, lhs_var, goal_range);
   }
