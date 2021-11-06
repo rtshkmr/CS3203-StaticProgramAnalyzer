@@ -349,9 +349,8 @@ void PSubsystem::SetStatementObject(Statement* statement) {
   if (current_node_type_ == NodeType::kElse) {
     auto* if_entity = dynamic_cast<IfEntity*>(current_node_);
     assert (if_entity != nullptr);
-    if_entity->GetElseStmtList()->push_back(statement);
-
-    if (if_entity->GetElseStmtList()->size() == 1)
+    if_entity->AddStatementToElseEntity(statement);
+    if (if_entity->GetElseStatementListSize() == 1)
       new_else = true;
   } else {
     current_node_->AddStatement(statement);
@@ -525,8 +524,7 @@ void PSubsystem::HandleAssignStmt(Entity* entity) {
   if (current_procedure_ != current_node_)
     deliverable_->AddModifiesRelationship(current_node_, assign_entity->GetVariableObj());  //container level
 
-  // todo: add these variables into the respective sets in cluster/block
-  for (Variable* v: assign_entity->GetControlVariables()) {
+  for (Variable* v: assign_entity->GetExprVariables()) {
     deliverable_->AddUsesRelationship(assign_entity, v);
     deliverable_->AddUsesRelationship(current_procedure_, v); //procedure level
     if (current_procedure_ != current_node_)
@@ -538,27 +536,27 @@ void PSubsystem::HandleCallStmt(Entity* entity) {
   auto* call_entity = dynamic_cast<CallEntity*>(entity);
   assert(call_entity);
   deliverable_->AddCallEntity(call_entity);
-  deliverable_->AddCallsRelationship(current_procedure_, call_entity->GetProcedure());
+  deliverable_->AddCallsRelationship(current_procedure_, call_entity->GetCalledProcedure());
 }
 
 void PSubsystem::HandlePrintStmt(Entity* entity) {
   auto* print_entity = dynamic_cast<PrintEntity*>(entity);
   assert(print_entity);
   deliverable_->AddPrintEntity(print_entity);
-  deliverable_->AddUsesRelationship(print_entity, print_entity->GetVariable());
-  deliverable_->AddUsesRelationship(current_procedure_, print_entity->GetVariable()); //procedure level
+  deliverable_->AddUsesRelationship(print_entity, print_entity->GetVariableObj());
+  deliverable_->AddUsesRelationship(current_procedure_, print_entity->GetVariableObj()); //procedure level
   if (current_procedure_ != current_node_)
-    deliverable_->AddUsesRelationship(current_node_, print_entity->GetVariable());   //container level
+    deliverable_->AddUsesRelationship(current_node_, print_entity->GetVariableObj());   //container level
 }
 
 void PSubsystem::HandleReadStmt(Entity* entity) {
   auto* read_entity = dynamic_cast<ReadEntity*>(entity);
   assert(read_entity);
   deliverable_->AddReadEntity(read_entity);
-  deliverable_->AddModifiesRelationship(read_entity, read_entity->GetVariable());
-  deliverable_->AddModifiesRelationship(current_procedure_, read_entity->GetVariable()); //procedure level
+  deliverable_->AddModifiesRelationship(read_entity, read_entity->GetVariableObj());
+  deliverable_->AddModifiesRelationship(current_procedure_, read_entity->GetVariableObj()); //procedure level
   if (current_procedure_ != current_node_)
-    deliverable_->AddModifiesRelationship(current_node_, read_entity->GetVariable());  //container level
+    deliverable_->AddModifiesRelationship(current_node_, read_entity->GetVariableObj());  //container level
 }
 
 void PSubsystem::CheckForIfElseValidity() {

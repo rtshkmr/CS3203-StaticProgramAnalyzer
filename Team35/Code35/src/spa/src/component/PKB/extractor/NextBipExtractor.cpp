@@ -63,7 +63,7 @@ void NextBipExtractor::PopulateBipMaps() {
   for (Entity* call_entity : call_list_) {
     if (auto* call_statement = dynamic_cast<Statement*>(call_entity)) {
       std::list<Entity*> next_entities = GetRelFromMap(call_entity, PKBRelRefs::kNextBip);
-      Procedure* called_proc = dynamic_cast<CallEntity*>(call_statement)->GetProcedure();
+      Procedure* called_proc = dynamic_cast<CallEntity*>(call_statement)->GetCalledProcedure();
       if (!next_entities.empty()) {
         EraseNextRelationship(call_entity);
         JoinEndToEnd(called_proc, next_entities);
@@ -164,7 +164,7 @@ std::list<int> NextBipExtractor::HandleCallLastStmt(const std::list<int> &last_s
     Entity* last_entity = stmt_list_[last_stmt - 1];
     if (std::find(call_list_.begin(), call_list_.end(), last_entity) != call_list_.end()) {
       auto* call_entity = dynamic_cast<CallEntity*>(last_entity);
-      Procedure* called_proc = call_entity->GetProcedure();
+      Procedure* called_proc = call_entity->GetCalledProcedure();
       auto* root_block = const_cast<Block*>(called_proc->GetBlockRoot());
       std::list<int> called_last_stmts = root_block->GetCFGLastStmts();
       nested_last_stmts.insert(nested_last_stmts.end(), called_last_stmts.begin(), called_last_stmts.end());
