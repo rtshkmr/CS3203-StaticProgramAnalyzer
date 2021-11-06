@@ -4,6 +4,7 @@
 #include <string>
 #include <datatype/Deliverable.h>
 #include "../PKB/PKB.h"
+#include "Parser.h"
 
 /**
  * This namespace provides a scope for SourceProcessor related declarations. This only includes declarations on the
@@ -15,11 +16,12 @@ namespace sp {
  * file by calling the Parser and DesignExtractor and populates the PKB when the preprocessing is done.
  */
 class SourceProcessor {
+
  public:
   SourceProcessor() = default;
 
-  static PKB* ProcessSourceFile(std::string file_name);
-  static void Terminate(std::string msg);
+  static PKB* ProcessSourceFile(const std::string& file_name);
+  static void Terminate(const std::string &msg);
 };
 }
 

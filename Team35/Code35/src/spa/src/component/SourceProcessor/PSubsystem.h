@@ -38,7 +38,6 @@ class PSubsystem {
                                                        & PSubsystem::HandleReadStmt, & PSubsystem::HandleElseStmt};
   Procedure* current_procedure_;
   Deliverable* deliverable_;
-  SyntaxValidator syntax_validator_;
   EntityFactory entity_factory_;
 
   bool valid_state = true;
@@ -78,7 +77,7 @@ class PSubsystem {
   void InitInternalState(Procedure* procedure);
   void ProcessEntityAsNewProcedure(Entity* entity);
   void ProcessEntityAsStatement(Entity* entity);
-  void FiniStateChecker();
+  void FiniStateCheck();
   bool CheckForStacksEmpty();
  public:
   PSubsystem() = default;
