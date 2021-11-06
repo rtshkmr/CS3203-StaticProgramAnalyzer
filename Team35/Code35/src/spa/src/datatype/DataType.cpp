@@ -5,7 +5,7 @@
 #include <string>
 #include <stdexcept>
 #include "DataType.h"
-#include <datatype/RegexPatterns.h>
+#include <util/RegexPatterns.h>
 #include <cassert>
 #include <exception/SpaException.h>
 #include "../util/Utility.h"

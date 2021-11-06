@@ -2,7 +2,7 @@
 #include "QuerySemanticValidator.h"
 #include <component/SourceProcessor/Tokenizer.h>
 #include <component/SourceProcessor/SyntaxValidator.h>
-#include <datatype/RegexPatterns.h>
+#include <util/RegexPatterns.h>
 #include <unordered_set>
 #include <sstream>
 #include <exception/SpaException.h>

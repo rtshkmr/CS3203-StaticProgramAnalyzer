@@ -1,7 +1,7 @@
 #include "catch.hpp"
 #include <iostream>
 #include <component/SourceProcessor/Tokenizer.h>
-#include <datatype/RegexPatterns.h>
+#include <util/RegexPatterns.h>
 #include <regex>
 #include <random>
 
