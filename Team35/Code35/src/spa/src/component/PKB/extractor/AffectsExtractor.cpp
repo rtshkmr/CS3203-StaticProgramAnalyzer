@@ -3,18 +3,63 @@
 #include "AffectsExtractor.h"
 #include "../../../model/CFG.h"
 
-
-void AffectsExtractor::SetPKB(PKB* pkb) {
+AffectsExtractor::AffectsExtractor(RuntimeMediator* rte, PKB* pkb) {
+  this->rte_ = rte;
   this->pkb_ = pkb;
 }
 
-/**
- * For Affects(_,_)
- */
-bool AffectsExtractor::HasAffects() {
-  if(affects_map_.size() > 0) return true;
+std::vector<Entity*> AffectsExtractor::GetRelationship(RelDirection dir, int target) {
+  AssignEntity* target_ae = Utility::GetAssignEntityFromStmtNum(pkb_, target);
 
-  //TODO: Change optimised Affects(_,_)
+  if (!target_ae) return std::vector<Entity*>();
+  return (dir == RelDirection::kForward) ? GetAffects(target_ae) : GetAffectedBy(target_ae);
+}
+
+std::vector<Entity*> AffectsExtractor::GetFirstEntityOfRelationship(RelDirection dir, DesignEntity de) {
+  if (!Utility::IsAssignDesignEntity(de))
+    return std::vector<Entity*>{};
+
+  return (dir == RelDirection::kForward) ? GetAllAffects() : GetAllAffectedBy();
+}
+
+
+std::vector<std::tuple<Entity*, Entity*>> AffectsExtractor::GetRelationshipByTypes(RelDirection dir,
+                                                                                   DesignEntity first,
+                                                                                   DesignEntity second) {
+  std::vector<std::tuple<Entity*, Entity*>> retList = {};
+
+  if (!Utility::IsAssignDesignEntity(first) || !Utility::IsAssignDesignEntity(second))
+    return retList;
+
+  if (cacheIndication == ScopeIndication::kAllScope) {
+    for (auto pair : affects_map_) {
+      std::vector<Entity*> this_key_entity = GetAffects(pair.first);
+      for (auto val: this_key_entity) {
+        retList.push_back(std::make_tuple(pair.first, val));
+      }
+    }
+    return retList;
+  }
+
+  std::vector<Entity*> assign_list = pkb_->GetDesignEntities(DesignEntity::kAssign);
+  for (auto* entity : assign_list) {
+    AssignEntity* ae = dynamic_cast<AssignEntity*>(entity);
+    std::vector<Entity*> all_affected_by_ae = GetAffects(ae);
+    for (auto* affected : all_affected_by_ae) {
+      retList.push_back(std::make_tuple(entity, affected));
+    }
+  }
+
+  if (retList.size() > 0) {
+    retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
+  }
+  cacheIndication = ScopeIndication::kAllScope;
+  return retList;
+}
+
+
+bool AffectsExtractor::HasRelationship(RelDirection dir) {
+  if(affects_map_.size() > 0) return true;
 
   std::vector<Entity*> all_assign_list = pkb_->GetDesignEntities(DesignEntity::kAssign);
 
@@ -25,6 +70,26 @@ bool AffectsExtractor::HasAffects() {
     }
   }
   return false;
+}
+
+bool AffectsExtractor::HasRelationship(RelDirection dir, int target) {
+  AssignEntity* target_ae = Utility::GetAssignEntityFromStmtNum(pkb_, target);
+
+  if (!target_ae) return false;
+  return (dir == RelDirection::kForward) ? HasAffects(target_ae) : HasAffectedBy(target_ae);
+}
+
+bool AffectsExtractor::HasRelationship(RelDirection dir, int first, int second) {
+  AssignEntity* ae_first = Utility::GetAssignEntityFromStmtNum(pkb_, first);
+  AssignEntity* ae_second = Utility::GetAssignEntityFromStmtNum(pkb_, second);
+
+  if (! ae_first || !ae_second) return false;
+  return (dir == RelDirection::kForward) ? HasAffects(ae_first, ae_second) : HasAffects(ae_second, ae_first);
+}
+
+bool AffectsExtractor::HasRelationship(RelDirection dir, DesignEntity first, DesignEntity second) {
+  if (!Utility::IsAssignDesignEntity(first) || !Utility::IsAssignDesignEntity(second)) return false;
+  return HasRelationship(dir);
 }
 
 /**
@@ -47,7 +112,10 @@ std::vector<Entity*> AffectsExtractor::GetAllAffects() {
       retList.push_back(entity);
     }
   }
-  retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
+
+  if (retList.size() > 0) {
+    retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
+  }
 
   if (cacheIndication == ScopeIndication::kNoScope) {
     cacheIndication = ScopeIndication::kLeftScope;
@@ -77,7 +145,10 @@ std::vector<Entity*> AffectsExtractor::GetAllAffectedBy() {
       retList.push_back(entity);
     }
   }
-  retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
+
+  if (retList.size() > 0) {
+    retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
+  }
 
   if (cacheIndication == ScopeIndication::kNoScope) {
     cacheIndication = ScopeIndication::kRightScope;
@@ -85,82 +156,6 @@ std::vector<Entity*> AffectsExtractor::GetAllAffectedBy() {
     cacheIndication = ScopeIndication::kAllScope;
   }
   return retList;
-}
-
-/**
- * For Affects(a1, a2)
- */
-std::vector<std::tuple<Entity*, Entity*>> AffectsExtractor::GetAllPair() {
-  std::vector<std::tuple<Entity*, Entity*>> retList = {};
-
-  if (cacheIndication == ScopeIndication::kAllScope) {
-    for (auto pair : affects_map_) {
-      std::vector<Entity*> this_key_entity = GetAffects(pair.first);
-      for (auto val: this_key_entity) {
-        retList.push_back(std::make_tuple(pair.first, val));
-      }
-    }
-    return retList;
-  }
-
-  std::vector<Entity*> assign_list = pkb_->GetDesignEntities(DesignEntity::kAssign);
-  for (auto* entity : assign_list) {
-    AssignEntity* ae = dynamic_cast<AssignEntity*>(entity);
-    std::vector<Entity*> all_affected_by_ae = GetAffects(ae);
-    for (auto* affected : all_affected_by_ae) {
-      retList.push_back(std::make_tuple(entity, affected));
-    }
-  }
-  retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
-  cacheIndication = ScopeIndication::kAllScope;
-  return retList;
-}
-
-/**
- * Returns a vector of entities that the target affects. i.e. Affects(target, s)
- * @param target
- * @return
- */
-std::vector<Entity*> AffectsExtractor::GetAffects(int target) {
-  AssignEntity* target_ae = Utility::GetAssignEntityFromStmtNum(pkb_, target);
-  return target_ae ? GetAffects(target_ae) : std::vector<Entity*>();
-}
-
-/**
- * Returns a list of Entity (ie. s1) that is: Affects(s1, target)
- */
-std::vector<Entity*> AffectsExtractor::GetAffectedBy(int target) {
-  AssignEntity* target_ae = Utility::GetAssignEntityFromStmtNum(pkb_, target);
-  return target_ae ? GetAffectedBy(target_ae) : std::vector<Entity*>();
-}
-
-/**
- * For Affects(#,_)
- */
-bool AffectsExtractor::HasAffects(int target) {
-  AssignEntity* target_ae = Utility::GetAssignEntityFromStmtNum(pkb_, target);
-  return target_ae ? HasAffects(target_ae) : false;
-}
-
-/**
- * For Affects(_,#)
- */
-bool AffectsExtractor::HasAffectedBy(int target) {
-  AssignEntity* target_ae = Utility::GetAssignEntityFromStmtNum(pkb_, target);
-  return target_ae ? HasAffectedBy(target_ae) : false;
-}
-
-/**
- * Affects(#1, #2)
- */
-bool AffectsExtractor::HasAffects(int first, int second) {
-  AssignEntity* ae_first = Utility::GetAssignEntityFromStmtNum(pkb_, first);
-  AssignEntity* ae_second = Utility::GetAssignEntityFromStmtNum(pkb_, second);
-  return ae_first && ae_second ? HasAffects(ae_first, ae_second) : false;
-}
-
-bool AffectsExtractor::HasAffectedBy(int first, int second) {
-  return HasAffects(second, first);
 }
 
 std::vector<Entity*> AffectsExtractor::GetAffects(AssignEntity* target) {
@@ -186,7 +181,10 @@ std::vector<Entity*> AffectsExtractor::GetAffects(AssignEntity* target) {
       retList.push_back(entity);
     }
   }
-  retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
+
+  if (retList.size() > 0) {
+    retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
+  }
   return retList;
 }
 

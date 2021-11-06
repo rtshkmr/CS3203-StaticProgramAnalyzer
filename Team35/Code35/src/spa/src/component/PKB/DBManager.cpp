@@ -119,15 +119,6 @@ std::vector<std::tuple<Entity*, Entity*>> DBManager::GetRelationshipByTypes(PKBR
   }
 }
 
-std::vector<std::tuple<Entity*, Entity*>> DBManager::MergeScopedEntities(std::vector<Entity*> left_entities,
-                                                                         std::vector<Entity*> right_entities) {
-  std::vector<std::tuple<Entity*, Entity*>> results(left_entities.size());
-  for (int i = 0; i < left_entities.size(); ++i) {
-    results.emplace_back(left_entities[i], right_entities[i]);
-  }
-  return results;
-}
-
 /**
  * To query for existence of relationship, e.g. Parent(_, _)
  * @param ref Relationship type

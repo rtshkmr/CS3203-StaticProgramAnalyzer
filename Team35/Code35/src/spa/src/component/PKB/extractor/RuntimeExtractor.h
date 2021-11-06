@@ -10,6 +10,8 @@
 #include "NextTExtractor.h"
 #include "AffectsExtractor.h"
 #include "AffectsTExtractor.h"
+#include "AffectsBipExtractor.h"
+#include "AffectsBipTExtractor.h"
 
 const std::unordered_set<PKBRelRefs> runtime_relationships = {
     PKBRelRefs::kNextT,
@@ -21,7 +23,11 @@ const std::unordered_set<PKBRelRefs> runtime_relationships = {
     PKBRelRefs::kNextBip,
     PKBRelRefs::kPrevBip,
     PKBRelRefs::kNextBipT,
-    PKBRelRefs::kPrevBipT
+    PKBRelRefs::kPrevBipT,
+    PKBRelRefs::kAffectsBip,
+    PKBRelRefs::kAffectedByBip,
+    PKBRelRefs::kAffectsBipT,
+    PKBRelRefs::kAffectedByBipT
 };
 
 const std::unordered_set<DesignEntity> next_design_entities = {
@@ -51,7 +57,6 @@ class RuntimeExtractor : public RuntimeMediator {
   bool HasRelationship(PKBRelRefs ref, DesignEntity first, DesignEntity second) override;
 
   void Delete();
-
   static bool IsRuntimeRelationship(PKBRelRefs ref);
 
   std::vector<Entity*> GetScopedFirstEntities(PKBRelRefs ref, std::vector<Entity*> scoped_entities);
@@ -63,65 +68,15 @@ class RuntimeExtractor : public RuntimeMediator {
  private:
   PKB* pkb_;
   NextTExtractor next_t_extractor_;
-  AffectsExtractor affects_extractor_ = AffectsExtractor();
+  AffectsExtractor affects_extractor_;
   AffectsTExtractor affects_t_extractor_;
   NextBipExtractor next_bip_extractor_;
   NextBipTExtractor next_bip_t_extractor_;
+  AffectsBipExtractor affects_bip_extractor_;
+  AffectsBipTExtractor affects_bip_t_extractor_;
 
-  std::vector<Entity*> GetNextT(int target);
-  std::vector<Entity*> GetPrevT(int target);
-  std::vector<Entity*> GetAffects(int target);
-  std::vector<Entity*> GetAffectedBy(int target);
-  std::vector<Entity*> GetAffectsT(int target);
-  std::vector<Entity*> GetAffectedByT(int target);
-  std::vector<Entity*> GetNextBip(int target);
-  std::vector<Entity*> GetPrevBip(int target);
-  std::vector<Entity*> GetNextBipT(int target);
-  std::vector<Entity*> GetPrevBipT(int target);
-
-  std::vector<Entity*> GetNextT(DesignEntity de);
-  std::vector<Entity*> GetPrevT(DesignEntity de);
-  std::vector<Entity*> GetAffects(DesignEntity de);
-  std::vector<Entity*> GetAffectedBy(DesignEntity de);
-  std::vector<Entity*> GetAffectsT(DesignEntity de);
-  std::vector<Entity*> GetAffectedByT(DesignEntity de);
-  std::vector<Entity*> GetNextBip(DesignEntity de);
-  std::vector<Entity*> GetPrevBip(DesignEntity de);
-  std::vector<Entity*> GetNextBipT(DesignEntity de);
-  std::vector<Entity*> GetPrevBipT(DesignEntity de);
-
-  std::vector<std::tuple<Entity*, Entity*>> GetNextT(DesignEntity first, DesignEntity second);
-  std::vector<std::tuple<Entity*, Entity*>> GetPrevT(DesignEntity first, DesignEntity second);
-  std::vector<std::tuple<Entity*, Entity*>> GetAffects(DesignEntity first, DesignEntity second);
-  std::vector<std::tuple<Entity*, Entity*>> GetAffectedBy(DesignEntity first, DesignEntity second);
-  std::vector<std::tuple<Entity*, Entity*>> GetAffectsT(DesignEntity first, DesignEntity second);
-  std::vector<std::tuple<Entity*, Entity*>> GetAffectedByT(DesignEntity first, DesignEntity second);
-  std::vector<std::tuple<Entity*, Entity*>> GetNextBip(DesignEntity first, DesignEntity second);
-  std::vector<std::tuple<Entity*, Entity*>> GetPrevBip(DesignEntity first, DesignEntity second);
-  std::vector<std::tuple<Entity*, Entity*>> GetNextBipT(DesignEntity first, DesignEntity second);
-  std::vector<std::tuple<Entity*, Entity*>> GetPrevBipT(DesignEntity first, DesignEntity second);
-
-  bool HasAffects();
-  bool HasAffectedBy();
-  bool HasAffectsT();
-  bool HasAffectedByT();
-  bool HasNextBip();
-
-  bool HasAffects(int first);
-  bool HasAffectedBy(int first);
-  bool HasAffectsT(int first);
-  bool HasAffectedByT(int first);
-  bool HasNextBip(int first);
-  bool HasPrevBip(int first);
-
-  bool HasNextT(int first, int second);
-  bool HasAffects(int first, int second);
-  bool HasAffectedBy(int first, int second);
-  bool HasAffectsT(int first, int second);
-  bool HasAffectedByT(int first, int second);
-  bool HasNextBip(int first, int second);
-  bool HasNextBipT(int first, int second);
-  PKBRelRefs ReverseRelationship(PKBRelRefs ref);
+  std::pair<RuntimeColleague*,RelDirection> GetExtractorAndDirection(PKBRelRefs ref);
+  static PKBRelRefs ReverseRelationship(PKBRelRefs ref);
 };
 
 #endif //AUTOTESTER_CODE35_SRC_SPA_SRC_COMPONENT_PKB_RUNTIMEEXTRACTOR_H_

@@ -8,7 +8,7 @@
 class NextBipTExtractor : public RuntimeColleague {
  public:
   NextBipTExtractor() = default;
-  explicit NextBipTExtractor(PKB* pkb);
+  explicit NextBipTExtractor(RuntimeMediator* rtm, PKB* pkb);
   std::vector<Entity*> GetRelationship(RelDirection dir, int target) override;
   std::vector<Entity*> GetFirstEntityOfRelationship(RelDirection dir, DesignEntity de) override;
   std::vector<std::tuple<Entity*, Entity*>> GetRelationshipByTypes(RelDirection dir,
@@ -17,7 +17,8 @@ class NextBipTExtractor : public RuntimeColleague {
   bool HasRelationship(RelDirection dir) override;
   bool HasRelationship(RelDirection dir, int target) override;
   bool HasRelationship(RelDirection dir, int first, int second) override;
-  void SetMediator(RuntimeMediator* rtm);
+  bool HasRelationship(RelDirection dir, DesignEntity first, DesignEntity second) override;
+
  private:
   PKB* pkb_{};
   RuntimeMediator* rtm_{};

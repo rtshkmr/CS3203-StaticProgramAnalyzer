@@ -92,7 +92,7 @@ TEST_CASE("1.CFG.Cluster") {
     Cluster* if_cond = new Cluster();
     Cluster* if_body = new Cluster();
     Cluster* else_body = new Cluster();
-    if_cond->SetClusterTag(ClusterTag::kIfCond);
+    if_cond->SetClusterTag(ClusterTag::kIfCondBlock);
     if_body->SetClusterTag(ClusterTag::kIfBody);
     else_body->SetClusterTag(ClusterTag::kElseBody);
     if_cluster->AddChildClusterToBack(if_cond);
@@ -105,13 +105,13 @@ TEST_CASE("1.CFG.Cluster") {
     Cluster* while_cond = new Cluster();
     Cluster* while_body = new Cluster();
     while_cluster->SetClusterTag(ClusterTag::kWhileCluster);
-    while_cond->SetClusterTag(ClusterTag::kWhileCond);
+    while_cond->SetClusterTag(ClusterTag::kWhileCondBlock);
     while_body->SetClusterTag(ClusterTag::kWhileBody);
     while_cluster->AddChildClusterToBack(while_cond);
     while_cluster->AddChildClusterToBack(while_body);
 
     SECTION("Getting Cluster Constituents") {
-      bool correctly_found_if_cond_constituent = if_cond == if_cluster->GetClusterConstituent(ClusterTag::kIfCond);
+      bool correctly_found_if_cond_constituent = if_cond == if_cluster->GetClusterConstituent(ClusterTag::kIfCondBlock);
       bool correctly_found_if_body_constituent = if_body == if_cluster->GetClusterConstituent(ClusterTag::kIfBody);
       bool
           correctly_found_else_body_constituent = else_body == if_cluster->GetClusterConstituent(ClusterTag::kElseBody);
@@ -121,7 +121,7 @@ TEST_CASE("1.CFG.Cluster") {
 
       // while cluster with valid constituents:
       bool correctly_found_while_cond_constituent =
-          while_cond == while_cluster->GetClusterConstituent(ClusterTag::kWhileCond);
+          while_cond == while_cluster->GetClusterConstituent(ClusterTag::kWhileCondBlock);
       bool correctly_found_while_body_constituent =
           while_body == while_cluster->GetClusterConstituent(ClusterTag::kWhileBody);
       REQUIRE(correctly_found_while_cond_constituent);

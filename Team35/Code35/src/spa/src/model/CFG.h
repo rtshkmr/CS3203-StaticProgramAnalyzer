@@ -18,8 +18,8 @@ enum class ClusterTag {
   kIfCluster,
   kWhileCluster,
   kProcedureCluster,
-  kWhileCond,
-  kIfCond,
+  kWhileCondBlock,
+  kIfCondBlock,
   kWhileBody,
   kIfBody,
   kElseBody,
@@ -58,11 +58,6 @@ class Cluster {
   void SetParentCluster(Cluster* parent_cluster);
   virtual ~Cluster();
 
-  // only for testing
-  void SetStartEnd(int start, int end) {
-    start_ = start;
-    end_ = end;
-  };
   std::list<Cluster*> nested_clusters_;
   Cluster* GetClusterConstituent(ClusterTag constituent_tag);
   Cluster* FindNextSibling(ClusterTag target_tag);
@@ -95,7 +90,6 @@ class Block : public Cluster {
   void AddNextBlock(Block* next_block);
   std::set<Block*> GetNextBlocks() const;
   std::set<Block*> GetPrevBlocks() const;
-  std::list<int> GetCFGLastStmts();
 
   bool isWhile = false;
 };
