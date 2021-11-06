@@ -31,14 +31,14 @@ std::vector<Entity*> NextBipExtractor::GetRelationship(RelDirection dir, int tar
  */
 std::vector<Entity*> NextBipExtractor::GetFirstEntityOfRelationship(RelDirection dir, DesignEntity de) {
   PopulateBipMaps();
-  return pkb_->GetFirstEntityOfRelationship(GetPKBRelRef(dir), DesignEntity::kStmt);
+  return pkb_->GetFirstEntityOfRelationship(GetPKBRelRef(dir), de);
 }
 
 std::vector<std::tuple<Entity*, Entity*>> NextBipExtractor::GetRelationshipByTypes(RelDirection dir,
                                                                                    DesignEntity first,
                                                                                    DesignEntity second) {
   PopulateBipMaps();
-  return pkb_->GetRelationshipByTypes(GetPKBRelRef(dir), DesignEntity::kStmt, DesignEntity::kStmt);
+  return pkb_->GetRelationshipByTypes(GetPKBRelRef(dir), first, second);
 }
 
 bool NextBipExtractor::HasRelationship(RelDirection dir) {

@@ -3,6 +3,7 @@
 //
 
 #include "ClauseStrategy.h"
+#include <cassert>
 
 ClauseContext::ClauseContext(QueryEvaluatorTable *table) : group_table(table){}
 
@@ -42,22 +43,28 @@ ClauseStrategy::DetermineDoubleSynonymCommands(QueryEvaluatorTable *table, Synon
   } else if (table->ContainsColumn(second_synonym)) {
     clause_command = new DoubleSynonymSinglePresentCommand(false);
   } else {
-    // Should not be the case unless cross product
+    clause_command = new DoubleSynonymNonePresentCommand();
   }
   return std::make_tuple(query_command, clause_command);
 }
 
 std::tuple<PKBQueryCommand *, ClauseCommand *>
-ClauseStrategy::DetermineSingleSynonymCommand(Clause *clause, bool synonym_is_first_param) {
+ClauseStrategy::DetermineSingleSynonymCommand(QueryEvaluatorTable *table, bool synonym_is_first_param, Clause *clause) {
   PKBQueryCommand *query_command = nullptr;
+  ClauseCommand *clause_command = nullptr;
   if (typeid(*clause) == typeid(SuchThat)) {
     query_command = new QuerySuchThatOneSynonymCommand(clause);
   } else if (typeid(*clause) == typeid(Pattern)) {
     query_command = new QueryPatternOneSynonymCommand(clause);
-  }else {
+  } else {
     query_command = new QueryWithOneSynonymCommand(clause);
   }
-  ClauseCommand *clause_command = new SingleSynonymPresentCommand(synonym_is_first_param);
+  Synonym* synonym = synonym_is_first_param ? clause->first_synonym : clause->second_synonym;
+  if (table->ContainsColumn(synonym)) {
+    clause_command = new SingleSynonymPresentCommand(synonym_is_first_param);
+  } else {
+    clause_command = new SingleSynonymNonePresentCommand(synonym_is_first_param);
+  }
   return std::make_tuple(query_command, clause_command);
 }
 
@@ -77,9 +84,9 @@ SuchThatStrategy::DetermineClauseCommand(Clause *clause, QueryEvaluatorTable *ta
     // Both are synonyms
     return DetermineDoubleSynonymCommands(table, such_that_clause->first_synonym, such_that_clause->second_synonym, clause);
   } else if (such_that_clause->left_is_synonym) {
-    return DetermineSingleSynonymCommand(clause, true);
+    return DetermineSingleSynonymCommand(table, true, clause);
   } else if (such_that_clause->right_is_synonym) {
-    return DetermineSingleSynonymCommand(clause, false);
+    return DetermineSingleSynonymCommand(table, false, clause);
   } else {
     query_command = new QuerySuchThatNoSynonymCommand(clause);
     return std::make_tuple(query_command, clause_command);
@@ -98,9 +105,9 @@ PatternStrategy::DetermineClauseCommand(Clause *clause, QueryEvaluatorTable *tab
     return DetermineDoubleSynonymCommands(table, assign_synonym, variable_synonym, clause);
   } else {
     if (table->ContainsColumn(assign_synonym)) {
-      return DetermineSingleSynonymCommand(clause, true);
+      return DetermineSingleSynonymCommand(table, true, clause);
     } else {
-      // Assign is not in the table yet, cross product
+      return DetermineSingleSynonymCommand(table, true, clause);
     }
   }
   return std::make_tuple(query_command, clause_command);
@@ -113,12 +120,11 @@ WithStrategy::DetermineClauseCommand(Clause *clause, QueryEvaluatorTable *table)
   if (with_clause->left_is_synonym && with_clause->right_is_synonym) {
     return DetermineDoubleSynonymCommands(table, with_clause->first_synonym, with_clause->second_synonym, clause);
   } else if (with_clause->left_is_synonym) {
-    return DetermineSingleSynonymCommand(clause, true);
+    return DetermineSingleSynonymCommand(table, true, clause);
   } else if (with_clause->right_is_synonym) {
-    return DetermineSingleSynonymCommand(clause, false);
+    return DetermineSingleSynonymCommand(table, false, clause);
   } else {
-    // Cross product.
+    // This is handled by the queryEvaluator as a shortcut instead. (Optimisation)
+    assert(false);
   }
-
-  return std::tuple<PKBQueryCommand *, ClauseCommand *>();
 }

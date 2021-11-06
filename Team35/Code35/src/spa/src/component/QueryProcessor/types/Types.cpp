@@ -13,6 +13,8 @@ static std::unordered_map<std::string, RelRef> _relref_map = {{"ModifiesP", RelR
                                                               {"Follows*", RelRef::kFollowsT},
                                                               {"Next", RelRef::kNext},
                                                               {"Next*", RelRef::kNextT},
+                                                              {"NextBip", RelRef::kNextBip},
+                                                              {"NextBip*", RelRef::kNextBipT},
                                                               {"Affects", RelRef::kAffects},
                                                               {"Affects*", RelRef::kAffectsT}};
 

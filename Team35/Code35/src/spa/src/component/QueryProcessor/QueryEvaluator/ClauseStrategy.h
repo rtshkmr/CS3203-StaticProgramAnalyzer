@@ -15,7 +15,7 @@ class ClauseStrategy {
     static std::tuple<PKBQueryCommand *, ClauseCommand *>
     DetermineDoubleSynonymCommands(QueryEvaluatorTable *table, Synonym *first_synonym, Synonym *second_synonym, Clause *clause);
     static std::tuple<PKBQueryCommand *, ClauseCommand *>
-    DetermineSingleSynonymCommand(Clause *clause, bool synonym_is_first_param);
+    DetermineSingleSynonymCommand(QueryEvaluatorTable *table, bool synonym_is_first_param, Clause *clause);
 };
 
 class ClauseContext {
