@@ -188,7 +188,7 @@ TEST_CASE("1.Model.Statement.AssignEntity") {
 
     REQUIRE(assign_entity->GetAssignmentExpr()->CheckExact(expression));
 
-    REQUIRE(assign_entity->GetControlVariables() == expr_var);
+    REQUIRE(assign_entity->GetExprVariables() == expr_var);
     REQUIRE(assign_entity->GetExpressionConstants() == expr_constants);
   }
 

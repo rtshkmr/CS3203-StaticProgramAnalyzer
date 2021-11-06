@@ -30,7 +30,7 @@ class IfEntity : public Statement, public Container {
   ConditionalExpression* cond_expr_;
   std::vector<Variable*> control_variables;
   std::vector<Constant*> control_constants;
-  ElseEntity* else_entity_ = nullptr; //TODO: check if keeping ELSE as object or merge ELSE object into IF object
+  ElseEntity* else_entity_ = nullptr;
 
  public:
   IfEntity(std::string condition, std::vector<Variable*> control_variables, std::vector<Constant*> control_constants);
@@ -105,7 +105,7 @@ class AssignEntity : public Statement {
 
   AssignmentExpression* GetAssignmentExpr();
 
-  std::vector<Variable*> GetControlVariables();
+  std::vector<Variable*> GetExprVariables();
 
   std::vector<Constant*> GetExpressionConstants();
 

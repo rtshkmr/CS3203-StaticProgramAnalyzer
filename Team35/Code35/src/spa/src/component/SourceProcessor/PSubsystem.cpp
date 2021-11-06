@@ -526,7 +526,7 @@ void PSubsystem::HandleAssignStmt(Entity* entity) {
     deliverable_->AddModifiesRelationship(current_node_, assign_entity->GetVariableObj());  //container level
 
   // todo: add these variables into the respective sets in cluster/block
-  for (Variable* v: assign_entity->GetControlVariables()) {
+  for (Variable* v: assign_entity->GetExprVariables()) {
     deliverable_->AddUsesRelationship(assign_entity, v);
     deliverable_->AddUsesRelationship(current_procedure_, v); //procedure level
     if (current_procedure_ != current_node_)
