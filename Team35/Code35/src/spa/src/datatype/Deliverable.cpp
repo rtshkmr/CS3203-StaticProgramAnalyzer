@@ -1,9 +1,5 @@
 #include "Deliverable.h"
 
-void Deliverable::AddProcedure(Procedure* proc) {
-  proc_list_.push_back(proc);
-}
-
 void Deliverable::AddStatement(Statement* stmt) {
   stmt_list_.push_back(stmt);
 }
@@ -44,12 +40,6 @@ void Deliverable::AddFollowsTransitiveRelationship(Statement* before, Statement*
   AddRelationshipToMap(&followed_by_T_hash_, after, before);
 }
 
-void Deliverable::AddFollowsTransitiveRelationshipForList(Statement* before, std::list<Statement*>* afters) {
-  for (Statement* after: * afters) {
-    AddFollowsTransitiveRelationship(before, after);
-  }
-}
-
 void Deliverable::AddParentRelationship(Statement* parent, Statement* child) {
   AddRelationshipToMap(&parent_to_child_hash_, parent, child);
   AddRelationshipToMap(&child_to_parent_hash_, child, parent);
@@ -58,12 +48,6 @@ void Deliverable::AddParentRelationship(Statement* parent, Statement* child) {
 void Deliverable::AddParentTransitiveRelationship(Statement* parent, Statement* child) {
   AddRelationshipToMap(&parent_to_child_T_hash_, parent, child);
   AddRelationshipToMap(&child_to_parent_T_hash_, child, parent);
-}
-
-void Deliverable::AddParentTransitiveRelationshipForList(Statement* parent, std::list<Statement*>* children) {
-  for (Statement* child: * children) {
-    AddParentTransitiveRelationship(parent, child);
-  }
 }
 
 void Deliverable::AddUsesRelationship(Statement* u1, Variable* u2) {
@@ -106,12 +90,6 @@ void Deliverable::AddCallsRelationship(Procedure* p1, Procedure* p2) {
 void Deliverable::AddCallsTransitiveRelationship(Procedure* p1, Procedure* p2) {
   AddRelationshipToMap(&calls_T_hash_, p1, p2);
   AddRelationshipToMap(&called_by_T_hash_, p2, p1);
-}
-
-void Deliverable::AddCallsTransitiveRelationshipForList(Procedure* p1, std::list<Procedure*>* proc_list) {
-  for (Procedure* proc: *proc_list) {
-    AddCallsTransitiveRelationship(p1, proc);
-  }
 }
 
 void Deliverable::AddNextRelationship(Statement* s1, Statement* s2) {

@@ -13,7 +13,6 @@ class Deliverable {
  public:
   Deliverable() = default;
   // Adding of Procedure, Variable, ConstantValue are added using pointers to the list in EntityFactory.
-  void AddProcedure(Procedure* proc);
   void AddStatement(Statement* stmt);
 
   void AddIfEntity(IfEntity* if_entity);
@@ -25,10 +24,8 @@ class Deliverable {
 
   void AddFollowRelationship(Statement* f1, Statement* f2);
   void AddFollowsTransitiveRelationship(Statement* before, Statement* after);
-  void AddFollowsTransitiveRelationshipForList(Statement* before, std::list<Statement*>* afters);
   void AddParentRelationship(Statement* parent, Statement* child);
   void AddParentTransitiveRelationship(Statement* parent, Statement* child);
-  void AddParentTransitiveRelationshipForList(Statement* parent, std::list<Statement*>* children);
   void AddUsesRelationship(Statement* u1, Variable* u2);
   void AddUsesRelationship(Container* u1, Variable* u2);
   void AddUsesRelationship(Container* container, std::list<Variable*>* var_list);
@@ -37,7 +34,6 @@ class Deliverable {
   void AddModifiesRelationship(Container* container, std::list<Variable*>* var_list);
   void AddCallsRelationship(Procedure* p1, Procedure* p2);
   void AddCallsTransitiveRelationship(Procedure* p1, Procedure* p2);
-  void AddCallsTransitiveRelationshipForList(Procedure* p1, std::list<Procedure*>* proc_list);
   void AddNextRelationship(Statement* s1, Statement* s2);
 
   void SetProgram(Program* program);
@@ -80,6 +76,22 @@ class Deliverable {
   template<typename X, typename Y>
   static void AddRelationshipToMap(std::unordered_map<X, std::list<Y>*>* map, X key, Y value);
 
+ private:
+  //root-node of AST
+  Program* program_;
+
+  // EntityTables
+  std::list<Procedure*> proc_list_;
+  std::list<Variable*> var_list_;
+  std::list<Constant*> const_list_;
+  std::vector<Statement*> stmt_list_;
+  std::list<IfEntity*> if_list_;
+  std::list<WhileEntity*> while_list_;
+  std::list<AssignEntity*> assign_list_;
+  std::list<CallEntity*> call_list_;
+  std::list<PrintEntity*> print_list_;
+  std::list<ReadEntity*> read_list_;
+
   // RelationshipTables
   std::unordered_map<Statement*, std::list<Statement*>*> follow_hash_; // to store Follows
   std::unordered_map<Statement*, std::list<Statement*>*> follows_T_hash_; // to store Follows*
@@ -109,22 +121,6 @@ class Deliverable {
   std::unordered_map<Procedure*, std::list<Procedure*>*> called_by_hash_; // represents a Calls(x, y) where y -> x
   std::unordered_map<Procedure*, std::list<Procedure*>*> called_by_T_hash_; // represents a Calls*(x, y) where y -> x
   std::unordered_map<Statement*, std::list<Statement*>*> previous_hash_;  // to store Previous (reverse of Next)
-
- private:
-  //root-node of AST
-  Program* program_;
-
-  // EntityTables
-  std::list<Procedure*> proc_list_;
-  std::list<Variable*> var_list_;
-  std::list<Constant*> const_list_;
-  std::vector<Statement*> stmt_list_;
-  std::list<IfEntity*> if_list_;
-  std::list<WhileEntity*> while_list_;
-  std::list<AssignEntity*> assign_list_;
-  std::list<CallEntity*> call_list_;
-  std::list<PrintEntity*> print_list_;
-  std::list<ReadEntity*> read_list_;
 };
 
 template <typename X, typename Y>

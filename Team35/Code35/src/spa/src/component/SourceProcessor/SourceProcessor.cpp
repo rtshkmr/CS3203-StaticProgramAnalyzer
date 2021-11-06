@@ -23,21 +23,17 @@ PKB* SourceProcessor::ProcessSourceFile(const std::string& file_name) {
   L("[ENTER] SOURCE PROC ");
   L("... processing source file");
   par::Parser parser;
-
   Deliverable* deliverable;
-
   try {
     parser.Parse(file_name);
     deliverable = parser.GetDeliverables();
     auto design_extractor = DesignExtractor(deliverable);
     design_extractor.ExtractDesignAbstractions();
   } catch (SyntaxException s) {
-    std::cerr << "Syntax Error\n";
-    std::cerr << s.what() << std::endl;
+    std::cerr << "Syntax Error\n" << s.what() << std::endl;
     Terminate(std::string("Unfortunately, there was a syntax error in the input SIMPLE Program:("));
   } catch (std::exception e) {
-    std::cerr << "Exception error\n";
-    std::cerr << e.what() << std::endl;
+    std::cerr << "Exception error\n" << e.what() << std::endl;
     Terminate(std::string("Unfortunately, there was an unknown exception thrown due to an invalid SIMPLE program."));
   }
 
@@ -45,8 +41,7 @@ PKB* SourceProcessor::ProcessSourceFile(const std::string& file_name) {
   try {
     new_pkb->PopulateDataStructures(* deliverable);
   } catch (PKBException e) {
-    std::cerr << "PKB error\n";
-    std::cerr << e.what() << std::endl;
+    std::cerr << "PKB error\n" << e.what() << std::endl;
     Terminate(std::string("Unfortunately, there was an unknown exception thrown due to an invalid SIMPLE program."));
   }
   return new_pkb;
