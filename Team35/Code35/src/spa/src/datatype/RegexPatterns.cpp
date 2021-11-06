@@ -34,9 +34,6 @@ std::regex RegexPatterns::GetBinaryBooleanOperatorPattern() {
   return std::regex(R"(&&|\|\|)");
 }
 
-std::regex RegexPatterns::GetUnaryBooleanOperatorPattern() {
-  return std::regex(R"(!)");
-}
 std::regex RegexPatterns::GetNamePattern() {
   return std::regex(R"(^[[:alpha:]]+([0-9]+|[[:alpha:]]+)*)", std::regex_constants::optimize);
 }
@@ -46,10 +43,6 @@ std::regex RegexPatterns::GetIntegerPattern() {
 
 std::regex RegexPatterns::GetIntegerPatternNonTerminating() {
   return std::regex(R"(^(0|[1-9][0-9]*))");
-}
-
-std::regex RegexPatterns::GetDesignEntityPattern() {
-  return std::regex(R"(stmt|read|print|call|while|if|assign|variable|constant|procedure|prog_line)");
 };
 
 /**

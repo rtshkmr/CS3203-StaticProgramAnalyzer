@@ -28,7 +28,14 @@ NextTExtractor::NextTExtractor(std::vector<Procedure*> proc_list, std::vector<St
   next_t_2d_array_ = std::vector<std::vector<int>>(total, std::vector<int>(total));
 }
 
-void NextTExtractor::Delete() {}
+void NextTExtractor::Delete() {
+  proc_list_ = {};
+  stmt_list_ = {};
+  rel_table_ = {};
+  first_arg_table_ = {};
+  rel_by_types_table_ = {};
+  next_t_2d_array_ = {};
+}
 
 /**
  * @return size of next_t_map

@@ -19,7 +19,7 @@ constexpr auto L = [](auto msg) {
  * @param fileName The name of the file to be processed.
  * @return Source process status
  */
-PKB* SourceProcessor::ProcessSourceFile(std::string file_name) {
+PKB* SourceProcessor::ProcessSourceFile(const std::string& file_name) {
   L("[ENTER] SOURCE PROC ");
   L("... processing source file");
   par::Parser parser;
@@ -29,7 +29,7 @@ PKB* SourceProcessor::ProcessSourceFile(std::string file_name) {
   try {
     parser.Parse(file_name);
     deliverable = parser.GetDeliverables();
-    DesignExtractor design_extractor = DesignExtractor(deliverable);
+    auto design_extractor = DesignExtractor(deliverable);
     design_extractor.ExtractDesignAbstractions();
   } catch (SyntaxException s) {
     std::cerr << "Syntax Error\n";
@@ -55,7 +55,7 @@ PKB* SourceProcessor::ProcessSourceFile(std::string file_name) {
 /**
  * Terminates Parser execution and logger, and exits program.
  */
-void SourceProcessor::Terminate(std::string msg) {
+void SourceProcessor::Terminate(const std::string& msg) {
   std::string logger_output = msg + "\n [ERROR] TERMINATING PROGRAM";
   L(logger_output);
   LoggerTerminate();

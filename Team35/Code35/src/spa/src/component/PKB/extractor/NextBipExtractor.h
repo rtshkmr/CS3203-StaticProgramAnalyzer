@@ -18,7 +18,7 @@ class NextBipExtractor : public RuntimeColleague {
   bool HasRelationship(RelDirection dir) override;
   bool HasRelationship(RelDirection dir, int target) override;
   bool HasRelationship(RelDirection dir, int first, int second) override;
-
+  void Delete();
  private:
   PKB* pkb_{};
   std::vector<Entity*> stmt_list_;

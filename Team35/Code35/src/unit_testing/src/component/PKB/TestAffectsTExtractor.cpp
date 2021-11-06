@@ -248,11 +248,8 @@ TEST_CASE("2.PKB.AffectsT.adv_spa_lecture") {
   }
 
   SECTION ("11 - Get Affects By Both Type : (a1, a2) ") {
-    //TODO Fix this.
-    //CHECK(dbm->GetRelationshipByTypes(PKBRelRefs::kAffectsT, DesignEntity::kAssign, DesignEntity::kAssign,
-    //                                  std::vector<Entity*>{}, std::vector<Entity*>{}, ScopeIndication::kNoScope).size() == 28);
+    CHECK(dbm->GetRelationshipByTypes(PKBRelRefs::kAffectsT, DesignEntity::kAssign, DesignEntity::kAssign,
+                                      std::vector<Entity*>{}, std::vector<Entity*>{}, ScopeIndication::kNoScope).size() == 28);
   }
 
 }
-
-//mixed_loop_source is not a good test case as it does not have any transitive relationship.

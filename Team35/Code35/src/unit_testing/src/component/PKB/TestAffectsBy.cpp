@@ -236,9 +236,8 @@ TEST_CASE("2.PKB.Affects.adv_spa_lecture") {
   }
 
   SECTION ("11 - Get Affects By Both Type : (a1, a2) ") {
-    //TODO Fix this.
-    //CHECK(dbm->GetRelationshipByTypes(PKBRelRefs::kAffectedBy, DesignEntity::kAssign, DesignEntity::kAssign,
-    //                                  std::vector<Entity*>{}, std::vector<Entity*>{}, ScopeIndication::kNoScope).size() == 19);
+    CHECK(dbm->GetRelationshipByTypes(PKBRelRefs::kAffectedBy, DesignEntity::kAssign, DesignEntity::kAssign,
+                                      std::vector<Entity*>{}, std::vector<Entity*>{}, ScopeIndication::kNoScope).size() == 19);
   }
 }
 
@@ -426,8 +425,7 @@ TEST_CASE("2.PKB.Affects.mixed_loops_source") {
   }
 
   SECTION ("11 - Get Affects By Both Type : (a1, a2) ") {
-    //TODO Fix this.
-    //CHECK(dbm->GetRelationshipByTypes(PKBRelRefs::kAffectedBy, DesignEntity::kAssign, DesignEntity::kAssign,
-    //                                  std::vector<Entity*>{}, std::vector<Entity*>{}, ScopeIndication::kNoScope).size() == 6);
+    CHECK(dbm->GetRelationshipByTypes(PKBRelRefs::kAffectedBy, DesignEntity::kAssign, DesignEntity::kAssign,
+                                      std::vector<Entity*>{}, std::vector<Entity*>{}, ScopeIndication::kNoScope).size() == 6);
   }
 }
