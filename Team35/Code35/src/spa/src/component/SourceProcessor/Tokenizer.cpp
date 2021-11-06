@@ -70,9 +70,6 @@ vector<string> Tokenizer::SplitString(const string& delimiter, const string& inp
     if (!IsWhiteSpace(split_string)) {
       split_strings.push_back(split_string);
     }
-    if (retain_delimiter) {
-      split_strings.push_back(delimiter);
-    }
     left = right + delimiter.length();
     right = input.find(delimiter, left);
   }
@@ -82,11 +79,6 @@ vector<string> Tokenizer::SplitString(const string& delimiter, const string& inp
     string substr = input.substr(left, right);
     split_strings.push_back(substr);
     // check if the delimiter appears at the right of the input string:
-    string s;
-    bool last_char_is_delimiter = (s + input[input.size() - 1]) == delimiter;
-    if (retain_delimiter && last_char_is_delimiter) {
-      split_strings.push_back(delimiter);
-    }
     return split_strings;
   }
 }

@@ -18,7 +18,6 @@ LoggerSettings::LoggerSettings() {
   this->include_datetime_ = true;
   this->include_file_line_ = true;
 }
-// constructor:
 Logger::Logger() {
   this->is_init_ = false;
 }
