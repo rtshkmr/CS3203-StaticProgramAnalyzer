@@ -3,6 +3,7 @@
 #include <util/Utility.h>
 #include "NextTExtractor.h"
 #include "model/CFG.h"
+#include "RuntimeExtractor.h"
 
 NextTExtractor::NextTExtractor(PKB* pkb) {
   pkb_ = pkb;
@@ -28,7 +29,14 @@ NextTExtractor::NextTExtractor(std::vector<Procedure*> proc_list, std::vector<St
   next_t_2d_array_ = std::vector<std::vector<int>>(total, std::vector<int>(total));
 }
 
-void NextTExtractor::Delete() {}
+void NextTExtractor::Delete() {
+  proc_list_ = {};
+  stmt_list_ = {};
+  rel_table_ = {};
+  first_arg_table_ = {};
+  rel_by_types_table_ = {};
+  next_t_2d_array_ = {};
+}
 
 /**
  * @return size of next_t_map
@@ -77,6 +85,7 @@ std::vector<Entity*> NextTExtractor::GetRelationship(RelDirection dir,
  * @return all Entities that can be on the LHS/RHS of the relationship.
  */
 std::vector<Entity*> NextTExtractor::GetFirstEntityOfRelationship(RelDirection dir, DesignEntity de) {
+  if (next_design_entities.count(de) == 0) return {};
   if (de == DesignEntity::kProgLine) {
     de = DesignEntity::kStmt;
   }
@@ -88,6 +97,7 @@ std::vector<Entity*> NextTExtractor::GetFirstEntityOfRelationship(RelDirection d
 std::vector<std::tuple<Entity*, Entity*>> NextTExtractor::GetRelationshipByTypes(RelDirection dir,
                                                                                  DesignEntity first,
                                                                                  DesignEntity second) {
+  if (next_design_entities.count(first) == 0 || next_design_entities.count(second) == 0) return {};
   if (first == DesignEntity::kProgLine) {
     first = DesignEntity::kStmt;
   }
@@ -113,14 +123,23 @@ bool NextTExtractor::HasRelationship(RelDirection dir) {
 }
 
 bool NextTExtractor::HasRelationship(RelDirection dir, int target) {
-  return pkb_->HasRelationship(PKBRelRefs::kNext, std::to_string(target));
+  if (dir == RelDirection::kForward) {
+    return pkb_->HasRelationship(PKBRelRefs::kNext, std::to_string(target));
+  } else {
+    return pkb_->HasRelationship(PKBRelRefs::kPrevious, std::to_string(target));
+  }
 }
 
 /**
  * Returns true if Next*(first, second).
  */
 bool NextTExtractor::HasRelationship(RelDirection dir, int first, int second) {
-  rel_direction_ = dir;
+  if (dir == RelDirection::kReverse) {
+    rel_direction_ = RelDirection::kForward;
+    int temp = first;
+    first = second;
+    second = temp;
+  }
   int total_stmt = stmt_list_.size();
   if (first > total_stmt || first <= 0 || second > total_stmt || second <= 0) {
     return false;
@@ -349,7 +368,7 @@ void NextTExtractor::AddRelationships(Statement* first_arg, std::list<Statement*
  */
 void NextTExtractor::AddRelationshipsWithDup(Statement* first_arg, const std::list<Statement*> &second_args) {
   if (second_args.empty() || rel_table_[rel_direction_].count(first_arg) == 1) return;
-  int first_arg_num = first_arg->GetStatementNumber()->GetNum();
+  int first_arg_num = first_arg->GetStatementNumber();
   auto* list = MakeUniqueList(first_arg_num, second_args);
   rel_table_[rel_direction_].insert({first_arg, list});
   DesignEntity de = PKB::GetDesignEntityFromEntity(first_arg);
@@ -397,7 +416,7 @@ std::list<Statement*>* NextTExtractor::MakeUniqueList(int s1_num, const std::lis
   auto new_list = new std::list<Statement*>();
   std::vector<int> duplicates(stmt_list_.size(), 0);
   for (Statement* s: list) {
-    int s_num = s->GetStatementNumber()->GetNum();
+    int s_num = s->GetStatementNumber();
     if (duplicates[s_num - 1] == 0) {
       duplicates[s_num - 1] = 1;
       next_t_2d_array_[s_num - 1][s1_num - 1] = 1;

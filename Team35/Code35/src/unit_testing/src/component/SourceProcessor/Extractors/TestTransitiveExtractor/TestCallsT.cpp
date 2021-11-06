@@ -18,7 +18,7 @@ TEST_CASE("1.TransitiveExtractor.Extract CallsT positive tests") {
     procedure_extractor.Extract(deliverable->GetCallsTMap(),
                                 deliverable->GetCalledByTMap(),
                                 deliverable->GetCallsMap());
-    CHECK(deliverable->calls_T_hash_.empty());
+    CHECK(deliverable->GetCallsTMap()->empty());
   }
 
   SECTION("No transitive Calls") {
@@ -42,8 +42,8 @@ TEST_CASE("1.TransitiveExtractor.Extract CallsT positive tests") {
                                 deliverable->GetCalledByTMap(),
                                 deliverable->GetCallsMap());
 
-    std::list<Procedure*>* actual_proc_list1 = deliverable->calls_T_hash_.find(proc1)->second;
-    std::list<Procedure*>* actual_proc_list3 = deliverable->calls_T_hash_.find(proc3)->second;
+    std::list<Procedure*>* actual_proc_list1 = deliverable->GetCallsTMap()->find(proc1)->second;
+    std::list<Procedure*>* actual_proc_list3 = deliverable->GetCallsTMap()->find(proc3)->second;
     std::list<Procedure*> expected_proc_list1 = std::list<Procedure*>{
         proc2, proc4
     };
@@ -52,16 +52,16 @@ TEST_CASE("1.TransitiveExtractor.Extract CallsT positive tests") {
     };
 
     CHECK(*actual_proc_list1 == expected_proc_list1);
-    CHECK(deliverable->calls_T_hash_.count(proc2) == 0);
+    CHECK(deliverable->GetCallsTMap()->count(proc2) == 0);
     CHECK(*actual_proc_list3 == expected_proc_list3);
-    CHECK(deliverable->calls_T_hash_.count(proc4) == 0);
+    CHECK(deliverable->GetCallsTMap()->count(proc4) == 0);
 
     // reverse
     std::list<Procedure*> expected_proc_list4 = std::list<Procedure*>{
         proc1, proc3
     };
-    CHECK(TestUtils::AreListsEqual(*deliverable->called_by_T_hash_.find(proc2)->second, expected_proc_list4));
-    CHECK(TestUtils::AreListsEqual(*deliverable->called_by_T_hash_.find(proc4)->second, expected_proc_list4));
+    CHECK(TestUtils::AreListsEqual(*deliverable->GetCalledByTMap()->find(proc2)->second, expected_proc_list4));
+    CHECK(TestUtils::AreListsEqual(*deliverable->GetCalledByTMap()->find(proc4)->second, expected_proc_list4));
   }
 
   SECTION("Transitive Calls") {
@@ -91,9 +91,9 @@ TEST_CASE("1.TransitiveExtractor.Extract CallsT positive tests") {
                                 deliverable->GetCalledByTMap(),
                                 deliverable->GetCallsMap());
 
-    std::list<Procedure*>* actual_proc_list1 = deliverable->calls_T_hash_.find(proc1)->second;
-    std::list<Procedure*>* actual_proc_list2 = deliverable->calls_T_hash_.find(proc2)->second;
-    std::list<Procedure*>* actual_proc_list3 = deliverable->calls_T_hash_.find(proc3)->second;
+    std::list<Procedure*>* actual_proc_list1 = deliverable->GetCallsTMap()->find(proc1)->second;
+    std::list<Procedure*>* actual_proc_list2 = deliverable->GetCallsTMap()->find(proc2)->second;
+    std::list<Procedure*>* actual_proc_list3 = deliverable->GetCallsTMap()->find(proc3)->second;
     std::list<Procedure*> expected_proc_list1 = std::list<Procedure*>{
         proc4, proc3, proc2
     };
@@ -107,7 +107,7 @@ TEST_CASE("1.TransitiveExtractor.Extract CallsT positive tests") {
     CHECK(*actual_proc_list1 == expected_proc_list1);
     CHECK(*actual_proc_list2 == expected_proc_list2);
     CHECK(*actual_proc_list3 == expected_proc_list3);
-    CHECK(deliverable->calls_T_hash_.count(proc4) == 0);
+    CHECK(deliverable->GetCallsTMap()->count(proc4) == 0);
 
     // reverse
     std::list<Procedure*> expected_proc_list4 = std::list<Procedure*>{
@@ -116,10 +116,10 @@ TEST_CASE("1.TransitiveExtractor.Extract CallsT positive tests") {
     std::list<Procedure*> expected_proc_list5 = std::list<Procedure*>{
         proc2, proc1
     };
-    CHECK(deliverable->called_by_T_hash_.count(proc1) == 0);
-    CHECK(*deliverable->called_by_T_hash_.find(proc2)->second == std::list<Procedure*>{proc1});
-    CHECK(*deliverable->called_by_T_hash_.find(proc3)->second == expected_proc_list5);
-    CHECK(*deliverable->called_by_T_hash_.find(proc4)->second == expected_proc_list4);
+    CHECK(deliverable->GetCalledByTMap()->count(proc1) == 0);
+    CHECK(*deliverable->GetCalledByTMap()->find(proc2)->second == std::list<Procedure*>{proc1});
+    CHECK(*deliverable->GetCalledByTMap()->find(proc3)->second == expected_proc_list5);
+    CHECK(*deliverable->GetCalledByTMap()->find(proc4)->second == expected_proc_list4);
   }
 }
 

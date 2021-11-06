@@ -23,7 +23,7 @@ TEST_CASE("1.NextExtractor.basic conditions") {
     NextExtractor next_extractor{};
     next_extractor.Extract(&deliverable);
 
-    CHECK(deliverable.next_hash_.size() == 0);
+    CHECK(deliverable.GetNextMap()->size() == 0);
   }
 
   SECTION("single level statement list") {
@@ -45,11 +45,11 @@ TEST_CASE("1.NextExtractor.basic conditions") {
     NextExtractor next_extractor{};
     next_extractor.Extract(&deliverable);
 
-    CHECK(deliverable.next_hash_.size() == 2);
+    CHECK(deliverable.GetNextMap()->size() == 2);
     std::list<Statement*> expected_s1 = {s2};
-    CHECK(*deliverable.next_hash_.find(s1)->second == expected_s1);
+    CHECK(*deliverable.GetNextMap()->find(s1)->second == expected_s1);
     std::list<Statement*> expected_s2 = {s3};
-    CHECK(*deliverable.next_hash_.find(s2)->second == expected_s2);
+    CHECK(*deliverable.GetNextMap()->find(s2)->second == expected_s2);
   }
 
   SECTION("1 if") {
@@ -104,25 +104,25 @@ TEST_CASE("1.NextExtractor.basic conditions") {
     NextExtractor next_extractor{};
     next_extractor.Extract(&deliverable);
 
-    CHECK(deliverable.next_hash_.size() == 6);
+    CHECK(deliverable.GetNextMap()->size() == 6);
     std::list<Statement*> expected_s1 = {s2};
     CHECK(TestUtils::AreListsEqual(
-        *deliverable.next_hash_.find(s1)->second, expected_s1));
+        *deliverable.GetNextMap()->find(s1)->second, expected_s1));
     std::list<Statement*> expected_s2 = {s3, s5};
     CHECK(TestUtils::AreListsEqual(
-        *deliverable.next_hash_.find(s2)->second, expected_s2));
+        *deliverable.GetNextMap()->find(s2)->second, expected_s2));
     std::list<Statement*> expected_s3 = {s4};
     CHECK(TestUtils::AreListsEqual(
-        *deliverable.next_hash_.find(s3)->second, expected_s3));
+        *deliverable.GetNextMap()->find(s3)->second, expected_s3));
     std::list<Statement*> expected_s4 = {s7};
     CHECK(TestUtils::AreListsEqual(
-        *deliverable.next_hash_.find(s4)->second, expected_s4));
+        *deliverable.GetNextMap()->find(s4)->second, expected_s4));
     std::list<Statement*> expected_s5 = {s6};
     CHECK(TestUtils::AreListsEqual(
-        *deliverable.next_hash_.find(s5)->second, expected_s5));
+        *deliverable.GetNextMap()->find(s5)->second, expected_s5));
     std::list<Statement*> expected_s6 = {s7};
     CHECK(TestUtils::AreListsEqual(
-        *deliverable.next_hash_.find(s6)->second, expected_s6));
+        *deliverable.GetNextMap()->find(s6)->second, expected_s6));
   }
 
   SECTION("1 while with next") {
@@ -170,22 +170,22 @@ TEST_CASE("1.NextExtractor.basic conditions") {
     NextExtractor next_extractor{};
     next_extractor.Extract(&deliverable);
 
-    CHECK(deliverable.next_hash_.size() == 5);
+    CHECK(deliverable.GetNextMap()->size() == 5);
     std::list<Statement*> expected_s1 = {s2};
     CHECK(TestUtils::AreListsEqual(
-        *deliverable.next_hash_.find(s1)->second, expected_s1));
+        *deliverable.GetNextMap()->find(s1)->second, expected_s1));
     std::list<Statement*> expected_s2 = {s3, s6};
     CHECK(TestUtils::AreListsEqual(
-        *deliverable.next_hash_.find(s2)->second, expected_s2));
+        *deliverable.GetNextMap()->find(s2)->second, expected_s2));
     std::list<Statement*> expected_s3 = {s4};
     CHECK(TestUtils::AreListsEqual(
-        *deliverable.next_hash_.find(s3)->second, expected_s3));
+        *deliverable.GetNextMap()->find(s3)->second, expected_s3));
     std::list<Statement*> expected_s4 = {s5};
     CHECK(TestUtils::AreListsEqual(
-        *deliverable.next_hash_.find(s4)->second, expected_s4));
+        *deliverable.GetNextMap()->find(s4)->second, expected_s4));
     std::list<Statement*> expected_s5 = {s2};
     CHECK(TestUtils::AreListsEqual(
-        *deliverable.next_hash_.find(s5)->second, expected_s5));
+        *deliverable.GetNextMap()->find(s5)->second, expected_s5));
   }
 
   SECTION("1 while without next") {
@@ -217,16 +217,16 @@ TEST_CASE("1.NextExtractor.basic conditions") {
     NextExtractor next_extractor{};
     next_extractor.Extract(&deliverable);
 
-    CHECK(deliverable.next_hash_.size() == 3);
+    CHECK(deliverable.GetNextMap()->size() == 3);
     std::list<Statement*> expected_s1 = {s2};
     CHECK(TestUtils::AreListsEqual(
-        *deliverable.next_hash_.find(s1)->second, expected_s1));
+        *deliverable.GetNextMap()->find(s1)->second, expected_s1));
     std::list<Statement*> expected_s2 = {s3};
     CHECK(TestUtils::AreListsEqual(
-        *deliverable.next_hash_.find(s2)->second, expected_s2));
+        *deliverable.GetNextMap()->find(s2)->second, expected_s2));
     std::list<Statement*> expected_s3 = {s1};
     CHECK(TestUtils::AreListsEqual(
-        *deliverable.next_hash_.find(s3)->second, expected_s3));
+        *deliverable.GetNextMap()->find(s3)->second, expected_s3));
   }
 
   SECTION("multiple procedures") {
@@ -296,19 +296,19 @@ TEST_CASE("1.NextExtractor.basic conditions") {
     NextExtractor next_extractor{};
     next_extractor.Extract(&deliverable);
 
-    CHECK(deliverable.next_hash_.size() == 4);
+    CHECK(deliverable.GetNextMap()->size() == 4);
     std::list<Statement*> expected_s1 = {s2};
     CHECK(TestUtils::AreListsEqual(
-        *deliverable.next_hash_.find(s1)->second, expected_s1));
+        *deliverable.GetNextMap()->find(s1)->second, expected_s1));
     std::list<Statement*> expected_s2 = {s3};
     CHECK(TestUtils::AreListsEqual(
-        *deliverable.next_hash_.find(s2)->second, expected_s2));
+        *deliverable.GetNextMap()->find(s2)->second, expected_s2));
     std::list<Statement*> expected_s3 = {s1};
     CHECK(TestUtils::AreListsEqual(
-        *deliverable.next_hash_.find(s3)->second, expected_s3));
+        *deliverable.GetNextMap()->find(s3)->second, expected_s3));
     std::list<Statement*> expected_s5 = {s6, s7};
     CHECK(TestUtils::AreListsEqual(
-        *deliverable.next_hash_.find(s5)->second, expected_s5));
+        *deliverable.GetNextMap()->find(s5)->second, expected_s5));
   }
 }
 
@@ -381,21 +381,21 @@ TEST_CASE("1.NextExtractor.nested containers") {
     NextExtractor next_extractor{};
     next_extractor.Extract(&deliverable);
 
-    CHECK(deliverable.next_hash_.size() == 7);
+    CHECK(deliverable.GetNextMap()->size() == 7);
     CHECK(TestUtils::AreListsEqual(
-        *deliverable.next_hash_.find(s1)->second, {s2, s7}));
+        *deliverable.GetNextMap()->find(s1)->second, {s2, s7}));
     CHECK(TestUtils::AreListsEqual(
-        *deliverable.next_hash_.find(s2)->second, {s3, s4}));
+        *deliverable.GetNextMap()->find(s2)->second, {s3, s4}));
     CHECK(TestUtils::AreListsEqual(
-        *deliverable.next_hash_.find(s3)->second, {s8}));
+        *deliverable.GetNextMap()->find(s3)->second, {s8}));
     CHECK(TestUtils::AreListsEqual(
-        *deliverable.next_hash_.find(s4)->second, {s5, s6}));
+        *deliverable.GetNextMap()->find(s4)->second, {s5, s6}));
     CHECK(TestUtils::AreListsEqual(
-        *deliverable.next_hash_.find(s5)->second, {s8}));
+        *deliverable.GetNextMap()->find(s5)->second, {s8}));
     CHECK(TestUtils::AreListsEqual(
-        *deliverable.next_hash_.find(s6)->second, {s8}));
+        *deliverable.GetNextMap()->find(s6)->second, {s8}));
     CHECK(TestUtils::AreListsEqual(
-        *deliverable.next_hash_.find(s7)->second, {s8}));
+        *deliverable.GetNextMap()->find(s7)->second, {s8}));
   }
 
   SECTION("while x3") {
@@ -436,17 +436,17 @@ TEST_CASE("1.NextExtractor.nested containers") {
     NextExtractor next_extractor{};
     next_extractor.Extract(&deliverable);
 
-    CHECK(deliverable.next_hash_.size() == 5);
+    CHECK(deliverable.GetNextMap()->size() == 5);
     CHECK(TestUtils::AreListsEqual(
-        *deliverable.next_hash_.find(s1)->second, {s2, s6}));
+        *deliverable.GetNextMap()->find(s1)->second, {s2, s6}));
     CHECK(TestUtils::AreListsEqual(
-        *deliverable.next_hash_.find(s2)->second, {s3, s1}));
+        *deliverable.GetNextMap()->find(s2)->second, {s3, s1}));
     CHECK(TestUtils::AreListsEqual(
-        *deliverable.next_hash_.find(s3)->second, {s4}));
+        *deliverable.GetNextMap()->find(s3)->second, {s4}));
     CHECK(TestUtils::AreListsEqual(
-        *deliverable.next_hash_.find(s4)->second, {s5, s2}));
+        *deliverable.GetNextMap()->find(s4)->second, {s5, s2}));
     CHECK(TestUtils::AreListsEqual(
-        *deliverable.next_hash_.find(s5)->second, {s4}));
+        *deliverable.GetNextMap()->find(s5)->second, {s4}));
   }
   SECTION("if and while") {}
   SECTION("multiple nesting of if and while") {}

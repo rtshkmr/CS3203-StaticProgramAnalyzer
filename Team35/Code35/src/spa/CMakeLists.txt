@@ -12,7 +12,7 @@ add_library(spa ${srcs} ${headers}
         src/component/SourceProcessor/EntityFactory.cpp src/component/SourceProcessor/EntityFactory.h
         src/datatype/Deliverable.cpp
         src/datatype/Deliverable.h
-        src/datatype/RegexPatterns.h src/datatype/RegexPatterns.cpp
+        src/util/RegexPatterns.h src/util/RegexPatterns.cpp
         src/component/SourceProcessor/SourceProcessor.cpp
         src/component/SourceProcessor/SourceProcessor.h
         src/component/SourceProcessor/Parser.cpp
@@ -53,7 +53,7 @@ add_library(spa ${srcs} ${headers}
         src/util/Utility.cpp src/util/Utility.h src/component/PKB/extractor/NextBipExtractor.cpp src/component/PKB/extractor/NextBipExtractor.h
         src/component/SourceProcessor/Extractors/TransitiveExtractor.h
         src/component/SourceProcessor/Extractors/VariableTExtractor.cpp src/component/SourceProcessor/Extractors/VariableTExtractor.h
-        src/component/PKB/extractor/NextBipTExtractor.cpp src/component/PKB/extractor/NextBipTExtractor.h src/component/PKB/extractor/RuntimeColleague.h src/component/PKB/extractor/RuntimeMediator.h)
+        src/component/PKB/extractor/NextBipTExtractor.cpp src/component/PKB/extractor/NextBipTExtractor.h src/component/PKB/extractor/RuntimeColleague.h src/component/PKB/extractor/RuntimeMediator.h src/component/PKB/extractor/AffectsBipExtractor.cpp src/component/PKB/extractor/AffectsBipExtractor.h src/component/PKB/extractor/AffectsBipTExtractor.cpp src/component/PKB/extractor/AffectsBipTExtractor.h)
 
 # this makes the headers accessible for other projects which uses spa lib
 target_include_directories(spa PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)

@@ -1,0 +1,54 @@
+procedure n4 {
+	if (reset == true) then {
+		alpha = 1;
+		call n5;
+	} else {
+		call n5;
+	}
+}
+procedure n5 {
+    while (false == no) {
+	print alpha;
+	print beta;
+	print charlie;
+    }
+}
+procedure n6 {
+	read beta;
+}
+procedure n1 {
+	if (zebra > lion) then {
+		call n3;
+		while (lion > tiger) {
+			charlie = charlie % delta;
+			call n2;
+			delta = charlie % alpha;
+		}
+	} else {
+		null = alpha;
+		call n5;
+		read delta;
+	}
+	charlie = delta;
+    if (rit == esh) then {
+	while (submodule == submodule) {
+		while (!(submodule == submodule)) {
+			null = null;
+			call n4;
+		}
+	}
+    } else {
+        g = g;
+    }
+}
+procedure n2 {
+	call n5;
+}
+procedure n3 {
+    call n4;
+    call n5;
+    call n6;
+}
+procedure no {
+    read no;
+}

@@ -6,6 +6,7 @@
 
 #include <regex>
 
+// todo: shift RegexPatterns to utils
 class RegexPatterns {
 
  public:
@@ -15,12 +16,11 @@ class RegexPatterns {
   static std::regex GetBinaryComparisonPattern();
   static std::regex GetNamePattern();
   static std::regex GetIntegerPattern();
-  static std::regex GetDesignEntityPattern();
   static std::regex GetBooleanOperatorPattern();
   // for validator:
   static std::regex GetTermDelimiterPattern();
   static std::regex GetExprDelimiterPattern();
-  static std::regex GetUnaryBooleanOperatorPattern(); // only NOT
+  // only NOT
   static std::regex GetBinaryBooleanOperatorPattern();
   static std::regex GetValidStatementTerminalToken();
   static std::regex GetIntegerPatternNonTerminating();

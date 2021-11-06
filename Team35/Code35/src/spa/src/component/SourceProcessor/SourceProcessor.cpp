@@ -19,25 +19,21 @@ constexpr auto L = [](auto msg) {
  * @param fileName The name of the file to be processed.
  * @return Source process status
  */
-PKB* SourceProcessor::ProcessSourceFile(std::string file_name) {
+PKB* SourceProcessor::ProcessSourceFile(const std::string& file_name) {
   L("[ENTER] SOURCE PROC ");
   L("... processing source file");
   par::Parser parser;
-
   Deliverable* deliverable;
-
   try {
     parser.Parse(file_name);
     deliverable = parser.GetDeliverables();
-    DesignExtractor design_extractor = DesignExtractor(deliverable);
+    auto design_extractor = DesignExtractor(deliverable);
     design_extractor.ExtractDesignAbstractions();
   } catch (SyntaxException s) {
-    std::cerr << "Syntax Error\n";
-    std::cerr << s.what() << std::endl;
+    std::cerr << "Syntax Error\n" << s.what() << std::endl;
     Terminate(std::string("Unfortunately, there was a syntax error in the input SIMPLE Program:("));
   } catch (std::exception e) {
-    std::cerr << "Exception error\n";
-    std::cerr << e.what() << std::endl;
+    std::cerr << "Exception error\n" << e.what() << std::endl;
     Terminate(std::string("Unfortunately, there was an unknown exception thrown due to an invalid SIMPLE program."));
   }
 
@@ -45,8 +41,7 @@ PKB* SourceProcessor::ProcessSourceFile(std::string file_name) {
   try {
     new_pkb->PopulateDataStructures(* deliverable);
   } catch (PKBException e) {
-    std::cerr << "PKB error\n";
-    std::cerr << e.what() << std::endl;
+    std::cerr << "PKB error\n" << e.what() << std::endl;
     Terminate(std::string("Unfortunately, there was an unknown exception thrown due to an invalid SIMPLE program."));
   }
   return new_pkb;
@@ -55,7 +50,7 @@ PKB* SourceProcessor::ProcessSourceFile(std::string file_name) {
 /**
  * Terminates Parser execution and logger, and exits program.
  */
-void SourceProcessor::Terminate(std::string msg) {
+void SourceProcessor::Terminate(const std::string& msg) {
   std::string logger_output = msg + "\n [ERROR] TERMINATING PROGRAM";
   L(logger_output);
   LoggerTerminate();

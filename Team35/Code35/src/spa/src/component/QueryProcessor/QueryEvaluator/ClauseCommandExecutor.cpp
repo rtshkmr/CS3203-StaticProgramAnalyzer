@@ -78,13 +78,8 @@ bool ClauseCommandExecutor::HasAssignPatternRelationship(Entity *assign_entity, 
   bool has_relationship = false;
 
   for (auto current_entity: intermediate_table) {
-//<<<<<<< HEAD
-//    auto *current_assign_entity = dynamic_cast<AssignEntity *>(current_entity);
-//    Variable *current_variable_entity = current_assign_entity->GetVariable();
-//=======
-    AssignEntity *current_assign_entity = dynamic_cast<AssignEntity *>(current_entity);
+    auto *current_assign_entity = dynamic_cast<AssignEntity *>(current_entity);
     Variable *current_variable_entity = current_assign_entity->GetVariableObj();
-//>>>>>>> master
     if (current_assign_entity == assign_entity && variable_entity == current_variable_entity &&
     HasExpressionMatch(pattern, current_assign_entity)) {
       has_relationship = true;
@@ -119,22 +114,23 @@ bool ClauseCommandExecutor::HasWhileOrIfPatternRelationship(Entity *left_entity,
 std::string ClauseCommandExecutor::RetrieveEntityAttribute(Entity *entity, Attribute attribute) {
   switch (attribute) {
   case (Attribute::kStmtNumber):
-    return std::to_string(const_cast<StatementNumber*>(dynamic_cast<Statement *>(entity)->GetStatementNumber())->GetNum());
+//    return std::to_string(const_cast<StatementNumber*>(dynamic_cast<Statement*>(entity)->GetStatementNumberObj())->GetNum());
+      return std::to_string(dynamic_cast<Statement*>(entity)->GetStatementNumber());
   case Attribute::kProcName :
     if (typeid(*entity) == typeid(Procedure)) {
-      return const_cast<ProcedureName*>(dynamic_cast<Procedure *>(entity)->GetName())->getName();
+      return const_cast<ProcedureName*>(dynamic_cast<Procedure*>(entity)->GetName())->GetName();
     } else {
-      return const_cast<ProcedureName*>(dynamic_cast<CallEntity *>(entity)->GetProcedure()->GetName())->getName();
+      return const_cast<ProcedureName*>(dynamic_cast<CallEntity*>(entity)->GetCalledProcedure()->GetName())->GetName();
     }
   case Attribute::kValue:
-    return std::to_string(const_cast<ConstantValue*>(dynamic_cast<Constant *>(entity)->GetValue())->Get());
+    return std::to_string(const_cast<ConstantValue*>(dynamic_cast<Constant*>(entity)->GetValue())->GetValue());
   case Attribute::kVarName:
     if (typeid(*entity) == typeid(Variable)) {
       return dynamic_cast<Variable*>(entity)->GetNameInString();
     } else if (typeid(*entity) == typeid(ReadEntity)) {
-      return dynamic_cast<ReadEntity *>(entity)->GetVariable()->GetNameInString();
+      return dynamic_cast<ReadEntity *>(entity)->GetVariableString();
     } else {
-      return dynamic_cast<PrintEntity *>(entity)->GetVariable()->GetNameInString();
+      return dynamic_cast<PrintEntity*>(entity)->GetVariableString();
     }
   default:
     return "";
@@ -367,7 +363,7 @@ bool ClauseCommandExecutor::HasPatternValueMatch(Entity *stmt_entity_in_table, c
   std::vector<Variable *> variable_to_check = RetrieveVariablesFromStmt(stmt_entity_in_table);
 
   if (typeid(*stmt_entity_in_table) == typeid(AssignEntity)) {
-    AssignEntity *assign_entity = dynamic_cast<AssignEntity *>(stmt_entity_in_table);
+    auto *assign_entity = dynamic_cast<AssignEntity *>(stmt_entity_in_table);
     std::string variable_value_in_table = const_cast<VariableName*>(variable_to_check[0]->GetVariableName())->GetName();
     return (value == "_" || value == variable_value_in_table) && HasExpressionMatch(pattern, assign_entity);
   } else {
@@ -382,7 +378,7 @@ bool ClauseCommandExecutor::HasPatternValueMatch(Entity *stmt_entity_in_table, c
 std::vector<Variable *> ClauseCommandExecutor::RetrieveVariablesFromStmt(Entity *stmt_entity) {
   std::vector<Variable *> variable_to_check;
   if (typeid(*stmt_entity) == typeid(AssignEntity)) {
-    AssignEntity *assign_entity = dynamic_cast<AssignEntity *>(stmt_entity);
+    auto *assign_entity = dynamic_cast<AssignEntity *>(stmt_entity);
     variable_to_check.push_back(assign_entity->GetVariableObj());
   } else if (typeid(*stmt_entity) == typeid(IfEntity)) {
     auto *if_entity = dynamic_cast<IfEntity *>(stmt_entity);
@@ -409,4 +405,51 @@ bool ClauseCommandExecutor::HasExpressionMatch(Pattern *pattern, AssignEntity *a
   } else {
     return true;
   }
+}
+
+void ClauseCommandExecutor::DoubleSynonymCross(Clause *clause) {
+  Synonym *first_syn = clause->first_synonym;
+  Synonym *second_syn = clause->second_synonym;
+  std::vector<std::tuple<Entity *, Entity *>> intermediate_table = table->GetRelationshipsByType();
+  std::vector<Entity*> first_entity_list;
+  std::vector<Entity*> second_entity_list;
+  for (auto tuple : intermediate_table) {
+    if (typeid(*clause) == typeid(Pattern) && first_syn->GetType() == DesignEntity::kAssign) {
+      if (!HasAssignPatternRelationship(std::get<0>(tuple),
+                                        std::get<1>(tuple), dynamic_cast<Pattern*>(clause))) continue;
+    }
+    first_entity_list.push_back(std::get<0>(tuple));
+    second_entity_list.push_back(std::get<1>(tuple));
+  }
+  std::vector<std::vector<Entity*>> entity_list = {first_entity_list, second_entity_list};
+  std::vector<Synonym *> synonym_list = {first_syn, second_syn};
+  group_table->CrossProductColumns(synonym_list, entity_list);
+}
+
+void ClauseCommandExecutor::SingleSynonymCross(Clause *clause, bool syn_is_first_param) {
+  Synonym *new_synonym = syn_is_first_param ? clause->first_synonym : clause->second_synonym;
+  std::vector<Entity*> entity_list = table->GetRelationships();
+  if (typeid(*clause) == typeid(Pattern) && new_synonym->GetType() == DesignEntity::kAssign) {
+    entity_list = FilterAssignSingleClause(entity_list, clause, syn_is_first_param);
+  }
+  std::vector<std::vector<Entity*>> final_entity_list = {entity_list};
+  std::vector<Synonym *> synonym_list = {new_synonym};
+  group_table->CrossProductColumns(synonym_list, final_entity_list);
+}
+
+std::vector<Entity *> ClauseCommandExecutor::FilterAssignSingleClause(const std::vector<Entity *>& unfiltered_entities, Clause *clause, bool is_first) {
+  std::vector<Entity *> filtered_entities;
+
+  for (auto entity : unfiltered_entities) {
+    auto assign_entity = dynamic_cast<AssignEntity*>(entity);
+    Variable* variable_entity = assign_entity->GetVariableObj();
+    if (!HasAssignPatternRelationship(entity, variable_entity
+                                      , dynamic_cast<Pattern*>(clause))) continue;
+    if (is_first) {
+      filtered_entities.push_back(entity);
+    } else {
+      filtered_entities.push_back(variable_entity);
+    }
+  }
+  return filtered_entities;
 }

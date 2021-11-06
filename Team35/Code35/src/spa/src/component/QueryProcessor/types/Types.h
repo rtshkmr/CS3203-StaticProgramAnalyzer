@@ -51,7 +51,12 @@ enum class PKBRelRefs {
   kNextBip,
   kPrevBip,
   kNextBipT,
-  kPrevBipT
+  kPrevBipT,
+  kAffectsBip,
+  kAffectedByBip,
+  kAffectsBipT,
+  kAffectedByBipT,
+  kInvalid
 };
 
 enum class RelRef {
@@ -67,8 +72,12 @@ enum class RelRef {
   kFollowsT,
   kNext,
   kNextT,
+  kNextBip,
+  kNextBipT,
   kAffects,
   kAffectsT,
+  kAffectsBip,
+  kAffectsBipT,
   kInvalid
 };
 
@@ -154,7 +163,11 @@ const std::unordered_set<PKBRelRefs> second_param_is_stmt = {
   PKBRelRefs::kNextBip,
   PKBRelRefs::kPrevBip,
   PKBRelRefs::kNextBipT,
-  PKBRelRefs::kPrevBipT
+  PKBRelRefs::kPrevBipT,
+  PKBRelRefs::kAffectsBip,
+  PKBRelRefs::kAffectedByBip,
+  PKBRelRefs::kAffectsBipT,
+  PKBRelRefs::kAffectedByBipT
 };
 
 const std::unordered_set<PKBRelRefs> second_param_is_var = {
@@ -196,8 +209,8 @@ struct Clause {
 };
 
 struct With : Clause {
-  Attribute left_attribute;
-  Attribute right_attribute;
+  Attribute left_attribute = Attribute::kInvalid;
+  Attribute right_attribute = Attribute::kInvalid;
   bool left_is_prog_line;
   bool right_is_prog_line;
   With() {};
@@ -351,6 +364,74 @@ class Group {
   std::vector<Synonym*> GetTargetSynonyms();
   void UpdateHasTargetSynonymAttr();
   int GetGroupSize();
+};
+
+// functors for hashing purposes
+struct SuchThatHash {
+  std::size_t operator()(const SuchThat& cl) const {
+    int hash = 17;
+    hash = hash * 23 + std::hash<RelRef>()(cl.rel_ref);
+    hash = hash * 23 + std::hash<std::string>()(cl.left_hand_side);
+    hash = hash * 23 + std::hash<std::string>()(cl.right_hand_side);
+    hash = hash * 23 + std::hash<bool>()(cl.left_is_synonym);
+    hash = hash * 23 + std::hash<bool>()(cl.right_is_synonym);
+    return hash;
+  }
+};
+
+struct PatternHash {
+  std::size_t operator()(const Pattern& cl) const {
+    int hash = 17;
+    hash = hash * 23 + std::hash<std::string>()(cl.left_hand_side);
+    hash = hash * 23 + std::hash<std::string>()(cl.right_hand_side);
+    hash = hash * 23 + std::hash<bool>()(cl.left_is_synonym);
+    hash = hash * 23 + std::hash<bool>()(cl.right_is_synonym);
+    hash = hash * 23 + std::hash<bool>()(cl.is_exact);
+    hash = hash * 23 + std::hash<std::string>()(cl.assign_synonym);
+    hash = hash * 23 + std::hash<DesignEntity>()(cl.pattern_type);
+    return hash;
+  }
+};
+
+struct WithHash {
+  std::size_t operator()(const With& cl) const {
+    int hash = 17;
+    hash = hash * 23 + std::hash<std::string>()(cl.left_hand_side);
+    hash = hash * 23 + std::hash<std::string>()(cl.right_hand_side);
+    hash = hash * 23 + std::hash<Attribute>()(cl.left_attribute);
+    hash = hash * 23 + std::hash<Attribute>()(cl.right_attribute);
+    hash = hash * 23 + std::hash<bool>()(cl.left_is_synonym);
+    hash = hash * 23 + std::hash<bool>()(cl.right_is_synonym);
+    hash = hash * 23 + std::hash<bool>()(cl.left_is_prog_line);
+    hash = hash * 23 + std::hash<bool>()(cl.right_is_prog_line);
+    return hash;
+  }
+};
+
+// functors for checking for equivalence
+struct SuchThatComparator {
+  bool operator()(const SuchThat& c1, const SuchThat& c2) const {
+    return c1.rel_ref == c2.rel_ref && c1.left_hand_side == c2.left_hand_side &&
+    c1.right_hand_side == c2.right_hand_side && c1.left_is_synonym == c2.left_is_synonym &&
+    c1.right_is_synonym == c2.right_is_synonym;
+  }
+};
+
+struct PatternComparator {
+  bool operator()(const Pattern& c1, const Pattern& c2) const {
+    return c1.pattern_type == c2.pattern_type && c1.left_hand_side == c2.left_hand_side &&
+    c1.right_hand_side == c2.right_hand_side && c1.left_is_synonym == c2.left_is_synonym &&
+    c1.right_is_synonym == c2.right_is_synonym && c1.is_exact == c2.is_exact && c1.assign_synonym == c2.assign_synonym;
+  }
+};
+
+struct WithComparator {
+  bool operator()(const With& c1, const With& c2) const {
+    return c1.left_hand_side == c2.left_hand_side && c1.right_hand_side == c2.right_hand_side &&
+    c1.left_is_synonym == c2.left_is_synonym && c1.right_is_synonym == c2.right_is_synonym &&
+    c1.left_attribute == c2.left_attribute && c1.right_attribute == c2.right_attribute &&
+    c1.left_is_prog_line == c2.left_is_prog_line && c1.right_is_prog_line == c2.right_is_prog_line;
+  }
 };
 
 #endif //AUTOTESTER_TYPES_H

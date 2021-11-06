@@ -2,7 +2,7 @@
 #include "QuerySemanticValidator.h"
 #include <component/SourceProcessor/Tokenizer.h>
 #include <component/SourceProcessor/SyntaxValidator.h>
-#include <datatype/RegexPatterns.h>
+#include <util/RegexPatterns.h>
 #include <unordered_set>
 #include <sstream>
 #include <exception/SpaException.h>
@@ -164,11 +164,14 @@ void QueryParser::ParseTuple() {
  */
 void QueryParser::ParseTarget() {
   if (lookahead.GetTokenTag() == TokenTag::kName && lookahead.GetTokenString().compare("BOOLEAN") == 0) {
-    // parse boolean
-    Eat(TokenTag::kName);
-  } else {
-    ParseTuple();
+    // parse boolean but only if there is no declared syn called 'BOOLEAN'
+    if (synonyms_name_set.find(lookahead.GetTokenString()) == synonyms_name_set.end()) {
+      Eat(TokenTag::kName);
+      was_query_boolean = true;
+      return;
+    }
   }
+  ParseTuple();
 }
 
 // stmtRef: synonym | ‘_’ | INTEGER
@@ -235,6 +238,7 @@ std::tuple<std::string, bool, bool, bool> QueryParser::ParseStmtOrEntRef() {
     std::tie(tok, is_case_syn) = ParseEntRef(false);
     is_synonym = is_case_syn && IsValidSynonym(tok);
     is_target_synonym = is_synonym && target_synonyms_map.find(tok.GetTokenString()) != target_synonyms_map.end();
+    curr_lookahead = tok.GetTokenString();
   } else {
     std::tie(curr_lookahead, is_synonym, is_target_synonym) = ParseStmtRef();
   }
@@ -247,7 +251,8 @@ std::tuple<std::string, bool, bool, bool> QueryParser::ParseStmtOrEntRef() {
  * @returns a tuple of values corresponding to Clause object, bool isTargetSynonym.
  */
 std::pair<Clause*, bool> QueryParser::ParseRelRef() {
-  std::unordered_set<std::string> relRefs = {"Follows", "Parent", "Uses", "Modifies", "Calls", "Next", "Affects"};
+  std::unordered_set<std::string> relRefs = {"Follows", "Parent", "Uses", "Modifies",
+                                             "Calls", "Next", "NextBip", "Affects"};
   std::unordered_set<std::string>::const_iterator got = relRefs.find(lookahead.GetTokenString());
   if (got == relRefs.end()) {
     throw PQLParseException("Invalid relRef in such that clause.");

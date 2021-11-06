@@ -14,30 +14,17 @@ void QueryExtractor::ExtractQuery() {
   QueryExtractor::ExtractQuery(true);
 }
 
-void QueryExtractor::ExtractQuery(bool flag) {
+void QueryExtractor::ExtractQuery(bool should_optimize) {
   auto tokenizer = QueryTokenizer();
   tokenizer.SetQueryString(& query);
   std::vector<Clause*> clauses;
-  QueryParser parser = QueryParser(clauses, synonyms, target_syn_attrs, target_synonyms_map, tokenizer);
+  QueryParser parser = QueryParser(clauses, synonyms, was_query_boolean,
+                                   target_syn_attrs, target_synonyms_map, tokenizer);
   parser.Parse();
-  QueryExtractor::PopulateSynAdjacencyList(& map_of_syn_to_clause_indices, & clauses);
-  QueryGrouper::GroupClauses(& clauses, & groups, & target_syn_attrs, &target_synonyms_map,
-                             & map_of_syn_to_clause_indices);
-  auto optimizer = QueryOptimizer(flag);
-  optimizer.ReorderGroups(& groups);
-}
-
-void QueryExtractor::PopulateSynAdjacencyList(std::unordered_map<std::string, std::vector<int>>* map_of_syn_to_cl_indices,
-                                              std::vector<Clause*>* clauses) {
-  for (int i = 0; i < clauses->size(); i++) {
-    std::vector<std::string> syns = clauses->at(i)->GetAllSynonymNamesOfClause();
-    for (std::string s : syns) {
-      if (map_of_syn_to_cl_indices->find(s) != map_of_syn_to_cl_indices->end()) {
-        map_of_syn_to_cl_indices->at(s).push_back(i);
-      } else {
-        std::vector<int> v { i };
-        map_of_syn_to_cl_indices->insert(std::make_pair(s, v));
-      }
-    }
+  if (!should_optimize) {
+    QueryGrouper::BasicGroupClauses(& clauses, & groups, &target_synonyms_map);
+  } else {
+    auto optimizer = QueryOptimizer(clauses, groups, target_syn_attrs, target_synonyms_map);
+    optimizer.Optimize();
   }
 }
