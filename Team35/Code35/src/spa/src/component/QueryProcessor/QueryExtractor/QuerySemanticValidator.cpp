@@ -177,7 +177,7 @@ bool QuerySemanticValidator::Is_Semantically_Valid_AttrCompare(Synonym* lhs_syn,
   bool lhs_has_attr = lhs_attr != Attribute::kInvalid;
   bool rhs_has_attr = rhs_attr != Attribute::kInvalid;
   bool lhs_is_pl = lhs_is_syn && lhs_syn->GetType() == DesignEntity::kProgLine;
-  bool rhs_is_pl = rhs_is_syn && lhs_syn->GetType() == DesignEntity::kProgLine;
+  bool rhs_is_pl = rhs_is_syn && rhs_syn->GetType() == DesignEntity::kProgLine;
 
   // conceptually, at least one lhs or rhs of with-cl must involve an attribute (or a prog_line with no attributes);
   bool one_side_is_prog_line = lhs_is_pl || rhs_is_pl;
