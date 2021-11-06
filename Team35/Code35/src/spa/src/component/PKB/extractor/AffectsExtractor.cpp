@@ -16,6 +16,8 @@ std::vector<Entity*> AffectsExtractor::GetRelationship(RelDirection dir, int tar
 }
 
 std::vector<Entity*> AffectsExtractor::GetFirstEntityOfRelationship(RelDirection dir, DesignEntity de) {
+  if (!Utility::IsAssignDesignEntity(de))
+    return std::vector<Entity*>{};
 
   return (dir == RelDirection::kForward) ? GetAllAffects() : GetAllAffectedBy();
 }
@@ -25,6 +27,9 @@ std::vector<std::tuple<Entity*, Entity*>> AffectsExtractor::GetRelationshipByTyp
                                                                                    DesignEntity first,
                                                                                    DesignEntity second) {
   std::vector<std::tuple<Entity*, Entity*>> retList = {};
+
+  if (!Utility::IsAssignDesignEntity(first) || !Utility::IsAssignDesignEntity(second))
+    return retList;
 
   if (cacheIndication == ScopeIndication::kAllScope) {
     for (auto pair : affects_map_) {
