@@ -35,7 +35,7 @@ Deliverable* SetUpDeliverable_Week4() {
   proc->AddStatement(stmt1);
   deliverable->AddStatement(stmt1);
   deliverable->AddReadEntity(stmt1);
-  deliverable->AddModifiesRelationship(stmt1, stmt1->GetVariable());
+  deliverable->AddModifiesRelationship(stmt1, stmt1->GetVariableObj());
 
   // print x
   PrintEntity* stmt2 = new PrintEntity(var_x);
@@ -44,7 +44,7 @@ Deliverable* SetUpDeliverable_Week4() {
   proc->AddStatement(stmt2);
   deliverable->AddStatement(stmt2);
   deliverable->AddPrintEntity(stmt2);
-  deliverable->AddUsesRelationship(stmt2, stmt2->GetVariable());
+  deliverable->AddUsesRelationship(stmt2, stmt2->GetVariableObj());
 
   // y = 1
   Constant* cv1 = new Constant(new ConstantValue("1"));

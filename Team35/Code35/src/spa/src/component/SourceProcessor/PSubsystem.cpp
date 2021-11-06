@@ -536,27 +536,27 @@ void PSubsystem::HandleCallStmt(Entity* entity) {
   auto* call_entity = dynamic_cast<CallEntity*>(entity);
   assert(call_entity);
   deliverable_->AddCallEntity(call_entity);
-  deliverable_->AddCallsRelationship(current_procedure_, call_entity->GetProcedure());
+  deliverable_->AddCallsRelationship(current_procedure_, call_entity->GetCalledProcedure());
 }
 
 void PSubsystem::HandlePrintStmt(Entity* entity) {
   auto* print_entity = dynamic_cast<PrintEntity*>(entity);
   assert(print_entity);
   deliverable_->AddPrintEntity(print_entity);
-  deliverable_->AddUsesRelationship(print_entity, print_entity->GetVariable());
-  deliverable_->AddUsesRelationship(current_procedure_, print_entity->GetVariable()); //procedure level
+  deliverable_->AddUsesRelationship(print_entity, print_entity->GetVariableObj());
+  deliverable_->AddUsesRelationship(current_procedure_, print_entity->GetVariableObj()); //procedure level
   if (current_procedure_ != current_node_)
-    deliverable_->AddUsesRelationship(current_node_, print_entity->GetVariable());   //container level
+    deliverable_->AddUsesRelationship(current_node_, print_entity->GetVariableObj());   //container level
 }
 
 void PSubsystem::HandleReadStmt(Entity* entity) {
   auto* read_entity = dynamic_cast<ReadEntity*>(entity);
   assert(read_entity);
   deliverable_->AddReadEntity(read_entity);
-  deliverable_->AddModifiesRelationship(read_entity, read_entity->GetVariable());
-  deliverable_->AddModifiesRelationship(current_procedure_, read_entity->GetVariable()); //procedure level
+  deliverable_->AddModifiesRelationship(read_entity, read_entity->GetVariableObj());
+  deliverable_->AddModifiesRelationship(current_procedure_, read_entity->GetVariableObj()); //procedure level
   if (current_procedure_ != current_node_)
-    deliverable_->AddModifiesRelationship(current_node_, read_entity->GetVariable());  //container level
+    deliverable_->AddModifiesRelationship(current_node_, read_entity->GetVariableObj());  //container level
 }
 
 void PSubsystem::CheckForIfElseValidity() {

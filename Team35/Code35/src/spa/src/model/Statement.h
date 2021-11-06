@@ -111,7 +111,7 @@ class AssignEntity : public Statement {
 
   std::vector<Variable*> GetExprVariables();
 
-  std::vector<Constant*> GetExpressionConstants();
+  std::vector<Constant*> GetExprConstants();
 
 };
 
@@ -123,12 +123,12 @@ class AssignEntity : public Statement {
  */
 class CallEntity : public Statement {
  private:
-  Procedure* proc_name_;
+  Procedure* called_proc_name_;
 
  public:
   CallEntity(Procedure* proc_name);
 
-  Procedure* GetProcedure();
+  Procedure* GetCalledProcedure();
 };
 
 /**
@@ -143,7 +143,9 @@ class PrintEntity : public Statement {
  public:
   PrintEntity(Variable* var_name);
 
-  Variable* GetVariable();
+  Variable* GetVariableObj();
+  std::string GetVariableString();
+
 };
 
 /**
@@ -158,7 +160,8 @@ class ReadEntity : public Statement {
  public:
   ReadEntity(Variable* var_name);
 
-  Variable* GetVariable();
+  Variable* GetVariableObj();
+  std::string GetVariableString();
 };
 
 #endif //AUTOTESTER_STATEMENT_H

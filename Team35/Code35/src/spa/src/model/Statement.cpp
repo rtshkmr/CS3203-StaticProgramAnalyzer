@@ -84,7 +84,7 @@ AssignEntity::AssignEntity(Variable* var,
                            vector<Constant*> expr_constants) {
   type = EntityEnum::kAssignEntity;
   assigned_to_ = var;
-  expr_ = new AssignmentExpression(expression);
+  expr_ = new AssignmentExpression(std::move(expression));
   this->expr_variables = std::move(expr_variables);
   this->expr_constants = std::move(expr_constants);
 
@@ -106,7 +106,7 @@ vector<Variable*> AssignEntity::GetExprVariables() {
   return expr_variables;
 }
 
-vector<Constant*> AssignEntity::GetExpressionConstants() {
+vector<Constant*> AssignEntity::GetExprConstants() {
   return expr_constants;
 }
 std::string AssignEntity::GetVariableString() {
@@ -115,11 +115,11 @@ std::string AssignEntity::GetVariableString() {
 
 CallEntity::CallEntity(Procedure* proc_name) {
   type = EntityEnum::kCallEntity;
-  proc_name_ = proc_name;
+  called_proc_name_ = proc_name;
 }
 
-Procedure* CallEntity::GetProcedure() {
-  return proc_name_;
+Procedure* CallEntity::GetCalledProcedure() {
+  return called_proc_name_;
 }
 
 PrintEntity::PrintEntity(Variable* var_name) {
@@ -128,8 +128,11 @@ PrintEntity::PrintEntity(Variable* var_name) {
   var_name_->AddStatement(this);
 }
 
-Variable* PrintEntity::GetVariable() {
+Variable* PrintEntity::GetVariableObj() {
   return var_name_;
+}
+std::string PrintEntity::GetVariableString() {
+  return var_name_->GetName();
 }
 
 ReadEntity::ReadEntity(Variable* var_name) {
@@ -138,6 +141,9 @@ ReadEntity::ReadEntity(Variable* var_name) {
   var_name_->AddStatement(this);
 }
 
-Variable* ReadEntity::GetVariable() {
+Variable* ReadEntity::GetVariableObj() {
   return var_name_;
+}
+std::string ReadEntity::GetVariableString() {
+  return var_name_->GetName();
 }

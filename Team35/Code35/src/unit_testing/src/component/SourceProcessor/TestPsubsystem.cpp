@@ -37,7 +37,7 @@ TEST_CASE("1.PSubsystem.Basic Single Line Creation") {
     REQUIRE(* assign_entity->GetVariableObj()->GetVariableName() == vname);
     REQUIRE(assign_entity->GetAssignmentExpr()->CheckExact("x + 100"));
     ConstantValue* expression_constant_front = const_cast<ConstantValue*>(
-      assign_entity->GetExpressionConstants().front()->GetValue());
+        assign_entity->GetExprConstants().front()->GetValue());
     REQUIRE(expression_constant_front->GetValue() == 100);
 
     //ensure trace down from Program is the same variable
