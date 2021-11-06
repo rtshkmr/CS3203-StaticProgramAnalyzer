@@ -1366,27 +1366,27 @@ none
 274 - int cross
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
 Select BOOLEAN with -1 = -1
-TRUE
+none
 5000
 275 - int cross
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
 Select BOOLEAN with -1 = 0
-FALSE
+none
 5000
 276 - int cross
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
 Select BOOLEAN with -1 = 1
-FALSE
+none
 5000
 277 - int cross
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
 Select BOOLEAN with -1 = 100
-FALSE
+none
 5000
 278 - int cross
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
 Select BOOLEAN with 0 = -1
-FALSE
+none
 5000
 279 - int cross
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
@@ -1406,7 +1406,7 @@ FALSE
 282 - int cross
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
 Select BOOLEAN with 1 = -1
-FALSE
+none
 5000
 283 - int cross
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
@@ -1426,7 +1426,7 @@ FALSE
 286 - int cross
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
 Select BOOLEAN with 100 = -1
-FALSE
+none
 5000
 287 - int cross
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
@@ -1461,7 +1461,7 @@ FALSE
 293 - variable cross
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
 Select BOOLEAN with "x" = ""
-FALSE
+none
 5000
 294 - variable cross
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
@@ -1481,7 +1481,7 @@ FALSE
 297 - variable cross
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
 Select BOOLEAN with "First" = ""
-FALSE
+none
 5000
 298 - variable cross
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
@@ -1501,12 +1501,12 @@ TRUE
 301 - variable cross
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
 Select BOOLEAN with "noSuchVariable" = ""
-FALSE
+none
 5000
 302 - variable cross
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
 Select BOOLEAN with "" = "x"
-FALSE
+none
 5000
 303 - variable cross
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
@@ -1516,12 +1516,12 @@ none
 304 - variable cross
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
 Select BOOLEAN with "" = "noSuchVariable"
-FALSE
+none
 5000
 305 - variable cross
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
 Select BOOLEAN with "" = ""
-TRUE
+none
 5000
 306 - variable-int pair
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
