@@ -129,10 +129,6 @@ void PSubsystem::CloseElseBlock() {
 
     Block* if_cond_block = block_stack_.top();
 
-    else_body_block->SetClusterTag(ClusterTag::kElseBody);
-    if_body_block->SetClusterTag(ClusterTag::kIfBody);
-    if_cond_block->SetClusterTag(ClusterTag::kIfCond);
-
     if (Block::IsExitBlock(else_body_block)) {
       Block::PatchEmptyBlocks(else_body_block, block_if_else_exit);
     } else {
@@ -173,7 +169,7 @@ void PSubsystem::CloseWhileBlock() {
   block_stack_.pop(); // link the last stmt to the while_cond_block block, and pop it.
   //todo: change from Block* to ConditionalBlock*
   auto* while_cond_block = dynamic_cast<Block*>(block_stack_.top());
-  while_cond_block->SetClusterTag(ClusterTag::kWhileCond);
+  while_cond_block->SetClusterTag(ClusterTag::kWhileCondBlock);
   assert(while_cond_block);
 
   bool is_currently_in_nested_cluster = cluster_stack_.size() > 1;
@@ -394,7 +390,7 @@ void PSubsystem::HandleIfStmt(Entity* entity) {
   current_node_ = if_entity;
   auto* conditional_statement = dynamic_cast<Statement*>(entity);
   ConditionalBlock* block_if_cond = CreateConditionalBlock(conditional_statement);
-  block_if_cond->SetClusterTag(ClusterTag::kIfCond);
+  block_if_cond->SetClusterTag(ClusterTag::kIfCondBlock);
   CreateBodyBlock(block_if_cond);
   AddControlVariableRelationships(if_entity->GetControlVariables());
   auto* if_cluster = new Cluster();
@@ -440,7 +436,7 @@ void PSubsystem::HandleWhileStmt(Entity* entity) {
 
   auto* conditional_statement = dynamic_cast<Statement*>(entity);
   ConditionalBlock* block_while_cond = CreateConditionalBlock(conditional_statement);
-  block_while_cond->SetClusterTag(ClusterTag::kWhileCond);
+  block_while_cond->SetClusterTag(ClusterTag::kWhileCondBlock);
   block_while_cond->isWhile = true;
   CreateBodyBlock(block_while_cond);
   AddControlVariableRelationships(while_entity->GetControlVariables());

@@ -559,6 +559,7 @@ TEST_CASE("Next* relationship tests") {
     CHECK_FALSE(empty_rte.HasRelationship(PKBRelRefs::kNextT));
     CHECK_FALSE(empty_rte.HasRelationship(PKBRelRefs::kNextT, "1"));
     CHECK_FALSE(empty_rte.HasRelationship(PKBRelRefs::kNextT, "2", "3"));
+    CHECK_FALSE(empty_rte.HasRelationship(PKBRelRefs::kNextT, DesignEntity::kStmt, DesignEntity::kStmt));
   }
 
   PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/mixed_loops2_source.txt");
@@ -645,5 +646,11 @@ TEST_CASE("Next* relationship tests") {
     CHECK_FALSE(dbm.HasRelationship(PKBRelRefs::kNextT, "6", "5"));
     CHECK_FALSE(dbm.HasRelationship(PKBRelRefs::kNextT, "21", "21"));
     CHECK_FALSE(dbm.HasRelationship(PKBRelRefs::kPreviousT, "21", "21"));
+    CHECK(dbm.HasRelationship(PKBRelRefs::kNextT, DesignEntity::kStmt, DesignEntity::kStmt));
+    CHECK(dbm.HasRelationship(PKBRelRefs::kNextT, DesignEntity::kProgLine, DesignEntity::kProgLine));
+    CHECK(dbm.HasRelationship(PKBRelRefs::kNextT, DesignEntity::kAssign, DesignEntity::kRead));
+    CHECK(dbm.HasRelationship(PKBRelRefs::kNextT, DesignEntity::kPrint, DesignEntity::kPrint));
+    CHECK(dbm.HasRelationship(PKBRelRefs::kNextT, DesignEntity::kIf, DesignEntity::kWhile));
+    CHECK(dbm.HasRelationship(PKBRelRefs::kNextT, DesignEntity::kRead, DesignEntity::kWhile));
   }
 }

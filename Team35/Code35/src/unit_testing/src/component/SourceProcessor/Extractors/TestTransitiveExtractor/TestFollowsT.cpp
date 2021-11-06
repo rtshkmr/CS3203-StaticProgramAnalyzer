@@ -66,30 +66,30 @@ TEST_CASE("1.FollowsTExtractor.Extract FollowsT basic conditions") {
                                 deliverable->GetFollowedByTMap(),
                                 deliverable->GetFollowsMap());
 
+    std::unordered_map<Statement*, std::list<Statement*>*>* fth = deliverable->GetFollowsTMap();
     // Follows*(1, _)
     std::list<Statement*>
         expected_follows_1 = std::list<Statement*>{assign_3_, read_x_, print_y_, assign_4_, assign_5_};
-    std::list<Statement*>* actual_follows_1 = deliverable->follows_T_hash_.find(assign_1_)->second;
+    std::list<Statement*>* actual_follows_1 = fth->find(assign_1_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_1, expected_follows_1));
     // Follows*(2, _)
     std::list<Statement*> expected_follows_2 = std::list<Statement*>{read_x_, print_y_, assign_4_, assign_5_};
-    std::list<Statement*>* actual_follows_2 = deliverable->follows_T_hash_.find(assign_3_)->second;
+    std::list<Statement*>* actual_follows_2 = fth->find(assign_3_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_2, expected_follows_2));
     // Follows*(3, _)
     std::list<Statement*> expected_follows_3 = std::list<Statement*>{print_y_, assign_4_, assign_5_};
-    std::list<Statement*>* actual_follows_3 = deliverable->follows_T_hash_.find(read_x_)->second;
+    std::list<Statement*>* actual_follows_3 = fth->find(read_x_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_3, expected_follows_3));
     // Follows*(4, _)
     std::list<Statement*> expected_follows_4 = std::list<Statement*>{assign_4_, assign_5_};
-    std::list<Statement*>* actual_follows_4 = deliverable->follows_T_hash_.find(print_y_)->second;
+    std::list<Statement*>* actual_follows_4 = fth->find(print_y_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_4, expected_follows_4));
     // Follows*(5, _)
     std::list<Statement*> expected_follows_5 = std::list<Statement*>{assign_5_};
-    std::list<Statement*>* actual_follows_5 = deliverable->follows_T_hash_.find(assign_4_)->second;
+    std::list<Statement*>* actual_follows_5 = fth->find(assign_4_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_5, expected_follows_5));
     // Follows*(6, _)
-    std::unordered_map<Statement*, std::list<Statement*>*> fth = deliverable->follows_T_hash_;
-    CHECK(fth.find(assign_5_) == fth.end());
+    CHECK(fth->find(assign_5_) == fth->end());
   }
 
   SECTION("Statement list with if") {
@@ -122,26 +122,26 @@ TEST_CASE("1.FollowsTExtractor.Extract FollowsT basic conditions") {
     statement_extractor.Extract(deliverable->GetFollowsTMap(),
                                 deliverable->GetFollowedByTMap(),
                                 deliverable->GetFollowsMap());
-
+    
+    std::unordered_map<Statement*, std::list<Statement*>*>* fth = deliverable->GetFollowsTMap();
     // Follows*(1, _)
     std::list<Statement*> expected_follows_1 = std::list<Statement*>{print_y_};
-    std::list<Statement*>* actual_follows_1 = deliverable->follows_T_hash_.find(if_1_)->second;
+    std::list<Statement*>* actual_follows_1 = fth->find(if_1_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_1, expected_follows_1));
     // Follows*(2, _)
     std::list<Statement*> expected_follows_2 = std::list<Statement*>{read_y_, assign_3_};
-    std::list<Statement*>* actual_follows_2 = deliverable->follows_T_hash_.find(assign_1_)->second;
+    std::list<Statement*>* actual_follows_2 = fth->find(assign_1_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_2, expected_follows_2));
     // Follows*(4, _)
-    std::unordered_map<Statement*, std::list<Statement*>*> fth = deliverable->follows_T_hash_;
-    CHECK(fth.find(assign_3_) == fth.end());
+    CHECK(fth->find(assign_3_) == fth->end());
     // Follows*(5, _)
     std::list<Statement*> expected_follows_5 = std::list<Statement*>{assign_6_, assign_7_};
-    std::list<Statement*>* actual_follows_5 = deliverable->follows_T_hash_.find(assign_5_)->second;
+    std::list<Statement*>* actual_follows_5 = fth->find(assign_5_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_5, expected_follows_5));
     // Follows*(7, _)
-    CHECK(fth.find(assign_7_) == fth.end());
+    CHECK(fth->find(assign_7_) == fth->end());
     // Follows*(8, _)
-    CHECK(fth.find(print_y_) == fth.end());
+    CHECK(fth->find(print_y_) == fth->end());
   }
 
   SECTION("Statement list with while") {
@@ -167,19 +167,19 @@ TEST_CASE("1.FollowsTExtractor.Extract FollowsT basic conditions") {
                                 deliverable->GetFollowedByTMap(),
                                 deliverable->GetFollowsMap());
 
+    std::unordered_map<Statement*, std::list<Statement*>*>* fth = deliverable->GetFollowsTMap();
     // Follows*(1, _)
     std::list<Statement*> expected_follows_1 = std::list<Statement*>{print_i_, while_3_};
-    std::list<Statement*>* actual_follows_1 = deliverable->follows_T_hash_.find(assign_1_)->second;
+    std::list<Statement*>* actual_follows_1 = fth->find(assign_1_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_1, expected_follows_1));
     // Follows*(3, _)
-    std::unordered_map<Statement*, std::list<Statement*>*> fth = deliverable->follows_T_hash_;
-    CHECK(fth.find(while_3_) == fth.end());
+    CHECK(fth->find(while_3_) == fth->end());
     // Follows*(4, _)
     std::list<Statement*> expected_follows_4 = std::list<Statement*>{assign_5_};
-    std::list<Statement*>* actual_follows_4 = deliverable->follows_T_hash_.find(read_z_)->second;
+    std::list<Statement*>* actual_follows_4 = fth->find(read_z_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_4, expected_follows_4));
     // Follows*(5, _)
-    CHECK(fth.find(assign_5_) == fth.end());
+    CHECK(fth->find(assign_5_) == fth->end());
   }
 
   SECTION("Multiple procedures") {
@@ -212,19 +212,19 @@ TEST_CASE("1.FollowsTExtractor.Extract FollowsT basic conditions") {
                                 deliverable->GetFollowedByTMap(),
                                 deliverable->GetFollowsMap());
 
+    std::unordered_map<Statement*, std::list<Statement*>*>* fth = deliverable->GetFollowsTMap();
     // Follows*(1, _)
     std::list<Statement*> expected_follows_1 = std::list<Statement*>{call4, print_y_};
-    std::list<Statement*>* actual_follows_1 = deliverable->follows_T_hash_.find(assign_1_)->second;
+    std::list<Statement*>* actual_follows_1 = fth->find(assign_1_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_1, expected_follows_1));
     // Follows*(3, _)
-    std::unordered_map<Statement*, std::list<Statement*>*> fth = deliverable->follows_T_hash_;
-    CHECK(fth.find(print_y_) == fth.end());
+    CHECK(fth->find(print_y_) == fth->end());
     // Follows*(4, _)
     std::list<Statement*> expected_follows_4 = std::list<Statement*>{assign_5_, assign_6_};
-    std::list<Statement*>* actual_follows_4 = deliverable->follows_T_hash_.find(assign_4_)->second;
+    std::list<Statement*>* actual_follows_4 = fth->find(assign_4_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_4, expected_follows_4));
     //Follows*(6, _)
-    CHECK(fth.find(assign_6_) == fth.end());
+    CHECK(fth->find(assign_6_) == fth->end());
   }
 }
 
@@ -338,44 +338,44 @@ TEST_CASE("1.FollowsTExtractor.Extract FollowsT nested containers") {
                                 deliverable->GetFollowedByTMap(),
                                 deliverable->GetFollowsMap());
 
+    std::unordered_map<Statement*, std::list<Statement*>*>* fth = deliverable->GetFollowsTMap();
     // Follows*(1, _)
     std::list<Statement*> expected_follows_1 = std::list<Statement*>{print_n_};
-    std::list<Statement*>* actual_follows_1 = deliverable->follows_T_hash_.find(if_1_)->second;
+    std::list<Statement*>* actual_follows_1 = fth->find(if_1_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_1, expected_follows_1));
     // Follows*(2, _)
     std::list<Statement*> expected_follows_2 = std::list<Statement*>{read_x_, assign_2_, if_2_};
-    std::list<Statement*>* actual_follows_2 = deliverable->follows_T_hash_.find(assign_1_)->second;
+    std::list<Statement*>* actual_follows_2 = fth->find(assign_1_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_2, expected_follows_2));
     // Follows*(6, _)
     std::list<Statement*> expected_follows_6 = std::list<Statement*>{assign_4_, read_y_};
-    std::list<Statement*>* actual_follows_6 = deliverable->follows_T_hash_.find(assign_3_)->second;
+    std::list<Statement*>* actual_follows_6 = fth->find(assign_3_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_6, expected_follows_6));
     // Follows*(9, _)
     std::list<Statement*> expected_follows_9 = std::list<Statement*>{print_y_};
-    std::list<Statement*>* actual_follows_9 = deliverable->follows_T_hash_.find(print_x_)->second;
+    std::list<Statement*>* actual_follows_9 = fth->find(print_x_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_9, expected_follows_9));
     // Follows*(11, _)
     std::list<Statement*> expected_follows_11 = std::list<Statement*>{if_3_, print_i_};
-    std::list<Statement*>* actual_follows_11 = deliverable->follows_T_hash_.find(assign_5_)->second;
+    std::list<Statement*>* actual_follows_11 = fth->find(assign_5_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_11, expected_follows_11));
     // Follows*(13, _)
     std::list<Statement*> expected_follows_13 = std::list<Statement*>{assign_6_, assign_7_};
-    std::list<Statement*>* actual_follows_13 = deliverable->follows_T_hash_.find(print_z_)->second;
+    std::list<Statement*>* actual_follows_13 = fth->find(print_z_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_13, expected_follows_13));
     // Follows*(16, _)
-    std::unordered_map<Statement*, std::list<Statement*>*> fth = deliverable->follows_T_hash_;
-    CHECK(fth.find(if_4_) == fth.end());
+    CHECK(fth->find(if_4_) == fth->end());
     // Follows*(17, _)
     std::list<Statement*> expected_follows_17 = std::list<Statement*>{assign_9_, assign_10_};
-    std::list<Statement*>* actual_follows_17 = deliverable->follows_T_hash_.find(assign_8_)->second;
+    std::list<Statement*>* actual_follows_17 = fth->find(assign_8_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_17, expected_follows_17));
     // Follows*(20, _)
     std::list<Statement*> expected_follows_20 = std::list<Statement*>{read_i_, read_n_};
-    std::list<Statement*>* actual_follows_20 = deliverable->follows_T_hash_.find(read_z_)->second;
+    std::list<Statement*>* actual_follows_20 = fth->find(read_z_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_20, expected_follows_20));
 
     // Follows*(24, _)
-    CHECK(fth.find(print_n_) == fth.end());
+    CHECK(fth->find(print_n_) == fth->end());
   }
 
   SECTION("Nested while x3") {
@@ -420,29 +420,29 @@ TEST_CASE("1.FollowsTExtractor.Extract FollowsT nested containers") {
                                 deliverable->GetFollowedByTMap(),
                                 deliverable->GetFollowsMap());
 
+    std::unordered_map<Statement*, std::list<Statement*>*>* fth = deliverable->GetFollowsTMap();
     // Follows*(1, _)
     std::list<Statement*> expected_follows_1 = std::list<Statement*>{read_z_};
-    std::list<Statement*>* actual_follows_1 = deliverable->follows_T_hash_.find(while_1_)->second;
+    std::list<Statement*>* actual_follows_1 = fth->find(while_1_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_1, expected_follows_1));
     // Follows*(2, _)
     std::list<Statement*> expected_follows_2 = std::list<Statement*>{assign_2_, while_2_, read_y_};
-    std::list<Statement*>* actual_follows_2 = deliverable->follows_T_hash_.find(assign_1_)->second;
+    std::list<Statement*>* actual_follows_2 = fth->find(assign_1_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_2, expected_follows_2));
     // Follows*(5, _)
     std::list<Statement*> expected_follows_5 = std::list<Statement*>{assign_4_, while_3_, read_x_};
-    std::list<Statement*>* actual_follows_5 = deliverable->follows_T_hash_.find(assign_3_)->second;
+    std::list<Statement*>* actual_follows_5 = fth->find(assign_3_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_5, expected_follows_5));
     // Follows*(8, _)
     std::list<Statement*> expected_follows_8 = std::list<Statement*>{assign_6_, assign_7_};
-    std::list<Statement*>* actual_follows_8 = deliverable->follows_T_hash_.find(assign_5_)->second;
+    std::list<Statement*>* actual_follows_8 = fth->find(assign_5_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_8, expected_follows_8));
     // Follows*(11, _)
-    std::unordered_map<Statement*, std::list<Statement*>*> fth = deliverable->follows_T_hash_;
-    CHECK(fth.find(read_x_) == fth.end());
+    CHECK(fth->find(read_x_) == fth->end());
     // Follows*(12, _)
-    CHECK(fth.find(read_y_) == fth.end());
+    CHECK(fth->find(read_y_) == fth->end());
     // Follows*(13, _)
-    CHECK(fth.find(read_z_) == fth.end());
+    CHECK(fth->find(read_z_) == fth->end());
   }
 
   SECTION("If and while") {
@@ -484,26 +484,26 @@ TEST_CASE("1.FollowsTExtractor.Extract FollowsT nested containers") {
                                 deliverable->GetFollowedByTMap(),
                                 deliverable->GetFollowsMap());
 
+    std::unordered_map<Statement*, std::list<Statement*>*>* fth = deliverable->GetFollowsTMap();
     // Follows*(1, _)
     std::list<Statement*> expected_follows_1 = std::list<Statement*>{while_1_};
-    std::list<Statement*>* actual_follows_1 = deliverable->follows_T_hash_.find(if_4_)->second;
+    std::list<Statement*>* actual_follows_1 = fth->find(if_4_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_1, expected_follows_1));
     // Follows*(2, _)
     std::list<Statement*> expected_follows_2 = std::list<Statement*>{assign_5_, assign_6_};
-    std::list<Statement*>* actual_follows_2 = deliverable->follows_T_hash_.find(assign_4_)->second;
+    std::list<Statement*>* actual_follows_2 = fth->find(assign_4_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_2, expected_follows_2));
     // Follows*(5, _)
     std::list<Statement*> expected_follows_5 = std::list<Statement*>{print_y_, print_z_};
-    std::list<Statement*>* actual_follows_5 = deliverable->follows_T_hash_.find(print_x_)->second;
+    std::list<Statement*>* actual_follows_5 = fth->find(print_x_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_5, expected_follows_5));
 
     // Follows*(4, _)
-    std::unordered_map<Statement*, std::list<Statement*>*> fth = deliverable->follows_T_hash_;
-    CHECK(fth.find(assign_3_) == fth.end());
+    CHECK(fth->find(assign_3_) == fth->end());
     // Follows*(7, _)
-    CHECK(fth.find(assign_6_) == fth.end());
+    CHECK(fth->find(assign_6_) == fth->end());
     // Follows*(8, _)
-    CHECK(fth.find(while_1_) == fth.end());
+    CHECK(fth->find(while_1_) == fth->end());
   }
 
   SECTION("Multiple nesting of if and while") {
@@ -577,53 +577,53 @@ TEST_CASE("1.FollowsTExtractor.Extract FollowsT nested containers") {
                                 deliverable->GetFollowedByTMap(),
                                 deliverable->GetFollowsMap());
 
+    std::unordered_map<Statement*, std::list<Statement*>*>* fth = deliverable->GetFollowsTMap();
     // Follows*(1, _)
     std::list<Statement*> expected_follows_1 = std::list<Statement*>{while_3_};
-    std::list<Statement*>* actual_follows_1 = deliverable->follows_T_hash_.find(if_1_)->second;
+    std::list<Statement*>* actual_follows_1 = fth->find(if_1_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_1, expected_follows_1));
     // Follows*(2, _)
     std::list<Statement*> expected_follows_2 = std::list<Statement*>{assign_2_, while_1_};
-    std::list<Statement*>* actual_follows_2 = deliverable->follows_T_hash_.find(assign_1_)->second;
+    std::list<Statement*>* actual_follows_2 = fth->find(assign_1_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_2, expected_follows_2));
     // Follows*(5, _)
     std::list<Statement*> expected_follows_5 = std::list<Statement*>{read_y_, read_z_};
-    std::list<Statement*>* actual_follows_5 = deliverable->follows_T_hash_.find(read_x_)->second;
+    std::list<Statement*>* actual_follows_5 = fth->find(read_x_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_5, expected_follows_5));
     // Follows*(8, _)
     std::list<Statement*> expected_follows_8 = std::list<Statement*>{assign_5_, assign_6_};
-    std::list<Statement*>* actual_follows_8 = deliverable->follows_T_hash_.find(while_2_)->second;
+    std::list<Statement*>* actual_follows_8 = fth->find(while_2_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_8, expected_follows_8));
     // Follows*(9, _)
     std::list<Statement*> expected_follows_9 = std::list<Statement*>{read_n_, read_m_};
-    std::list<Statement*>* actual_follows_9 = deliverable->follows_T_hash_.find(read_i_)->second;
+    std::list<Statement*>* actual_follows_9 = fth->find(read_i_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_9, expected_follows_9));
     // Follows*(15, _)
     std::list<Statement*> expected_follows_15 = std::list<Statement*>{print_x_, print_y_, print_z_};
-    std::list<Statement*>* actual_follows_15 = deliverable->follows_T_hash_.find(if_2_)->second;
+    std::list<Statement*>* actual_follows_15 = fth->find(if_2_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_15, expected_follows_15));
     // Follows*(16, _)
     std::list<Statement*> expected_follows_16 = std::list<Statement*>{assign_8_, assign_9_};
-    std::list<Statement*>* actual_follows_16 = deliverable->follows_T_hash_.find(assign_7_)->second;
+    std::list<Statement*>* actual_follows_16 = fth->find(assign_7_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_16, expected_follows_16));
     // Follows*(20, _)
     std::list<Statement*> expected_follows_20 = std::list<Statement*>{print_n_, print_m_};
-    std::list<Statement*>* actual_follows_20 = deliverable->follows_T_hash_.find(print_i_)->second;
+    std::list<Statement*>* actual_follows_20 = fth->find(print_i_)->second;
     CHECK(TestUtils::AreListsEqual(*actual_follows_20, expected_follows_20));
 
     // Follows*(4, _)
-    std::unordered_map<Statement*, std::list<Statement*>*> fth = deliverable->follows_T_hash_;
-    CHECK(fth.find(while_1_) == fth.end());
+    CHECK(fth->find(while_1_) == fth->end());
     // Follows*(7, _)
-    CHECK(fth.find(read_z_) == fth.end());
+    CHECK(fth->find(read_z_) == fth->end());
     // Follows*(11, _)
-    CHECK(fth.find(read_m_) == fth.end());
+    CHECK(fth->find(read_m_) == fth->end());
     // Follows*(13, _)
-    CHECK(fth.find(assign_6_) == fth.end());
+    CHECK(fth->find(assign_6_) == fth->end());
     // Follows*(18, _)
-    CHECK(fth.find(assign_9_) == fth.end());
+    CHECK(fth->find(assign_9_) == fth->end());
     // Follows*(22, _)
-    CHECK(fth.find(print_m_) == fth.end());
+    CHECK(fth->find(print_m_) == fth->end());
     // Follows*(25, _)
-    CHECK(fth.find(print_z_) == fth.end());
+    CHECK(fth->find(print_z_) == fth->end());
   }
 }

@@ -59,8 +59,6 @@ class DBManager {
   PKB* pkb_;
   RuntimeExtractor* runtime_extractor_;
   bool is_optimized_ = true;
-  static std::vector<std::tuple<Entity*, Entity*>> MergeScopedEntities(std::vector<Entity*> left_entities,
-                                                                       std::vector<Entity*> right_entities);
 };
 
 #endif //AUTOTESTER_CODE35_SRC_SPA_SRC_COMPONENT_PKB_DBMANAGER_H_

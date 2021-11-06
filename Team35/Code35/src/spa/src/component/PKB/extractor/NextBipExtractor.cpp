@@ -3,6 +3,7 @@
 #include <utility>
 #include <util/Utility.h>
 #include "model/CFG.h"
+#include "RuntimeExtractor.h"
 
 /**
  * This class extracts all NextBip in the first query and populates the pkb.
@@ -30,6 +31,7 @@ std::vector<Entity*> NextBipExtractor::GetRelationship(RelDirection dir, int tar
  * @return Vector of entities satisfying the relationship.
  */
 std::vector<Entity*> NextBipExtractor::GetFirstEntityOfRelationship(RelDirection dir, DesignEntity de) {
+  if (next_design_entities.count(de) == 0) return {};
   PopulateBipMaps();
   return pkb_->GetFirstEntityOfRelationship(GetPKBRelRef(dir), de);
 }
@@ -37,6 +39,7 @@ std::vector<Entity*> NextBipExtractor::GetFirstEntityOfRelationship(RelDirection
 std::vector<std::tuple<Entity*, Entity*>> NextBipExtractor::GetRelationshipByTypes(RelDirection dir,
                                                                                    DesignEntity first,
                                                                                    DesignEntity second) {
+  if (next_design_entities.count(first) == 0 || next_design_entities.count(second) == 0) return {};
   PopulateBipMaps();
   return pkb_->GetRelationshipByTypes(GetPKBRelRef(dir), first, second);
 }
@@ -54,6 +57,11 @@ bool NextBipExtractor::HasRelationship(RelDirection dir, int target) {
 bool NextBipExtractor::HasRelationship(RelDirection dir, int first, int second) {
   PopulateBipMaps();
   return pkb_->HasRelationship(GetPKBRelRef(dir), std::to_string(first), std::to_string(second));
+}
+
+bool NextBipExtractor::HasRelationship(RelDirection dir, DesignEntity first, DesignEntity second) {
+  if (next_design_entities.count(first) == 0 || next_design_entities.count(second) == 0) return false;
+  return HasRelationship(dir);
 }
 
 void NextBipExtractor::PopulateBipMaps() {
@@ -142,7 +150,9 @@ void NextBipExtractor::ErasePrevRelationship(Entity* next_stmt, Entity* prev_stm
 }
 
 std::list<int> NextBipExtractor::GetBipLastStmts(Block* block) {
-  std::list<int> last_stmts = block->GetCFGLastStmts();
+  Statement* block_stmt = dynamic_cast<Statement*>(stmt_list_[block->GetStartEndRange().first - 1]);
+  Procedure* block_proc = block_stmt->GetProcedureNode();
+  std::list<int> last_stmts = GetCFGLastStmts(block_proc);
   bool call_exists = true;
   while (call_exists) {
     for (int last_stmt : last_stmts) {
@@ -165,8 +175,7 @@ std::list<int> NextBipExtractor::HandleCallLastStmt(const std::list<int> &last_s
     if (std::find(call_list_.begin(), call_list_.end(), last_entity) != call_list_.end()) {
       auto* call_entity = dynamic_cast<CallEntity*>(last_entity);
       Procedure* called_proc = call_entity->GetCalledProcedure();
-      auto* root_block = const_cast<Block*>(called_proc->GetBlockRoot());
-      std::list<int> called_last_stmts = root_block->GetCFGLastStmts();
+      std::list<int> called_last_stmts = GetCFGLastStmts(called_proc);
       nested_last_stmts.insert(nested_last_stmts.end(), called_last_stmts.begin(), called_last_stmts.end());
     } else {
       nested_last_stmts.push_back(last_stmt);
@@ -175,6 +184,15 @@ std::list<int> NextBipExtractor::HandleCallLastStmt(const std::list<int> &last_s
   nested_last_stmts.sort();
   nested_last_stmts.unique();
   return nested_last_stmts;
+}
+
+std::list<int> NextBipExtractor::GetCFGLastStmts(Procedure* proc) {
+  std::set<Block*> tail_blocks = proc->GetTailBlocks();
+  std::list<int> last_stmt_nums;
+  for (Block* block : tail_blocks) {
+    last_stmt_nums.push_back(block->GetStartEndRange().second);
+  }
+  return last_stmt_nums;
 }
 
 PKBRelRefs NextBipExtractor::GetPKBRelRef(RelDirection dir) {

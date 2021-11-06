@@ -52,6 +52,10 @@ enum class PKBRelRefs {
   kPrevBip,
   kNextBipT,
   kPrevBipT,
+  kAffectsBip,
+  kAffectedByBip,
+  kAffectsBipT,
+  kAffectedByBipT,
   kInvalid
 };
 
@@ -72,6 +76,8 @@ enum class RelRef {
   kNextBipT,
   kAffects,
   kAffectsT,
+  kAffectsBip,
+  kAffectsBipT,
   kInvalid
 };
 
@@ -157,7 +163,11 @@ const std::unordered_set<PKBRelRefs> second_param_is_stmt = {
   PKBRelRefs::kNextBip,
   PKBRelRefs::kPrevBip,
   PKBRelRefs::kNextBipT,
-  PKBRelRefs::kPrevBipT
+  PKBRelRefs::kPrevBipT,
+  PKBRelRefs::kAffectsBip,
+  PKBRelRefs::kAffectedByBip,
+  PKBRelRefs::kAffectsBipT,
+  PKBRelRefs::kAffectedByBipT
 };
 
 const std::unordered_set<PKBRelRefs> second_param_is_var = {
