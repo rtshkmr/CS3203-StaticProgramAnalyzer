@@ -9,6 +9,8 @@ RuntimeExtractor::RuntimeExtractor(PKB* pkb) {
   next_bip_t_extractor_ = NextBipTExtractor(pkb);
   next_bip_t_extractor_.SetMediator(this);
   affects_t_extractor_ = AffectsTExtractor(this, pkb);
+  affects_bip_extractor_ = AffectsBipExtractor(this, pkb);
+  affects_bip_t_extractor_ = AffectsBipTExtractor(this, pkb);
 }
 
 /**
@@ -65,7 +67,7 @@ std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetRelationshipByTyp
                                                                                    DesignEntity second) {
   std::pair<RuntimeColleague*,RelDirection> pair = GetExtractorAndDirection(ref);
   return (pair.first) ? pair.first->GetRelationshipByTypes(pair.second, first, second)
-      : std::vector<std::tuple<Entity*, Entity*>>{};;
+                      : std::vector<std::tuple<Entity*, Entity*>>{};;
 }
 
 /**
@@ -175,6 +177,10 @@ std::pair<RuntimeColleague*,RelDirection> RuntimeExtractor::GetExtractorAndDirec
     case PKBRelRefs::kPrevBip: return std::pair(&next_bip_extractor_, RelDirection::kReverse);
     case PKBRelRefs::kNextBipT: return std::pair(&next_bip_t_extractor_, RelDirection::kForward);
     case PKBRelRefs::kPrevBipT: return std::pair(&next_bip_t_extractor_, RelDirection::kForward);
+    case PKBRelRefs::kAffectsBip: return std::pair(&affects_bip_extractor_, RelDirection::kForward);
+    case PKBRelRefs::kAffectedByBip: return std::pair(&affects_bip_extractor_, RelDirection::kReverse);
+    case PKBRelRefs::kAffectsBipT: return std::pair(&affects_bip_t_extractor_, RelDirection::kForward);
+    case PKBRelRefs::kAffectedByBipT: return std::pair(&affects_bip_t_extractor_, RelDirection::kReverse);
     default: return std::pair(nullptr, RelDirection::kForward);
   }
 }
