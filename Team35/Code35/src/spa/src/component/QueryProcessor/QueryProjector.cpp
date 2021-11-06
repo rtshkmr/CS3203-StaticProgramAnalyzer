@@ -89,7 +89,7 @@ std::vector<std::vector<std::string>> QueryProjector::StringifyTable(std::vector
     switch (syn_attrs[i].second) {
       case Attribute::kStmtNumber:
         for (Entity* entity: entity_column) {
-          int statement_num = dynamic_cast<Statement*>(entity)->GetStatementNumberObj()->GetNum();
+          int statement_num = dynamic_cast<Statement*>(entity)->GetStatementNumber();
           stringified_column.push_back(std::to_string(statement_num));
         }
         break;

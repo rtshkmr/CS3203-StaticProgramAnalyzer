@@ -379,10 +379,10 @@ TEST_CASE("1.Model.Statement") {
   }
 
   SECTION ("Test LineNumber") {
-    REQUIRE(* while_entity->GetLineNumber() == LineNumber(1));
-    REQUIRE(* read_x->GetLineNumber() == LineNumber(2));
-    REQUIRE(* read_y->GetLineNumber() == LineNumber(3));
-    REQUIRE(* print_z->GetLineNumber() == LineNumber(4));
+    REQUIRE(* while_entity->GetLineNumberObj() == LineNumber(1));
+    REQUIRE(* read_x->GetLineNumberObj() == LineNumber(2));
+    REQUIRE(* read_y->GetLineNumberObj() == LineNumber(3));
+    REQUIRE(* print_z->GetLineNumberObj() == LineNumber(4));
   }
 
   SECTION ("Test ParentNode") {

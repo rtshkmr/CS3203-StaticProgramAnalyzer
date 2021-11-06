@@ -207,7 +207,7 @@ int Statement::GetStatementNumber() {
   return statement_number_->GetNum();
 }
 
-LineNumber* Statement::GetLineNumber() {
+LineNumber* Statement::GetLineNumberObj() {
   return line_number_;
 }
 std::string Statement::GetLineNumberString() {

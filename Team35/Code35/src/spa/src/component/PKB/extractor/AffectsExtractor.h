@@ -9,8 +9,8 @@ class AffectsExtractor {
   struct AssignEntityComparator
   {
     bool operator()(AssignEntity* lhs, AssignEntity* rhs) const  {
-      int left = lhs->GetStatementNumberObj()->GetNum();
-      int right = rhs->GetStatementNumberObj()->GetNum();
+      int left = lhs->GetStatementNumber();
+      int right = rhs->GetStatementNumber();
       return left > right;
     }
   };
@@ -38,7 +38,7 @@ class AffectsExtractor {
  private:
   PKB* pkb_;
   static constexpr auto cmp = [](AssignEntity* left, AssignEntity* right) {
-    return left->GetStatementNumberObj()->GetNum() < right->GetStatementNumberObj()->GetNum();
+    return left->GetStatementNumber() < right->GetStatementNumber();
   };
   ScopeIndication cacheIndication = ScopeIndication::kNoScope;
   std::unordered_map<AssignEntity*, std::list<AssignEntity*>*> affects_map_;

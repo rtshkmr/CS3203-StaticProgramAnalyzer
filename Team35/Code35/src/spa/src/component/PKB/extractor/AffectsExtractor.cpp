@@ -335,8 +335,8 @@ bool AffectsExtractor::HasAffects(AssignEntity* first_stmt, AssignEntity* second
 bool AffectsExtractor::HasValidUnmodifiedPath(AssignEntity* first_stmt, AssignEntity* second_stmt) {
   Procedure* proc = first_stmt->GetProcedureNode();
   if (first_stmt->GetProcedureNode() != second_stmt->GetProcedureNode()) return false;
-  int first_stmt_num = first_stmt->GetStatementNumberObj()->GetNum();
-  int second_stmt_num = second_stmt->GetStatementNumberObj()->GetNum();
+  int first_stmt_num = first_stmt->GetStatementNumber();
+  int second_stmt_num = second_stmt->GetStatementNumber();
   std::vector<Entity*> proc_entities = this->pkb_->GetDesignEntities(DesignEntity::kProcedure);
   Cluster* scoped_cluster =  proc->GetInnermostCluster(first_stmt_num, second_stmt_num, nullptr);
   std::string lhs_var = first_stmt->GetVariableString();

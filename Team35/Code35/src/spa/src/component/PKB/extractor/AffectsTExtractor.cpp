@@ -142,9 +142,9 @@ void AffectsTExtractor::InitCache() {
     assert(ae1 && ae2);
 
     Deliverable::AddRelationshipToMap(&affects_t_map_,
-                                      ae1->GetStatementNumberObj()->GetNum(), ae2->GetStatementNumberObj()->GetNum());
-    Deliverable::AddRelationshipToMap(&affected_by_t_map_, ae2->GetStatementNumberObj()->GetNum(),
-                                      ae1->GetStatementNumberObj()->GetNum());
+                                      ae1->GetStatementNumber(), ae2->GetStatementNumber());
+    Deliverable::AddRelationshipToMap(&affected_by_t_map_, ae2->GetStatementNumber(),
+                                      ae1->GetStatementNumber());
   }
   isCached = true;
 }

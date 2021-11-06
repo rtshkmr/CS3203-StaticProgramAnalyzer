@@ -114,7 +114,8 @@ bool ClauseCommandExecutor::HasWhileOrIfPatternRelationship(Entity *left_entity,
 std::string ClauseCommandExecutor::RetrieveEntityAttribute(Entity *entity, Attribute attribute) {
   switch (attribute) {
   case (Attribute::kStmtNumber):
-    return std::to_string(const_cast<StatementNumber*>(dynamic_cast<Statement*>(entity)->GetStatementNumberObj())->GetNum());
+//    return std::to_string(const_cast<StatementNumber*>(dynamic_cast<Statement*>(entity)->GetStatementNumberObj())->GetNum());
+      return std::to_string(dynamic_cast<Statement*>(entity)->GetStatementNumber());
   case Attribute::kProcName :
     if (typeid(*entity) == typeid(Procedure)) {
       return const_cast<ProcedureName*>(dynamic_cast<Procedure*>(entity)->GetName())->GetName();
