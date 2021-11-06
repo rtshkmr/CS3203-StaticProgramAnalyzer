@@ -22,6 +22,7 @@ class RuntimeColleague {
   virtual bool HasRelationship(RelDirection dir) = 0;
   virtual bool HasRelationship(RelDirection dir, int target) = 0;
   virtual bool HasRelationship(RelDirection dir, int first, int second) = 0;
+  virtual bool HasRelationship(RelDirection dir, DesignEntity first, DesignEntity second) = 0;
 };
 
 #endif //AUTOTESTER_CODE35_SRC_SPA_SRC_COMPONENT_PKB_EXTRACTOR_RUNTIMECOLLEAGUE_H_

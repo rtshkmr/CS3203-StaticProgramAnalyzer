@@ -59,6 +59,11 @@ bool NextBipExtractor::HasRelationship(RelDirection dir, int first, int second) 
   return pkb_->HasRelationship(GetPKBRelRef(dir), std::to_string(first), std::to_string(second));
 }
 
+bool NextBipExtractor::HasRelationship(RelDirection dir, DesignEntity first, DesignEntity second) {
+  if (next_design_entities.count(first) == 0 || next_design_entities.count(second) == 0) return {};
+  return HasRelationship(dir);
+}
+
 void NextBipExtractor::PopulateBipMaps() {
   if (pkb_->HasRelationship(PKBRelRefs::kNextBip)) return;
   next_bip_map_ = pkb_->ConvertStringToEntityMapping(pkb_->GetRelationshipMap(PKBRelRefs::kNext));

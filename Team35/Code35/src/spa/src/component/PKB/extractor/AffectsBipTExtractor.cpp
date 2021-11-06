@@ -37,3 +37,8 @@ bool AffectsBipTExtractor::HasRelationship(RelDirection dir, int first, int seco
   PKBRelRefs selector = (dir == RelDirection::kForward) ? PKBRelRefs::kAffectsT : PKBRelRefs::kAffectedByT;
   return rte_->HasRelationship(selector, std::to_string(first), std::to_string(second));
 }
+
+bool AffectsBipTExtractor::HasRelationship(RelDirection dir, DesignEntity first, DesignEntity second) {
+  PKBRelRefs selector = (dir == RelDirection::kForward) ? PKBRelRefs::kAffectsT : PKBRelRefs::kAffectedByT;
+  return rte_->HasRelationship(selector, first, second);
+}

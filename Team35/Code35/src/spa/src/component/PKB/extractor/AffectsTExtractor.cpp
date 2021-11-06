@@ -46,6 +46,7 @@ std::vector<Entity*> AffectsTExtractor::GetRelationship(RelDirection dir, int ta
 }
 
 std::vector<Entity*> AffectsTExtractor::GetFirstEntityOfRelationship(RelDirection dir, DesignEntity de) {
+  if (!Utility::IsAssignDesignEntity(de)) return {};
   if (!isCached) InitCache();
   std::unordered_map<int, std::list<int>*>* mapToCheck = (dir == RelDirection::kForward) ? &affects_t_map_ : &affected_by_t_map_;
 
@@ -60,6 +61,7 @@ std::vector<Entity*> AffectsTExtractor::GetFirstEntityOfRelationship(RelDirectio
 std::vector<std::tuple<Entity*, Entity*>> AffectsTExtractor::GetRelationshipByTypes(RelDirection dir,
                                                                                     DesignEntity first,
                                                                                     DesignEntity second) {
+  if (!Utility::IsAssignDesignEntity(first) || !Utility::IsAssignDesignEntity(second)) return {};
   if (!isCached) InitCache();
   std::unordered_map<int, std::list<int>*>* mapToCheck = (dir == RelDirection::kForward) ? &affects_t_map_ : &affected_by_t_map_;
 
@@ -124,6 +126,11 @@ bool AffectsTExtractor::HasRelationship(RelDirection dir, int first, int second)
     }
   }
   return false;
+}
+
+bool AffectsTExtractor::HasRelationship(RelDirection dir, DesignEntity first, DesignEntity second) {
+  if (!Utility::IsAssignDesignEntity(first) || !Utility::IsAssignDesignEntity(second)) return {};
+  return HasRelationship(dir);
 }
 
 void AffectsTExtractor::Delete() {

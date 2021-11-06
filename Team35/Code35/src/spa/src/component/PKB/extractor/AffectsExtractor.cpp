@@ -84,6 +84,11 @@ bool AffectsExtractor::HasRelationship(RelDirection dir, int first, int second) 
   return (dir == RelDirection::kForward) ? HasAffects(ae_first, ae_second) : HasAffects(ae_second, ae_first);
 }
 
+bool AffectsExtractor::HasRelationship(RelDirection dir, DesignEntity first, DesignEntity second) {
+  if (!Utility::IsAssignDesignEntity(first) || !Utility::IsAssignDesignEntity(second)) return false;
+  return HasRelationship(dir);
+}
+
 /**
  * For Affects(a1, _)
  */

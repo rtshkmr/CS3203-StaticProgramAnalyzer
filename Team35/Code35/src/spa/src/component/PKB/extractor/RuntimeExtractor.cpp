@@ -89,15 +89,15 @@ std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetAllRelationshipsS
     if (scope_indication == ScopeIndication::kRightScope) ref = ReverseRelationship(ref);
     for (Entity* scoped_entity : to_iter) {
       // todo: See if can replace the below with a single function that returns vector<entity_pair>
-      std::vector<Entity*> add = GetRelationship(ref, pkb_->GetNameFromEntity(scoped_entity));
+      std::vector<Entity*> add = GetRelationship(ref, PKB::GetNameFromEntity(scoped_entity));
       for (Entity* unscoped_entity : add) {
-        DesignEntity unscoped_type = pkb_->GetDesignEntityFromEntity(unscoped_entity);
+        DesignEntity unscoped_type = PKB::GetDesignEntityFromEntity(unscoped_entity);
         if (scope_indication == ScopeIndication::kLeftScope) {
           if (unscoped_type == type_two || type_two == DesignEntity::kStmt || type_two == DesignEntity::kProgLine)
-            results.push_back({scoped_entity, unscoped_entity});
+            results.emplace_back(scoped_entity, unscoped_entity);
         } else {
           if (unscoped_type == type_one || type_one == DesignEntity::kStmt || type_one == DesignEntity::kProgLine)
-            results.push_back({unscoped_entity, scoped_entity});
+            results.emplace_back(unscoped_entity, scoped_entity);
         }
       }
     }
@@ -108,7 +108,7 @@ std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetAllRelationshipsS
     std::string left_name = PKB::GetNameFromEntity(left_entities[i]);
     std::string right_name = PKB::GetNameFromEntity(right_entities[i]);
     if (HasRelationship(ref, left_name, right_name)) {
-      results.push_back({left_entities[i], right_entities[i]});
+      results.emplace_back(left_entities[i], right_entities[i]);
     }
   }
   return results;
@@ -121,7 +121,7 @@ std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetAllRelationshipsS
  */
 bool RuntimeExtractor::HasRelationship(PKBRelRefs ref) {
   std::pair<RuntimeColleague*,RelDirection> pair = GetExtractorAndDirection(ref);
-  return (pair.first) ? pair.first->HasRelationship(pair.second) : false;
+  return (pair.first) != nullptr && pair.first->HasRelationship(pair.second);
 }
 
 /**
@@ -134,7 +134,7 @@ bool RuntimeExtractor::HasRelationship(PKBRelRefs ref) {
 bool RuntimeExtractor::HasRelationship(PKBRelRefs ref, std::string first) {
   int target_num = Utility::ConvertStringToInt(first);
   std::pair<RuntimeColleague*,RelDirection> pair = GetExtractorAndDirection(ref);
-  return (pair.first) ? pair.first->HasRelationship(pair.second, target_num) : false;
+  return (pair.first) != nullptr && pair.first->HasRelationship(pair.second, target_num);
 }
 
 /**
@@ -149,7 +149,7 @@ bool RuntimeExtractor::HasRelationship(PKBRelRefs ref, std::string first, std::s
   int first_num = Utility::ConvertStringToInt(first);
   int second_num = Utility::ConvertStringToInt(second);
   std::pair<RuntimeColleague*,RelDirection> pair = GetExtractorAndDirection(ref);
-  return (pair.first) ? pair.first->HasRelationship(pair.second, first_num, second_num) : false;
+  return (pair.first) != nullptr && pair.first->HasRelationship(pair.second, first_num, second_num);
 }
 
 /**
@@ -161,7 +161,7 @@ bool RuntimeExtractor::HasRelationship(PKBRelRefs ref, std::string first, std::s
  */
 bool RuntimeExtractor::HasRelationship(PKBRelRefs ref, DesignEntity first, DesignEntity second) {
   std::pair<RuntimeColleague*,RelDirection> pair = GetExtractorAndDirection(ref);
-  return (pair.first) ? pair.first->HasRelationship(pair.second) : false;
+  return (pair.first) != nullptr && pair.first->HasRelationship(pair.second, first, second);
 }
 
 std::pair<RuntimeColleague*,RelDirection> RuntimeExtractor::GetExtractorAndDirection(PKBRelRefs ref) {
