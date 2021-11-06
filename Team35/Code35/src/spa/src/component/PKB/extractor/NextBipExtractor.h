@@ -18,6 +18,7 @@ class NextBipExtractor : public RuntimeColleague {
   bool HasRelationship(RelDirection dir) override;
   bool HasRelationship(RelDirection dir, int target) override;
   bool HasRelationship(RelDirection dir, int first, int second) override;
+  bool HasRelationship(RelDirection dir, DesignEntity first, DesignEntity second) override;
   void Delete();
  private:
   PKB* pkb_{};

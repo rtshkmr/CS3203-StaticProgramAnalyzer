@@ -76,7 +76,7 @@ class RuntimeExtractor : public RuntimeMediator {
   AffectsBipTExtractor affects_bip_t_extractor_;
 
   std::pair<RuntimeColleague*,RelDirection> GetExtractorAndDirection(PKBRelRefs ref);
-  PKBRelRefs ReverseRelationship(PKBRelRefs ref);
+  static PKBRelRefs ReverseRelationship(PKBRelRefs ref);
 };
 
 #endif //AUTOTESTER_CODE35_SRC_SPA_SRC_COMPONENT_PKB_RUNTIMEEXTRACTOR_H_

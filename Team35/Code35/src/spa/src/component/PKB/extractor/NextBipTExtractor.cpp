@@ -40,6 +40,11 @@ bool NextBipTExtractor::HasRelationship(RelDirection dir, int first, int second)
   return pkb_->HasRelationship(GetPKBRelRef(dir), std::to_string(first), std::to_string(second));
 }
 
+bool NextBipTExtractor::HasRelationship(RelDirection dir, DesignEntity first, DesignEntity second) {
+  if (next_design_entities.count(first) == 0 || next_design_entities.count(second) == 0) return false;
+  return HasRelationship(dir);
+}
+
 void NextBipTExtractor::PopulateRelationships() {
   if (pkb_->HasRelationship(PKBRelRefs::kNextBipT)) return;
   if (!pkb_->HasRelationship(PKBRelRefs::kNextBip)) {

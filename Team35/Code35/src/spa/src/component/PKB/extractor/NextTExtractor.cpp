@@ -160,6 +160,22 @@ bool NextTExtractor::HasRelationship(RelDirection dir, int first, int second) {
   return false;
 }
 
+bool NextTExtractor::HasRelationship(RelDirection dir, DesignEntity first, DesignEntity second) {
+  if (next_design_entities.count(first) == 0 || next_design_entities.count(second) == 0) return false;
+  std::vector<Entity*> first_entities = pkb_->GetDesignEntities(first);
+  std::vector<Entity*> second_entities = pkb_->GetDesignEntities(second);
+  for (Entity* first_entity : first_entities) {
+    int first_stmt_num = Utility::ConvertStringToInt(PKB::GetNameFromEntity(first_entity));
+    for (Entity* second_entity : second_entities) {
+      int second_stmt_num = Utility::ConvertStringToInt(PKB::GetNameFromEntity(second_entity));
+      if (HasRelationship(dir, first_stmt_num, second_stmt_num)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 std::vector<Entity*> NextTExtractor::GetRel(int target,
                                             const std::vector<Procedure*> &proc_list,
                                             std::vector<Statement*> stmt_list) {
