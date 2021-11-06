@@ -11,7 +11,8 @@ bool QueryEvaluatorTable::AddTargetSynonymValues(Synonym *target, std::vector<En
 
 bool QueryEvaluatorTable::AddColumn(Synonym *synonym) {
   if (synonym_to_entity_map.find(synonym) == synonym_to_entity_map.end()) {
-    std::vector<Entity *> synonym_list;
+    int size = GetRowSize();
+    std::vector<Entity *> synonym_list(size, nullptr);
     synonym_to_entity_map.insert(std::make_pair(synonym, synonym_list));
     return true;
   } else {
@@ -25,12 +26,8 @@ bool QueryEvaluatorTable::ContainsColumn(Synonym *synonym) {
 }
 
 bool QueryEvaluatorTable::AddRow(Synonym *synonym, int index, Entity *entity) {
-  // assert that index == size
-  if (index != synonym_to_entity_map[synonym].size()) {
-    return false;
-  }
-  synonym_to_entity_map[synonym].push_back(entity);
-  return true;
+  synonym_to_entity_map[synonym][index] = entity;
+  return index == synonym_to_entity_map[synonym].size();
 }
 
 /**
@@ -50,14 +47,12 @@ bool QueryEvaluatorTable::AddMultipleRowForAllColumn(Synonym *synonym, int index
   }
 
   for (auto & tableIterator : synonym_to_entity_map) {
-    if (tableIterator.first == synonym) {
-      AddRow(synonym, index + repeat_count, entity);
-    } else {
-      if (repeat_count > 0) {
-        std::vector<Entity *> currList = tableIterator.second;
-        currList.insert(currList.begin() + index + repeat_count, currList[index]);
-        tableIterator.second = currList;
-      }
+    if (repeat_count > 0) {
+      std::vector<Entity *> currList = tableIterator.second;
+      currList.push_back(currList[index]);
+      tableIterator.second = currList;
+    } else if (tableIterator.first == synonym) {
+      AddRow(synonym, index, entity);
     }
   }
   return true;

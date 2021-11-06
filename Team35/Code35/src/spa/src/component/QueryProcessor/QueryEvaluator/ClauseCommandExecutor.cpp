@@ -154,7 +154,6 @@ void ClauseCommandExecutor::DoubleSynonymExpansion(Clause *clause, bool first_sy
     std::tuple<bool, int> tuple = DoubleSynonymExpansionCheck(clause, first_syn_in, group_table_pointer);
     bool has_relation = std::get<0>(tuple);
     int repeat_count = std::get<1>(tuple);
-    if (repeat_count > 0) group_table_pointer += repeat_count - 1;
     if (!has_relation) {
       group_table->DeleteRow(group_table_pointer);
       group_table_pointer--;

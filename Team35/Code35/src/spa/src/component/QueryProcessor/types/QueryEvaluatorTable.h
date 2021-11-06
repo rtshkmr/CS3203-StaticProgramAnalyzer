@@ -1,13 +1,6 @@
 #ifndef AUTOTESTER_QUERYEVALUATORTABLE_H
 #define AUTOTESTER_QUERYEVALUATORTABLE_H
 
-//#include <synonym_to_entity_map>
-//#include <string>
-//#include <vector>
-//#include <utility>
-//#include <model/Entity.h>
-//#include "Types.h"
-
 #include <model/Entity.h>
 #include <unordered_map>
 #include "Types.h"
