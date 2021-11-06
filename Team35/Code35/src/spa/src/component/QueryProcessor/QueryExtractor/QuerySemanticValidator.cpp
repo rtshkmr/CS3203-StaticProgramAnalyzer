@@ -168,6 +168,10 @@ bool QuerySemanticValidator::Is_Semantically_Valid_AttrRef(Synonym* s, Attribute
 bool QuerySemanticValidator::Is_Semantically_Valid_AttrCompare(Synonym* lhs_syn, Attribute lhs_attr,
                                                        std::string lhs_return_type, Synonym* rhs_syn,
                                                        Attribute rhs_attr, std::string rhs_return_type) {
+  // edge cases: meaningless but valid query
+  if (lhs_return_type == "INTEGER" && rhs_return_type == "INTEGER") return true;
+  if (lhs_return_type == "STRING" && rhs_return_type == "STRING") return true;
+
   bool lhs_is_syn = lhs_return_type == "SYNONYM";
   bool rhs_is_syn = rhs_return_type == "SYNONYM";
   bool lhs_has_attr = lhs_attr != Attribute::kInvalid;
