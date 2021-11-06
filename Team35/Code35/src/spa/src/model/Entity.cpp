@@ -199,17 +199,22 @@ Statement* Statement::GetBeforeNode() {
   return before_node_;
 }
 
-StatementNumber* Statement::GetStatementNumber() {
+StatementNumber* Statement::GetStatementNumberObj() {
   return statement_number_;
+}
+
+int Statement::GetStatementNumber() {
+  return statement_number_->GetNum();
 }
 
 LineNumber* Statement::GetLineNumber() {
   return line_number_;
 }
 std::string Statement::GetLineNumberString() {
-  return std::to_string(line_number_->getNum());
+  return std::to_string(line_number_->GetNum());
 }
 
 Procedure* Statement::GetProcedureNode() {
   return procedure_node_;
 }
+

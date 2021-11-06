@@ -55,7 +55,8 @@ class Statement : public Entity {
   void SetProcedureNode(Procedure* procedure);
   void SetParentNode(Container* parent);
   void SetBeforeNode(Statement* before);
-  StatementNumber* GetStatementNumber();
+  StatementNumber* GetStatementNumberObj();
+  int GetStatementNumber();
   LineNumber* GetLineNumber();
   std::string GetLineNumberString();
   Procedure* GetProcedureNode();

@@ -372,10 +372,10 @@ TEST_CASE("1.Model.Statement") {
   print_z->SetBeforeNode(while_entity);
 
   SECTION ("Test StatementNumber") {
-    REQUIRE(* while_entity->GetStatementNumber() == StatementNumber(1));
-    REQUIRE(* read_x->GetStatementNumber() == StatementNumber(2));
-    REQUIRE(* read_y->GetStatementNumber() == StatementNumber(3));
-    REQUIRE(* print_z->GetStatementNumber() == StatementNumber(4));
+    REQUIRE(* while_entity->GetStatementNumberObj() == StatementNumber(1));
+    REQUIRE(* read_x->GetStatementNumberObj() == StatementNumber(2));
+    REQUIRE(* read_y->GetStatementNumberObj() == StatementNumber(3));
+    REQUIRE(* print_z->GetStatementNumberObj() == StatementNumber(4));
   }
 
   SECTION ("Test LineNumber") {

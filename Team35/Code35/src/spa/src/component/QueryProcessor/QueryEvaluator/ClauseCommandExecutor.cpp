@@ -114,15 +114,15 @@ bool ClauseCommandExecutor::HasWhileOrIfPatternRelationship(Entity *left_entity,
 std::string ClauseCommandExecutor::RetrieveEntityAttribute(Entity *entity, Attribute attribute) {
   switch (attribute) {
   case (Attribute::kStmtNumber):
-    return std::to_string(const_cast<StatementNumber*>(dynamic_cast<Statement *>(entity)->GetStatementNumber())->GetNum());
+    return std::to_string(const_cast<StatementNumber*>(dynamic_cast<Statement*>(entity)->GetStatementNumberObj())->GetNum());
   case Attribute::kProcName :
     if (typeid(*entity) == typeid(Procedure)) {
-      return const_cast<ProcedureName*>(dynamic_cast<Procedure *>(entity)->GetName())->getName();
+      return const_cast<ProcedureName*>(dynamic_cast<Procedure*>(entity)->GetName())->GetName();
     } else {
-      return const_cast<ProcedureName*>(dynamic_cast<CallEntity *>(entity)->GetProcedure()->GetName())->getName();
+      return const_cast<ProcedureName*>(dynamic_cast<CallEntity*>(entity)->GetProcedure()->GetName())->GetName();
     }
   case Attribute::kValue:
-    return std::to_string(const_cast<ConstantValue*>(dynamic_cast<Constant *>(entity)->GetValue())->Get());
+    return std::to_string(const_cast<ConstantValue*>(dynamic_cast<Constant*>(entity)->GetValue())->GetValue());
   case Attribute::kVarName:
     if (typeid(*entity) == typeid(Variable)) {
       return dynamic_cast<Variable*>(entity)->GetNameInString();

@@ -27,7 +27,7 @@ TEST_CASE("1.PSubsystem.Basic Single Line Creation") {
 
     REQUIRE(deliverable->GetConstantList()->size() == 1);
     ConstantValue* constant_list_front = const_cast<ConstantValue*>(deliverable->GetConstantList()->front()->GetValue());
-    REQUIRE(constant_list_front->Get() == 100);
+    REQUIRE(constant_list_front->GetValue() == 100);
 
     //ensure StmtList and AssignList holds the same object
     REQUIRE(deliverable->GetStatementList()->size() == 1);
@@ -38,7 +38,7 @@ TEST_CASE("1.PSubsystem.Basic Single Line Creation") {
     REQUIRE(assign_entity->GetAssignmentExpr()->CheckExact("x + 100"));
     ConstantValue* expression_constant_front = const_cast<ConstantValue*>(
       assign_entity->GetExpressionConstants().front()->GetValue());
-    REQUIRE(expression_constant_front->Get() == 100);
+    REQUIRE(expression_constant_front->GetValue() == 100);
 
     //ensure trace down from Program is the same variable
     REQUIRE(deliverable->GetProgram()->GetProcedureList()->front() == deliverable->GetProcList()->front());

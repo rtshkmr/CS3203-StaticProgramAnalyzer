@@ -25,7 +25,7 @@ TEST_CASE("1.EntityFactory.CreateEntity") {
     // ideally should be able to overload == and compare 2 objects of the same type
     // but object member pointers not pointing to the correct place yet
 
-    CHECK(actual_procedure_name->getName() == "proc1");
+    CHECK(actual_procedure_name->GetName() == "proc1");
 
 //    Entity* duplicate_proc = entity_factory.CreateEntity(procedure_tokens);
 //    CHECK(actual_procedure_entity == duplicate_proc);
@@ -86,7 +86,7 @@ TEST_CASE("1.EntityFactory.CreateEntity") {
     auto* actual_call_proc = actual_casted_call->GetProcedure();
     auto* actual_call_proc_name = const_cast<ProcedureName*>(actual_call_proc->GetName());
 
-    CHECK(actual_call_proc_name->getName() == "anotherProc");
+    CHECK(actual_call_proc_name->GetName() == "anotherProc");
 
     Entity* duplicate_call = entity_factory.CreateEntity(call_tokens);
     auto* dup_casted_call = dynamic_cast<CallEntity*>(duplicate_call);
