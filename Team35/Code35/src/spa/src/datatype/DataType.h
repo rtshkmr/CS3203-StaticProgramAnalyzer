@@ -40,9 +40,9 @@ class LineNumber {
   int num_;
 
  public:
-  LineNumber(int ln);
+  explicit LineNumber(int ln);
 
-  int getNum();
+  int GetNum();
 
   bool operator<(const LineNumber& other) const;
 
@@ -60,7 +60,7 @@ class ProcedureName {
  public:
   ProcedureName(std::string pName);
 
-  std::string getName();
+  std::string GetName();
 
   bool operator<(const ProcedureName& other) const;
 
@@ -98,7 +98,7 @@ class ConstantValue {
  public:
   ConstantValue(const std::string& constant);
 
-  int Get();
+  int GetValue();
 
   bool operator<(const ConstantValue& other) const;
 
@@ -130,13 +130,8 @@ enum class TokenTag {
   kStringQuote, // "my_var"
   kComma,
   kSuchThat,
-  kPattern,
   kUnderscore,
-  kPlus,
-  kMinus,
-  kModulo,
   kTimes,
-  kDivide,
   kOpenKarat,
   kCloseKarat,
   kDot,
@@ -157,7 +152,7 @@ class Token {
  public:
   std::string GetTokenString() const;
   Token(std::string token_string, TokenTag token_tag);
-  [[nodiscard]] TokenTag GetTokenTag() const;
+  TokenTag GetTokenTag() const;
   bool operator==(const Token& other) const;
   static TokenTag TagStringWithToken(std::string const& reference);
   static bool IsKeywordToken(const Token& token);
@@ -186,20 +181,14 @@ class Token {
                                       const std::regex& desired_pattern,
                                       int left_boundary_idx,
                                       int right_boundary_idx);
-  static int GetFirstMatchingTokenIdx(const std::vector<Token>& tokens, const std::regex& desired_pattern);
+  [[maybe_unused]] static int GetFirstMatchingTokenIdx(const std::vector<Token>& tokens,
+                                                       const std::regex& desired_pattern);
   static int GetFirstMatchingTokenIdx(const std::vector<Token>& tokens, TokenTag target_token_tag);
   static int GetLastMatchingTokenIdx(const std::vector<Token>& tokens,
                                      const std::regex& desired_pattern,
                                      int left_boundary_idx,
                                      int right_boundary_idx);
-
-  static int GetLastMatchingTokenIdx(const std::vector<Token>& tokens,
-                                     TokenTag target_token_tag,
-                                     int left_boundary_idx,
-                                     int right_boundary_idx);
-  static int GetLastMatchingTokenIdx(const std::vector<Token>& tokens, const std::regex& desired_pattern);
   static int GetLastMatchingTokenIdx(const std::vector<Token>& tokens, TokenTag target_token_tag);
-
   static int CountTokens(std::vector<Token> tokens, TokenTag target_tag, std::string target_string);
   static int CountTokens(std::vector<Token> tokens, TokenTag target_tag);
 };

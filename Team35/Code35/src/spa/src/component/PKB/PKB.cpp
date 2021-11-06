@@ -233,7 +233,7 @@ std::string PKB::GetNameFromEntity(Entity* entity) {
   if (e == EntityEnum::kProcedureEntity) {
     Procedure* proc = dynamic_cast<Procedure*>(entity);
     ProcedureName* proc_name = const_cast<ProcedureName*>(proc->GetName());
-    return proc_name->getName();
+    return proc_name->GetName();
   } else if (e == EntityEnum::kVariableEntity) {
     Variable* var = dynamic_cast<Variable*>(entity);
     VariableName* variable_name = const_cast<VariableName*>(var->GetVariableName());
@@ -241,9 +241,9 @@ std::string PKB::GetNameFromEntity(Entity* entity) {
   } else if (e == EntityEnum::kConstantEntity) {
     Constant* constant = dynamic_cast<Constant*>(entity);
     ConstantValue* cv = const_cast<ConstantValue*>(constant->GetValue());
-    return std::to_string(cv->Get());
+    return std::to_string(cv->GetValue());
   } else if (Statement* stmt = dynamic_cast<Statement*>(entity)) {
-    auto* k_number = const_cast<StatementNumber*>(stmt->GetStatementNumber());
+    auto* k_number = const_cast<StatementNumber*>(stmt->GetStatementNumberObj());
     return std::to_string(k_number->GetNum());
   } else {
     throw PKBException("Invalid entity type encountered.");
