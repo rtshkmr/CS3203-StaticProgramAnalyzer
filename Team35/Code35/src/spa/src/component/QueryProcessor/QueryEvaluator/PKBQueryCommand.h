@@ -35,6 +35,13 @@ class PKBQueryReceiver {
     IntermediateTable *QueryEntityAttributeMatch(DesignEntity design_entity, Attribute attribute, std::string value);
 };
 
+struct EntityPairComparator {
+  bool operator()(std::pair<Entity *, Entity *> lhs, std::pair<Entity *, Entity *> rhs) const  {
+    int left = lhs->GetStatementNumber();
+    int right = rhs->GetStatementNumber();
+    return left > right;
+  }
+};
 class PKBQueryCommand {
   public:
     virtual void SetReceiver(PKBQueryReceiver *receiver) = 0;

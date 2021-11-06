@@ -54,11 +54,26 @@ IntermediateTable* PKBQueryReceiver::QueryPKBTwoSynonyms(PKBRelRefs rel, Synonym
   std::vector<Entity*> first_list = table->GetColumn(first_synonym);
   std::vector<Entity*> second_list =table->GetColumn(second_synonym);
   ScopeIndication scoping = GetDoubleSynonymScoping(first_list, second_list);
+  if
+  std::set<std::pair<Entity*, Entity*>> temp_set;
+  std::vector<Entity*> filtered_first_list;
+  std::vector<Entity*> filtered_second_list;
+  for (unsigned i = 0; i < first_list.size(); i++) {
+    if (temp_set.find(std::make_pair(first_list[i], second_list[i])) == temp_set.end()) {
+      temp_set.insert(std::make_pair(first_list[i], second_list[i]));
+      filtered_first_list.push_back(first_list[i]);
+      filtered_second_list.push_back(second_list[i]);
+    }
+  }
+//  sort( first_list.begin(), first_list.end() );
+//  first_list.erase(std::unique(first_list.begin(), first_list.end()), first_list.end());
+//  sort( second_list.begin(), second_list.end() );
+//  second_list.erase(std::unique(second_list.begin(), second_list.end()), second_list.end());
   std::vector<std::tuple<Entity *, Entity *>> output = db_manager->GetRelationshipByTypes(rel,
                                                                                           first_synonym->GetType(),
                                                                                           second_synonym->GetType(),
-                                                                                          first_list,
-                                                                                          second_list,
+                                                                                          filtered_first_list,
+                                                                                          filtered_second_list,
                                                                                           scoping);
   auto *intermediate_table = new IntermediateTable();
   intermediate_table->InsertData(output);
