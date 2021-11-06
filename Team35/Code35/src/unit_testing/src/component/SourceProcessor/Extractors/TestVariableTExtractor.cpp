@@ -33,7 +33,7 @@ TEST_CASE("1.VariableTExtractor.Extract variables basic conditions") {
     std::list<Variable*> proc_var_list = {
         var_x_ // from print
     };
-    deliverable->container_use_hash_.insert(std::make_pair(proc1, &proc_var_list));
+    deliverable->GetUseCMap()->insert(std::make_pair(proc1, &proc_var_list));
 
     Procedure* proc2 = new Procedure(new ProcedureName("proc1"));
     proc2->AddStatement(new ReadEntity(var_x_));
@@ -42,24 +42,24 @@ TEST_CASE("1.VariableTExtractor.Extract variables basic conditions") {
     std::list<Variable*> proc_var_list2 = {
         var_x_ // from read
     };
-    deliverable->container_modifies_hash_.insert(std::make_pair(proc2, &proc_var_list2));
+    deliverable->GetModifiesCMap()->insert(std::make_pair(proc2, &proc_var_list2));
 
     auto variable_t_extractor = VariableTExtractor(deliverable);
     variable_t_extractor.Extract(VariableRel::kUses);
     variable_t_extractor.Extract(VariableRel::kModifies);
 
     SECTION("Uses") {
-      std::list<Variable*> actual_var_list = *deliverable->container_use_hash_.find(proc1)->second;
+      std::list<Variable*> actual_var_list = *deliverable->GetUseCMap()->find(proc1)->second;
       std::list<Variable*> expected_var_list = {var_x_};
       CHECK(actual_var_list == expected_var_list);
-      CHECK(deliverable->container_modifies_hash_.count(proc1) == 0);
+      CHECK(deliverable->GetModifiesCMap()->count(proc1) == 0);
     }
 
     SECTION("Modifies") {
-      std::list<Variable*> actual_var_list = *deliverable->container_modifies_hash_.find(proc2)->second;
+      std::list<Variable*> actual_var_list = *deliverable->GetModifiesCMap()->find(proc2)->second;
       std::list<Variable*> expected_var_list = {var_x_};
       CHECK(actual_var_list == expected_var_list);
-      CHECK(deliverable->container_use_hash_.count(proc2) == 0);
+      CHECK(deliverable->GetUseCMap()->count(proc2) == 0);
     }
   }
 
@@ -86,9 +86,9 @@ TEST_CASE("1.VariableTExtractor.Extract variables basic conditions") {
       auto variable_t_extractor = VariableTExtractor(deliverable);
       variable_t_extractor.Extract(VariableRel::kUses);
 
-      CHECK(deliverable->container_use_hash_.count(proc1) == 0);
-      CHECK(deliverable->container_use_hash_.count(proc2) == 0);
-      CHECK(deliverable->use_hash_.count(call2) == 0);
+      CHECK(deliverable->GetUseCMap()->count(proc1) == 0);
+      CHECK(deliverable->GetUseCMap()->count(proc2) == 0);
+      CHECK(deliverable->GetUseSMap()->count(call2) == 0);
     }
 
     SECTION("modifies") {
@@ -113,9 +113,9 @@ TEST_CASE("1.VariableTExtractor.Extract variables basic conditions") {
       auto variable_t_extractor = VariableTExtractor(deliverable);
       variable_t_extractor.Extract(VariableRel::kModifies);
 
-      CHECK(deliverable->container_modifies_hash_.count(proc1) == 0);
-      CHECK(deliverable->container_modifies_hash_.count(proc2) == 0);
-      CHECK(deliverable->modifies_hash_.count(call2) == 0);
+      CHECK(deliverable->GetModifiesCMap()->count(proc1) == 0);
+      CHECK(deliverable->GetModifiesCMap()->count(proc2) == 0);
+      CHECK(deliverable->GetModifiesSMap()->count(call2) == 0);
     }
   }
 
@@ -149,44 +149,44 @@ TEST_CASE("1.VariableTExtractor.Extract variables basic conditions") {
         var_z_,
         var_i_
     };
-    deliverable->container_use_hash_.insert(std::make_pair(proc1, &proc_use_list));
+    deliverable->GetUseCMap()->insert(std::make_pair(proc1, &proc_use_list));
     std::list<Variable*> if_use_list = {
         var_x_, // from if condition
         var_z_,
         var_i_
     };
-    deliverable->container_use_hash_.insert(std::make_pair(if_1_, &if_use_list));
+    deliverable->GetUseCMap()->insert(std::make_pair(if_1_, &if_use_list));
     std::list<Variable*> proc_mod_list = {
         var_x_, // from read
         var_z_,
         var_y_,
     };
-    deliverable->container_modifies_hash_.insert(std::make_pair(proc1, &proc_mod_list));
+    deliverable->GetModifiesCMap()->insert(std::make_pair(proc1, &proc_mod_list));
     std::list<Variable*> if_mod_list = {
         var_y_,
     };
-    deliverable->container_modifies_hash_.insert(std::make_pair(if_1_, &if_mod_list));
+    deliverable->GetModifiesCMap()->insert(std::make_pair(if_1_, &if_mod_list));
 
     auto variable_t_extractor = VariableTExtractor(deliverable);
     variable_t_extractor.Extract(VariableRel::kUses);
     variable_t_extractor.Extract(VariableRel::kModifies);
 
-    std::list<Variable*> actual_use_list = *deliverable->container_use_hash_.find(proc1)->second;
+    std::list<Variable*> actual_use_list = *deliverable->GetUseCMap()->find(proc1)->second;
     std::list<Variable*> expected_use_list = {var_y_, var_x_, var_z_, var_i_};
 
     // use
     CHECK(actual_use_list == expected_use_list);
     //intermediate change
     std::list<Variable*> expected_if_use_list = {var_x_, var_z_, var_i_};
-    CHECK(*deliverable->container_use_hash_.find(if_1_)->second == expected_if_use_list);
+    CHECK(*deliverable->GetUseCMap()->find(if_1_)->second == expected_if_use_list);
 
     // mod
-    std::list<Variable*> actual_mod_list = *deliverable->container_modifies_hash_.find(proc1)->second;
+    std::list<Variable*> actual_mod_list = *deliverable->GetModifiesCMap()->find(proc1)->second;
     std::list<Variable*> expected_mod_list = {var_x_, var_z_, var_y_};
     CHECK(actual_mod_list == expected_mod_list);
     // no change to inner container
     std::list<Variable*> expected_if_mod_list = {var_y_};
-    CHECK(*deliverable->container_modifies_hash_.find(if_1_)->second == expected_if_mod_list);
+    CHECK(*deliverable->GetModifiesCMap()->find(if_1_)->second == expected_if_mod_list);
   }
 
   SECTION("Procedure with 1 while container") {
@@ -219,41 +219,41 @@ TEST_CASE("1.VariableTExtractor.Extract variables basic conditions") {
         var_x_, // from while
         var_i_
     };
-    deliverable->container_use_hash_.insert(std::make_pair(proc2, &proc_use_list));
+    deliverable->GetUseCMap()->insert(std::make_pair(proc2, &proc_use_list));
     std::list<Variable*> while_use_list = {
         var_x_, // from condition
         var_z_,
         var_i_
     };
-    deliverable->container_use_hash_.insert(std::make_pair(while_1_, &while_use_list));
+    deliverable->GetUseCMap()->insert(std::make_pair(while_1_, &while_use_list));
     std::list<Variable*> proc_mod_list = {
         var_z_,
         var_i_,
         var_x_,
         var_y_
     };
-    deliverable->container_modifies_hash_.insert(std::make_pair(proc2, &proc_mod_list));
+    deliverable->GetModifiesCMap()->insert(std::make_pair(proc2, &proc_mod_list));
     std::list<Variable*> while_mod_list = {
         var_y_
     };
-    deliverable->container_modifies_hash_.insert(std::make_pair(while_1_, &while_mod_list));
+    deliverable->GetModifiesCMap()->insert(std::make_pair(while_1_, &while_mod_list));
 
     auto variable_t_extractor = VariableTExtractor(deliverable);
     variable_t_extractor.Extract(VariableRel::kUses);
     variable_t_extractor.Extract(VariableRel::kModifies);
 
-    std::list<Variable*> actual_use_list = *deliverable->container_use_hash_.find(proc2)->second;
+    std::list<Variable*> actual_use_list = *deliverable->GetUseCMap()->find(proc2)->second;
     std::list<Variable*> expected_use_list = {var_y_, var_z_, var_x_, var_i_};
 
     // use
-    CHECK(*deliverable->container_use_hash_.find(while_1_)->second == while_use_list); // no change to inner container
+    CHECK(*deliverable->GetUseCMap()->find(while_1_)->second == while_use_list); // no change to inner container
     CHECK(actual_use_list == expected_use_list);
 
-    std::list<Variable*> actual_mod_list = *deliverable->container_modifies_hash_.find(proc2)->second;
+    std::list<Variable*> actual_mod_list = *deliverable->GetModifiesCMap()->find(proc2)->second;
     std::list<Variable*> expected_mod_list = {var_z_, var_i_, var_x_, var_y_};
 
     // mod
-    CHECK(*deliverable->container_modifies_hash_.find(while_1_)->second
+    CHECK(*deliverable->GetModifiesCMap()->find(while_1_)->second
               == while_mod_list); // no change to inner container
     CHECK(actual_mod_list == expected_mod_list);
   }
@@ -281,40 +281,40 @@ TEST_CASE("1.VariableTExtractor.Extract variables basic conditions") {
     std::list<Variable*> proc3_use_list = {
         var_z_
     };
-    deliverable->container_use_hash_.insert(std::make_pair(proc3, &proc3_use_list));
+    deliverable->GetUseCMap()->insert(std::make_pair(proc3, &proc3_use_list));
     std::list<Variable*> proc4_use_list = {
         var_y_
     };
-    deliverable->container_use_hash_.insert(std::make_pair(proc4, &proc4_use_list));
+    deliverable->GetUseCMap()->insert(std::make_pair(proc4, &proc4_use_list));
     std::list<Variable*> proc3_mod_list = {
         var_y_
     };
-    deliverable->container_modifies_hash_.insert(std::make_pair(proc3, &proc3_mod_list));
+    deliverable->GetModifiesCMap()->insert(std::make_pair(proc3, &proc3_mod_list));
     std::list<Variable*> proc4_mod_list = {
         var_z_
     };
-    deliverable->container_modifies_hash_.insert(std::make_pair(proc4, &proc4_mod_list));
+    deliverable->GetModifiesCMap()->insert(std::make_pair(proc4, &proc4_mod_list));
 
     auto variable_t_extractor = VariableTExtractor(deliverable);
     variable_t_extractor.Extract(VariableRel::kUses);
     variable_t_extractor.Extract(VariableRel::kModifies);
 
     // use
-    std::list<Variable*> actual_use_list = *deliverable->container_use_hash_.find(proc3)->second;
+    std::list<Variable*> actual_use_list = *deliverable->GetUseCMap()->find(proc3)->second;
     std::list<Variable*> expected_use_list = {var_z_, var_y_};
     CHECK(actual_use_list == expected_use_list);
     // call stmt
-    std::list<Variable*> actual_use_list2 = *deliverable->use_hash_.find(call4)->second;
+    std::list<Variable*> actual_use_list2 = *deliverable->GetUseSMap()->find(call4)->second;
     CHECK(actual_use_list2 == proc4_use_list);
-    CHECK(*deliverable->container_use_hash_.find(proc4)->second == proc4_use_list); // no change to inner container
+    CHECK(*deliverable->GetUseCMap()->find(proc4)->second == proc4_use_list); // no change to inner container
 
     // mod
-    std::list<Variable*> actual_mod_list = *deliverable->container_modifies_hash_.find(proc3)->second;
+    std::list<Variable*> actual_mod_list = *deliverable->GetModifiesCMap()->find(proc3)->second;
     std::list<Variable*> expected_mod_list = {var_y_, var_z_};
     CHECK(actual_mod_list == expected_mod_list);
-    CHECK(*deliverable->container_modifies_hash_.find(proc4)->second == proc4_mod_list); // no change to inner container
+    CHECK(*deliverable->GetModifiesCMap()->find(proc4)->second == proc4_mod_list); // no change to inner container
     // call stmt
-    std::list<Variable*> actual_var_list2 = *deliverable->modifies_hash_.find(call4)->second;
+    std::list<Variable*> actual_var_list2 = *deliverable->GetModifiesSMap()->find(call4)->second;
     CHECK(actual_var_list2 == proc4_mod_list);
   }
 }
@@ -385,59 +385,59 @@ TEST_CASE("1.VariableTExtractor.Extract variables nested containers") {
         var_y_,
         var_i_
     };
-    deliverable->container_modifies_hash_.insert(std::make_pair(if_1_, &if1_mod_list));
+    deliverable->GetModifiesCMap()->insert(std::make_pair(if_1_, &if1_mod_list));
     std::list<Variable*> if2_mod_list = {
         var_i_,
         var_z_
     };
-    deliverable->container_modifies_hash_.insert(std::make_pair(if_2_, &if2_mod_list));
+    deliverable->GetModifiesCMap()->insert(std::make_pair(if_2_, &if2_mod_list));
     std::list<Variable*> if3_mod_list = {
         var_x_,
         var_z_
     };
-    deliverable->container_modifies_hash_.insert(std::make_pair(if_3_, &if3_mod_list));
+    deliverable->GetModifiesCMap()->insert(std::make_pair(if_3_, &if3_mod_list));
     std::list<Variable*> if1_use_list = {
         var_x_, // from if condition
         var_z_,
     };
-    deliverable->container_use_hash_.insert(std::make_pair(if_1_, &if1_use_list));
+    deliverable->GetUseCMap()->insert(std::make_pair(if_1_, &if1_use_list));
     std::list<Variable*> if2_use_list = {
         var_y_, // from if condition
         var_z_,
     };
-    deliverable->container_use_hash_.insert(std::make_pair(if_2_, &if2_use_list));
+    deliverable->GetUseCMap()->insert(std::make_pair(if_2_, &if2_use_list));
     std::list<Variable*> if3_use_list = {
         var_z_, // from if condition
     };
-    deliverable->container_use_hash_.insert(std::make_pair(if_3_, &if3_use_list));
+    deliverable->GetUseCMap()->insert(std::make_pair(if_3_, &if3_use_list));
 
     auto variable_t_extractor = VariableTExtractor(deliverable);
     variable_t_extractor.Extract(VariableRel::kUses);
     variable_t_extractor.Extract(VariableRel::kModifies);
 
     // mod
-    std::list<Variable*> actual_mod_list = *deliverable->container_modifies_hash_.find(if_1_)->second;
+    std::list<Variable*> actual_mod_list = *deliverable->GetModifiesCMap()->find(if_1_)->second;
     std::list<Variable*> expected_mod_list = {var_y_, var_i_, var_z_, var_x_};
     CHECK(actual_mod_list == expected_mod_list);
     // else should not be in modifies hash
-    CHECK(deliverable->container_modifies_hash_.count(else_2_) == 0);
+    CHECK(deliverable->GetModifiesCMap()->count(else_2_) == 0);
     // no change to inner container
     std::list<Variable*> expected_if3_mod_list = {var_x_, var_z_};
-    CHECK(*deliverable->container_modifies_hash_.find(if_3_)->second == expected_if3_mod_list);
+    CHECK(*deliverable->GetModifiesCMap()->find(if_3_)->second == expected_if3_mod_list);
     // intermediate change to secondary container
-    CHECK(*deliverable->container_modifies_hash_.find(if_2_)->second == std::list<Variable*>{var_i_, var_z_, var_x_});
+    CHECK(*deliverable->GetModifiesCMap()->find(if_2_)->second == std::list<Variable*>{var_i_, var_z_, var_x_});
 
     // use
-    std::list<Variable*> actual_use_list = *deliverable->container_use_hash_.find(if_1_)->second;
+    std::list<Variable*> actual_use_list = *deliverable->GetUseCMap()->find(if_1_)->second;
     std::list<Variable*> expected_use_list = {var_x_, var_z_, var_y_};
     CHECK(actual_use_list == expected_use_list);
     // else should not be in modifies hash
-    CHECK(deliverable->container_use_hash_.count(else_2_) == 0);
+    CHECK(deliverable->GetUseCMap()->count(else_2_) == 0);
     // no change to innermost container
     std::list<Variable*> expected_if3_use_list = {var_z_};
-    CHECK(*deliverable->container_use_hash_.find(if_3_)->second == expected_if3_use_list);
+    CHECK(*deliverable->GetUseCMap()->find(if_3_)->second == expected_if3_use_list);
     // intermediate change to secondary container
-    CHECK(*deliverable->container_use_hash_.find(if_2_)->second == std::list<Variable*>{var_y_, var_z_});
+    CHECK(*deliverable->GetUseCMap()->find(if_2_)->second == std::list<Variable*>{var_y_, var_z_});
 
   }
 
@@ -468,51 +468,51 @@ TEST_CASE("1.VariableTExtractor.Extract variables nested containers") {
     std::list<Variable*> while_mod_list = {
         var_y_
     };
-    deliverable->container_modifies_hash_.insert(std::make_pair(while_1_, &while_mod_list));
+    deliverable->GetModifiesCMap()->insert(std::make_pair(while_1_, &while_mod_list));
     std::list<Variable*> while2_mod_list = {
         var_z_
     };
-    deliverable->container_modifies_hash_.insert(std::make_pair(while_2_, &while2_mod_list));
+    deliverable->GetModifiesCMap()->insert(std::make_pair(while_2_, &while2_mod_list));
     std::list<Variable*> while3_mod_list = {
         var_m_
     };
-    deliverable->container_modifies_hash_.insert(std::make_pair(while_3_, &while3_mod_list));
+    deliverable->GetModifiesCMap()->insert(std::make_pair(while_3_, &while3_mod_list));
     std::list<Variable*> while_use_list = {
         var_x_, // from condition
         var_z_,
     };
-    deliverable->container_use_hash_.insert(std::make_pair(while_1_, &while_use_list));
+    deliverable->GetUseCMap()->insert(std::make_pair(while_1_, &while_use_list));
     std::list<Variable*> while2_use_list = {
         var_y_,
     };
-    deliverable->container_use_hash_.insert(std::make_pair(while_2_, &while2_use_list));
+    deliverable->GetUseCMap()->insert(std::make_pair(while_2_, &while2_use_list));
     std::list<Variable*> while3_use_list = {
         var_z_,
         var_n_
     };
-    deliverable->container_use_hash_.insert(std::make_pair(while_3_, &while3_use_list));
+    deliverable->GetUseCMap()->insert(std::make_pair(while_3_, &while3_use_list));
 
     auto variable_t_extractor = VariableTExtractor(deliverable);
     variable_t_extractor.Extract(VariableRel::kUses);
     variable_t_extractor.Extract(VariableRel::kModifies);
 
     //mod
-    std::list<Variable*> actual_mod_list = *deliverable->container_modifies_hash_.find(while_1_)->second;
+    std::list<Variable*> actual_mod_list = *deliverable->GetModifiesCMap()->find(while_1_)->second;
     std::list<Variable*> expected_mod_list = {var_y_, var_z_, var_m_};
     CHECK(actual_mod_list == expected_mod_list);
-    CHECK(*deliverable->container_modifies_hash_.find(while_3_)->second
+    CHECK(*deliverable->GetModifiesCMap()->find(while_3_)->second
               == while3_mod_list); // no change to inner container
     // intermediate change to secondary container
-    CHECK(*deliverable->container_modifies_hash_.find(while_2_)->second == std::list<Variable*>{var_z_, var_m_});
+    CHECK(*deliverable->GetModifiesCMap()->find(while_2_)->second == std::list<Variable*>{var_z_, var_m_});
 
     // use
-    std::list<Variable*> actual_use_list = *deliverable->container_use_hash_.find(while_1_)->second;
+    std::list<Variable*> actual_use_list = *deliverable->GetUseCMap()->find(while_1_)->second;
     std::list<Variable*> expected_use_list = {var_x_, var_z_, var_y_, var_n_};
     CHECK(actual_use_list == expected_use_list);
-    CHECK(*deliverable->container_use_hash_.find(while_3_)->second == while3_use_list); // no change to inner container
+    CHECK(*deliverable->GetUseCMap()->find(while_3_)->second == while3_use_list); // no change to inner container
     std::list<Variable*> secondary_use_list = {var_y_, var_z_, var_n_};
     // intermediate change to secondary container
-    CHECK(*deliverable->container_use_hash_.find(while_2_)->second == secondary_use_list);
+    CHECK(*deliverable->GetUseCMap()->find(while_2_)->second == secondary_use_list);
   }
 
   SECTION("Procedure with 2 call container") {
@@ -547,51 +547,51 @@ TEST_CASE("1.VariableTExtractor.Extract variables nested containers") {
     std::list<Variable*> proc3_mod_list = {
         var_y_
     };
-    deliverable->container_modifies_hash_.insert(std::make_pair(proc3, &proc3_mod_list));
+    deliverable->GetModifiesCMap()->insert(std::make_pair(proc3, &proc3_mod_list));
     std::list<Variable*> proc4_mod_list = {
         var_z_
     };
-    deliverable->container_modifies_hash_.insert(std::make_pair(proc4, &proc4_mod_list));
+    deliverable->GetModifiesCMap()->insert(std::make_pair(proc4, &proc4_mod_list));
     std::list<Variable*> proc2_mod_list = {
         var_m_
     };
-    deliverable->container_modifies_hash_.insert(std::make_pair(proc2, &proc2_mod_list));
+    deliverable->GetModifiesCMap()->insert(std::make_pair(proc2, &proc2_mod_list));
     std::list<Variable*> proc3_use_list = {
         var_z_
     };
-    deliverable->container_use_hash_.insert(std::make_pair(proc3, &proc3_use_list));
+    deliverable->GetUseCMap()->insert(std::make_pair(proc3, &proc3_use_list));
     std::list<Variable*> proc2_use_list = {
         var_n_
     };
-    deliverable->container_use_hash_.insert(std::make_pair(proc2, &proc2_use_list));
+    deliverable->GetUseCMap()->insert(std::make_pair(proc2, &proc2_use_list));
 
     auto variable_t_extractor = VariableTExtractor(deliverable);
     variable_t_extractor.Extract(VariableRel::kUses);
     variable_t_extractor.Extract(VariableRel::kModifies);
 
     // mod
-    std::list<Variable*> actual_mod_list = *deliverable->container_modifies_hash_.find(proc3)->second;
+    std::list<Variable*> actual_mod_list = *deliverable->GetModifiesCMap()->find(proc3)->second;
     std::list<Variable*> expected_mod_list = {var_y_, var_z_, var_m_};
     CHECK(actual_mod_list == expected_mod_list);
-    CHECK(*deliverable->container_modifies_hash_.find(proc2)->second == proc2_mod_list); // no change to inner container
+    CHECK(*deliverable->GetModifiesCMap()->find(proc2)->second == proc2_mod_list); // no change to inner container
     // intermediate change to secondary container
     std::list<Variable*> secondary_mod_list = {var_z_, var_m_};
-    CHECK(*deliverable->container_modifies_hash_.find(proc4)->second == secondary_mod_list);
+    CHECK(*deliverable->GetModifiesCMap()->find(proc4)->second == secondary_mod_list);
     // call stmts
-    CHECK(*deliverable->modifies_hash_.find(call4)->second == secondary_mod_list);
-    CHECK(*deliverable->modifies_hash_.find(call2)->second == proc2_mod_list);
+    CHECK(*deliverable->GetModifiesSMap()->find(call4)->second == secondary_mod_list);
+    CHECK(*deliverable->GetModifiesSMap()->find(call2)->second == proc2_mod_list);
 
     // use
-    std::list<Variable*> actual_use_list = *deliverable->container_use_hash_.find(proc3)->second;
+    std::list<Variable*> actual_use_list = *deliverable->GetUseCMap()->find(proc3)->second;
     std::list<Variable*> expected_use_list = {var_z_, var_n_};
     CHECK(actual_use_list == expected_use_list);
-    CHECK(*deliverable->container_use_hash_.find(proc2)->second == proc2_use_list); // no change to inner container
+    CHECK(*deliverable->GetUseCMap()->find(proc2)->second == proc2_use_list); // no change to inner container
     std::list<Variable*> secondary_use_list = {var_n_};
     // intermediate change to secondary container
-    CHECK(*deliverable->container_use_hash_.find(proc4)->second == secondary_use_list);
+    CHECK(*deliverable->GetUseCMap()->find(proc4)->second == secondary_use_list);
     // call stmts
-    CHECK(*deliverable->use_hash_.find(call4)->second == secondary_use_list);
-    CHECK(*deliverable->use_hash_.find(call2)->second == secondary_use_list);
+    CHECK(*deliverable->GetUseSMap()->find(call4)->second == secondary_use_list);
+    CHECK(*deliverable->GetUseSMap()->find(call2)->second == secondary_use_list);
 
   }
 
@@ -621,38 +621,38 @@ TEST_CASE("1.VariableTExtractor.Extract variables nested containers") {
     std::list<Variable*> if_mod_list = {
         var_y_
     };
-    deliverable->container_modifies_hash_.insert(std::make_pair(if_1_, &if_mod_list));
+    deliverable->GetModifiesCMap()->insert(std::make_pair(if_1_, &if_mod_list));
     std::list<Variable*> while_mod_list = {
         var_i_,
     };
-    deliverable->container_modifies_hash_.insert(std::make_pair(while_1_, &while_mod_list));
+    deliverable->GetModifiesCMap()->insert(std::make_pair(while_1_, &while_mod_list));
     std::list<Variable*> if_use_list = {
         var_x_, // from if condition
         var_z_,
         var_i_
     };
-    deliverable->container_use_hash_.insert(std::make_pair(if_1_, &if_use_list));
+    deliverable->GetUseCMap()->insert(std::make_pair(if_1_, &if_use_list));
     std::list<Variable*> while_use_list = {
         var_z_,
     };
-    deliverable->container_use_hash_.insert(std::make_pair(while_1_, &while_use_list));
+    deliverable->GetUseCMap()->insert(std::make_pair(while_1_, &while_use_list));
 
     auto variable_t_extractor = VariableTExtractor(deliverable);
     variable_t_extractor.Extract(VariableRel::kUses);
     variable_t_extractor.Extract(VariableRel::kModifies);
 
     // mod
-    CHECK(*deliverable->container_modifies_hash_.find(while_1_)->second
+    CHECK(*deliverable->GetModifiesCMap()->find(while_1_)->second
               == while_mod_list); // no change to inner container
     // intermediate change to if container turns out to be the same
     std::list<Variable*> expected_if_mod_list = {var_y_};
-    CHECK(*deliverable->container_modifies_hash_.find(if_1_)->second == expected_if_mod_list);
+    CHECK(*deliverable->GetModifiesCMap()->find(if_1_)->second == expected_if_mod_list);
 
     // use
-    CHECK(*deliverable->container_use_hash_.find(while_1_)->second == while_use_list); // no change to inner container
+    CHECK(*deliverable->GetUseCMap()->find(while_1_)->second == while_use_list); // no change to inner container
     // no change to inner container
     std::list<Variable*> expected_if_use_list = {var_x_, var_z_, var_i_};
-    CHECK(*deliverable->container_use_hash_.find(if_1_)->second == expected_if_use_list);
+    CHECK(*deliverable->GetUseCMap()->find(if_1_)->second == expected_if_use_list);
   }
 }
 
@@ -734,67 +734,67 @@ TEST_CASE("1.VariableTExtractor.Extract variables nested calls") {
   std::list<Variable*> proc1_mod_list = {
       var_y_
   };
-  deliverable->container_modifies_hash_.insert(std::make_pair(proc1, &proc1_mod_list));
+  deliverable->GetModifiesCMap()->insert(std::make_pair(proc1, &proc1_mod_list));
   std::list<Variable*> proc2_mod_list = {
       var_m_
   };
-  deliverable->container_modifies_hash_.insert(std::make_pair(proc2, &proc2_mod_list));
+  deliverable->GetModifiesCMap()->insert(std::make_pair(proc2, &proc2_mod_list));
   std::list<Variable*> proc3_mod_list = {
       var_z_
   };
-  deliverable->container_modifies_hash_.insert(std::make_pair(proc3, &proc3_mod_list));
+  deliverable->GetModifiesCMap()->insert(std::make_pair(proc3, &proc3_mod_list));
   std::list<Variable*> proc4_mod_list = {
       var_i_
   };
-  deliverable->container_modifies_hash_.insert(std::make_pair(proc4, &proc4_mod_list));
+  deliverable->GetModifiesCMap()->insert(std::make_pair(proc4, &proc4_mod_list));
   std::list<Variable*> proc5_mod_list = {
       var_n_
   };
-  deliverable->container_modifies_hash_.insert(std::make_pair(proc5, &proc5_mod_list));
+  deliverable->GetModifiesCMap()->insert(std::make_pair(proc5, &proc5_mod_list));
   std::list<Variable*> while1_mod_list = {
       var_y_
   };
-  deliverable->container_modifies_hash_.insert(std::make_pair(while_1, &while1_mod_list));
+  deliverable->GetModifiesCMap()->insert(std::make_pair(while_1, &while1_mod_list));
   std::list<Variable*> if2_mod_list = {
       var_m_
   };
-  deliverable->container_modifies_hash_.insert(std::make_pair(if_2, &if2_mod_list));
+  deliverable->GetModifiesCMap()->insert(std::make_pair(if_2, &if2_mod_list));
   std::list<Variable*> proc1_use_list = {
       var_x_,
       var_z_
   };
-  deliverable->container_use_hash_.insert(std::make_pair(proc1, &proc1_use_list));
+  deliverable->GetUseCMap()->insert(std::make_pair(proc1, &proc1_use_list));
   std::list<Variable*> proc2_use_list = {
       var_x_,
       var_n_
   };
-  deliverable->container_use_hash_.insert(std::make_pair(proc2, &proc2_use_list));
+  deliverable->GetUseCMap()->insert(std::make_pair(proc2, &proc2_use_list));
   std::list<Variable*> proc3_use_list = {
       var_y_
   };
-  deliverable->container_use_hash_.insert(std::make_pair(proc3, &proc3_use_list));
+  deliverable->GetUseCMap()->insert(std::make_pair(proc3, &proc3_use_list));
   std::list<Variable*> proc4_use_list = {
       var_i_
   };
-  deliverable->container_use_hash_.insert(std::make_pair(proc4, &proc4_use_list));
+  deliverable->GetUseCMap()->insert(std::make_pair(proc4, &proc4_use_list));
   std::list<Variable*> while1_use_list = {
       var_x_,
       var_z_
   };
-  deliverable->container_use_hash_.insert(std::make_pair(while_1, &while1_use_list));
+  deliverable->GetUseCMap()->insert(std::make_pair(while_1, &while1_use_list));
   std::list<Variable*> while2_use_list = {
       var_x_,
   };
-  deliverable->container_use_hash_.insert(std::make_pair(while_2, &while2_use_list));
+  deliverable->GetUseCMap()->insert(std::make_pair(while_2, &while2_use_list));
   std::list<Variable*> if1_use_list = {
       var_x_,
   };
-  deliverable->container_use_hash_.insert(std::make_pair(if_1, &if1_use_list));
+  deliverable->GetUseCMap()->insert(std::make_pair(if_1, &if1_use_list));
   std::list<Variable*> if2_use_list = {
       var_x_,
       var_n_,
   };
-  deliverable->container_use_hash_.insert(std::make_pair(if_2, &if2_use_list));
+  deliverable->GetUseCMap()->insert(std::make_pair(if_2, &if2_use_list));
 
   SECTION("Called procedures parsed later") {
     deliverable->GetProcList()->push_back(proc1);
@@ -808,44 +808,44 @@ TEST_CASE("1.VariableTExtractor.Extract variables nested calls") {
     variable_t_extractor.Extract(VariableRel::kModifies);
 
     // mod
-    CHECK(*deliverable->container_modifies_hash_.find(proc3)->second == proc3_mod_list); // no change to inner container
+    CHECK(*deliverable->GetModifiesCMap()->find(proc3)->second == proc3_mod_list); // no change to inner container
     // intermediate changes to secondary containers
     std::list<Variable*> mod_list1 = {var_m_, var_i_};
-    CHECK(*deliverable->container_modifies_hash_.find(proc2)->second == mod_list1);
-    CHECK(*deliverable->container_modifies_hash_.find(if_2)->second == mod_list1);
+    CHECK(*deliverable->GetModifiesCMap()->find(proc2)->second == mod_list1);
+    CHECK(*deliverable->GetModifiesCMap()->find(if_2)->second == mod_list1);
     std::list<Variable*> mod_list2 = {var_y_, var_m_, var_i_};
-    CHECK(*deliverable->container_modifies_hash_.find(while_1)->second == mod_list2);
+    CHECK(*deliverable->GetModifiesCMap()->find(while_1)->second == mod_list2);
     std::list<Variable*> mod_list3 = {var_z_};
-    CHECK(*deliverable->container_modifies_hash_.find(while_2)->second == mod_list3);
+    CHECK(*deliverable->GetModifiesCMap()->find(while_2)->second == mod_list3);
     std::list<Variable*> mod_list4 = {var_z_, var_y_, var_m_, var_i_};
-    CHECK(*deliverable->container_modifies_hash_.find(if_1)->second == mod_list4);
+    CHECK(*deliverable->GetModifiesCMap()->find(if_1)->second == mod_list4);
     std::list<Variable*> mod_list5 = {var_y_, var_i_, var_z_, var_m_, var_n_};
-    CHECK(*deliverable->container_modifies_hash_.find(proc1)->second == mod_list5);
+    CHECK(*deliverable->GetModifiesCMap()->find(proc1)->second == mod_list5);
     // call stmts
-    CHECK(*deliverable->modifies_hash_.find(call2)->second == mod_list1);
-    CHECK(*deliverable->modifies_hash_.find(call3)->second == proc3_mod_list);
-    CHECK(*deliverable->modifies_hash_.find(call4)->second == proc4_mod_list);
-    CHECK(*deliverable->modifies_hash_.find(call5)->second == proc5_mod_list);
+    CHECK(*deliverable->GetModifiesSMap()->find(call2)->second == mod_list1);
+    CHECK(*deliverable->GetModifiesSMap()->find(call3)->second == proc3_mod_list);
+    CHECK(*deliverable->GetModifiesSMap()->find(call4)->second == proc4_mod_list);
+    CHECK(*deliverable->GetModifiesSMap()->find(call5)->second == proc5_mod_list);
 
     //use
-    CHECK(*deliverable->container_use_hash_.find(proc3)->second == proc3_use_list); // no change to inner container
+    CHECK(*deliverable->GetUseCMap()->find(proc3)->second == proc3_use_list); // no change to inner container
     // intermediate changes to secondary containers
     std::list<Variable*> use_list1 = {var_x_, var_n_, var_i_};
-    CHECK(*deliverable->container_use_hash_.find(proc2)->second == use_list1);
-    CHECK(*deliverable->container_use_hash_.find(if_2)->second == use_list1);
+    CHECK(*deliverable->GetUseCMap()->find(proc2)->second == use_list1);
+    CHECK(*deliverable->GetUseCMap()->find(if_2)->second == use_list1);
     std::list<Variable*> use_list2 = {var_x_, var_z_, var_n_, var_i_};
-    CHECK(*deliverable->container_use_hash_.find(while_1)->second == use_list2);
+    CHECK(*deliverable->GetUseCMap()->find(while_1)->second == use_list2);
     std::list<Variable*> use_list3 = {var_x_, var_y_};
-    CHECK(*deliverable->container_use_hash_.find(while_2)->second == use_list3);
+    CHECK(*deliverable->GetUseCMap()->find(while_2)->second == use_list3);
     std::list<Variable*> use_list4 = {var_x_, var_y_, var_z_, var_n_, var_i_};
-    CHECK(*deliverable->container_use_hash_.find(if_1)->second == use_list4);
+    CHECK(*deliverable->GetUseCMap()->find(if_1)->second == use_list4);
     std::list<Variable*> use_list5 = {var_x_, var_z_, var_i_, var_y_, var_n_};
-    CHECK(*deliverable->container_use_hash_.find(proc1)->second == use_list5);
+    CHECK(*deliverable->GetUseCMap()->find(proc1)->second == use_list5);
     // call stmts
-    CHECK(*deliverable->use_hash_.find(call2)->second == use_list1);
-    CHECK(*deliverable->use_hash_.find(call3)->second == proc3_use_list);
-    CHECK(*deliverable->use_hash_.find(call4)->second == proc4_use_list);
-    CHECK(deliverable->use_hash_.count(call5) == 0);
+    CHECK(*deliverable->GetUseSMap()->find(call2)->second == use_list1);
+    CHECK(*deliverable->GetUseSMap()->find(call3)->second == proc3_use_list);
+    CHECK(*deliverable->GetUseSMap()->find(call4)->second == proc4_use_list);
+    CHECK(deliverable->GetUseSMap()->count(call5) == 0);
 
   }
 
@@ -861,43 +861,43 @@ TEST_CASE("1.VariableTExtractor.Extract variables nested calls") {
     variable_t_extractor.Extract(VariableRel::kModifies);
 
     // mod
-    CHECK(*deliverable->container_modifies_hash_.find(proc3)->second == proc3_mod_list); // no change to inner container
+    CHECK(*deliverable->GetModifiesCMap()->find(proc3)->second == proc3_mod_list); // no change to inner container
     // intermediate changes to secondary containers
     std::list<Variable*> mod_list1 = {var_m_, var_i_};
-    CHECK(*deliverable->container_modifies_hash_.find(proc2)->second == mod_list1);
-    CHECK(*deliverable->container_modifies_hash_.find(if_2)->second == mod_list1);
+    CHECK(*deliverable->GetModifiesCMap()->find(proc2)->second == mod_list1);
+    CHECK(*deliverable->GetModifiesCMap()->find(if_2)->second == mod_list1);
     std::list<Variable*> mod_list2 = {var_y_, var_m_, var_i_};
-    CHECK(*deliverable->container_modifies_hash_.find(while_1)->second == mod_list2);
+    CHECK(*deliverable->GetModifiesCMap()->find(while_1)->second == mod_list2);
     std::list<Variable*> mod_list3 = {var_z_};
-    CHECK(*deliverable->container_modifies_hash_.find(while_2)->second == mod_list3);
+    CHECK(*deliverable->GetModifiesCMap()->find(while_2)->second == mod_list3);
     std::list<Variable*> mod_list4 = {var_z_, var_y_, var_m_, var_i_};
-    CHECK(*deliverable->container_modifies_hash_.find(if_1)->second == mod_list4);
+    CHECK(*deliverable->GetModifiesCMap()->find(if_1)->second == mod_list4);
     std::list<Variable*> mod_list5 = {var_y_, var_i_, var_z_, var_m_, var_n_};
-    CHECK(*deliverable->container_modifies_hash_.find(proc1)->second == mod_list5);
+    CHECK(*deliverable->GetModifiesCMap()->find(proc1)->second == mod_list5);
     // call stmts
-    CHECK(*deliverable->modifies_hash_.find(call2)->second == mod_list1);
-    CHECK(*deliverable->modifies_hash_.find(call3)->second == proc3_mod_list);
-    CHECK(*deliverable->modifies_hash_.find(call4)->second == proc4_mod_list);
-    CHECK(*deliverable->modifies_hash_.find(call5)->second == proc5_mod_list);
+    CHECK(*deliverable->GetModifiesSMap()->find(call2)->second == mod_list1);
+    CHECK(*deliverable->GetModifiesSMap()->find(call3)->second == proc3_mod_list);
+    CHECK(*deliverable->GetModifiesSMap()->find(call4)->second == proc4_mod_list);
+    CHECK(*deliverable->GetModifiesSMap()->find(call5)->second == proc5_mod_list);
 
     // use
-    CHECK(*deliverable->container_use_hash_.find(proc3)->second == proc3_use_list); // no change to inner container
+    CHECK(*deliverable->GetUseCMap()->find(proc3)->second == proc3_use_list); // no change to inner container
     // intermediate changes to secondary containers
     std::list<Variable*> use_list1 = {var_x_, var_n_, var_i_};
-    CHECK(*deliverable->container_use_hash_.find(proc2)->second == use_list1);
-    CHECK(*deliverable->container_use_hash_.find(if_2)->second == use_list1);
+    CHECK(*deliverable->GetUseCMap()->find(proc2)->second == use_list1);
+    CHECK(*deliverable->GetUseCMap()->find(if_2)->second == use_list1);
     std::list<Variable*> use_list2 = {var_x_, var_z_, var_n_, var_i_};
-    CHECK(*deliverable->container_use_hash_.find(while_1)->second == use_list2);
+    CHECK(*deliverable->GetUseCMap()->find(while_1)->second == use_list2);
     std::list<Variable*> use_list3 = {var_x_, var_y_};
-    CHECK(*deliverable->container_use_hash_.find(while_2)->second == use_list3);
+    CHECK(*deliverable->GetUseCMap()->find(while_2)->second == use_list3);
     std::list<Variable*> use_list4 = {var_x_, var_y_, var_z_, var_n_, var_i_};
-    CHECK(*deliverable->container_use_hash_.find(if_1)->second == use_list4);
+    CHECK(*deliverable->GetUseCMap()->find(if_1)->second == use_list4);
     std::list<Variable*> use_list5 = {var_x_, var_z_, var_i_, var_y_, var_n_};
-    CHECK(*deliverable->container_use_hash_.find(proc1)->second == use_list5);
+    CHECK(*deliverable->GetUseCMap()->find(proc1)->second == use_list5);
     // call stmts
-    CHECK(*deliverable->use_hash_.find(call2)->second == use_list1);
-    CHECK(*deliverable->use_hash_.find(call3)->second == proc3_use_list);
-    CHECK(*deliverable->use_hash_.find(call4)->second == proc4_use_list);
-    CHECK(deliverable->use_hash_.count(call5) == 0);
+    CHECK(*deliverable->GetUseSMap()->find(call2)->second == use_list1);
+    CHECK(*deliverable->GetUseSMap()->find(call3)->second == proc3_use_list);
+    CHECK(*deliverable->GetUseSMap()->find(call4)->second == proc4_use_list);
+    CHECK(deliverable->GetUseSMap()->count(call5) == 0);
   }
 }

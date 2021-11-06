@@ -80,6 +80,23 @@ class Deliverable {
   template<typename X, typename Y>
   static void AddRelationshipToMap(std::unordered_map<X, std::list<Y>*>* map, X key, Y value);
 
+
+ private:
+  //root-node of AST
+  Program* program_;
+
+  // EntityTables
+  std::list<Procedure*> proc_list_;
+  std::list<Variable*> var_list_;
+  std::list<Constant*> const_list_;
+  std::vector<Statement*> stmt_list_;
+  std::list<IfEntity*> if_list_;
+  std::list<WhileEntity*> while_list_;
+  std::list<AssignEntity*> assign_list_;
+  std::list<CallEntity*> call_list_;
+  std::list<PrintEntity*> print_list_;
+  std::list<ReadEntity*> read_list_;
+
   // RelationshipTables
   std::unordered_map<Statement*, std::list<Statement*>*> follow_hash_; // to store Follows
   std::unordered_map<Statement*, std::list<Statement*>*> follows_T_hash_; // to store Follows*
@@ -109,22 +126,6 @@ class Deliverable {
   std::unordered_map<Procedure*, std::list<Procedure*>*> called_by_hash_; // represents a Calls(x, y) where y -> x
   std::unordered_map<Procedure*, std::list<Procedure*>*> called_by_T_hash_; // represents a Calls*(x, y) where y -> x
   std::unordered_map<Statement*, std::list<Statement*>*> previous_hash_;  // to store Previous (reverse of Next)
-
- private:
-  //root-node of AST
-  Program* program_;
-
-  // EntityTables
-  std::list<Procedure*> proc_list_;
-  std::list<Variable*> var_list_;
-  std::list<Constant*> const_list_;
-  std::vector<Statement*> stmt_list_;
-  std::list<IfEntity*> if_list_;
-  std::list<WhileEntity*> while_list_;
-  std::list<AssignEntity*> assign_list_;
-  std::list<CallEntity*> call_list_;
-  std::list<PrintEntity*> print_list_;
-  std::list<ReadEntity*> read_list_;
 };
 
 template <typename X, typename Y>
