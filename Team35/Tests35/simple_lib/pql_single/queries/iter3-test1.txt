@@ -1078,8 +1078,6 @@ stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr
 Select if1 with if1.stmt# = 29
 29
 5000
-
-// TODO: TO CONTINUE
 217 - attrRef-integer pair
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
 Select s1 with if1.stmt# = 100
@@ -1192,8 +1190,8 @@ Select p1.stmt# with "x" = p1.varName
 5000
 239 - attrRef-variable pair
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
-Select p1 with p1.varName = "First"
-First
+Select p1.varName with p1.varName = "Third"
+Third
 5000
 240 - attrRef-variable pair
 stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2;
