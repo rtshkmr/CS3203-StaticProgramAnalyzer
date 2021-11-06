@@ -129,7 +129,7 @@ bool AffectsTExtractor::HasRelationship(RelDirection dir, int first, int second)
 }
 
 bool AffectsTExtractor::HasRelationship(RelDirection dir, DesignEntity first, DesignEntity second) {
-  if (!Utility::IsAssignDesignEntity(first) || !Utility::IsAssignDesignEntity(second)) return {};
+  if (!Utility::IsAssignDesignEntity(first) || !Utility::IsAssignDesignEntity(second)) return false;
   return HasRelationship(dir);
 }
 

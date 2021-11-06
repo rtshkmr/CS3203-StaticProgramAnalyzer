@@ -161,7 +161,7 @@ bool NextTExtractor::HasRelationship(RelDirection dir, int first, int second) {
 }
 
 bool NextTExtractor::HasRelationship(RelDirection dir, DesignEntity first, DesignEntity second) {
-  if (next_design_entities.count(first) == 0 || next_design_entities.count(second) == 0) return {};
+  if (next_design_entities.count(first) == 0 || next_design_entities.count(second) == 0) return false;
   std::vector<Entity*> first_entities = pkb_->GetDesignEntities(first);
   std::vector<Entity*> second_entities = pkb_->GetDesignEntities(second);
   for (Entity* first_entity : first_entities) {

@@ -60,7 +60,7 @@ bool NextBipExtractor::HasRelationship(RelDirection dir, int first, int second) 
 }
 
 bool NextBipExtractor::HasRelationship(RelDirection dir, DesignEntity first, DesignEntity second) {
-  if (next_design_entities.count(first) == 0 || next_design_entities.count(second) == 0) return {};
+  if (next_design_entities.count(first) == 0 || next_design_entities.count(second) == 0) return false;
   return HasRelationship(dir);
 }
 
