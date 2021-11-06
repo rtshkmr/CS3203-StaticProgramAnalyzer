@@ -49,7 +49,10 @@ std::vector<std::tuple<Entity*, Entity*>> AffectsExtractor::GetRelationshipByTyp
       retList.push_back(std::make_tuple(entity, affected));
     }
   }
-  retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
+
+  if (retList.size() > 0) {
+    retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
+  }
   cacheIndication = ScopeIndication::kAllScope;
   return retList;
 }
@@ -109,7 +112,10 @@ std::vector<Entity*> AffectsExtractor::GetAllAffects() {
       retList.push_back(entity);
     }
   }
-  retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
+
+  if (retList.size() > 0) {
+    retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
+  }
 
   if (cacheIndication == ScopeIndication::kNoScope) {
     cacheIndication = ScopeIndication::kLeftScope;
@@ -139,7 +145,10 @@ std::vector<Entity*> AffectsExtractor::GetAllAffectedBy() {
       retList.push_back(entity);
     }
   }
-  retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
+
+  if (retList.size() > 0) {
+    retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
+  }
 
   if (cacheIndication == ScopeIndication::kNoScope) {
     cacheIndication = ScopeIndication::kRightScope;
@@ -172,7 +181,10 @@ std::vector<Entity*> AffectsExtractor::GetAffects(AssignEntity* target) {
       retList.push_back(entity);
     }
   }
-  retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
+
+  if (retList.size() > 0) {
+    retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
+  }
   return retList;
 }
 
