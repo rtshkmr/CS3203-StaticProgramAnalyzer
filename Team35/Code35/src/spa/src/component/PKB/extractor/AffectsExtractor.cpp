@@ -230,7 +230,6 @@ bool AffectsExtractor::HasAffects(AssignEntity* target_ae) {
   }
 
   Procedure* target_proc = target_ae->GetProcedureNode();
-//  VariableName* target_var = const_cast<VariableName*>(target_ae->GetVariableObj()yyp->GetName());
   std::string target_var = target_ae->GetVariableString();
 
   //check against the entire procedure's assign
