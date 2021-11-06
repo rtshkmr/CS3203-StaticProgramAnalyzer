@@ -44,42 +44,6 @@ std::vector<Entity*> DBManager::GetFirstEntityOfRelationship(PKBRelRefs ref, Des
 }
 
 /**
- * Gets relationships for 1 type-specified entity, e.g. Uses(s, _) where s are entities in the scoped vector.
- * @param ref Relationship type
- * @param de Type of entity to query
- * @param scoped_entities Entities that have already been scoped
- * @param scope_indication Enum describing if result has already been scoped
- * @return All entities in the scope that can be on the LHS of the relationship.
- */
-std::vector<Entity*> DBManager::GetFirstEntityOfRelationship(PKBRelRefs ref,
-                                                             DesignEntity de,
-                                                             std::vector<Entity*> scoped_entities,
-                                                             ScopeIndication scope_indication) {
-  // If there is no scope, return the unscoped_entities from PKB/RuntimeExtractor
-  if (scope_indication == ScopeIndication::kNoScope) {
-    return GetFirstEntityOfRelationship(ref, de);
-  } else {
-    // Check if pkb contains the relationship type
-    const bool pkb_ref = preprocessed_rel_refs.find(ref) != preprocessed_rel_refs.end();
-    if (pkb_ref) {
-      // PKB contains the relationship type
-      std::vector<Entity*> unscoped_entities = pkb_->GetFirstEntityOfRelationship(ref, de);
-
-      // Scoped entities will always be a subset of unscoped entities
-      // Can simply check if scoped_entities is smaller than unscoped_entities and return the smaller vector
-      if (scoped_entities.size() <= unscoped_entities.size()) {
-        return scoped_entities;
-      } else {
-        return unscoped_entities;
-      }
-    } else {
-      // PKB does not contain the relationship type
-      return runtime_extractor_->GetScopedFirstEntities(ref, scoped_entities);
-    }
-  }
-}
-
-/**
  * Gets relationships for 2 type-specified entities, e.g. Uses(p, v)
  * @param ref Relationship type
  * @param first Type of first entity
@@ -112,27 +76,45 @@ std::vector<std::tuple<Entity*, Entity*>> DBManager::GetRelationshipByTypes(PKBR
                                                                             std::vector<Entity*> left_scoped_entities,
                                                                             std::vector<Entity*> right_scoped_entities,
                                                                             ScopeIndication scope_indication) {
-  // If there is no scope, return the unscoped_entities from PKB/RuntimeExtractor
+
+
   if (scope_indication == ScopeIndication::kNoScope) {
     return GetRelationshipByTypes(ref, first_de, second_de);
   } else {
     // Check if pkb contains the relationship type
     const bool pkb_ref = preprocessed_rel_refs.find(ref) != preprocessed_rel_refs.end();
     if (pkb_ref) {
-      // PKB contains the relationship type
-      std::vector<std::tuple<Entity*, Entity*>>
-          unscoped_entities = pkb_->GetRelationshipByTypes(ref, first_de, second_de);
-      // Scoped entities will always be a subset of unscoped entities
-      // Can simply check if lef_scoped_entities is smaller than unscoped_entities
-      // and return the smaller vector
-      if (left_scoped_entities.size() <= unscoped_entities.size()) {
-        return MergeScopedEntities(left_scoped_entities, right_scoped_entities);
+      if (scope_indication == ScopeIndication::kAllScope) {
+        std::vector<std::tuple<Entity*, Entity*>> results(left_scoped_entities.size());
+        for (int i = 0; i < left_scoped_entities.size(); i++) {
+          if (pkb_->HasRelationship(
+            ref,
+            GetNameFromEntity(left_scoped_entities[i]),
+            GetNameFromEntity(right_scoped_entities[i])))
+            results.emplace_back(left_scoped_entities[i], right_scoped_entities[i]);
+        }
+        return results;
       } else {
-        return unscoped_entities;
+        std::vector<entity_pair> results;
+        auto scoped_entities = scope_indication == ScopeIndication::kLeftScope ? left_scoped_entities : right_scoped_entities;
+        for (Entity* entity : scoped_entities) {
+          std::vector<entity_pair> pairs;
+          if (scope_indication == ScopeIndication::kLeftScope)
+            pairs = pkb_->GetRelationshipByFirst(ref, GetNameFromEntity(entity), {first_de, second_de});
+          if (scope_indication == ScopeIndication::kRightScope)
+            pairs = pkb_->GetRelationshipBySecond(ref, GetNameFromEntity(entity), {first_de, second_de});
+          results.insert(results.end(), pairs.begin(), pairs.end());
+        }
+        return results;
       }
     } else {
       // PKB does not contain the relationship type
-      return runtime_extractor_->GetAllRelationshipsScoped(ref, left_scoped_entities, right_scoped_entities);
+      return runtime_extractor_->GetAllRelationshipsScoped(
+        ref,
+        left_scoped_entities,
+        right_scoped_entities,
+        scope_indication,
+        {first_de, second_de});
     }
   }
 }

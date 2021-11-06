@@ -5,7 +5,7 @@
  */
 #include "SyntaxValidator.h"
 #include <cassert>
-#include <datatype/RegexPatterns.h>
+#include <util/RegexPatterns.h>
 
 using std::string;
 using std::vector;

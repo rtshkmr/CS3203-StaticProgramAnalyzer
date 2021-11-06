@@ -89,7 +89,7 @@ std::vector<std::vector<std::string>> QueryProjector::StringifyTable(std::vector
     switch (syn_attrs[i].second) {
       case Attribute::kStmtNumber:
         for (Entity* entity: entity_column) {
-          int statement_num = dynamic_cast<Statement*>(entity)->GetStatementNumber()->GetNum();
+          int statement_num = dynamic_cast<Statement*>(entity)->GetStatementNumber();
           stringified_column.push_back(std::to_string(statement_num));
         }
         break;
@@ -98,10 +98,10 @@ std::vector<std::vector<std::string>> QueryProjector::StringifyTable(std::vector
           std::string var_string;
           Variable* temp;
           if (syn_attrs[i].first->GetType() == DesignEntity::kPrint) {
-            temp = dynamic_cast<PrintEntity*>(entity)->GetVariable();
+            temp = dynamic_cast<PrintEntity*>(entity)->GetVariableObj();
           }
           else if (syn_attrs[i].first->GetType() == DesignEntity::kRead) {
-            temp = dynamic_cast<ReadEntity*>(entity)->GetVariable();
+            temp = dynamic_cast<ReadEntity*>(entity)->GetVariableObj();
           }
           else {
             temp = dynamic_cast<Variable*>(entity);
@@ -115,17 +115,17 @@ std::vector<std::vector<std::string>> QueryProjector::StringifyTable(std::vector
           std::string proc_string;
           Procedure* temp;
           if (syn_attrs[i].first->GetType() == DesignEntity::kCall) {
-            temp = dynamic_cast<CallEntity*>(entity)->GetProcedure();
+            temp = dynamic_cast<CallEntity*>(entity)->GetCalledProcedure();
           } else {
             temp = dynamic_cast<Procedure*>(entity);
           }
-          proc_string = const_cast<ProcedureName*>(temp->GetName())->getName();
+          proc_string = const_cast<ProcedureName*>(temp->GetName())->GetName();
           stringified_column.push_back(proc_string);
         }
         break;
       case Attribute::kValue:
         for (Entity* entity: entity_column) {
-          int constant_int = const_cast<ConstantValue*>(dynamic_cast<Constant*>(entity)->GetValue())->Get();
+          int constant_int = const_cast<ConstantValue*>(dynamic_cast<Constant*>(entity)->GetValue())->GetValue();
           stringified_column.push_back(std::to_string(constant_int));
         }
         break;
@@ -233,3 +233,4 @@ std::vector<std::string> QueryProjector::JoinTuples(std::vector<std::vector<std:
   }
   return tuples;
 }
+

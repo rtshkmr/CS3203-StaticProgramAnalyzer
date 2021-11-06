@@ -26,7 +26,6 @@ class LoggerSettings {
   bool out_to_stdout_;
   bool include_datetime_;
   bool include_file_line_;
-  // default constructor:
   LoggerSettings();
 };
 

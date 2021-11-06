@@ -31,7 +31,6 @@ class NextTExtractor : public RuntimeColleague {
   std::vector<Procedure*> proc_list_{};
 
   // state
-  bool initialized_ = false;
   RelDirection rel_direction_;
   std::unordered_map<RelDirection, std::unordered_map<Statement*, std::list<Statement*>*>> rel_table_;
   std::unordered_map<RelDirection, std::unordered_map<DesignEntity, std::vector<Entity*>>> first_arg_table_;

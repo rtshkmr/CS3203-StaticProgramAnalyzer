@@ -28,7 +28,14 @@ NextTExtractor::NextTExtractor(std::vector<Procedure*> proc_list, std::vector<St
   next_t_2d_array_ = std::vector<std::vector<int>>(total, std::vector<int>(total));
 }
 
-void NextTExtractor::Delete() {}
+void NextTExtractor::Delete() {
+  proc_list_ = {};
+  stmt_list_ = {};
+  rel_table_ = {};
+  first_arg_table_ = {};
+  rel_by_types_table_ = {};
+  next_t_2d_array_ = {};
+}
 
 /**
  * @return size of next_t_map
@@ -349,7 +356,7 @@ void NextTExtractor::AddRelationships(Statement* first_arg, std::list<Statement*
  */
 void NextTExtractor::AddRelationshipsWithDup(Statement* first_arg, const std::list<Statement*> &second_args) {
   if (second_args.empty() || rel_table_[rel_direction_].count(first_arg) == 1) return;
-  int first_arg_num = first_arg->GetStatementNumber()->GetNum();
+  int first_arg_num = first_arg->GetStatementNumber();
   auto* list = MakeUniqueList(first_arg_num, second_args);
   rel_table_[rel_direction_].insert({first_arg, list});
   DesignEntity de = PKB::GetDesignEntityFromEntity(first_arg);
@@ -397,7 +404,7 @@ std::list<Statement*>* NextTExtractor::MakeUniqueList(int s1_num, const std::lis
   auto new_list = new std::list<Statement*>();
   std::vector<int> duplicates(stmt_list_.size(), 0);
   for (Statement* s: list) {
-    int s_num = s->GetStatementNumber()->GetNum();
+    int s_num = s->GetStatementNumber();
     if (duplicates[s_num - 1] == 0) {
       duplicates[s_num - 1] = 1;
       next_t_2d_array_[s_num - 1][s1_num - 1] = 1;
