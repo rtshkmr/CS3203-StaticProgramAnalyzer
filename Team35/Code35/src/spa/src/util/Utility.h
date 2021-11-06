@@ -14,7 +14,7 @@ class Utility {
  public:
   static int ConvertStringToInt(const std::string& input);
   static AssignEntity* GetAssignEntityFromStmtNum(PKB* pkb, int target);
-  static bool isAssignDesignEntity(DesignEntity de);
+  static bool IsAssignDesignEntity(DesignEntity de);
   template <typename T>
   static std::vector<Entity*> ConvertListToVector(std::list<T*> list);
 };

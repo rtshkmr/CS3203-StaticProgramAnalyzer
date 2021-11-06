@@ -272,7 +272,7 @@ std::vector<Entity*> RuntimeExtractor::GetPrevT(DesignEntity de) {
 }
 
 std::vector<Entity*> RuntimeExtractor::GetAffects(DesignEntity de) {
-  if (Utility::isAssignDesignEntity(de)) {
+  if (Utility::IsAssignDesignEntity(de)) {
     return affects_extractor_.GetAllAffects();
   } else {
     return std::vector<Entity*>{};
@@ -280,21 +280,21 @@ std::vector<Entity*> RuntimeExtractor::GetAffects(DesignEntity de) {
 }
 
 std::vector<Entity*> RuntimeExtractor::GetAffectedBy(DesignEntity de) {
-  if (Utility::isAssignDesignEntity(de)) {
+  if (Utility::IsAssignDesignEntity(de)) {
     return affects_extractor_.GetAllAffectedBy();
   } else {
     return std::vector<Entity*>{};
   }
 }
 std::vector<Entity*> RuntimeExtractor::GetAffectsT(DesignEntity de) {
-  if (Utility::isAssignDesignEntity(de)) {
+  if (Utility::IsAssignDesignEntity(de)) {
     return affects_t_extractor_.GetFirstEntityOfRelationship(RelDirection::kForward, de);
   } else {
     return std::vector<Entity*>();
   }
 }
 std::vector<Entity*> RuntimeExtractor::GetAffectedByT(DesignEntity de) {
-  if (Utility::isAssignDesignEntity(de)) {
+  if (Utility::IsAssignDesignEntity(de)) {
     return affects_t_extractor_.GetFirstEntityOfRelationship(RelDirection::kReverse, de);
   } else {
     return std::vector<Entity*>();
@@ -352,7 +352,7 @@ std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetPrevT(DesignEntit
 }
 
 std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetAffects(DesignEntity first, DesignEntity second) {
-  if (Utility::isAssignDesignEntity(first) && Utility::isAssignDesignEntity(second)) {
+  if (Utility::IsAssignDesignEntity(first) && Utility::IsAssignDesignEntity(second)) {
     return affects_extractor_.GetAllPair();
   } else {
     return std::vector<std::tuple<Entity*, Entity*>>();
@@ -360,7 +360,7 @@ std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetAffects(DesignEnt
 }
 
 std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetAffectedBy(DesignEntity first, DesignEntity second) {
-  if (Utility::isAssignDesignEntity(first) && Utility::isAssignDesignEntity(second)) {
+  if (Utility::IsAssignDesignEntity(first) && Utility::IsAssignDesignEntity(second)) {
     return affects_extractor_.GetAllPair();
   } else {
     return std::vector<std::tuple<Entity*, Entity*>>();
@@ -368,14 +368,14 @@ std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetAffectedBy(Design
 }
 
 std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetAffectsT(DesignEntity first, DesignEntity second) {
-  if (Utility::isAssignDesignEntity(first) && Utility::isAssignDesignEntity(second)) {
+  if (Utility::IsAssignDesignEntity(first) && Utility::IsAssignDesignEntity(second)) {
     return affects_t_extractor_.GetRelationshipByTypes(RelDirection::kForward, first, second);
   } else {
     return std::vector<std::tuple<Entity*, Entity*>>();
   }
 }
 std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetAffectedByT(DesignEntity first, DesignEntity second) {
-  if (Utility::isAssignDesignEntity(first) && Utility::isAssignDesignEntity(second)) {
+  if (Utility::IsAssignDesignEntity(first) && Utility::IsAssignDesignEntity(second)) {
     return affects_t_extractor_.GetRelationshipByTypes(RelDirection::kReverse, first, second);
   } else {
     return std::vector<std::tuple<Entity*, Entity*>>();

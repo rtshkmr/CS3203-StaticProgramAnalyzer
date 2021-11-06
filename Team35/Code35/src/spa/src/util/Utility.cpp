@@ -48,6 +48,6 @@ AssignEntity* Utility::GetAssignEntityFromStmtNum(PKB* pkb, int target) {
  * @param de DesignEntity to be checked.
  * @return true if it is; false otherwise.
  */
-bool Utility::isAssignDesignEntity(DesignEntity de) {
+bool Utility::IsAssignDesignEntity(DesignEntity de) {
   return de == DesignEntity::kAssign || de == DesignEntity::kStmt || de == DesignEntity::kProgLine;
 }
