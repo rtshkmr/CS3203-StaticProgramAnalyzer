@@ -7,11 +7,23 @@
 using namespace entity_utils;
 using psub::PSubsystem;
 
+void AddBlocks(Cluster* cluster, const std::list<Block*>& blocks) {
+  for (Block* block : blocks) {
+    cluster->AddChildClusterToBack(block);
+  }
+  cluster->UpdateClusterRange();
+}
+
 TEST_CASE("1.NextExtractor.basic conditions") {
   Deliverable deliverable;
+  auto* b1 = new Block();
+  auto* b2 = new Block();
+  auto* b3 = new Block();
+  auto* b4 = new Block();
+  auto* b5 = new Block();
+  auto* b6 = new Block();
 
   SECTION("1 statement") {
-    Block* b1 = new Block();
     b1->AddStmt(StatementNumber(1));
     Procedure* proc1 = GetProc1();
     proc1->SetBlockRoot(b1);
@@ -23,11 +35,10 @@ TEST_CASE("1.NextExtractor.basic conditions") {
     NextExtractor next_extractor{};
     next_extractor.Extract(&deliverable);
 
-    CHECK(deliverable.GetNextMap()->size() == 0);
+    CHECK(deliverable.GetNextMap()->empty());
   }
 
   SECTION("single level statement list") {
-    Block* b1 = new Block();
     b1->AddStmt(StatementNumber(1));
     b1->AddStmt(StatementNumber(2));
     b1->AddStmt(StatementNumber(3));
@@ -63,11 +74,6 @@ TEST_CASE("1.NextExtractor.basic conditions") {
      *  s6
      * s7
      */
-    Block* b1 = new Block();
-    Block* b2 = new Block();
-    Block* b3 = new Block();
-    Block* b4 = new Block();
-    Block* b5 = new Block();
     b1->AddStmt(StatementNumber(1));
     b2->AddStmt(StatementNumber(2));
     b3->AddStmt(StatementNumber(3));
@@ -75,8 +81,8 @@ TEST_CASE("1.NextExtractor.basic conditions") {
     b4->AddStmt(StatementNumber(5));
     b4->AddStmt(StatementNumber(6));
     b5->AddStmt(StatementNumber(7));
-    Cluster* c1 = new Cluster();
-    c1->SetStartEnd(1, 7);
+    auto* c1 = new Cluster();
+    AddBlocks(c1, {b1, b2, b3, b4, b5});
     b1->AddNextBlock(b2);
     b2->AddNextBlock(b3);
     b2->AddNextBlock(b4);
@@ -134,18 +140,14 @@ TEST_CASE("1.NextExtractor.basic conditions") {
      *  s5
      * s6
      */
-    Block* b1 = new Block();
-    Block* b2 = new Block();
-    Block* b3 = new Block();
-    Block* b4 = new Block();
     b1->AddStmt(StatementNumber(1));
     b2->AddStmt(StatementNumber(2));
     b3->AddStmt(StatementNumber(3));
     b3->AddStmt(StatementNumber(4));
     b3->AddStmt(StatementNumber(5));
     b4->AddStmt(StatementNumber(6));
-    Cluster* c1 = new Cluster();
-    c1->SetStartEnd(1, 6);
+    auto* c1 = new Cluster();
+    AddBlocks(c1, {b1, b2, b3, b4});
     b1->AddNextBlock(b2);
     b2->AddNextBlock(b3);
     b2->AddNextBlock(b4);
@@ -194,15 +196,13 @@ TEST_CASE("1.NextExtractor.basic conditions") {
      *  s2
      *  s3
      */
-    Block* b1 = new Block();
-    Block* b2 = new Block();
     b1->AddStmt(StatementNumber(1));
     b2->AddStmt(StatementNumber(2));
     b2->AddStmt(StatementNumber(3));
-    Cluster* c1 = new Cluster();
-    c1->SetStartEnd(1, 3);
     b1->AddNextBlock(b2);
     b2->AddNextBlock(b1);
+    auto* c1 = new Cluster();
+    AddBlocks(c1, {b1, b2});
     Procedure* proc1 = GetProc1();
     proc1->SetBlockRoot(b1);
     proc1->SetClusterRoot(c1);
@@ -243,12 +243,6 @@ TEST_CASE("1.NextExtractor.basic conditions") {
      * else
      *  s7
      */
-    Block* b1 = new Block();
-    Block* b2 = new Block();
-    Block* b3 = new Block();
-    Block* b4 = new Block();
-    Block* b5 = new Block();
-    Block* b6 = new Block();
     b1->AddStmt(StatementNumber(1));
     b2->AddStmt(StatementNumber(2));
     b2->AddStmt(StatementNumber(3));
@@ -256,12 +250,12 @@ TEST_CASE("1.NextExtractor.basic conditions") {
     b4->AddStmt(StatementNumber(5));
     b5->AddStmt(StatementNumber(6));
     b6->AddStmt(StatementNumber(7));
-    Cluster* c1 = new Cluster();
-    Cluster* c2 = new Cluster();
-    Cluster* c3 = new Cluster();
-    c1->SetStartEnd(1, 3);
-    c2->SetStartEnd(4, 4);
-    c3->SetStartEnd(5, 7);
+    auto* c1 = new Cluster();
+    auto* c2 = new Cluster();
+    auto* c3 = new Cluster();
+    AddBlocks(c1, {b1, b2});
+    AddBlocks(c2, {b3});
+    AddBlocks(c3, {b4, b5, b6});
     b1->AddNextBlock(b2);
     b2->AddNextBlock(b1);
     b4->AddNextBlock(b5);
@@ -314,15 +308,15 @@ TEST_CASE("1.NextExtractor.basic conditions") {
 
 TEST_CASE("1.NextExtractor.nested containers") {
   Deliverable deliverable;
-  Block* b1 = new Block();
-  Block* b2 = new Block();
-  Block* b3 = new Block();
-  Block* b4 = new Block();
-  Block* b5 = new Block();
-  Block* b6 = new Block();
-  Block* b7 = new Block();
-  Block* b8 = new Block();
-  Cluster* c1 = new Cluster();
+  auto* b1 = new Block();
+  auto* b2 = new Block();
+  auto* b3 = new Block();
+  auto* b4 = new Block();
+  auto* b5 = new Block();
+  auto* b6 = new Block();
+  auto* b7 = new Block();
+  auto* b8 = new Block();
+  auto* c1 = new Cluster();
   Statement* s1 = CreateStatement(GetAssign1(), 1);
   Statement* s2 = CreateStatement(GetAssign1(), 2);
   Statement* s3 = CreateStatement(GetAssign1(), 3);
@@ -354,7 +348,7 @@ TEST_CASE("1.NextExtractor.nested containers") {
     b6->AddStmt(StatementNumber(6));
     b7->AddStmt(StatementNumber(7));
     b8->AddStmt(StatementNumber(8));
-    c1->SetStartEnd(1, 8);
+    AddBlocks(c1, {b1, b2, b3, b4, b5, b6, b7, b8});
     b1->AddNextBlock(b2);
     b1->AddNextBlock(b7);
     b2->AddNextBlock(b3);
@@ -413,7 +407,7 @@ TEST_CASE("1.NextExtractor.nested containers") {
     b4->AddStmt(StatementNumber(4));
     b5->AddStmt(StatementNumber(5));
     b6->AddStmt(StatementNumber(6));
-    c1->SetStartEnd(1, 6);
+    AddBlocks(c1, {b1, b2, b3, b4, b5, b6});
     b1->AddNextBlock(b2);
     b1->AddNextBlock(b6);
     b2->AddNextBlock(b3);
@@ -448,6 +442,4 @@ TEST_CASE("1.NextExtractor.nested containers") {
     CHECK(TestUtils::AreListsEqual(
         *deliverable.GetNextMap()->find(s5)->second, {s4}));
   }
-  SECTION("if and while") {}
-  SECTION("multiple nesting of if and while") {}
 }

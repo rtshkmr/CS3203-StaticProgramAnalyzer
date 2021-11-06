@@ -548,25 +548,3 @@ std::set<Block*> Block::GetNextBlocks() const {
 std::set<Block*> Block::GetPrevBlocks() const {
   return this->prev_blocks_;
 }
-
-std::list<int> Block::GetCFGLastStmts() {
-  std::list<int> last_stmts = std::list<int>{};
-  for (Block* next_block: next_blocks_) {
-    int next = next_block->GetStartEndRange().first;
-    if (isWhile && next == start_ + 1) {
-      continue;
-    }
-    if (next == -1) { // exit block
-      assert(next_block->GetNextBlocks().empty());
-      last_stmts.push_back(end_);
-      continue;
-    }
-    std::list<int> next_last_stmts = next_block->GetCFGLastStmts();
-    last_stmts.insert(last_stmts.end(), next_last_stmts.begin(), next_last_stmts.end());
-  }
-  if (next_blocks_.empty() || (next_blocks_.size() == 1 && isWhile)) {
-    last_stmts.push_back(end_);
-  }
-  return last_stmts;
-}
-
