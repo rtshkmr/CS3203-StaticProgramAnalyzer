@@ -26,7 +26,7 @@ class QueryExtractor {
   void ExtractQuery(bool are_optimizations_enabled);
   std::vector<Group*> GetGroupsList() { return groups; };
   std::list<Synonym*> GetSynonymsList() { return synonyms; }; // TODO: deprecate or convert to private.
-  std::vector<std::pair<Synonym*, Attribute>> GetTargetSynAttrPairs() { return target_syn_attrs; };
+  std::vector<std::pair<Synonym*, Attribute>> GetTargetSynAttrPairs();
   bool WasQueryBoolean() { return was_query_boolean; };
 };
 

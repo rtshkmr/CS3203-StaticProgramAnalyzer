@@ -128,7 +128,7 @@ std::pair<Synonym*, Attribute> QueryParser::ParseElem(bool is_first_pass) {
   }
 
   Synonym* s = QueryParser::GetSynonymInfo(target, &synonyms);
-  Attribute attr = GetDefaultAttribute(s->GetType());
+  Attribute attr = Attribute::kInvalid;
   // handle case where we need to parse attrRef
   if (lookahead.GetTokenTag() == TokenTag::kDot) {
     Eat(TokenTag::kDot);
