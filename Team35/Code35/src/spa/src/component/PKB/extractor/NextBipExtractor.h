@@ -39,7 +39,7 @@ class NextBipExtractor : public RuntimeColleague {
   std::list<int> GetBipLastStmts(Block* block);
   std::list<int> HandleCallLastStmt(const std::list<int>& last_stmts);
   static PKBRelRefs GetPKBRelRef(RelDirection dir);
-  std::list<int> GetCFGLastStmts(Procedure* proc);
+  static std::list<int> GetCFGLastStmts(Procedure* proc);
 };
 
 #endif //AUTOTESTER_CODE35_SRC_SPA_SRC_COMPONENT_PKB_EXTRACTOR_NEXTBIPEXTRACTOR_H_

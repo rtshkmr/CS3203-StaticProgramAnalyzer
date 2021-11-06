@@ -145,7 +145,7 @@ void NextBipExtractor::ErasePrevRelationship(Entity* next_stmt, Entity* prev_stm
 }
 
 std::list<int> NextBipExtractor::GetBipLastStmts(Block* block) {
-  Statement* block_stmt = dynamic_cast<Statement*>(stmt_list_[block->GetStartEndRange().first]);
+  Statement* block_stmt = dynamic_cast<Statement*>(stmt_list_[block->GetStartEndRange().first - 1]);
   Procedure* block_proc = block_stmt->GetProcedureNode();
   std::list<int> last_stmts = GetCFGLastStmts(block_proc);
   bool call_exists = true;
