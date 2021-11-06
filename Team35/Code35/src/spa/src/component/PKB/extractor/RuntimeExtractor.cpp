@@ -10,7 +10,7 @@ RuntimeExtractor::RuntimeExtractor(PKB* pkb) {
   next_bip_t_extractor_.SetMediator(this);
   affects_t_extractor_ = AffectsTExtractor(this, pkb);
   affects_bip_extractor_ = AffectsBipExtractor(this, pkb);
-  affects_bip_t_extractor_ = AffectsBipTExtractor(this, pkb); 
+  affects_bip_t_extractor_ = AffectsBipTExtractor(this, pkb);
 }
 
 /**
@@ -21,28 +21,8 @@ RuntimeExtractor::RuntimeExtractor(PKB* pkb) {
  */
 std::vector<Entity*> RuntimeExtractor::GetRelationship(PKBRelRefs ref, std::string target) {
   int target_num = Utility::ConvertStringToInt(target);
-<<<<<<< HEAD
-  switch (ref) {
-    case PKBRelRefs::kNextT: return GetNextT(target_num);
-    case PKBRelRefs::kPreviousT: return GetPrevT(target_num);
-    case PKBRelRefs::kAffects: return GetAffects(target_num);
-    case PKBRelRefs::kAffectedBy: return GetAffectedBy(target_num);
-    case PKBRelRefs::kAffectsT: return GetAffectsT(target_num);
-    case PKBRelRefs::kAffectedByT: return GetAffectedByT(target_num);
-    case PKBRelRefs::kNextBip: return GetNextBip(target_num);
-    case PKBRelRefs::kPrevBip: return GetPrevBip(target_num);
-    case PKBRelRefs::kNextBipT: return GetNextBipT(target_num);
-    case PKBRelRefs::kPrevBipT: return GetPrevBipT(target_num);
-    case PKBRelRefs::kAffectsBip: return affects_bip_extractor_.GetRelationship(RelDirection::kForward, target_num);
-    case PKBRelRefs::kAffectedByBip: return affects_bip_extractor_.GetRelationship(RelDirection::kReverse, target_num);
-    case PKBRelRefs::kAffectsBipT: return affects_bip_t_extractor_.GetRelationship(RelDirection::kForward, target_num);
-    case PKBRelRefs::kAffectedByBipT: return affects_bip_t_extractor_.GetRelationship(RelDirection::kReverse, target_num);
-    default: return std::vector<Entity*>{};
-  }
-=======
   std::pair<RuntimeColleague*,RelDirection> pair = GetExtractorAndDirection(ref);
   return (pair.first) ? pair.first->GetRelationship(pair.second, target_num) : std::vector<Entity*>{};
->>>>>>> staging/common
 }
 
 /**
@@ -54,28 +34,8 @@ std::vector<Entity*> RuntimeExtractor::GetRelationship(PKBRelRefs ref, std::stri
  * @return All entities that can be on the LHS of the relationship.
  */
 std::vector<Entity*> RuntimeExtractor::GetFirstEntityOfRelationship(PKBRelRefs ref, DesignEntity de) {
-<<<<<<< HEAD
-  switch (ref) {
-    case PKBRelRefs::kNextT: return GetNextT(de);
-    case PKBRelRefs::kPreviousT: return GetPrevT(de);
-    case PKBRelRefs::kAffects: return GetAffects(de);
-    case PKBRelRefs::kAffectedBy: return GetAffectedBy(de);
-    case PKBRelRefs::kAffectsT: return GetAffectsT(de);
-    case PKBRelRefs::kAffectedByT: return GetAffectedByT(de);
-    case PKBRelRefs::kNextBip: return GetNextBip(de);
-    case PKBRelRefs::kPrevBip: return GetPrevBip(de);
-    case PKBRelRefs::kNextBipT: return GetNextBipT(de);
-    case PKBRelRefs::kPrevBipT: return GetPrevBipT(de);
-    case PKBRelRefs::kAffectsBip: return affects_bip_extractor_.GetFirstEntityOfRelationship(RelDirection::kForward, de);
-    case PKBRelRefs::kAffectedByBip: return affects_bip_extractor_.GetFirstEntityOfRelationship(RelDirection::kReverse, de);
-    case PKBRelRefs::kAffectsBipT: return affects_bip_t_extractor_.GetFirstEntityOfRelationship(RelDirection::kForward, de);
-    case PKBRelRefs::kAffectedByBipT: return affects_bip_t_extractor_.GetFirstEntityOfRelationship(RelDirection::kReverse, de);
-    default: return std::vector<Entity*>{};
-  }
-=======
   std::pair<RuntimeColleague*,RelDirection> pair = GetExtractorAndDirection(ref);
   return (pair.first) ? pair.first->GetFirstEntityOfRelationship(pair.second, de) : std::vector<Entity*>{};
->>>>>>> staging/common
 }
 
 /**
@@ -105,29 +65,9 @@ std::vector<Entity*> RuntimeExtractor::GetScopedFirstEntities(PKBRelRefs ref, st
 std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetRelationshipByTypes(PKBRelRefs ref,
                                                                                    DesignEntity first,
                                                                                    DesignEntity second) {
-<<<<<<< HEAD
-  switch (ref) {
-    case PKBRelRefs::kNextT: return GetNextT(first, second);
-    case PKBRelRefs::kPreviousT: return GetPrevT(first, second);
-    case PKBRelRefs::kAffects: return GetAffects(first, second);
-    case PKBRelRefs::kAffectedBy: return GetAffectedBy(first, second);
-    case PKBRelRefs::kAffectsT: return GetAffectsT(first, second);
-    case PKBRelRefs::kAffectedByT: return GetAffectedByT(first, second);
-    case PKBRelRefs::kNextBip: return GetNextBip(first, second);
-    case PKBRelRefs::kPrevBip: return GetPrevBip(first, second);
-    case PKBRelRefs::kNextBipT: return GetNextBipT(first, second);
-    case PKBRelRefs::kPrevBipT: return GetPrevBipT(first, second);
-    case PKBRelRefs::kAffectsBip: return affects_bip_extractor_.GetRelationshipByTypes(RelDirection::kForward, first, second);
-    case PKBRelRefs::kAffectedByBip: return affects_bip_extractor_.GetRelationshipByTypes(RelDirection::kReverse, first, second);
-    case PKBRelRefs::kAffectsBipT: return affects_bip_t_extractor_.GetRelationshipByTypes(RelDirection::kForward, first, second);
-    case PKBRelRefs::kAffectedByBipT: return affects_bip_t_extractor_.GetRelationshipByTypes(RelDirection::kReverse, first, second);
-    default: return std::vector<std::tuple<Entity*, Entity*>>{};
-  }
-=======
   std::pair<RuntimeColleague*,RelDirection> pair = GetExtractorAndDirection(ref);
   return (pair.first) ? pair.first->GetRelationshipByTypes(pair.second, first, second)
-      : std::vector<std::tuple<Entity*, Entity*>>{};;
->>>>>>> staging/common
+                      : std::vector<std::tuple<Entity*, Entity*>>{};;
 }
 
 /**
@@ -181,28 +121,8 @@ std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetAllRelationshipsS
  * @return true if any relationship exists.
  */
 bool RuntimeExtractor::HasRelationship(PKBRelRefs ref) {
-<<<<<<< HEAD
-  switch (ref) {
-    case PKBRelRefs::kNextT:  // fallthrough
-    case PKBRelRefs::kPreviousT: return pkb_->HasRelationship(PKBRelRefs::kNext);
-    case PKBRelRefs::kAffects: return HasAffects();
-    case PKBRelRefs::kAffectedBy: return HasAffectedBy();
-    case PKBRelRefs::kAffectsT: return HasAffectsT();
-    case PKBRelRefs::kAffectedByT: return HasAffectedByT();
-    case PKBRelRefs::kNextBip: // fallthrough
-    case PKBRelRefs::kPrevBip: // fallthrough
-    case PKBRelRefs::kNextBipT: // fallthrough
-    case PKBRelRefs::kPrevBipT: return HasNextBip();
-    case PKBRelRefs::kAffectsBip: return affects_bip_extractor_.HasRelationship(RelDirection::kForward);
-    case PKBRelRefs::kAffectedByBip: return affects_bip_extractor_.HasRelationship(RelDirection::kReverse);
-    case PKBRelRefs::kAffectsBipT: return affects_bip_t_extractor_.HasRelationship(RelDirection::kForward);
-    case PKBRelRefs::kAffectedByBipT: return affects_bip_t_extractor_.HasRelationship(RelDirection::kReverse);
-    default: return false;
-  }
-=======
   std::pair<RuntimeColleague*,RelDirection> pair = GetExtractorAndDirection(ref);
   return (pair.first) ? pair.first->HasRelationship(pair.second) : false;
->>>>>>> staging/common
 }
 
 /**
@@ -214,28 +134,8 @@ bool RuntimeExtractor::HasRelationship(PKBRelRefs ref) {
  */
 bool RuntimeExtractor::HasRelationship(PKBRelRefs ref, std::string first) {
   int target_num = Utility::ConvertStringToInt(first);
-<<<<<<< HEAD
-  switch (ref) {
-    case PKBRelRefs::kNextT: return pkb_->HasRelationship(PKBRelRefs::kNext, first);
-    case PKBRelRefs::kPreviousT: return pkb_->HasRelationship(PKBRelRefs::kPrevious, first);
-    case PKBRelRefs::kAffects: return HasAffects(target_num);
-    case PKBRelRefs::kAffectedBy: return HasAffectedBy(target_num);
-    case PKBRelRefs::kAffectsT: return HasAffectsT(target_num);
-    case PKBRelRefs::kAffectedByT: return HasAffectedByT(target_num);
-    case PKBRelRefs::kNextBip: return HasNextBip(target_num);
-    case PKBRelRefs::kPrevBip: return HasPrevBip(target_num);
-    case PKBRelRefs::kNextBipT: return HasNextBip(target_num);
-    case PKBRelRefs::kPrevBipT: return HasPrevBip(target_num);
-    case PKBRelRefs::kAffectsBip: return affects_bip_extractor_.HasRelationship(RelDirection::kForward, target_num);
-    case PKBRelRefs::kAffectedByBip: return affects_bip_extractor_.HasRelationship(RelDirection::kReverse, target_num);
-    case PKBRelRefs::kAffectsBipT: return affects_bip_t_extractor_.HasRelationship(RelDirection::kForward, target_num);
-    case PKBRelRefs::kAffectedByBipT: return affects_bip_t_extractor_.HasRelationship(RelDirection::kReverse, target_num);
-    default: return false;
-  }
-=======
   std::pair<RuntimeColleague*,RelDirection> pair = GetExtractorAndDirection(ref);
   return (pair.first) ? pair.first->HasRelationship(pair.second, target_num) : false;
->>>>>>> staging/common
 }
 
 /**
@@ -249,28 +149,8 @@ bool RuntimeExtractor::HasRelationship(PKBRelRefs ref, std::string first) {
 bool RuntimeExtractor::HasRelationship(PKBRelRefs ref, std::string first, std::string second) {
   int first_num = Utility::ConvertStringToInt(first);
   int second_num = Utility::ConvertStringToInt(second);
-<<<<<<< HEAD
-  switch (ref) {
-    case PKBRelRefs::kNextT: return HasNextT(first_num, second_num);
-    case PKBRelRefs::kPreviousT: return HasNextT(second_num, first_num);
-    case PKBRelRefs::kAffects: return HasAffects(first_num, second_num);
-    case PKBRelRefs::kAffectedBy: return HasAffectedBy(first_num, second_num);
-    case PKBRelRefs::kAffectsT: return HasAffectsT(first_num, second_num);
-    case PKBRelRefs::kAffectedByT: return HasAffectedByT(first_num, second_num);
-    case PKBRelRefs::kNextBip: return HasNextBip(first_num, second_num);
-    case PKBRelRefs::kPrevBip: return HasNextBip(second_num, first_num);
-    case PKBRelRefs::kNextBipT: return HasNextBipT(first_num, second_num);
-    case PKBRelRefs::kPrevBipT: return HasNextBipT(second_num, first_num);
-    case PKBRelRefs::kAffectsBip: return affects_bip_extractor_.HasRelationship(RelDirection::kForward, first_num, second_num);
-    case PKBRelRefs::kAffectedByBip: return affects_bip_extractor_.HasRelationship(RelDirection::kReverse, first_num, second_num);
-    case PKBRelRefs::kAffectsBipT: return affects_bip_t_extractor_.HasRelationship(RelDirection::kForward, first_num, second_num);
-    case PKBRelRefs::kAffectedByBipT: return affects_bip_t_extractor_.HasRelationship(RelDirection::kReverse, first_num, second_num);
-    default: return false;
-  }
-=======
   std::pair<RuntimeColleague*,RelDirection> pair = GetExtractorAndDirection(ref);
   return (pair.first) ? pair.first->HasRelationship(pair.second, first_num, second_num) : false;
->>>>>>> staging/common
 }
 
 /**
@@ -281,56 +161,8 @@ bool RuntimeExtractor::HasRelationship(PKBRelRefs ref, std::string first, std::s
  * @return true if any relationship with the specified types exists.
  */
 bool RuntimeExtractor::HasRelationship(PKBRelRefs ref, DesignEntity first, DesignEntity second) {
-<<<<<<< HEAD
-  switch (ref) {
-    case PKBRelRefs::kNextT:  // fallthrough
-    case PKBRelRefs::kPreviousT: return pkb_->HasRelationship(PKBRelRefs::kNext); // TODO
-    case PKBRelRefs::kAffects: return HasAffects();
-    case PKBRelRefs::kAffectedBy: return HasAffectedBy();
-    case PKBRelRefs::kAffectsT: return HasAffects();
-    case PKBRelRefs::kAffectedByT: return HasAffectedBy();
-    case PKBRelRefs::kNextBip: // fallthrough
-    case PKBRelRefs::kPrevBip: // fallthrough
-    case PKBRelRefs::kNextBipT: // fallthrough
-    case PKBRelRefs::kPrevBipT: return HasNextBip();
-    case PKBRelRefs::kAffectsBip: affects_bip_extractor_.HasRelationship(RelDirection::kForward);
-    case PKBRelRefs::kAffectedByBip: affects_bip_extractor_.HasRelationship(RelDirection::kReverse);
-    case PKBRelRefs::kAffectsBipT: affects_bip_t_extractor_.HasRelationship(RelDirection::kForward);
-    case PKBRelRefs::kAffectedByBipT: affects_bip_t_extractor_.HasRelationship(RelDirection::kReverse);
-    default: return false;
-  }
-}
-
-std::vector<Entity*> RuntimeExtractor::GetNextT(int target) {
-  return next_t_extractor_.GetRelationship(RelDirection::kForward, target);
-}
-
-std::vector<Entity*> RuntimeExtractor::GetPrevT(int target) {
-  return next_t_extractor_.GetRelationship(RelDirection::kReverse, target);
-}
-
-std::vector<Entity*> RuntimeExtractor::GetAffects(int target) {
-  return affects_extractor_.GetAffects(target);
-}
-
-std::vector<Entity*> RuntimeExtractor::GetAffectedBy(int target) {
-  return affects_extractor_.GetAffectedBy(target);
-}
-
-std::vector<Entity*> RuntimeExtractor::GetAffectsT(int target) {
-  return affects_t_extractor_.GetRelationship(RelDirection::kForward, target);
-}
-
-std::vector<Entity*> RuntimeExtractor::GetAffectedByT(int target) {
-  return affects_t_extractor_.GetRelationship(RelDirection::kReverse, target);
-}
-
-std::vector<Entity*> RuntimeExtractor::GetNextBip(int target) {
-  return next_bip_extractor_.GetRelationship(RelDirection::kForward, target);
-=======
   std::pair<RuntimeColleague*,RelDirection> pair = GetExtractorAndDirection(ref);
   return (pair.first) ? pair.first->HasRelationship(pair.second) : false;
->>>>>>> staging/common
 }
 
 std::pair<RuntimeColleague*,RelDirection> RuntimeExtractor::GetExtractorAndDirection(PKBRelRefs ref) {
@@ -345,6 +177,10 @@ std::pair<RuntimeColleague*,RelDirection> RuntimeExtractor::GetExtractorAndDirec
     case PKBRelRefs::kPrevBip: return std::pair(&next_bip_extractor_, RelDirection::kReverse);
     case PKBRelRefs::kNextBipT: return std::pair(&next_bip_t_extractor_, RelDirection::kForward);
     case PKBRelRefs::kPrevBipT: return std::pair(&next_bip_t_extractor_, RelDirection::kForward);
+    case PKBRelRefs::kAffectsBip: return std::pair(&affects_bip_extractor_, RelDirection::kForward);
+    case PKBRelRefs::kAffectedByBip: return std::pair(&affects_bip_extractor_, RelDirection::kReverse);
+    case PKBRelRefs::kAffectsBipT: return std::pair(&affects_bip_t_extractor_, RelDirection::kForward);
+    case PKBRelRefs::kAffectedByBipT: return std::pair(&affects_bip_t_extractor_, RelDirection::kReverse);
     default: return std::pair(nullptr, RelDirection::kForward);
   }
 }

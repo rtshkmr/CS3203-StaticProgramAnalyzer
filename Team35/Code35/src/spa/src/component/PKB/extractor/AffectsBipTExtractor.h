@@ -7,7 +7,7 @@
 #include "RuntimeMediator.h"
 #include <unordered_map>
 
-class AffectsBipTExtractor : RuntimeColleague {
+class AffectsBipTExtractor : public RuntimeColleague {
  public:
   AffectsBipTExtractor() = default;
   explicit AffectsBipTExtractor(RuntimeMediator* rte, PKB* pkb);
