@@ -7,7 +7,7 @@
 #include <component/PKB/extractor/RuntimeMediator.h>
 #include <unordered_map>
 
-class AffectsTExtractor : RuntimeColleague {
+class AffectsTExtractor : public RuntimeColleague {
  public:
   AffectsTExtractor() = default;
   explicit AffectsTExtractor(RuntimeMediator* rte, PKB* pkb);

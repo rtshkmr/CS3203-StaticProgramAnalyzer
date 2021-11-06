@@ -51,7 +51,6 @@ class RuntimeExtractor : public RuntimeMediator {
   bool HasRelationship(PKBRelRefs ref, DesignEntity first, DesignEntity second) override;
 
   void Delete();
-
   static bool IsRuntimeRelationship(PKBRelRefs ref);
 
   std::vector<Entity*> GetScopedFirstEntities(PKBRelRefs ref, std::vector<Entity*> scoped_entities);
@@ -68,47 +67,7 @@ class RuntimeExtractor : public RuntimeMediator {
   NextBipExtractor next_bip_extractor_;
   NextBipTExtractor next_bip_t_extractor_;
 
-  std::vector<Entity*> GetNextT(int target);
-  std::vector<Entity*> GetPrevT(int target);
-  std::vector<Entity*> GetAffectsT(int target);
-  std::vector<Entity*> GetAffectedByT(int target);
-  std::vector<Entity*> GetNextBip(int target);
-  std::vector<Entity*> GetPrevBip(int target);
-  std::vector<Entity*> GetNextBipT(int target);
-  std::vector<Entity*> GetPrevBipT(int target);
-
-  std::vector<Entity*> GetNextT(DesignEntity de);
-  std::vector<Entity*> GetPrevT(DesignEntity de);
-  std::vector<Entity*> GetAffectsT(DesignEntity de);
-  std::vector<Entity*> GetAffectedByT(DesignEntity de);
-  std::vector<Entity*> GetNextBip(DesignEntity de);
-  std::vector<Entity*> GetPrevBip(DesignEntity de);
-  std::vector<Entity*> GetNextBipT(DesignEntity de);
-  std::vector<Entity*> GetPrevBipT(DesignEntity de);
-
-  std::vector<std::tuple<Entity*, Entity*>> GetNextT(DesignEntity first, DesignEntity second);
-  std::vector<std::tuple<Entity*, Entity*>> GetPrevT(DesignEntity first, DesignEntity second);
-  std::vector<std::tuple<Entity*, Entity*>> GetAffectsT(DesignEntity first, DesignEntity second);
-  std::vector<std::tuple<Entity*, Entity*>> GetAffectedByT(DesignEntity first, DesignEntity second);
-  std::vector<std::tuple<Entity*, Entity*>> GetNextBip(DesignEntity first, DesignEntity second);
-  std::vector<std::tuple<Entity*, Entity*>> GetPrevBip(DesignEntity first, DesignEntity second);
-  std::vector<std::tuple<Entity*, Entity*>> GetNextBipT(DesignEntity first, DesignEntity second);
-  std::vector<std::tuple<Entity*, Entity*>> GetPrevBipT(DesignEntity first, DesignEntity second);
-
-  bool HasAffectsT();
-  bool HasAffectedByT();
-  bool HasNextBip();
-
-  bool HasAffectsT(int first);
-  bool HasAffectedByT(int first);
-  bool HasNextBip(int first);
-  bool HasPrevBip(int first);
-
-  bool HasNextT(int first, int second);
-  bool HasAffectsT(int first, int second);
-  bool HasAffectedByT(int first, int second);
-  bool HasNextBip(int first, int second);
-  bool HasNextBipT(int first, int second);
+  std::pair<RuntimeColleague*,RelDirection> GetExtractorAndDirection(PKBRelRefs ref);
   PKBRelRefs ReverseRelationship(PKBRelRefs ref);
 };
 

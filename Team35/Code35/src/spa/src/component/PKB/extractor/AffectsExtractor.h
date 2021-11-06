@@ -7,7 +7,7 @@
 #include "RuntimeMediator.h"
 #include "RuntimeColleague.h"
 
-class AffectsExtractor : RuntimeColleague {
+class AffectsExtractor : public RuntimeColleague {
   struct AssignEntityComparator
   {
     bool operator()(AssignEntity* lhs, AssignEntity* rhs) const  {
