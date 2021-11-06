@@ -3,6 +3,7 @@
 #include "QueryProjector.h"
 #include <component/QueryProcessor/QueryExtractor/QueryExtractor.h>
 #include <util/Logger.h>
+#include <exception/SpaException.h>
 #include <component/PKB/DBManager.h>
 
 constexpr auto L = [](auto msg) {
@@ -15,6 +16,11 @@ std::vector<std::string> QuerySystemController::Evaluate(std::string* query, PKB
   auto query_extractor = QueryExtractor(query);
   try {
     query_extractor.ExtractQuery();
+  } catch (const PQLValidationException) {
+    bool was_query_boolean = query_extractor.WasQueryBoolean();
+    std::vector<std::string> result;
+    if (was_query_boolean) result.push_back("FALSE");
+    return result;
   } catch (const std::runtime_error& error) {
     return {};
   }

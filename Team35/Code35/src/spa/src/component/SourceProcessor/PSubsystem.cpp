@@ -418,7 +418,6 @@ void PSubsystem::HandleElseStmt(Entity* entity) {
   assert(else_entity);
   auto* if_entity = dynamic_cast<IfEntity*>(parent_stack_.top());
   if (if_entity == nullptr) {
-    //If assertion failed, Else did not follow If
     throw SyntaxException("Encountered Else statement without If construct");
   }
   parent_stack_.push(else_entity);
@@ -464,7 +463,7 @@ void PSubsystem::HandleWhileStmt(Entity* entity) {
  * @return pointer to the newly created conditional block
  */
 ConditionalBlock* PSubsystem::CreateConditionalBlock(Statement* conditional_statement) {
-  int statement_num = conditional_statement->GetStatementNumber()->GetNum();
+  int statement_num = conditional_statement->GetStatementNumber();
   ConditionalBlock* conditional_block;
   Block* block_before_cond = block_stack_.top();
   if (block_before_cond->size() > 1) {

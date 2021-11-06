@@ -11,7 +11,7 @@ TEST_CASE("2.PKB.AffectsBy") {
   DBManager* dbm = new DBManager(pkb);
   std::vector<Entity*> rs = dbm->GetRelationship(PKBRelRefs::kAffectedBy, "5");
   REQUIRE(rs.size() == 1);
-  REQUIRE(dynamic_cast<AssignEntity*>(rs[0])->GetStatementNumber()->GetNum() == 3);
+  REQUIRE(dynamic_cast<AssignEntity*>(rs[0])->GetStatementNumberObj()->GetNum() == 3);
 }
 
 TEST_CASE("2.PKB.Affects") {
@@ -23,7 +23,7 @@ TEST_CASE("2.PKB.Affects") {
 //  SECTION("AffectsBy()") {
 //    std::vector<Entity*> rs = dbm->GetRelationship(PKBRelRefs::kAffectedBy, "5");
 //    REQUIRE(rs.size() == 1);
-//    REQUIRE(dynamic_cast<AssignEntity*>(rs[0])->GetStatementNumber()->GetNum() == 3);
+//    REQUIRE(dynamic_cast<AssignEntity*>(rs[0])->GetStatementNumberObj()->GetNum() == 3);
 //  }
 
   SECTION("HasAffects(#,#)") {

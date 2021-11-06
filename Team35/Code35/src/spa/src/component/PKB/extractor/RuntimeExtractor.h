@@ -57,7 +57,9 @@ class RuntimeExtractor : public RuntimeMediator {
   std::vector<Entity*> GetScopedFirstEntities(PKBRelRefs ref, std::vector<Entity*> scoped_entities);
   std::vector<std::tuple<Entity*, Entity*>> GetAllRelationshipsScoped(PKBRelRefs ref,
                                                                       std::vector<Entity*> left_entities,
-                                                                      std::vector<Entity*> right_entities);
+                                                                      std::vector<Entity*> right_entities,
+                                                                      ScopeIndication scope_indication,
+                                                                      type_combo types);
  private:
   PKB* pkb_;
   NextTExtractor next_t_extractor_;
@@ -119,6 +121,7 @@ class RuntimeExtractor : public RuntimeMediator {
   bool HasAffectedByT(int first, int second);
   bool HasNextBip(int first, int second);
   bool HasNextBipT(int first, int second);
+  PKBRelRefs ReverseRelationship(PKBRelRefs ref);
 };
 
 #endif //AUTOTESTER_CODE35_SRC_SPA_SRC_COMPONENT_PKB_RUNTIMEEXTRACTOR_H_

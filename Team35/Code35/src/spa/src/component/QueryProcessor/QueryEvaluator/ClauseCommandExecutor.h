@@ -30,12 +30,15 @@ class ClauseCommandExecutor {
     bool PatternSingleSynonymIntersection(Pattern *clause, int index);
     bool WithSingleSynonymIntersection(With *clause, bool first_syn_in, int index);
     static bool HasExpressionMatch(Pattern *pattern , AssignEntity *assign_entity);
+    std::vector<Entity*> FilterAssignSingleClause(const std::vector<Entity *>& unfiltered_entities, Clause *clause, bool is_first);
   public:
     ClauseCommandExecutor(QueryEvaluatorTable *table, IntermediateTable *intermediate_table);
 
     void DoubleSynonymIntersection(Clause *clause);
     void DoubleSynonymExpansion(Clause *clause, bool first_syn_in);
     void SingleSynonymIntersection(Clause *clause, bool first_syn_in);
+    void DoubleSynonymCross(Clause *clause);
+    void SingleSynonymCross(Clause *clause, bool syn_is_first_param);
 };
 
 #endif //AUTOTESTER_CLAUSECOMMANDEXECUTOR_H
