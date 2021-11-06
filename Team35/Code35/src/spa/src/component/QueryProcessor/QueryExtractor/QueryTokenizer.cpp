@@ -3,7 +3,7 @@
 #include <map>
 #include <unordered_map>
 #include <regex>
-#include <datatype/RegexPatterns.h>
+#include <util/RegexPatterns.h>
 #include <exception/SpaException.h>
 
 static std::unordered_set<std::string> exact_tokens { "*", ";", "(", ")", ",", "_", "<", ">", ".", "=",

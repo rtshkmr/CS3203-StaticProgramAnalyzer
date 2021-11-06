@@ -120,7 +120,7 @@ std::string ClauseCommandExecutor::RetrieveEntityAttribute(Entity *entity, Attri
     if (typeid(*entity) == typeid(Procedure)) {
       return const_cast<ProcedureName*>(dynamic_cast<Procedure*>(entity)->GetName())->GetName();
     } else {
-      return const_cast<ProcedureName*>(dynamic_cast<CallEntity*>(entity)->GetProcedure()->GetName())->GetName();
+      return const_cast<ProcedureName*>(dynamic_cast<CallEntity*>(entity)->GetCalledProcedure()->GetName())->GetName();
     }
   case Attribute::kValue:
     return std::to_string(const_cast<ConstantValue*>(dynamic_cast<Constant*>(entity)->GetValue())->GetValue());
@@ -128,9 +128,9 @@ std::string ClauseCommandExecutor::RetrieveEntityAttribute(Entity *entity, Attri
     if (typeid(*entity) == typeid(Variable)) {
       return dynamic_cast<Variable*>(entity)->GetNameInString();
     } else if (typeid(*entity) == typeid(ReadEntity)) {
-      return dynamic_cast<ReadEntity *>(entity)->GetVariable()->GetNameInString();
+      return dynamic_cast<ReadEntity *>(entity)->GetVariableString();
     } else {
-      return dynamic_cast<PrintEntity *>(entity)->GetVariable()->GetNameInString();
+      return dynamic_cast<PrintEntity*>(entity)->GetVariableString();
     }
   default:
     return "";

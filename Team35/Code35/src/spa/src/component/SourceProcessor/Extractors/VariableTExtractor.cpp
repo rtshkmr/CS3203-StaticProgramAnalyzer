@@ -114,7 +114,7 @@ void VariableTExtractor::ExtractFromWhileContainer(WhileEntity* while_entity,
 void VariableTExtractor::ExtractFromCallContainer(CallEntity* call_entity,
                                                   Container* container,
                                                   std::vector<Procedure*>* extracted_procedures) {
-  Procedure* called_proc = call_entity->GetProcedure();
+  Procedure* called_proc = call_entity->GetCalledProcedure();
   std::list<Variable*>* var_list;
 
   if (std::find(extracted_procedures->begin(), extracted_procedures->end(), called_proc)

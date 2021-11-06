@@ -30,7 +30,7 @@ class IfEntity : public Statement, public Container {
   ConditionalExpression* cond_expr_;
   std::vector<Variable*> control_variables;
   std::vector<Constant*> control_constants;
-  ElseEntity* else_entity_ = nullptr; //TODO: check if keeping ELSE as object or merge ELSE object into IF object
+  ElseEntity* else_entity_ = nullptr;
 
  public:
   IfEntity(std::string condition, std::vector<Variable*> control_variables, std::vector<Constant*> control_constants);
@@ -46,6 +46,10 @@ class IfEntity : public Statement, public Container {
   void SetElseEntity(ElseEntity* else_entity);
 
   std::list<Statement*>* GetElseStmtList();
+
+  void AddStatementToElseEntity(Statement* statement);
+
+  int GetElseStatementListSize();
 };
 
 /**
@@ -105,9 +109,9 @@ class AssignEntity : public Statement {
 
   AssignmentExpression* GetAssignmentExpr();
 
-  std::vector<Variable*> GetControlVariables();
+  std::vector<Variable*> GetExprVariables();
 
-  std::vector<Constant*> GetExpressionConstants();
+  std::vector<Constant*> GetExprConstants();
 
 };
 
@@ -119,12 +123,12 @@ class AssignEntity : public Statement {
  */
 class CallEntity : public Statement {
  private:
-  Procedure* proc_name_;
+  Procedure* called_proc_name_;
 
  public:
   CallEntity(Procedure* proc_name);
 
-  Procedure* GetProcedure();
+  Procedure* GetCalledProcedure();
 };
 
 /**
@@ -139,7 +143,9 @@ class PrintEntity : public Statement {
  public:
   PrintEntity(Variable* var_name);
 
-  Variable* GetVariable();
+  Variable* GetVariableObj();
+  std::string GetVariableString();
+
 };
 
 /**
@@ -154,7 +160,8 @@ class ReadEntity : public Statement {
  public:
   ReadEntity(Variable* var_name);
 
-  Variable* GetVariable();
+  Variable* GetVariableObj();
+  std::string GetVariableString();
 };
 
 #endif //AUTOTESTER_STATEMENT_H
