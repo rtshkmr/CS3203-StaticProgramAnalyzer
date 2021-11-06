@@ -557,3 +557,4 @@ std::list<int> Block::GetCFGLastStmts() {
   }
   return last_stmts;
 }
+

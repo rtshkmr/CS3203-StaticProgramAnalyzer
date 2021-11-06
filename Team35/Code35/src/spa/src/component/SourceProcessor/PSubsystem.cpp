@@ -20,7 +20,7 @@ void PSubsystem::InitDataStructures() {
   program_counter_ = 0;
 
   deliverable_ = new Deliverable(); //created in heap so that can pass this object to PKB
-  syntax_validator_ = SyntaxValidator();
+  SyntaxValidator();
   entity_factory_ =
       EntityFactory(deliverable_->GetProcList(), deliverable_->GetVariableList(),
                     deliverable_->GetConstantList());
@@ -53,7 +53,7 @@ std::vector<Token> PSubsystem::GetValidatedTokens(const std::string& statement) 
 }
 
 void PSubsystem::ProcessEntityAsNewProcedure(Entity* entity) {
-  if (Procedure* procedure = dynamic_cast<Procedure*>(entity)) {
+  if (auto* procedure = dynamic_cast<Procedure*>(entity)) {
     assert(entity->GetEntityEnum() == EntityEnum::kProcedureEntity && current_procedure_ == nullptr
                && current_node_ == nullptr && follow_stack_.empty() && parent_stack_.empty() && block_stack_.empty());
     return PerformNewProcedureSteps(procedure);
@@ -64,7 +64,7 @@ void PSubsystem::ProcessEntityAsNewProcedure(Entity* entity) {
 
 void PSubsystem::ProcessEntityAsStatement(Entity* entity) {
   //From here onwards, Entity must be a Statement type;
-  if (Statement* stmt = dynamic_cast<Statement*>(entity)) {
+  if (auto* stmt = dynamic_cast<Statement*>(entity)) {
     SetStatementObject(stmt);
     StatementHandler handler = statement_handlers_[static_cast<int>(entity->GetEntityEnum())];
     (this->*handler)(entity);
@@ -94,7 +94,6 @@ void PSubsystem::ProcessStatement(const std::string& statement) {
 
 void PSubsystem::CloseProcedureBlock() {
   if (current_node_type_ == NodeType::kProcedure && parent_stack_.empty()) {
-    const Cluster* assigned_cluster_root = current_procedure_->GetClusterRoot();
     Block* proc_tail = Block::GetNewExitBlock();
     current_procedure_->SetBlockTail(proc_tail);
 
@@ -170,10 +169,10 @@ void PSubsystem::CloseElseBlock() {
 }
 
 void PSubsystem::CloseWhileBlock() {
-  Block* while_body_block = dynamic_cast<Block*>(block_stack_.top());
+  auto* while_body_block = dynamic_cast<Block*>(block_stack_.top());
   block_stack_.pop(); // link the last stmt to the while_cond_block block, and pop it.
   //todo: change from Block* to ConditionalBlock*
-  Block* while_cond_block = dynamic_cast<Block*>(block_stack_.top());
+  auto* while_cond_block = dynamic_cast<Block*>(block_stack_.top());
   while_cond_block->SetClusterTag(ClusterTag::kWhileCond);
   assert(while_cond_block);
 
@@ -230,17 +229,17 @@ void PSubsystem::ProcessParentNodeAsProcedure() {
 
 void PSubsystem::ProcessParentNodeType(Container* current_nest) {
   current_nest = parent_stack_.top();
-  if (WhileEntity* while_entity = dynamic_cast<WhileEntity*>(current_nest)) {
+  if (dynamic_cast<WhileEntity*>(current_nest)) {
     current_node_type_ = NodeType::kWhile;
-  } else if (IfEntity* if_entity = dynamic_cast<IfEntity*>(current_nest)) {
+  } else if (dynamic_cast<IfEntity*>(current_nest)) {
     current_node_type_ = NodeType::kIf;
-  } else if (ElseEntity* else_entity = dynamic_cast<ElseEntity*>(current_nest)) {
+  } else if (auto* else_entity = dynamic_cast<ElseEntity*>(current_nest)) {
     current_node_type_ = NodeType::kElse;
 
     //dirty way to get the original if-statement (should be 2nd highest)
     parent_stack_.pop(); //pop this else;
     current_node_ = parent_stack_.top();
-    assert (dynamic_cast<IfEntity*>(current_node_) != nullptr);
+    assert (dynamic_cast<IfEntity*>(current_node_));
     parent_stack_.push(else_entity);
   } else {
     throw std::invalid_argument("[ERROR] Retrace error. There should not be any other types ");
@@ -301,9 +300,9 @@ void PSubsystem::InitInternalState(Procedure* procedure) {
   current_procedure_ = procedure;
   current_node_ = procedure;
   current_node_type_ = NodeType::kProcedure;
-  Cluster* cluster_root = new Cluster(); // the outer procedure
+  auto* cluster_root = new Cluster(); // the outer procedure
   cluster_root->SetParentCluster(nullptr);
-  Block* block_root = new Block();
+  auto* block_root = new Block();
   block_stack_.push(block_root);
   cluster_stack_.push(cluster_root);
   procedure->SetBlockRoot(block_root);
@@ -320,7 +319,7 @@ void PSubsystem::PerformNewProcedureSteps(Procedure* procedure) {
   InitInternalState(procedure);
 
   if (deliverable_->GetProgram() == nullptr) {
-    Program* program = new Program(procedure);
+    auto* program = new Program(procedure);
     deliverable_->SetProgram(program);
   } else {
     // throw error if this name is duplicated
@@ -340,7 +339,7 @@ void PSubsystem::SetStatementObject(Statement* statement) {
     return;
 
   program_counter_++;
-  StatementNumber* statement_number = new StatementNumber(program_counter_);
+  auto* statement_number = new StatementNumber(program_counter_);
   statement->SetStatementNumber(statement_number);
   deliverable_->AddStatement(statement);
   block_stack_.top()->AddStmt(StatementNumber(program_counter_));
@@ -348,7 +347,7 @@ void PSubsystem::SetStatementObject(Statement* statement) {
   bool new_else = false;
   //to check if adding stmt to Else block
   if (current_node_type_ == NodeType::kElse) {
-    IfEntity* if_entity = dynamic_cast<IfEntity*>(current_node_);
+    auto* if_entity = dynamic_cast<IfEntity*>(current_node_);
     assert (if_entity != nullptr);
     if_entity->GetElseStmtList()->push_back(statement);
 
@@ -388,22 +387,22 @@ void PSubsystem::HandleError(Entity* entity) {
  * @param entity
  */
 void PSubsystem::HandleIfStmt(Entity* entity) {
-  IfEntity* if_entity = dynamic_cast<IfEntity*>(entity);
+  auto* if_entity = dynamic_cast<IfEntity*>(entity);
   assert(if_entity);
   deliverable_->AddIfEntity(if_entity);
   parent_stack_.push(if_entity);
   current_node_type_ = NodeType::kIf;
   current_node_ = if_entity;
-  Statement* conditional_statement = dynamic_cast<Statement*>(entity);
+  auto* conditional_statement = dynamic_cast<Statement*>(entity);
   ConditionalBlock* block_if_cond = CreateConditionalBlock(conditional_statement);
   block_if_cond->SetClusterTag(ClusterTag::kIfCond);
   CreateBodyBlock(block_if_cond);
   AddControlVariableRelationships(if_entity->GetControlVariables());
-  Cluster* if_cluster = new Cluster();
+  auto* if_cluster = new Cluster();
   if_cluster->SetClusterTag(ClusterTag::kIfCluster);
   cluster_stack_.push(if_cluster);
   if_cluster->AddChildClusterToFront(block_if_cond);
-  Cluster* if_body_cluster = new Cluster();
+  auto* if_body_cluster = new Cluster();
   if_body_cluster->SetClusterTag(ClusterTag::kIfBody);
   if_cluster->AddChildClusterToBack(if_body_cluster);
   cluster_stack_.push(if_body_cluster);
@@ -415,9 +414,9 @@ void PSubsystem::HandleIfStmt(Entity* entity) {
  * @param entity
  */
 void PSubsystem::HandleElseStmt(Entity* entity) {
-  ElseEntity* else_entity = dynamic_cast<ElseEntity*>(entity);
+  auto* else_entity = dynamic_cast<ElseEntity*>(entity);
   assert(else_entity);
-  IfEntity* if_entity = dynamic_cast<IfEntity*>(parent_stack_.top());
+  auto* if_entity = dynamic_cast<IfEntity*>(parent_stack_.top());
   if (if_entity == nullptr) {
     //If assertion failed, Else did not follow If
     throw SyntaxException("Encountered Else statement without If construct");
@@ -427,31 +426,31 @@ void PSubsystem::HandleElseStmt(Entity* entity) {
   current_node_type_ = NodeType::kElse;
   current_node_ = if_entity;
   CreateBodyBlock();
-  Cluster* else_body_cluster = new Cluster();
+  auto* else_body_cluster = new Cluster();
   else_body_cluster->SetClusterTag(ClusterTag::kElseBody);
   cluster_stack_.top()->AddChildClusterToBack(else_body_cluster);
   cluster_stack_.push(else_body_cluster);
 }
 
 void PSubsystem::HandleWhileStmt(Entity* entity) {
-  WhileEntity* while_entity = dynamic_cast<WhileEntity*>(entity);
+  auto* while_entity = dynamic_cast<WhileEntity*>(entity);
   assert(while_entity);
   deliverable_->AddWhileEntity(while_entity);
   parent_stack_.push(while_entity);
   current_node_type_ = NodeType::kWhile;
   current_node_ = while_entity;
 
-  Statement* conditional_statement = dynamic_cast<Statement*>(entity);
+  auto* conditional_statement = dynamic_cast<Statement*>(entity);
   ConditionalBlock* block_while_cond = CreateConditionalBlock(conditional_statement);
   block_while_cond->SetClusterTag(ClusterTag::kWhileCond);
   block_while_cond->isWhile = true;
   CreateBodyBlock(block_while_cond);
   AddControlVariableRelationships(while_entity->GetControlVariables());
-  Cluster* while_cluster = new Cluster();
+  auto* while_cluster = new Cluster();
   while_cluster->SetClusterTag(ClusterTag::kWhileCluster);
   cluster_stack_.push(while_cluster);
   while_cluster->AddChildClusterToFront(block_while_cond);
-  Cluster* while_body_cluster = new Cluster();
+  auto* while_body_cluster = new Cluster();
   while_body_cluster->SetClusterTag(ClusterTag::kWhileBody);
   while_cluster->AddChildClusterToBack(while_body_cluster);
   cluster_stack_.push(while_body_cluster);
@@ -490,7 +489,7 @@ ConditionalBlock* PSubsystem::CreateConditionalBlock(Statement* conditional_stat
  * @param conditional_block the conditional block that shall be linked to this newly created body block
  */
 BodyBlock* PSubsystem::CreateBodyBlock(ConditionalBlock* conditional_block) {
-  BodyBlock* body_block = new BodyBlock();
+  auto* body_block = new BodyBlock();
   conditional_block->AddNextBlock(dynamic_cast<Block*>(body_block));
   block_stack_.push(dynamic_cast<Block*>(body_block));
   return body_block;
@@ -500,9 +499,9 @@ BodyBlock* PSubsystem::CreateBodyBlock(ConditionalBlock* conditional_block) {
  *  Creates the Else block's body
  */
 BodyBlock* PSubsystem::CreateBodyBlock() {
-  Block* block_if_body = dynamic_cast<Block*>(block_stack_.top());
+  auto* block_if_body = dynamic_cast<Block*>(block_stack_.top());
   block_stack_.pop(); //pop so that the if_cond can perform next_block map to else block
-  BodyBlock* block_else_body = new BodyBlock();
+  auto* block_else_body = new BodyBlock();
   Block* block_if_cond = block_stack_.top();
   block_if_cond->AddNextBlock(block_else_body);
   block_stack_.push(block_if_body);
@@ -519,7 +518,7 @@ void PSubsystem::AddControlVariableRelationships(const std::vector<Variable*>& c
 }
 
 void PSubsystem::HandleAssignStmt(Entity* entity) {
-  AssignEntity* assign_entity = dynamic_cast<AssignEntity*>(entity);
+  auto* assign_entity = dynamic_cast<AssignEntity*>(entity);
   assert(assign_entity);
   deliverable_->AddAssignEntity(assign_entity);
   deliverable_->AddModifiesRelationship(assign_entity, assign_entity->GetVariableObj());
@@ -537,14 +536,14 @@ void PSubsystem::HandleAssignStmt(Entity* entity) {
 }
 
 void PSubsystem::HandleCallStmt(Entity* entity) {
-  CallEntity* call_entity = dynamic_cast<CallEntity*>(entity);
+  auto* call_entity = dynamic_cast<CallEntity*>(entity);
   assert(call_entity);
   deliverable_->AddCallEntity(call_entity);
   deliverable_->AddCallsRelationship(current_procedure_, call_entity->GetProcedure());
 }
 
 void PSubsystem::HandlePrintStmt(Entity* entity) {
-  PrintEntity* print_entity = dynamic_cast<PrintEntity*>(entity);
+  auto* print_entity = dynamic_cast<PrintEntity*>(entity);
   assert(print_entity);
   deliverable_->AddPrintEntity(print_entity);
   deliverable_->AddUsesRelationship(print_entity, print_entity->GetVariable());
@@ -554,7 +553,7 @@ void PSubsystem::HandlePrintStmt(Entity* entity) {
 }
 
 void PSubsystem::HandleReadStmt(Entity* entity) {
-  ReadEntity* read_entity = dynamic_cast<ReadEntity*>(entity);
+  auto* read_entity = dynamic_cast<ReadEntity*>(entity);
   assert(read_entity);
   deliverable_->AddReadEntity(read_entity);
   deliverable_->AddModifiesRelationship(read_entity, read_entity->GetVariable());
@@ -572,14 +571,6 @@ void PSubsystem::CheckForIfElseValidity() {
 }
 
 void PSubsystem::CheckForExistingProcedure() {
-  // Check if Program.procList === Deliverables.procList
-  // assumption: EntityFactory will create into Deliverables.procList whenever encountered
-  //             Program.procList will be created when "procedure x {" is encountered.
-  //   So, if both are same, it would be correct.
-  //   Note that Program.procList is strictly <= Deliverables.procList because EntityFactory will create procedure too.
-
-  // Note that using dup to ensure that my Program.procList still has the original procedure structure.
-  // Note that from this method onwards, deliverables.procList will be in sorted order.
   std::list<Procedure*> program_proclist_dup(* deliverable_->GetProgram()->GetProcedureList());
   std::list<Procedure*>* del_proclist = deliverable_->GetProcList();
 
@@ -593,12 +584,15 @@ void PSubsystem::CheckForExistingProcedure() {
   }
 }
 
-void PSubsystem::FiniStateChecker() {
+/**
+ * Verifies the validity of the finial state.
+ */
+void PSubsystem::FiniStateCheck() {
   if (deliverable_->GetStatementList()->empty()) {
     throw SyntaxException("A blank simple file is encountered.");
   }
 
-  CheckForIfElseValidity(); //TODO: to put it within main handling if possible.
+  CheckForIfElseValidity();
   CheckForExistingProcedure();
   if (!CheckForStacksEmpty()) {
     throw SyntaxException("Difficulty in processing simple file. This could be caused by mismatch braces.");
@@ -606,8 +600,8 @@ void PSubsystem::FiniStateChecker() {
 }
 
 Deliverable* PSubsystem::GetDeliverables() {
-  FiniStateChecker();
-  valid_state = false; //to prevent further processsing.
+  FiniStateCheck();
+  valid_state = false; //to prevent further processing.
   return deliverable_;
 }
 
