@@ -267,25 +267,31 @@ bool Cluster::CheckScopeClusterForAffects(Cluster* scoped_cluster,
                                           const std::string& lhs_var) {
   // todo: put the goal stmt here
   const std::pair<int,int> goal_range = std::make_pair(target_range.first, target_range.second);
-  if (target_range.first >= target_range.second) {
-    Cluster* current_scope = scoped_cluster;
-    while (current_scope
-        && current_scope->start_ <= target_range.second
-        && current_scope->GetClusterTag() != ClusterTag::kWhileCluster) {
-      current_scope = current_scope->GetParentCluster();
+
+  Cluster* current_scope = scoped_cluster;
+  Cluster* outermost_while = nullptr;
+
+  while (current_scope) {
+    if (current_scope->GetClusterTag() == ClusterTag::kWhileCluster) {
+      outermost_while = current_scope;
     }
-    if (!current_scope) return false;
-    auto current_scope_range = current_scope->GetStartEndRange();
+    current_scope = current_scope->GetParentCluster();
+  }
+
+  if (!outermost_while && (target_range.first >= target_range.second)) return false;
+
+  if (!outermost_while) {
+    return TraverseScopedClusterForAffects(scoped_cluster, target_range, pkb, lhs_var, goal_range);
+  } else {
+    auto current_scope_range = outermost_while->GetStartEndRange();
     bool first_stmt_to_while_end_is_unmodified = (target_range.second == current_scope_range.second)
-        || TraverseScopedClusterForAffects(current_scope,
+        || TraverseScopedClusterForAffects(outermost_while,
                                            {target_range.first, current_scope_range.second},
                                            pkb,
                                            lhs_var, goal_range);
     bool while_start_to_second_stmt_is_unmodified =
-        TraverseScopedClusterForAffects(current_scope, {current_scope->start_, target_range.second}, pkb, lhs_var, goal_range);
+        TraverseScopedClusterForAffects(outermost_while, {current_scope_range.first, target_range.second}, pkb, lhs_var, goal_range);
     return first_stmt_to_while_end_is_unmodified && while_start_to_second_stmt_is_unmodified;
-  } else {
-    return TraverseScopedClusterForAffects(scoped_cluster, target_range, pkb, lhs_var, goal_range);
   }
 }
 
@@ -308,7 +314,7 @@ bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
   for (auto child: children) {
     auto child_range = child->GetStartEndRange();
     ClusterTag tag = child->GetClusterTag();
-    bool child_is_cond_block = tag == ClusterTag::kIfCond || tag == ClusterTag::kWhileCond;
+    bool child_is_cond_block = tag == ClusterTag::kIfCondBlock || tag == ClusterTag::kWhileCondBlock;
     bool child_does_not_contain_first_stmt = child_range.second < target_range.first;
     if (child_is_cond_block && child_range.second == target_range.first) target_range.first = target_range.first + 1;
     if (child_does_not_contain_first_stmt || child_is_cond_block) continue; // skips this child
@@ -341,6 +347,7 @@ bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
           if_body_is_unmodified_path = TraverseScopedClusterForAffects(if_body, if_body_range, pkb, lhs_var, goal_range);
           if (if_body_is_unmodified_path) continue;
         } else if (if_body_range.first < target_range.first && target_range.first < if_body_range.second) {
+          if (else_body->CheckIfStmtNumInRange(target_range.second)) return false;
           //starts inside if-body
           if_body_is_unmodified_path = TraverseScopedClusterForAffects(if_body,
                                                                        std::make_pair(target_range.first,
@@ -395,6 +402,12 @@ bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
       // iterate into the while body:
       return TraverseScopedClusterForAffects(child, target_range, pkb, lhs_var, goal_range);
     } else if (tag == ClusterTag::kIfBody || tag == ClusterTag::kElseBody) {
+
+      if (tag == ClusterTag::kIfBody) { //extra check -
+        Cluster* else_cluster = child->GetNextSiblingCluster();
+        if (else_cluster->CheckIfStmtNumInRange(target_range.second)) return false;
+      }
+
       bool child_is_normal_block = child->nested_clusters_.empty();
       if (child_is_normal_block) {
         auto traversal_results = TraverseNormalBlockForAffects(child, target_range, pkb, lhs_var, goal_range);
@@ -408,7 +421,6 @@ bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
         }
       } else {
         // todo: test this case: have to call in if{while{...}}else{..}
-        target_range.first = child_range.first - 1;
         return TraverseScopedClusterForAffects(child, target_range, pkb, lhs_var, goal_range);
       }
     } else { // it's a simple block, no alternative paths to consider:
@@ -442,29 +454,29 @@ Cluster* Cluster::GetClusterConstituent(ClusterTag constituent_tag) {
   auto constituents = this->GetNestedClusters();
   Cluster* first_constituent = constituents.front();
   switch (constituent_tag) {
-    case ClusterTag::kIfCond: {
+    case ClusterTag::kIfCondBlock: {
       assert(cluster_tag_ == ClusterTag::kIfCluster);
-      assert(first_constituent->GetClusterTag() == ClusterTag::kIfCond);
+      assert(first_constituent->GetClusterTag() == ClusterTag::kIfCondBlock);
       return first_constituent;
     };
     case ClusterTag::kIfBody: {
       assert(cluster_tag_ == ClusterTag::kIfCluster);
-      assert(first_constituent->GetClusterTag() == ClusterTag::kIfCond);
+      assert(first_constituent->GetClusterTag() == ClusterTag::kIfCondBlock);
       return first_constituent->FindNextSibling(ClusterTag::kIfBody);
     };
     case ClusterTag::kElseBody: {
       assert(cluster_tag_ == ClusterTag::kIfCluster);
-      assert(first_constituent->GetClusterTag() == ClusterTag::kIfCond);
+      assert(first_constituent->GetClusterTag() == ClusterTag::kIfCondBlock);
       return first_constituent->FindNextSibling(ClusterTag::kElseBody);
     };
-    case ClusterTag::kWhileCond: {
+    case ClusterTag::kWhileCondBlock: {
       assert(cluster_tag_ == ClusterTag::kWhileCluster);
-      assert(first_constituent->GetClusterTag() == ClusterTag::kWhileCond);
+      assert(first_constituent->GetClusterTag() == ClusterTag::kWhileCondBlock);
       return first_constituent;
     };
     case ClusterTag::kWhileBody: {
       assert(cluster_tag_ == ClusterTag::kWhileCluster);
-      assert(first_constituent->GetClusterTag() == ClusterTag::kWhileCond);
+      assert(first_constituent->GetClusterTag() == ClusterTag::kWhileCondBlock);
       return first_constituent->FindNextSibling(ClusterTag::kWhileBody);
     };
     default: {
