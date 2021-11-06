@@ -63,15 +63,13 @@ class RuntimeExtractor : public RuntimeMediator {
  private:
   PKB* pkb_;
   NextTExtractor next_t_extractor_;
-  AffectsExtractor affects_extractor_ = AffectsExtractor();
+  AffectsExtractor affects_extractor_;
   AffectsTExtractor affects_t_extractor_;
   NextBipExtractor next_bip_extractor_;
   NextBipTExtractor next_bip_t_extractor_;
 
   std::vector<Entity*> GetNextT(int target);
   std::vector<Entity*> GetPrevT(int target);
-  std::vector<Entity*> GetAffects(int target);
-  std::vector<Entity*> GetAffectedBy(int target);
   std::vector<Entity*> GetAffectsT(int target);
   std::vector<Entity*> GetAffectedByT(int target);
   std::vector<Entity*> GetNextBip(int target);
@@ -81,8 +79,6 @@ class RuntimeExtractor : public RuntimeMediator {
 
   std::vector<Entity*> GetNextT(DesignEntity de);
   std::vector<Entity*> GetPrevT(DesignEntity de);
-  std::vector<Entity*> GetAffects(DesignEntity de);
-  std::vector<Entity*> GetAffectedBy(DesignEntity de);
   std::vector<Entity*> GetAffectsT(DesignEntity de);
   std::vector<Entity*> GetAffectedByT(DesignEntity de);
   std::vector<Entity*> GetNextBip(DesignEntity de);
@@ -92,8 +88,6 @@ class RuntimeExtractor : public RuntimeMediator {
 
   std::vector<std::tuple<Entity*, Entity*>> GetNextT(DesignEntity first, DesignEntity second);
   std::vector<std::tuple<Entity*, Entity*>> GetPrevT(DesignEntity first, DesignEntity second);
-  std::vector<std::tuple<Entity*, Entity*>> GetAffects(DesignEntity first, DesignEntity second);
-  std::vector<std::tuple<Entity*, Entity*>> GetAffectedBy(DesignEntity first, DesignEntity second);
   std::vector<std::tuple<Entity*, Entity*>> GetAffectsT(DesignEntity first, DesignEntity second);
   std::vector<std::tuple<Entity*, Entity*>> GetAffectedByT(DesignEntity first, DesignEntity second);
   std::vector<std::tuple<Entity*, Entity*>> GetNextBip(DesignEntity first, DesignEntity second);
@@ -101,22 +95,16 @@ class RuntimeExtractor : public RuntimeMediator {
   std::vector<std::tuple<Entity*, Entity*>> GetNextBipT(DesignEntity first, DesignEntity second);
   std::vector<std::tuple<Entity*, Entity*>> GetPrevBipT(DesignEntity first, DesignEntity second);
 
-  bool HasAffects();
-  bool HasAffectedBy();
   bool HasAffectsT();
   bool HasAffectedByT();
   bool HasNextBip();
 
-  bool HasAffects(int first);
-  bool HasAffectedBy(int first);
   bool HasAffectsT(int first);
   bool HasAffectedByT(int first);
   bool HasNextBip(int first);
   bool HasPrevBip(int first);
 
   bool HasNextT(int first, int second);
-  bool HasAffects(int first, int second);
-  bool HasAffectedBy(int first, int second);
   bool HasAffectsT(int first, int second);
   bool HasAffectedByT(int first, int second);
   bool HasNextBip(int first, int second);
