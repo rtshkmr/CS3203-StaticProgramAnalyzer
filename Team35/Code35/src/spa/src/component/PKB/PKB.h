@@ -45,6 +45,16 @@ class PKB {
   // E.g. GetRelationship(kFollows, 1) returns a vector with one Entity with statement number 2
   std::vector<Entity*> GetRelationship(PKBRelRefs ref, std::string entity);
 
+  // Returns a vector of 2-tuples of entities in which the first element of the tuple is specified
+  // by entity and the second element is any element for which the ref relationship holds with entity
+  // Both types are determined by de1 and de2 respectively
+  std::vector<entity_pair> GetRelationshipByFirst(PKBRelRefs ref, std::string entity, type_combo t_c);
+
+  // Returns a vector of 2-tuples of entities in which the second element of the tuple is specified
+  // by entity and the first element is any element for which the ref relationship holds with entity
+  // Both types are determined by de1 and de2 respectively
+  std::vector<entity_pair> GetRelationshipBySecond(PKBRelRefs ref, std::string entity, type_combo t_c);
+
   // Returns a vector of 2-tuples of entities in which the first element of the tuple is of type de1,
   // the second elements is of type de2, and the ref relationship holds between them
   std::vector<entity_pair> GetRelationshipByTypes(PKBRelRefs ref, DesignEntity de1, DesignEntity de2);
@@ -146,6 +156,30 @@ class PKB {
   std::unordered_map<
     PKBRelRefs,
     std::unordered_map<
+      std::string,
+      std::unordered_map<
+        type_combo,
+        std::vector<entity_pair>,
+        type_combo_hash
+      >
+    >
+  > relationship_by_first_entity_table_;
+
+  std::unordered_map<
+    PKBRelRefs,
+    std::unordered_map<
+      std::string,
+      std::unordered_map<
+        type_combo,
+        std::vector<entity_pair>,
+        type_combo_hash
+      >
+    >
+  > relationship_by_second_entity_table_;
+
+  std::unordered_map<
+    PKBRelRefs,
+    std::unordered_map<
       type_combo,
       std::vector<Entity*>,
       type_combo_hash
@@ -224,6 +258,10 @@ void PKB::PopulateRelationship(std::unordered_map<X*, std::list<Y*>*>* hash, PKB
       for (DesignEntity type1 : first_types) {
         for (DesignEntity type2 : second_types) {
           relationship_by_types_table_[ref][{type1, type2}].push_back({first_entity, entity});
+          relationship_by_first_entity_table_[ref][k_string][{type1, type2}]
+            .push_back({first_entity, entity});
+          relationship_by_second_entity_table_[ref][GetNameFromEntity(entity)][{type1, type2}]
+            .push_back({first_entity, entity});
           std::vector<Entity*> first_params = first_param_by_types_table_[ref][{type1, type2}];
           if (std::find(first_params.begin(), first_params.end(), first_entity) == first_params.end()) {
             first_param_by_types_table_[ref][{type1, type2}].push_back(first_entity);

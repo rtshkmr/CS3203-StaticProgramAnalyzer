@@ -41,7 +41,7 @@ TEST_CASE("3.ClauseStrategy.Such That Double Synonym Both Not In") {
   bool outcome = typeid(*query_command) == typeid(QuerySuchThatTwoSynonymCommand);
   REQUIRE(outcome);
   ClauseCommand *clause_command = std::get<1>(commands);
-  outcome = clause_command == nullptr;
+  outcome = typeid(*clause_command) == typeid(DoubleSynonymNonePresentCommand);
   REQUIRE(outcome);
 }
 

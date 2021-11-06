@@ -11,14 +11,14 @@ std::vector<Entity*> NextBipTExtractor::GetRelationship(RelDirection dir, int ta
 
 std::vector<Entity*> NextBipTExtractor::GetFirstEntityOfRelationship(RelDirection dir, DesignEntity de) {
   PopulateRelationships();
-  return pkb_->GetFirstEntityOfRelationship(GetPKBRelRef(dir), DesignEntity::kStmt);
+  return pkb_->GetFirstEntityOfRelationship(GetPKBRelRef(dir), de);
 }
 
 std::vector<std::tuple<Entity*, Entity*>> NextBipTExtractor::GetRelationshipByTypes(RelDirection dir,
                                                                                     DesignEntity first,
                                                                                     DesignEntity second) {
   PopulateRelationships();
-  return pkb_->GetRelationshipByTypes(GetPKBRelRef(dir), DesignEntity::kStmt, DesignEntity::kStmt);
+  return pkb_->GetRelationshipByTypes(GetPKBRelRef(dir), first, second);
 }
 
 bool NextBipTExtractor::HasRelationship(RelDirection dir) {

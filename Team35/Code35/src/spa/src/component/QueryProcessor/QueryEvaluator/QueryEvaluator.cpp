@@ -41,18 +41,18 @@ UnformattedQueryResult QueryEvaluator::EvaluateQuery(const std::vector<Group *>&
  */
 void QueryEvaluator::ProcessGroup(QueryEvaluatorTable *table, Group *group) {
   for (Clause* current_clause: group->GetClauses()) {
-    auto clause_context = ClauseContext(table); // TODO: clause strategy for with clause
+    auto clause_context = ClauseContext(table);
     std::tuple<PKBQueryCommand*, ClauseCommand*> commands = clause_context.ProcessClause(current_clause);
     PKBQueryCommand *query_command = std::get<0>(commands);
     ClauseCommand *clause_command = std::get<1>(commands);
 
-    auto query_receiver = PKBQueryReceiver(db_manager);
+    auto query_receiver = PKBQueryReceiver(db_manager, table);
     query_command->SetReceiver(&query_receiver);
     IntermediateTable *intermediate_table = query_command->ExecuteQuery(current_clause);
-
     ClauseCommandExecutor clause_executor = ClauseCommandExecutor(table, intermediate_table);
     clause_command->SetExecutor(&clause_executor);
     clause_command->Execute(current_clause);
+    if (table->GetRowSize() == 0) break;        // Optimisation through early termination.
   }
 }
 

@@ -31,12 +31,12 @@ TEST_CASE("3.QueryGrouper.No and + multiple queries + common non-target synonym"
                       "pattern a (\"x\", _) such that Uses (a, \"x\")";
 
   auto query_extractor = QueryExtractor(& query);
-  query_extractor.ExtractQuery(false);
+  query_extractor.ExtractQuery(true);
   std::vector<Group*> groups = query_extractor.GetGroupsList();
   // expecting 2 groups, 1 is an empty group for tgt syn a2, the other is the boolean group with 4 clauses
   REQUIRE(groups.size() == 2);
-  Group* g1 = Get(&groups, 0);
-  Group* g2 = Get(&groups, 1);
+  Group* g1 = Get(&groups, 1);
+  Group* g2 = Get(&groups, 0);
   REQUIRE(g1->GetClauses().size() == 0);
   REQUIRE(g1->ContainsTargetSynonym());
   REQUIRE(g2->GetClauses().size() == 4);
@@ -49,12 +49,12 @@ TEST_CASE("3.QueryGrouper.No and + multiple queries + common target & non-target
                       "pattern a2 (\"x\", _) such that Uses (a2, \"x\")";
 
   auto query_extractor = QueryExtractor(& query);
-  query_extractor.ExtractQuery(false);
+  query_extractor.ExtractQuery(true);
   std::vector<Group*> groups = query_extractor.GetGroupsList();
   // expecting 2 groups with 2 clauses each
   REQUIRE(groups.size() == 2);
-  Group* g1 = Get(&groups, 0);
-  Group* g2 = Get(&groups, 1);
+  Group* g1 = Get(&groups, 1);
+  Group* g2 = Get(&groups, 0);
   REQUIRE(g1->GetClauses().size() == 2);
   REQUIRE(g1->ContainsTargetSynonym());
   REQUIRE(g2->GetClauses().size() == 2);
@@ -66,12 +66,12 @@ TEST_CASE("3.QueryGrouper.And keyword + multiple queries rel & pattern") {
                       "pattern a1 (\"x\", _) and a2 (\"x\",_\"x\"_) "
                       "such that Parent* (w2, a2) and Parent* (w1, w2)";
   auto query_extractor = QueryExtractor(& query);
-  query_extractor.ExtractQuery(false);
+  query_extractor.ExtractQuery(true);
   std::vector<Group*> groups = query_extractor.GetGroupsList();
   // expecting 2 groups with 1 and 3 clauses respectively.
   REQUIRE(groups.size() == 2);
-  Group* g1 = Get(&groups, 0);
-  Group* g2 = Get(&groups, 1);
+  Group* g1 = Get(&groups, 1);
+  Group* g2 = Get(&groups, 0);
   REQUIRE(g1->GetClauses().size() == 3);
   REQUIRE(g1->ContainsTargetSynonym());
   REQUIRE(g2->GetClauses().size() == 1);

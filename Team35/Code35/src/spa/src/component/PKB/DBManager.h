@@ -20,10 +20,6 @@ class DBManager {
 
   std::vector<Entity*> GetFirstEntityOfRelationship(PKBRelRefs ref, DesignEntity de);
 
-  std::vector<Entity*> GetFirstEntityOfRelationship(PKBRelRefs ref, DesignEntity de,
-                                                    std::vector<Entity*> scoped_entities,
-                                                    ScopeIndication scope_indication);
-
   std::vector<std::tuple<Entity*, Entity*>> GetRelationshipByTypes(PKBRelRefs ref,
                                                                    DesignEntity first_de,
                                                                    DesignEntity second_de,
