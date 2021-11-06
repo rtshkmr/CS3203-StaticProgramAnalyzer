@@ -1,7 +1,9 @@
 #include "NextBipTExtractor.h"
+#include "RuntimeExtractor.h"
 
-NextBipTExtractor::NextBipTExtractor(PKB* pkb) {
+NextBipTExtractor::NextBipTExtractor(RuntimeMediator* rtm, PKB* pkb) {
   pkb_ = pkb;
+  rtm_ = rtm;
 }
 
 std::vector<Entity*> NextBipTExtractor::GetRelationship(RelDirection dir, int target) {
@@ -10,6 +12,7 @@ std::vector<Entity*> NextBipTExtractor::GetRelationship(RelDirection dir, int ta
 }
 
 std::vector<Entity*> NextBipTExtractor::GetFirstEntityOfRelationship(RelDirection dir, DesignEntity de) {
+  if (next_design_entities.count(de) == 0) return {};
   PopulateRelationships();
   return pkb_->GetFirstEntityOfRelationship(GetPKBRelRef(dir), de);
 }
@@ -17,6 +20,7 @@ std::vector<Entity*> NextBipTExtractor::GetFirstEntityOfRelationship(RelDirectio
 std::vector<std::tuple<Entity*, Entity*>> NextBipTExtractor::GetRelationshipByTypes(RelDirection dir,
                                                                                     DesignEntity first,
                                                                                     DesignEntity second) {
+  if (next_design_entities.count(first) == 0 || next_design_entities.count(second) == 0) return {};
   PopulateRelationships();
   return pkb_->GetRelationshipByTypes(GetPKBRelRef(dir), first, second);
 }
@@ -50,10 +54,6 @@ void NextBipTExtractor::PopulateRelationships() {
 
 PKBRelRefs NextBipTExtractor::GetPKBRelRef(RelDirection dir) {
   return dir == RelDirection::kForward ? PKBRelRefs::kNextBipT : PKBRelRefs::kPrevBipT;
-}
-
-void NextBipTExtractor::SetMediator(RuntimeMediator* rtm) {
-  rtm_ = rtm;
 }
 
 void NextBipTExtractor::PopulateNextBipT() {

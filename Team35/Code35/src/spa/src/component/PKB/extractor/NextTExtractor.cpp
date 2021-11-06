@@ -3,6 +3,7 @@
 #include <util/Utility.h>
 #include "NextTExtractor.h"
 #include "model/CFG.h"
+#include "RuntimeExtractor.h"
 
 NextTExtractor::NextTExtractor(PKB* pkb) {
   pkb_ = pkb;
@@ -84,6 +85,7 @@ std::vector<Entity*> NextTExtractor::GetRelationship(RelDirection dir,
  * @return all Entities that can be on the LHS/RHS of the relationship.
  */
 std::vector<Entity*> NextTExtractor::GetFirstEntityOfRelationship(RelDirection dir, DesignEntity de) {
+  if (next_design_entities.count(de) == 0) return {};
   if (de == DesignEntity::kProgLine) {
     de = DesignEntity::kStmt;
   }
@@ -95,6 +97,7 @@ std::vector<Entity*> NextTExtractor::GetFirstEntityOfRelationship(RelDirection d
 std::vector<std::tuple<Entity*, Entity*>> NextTExtractor::GetRelationshipByTypes(RelDirection dir,
                                                                                  DesignEntity first,
                                                                                  DesignEntity second) {
+  if (next_design_entities.count(first) == 0 || next_design_entities.count(second) == 0) return {};
   if (first == DesignEntity::kProgLine) {
     first = DesignEntity::kStmt;
   }
@@ -120,14 +123,23 @@ bool NextTExtractor::HasRelationship(RelDirection dir) {
 }
 
 bool NextTExtractor::HasRelationship(RelDirection dir, int target) {
-  return pkb_->HasRelationship(PKBRelRefs::kNext, std::to_string(target));
+  if (dir == RelDirection::kForward) {
+    return pkb_->HasRelationship(PKBRelRefs::kNext, std::to_string(target));
+  } else {
+    return pkb_->HasRelationship(PKBRelRefs::kPrevious, std::to_string(target));
+  }
 }
 
 /**
  * Returns true if Next*(first, second).
  */
 bool NextTExtractor::HasRelationship(RelDirection dir, int first, int second) {
-  rel_direction_ = dir;
+  if (dir == RelDirection::kReverse) {
+    rel_direction_ = RelDirection::kForward;
+    int temp = first;
+    first = second;
+    second = temp;
+  }
   int total_stmt = stmt_list_.size();
   if (first > total_stmt || first <= 0 || second > total_stmt || second <= 0) {
     return false;

@@ -3,6 +3,7 @@
 #include <utility>
 #include <util/Utility.h>
 #include "model/CFG.h"
+#include "RuntimeExtractor.h"
 
 /**
  * This class extracts all NextBip in the first query and populates the pkb.
@@ -30,6 +31,7 @@ std::vector<Entity*> NextBipExtractor::GetRelationship(RelDirection dir, int tar
  * @return Vector of entities satisfying the relationship.
  */
 std::vector<Entity*> NextBipExtractor::GetFirstEntityOfRelationship(RelDirection dir, DesignEntity de) {
+  if (next_design_entities.count(de) == 0) return {};
   PopulateBipMaps();
   return pkb_->GetFirstEntityOfRelationship(GetPKBRelRef(dir), de);
 }
@@ -37,6 +39,7 @@ std::vector<Entity*> NextBipExtractor::GetFirstEntityOfRelationship(RelDirection
 std::vector<std::tuple<Entity*, Entity*>> NextBipExtractor::GetRelationshipByTypes(RelDirection dir,
                                                                                    DesignEntity first,
                                                                                    DesignEntity second) {
+  if (next_design_entities.count(first) == 0 || next_design_entities.count(second) == 0) return {};
   PopulateBipMaps();
   return pkb_->GetRelationshipByTypes(GetPKBRelRef(dir), first, second);
 }
