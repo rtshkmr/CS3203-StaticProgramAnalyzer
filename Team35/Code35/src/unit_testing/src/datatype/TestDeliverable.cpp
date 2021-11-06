@@ -72,12 +72,6 @@ TEST_CASE("1.Deliverable.Add relationships") {
     deliverable.AddFollowsTransitiveRelationship(rx, a1);
     REQUIRE(* follows_T_hash->find(rx)->second == stmt_list2);
 
-    // adding list
-    std::list<Statement*> add_stmt_list = {a1, if_2, while_1};
-    deliverable.AddFollowsTransitiveRelationshipForList(rx, & add_stmt_list);
-    std::list<Statement*> expected_stmt_list = {if_1, a1, if_2, while_1};
-    REQUIRE(* follows_T_hash->find(rx)->second == expected_stmt_list);
-
     deliverable.AddFollowsTransitiveRelationship(px, if_1);
     deliverable.AddFollowsTransitiveRelationship(px, if_1);  // duplicate check
     REQUIRE(follows_T_hash->count(px));
@@ -86,12 +80,6 @@ TEST_CASE("1.Deliverable.Add relationships") {
     // adding more var to existing entry
     deliverable.AddFollowsTransitiveRelationship(px, a1);
     REQUIRE(* follows_T_hash->find(px)->second == stmt_list2);
-
-    // adding list
-    std::list<Statement*> add_stmt_list2 = {if_1, if_2, while_1};
-    deliverable.AddFollowsTransitiveRelationshipForList(rx, & add_stmt_list2);
-    std::list<Statement*> expected_stmt_list2 = {if_1, a1, if_2, while_1};
-    REQUIRE(* follows_T_hash->find(rx)->second == expected_stmt_list2);
 
     // reverse check
     deliverable.AddFollowsTransitiveRelationship(if_2, a1);

@@ -273,7 +273,6 @@ TEST_CASE("1.TransitiveExtractor.Extract ParentT nested containers") {
     if_1_->SetElseEntity(else_1_);
     if_2_->SetElseEntity(else_2_);
     if_3_->SetElseEntity(else_3_);
-    deliverable->AddProcedure(proc2);
     deliverable->AddParentRelationship(if_1_, assign_1_);
     deliverable->AddParentRelationship(if_1_, if_2_);
     deliverable->AddParentRelationship(if_1_, print_i_);
