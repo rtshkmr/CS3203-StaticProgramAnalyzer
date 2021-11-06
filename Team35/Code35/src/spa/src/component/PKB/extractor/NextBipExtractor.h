@@ -18,6 +18,7 @@ class NextBipExtractor : public RuntimeColleague {
   bool HasRelationship(RelDirection dir) override;
   bool HasRelationship(RelDirection dir, int target) override;
   bool HasRelationship(RelDirection dir, int first, int second) override;
+  bool HasRelationship(RelDirection dir, DesignEntity first, DesignEntity second) override;
   void Delete();
  private:
   PKB* pkb_{};
@@ -39,6 +40,7 @@ class NextBipExtractor : public RuntimeColleague {
   std::list<int> GetBipLastStmts(Block* block);
   std::list<int> HandleCallLastStmt(const std::list<int>& last_stmts);
   static PKBRelRefs GetPKBRelRef(RelDirection dir);
+  static std::list<int> GetCFGLastStmts(Procedure* proc);
 };
 
 #endif //AUTOTESTER_CODE35_SRC_SPA_SRC_COMPONENT_PKB_EXTRACTOR_NEXTBIPEXTRACTOR_H_

@@ -4,8 +4,10 @@
 #include <model/Entity.h>
 #include <unordered_map>
 #include <component/PKB/PKB.h>
+#include "RuntimeMediator.h"
+#include "RuntimeColleague.h"
 
-class AffectsExtractor {
+class AffectsExtractor : public RuntimeColleague {
   struct AssignEntityComparator
   {
     bool operator()(AssignEntity* lhs, AssignEntity* rhs) const  {
@@ -15,27 +17,22 @@ class AffectsExtractor {
     }
   };
  public:
-  bool HasAffects();
-  std::vector<Entity*> GetAllAffects();
-  std::vector<Entity*> GetAllAffectedBy();
-  std::vector<std::tuple<Entity*, Entity*>> GetAllPair();
+  AffectsExtractor() = default;
+  explicit AffectsExtractor(RuntimeMediator* rte, PKB* pkb);
 
-  std::vector<Entity*> GetAffects(int target);
-  std::vector<Entity*> GetAffectedBy(int target);
-  bool HasAffects(int target);
-  bool HasAffectedBy(int target);
-  bool HasAffects(int first, int second);
-  bool HasAffectedBy(int first, int second);
+  std::vector<Entity*> GetRelationship(RelDirection dir, int target) override;
+  std::vector<Entity*> GetFirstEntityOfRelationship(RelDirection dir, DesignEntity de) override;
+  std::vector<std::tuple<Entity*, Entity*>> GetRelationshipByTypes(RelDirection dir,
+                                                                   DesignEntity first,
+                                                                   DesignEntity second) override;
+  bool HasRelationship(RelDirection dir) override;
+  bool HasRelationship(RelDirection dir, int target) override;
+  bool HasRelationship(RelDirection dir, int first, int second) override;
+  bool HasRelationship(RelDirection dir, DesignEntity first, DesignEntity second) override;
 
-  std::vector<Entity*> GetAffects(AssignEntity* target);
-  std::vector<Entity*> GetAffectedBy(AssignEntity* target);
-  bool HasAffects(AssignEntity* target);
-  bool HasAffectedBy(AssignEntity* target);
-  bool HasAffects(AssignEntity* first_stmt, AssignEntity* second_stmt); //also used by HasAffectedBy(second, first)
-
-  void SetPKB(PKB* pkb);
   void Delete();
  private:
+  RuntimeMediator* rte_;
   PKB* pkb_;
   static constexpr auto cmp = [](AssignEntity* left, AssignEntity* right) {
     return left->GetStatementNumber() < right->GetStatementNumber();
@@ -47,6 +44,13 @@ class AffectsExtractor {
   std::unordered_map<AssignEntity*, std::list<AssignEntity*>*> not_affected_by_map_;
   bool HasValidUnmodifiedPath(AssignEntity* first_stmt, AssignEntity* second_stmt);
   std::set<AssignEntity*, AssignEntityComparator> GetPotentialAffectedBy(AssignEntity* target);
+  std::vector<Entity*> GetAllAffects();
+  std::vector<Entity*> GetAllAffectedBy();
+  std::vector<Entity*> GetAffects(AssignEntity* target);
+  std::vector<Entity*> GetAffectedBy(AssignEntity* target);
+  bool HasAffects(AssignEntity* target);
+  bool HasAffectedBy(AssignEntity* target);
+  bool HasAffects(AssignEntity* first_stmt, AssignEntity* second_stmt);
 };
 
 #endif //AUTOTESTER_CODE35_SRC_SPA_SRC_COMPONENT_PKB_AFFECTSEXTRACTOR_H_

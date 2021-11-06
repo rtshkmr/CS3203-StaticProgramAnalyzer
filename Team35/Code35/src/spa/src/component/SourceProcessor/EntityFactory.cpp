@@ -188,14 +188,12 @@ vector<Constant*> EntityFactory::GetConstantsFromExpressionTokens(const vector<T
 }
 
 Procedure* EntityFactory::CreateProcedure(std::string proc_name) {
-  // TODO iter2: Create destructor for ProcedureName and Procedure.
   auto* p = new Procedure(new ProcedureName(std::move(proc_name)));
   proc_list_->push_back(p);
   return p;
 }
 
 Variable* EntityFactory::CreateVariable(std::string var_name) {
-  //TODO iter2: Create destructor for VariableName and Variable.
   auto* v = new Variable(new VariableName(std::move(var_name)));
   var_list_->push_back(v);
   return v;
