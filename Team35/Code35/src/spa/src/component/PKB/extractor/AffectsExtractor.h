@@ -40,8 +40,11 @@ class AffectsExtractor {
   static constexpr auto cmp = [](AssignEntity* left, AssignEntity* right) {
     return left->GetStatementNumber()->GetNum() < right->GetStatementNumber()->GetNum();
   };
-  std::unordered_map<Statement*, std::list<Statement*>*> affects_map_;
-  std::unordered_map<Statement*, std::list<Statement*>*> affected_by_map_;
+  ScopeIndication cacheIndication = ScopeIndication::kNoScope;
+  std::unordered_map<AssignEntity*, std::list<AssignEntity*>*> affects_map_;
+  std::unordered_map<AssignEntity*, std::list<AssignEntity*>*> affected_by_map_;
+  std::unordered_map<AssignEntity*, std::list<AssignEntity*>*> not_affects_map_;
+  std::unordered_map<AssignEntity*, std::list<AssignEntity*>*> not_affected_by_map_;
   bool HasValidUnmodifiedPath(AssignEntity* first_stmt, AssignEntity* second_stmt);
   std::set<AssignEntity*, AssignEntityComparator> GetPotentialAffectedBy(AssignEntity* target);
 };

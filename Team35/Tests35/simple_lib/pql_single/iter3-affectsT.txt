@@ -1,0 +1,72 @@
+procedure Main {
+	alpha = 1;
+	beta = 2;
+	charlie = 3;
+	delta = 4;
+	null = null + 1;
+	if (zebra > lion) then {
+		call loopies;
+	} else {
+		null = alpha;
+		call PrinterWithoutInk;
+		while (lion > tiger) {
+			charlie = charlie % delta;
+			call LoopWrapper;
+			delta = charlie % alpha;
+		}
+		read delta;
+	}
+
+	charlie = delta;
+	delta = beta + erik;
+	call ResetBetaCharlie;
+
+	while (submodule == submodule) {
+		beta = null + beta;
+		charlie = erik;
+		null = null + delta;
+
+		while (!(submodule == submodule)) {
+			null = null;
+			call ResetAllExceptNull;
+		}
+		delta = null;
+	}
+	global = alpha + beta + charlie + delta + erik + null;
+}
+
+procedure LoopWrapper {
+	call loopies;
+}
+
+procedure loopies {
+	while (true == 1) {
+		alpha = beta + charlie + delta;
+		beta = charlie + delta + alpha;
+		charlie = delta + alpha + beta;
+		delta = delta + 1;
+	}
+}
+
+procedure ResetAllExceptNull {
+	if (reset == true) then {
+		alpha = 1;
+		beta = 2;
+		charlie = 3;
+		delta = 4;
+	} else {
+		call PrinterWithoutInk;
+	}
+}
+
+procedure PrinterWithoutInk {
+	print alpha;
+	print beta;
+	print charlie;
+	print delta;
+}
+
+procedure ResetBetaCharlie {
+	read beta;
+	read charlie; 
+}
