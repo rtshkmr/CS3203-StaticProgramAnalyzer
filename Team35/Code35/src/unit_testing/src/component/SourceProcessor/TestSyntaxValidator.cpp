@@ -3,7 +3,7 @@
 #include <component/SourceProcessor/Tokenizer.h>
 #include <component/SourceProcessor/SyntaxValidator.h>
 #include <regex>
-#include <datatype/RegexPatterns.h>
+#include <util/RegexPatterns.h>
 #include <util/TimeUtil.h>
 
 using std::string;

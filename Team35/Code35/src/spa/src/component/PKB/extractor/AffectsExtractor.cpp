@@ -306,7 +306,7 @@ bool AffectsExtractor::HasAffects(AssignEntity* first_stmt, AssignEntity* second
   // get the modified variable v from the lhs of first statement
   Variable* modified_var = first_stmt->GetVariableObj();
   std::vector<Variable*> vars_used_by_second_stmt =
-      second_stmt->GetControlVariables(); // todo: this is named wrongly, should be GetExpr Var for this
+      second_stmt->GetExprVariables();
   // check Uses(second_stmt, v)
   bool var_is_used = false;
   for (auto* var: vars_used_by_second_stmt) {
@@ -347,7 +347,7 @@ bool AffectsExtractor::HasValidUnmodifiedPath(AssignEntity* first_stmt, AssignEn
 }
 
 std::set<AssignEntity*, AffectsExtractor::AssignEntityComparator> AffectsExtractor::GetPotentialAffectedBy(AssignEntity* target) {
-  std::vector<Variable*> rhs_varlist = target->GetControlVariables();
+  std::vector<Variable*> rhs_varlist = target->GetExprVariables();
   std::set<AssignEntity*, AffectsExtractor::AssignEntityComparator> affected_set = {};
 
   // Have a PQ per var.

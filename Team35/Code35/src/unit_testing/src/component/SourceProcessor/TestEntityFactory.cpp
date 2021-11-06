@@ -40,14 +40,14 @@ TEST_CASE("1.EntityFactory.CreateEntity") {
     //  ReadEntity expected_read_entity = ReadEntity(new Variable(new VariableName("x")));
     Entity* actual_read_entity = entity_factory.CreateEntity(read_tokens);
     auto* actual_casted_read = dynamic_cast<ReadEntity*>(actual_read_entity);
-    auto* actual_read_var = actual_casted_read->GetVariable();
+    auto* actual_read_var = actual_casted_read->GetVariableObj();
     auto* actual_read_variable_name = const_cast<VariableName*>(actual_read_var->GetVariableName());
 
     CHECK(actual_read_variable_name->GetName() == "x");
 
     Entity* duplicate_read = entity_factory.CreateEntity(read_tokens);
     auto* dup_casted_read = dynamic_cast<ReadEntity*>(duplicate_read);
-    auto* dup_read_var = dup_casted_read->GetVariable();
+    auto* dup_read_var = dup_casted_read->GetVariableObj();
     CHECK(actual_read_var == dup_read_var);
   }
 
@@ -60,14 +60,14 @@ TEST_CASE("1.EntityFactory.CreateEntity") {
     //  PrintEntity expected_print_entity = PrintEntity(new Variable(new VariableName("x")));
     Entity* actual_print_entity = entity_factory.CreateEntity(print_tokens);
     auto* actual_casted_print = dynamic_cast<PrintEntity*>(actual_print_entity);
-    auto* actual_print_var = actual_casted_print->GetVariable();
+    auto* actual_print_var = actual_casted_print->GetVariableObj();
     auto* actual_print_variable_name = const_cast<VariableName*>(actual_print_var->GetVariableName());
 
     CHECK(actual_print_variable_name->GetName() == "x");
 
     Entity* duplicate_print = entity_factory.CreateEntity(print_tokens);
     auto* dup_casted_print = dynamic_cast<PrintEntity*>(duplicate_print);
-    auto* dup_print_var = dup_casted_print->GetVariable();
+    auto* dup_print_var = dup_casted_print->GetVariableObj();
     CHECK(actual_print_var == dup_print_var);
   }
 
@@ -83,14 +83,14 @@ TEST_CASE("1.EntityFactory.CreateEntity") {
     //          new ProcedureName("anotherProc")));
     Entity* actual_call_entity = entity_factory.CreateEntity(call_tokens);
     auto* actual_casted_call = dynamic_cast<CallEntity*>(actual_call_entity);
-    auto* actual_call_proc = actual_casted_call->GetProcedure();
+    auto* actual_call_proc = actual_casted_call->GetCalledProcedure();
     auto* actual_call_proc_name = const_cast<ProcedureName*>(actual_call_proc->GetName());
 
     CHECK(actual_call_proc_name->GetName() == "anotherProc");
 
     Entity* duplicate_call = entity_factory.CreateEntity(call_tokens);
     auto* dup_casted_call = dynamic_cast<CallEntity*>(duplicate_call);
-    auto* dup_call_proc = dup_casted_call->GetProcedure();
+    auto* dup_call_proc = dup_casted_call->GetCalledProcedure();
     CHECK(actual_call_proc == dup_call_proc);
   }
 

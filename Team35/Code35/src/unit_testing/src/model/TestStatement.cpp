@@ -188,8 +188,8 @@ TEST_CASE("1.Model.Statement.AssignEntity") {
 
     REQUIRE(assign_entity->GetAssignmentExpr()->CheckExact(expression));
 
-    REQUIRE(assign_entity->GetControlVariables() == expr_var);
-    REQUIRE(assign_entity->GetExpressionConstants() == expr_constants);
+    REQUIRE(assign_entity->GetExprVariables() == expr_var);
+    REQUIRE(assign_entity->GetExprConstants() == expr_constants);
   }
 
   SECTION ("Casting to Statement and back") {
@@ -224,7 +224,7 @@ TEST_CASE("1.Model.Statement.CallEntity") {
   CallEntity* call_entity = new CallEntity(proc_x);
 
   SECTION ("Check Elements") {
-    REQUIRE(call_entity->GetProcedure() == proc_x);
+    REQUIRE(call_entity->GetCalledProcedure() == proc_x);
   }
 
   SECTION ("Casting to Statement and back") {
@@ -259,7 +259,7 @@ TEST_CASE("1.Model.Statement.PrintEntity") {
   PrintEntity* print_entity = new PrintEntity(var_x);
 
   SECTION ("Check Elements") {
-    REQUIRE(print_entity->GetVariable() == var_x);
+    REQUIRE(print_entity->GetVariableObj() == var_x);
   }
 
   SECTION ("Casting to Statement and back") {
@@ -294,7 +294,7 @@ TEST_CASE("1.Model.Statement.ReadEntity") {
   ReadEntity* read_entity = new ReadEntity(var_x);
 
   SECTION ("Check Elements") {
-    REQUIRE(read_entity->GetVariable() == var_x);
+    REQUIRE(read_entity->GetVariableObj() == var_x);
   }
 
   SECTION ("Casting to Statement and back") {

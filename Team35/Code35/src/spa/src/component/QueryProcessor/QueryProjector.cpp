@@ -98,10 +98,10 @@ std::vector<std::vector<std::string>> QueryProjector::StringifyTable(std::vector
           std::string var_string;
           Variable* temp;
           if (syn_attrs[i].first->GetType() == DesignEntity::kPrint) {
-            temp = dynamic_cast<PrintEntity*>(entity)->GetVariable();
+            temp = dynamic_cast<PrintEntity*>(entity)->GetVariableObj();
           }
           else if (syn_attrs[i].first->GetType() == DesignEntity::kRead) {
-            temp = dynamic_cast<ReadEntity*>(entity)->GetVariable();
+            temp = dynamic_cast<ReadEntity*>(entity)->GetVariableObj();
           }
           else {
             temp = dynamic_cast<Variable*>(entity);
@@ -115,7 +115,7 @@ std::vector<std::vector<std::string>> QueryProjector::StringifyTable(std::vector
           std::string proc_string;
           Procedure* temp;
           if (syn_attrs[i].first->GetType() == DesignEntity::kCall) {
-            temp = dynamic_cast<CallEntity*>(entity)->GetProcedure();
+            temp = dynamic_cast<CallEntity*>(entity)->GetCalledProcedure();
           } else {
             temp = dynamic_cast<Procedure*>(entity);
           }

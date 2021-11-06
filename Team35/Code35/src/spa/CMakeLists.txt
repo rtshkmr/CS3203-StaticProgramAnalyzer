@@ -12,7 +12,7 @@ add_library(spa ${srcs} ${headers}
         src/component/SourceProcessor/EntityFactory.cpp src/component/SourceProcessor/EntityFactory.h
         src/datatype/Deliverable.cpp
         src/datatype/Deliverable.h
-        src/datatype/RegexPatterns.h src/datatype/RegexPatterns.cpp
+        src/util/RegexPatterns.h src/util/RegexPatterns.cpp
         src/component/SourceProcessor/SourceProcessor.cpp
         src/component/SourceProcessor/SourceProcessor.h
         src/component/SourceProcessor/Parser.cpp

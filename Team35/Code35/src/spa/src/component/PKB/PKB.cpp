@@ -317,13 +317,13 @@ std::string PKB::GetAttributeFromEntity(Entity* entity, Attribute attribute) {
     return GetNameFromEntity(entity);
   } else if (entity_enum == EntityEnum::kCallEntity) {
     CallEntity* call_entity = dynamic_cast<CallEntity*>(entity);
-    return GetNameFromEntity(call_entity->GetProcedure());
+    return GetNameFromEntity(call_entity->GetCalledProcedure());
   } else if (entity_enum == EntityEnum::kPrintEntity) {
     PrintEntity* print_entity = dynamic_cast<PrintEntity*>(entity);
-    return GetNameFromEntity(print_entity->GetVariable());
+    return GetNameFromEntity(print_entity->GetVariableObj());
   } else if (entity_enum == EntityEnum::kReadEntity) {
     ReadEntity* read_entity = dynamic_cast<ReadEntity*>(entity);
-    return GetNameFromEntity(read_entity->GetVariable());
+    return GetNameFromEntity(read_entity->GetVariableObj());
   } else {
     return GetNameFromEntity(entity);
   }
