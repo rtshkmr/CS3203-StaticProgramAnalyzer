@@ -571,14 +571,6 @@ void PSubsystem::CheckForIfElseValidity() {
 }
 
 void PSubsystem::CheckForExistingProcedure() {
-  // Check if Program.procList === Deliverables.procList
-  // assumption: EntityFactory will create into Deliverables.procList whenever encountered
-  //             Program.procList will be created when "procedure x {" is encountered.
-  //   So, if both are same, it would be correct.
-  //   Note that Program.procList is strictly <= Deliverables.procList because EntityFactory will create procedure too.
-
-  // Note that using dup to ensure that my Program.procList still has the original procedure structure.
-  // Note that from this method onwards, deliverables.procList will be in sorted order.
   std::list<Procedure*> program_proclist_dup(* deliverable_->GetProgram()->GetProcedureList());
   std::list<Procedure*>* del_proclist = deliverable_->GetProcList();
 
