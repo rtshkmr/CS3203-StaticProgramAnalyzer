@@ -54,7 +54,7 @@ IntermediateTable* PKBQueryReceiver::QueryPKBTwoSynonyms(PKBRelRefs rel, Synonym
   std::vector<Entity*> first_list = table->GetColumn(first_synonym);
   std::vector<Entity*> second_list =table->GetColumn(second_synonym);
   ScopeIndication scoping = GetDoubleSynonymScoping(first_list, second_list);
-  std::set<std::pair<Entity*, Entity*>, EntityPairComparator> temp_set;
+  std::set<std::pair<Entity*, Entity*>> temp_set;
   std::vector<Entity*> filtered_first_list;
   std::vector<Entity*> filtered_second_list;
   switch (scoping) {
