@@ -7,6 +7,7 @@
 #include <array>
 #include <unordered_set>
 #include <datatype/DataType.h>
+#include <model/Statement.h>
 #include <typeinfo>
 
 enum class DesignEntity : unsigned int {
@@ -454,5 +455,29 @@ struct WithComparator {
         c1.left_is_prog_line == c2.left_is_prog_line && c1.right_is_prog_line == c2.right_is_prog_line;
   }
 };
+
+typedef std::tuple<DesignEntity, DesignEntity> type_combo;
+
+struct type_combo_hash {
+  std::size_t operator()(const type_combo& combo) const {
+    return static_cast<std::size_t>(std::get<0>(combo))
+    * static_cast<std::size_t>(DesignEntity::kInvalid)
+    + static_cast<std::size_t>(std::get<1>(combo));
+  }
+};
+
+typedef std::tuple<DesignEntity, Attribute> type_attribute_pair;
+
+struct attribute_hash {
+  std::size_t operator()(const std::tuple<DesignEntity, Attribute>& combo) const {
+    return static_cast<std::size_t>(std::get<0>(combo))
+    * static_cast<std::size_t>(DesignEntity::kInvalid)
+    + static_cast<std::size_t>(std::get<1>(combo));
+  }
+};
+
+typedef std::tuple<Entity*, Entity*> entity_pair;
+
+typedef std::tuple<PKBRelRefs, std::string, std::string> relationship;
 
 #endif //AUTOTESTER_TYPES_H

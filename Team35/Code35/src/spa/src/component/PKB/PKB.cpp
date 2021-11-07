@@ -88,34 +88,36 @@ void PKB::PopulateEntities(DesignEntity design_entity, T& entity_list) {
     auto pattern_entities = GetPatternEntitySet();
     if (pattern_entities.find(design_entity) != pattern_entities.end()) {
       pattern_maps_[design_entity][entity_name].push_back(entity);
-
-      std::vector<Variable*> pattern_variables;
-
       auto* casted_entity = reinterpret_cast<Entity*>(entity);
-      EntityEnum entity_enum = casted_entity->GetEntityEnum();
-
-      switch (entity_enum) {
-        case EntityEnum::kWhileEntity: {
-          auto* while_entity = reinterpret_cast<WhileEntity*>(entity);
-          pattern_variables = while_entity->GetControlVariables();
-        } break;
-        case EntityEnum::kIfEntity: {
-          auto* if_entity = reinterpret_cast<IfEntity*>(entity);
-          pattern_variables = if_entity->GetControlVariables();
-        } break;
-        case EntityEnum::kAssignEntity: {
-          auto* assign_entity = reinterpret_cast<AssignEntity*>(entity);
-          pattern_variables.push_back(assign_entity->GetVariableObj());
-        } break;
-        default: {
-          throw PKBException("Invalid EntityEnum in pattern entity.");
-        } break;
-      }
-
-      for (Variable* variable : pattern_variables) {
-        pattern_maps_[design_entity][GetNameFromEntity(variable)].push_back(entity);
-      }
+      PopulatePatternVariables(casted_entity);
     }
+  }
+}
+
+void PKB::PopulatePatternVariables(Entity* entity) {
+  std::vector<Variable*> pattern_variables;
+  DesignEntity design_entity = GetDesignEntityFromEntity(entity);
+  EntityEnum entity_enum = entity->GetEntityEnum();
+  switch (entity_enum) {
+    case EntityEnum::kWhileEntity: {
+      auto* while_entity = reinterpret_cast<WhileEntity*>(entity);
+      pattern_variables = while_entity->GetControlVariables();
+    } break;
+    case EntityEnum::kIfEntity: {
+      auto* if_entity = reinterpret_cast<IfEntity*>(entity);
+      pattern_variables = if_entity->GetControlVariables();
+    } break;
+    case EntityEnum::kAssignEntity: {
+      auto* assign_entity = reinterpret_cast<AssignEntity*>(entity);
+      pattern_variables.push_back(assign_entity->GetVariableObj());
+    } break;
+    default: {
+      throw PKBException("Invalid EntityEnum in pattern entity.");
+    }
+  }
+
+  for (Variable* variable : pattern_variables) {
+    pattern_maps_[design_entity][GetNameFromEntity(variable)].push_back(entity);
   }
 }
 
@@ -206,25 +208,42 @@ bool PKB::HasRelationship(PKBRelRefs ref, const std::string& e1, const std::stri
 void PKB::ProcessEntitiesWithMatchingAttributes() {
   for (auto kv : attribute_string_to_entity_map_) {
     std::vector<Entity*> entities(kv.second.begin(), kv.second.end());
-    for (int i = 0; i < entities.size(); i++) {
-      Entity* entity_one = entities[i];
-      DesignEntity design_entity_one = GetDesignEntityFromEntity(entity_one);
-      auto first_entity_types = GetApplicableTypes(design_entity_one);
-      Attribute attribute_one = entity_to_attribute_type_map_[entity_one][kv.first];
-      for (int j = i; j < entities.size(); j++) {
-        Entity* entity_two = entities[j];
-        DesignEntity design_entity_two = GetDesignEntityFromEntity(entity_two);
-        auto second_entity_types = GetApplicableTypes(design_entity_two);
-        Attribute attribute_two = entity_to_attribute_type_map_[entity_two][kv.first];
-        for (auto first_type : first_entity_types) {
-          for (auto second_type : second_entity_types) {
-            entities_with_matching_attributes_map_[{first_type, attribute_one}][{second_type, attribute_two}]
-              .push_back({entity_one, entity_two});
-            entities_with_matching_attributes_map_[{second_type, attribute_two}][{first_type, attribute_one}]
-              .push_back({entity_two, entity_one});
-          }
-        }
-      }
+    std::string attribute_string = kv.first;
+    PopulateMatchingEntities(entities, attribute_string);
+  }
+}
+void PKB::PopulateMatchingEntities(std::vector<Entity*>& entities, std::string& attribute_string) {
+  for (int i = 0; i < entities.size(); i++) {
+    Entity* entity_one = entities[i];
+    DesignEntity design_entity_one = GetDesignEntityFromEntity(entity_one);
+    auto first_entity_types = GetApplicableTypes(design_entity_one);
+    Attribute attribute_one = entity_to_attribute_type_map_[entity_one][attribute_string];
+    for (int j = i; j < entities.size(); j++) {
+      Entity* entity_two = entities[j];
+      DesignEntity design_entity_two = GetDesignEntityFromEntity(entity_two);
+      auto second_entity_types = GetApplicableTypes(design_entity_two);
+      Attribute attribute_two = entity_to_attribute_type_map_[entity_two][attribute_string];
+      PopulateMatchingEntities(entity_one,
+                               entity_two,
+                               attribute_one,
+                               attribute_two,
+                               first_entity_types,
+                               second_entity_types);
+    }
+  }
+}
+void PKB::PopulateMatchingEntities(Entity* entity_one,
+                                   Entity* entity_two,
+                                   Attribute& attribute_one,
+                                   Attribute& attribute_two,
+                                   std::vector<DesignEntity>& first_entity_types,
+                                   std::vector<DesignEntity>& second_entity_types) {
+  for (auto first_type : first_entity_types) {
+    for (auto second_type : second_entity_types) {
+      entities_with_matching_attributes_map_[{first_type, attribute_one}][{second_type, attribute_two}]
+      .push_back({entity_one, entity_two});
+      entities_with_matching_attributes_map_[{second_type, attribute_two}][{first_type, attribute_one}]
+      .push_back({entity_two, entity_one});
     }
   }
 }
@@ -339,19 +358,6 @@ std::vector<DesignEntity> PKB::GetApplicableTypes(DesignEntity de) {
     types.push_back(DesignEntity::kProgLine);
   }
   return types;
-}
-
-std::unordered_map<Entity*,
-                   std::list<Entity*>*>* PKB::ConvertStringToEntityMapping(const std::unordered_map<std::string,
-                                                                                                    std::vector<Entity*>> &pkb_map) {
-  auto* entity_map = new std::unordered_map<Entity*, std::list<Entity*>*>{};
-  for (auto[key, value] : pkb_map) {
-    Entity* first_arg = type_to_entity_map_[DesignEntity::kStmt][Utility::ConvertStringToInt(key) - 1];
-    auto* second_arg = new std::list<Entity*>{};
-    second_arg->insert(second_arg->end(), value.begin(), value.end());
-    entity_map->insert({first_arg, second_arg});
-  }
-  return entity_map;
 }
 
 Program* PKB::GetProgram() {

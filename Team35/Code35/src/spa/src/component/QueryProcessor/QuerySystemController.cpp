@@ -15,7 +15,7 @@ std::vector<std::string> QuerySystemController::Evaluate(std::string* query, PKB
   auto query_extractor = QueryExtractor(query);
   try {
     query_extractor.ExtractQuery();
-  } catch (const PQLValidationException) {
+  } catch (const SemanticException) {
     bool was_query_boolean = query_extractor.WasQueryBoolean();
     std::vector<std::string> result;
     if (was_query_boolean) result.emplace_back("FALSE");

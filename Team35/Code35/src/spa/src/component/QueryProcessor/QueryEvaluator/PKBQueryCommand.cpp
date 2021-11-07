@@ -75,6 +75,8 @@ IntermediateTable* PKBQueryReceiver::QueryPKBTwoSynonyms(PKBRelRefs rel, Synonym
       std::set<Entity*> second_entity_set(second_list.begin(), second_list.end());
       std::copy(second_entity_set.begin(), second_entity_set.end(), std::back_inserter(filtered_second_list));
     } break;
+    default:
+      break;
   }
 
 
