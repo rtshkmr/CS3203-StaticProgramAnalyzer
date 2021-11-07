@@ -3,6 +3,8 @@
  */
 
 #include <model/Entity.h>
+
+#include <utility>
 #include "ConditionalExpression.h"
 
 /**
@@ -12,8 +14,8 @@
  * @param expr The actual expression found in source file.
  * @param var_list The variables within the actual expression.
  */
-ConditionalExpression::ConditionalExpression(std::string expr, std::vector<Variable*> var_list) {
-  var_list_ = Variable::SortVariableVector(var_list);
+ConditionalExpression::ConditionalExpression(const std::string& expr, std::vector<Variable*> var_list) {
+  var_list_ = Variable::SortVariableVector(std::move(var_list));
 }
 
 /**

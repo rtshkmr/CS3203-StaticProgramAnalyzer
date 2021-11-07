@@ -13,7 +13,7 @@ class ConditionalExpression {
   std::vector<Variable*> var_list_;
 
  public:
-  ConditionalExpression(std::string expr, std::vector<Variable*> var_list);
+  ConditionalExpression(const std::string& expr, std::vector<Variable*> var_list);
 
   std::vector<Variable*> GetVariableList();
 
