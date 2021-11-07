@@ -1,0 +1,4 @@
+procedure printDouble {
+   read x y;
+   print y x;
+}

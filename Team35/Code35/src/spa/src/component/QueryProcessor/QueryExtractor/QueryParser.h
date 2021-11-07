@@ -5,6 +5,7 @@
 #include <vector>
 #include <list>
 #include <unordered_set>
+#include <unordered_map>
 #include "QueryTokenizer.h"
 #include <component/QueryProcessor/types/Types.h>
 
@@ -16,9 +17,10 @@ class QueryParser {
  private:
   std::unordered_set<std::string> synonyms_name_set;
   std::vector<Clause*>& clauses;
-  std::list<Group*>& groups;
-  std::list<Synonym>& synonyms;
-  Synonym& target;
+  std::list<Synonym*>& synonyms;
+  bool& was_query_boolean;
+  std::vector<std::pair<Synonym*, Attribute>>& target_syn_attrs_list;
+  std::unordered_map<std::string, Synonym*>& target_synonyms_map;
 
   Token lookahead = Token("", TokenTag::kInvalid);
   QueryTokenizer tokenizer;
@@ -27,28 +29,37 @@ class QueryParser {
   void ParseQuery();
   void ParseSelect();
   void ParseSuchThat();
+  void ParsePatternCond();
+  void ParseAssignPattern();
+  void ParseWhilePattern();
+  void ParseIfPattern();
   void ParsePattern();
+  void ParseAttrCompare();
+  void ParseWith();
   void ParseDeclarations();
+  void ParseTuple();
   void ParseTarget();
   void ParseDeclaration();
-
+  std::pair<Synonym*, Attribute> ParseElem(bool is_first_pass);
+  std::tuple<std::string, std::string, Synonym*, Attribute> ParseRef();
+  Attribute ParseAttrName(Synonym* s);
   std::tuple<std::string, bool, bool> ParseStmtRef();
-  Token ParseEntRef(bool isPatternCl);
+  std::pair<Token, bool> ParseEntRef(bool isPatternCl);
   std::tuple<std::string, bool, bool, bool> ParseStmtOrEntRef();
   std::pair<Clause*, bool> ParseRelRef();
   std::pair<std::string, bool> ParseExpressionSpec();
-  std::string ParseFactor();
   std::vector<Token> ParseSynonyms();
 
   bool IsValidSynonym(Token token);
   bool IsValidSynonym(Token token, DesignEntity de);
  public:
-  QueryParser(std::vector<Clause*>& clauses, std::list<Group*>& groups, std::list<Synonym>& synonyms,
-              Synonym& target, QueryTokenizer tokenizer) :
-      clauses(clauses), groups(groups), synonyms(synonyms), target(target), tokenizer(tokenizer) {};
+  QueryParser(std::vector<Clause*>& clauses, std::list<Synonym*>& synonyms, bool& was_query_boolean,
+              std::vector<std::pair<Synonym*, Attribute>>& target_syn_attrs_list,
+              std::unordered_map<std::string, Synonym*>& target_synonyms_map, QueryTokenizer tokenizer) :
+      clauses(clauses), synonyms(synonyms), was_query_boolean(was_query_boolean),
+      target_syn_attrs_list(target_syn_attrs_list), target_synonyms_map(target_synonyms_map), tokenizer(tokenizer) {};
   void Parse();
-  std::list<Group*> GetGroupsList() { return groups; };
-  static Synonym GetSynonymInfo(std::string syn_name, std::list<Synonym>* synonyms);
+  static Synonym* GetSynonymInfo(std::string syn_name, std::list<Synonym*>* synonyms);
 };
 
 #endif //AUTOTESTER_QUERYPARSER_H

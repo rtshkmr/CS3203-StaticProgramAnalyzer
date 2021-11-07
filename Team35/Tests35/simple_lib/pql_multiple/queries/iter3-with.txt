@@ -1,0 +1,60 @@
+1 - Only such that and with clause, no result
+stmt s1; assign a1; variable v1; procedure pr1; prog_line pl;
+Select s1 such that Follows*(s1, a1) with s1.stmt# = a1.stmt#
+none
+5000
+2 - Only with clause
+stmt s1; assign a1; variable v1; procedure pr1; prog_line pl;
+Select s1 with s1.stmt# = a1.stmt# with s1.stmt# = a1.stmt#
+4, 5, 7, 12, 13, 17, 18, 24, 25, 26, 31, 32, 33, 34, 35
+5000
+3 - Only such that and with clause
+stmt s1; assign a1; variable v1; procedure pr1; prog_line pl;
+Select s1 with s1.stmt# = a1.stmt# such that Next*(s1, a1)
+7, 12, 13, 17, 18
+5000
+4 - Only with clause, diff attr
+stmt s1; assign a1; variable v1; procedure pr1; prog_line pl; print p1; read r1;
+Select s1 with p1.varName = r1.varName with p1.stmt# = r1.stmt#
+none
+5000
+5 - Mix - both syn encountered
+stmt s1; assign a1; variable v1; procedure pr1; prog_line pl; print p1; read r1;
+Select p1 such that Modifies(r1, "x") with p1.varName = r1.varName
+16, 21, 28
+5000
+6 - Mix - lhs encountered
+stmt s1; assign a1; variable v1; procedure pr1; prog_line pl; print p1; read r1;
+Select r1 such that Modifies(r1, _) with p1.varName = r1.varName
+1, 11
+5000
+7 - Mix - all 3 clause, rhs encountered
+stmt s1; assign a1; variable v1; procedure pr1; prog_line pl; print p1; read r1; while w1;
+Select v1 pattern w1("d", _) with w1.stmt# = pl such that Uses(pl, v1)
+d, j, x, Third, i, v, y, z
+5000
+8 - Mix - all 3 clause, lhs encountered
+stmt s1; assign a1; variable v1; procedure pr1; prog_line pl; print p1; read r1; while w1;
+Select v1 pattern w1("d", _) with pl = w1.stmt# such that Uses(pl, v1)
+d, j, x, Third, i, v, y, z
+5000
+9 - Mix - all 3 clause, looped
+stmt s1; assign a1; variable v1; procedure pr1; prog_line pl; print p1; read r1;
+Select v1 pattern a1(v1, _"6 + x"_) with pl = a1.stmt# such that Uses(pl, v1)
+x
+5000
+10 - Mix - all 3 clause, looped
+stmt s1; assign a1; variable v1; procedure pr1; prog_line pl; print p1; read r1;
+Select v1 with pl = a1.stmt# such that Uses(pl, v1) pattern a1(v1, _"6 + x"_)
+x
+5000
+11 - Mix - all 3 clause, looped
+stmt s1; assign a1; variable v1; procedure pr1; prog_line pl; print p1; read r1;
+Select v1 with v1.varName = p1.varName such that Uses(a1, v1) pattern a1(_, _"x % 1"_)
+x
+5000
+12 - INVALID, no while stmt
+stmt s1; assign a1; variable v1; procedure pr1; prog_line pl; print p1; read r1;
+Select v1 pattern w1("d", _) with w1.stmt# = pl such that Uses(pl, v1)
+none
+5000

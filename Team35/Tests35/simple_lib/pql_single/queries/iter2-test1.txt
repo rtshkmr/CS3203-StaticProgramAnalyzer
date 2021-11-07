@@ -1,0 +1,130 @@
+1 - Double synonym (valid)
+stmt s1; variable v1;
+Select s1 such that Uses(s1, v1)
+3, 6, 7, 9, 8, 10, 11, 13, 14, 15, 17, 18
+5000
+2 - Double synonym (valid)
+stmt s1; variable v1;
+Select s1 such that Modifies(s1, v1)
+1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
+5000
+3 - One synonym, one wildcard (valid)
+assign a1;
+Select a1 such that Uses(a1, _)
+7, 9, 11, 13, 14, 15, 17
+5000
+4 - One synonym, one wildcard (valid)
+assign a1;
+Select a1 such that Modifies(a1, _)
+4, 5, 7, 9, 11, 12, 13, 14, 15, 16, 17
+5000
+5 - One synonym, one exact match (valid)
+print p1;
+Select p1 such that Uses(p1, "x")
+none
+5000
+6 - One synonym, one exact match (valid)
+print p1;
+Select p1 such that Modifies(p1, "x")
+none
+5000
+7 - Double synonym (valid)
+read r1; variable v1;
+Select r1 such that Uses(r1, v1)
+none
+5000
+8 - Double synonym (valid)
+read r1; variable v1;
+Select r1 such that Modifies(r1, v1)
+1, 2
+5000
+9 - Double synonym (valid)
+while w1; variable v1;
+Select w1 such that Uses(w1, v1)
+6
+5000
+10 - Double synonym (valid)
+while w1; variable v1;
+Select w1 such that Modifies(w1, v1)
+6
+5000
+11 - Double synonym (valid)
+if if1; variable v1;
+Select if1 such that Uses(if1, v1)
+10
+5000
+12 - Double synonym (valid)
+if if1; variable v1;
+Select if1 such that Modifies(if1, v1)
+10
+5000
+13 - Zero (valid)
+variable v1;
+Select v1 such that Uses(0, v1)
+none
+5000
+14 - Zero (valid)
+variable v1;
+Select v1 such that Modifies(0, v1)
+none
+5000
+15 - Invalid second argument (invalid)
+stmt s1; procedure pr1;
+Select s1 such that Uses(s1, pr1)
+none
+5000
+16 - Invalid second argument (invalid)
+stmt s1; procedure pr1;
+Select s1 such that Modifies(s1, pr1)
+none
+5000
+17 - Invalid second argument (integer string) (invalid)
+stmt s1;
+Select s1 such that Uses(s1, "9")
+none
+5000
+18 - Invalid second argument (integer string) (invalid)
+stmt s1;
+Select s1 such that Modifies(s1, "9")
+none
+5000
+19 - Invalid second argument (empty string) (invalid)
+stmt s1;
+Select s1 such that Uses(s1, "")
+none
+5000
+20 - Invalid second argument (empty string) (invalid)
+stmt s1;
+Select s1 such that Modifies(s1, "")
+none
+5000
+21 - Invalid second argument (unknown variable) (invalid)
+stmt s1;
+Select s1 such that Uses(s1, "invalid")
+none
+5000
+22 - Invalid second argument (unknown variable) (invalid)
+stmt s1;
+Select s1 such that Modifies(s1, "invalid")
+none
+5000
+23 - Negative number (invalid)
+variable v1;
+Select v1 such that Uses(-1, v1)
+none
+5000
+24 - Negative number (invalid)
+variable v1;
+Select v1 such that Modifies(-1, v1)
+none
+5000
+25 - Ambiguous query due to wildcard (invalid)
+variable v1;
+Select v1 such that Modifies(_, v1)
+none
+5000
+26 - Ambiguous query due to wildcard (invalid)
+variable v1;
+Select v1 such that Uses(_, v1)
+none
+5000

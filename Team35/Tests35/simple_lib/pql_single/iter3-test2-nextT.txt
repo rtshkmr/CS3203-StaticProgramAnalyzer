@@ -1,0 +1,64 @@
+procedure First {
+    read x;
+    read z;
+    call Second;
+}
+
+procedure Second {
+    x = 0;
+    i = 5;
+    while ((! (d<=j)) || ((6<d) && ((x>Third) && (2<=0)))) {
+        x = x + 2 * y;
+        call Third;
+        while ((i!=i) || (! (2>d))) {
+            if (x >= y) then {
+                read x;
+                v = 5;
+            } else {
+                y = x * z + 10 * x;
+                print Third;
+                read First;
+            }
+            print x;
+            z = x % 1;
+        }
+        i = i - 1;
+    }
+    if (x == 1) then {
+        while (x < 0) {
+            print x;
+        }
+        if (!(z == 2)) then {
+            print y;
+        } else {
+            i = (a / (26));
+        }
+        x = x+1;
+    } else {
+        z = 1;
+        while (x < 0) {
+            print x;
+        }
+        if (!(z == 2)) then {
+            print y;
+        } else {
+            i = (a / (26));
+        }
+    }
+    z = z + x + i;
+    y = z + 2;
+}
+procedure Third {
+    z = 5;
+    v = z;
+    print v;
+        if (you == me) then {
+                while (aa>=aa) {
+             while (bb>=bb) {
+            read y;
+        }
+        }
+        } else {
+            print v;
+        }
+}

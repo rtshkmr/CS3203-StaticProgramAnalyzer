@@ -23,14 +23,11 @@ void Parser::Parse(const std::string& file_name) {
   if (source_file.is_open()) {
     vector<char> chara;
     char byte;
-    // read char by char, delimiter = { ; }
 
     while (source_file.get(byte)) {
-      if (byte == '\n') {
-        continue;
-      }
-
-      if (byte == '\t' || byte == '\a' || byte == '\n' || byte == '\v' || byte == '\r' || byte == '\f') {
+      bool byte_is_a_terminal_char =
+          byte == '\t' || byte == '\a' || byte == '\n' || byte == '\v' || byte == '\r' || byte == '\f';
+      if (byte_is_a_terminal_char) {
         byte = ' ';
       }
 
@@ -42,7 +39,8 @@ void Parser::Parse(const std::string& file_name) {
 
       chara.push_back(byte);
 
-      if (byte == '{' || byte == ';' || byte == '}') {
+      bool byte_is_desired_delimiter = byte == '{' || byte == ';' || byte == '}';
+      if (byte_is_desired_delimiter) {
         std::string s(chara.begin(), chara.end());
         p_subsystem.ProcessStatement(s);
         chara.clear();

@@ -1,0 +1,200 @@
+1 - Affects validity checking
+assign a1, a2; 
+Select a1 such that Affects(a1, _)
+1,2,3,4,5,8,13,16,19,20,21,23,25,29,30,31,32
+5000
+2 - Affects validity checking
+assign a1, a2; 
+Select a1 such that Affects(_, a1)
+8,11,16,19,21,23,25,26,29,30,31,32
+5000
+3 - Affects validity checking
+assign a1, a2; 
+Select <a1,a2> such that Affects(a1, a2)
+1 8,1 26,2 16,3 11,4 11,5 19,5 21,5 26,8 19,8 21,8 26,13 11,16 21,16 26,19 19,19 26,20 26,21 19,21 21,21 23,21 25,21 26,23 19,23 21,23 23,23 25,23 26,25 21,25 26,29 30,29 31,30 29,30 31,31 29,31 30,32 29,32 30,32 31,32 32
+5000
+4 - Affects EP s1,s1
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select s1 such that Affects(s1, s1)
+19,21,23,32
+5000
+5 - Affects EP s1,a2
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select s1 such that Affects(s1, a2)
+1,2,3,4,5,8,13,16,19,20,21,23,25,29,30,31,32
+5000
+6 - Affects EP a1,s2
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select s2 such that Affects(a1, s2)
+8,11,16,19,21,23,25,26,29,30,31,32
+5000
+7 - Affects EP s1,_
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select s1 such that Affects(s1, _)
+1,2,3,4,5,8,13,16,19,20,21,23,25,29,30,31,32
+5000
+8 - Affects EP _,s2
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select s2 such that Affects(_, s2)
+8,11,16,19,21,23,25,26,29,30,31,32
+5000
+9 - Affects EP _,#
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select BOOLEAN such that Affects(_,23)
+TRUE
+5000
+10 - Affects EP #,_
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select BOOLEAN such that Affects(8,_)
+TRUE
+5000
+11 - Affects EP s1,#
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select s1 such that Affects(s1, 11)
+3,4,13
+5000
+12 - Affects EP #,a2
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select a2 such that Affects(32, a2)
+29,30,31,32
+5000
+13 - Affects EP #,pl1
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select pl1 such that Affects(1, pl1)
+8,26
+5000
+14 - Affects EP pl1,#
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select pl1 such that Affects(pl1, 16)
+2
+5000
+15 - Affects PL,PL self affects
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select pl1 such that Affects(pl1, pl1)
+19,21,23,32
+5000
+16 - Affects _,_ 
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select s1 such that Affects(_,_)
+1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44
+5000
+17 - Affects Invalid 
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select a1 such that Affects(a1,r1)
+none
+5000
+18 - Affects Invalid 
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select pl1 such that Affects(pl1,w1)
+none
+5000
+19 - Affects Invalid 
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select a1 such that Affects(a2,if1)
+none
+5000
+20 - Affects Invalid 
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select s1 such that Affects(s2,c1)
+none
+5000
+21 - Affects Invalid 
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select s1 such that Affects(s1,pr1)
+none
+5000
+22 - Affects Invalid 
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select s1 such that Affects(s1,-1)
+none
+5000
+23 - Affects Invalid 
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select s1 such that Affects(s1,0)
+none
+5000
+24 - Affects Invalid 
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select s1 such that Affects(s1,100)
+none
+5000
+25 - Affects Invalid 
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select s1 such that Affects(p1, s1)
+none
+5000
+26 - Affects Invalid 
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select a1 such that Affects(r1,a1)
+none
+5000
+27 - Affects Invalid 
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select pl1 such that Affects(w1, pl1)
+none
+5000
+28 - Affects Invalid 
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select a1 such that Affects(if1, a2)
+none
+5000
+29 - Affects Invalid 
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select s1 such that Affects(c1,s2)
+none
+5000
+30 - Affects Invalid 
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select s1 such that Affects(pr1,s1)
+none
+5000
+31 - Affects Invalid 
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select a1 such that Affects(-1,a1)
+none
+5000
+32 - Affects Invalid 
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select a2 such that Affects(0, a2)
+none
+5000
+33 - Affects Invalid 
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select pl1 such that Affects(100,pl1)
+none
+5000
+34 - Affects Invalid 
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select s1 such that Affects(s1,p1)
+none
+5000
+35 - Affects Invalid 
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select s1 such that Affects(_,-1)
+none
+5000
+36 - Affects Invalid 
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select s1 such that Affects(-1,30)
+none
+5000
+37 - Affects Invalid 
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select s1 such that Affects(30,0)
+none
+5000
+38 - Affects Invalid 
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select s1 such that Affects(a1,999)
+none
+5000
+39 - Affects Invalid - Cross Procedure
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select s1 such that Affects(40,43)
+none
+5000
+40 - Affects Invalid - Reverse
+stmt s1, s2; assign a1, a2; call c1, c2; print p1, p2; read r1, r2; procedure pr1, pr2; while w1, w2; if if1, if2; prog_line pl1, pl2; variable v1, v2; constant const1, const2; 
+Select s1 such that Affects(19,23)
+none
+5000

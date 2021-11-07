@@ -5,9 +5,10 @@
 #include <string>
 #include <stdexcept>
 #include "DataType.h"
-#include <datatype/RegexPatterns.h>
+#include <util/RegexPatterns.h>
 #include <cassert>
-#include <exception/SyntaxException.h>
+#include <exception/SpaException.h>
+#include "../util/Utility.h"
 
 /**
  * This method checks if the given string as in the correct name syntax.
@@ -75,7 +76,7 @@ LineNumber::LineNumber(int ln) {
  * Gets the line number.
  * @return [Not Null] The line number
  */
-int LineNumber::getNum() {
+int LineNumber::GetNum() {
   return num_;
 }
 
@@ -117,7 +118,7 @@ ProcedureName::ProcedureName(std::string pName) {
  * Gets the name of the procedure.
  * @return [Not Null] The procedure name
  */
-std::string ProcedureName::getName() {
+std::string ProcedureName::GetName() {
   return name_;
 }
 
@@ -160,7 +161,7 @@ VariableName::VariableName(std::string vName) {
  * Gets the name of the variable.
  * @return [Not Null] The variable name
  */
-std::string VariableName::getName() {
+std::string VariableName::GetName() const{
   return name_;
 }
 
@@ -192,22 +193,14 @@ bool VariableName::operator==(const VariableName& other) const {
  * @throws SyntaxException when a non-integer in passed in or when integers that had exceeded the range.
  */
 ConstantValue::ConstantValue(const std::string& constant) {
-  size_t num_chars = 0;
-  try {
-    value_ = stoi(constant, & num_chars);
-  } catch (std::exception ia) {
-    throw SyntaxException("Argument is not smaller that max int.");
-  }
-  if (num_chars != constant.size()) {
-    throw SyntaxException("Constant is not valid. Numbers mixed with letters.");
-  }
+  value_ = Utility::ConvertStringToInt(constant);
 }
 
 /**
  * Gets the constant value.
  * @return [Not Null] The constant value
  */
-int ConstantValue::Get() {
+int ConstantValue::GetValue() {
   return value_;
 }
 
@@ -513,32 +506,12 @@ int Token::GetLastMatchingTokenIdx(const std::vector<Token>& tokens,
   return delim_idx;
 }
 /**
- * For a given vector of tokens and a boundary of indices to inspect, returns the index of the last token that matches
- * the target token tag.
- * @param tokens
- * @param target_token_tag
- * @param left_boundary_idx (inclusive boundary)
- * @param right_boundary_idx (inclusive boundary)
- * @return
- */
-int Token::GetLastMatchingTokenIdx(const std::vector<Token>& tokens,
-                                   TokenTag target_token_tag,
-                                   int left_boundary_idx,
-                                   int right_boundary_idx) {
-  auto delim_iterator = GetTokenMatchReverseIterator(tokens,
-                                                     target_token_tag,
-                                                     left_boundary_idx,
-                                                     right_boundary_idx);
-  int delim_idx = std::distance(tokens.begin(), delim_iterator.base()) - 1;
-  return delim_idx;
-}
-/**
  * Returns first matching token based on the desired regex pattern within the entire vector of tokens
  * @param tokens
  * @param desired_pattern
  * @return
  */
-int Token::GetFirstMatchingTokenIdx(const std::vector<Token>& tokens, const std::regex& desired_pattern) {
+[[maybe_unused]] int Token::GetFirstMatchingTokenIdx(const std::vector<Token>& tokens, const std::regex& desired_pattern) {
   assert(!tokens.empty());
   auto delim_iterator = GetTokenMatchForwardIterator(tokens,
                                                      desired_pattern,
@@ -560,21 +533,6 @@ int Token::GetFirstMatchingTokenIdx(const std::vector<Token>& tokens, TokenTag t
                                                      0,
                                                      tokens.size() - 1);
   int delim_idx = std::distance(tokens.begin(), delim_iterator);
-  return delim_idx;
-}
-/**
- * For a given vector of tokens, returns the index of the last token that matches
- * the desired regex pattern in the entire vector.
- * @param tokens
- * @param desired_pattern
- * @return
- */
-int Token::GetLastMatchingTokenIdx(const std::vector<Token>& tokens, const std::regex& desired_pattern) {
-  auto delim_iterator = GetTokenMatchReverseIterator(tokens,
-                                                     desired_pattern,
-                                                     0,
-                                                     tokens.size() - 1);
-  int delim_idx = std::distance(tokens.begin(), delim_iterator.base()) - 1;
   return delim_idx;
 }
 

@@ -1,0 +1,4 @@
+procedure WhileNoCloseBrace {
+	while (1 == 1) {
+		NoCloseBrace = For - While; 
+}

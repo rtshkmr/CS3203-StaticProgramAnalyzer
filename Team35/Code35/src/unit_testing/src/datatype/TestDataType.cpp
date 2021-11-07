@@ -1,4 +1,4 @@
-#include <exception/SyntaxException.h>
+#include <exception/SpaException.h>
 #include "catch.hpp"
 #include "datatype/DataType.h"
 
@@ -56,8 +56,8 @@ TEST_CASE("1.DataType.LineNumber") {
     LineNumber ln = LineNumber(39);
     LineNumber ln2(10);
 
-    REQUIRE(ln.getNum() == 39);
-    REQUIRE(ln2.getNum() == 10);
+    REQUIRE(ln.GetNum() == 39);
+    REQUIRE(ln2.GetNum() == 10);
     REQUIRE_THROWS_AS(LineNumber(0), std::invalid_argument);
     REQUIRE_THROWS_AS(LineNumber(-28), std::invalid_argument);
   }
@@ -88,9 +88,9 @@ TEST_CASE("1.DataType.ProcedureName") {
     ProcedureName pn2 = ProcedureName("M");
     ProcedureName pn3 = ProcedureName("Unc13S00");
 
-    REQUIRE(pn.getName() == "helloW0r1d");
-    REQUIRE(pn2.getName() == "M");
-    REQUIRE(pn3.getName() == "Unc13S00");
+    REQUIRE(pn.GetName() == "helloW0r1d");
+    REQUIRE(pn2.GetName() == "M");
+    REQUIRE(pn3.GetName() == "Unc13S00");
     REQUIRE_THROWS_AS(ProcedureName(""), std::invalid_argument); //blank name
     REQUIRE_THROWS_AS(ProcedureName("          "), std::invalid_argument); //blank name with space
     REQUIRE_THROWS_AS(ProcedureName("!@#$"), std::invalid_argument); //name with symbols
@@ -127,9 +127,9 @@ TEST_CASE("1.DataType.VariableName") {
     VariableName vn2 = VariableName("M");
     VariableName vn3 = VariableName("Unc13S00");
 
-    REQUIRE(vn.getName() == "helloW0r1d");
-    REQUIRE(vn2.getName() == "M");
-    REQUIRE(vn3.getName() == "Unc13S00");
+    REQUIRE(vn.GetName() == "helloW0r1d");
+    REQUIRE(vn2.GetName() == "M");
+    REQUIRE(vn3.GetName() == "Unc13S00");
     REQUIRE_THROWS_AS(VariableName(""), std::invalid_argument); //blank name
     REQUIRE_THROWS_AS(VariableName("          "), std::invalid_argument); //blank name with space
     REQUIRE_THROWS_AS(VariableName("!@#$"), std::invalid_argument); //name with symbols
@@ -168,11 +168,11 @@ TEST_CASE("1.DataType.ConstantValue") {
     ConstantValue cv4 = ConstantValue("00000000000");
     ConstantValue cv5 = ConstantValue("-12345678");
 
-    REQUIRE(cv.Get() == 39);
-    REQUIRE(cv2.Get() == 10000);
-    REQUIRE(cv3.Get() == 0);
-    REQUIRE(cv4.Get() == 0);
-    REQUIRE(cv5.Get() == -12345678);
+    REQUIRE(cv.GetValue() == 39);
+    REQUIRE(cv2.GetValue() == 10000);
+    REQUIRE(cv3.GetValue() == 0);
+    REQUIRE(cv4.GetValue() == 0);
+    REQUIRE(cv5.GetValue() == -12345678);
 
     REQUIRE_THROWS_AS(ConstantValue("999999999999999999999999999999999999999"), SyntaxException);
     REQUIRE_THROWS_AS(ConstantValue("9hello"), SyntaxException);

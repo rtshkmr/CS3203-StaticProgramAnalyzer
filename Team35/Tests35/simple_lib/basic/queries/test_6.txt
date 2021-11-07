@@ -1,0 +1,95 @@
+1 - Invalid synonym name
+assign 1a;
+Select 1a
+none
+5000
+2 - Invalid synonym name
+stmt 0a;
+Select 0a
+none
+5000
+3 - Invalid synonym name
+stmt -a;
+Select -a
+none
+5000
+4 - Invalid synonym declaration
+statement as;
+Select as
+none
+5000
+5 - Invalid synonym declaration
+proc pen;
+Select pen
+none
+5000
+6 - Invalid synonym declaration
+Variable var;
+Select var
+none
+5000
+7 - Invalid select
+   assign a   ;
+select a
+none
+5000
+8 - Invalid select
+stmt s ;
+Select s;
+none
+5000
+9 - No declaration
+stmt s,ass ;
+Select sass
+none
+5000
+10 - Ambiguous modifies
+stmt s ;
+Select s such that Modifies(_, "else")
+none
+5000
+11 - Ambiguous uses
+stmt s ;
+Select s such that uses(_, "0")
+none
+5000
+12 - Pattern checking
+assign ah;
+Select ah pattern ah                          (_, _"(0)"_)
+2
+5000
+13 - Pattern checking
+assign ah;
+Select ah pattern ah     (_, _"   0   ")
+none
+5000
+14 - Invalid grammar (Pattern)
+assign a1;
+Select a1 pattern a1 (a1, _"0"_)
+none
+5000
+15 - Invalid grammar (pattern)
+variable v1;
+Select v1 pattern v1 (v1, _"0"_)
+none
+5000
+16 - Invalid grammar (such that)
+variable v1;
+Select v1 such that Uses(v1, v1)
+none
+5000
+17 - Invalid grammar (such that)
+variable v1, v2;
+Select v1 such that Follows(v1, v2)
+none
+5000
+18 - Invalid grammar (such that)
+variable v1, v2; while w1;
+Select v1 such that Parent*(w1, v2)
+none
+5000
+19 - Multiple declarations
+assign a; if a;
+Select a
+none
+5000

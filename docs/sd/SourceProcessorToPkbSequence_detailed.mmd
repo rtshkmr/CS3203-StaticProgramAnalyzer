@@ -33,7 +33,7 @@ sequenceDiagram
         CGV -->>-PSub: bool valid_syntax
 
         %% create Entities:  Entity here refers to the Abstraction Entity as described by the wiki/lecture 1 slides
-        PSub ->>+EF:CreateEntities(vector<Token>)
+        PSub ->>+EF:CreateEntity(vector<Token>)
         %% This method has responsibilities such as creating necessary Entity Nodes and updating the necessary tables to reflect relationships (this is where we add info about relationships b/w lines, vars...)
         %% Entity node refers to WHILE/IF/ASSIGN... ref to
         EF-->>-PSub: Entity* entity

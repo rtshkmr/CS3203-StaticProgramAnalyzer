@@ -1,0 +1,8 @@
+procedure One { 
+	onlyC0nstant = 0; 
+	newConstant = 19304; 
+	onlyC0nstant = 2147483647;
+	twoBillion = 2000000000; 
+	
+	CantDoMathTBH = (1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9) * 0 / 0; 
+}

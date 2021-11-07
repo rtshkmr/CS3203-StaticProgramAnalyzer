@@ -1,0 +1,20 @@
+1 - Multiple chained such that + pattern clauses
+stmt s1; assign a1; if if1; variable v1; procedure pr1, pr2; prog_line pl;
+Select a1 such that Uses(a1, v1) and Calls(pr1, pr2) and Next (2, 3) and Modifies(pr1, v1) pattern a1(v1, _"2*y"_) pattern if1(v1, _, _) and a1(_, _) and a1("x", _"x"_) and if1(_,_,_)
+7
+5000
+2 - Multiple chained pattern + such that clauses
+stmt s1; assign a1; if if1; variable v1; procedure pr1, pr2; prog_line pl;
+Select a1 pattern a1(v1, _"x * y"_) pattern if1(v1, _, _) and a1(_, _) and a1("x", _"z"_) and if1(_,_,_) such that Uses(a1, v1) and Calls(pr1, pr2) and Next (2, 3) and Modifies(pr1, v1)
+15
+5000
+3 - Multiple chained interleaving such that + pattern clauses
+stmt s1; assign a1; if if1; variable v1; procedure pr1, pr2; prog_line pl;
+Select a1 such that Modifies(pr1, v1) pattern if1(v1, _, _) such that Uses(a1, v1) pattern a1(_, _) such that Calls(pr1, pr2) pattern if1(_,_,_) such that Next (2, 3) pattern a1("z", _"z"_)
+13
+5000
+4 - Multiple chained interleaving pattern + such that clauses
+stmt s1; assign a1; if if1; variable v1; procedure pr1, pr2; prog_line pl;
+Select a1 pattern a1("z", _"z"_) such that Modifies(pr1, v1) pattern if1(v1, _, _) such that Uses(a1, v1)
+13
+5000

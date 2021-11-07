@@ -1,0 +1,96 @@
+procedure NestedWhileIf {
+    read a;
+    read b;
+    a = 10;
+    b = 20;
+    c = 30;
+    d = 40;
+    print c;
+    print d;
+
+    while (a == 30) {
+        a = b + c;
+        while (a != 10) {
+            a = 10;
+        }
+        if (a == 10) then {
+            if (c == 30) then {
+                while (a == b) {
+                    d = 10 + 20 + 30;
+                    print d;
+                    read a;
+                }
+            } else {
+                if (!(b >= a)) then {
+                    read b;
+                    a = b + c;
+                    print c;
+                    c = a + b;
+                } else {
+                    a = b + c;
+                }
+            }
+        } else {
+            while (a != 10) {
+                while(a >= 20) {
+                    a = b + c;
+                }
+                print c;
+            }
+        }
+    }
+
+    if (a + b != 30) then {
+        while (a == 10) {
+            while (b == 20) {
+                while (c == 30) {
+                    while (d == 10 + 20) {
+                       a = b + c + d;
+                    }
+                }
+            }
+        }
+    } else {
+        while (a == 30) {
+            if (b == 30) then {
+                if (c == 30) then {
+                    if (d == 30) then {
+                        a = b + c + d;
+                    } else {
+                        if (a == 10) then {
+                            a = 10;
+                            read a;
+                        } else {
+                            if (b == 20) then {
+                                b = 20;
+                                print b;
+                            } else {
+                                if (c == 30) then {
+                                    read c;
+                                    print c;
+                                    c = 30;
+                                } else {
+                                    print c;
+                                    read c;
+                                    c = 10;
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    b = a + c + d;
+                }
+            } else {
+                a = b + c + d;
+            }
+        }
+    }
+
+    add = a * b * c;
+    print add;
+    if (add == 0) then {
+        print zero;
+    } else {
+        print nonzero;
+    }
+}

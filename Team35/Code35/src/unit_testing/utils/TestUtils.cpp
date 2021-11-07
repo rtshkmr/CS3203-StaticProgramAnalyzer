@@ -1,6 +1,6 @@
-
 #include "TestUtils.h"
 #include <vector>
+#include <unordered_set>
 
 std::vector<std::string> TestUtils::GetBasicSourceLines() {
   std::vector<std::string> lines = {
@@ -17,4 +17,65 @@ std::vector<std::string> TestUtils::GetBasicSourceLines() {
       //    R"(if(x >= 1) then {read x; call helloProc;} else {x=1;})", // todo: the {x=1;} is not supported by tokenizer (i.e. more than 2 special delimiters. if necessary, need to make the splitting functions do a recursive call)
   };
   return lines;
+}
+
+/**
+ * Checks if the contents of 2 lists are equal, which may not be in the same order.
+ */
+bool TestUtils::AreListsEqual(std::list<Statement*> as, std::list<Statement*> bs) {
+  for (Statement* a: as) {
+    bool found_a = false;
+    for (Statement* b: bs) {
+      found_a = found_a || a == b;
+    }
+    if (!found_a) {
+      return false;
+    }
+  }
+  return as.size() == bs.size();
+}
+
+bool TestUtils::AreVectorsEqual(std::vector<Entity*> as, std::vector<Entity*> bs) {
+  for (Entity* a: as) {
+    bool found_a = false;
+    for (Entity* b: bs) {
+      found_a = found_a || a == b;
+    }
+    if (!found_a) {
+      return false;
+    }
+  }
+  return as.size() == bs.size();
+}
+
+bool TestUtils::AreListsEqual(std::list<Procedure*> a, std::list<Procedure*> b) {
+  for (Procedure* a_proc: a) {
+    bool found_a = false;
+    for (Procedure* b_proc: b) {
+      found_a = found_a || *a_proc->GetName() == *b_proc->GetName();
+    }
+    if (!found_a) {
+      return false;
+    }
+  }
+  return a.size() == b.size();
+}
+
+bool TestUtils::AreVectorsEqual(std::vector<std::tuple<Entity*, Entity*>> as, std::vector<std::tuple<Entity*, Entity*>> bs) {
+  for (std::tuple<Entity*, Entity*> a: as) {
+    bool found_a = false;
+    for (std::tuple<Entity*, Entity*> b: bs) {
+      found_a = found_a || a == b;
+    }
+    if (!found_a) {
+      return false;
+    }
+  }
+  return as.size() == bs.size();
+}
+
+void TestUtils::AddStatementList(Container* container, const std::list<Statement*>& stmt_list) {
+  for (Statement* stmt: stmt_list) {
+    container->AddStatement(stmt);
+  }
 }

@@ -1,0 +1,390 @@
+1 - Self call syntax error
+stmt s1; assign a1; call c1; procedure pr1, pr2; prog_line pl;
+Select pr1 such that Calls(pr1, pr1)
+none
+5000
+2 - Normal Call with first var returned
+stmt s1; assign a1; call c1; procedure pr1, pr2;
+Select pr1 such that Calls(pr1, pr2)
+First, Second
+5000
+3 - Invalid call with assign in first var
+stmt s1; assign a1; call c1; procedure pr1, pr2;
+Select pr1 such that Calls(a1, pr1)
+none
+5000
+4 - Invalid call with call stmt in first var
+stmt s1; assign a1; call c1; procedure pr1, pr2;
+Select pr1 such that Calls(c1, pr1)
+none
+5000
+5 - Invalid call with pl not defined
+stmt s1; assign a1; call c1; procedure pr1, pr2;
+Select pr1 such that Calls(pr1, pl)
+none
+5000
+6 - Double wildcard Call
+stmt s1; assign a1; call c1; procedure pr1, pr2;
+Select pr1 such that Calls(_, _)
+First, Second, Third
+5000
+7 - Left wildcard, right syn call
+stmt s1; assign a1; call c1; procedure pr1, pr2;
+Select pr1 such that Calls(_, pr1)
+Second, Third
+5000
+8 - Left syn, right wildcard call
+stmt s1; assign a1; call c1; procedure pr1, pr2;
+Select pr1 such that Calls(pr1, _)
+First, Second
+5000
+9 - Left syn, right IDENT call
+stmt s1; assign a1; call c1; procedure pr1, pr2;
+Select pr1 such that Calls(pr1, "Third")
+Second
+5000
+10 - Left IDENT, right syn call
+stmt s1; assign a1; call c1; procedure pr1, pr2;
+Select pr1 such that Calls("Second", pr2)
+First, Second, Third
+5000
+11 - Left, Right IDENT call
+stmt s1; assign a1; call c1; procedure pr1, pr2;
+Select pr1 such that Calls("First", "Second")
+First, Second, Third
+5000
+12 - Left syn, right IDENT non matching proc call
+stmt s1; assign a1; call c1; procedure pr1, pr2;
+Select pr1 such that Calls(pr1, "9")
+none
+5000
+13 - Left syn, right invalid IDENT
+stmt s1; assign a1; call c1; procedure pr1, pr2;
+Select pr1 such that Calls(pr1, "")
+none
+5000
+14 - Left syn, right IDENT, BOOLEAN call
+stmt s1; assign a1; call c1; procedure pr1, pr2;
+Select pr1 such that Calls(pr2, "NotAProg")
+none
+5000
+15 - Left IDENT, right wildcard call
+stmt s1; assign a1; call c1; procedure pr1, pr2;
+Select pr1 such that Calls("Second", _)
+First, Second, Third
+5000
+16 - Left wildcard, Right IDENT call for no incoming proc
+stmt s1; assign a1; call c1; procedure pr1, pr2;
+Select pr1 such that Calls(_, "First")
+none
+5000
+17 - Self call syntax error
+stmt s1; assign a1; call c1; procedure pr1, pr2; prog_line pl;
+Select pr1 such that Calls*(pr1, pr1)
+none
+5000
+18 - Left, Right syn callT
+stmt s1; assign a1; call c1; procedure pr1, pr2;
+Select pr1 such that Calls*(pr1, pr2)
+First, Second
+5000
+19 - Left invalid arg callT
+stmt s1; assign a1; call c1; procedure pr1, pr2;
+Select pr1 such that Calls*(a1, pr1)
+none
+5000
+20 - Left invalid arg callT
+stmt s1; assign a1; call c1; procedure pr1, pr2;
+Select pr2 such that Calls*(c1, pr1)
+none
+5000
+21 - Right non declared var
+stmt s1; assign a1; call c1; procedure pr1, pr2;
+Select pr1 such that Calls*(pr1, pl)
+none
+5000
+22 - Double wildcard callT, BOOLEAN,
+stmt s1; assign a1; call c1; procedure pr1, pr2;
+Select pr1 such that Calls*(_, _)
+First, Second, Third
+5000
+23 - Left wildcard, Right syn, callT
+stmt s1; assign a1; call c1; procedure pr1, pr2;
+Select pr1 such that Calls*(_, pr1)
+Second, Third
+5000
+24 - Left syn, Right wildcard, callT
+stmt s1; assign a1; call c1; procedure pr1, pr2;
+Select pr1 such that Calls*(pr1, _)
+First, Second
+5000
+25 - Left syn, Right IDENT, callT
+stmt s1; assign a1; call c1; procedure pr1, pr2;
+Select pr1 such that Calls*(pr1, "Third")
+First, Second
+5000
+26 - Left IDENT, right syn, callT, BOOLEAN
+stmt s1; assign a1; call c1; procedure pr1, pr2;
+Select pr1 such that Calls*("Second", pr2)
+First, Second, Third
+5000
+27 - Left, Right IDENT callT, BOOLEAN
+stmt s1; assign a1; call c1; procedure pr1, pr2;
+Select pr1 such that Calls*("First", "Third")
+First, Second, Third
+5000
+28 - Left syn, Right IDENT no proc callT
+stmt s1; assign a1; call c1; procedure pr1, pr2;
+Select pr1 such that Calls*(pr1, "9")
+none
+5000
+29 - Left syn, Right IDENT empty INVALID
+stmt s1; assign a1; call c1; procedure pr1, pr2;
+Select pr1 such that Calls*(pr1, "")
+none
+5000
+30 - Left syn, Right IDENT no proc callT
+stmt s1; assign a1; call c1; procedure pr1, pr2;
+Select pr2 such that Calls*(pr1, "NotAProg")
+none
+5000
+31 - Left IDENT, right wildcard, callT, BOOLEAN
+stmt s1; assign a1; call c1; procedure pr1, pr2;
+Select pr1 such that Calls*("First", _)
+First, Second, Third
+5000
+32 - Left wildcard, Right IDENT, callT, BOOLEAN
+stmt s1; assign a1; call c1; procedure pr1, pr2;
+Select pr1 such that Calls*(_, "Third")
+First, Second, Third
+5000
+33 - Self CFG Next not possible
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2; procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+Select s1 such that Next(s1, s1)
+none
+5000
+34 - CFG Next from stmt syn to assign syn
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2; procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+Select s1 such that Next(s1, a1)
+4,6,8,10,11,12,13,14,16
+5000
+35 - CFG Next from assign syn to stmt syn
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2; procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+Select s1 such that Next(a1, s1)
+5,6,8,13,14,15,17,18
+5000
+36 - CFG Next from assign syn to assign syn (self), BOOLEAN
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2; procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+Select s1 such that Next(a1, a1)
+none
+5000
+37 - CFG Next from assign syn to assign syn (other), BOOLEAN
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2; procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+Select s1 such that Next(a1, a2)
+1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
+5000
+38 - CFG Next stmt syn to read syn
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2; procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+Select s1 such that Next(s1, r1)
+1
+5000
+39 - CFG Next stmt syn to print syn
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2; procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+Select s1 such that Next(s1, p1)
+17
+5000
+40 - CFG Next stmt syn to proc syn
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2; procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+Select s1 such that Next(s1, proc1)
+none
+5000
+41 - CFG Next stmt syn to call syn
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2; procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+Select s1 such that Next(s1, c1)
+2,7
+5000
+42 - CFG Next stmt syn to while syn
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2; procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+Select s1 such that Next(s1, w1)
+5,9
+5000
+43 - CFG Next stmt syn to if syn
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2; procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+Select s1 such that Next(s1, if1)
+6
+5000
+44 - CFG Next stmt syn to prog_line syn
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2; procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+Select s1 such that Next(s1, n1)
+1,2,4,5,6,7,8,9,10,11,12,13,14,16,17
+5000
+45 - CFG Next proc syn not valid to stmt syn
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2; procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+Select s1 such that Next(proc1, s1)
+none
+5000
+46 - CFG Next assign syn to read syn
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2; procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+Select s1 such that Next(a1, r1)
+none
+5000
+47 - CFG Next read syn to proc syn invalid
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2; procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+Select s1 such that Next(r1, proc1)
+none
+5000
+48 - CFG Next left wildcard to stmt syn
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2; procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+Select s1 such that Next(_, s1)
+2,3,5,6,7,8,9,10,11,12,13,14,15,17,18
+5000
+49 - CFG Next Double wildcard, BOOLEAN
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2; procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+Select s1 such that Next(_, _)
+1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
+5000
+50 - CFG Next Left stmt syn to Right wildcard
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2; procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+Select s1 such that Next(s1, _)
+1,2,4,5,6,7,8,9,10,11,12,13,14,16,17
+5000
+51 - CFG Next Left stmt syn to right INVALID IDENT
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2; procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+Select s1 such that Next(s1, -1)
+none
+5000
+52 - CFG Next Left stmt syn to right INVALID IDENT
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2; procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+Select s1 such that Next(s1, 0)
+none
+5000
+53 - CFG Next Left IDENT to right stmt syn, no output
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2; procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+Select s1 such that Next(3, s1)
+none
+5000
+54 - CFG Next Left IDENT to right stmt syn, have output
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2; procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+Select s1 such that Next(1, s1)
+2
+5000
+55 - CFG Next Left IDENT to right IDENT, no output
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2; procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+Select s1 such that Next(3, 7)
+none
+5000
+56 - CFG Next Left IDENT to right IDENT, while output
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2; procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+Select s1 such that Next(9,6)
+1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
+5000
+57 - Next clause as BOOLEAN (true)
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2; procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+Select s1 such that Next(n1, n2)
+1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
+5000
+58 - Valid Next clause progline after statement returns all statments except last statements for each procedure
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2; procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+Select s1 such that Next(s1, n1)
+1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17
+5000
+59 - Next as BOOLEAN (false), Wildcard for next of last statement in a procedure
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2; procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+Select s1 such that Next(3, _)
+none
+5000
+60 - Valid Next as BOOLEAN (false), wildcard before first statement in a procedure
+stmt s1,s2; assign a1,a2; read r1,r2; print p1,p2; procedure proc1,proc2; call c1,c2; while w1,w2; if if1,if2; prog_line n1, n2;
+Select s1 such that Next(_, 4)
+none
+5000
+61 - While statement with variable passed as control variable, valid input
+stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
+Select pr1 pattern w1(v1, _)
+First,Second,Third
+5000
+62 - While pattern with statement passed as control variable returns none
+stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
+Select pr1 pattern w1(s1, _)
+none
+5000
+63 - Select while statement with proc name being passed as a variable name returns none
+stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
+Select pr1 pattern w1(pr1, _)
+none
+5000
+64 - Select while statement with control const being a valid prog_line
+stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
+Select pr1 pattern w1(pl, _)
+none
+5000
+65 -  While pattern wildcard, return BOOLEAN procedure
+stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
+Select pr1 pattern w1(_, _)
+First,Second,Third
+5000
+66 -  While pattern empty entRef returns none
+stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
+Select pr1 pattern w1("", _)
+none
+5000
+67 - While pattern non existing control constant returns none
+stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
+Select pr1 pattern w1("9", _)
+none
+5000
+68 - While pattern non existing control variable returns none
+stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
+Select pr1 pattern w1("x", _)
+none
+5000
+69 -  While pattern, non-existing control variable input returns none
+stmt s1; while w1; variable v1; procedure pr1; prog_line pl;
+Select pr1 pattern w1("NoSuchVar", _)
+none
+5000
+70 - If pattern, existing variable as control variable
+stmt s1; if if1; variable v1; procedure pr1; prog_line pl;
+Select if1 pattern if1(v1, _, _)
+10
+5000
+71 - If pattern, statement as input to entRef returns none
+stmt s1; if if1; variable v1; procedure pr1; prog_line pl;
+Select if1 pattern if1(s1, _, _)
+none
+5000
+72 -  If pattern procedure as control variable returns none
+stmt s1; if if1; variable v1; procedure pr1; prog_line pl;
+Select if1 pattern if1(pr1, _, _)
+none
+5000
+73 - If pattern, prog line as the control const, INVALID first arg
+stmt s1; if if1; variable v1; procedure pr1; prog_line pl;
+Select if1 pattern if1(pl, _, _)
+none
+5000
+74 - If pattern wildcard control variable returns all valid
+stmt s1; if if1; variable v1; procedure pr1; prog_line pl;
+Select if1 pattern if1(_, _, _)
+10
+5000
+75 - If Pattern empty IDENT returns none
+stmt s1; if if1; variable v1; procedure pr1; prog_line pl;
+Select if1 pattern if1("", _, _)
+none
+5000
+76 - If pattern searching for non-existing IDENT returns none
+stmt s1; if if1; variable v1; procedure pr1; prog_line pl;
+Select if1 pattern if1("9", _, _)
+none
+5000
+77 - If pattern check existing pattern variable
+stmt s1; if if1; variable v1; procedure pr1; prog_line pl;
+Select if1 pattern if1("x", _, _)
+10
+5000
+78 - If pattern checking for non-existent control variable
+stmt s1; if if1; variable v1; procedure pr1; prog_line pl;
+Select if1 pattern if1("NoSuchVar", _, _)
+none
+5000

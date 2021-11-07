@@ -1,0 +1,5 @@
+procedure WhileMe{
+   while(true) {
+      x = 1;
+   }
+}

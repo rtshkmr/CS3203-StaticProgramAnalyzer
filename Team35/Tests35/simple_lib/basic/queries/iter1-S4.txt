@@ -1,0 +1,135 @@
+1 - Uses(s, v) -> s
+stmt s;
+Select s such that Uses(s, _)
+3,5,6,8,10,11,12,13,14,15,16,18,19,20,21,23,24,25,26,28,29, 31
+5000
+2 - Uses(s, 'v') -> v
+stmt s; variable v;
+Select v such that Uses(s, v)
+a, b, x, m, f, count, j, y, v, c, s, d
+5000
+3 - Uses(w,v)
+while w; variable v;
+Select v such that Uses(w, v)
+count, a, f, j, b, v, c, x, y, s, d
+5000
+4 - Uses(w, v) pattern
+while w; variable v; assign a;
+Select v such that Uses(w, v) pattern a (v,_"2"_)
+b, s, a
+5000
+5 - Modifies(re, v)
+read re; variable v;
+Select v such that Modifies(re, v)
+x, m, s, t, v, a
+5000
+6 - Modifies(a, v) pattern
+assign a;
+Select a pattern a(_,_"b"_) such that Modifies(a, "x")
+8, 15
+5000
+7 - Follows(3,s)
+stmt s;
+Select s such that Follows(3,s)
+17
+5000
+8 - Follows(a, s) pattern
+stmt s; assign a;
+Select s such that Follows(a, s) pattern a(_,_"count"_)
+14, 29
+5000
+9 - Follows*(1,w)
+while w;
+Select w such that Follows* (1,w)
+18
+5000
+10 - Follows* and pattern
+stmt s; assign a;
+Select s such that Follows*(s, a) pattern a (_,_"a"_)
+7, 9, 12, 13, 27, 28
+5000
+11 - Parent(s,ifs)
+stmt s; if ifs;
+Select ifs such that Parent(s, ifs)
+6, 21
+5000
+12 - Parent and pattern
+assign a; while w;
+Select a pattern a (_,_) such that Parent(w, a)
+12, 13, 14, 19, 20, 27, 28, 29
+5000
+13 - Parent*
+stmt s;
+Select s such that Parent* (s, 28)
+26, 18
+5000
+14 - Parent* and pattern
+assign a; if ifs;
+Select a such that Parent* (ifs, a) pattern a(_,_"count"_)
+13, 14, 24
+5000
+15 - pattern
+assign a; variable v;
+Select v pattern a (v, _"x"_)
+x, s, d
+5000
+16 - such that and pattern
+assign a; variable v;
+Select a such that Uses(a, v) pattern a(v, _)
+8, 14, 24, 29, 28
+5000
+17 - invalid
+stmt s;
+select
+none
+5000
+18 - invalid
+assign a;
+select a
+none
+5000
+19 - invalid
+assign a;
+Select a Pattern a(_, _)
+none
+5000
+20 - invalid
+assign a;
+Select a such that INVALID(a, _)
+none
+5000
+21 - invalid
+assign a;
+a
+none
+5000
+22 - invalid
+assign a;;
+Select a
+none
+5000
+23 - invalid
+assign a
+Select a;
+none
+5000
+24 - invalid
+assign a
+Select s
+none
+5000
+25 - pattern(_, _'c'_)
+assign a;
+Select a pattern a(_, _"0"_)
+none
+5000
+26 - pattern(_, _'c'_)
+assign a;
+Select a pattern a(_, "10")
+27
+5000
+27 - pattern(_, _'x'_)
+assign a;
+Select a pattern a(_, "unt")
+none
+5000

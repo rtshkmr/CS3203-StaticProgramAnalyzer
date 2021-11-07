@@ -9,7 +9,7 @@ using std::vector;
 
 EntityFactory::EntityFactory(std::list<Procedure*>* proc_list,
                              std::list<Variable*>* var_list,
-                             std::list<ConstantValue*>* const_list) {
+                             std::list<Constant*>* const_list) {
   proc_list_ = proc_list;
   var_list_ = var_list;
   const_list_ = const_list;
@@ -20,7 +20,7 @@ EntityFactory::EntityFactory(std::list<Procedure*>* proc_list,
  * Must assume that the tokens are in the form of a statement e.g. the 1st word is the keyword
  * and that the tokenized statement is syntactically correct
  */
-Entity* EntityFactory::CreateEntities(vector<Token> tokens) {
+Entity* EntityFactory::CreateEntity(vector<Token> tokens) {
   Token first_token = tokens.front();
   switch (first_token.GetTokenTag()) {
     case TokenTag::kProcedureKeyword: {
@@ -85,7 +85,7 @@ Entity* EntityFactory::CreateConditionalEntity(vector<Token> tokens, TokenTag en
   vector<Token> expression_tokens = GetExpressionTokens(tokens, TokenTag::kOpenBracket, TokenTag::kCloseBracket);
   std::string expression_string = ConvertTokensToString(expression_tokens);
   vector<Variable*> expression_variables = GetVariablesFromExpressionTokens(expression_tokens);
-  vector<ConstantValue*> expression_constants = GetConstantsFromExpressionTokens(expression_tokens);
+  vector<Constant*> expression_constants = GetConstantsFromExpressionTokens(expression_tokens);
 
   if (entity_type == TokenTag::kIfKeyword) {
     return new IfEntity(expression_string, expression_variables, expression_constants);
@@ -109,7 +109,7 @@ Entity* EntityFactory::CreateAssignEntity(vector<Token> tokens) {
   vector<Token> expression_tokens = GetExpressionTokens(tokens, TokenTag::kAssignmentOperator, TokenTag::kSemicolon);
   std::string expression_string = ConvertTokensToString(expression_tokens);
   vector<Variable*> expression_variables = GetVariablesFromExpressionTokens(expression_tokens);
-  vector<ConstantValue*> expression_constants = GetConstantsFromExpressionTokens(expression_tokens);
+  vector<Constant*> expression_constants = GetConstantsFromExpressionTokens(expression_tokens);
 
   return new AssignEntity(
       RetrieveVariable(tokens.front().GetTokenString()),
@@ -131,12 +131,8 @@ Entity* EntityFactory::CreateAssignEntity(vector<Token> tokens) {
  * @return Vector of tokens which represents the expression alone.
  */
 vector<Token> EntityFactory::GetExpressionTokens(vector<Token> tokens, TokenTag start_tag, TokenTag end_tag) {
-  int start_iter = -1;
-  int end_iter = -1;
-  // finding first start tag
-  start_iter = Token::GetFirstMatchingTokenIdx(tokens, start_tag);
-  // finding last end tag
-  end_iter = Token::GetLastMatchingTokenIdx(tokens, end_tag);
+  int start_iter = Token::GetFirstMatchingTokenIdx(tokens, start_tag);
+  int end_iter = Token::GetLastMatchingTokenIdx(tokens, end_tag);
   if (start_iter < 0 || end_iter < 0) {
     throw std::invalid_argument("EF: Start or end tag not found.\n");
   }
@@ -153,7 +149,7 @@ vector<Token> EntityFactory::GetExpressionTokens(vector<Token> tokens, TokenTag 
   return expression_tokens;
 }
 
-string EntityFactory::ConvertTokensToString(vector<Token> tokens) {
+string EntityFactory::ConvertTokensToString(const vector<Token>& tokens) {
   std::string expression_string;
   for (auto& token: tokens) {
     expression_string += token.GetTokenString();
@@ -161,7 +157,7 @@ string EntityFactory::ConvertTokensToString(vector<Token> tokens) {
   return expression_string;
 }
 
-vector<Variable*> EntityFactory::GetVariablesFromExpressionTokens(vector<Token> tokens) {
+vector<Variable*> EntityFactory::GetVariablesFromExpressionTokens(const vector<Token>& tokens) {
   vector<Variable*> variables;
   for (auto& token: tokens) {
     if (token.GetTokenTag() == TokenTag::kName) {
@@ -176,11 +172,11 @@ vector<Variable*> EntityFactory::GetVariablesFromExpressionTokens(vector<Token> 
   return variables;
 }
 
-vector<ConstantValue*> EntityFactory::GetConstantsFromExpressionTokens(vector<Token> tokens) {
-  vector<ConstantValue*> constants;
+vector<Constant*> EntityFactory::GetConstantsFromExpressionTokens(const vector<Token>& tokens) {
+  vector<Constant*> constants;
   for (auto& token: tokens) {
     if (token.GetTokenTag() == TokenTag::kInteger) {
-      ConstantValue* curr_const = CreateConstantValue(token.GetTokenString());
+      Constant* curr_const = CreateConstant(token.GetTokenString());
       auto iter = std::find(constants.begin(), constants.end(), curr_const);
       if (iter == constants.end()) {
         // add curr_const if it is not found in constants
@@ -192,21 +188,19 @@ vector<ConstantValue*> EntityFactory::GetConstantsFromExpressionTokens(vector<To
 }
 
 Procedure* EntityFactory::CreateProcedure(std::string proc_name) {
-  // TODO iter2: Create destructor for ProcedureName and Procedure.
-  Procedure* p = new Procedure(new ProcedureName(std::move(proc_name)));
+  auto* p = new Procedure(new ProcedureName(std::move(proc_name)));
   proc_list_->push_back(p);
   return p;
 }
 
 Variable* EntityFactory::CreateVariable(std::string var_name) {
-  //TODO iter2: Create destructor for VariableName and Variable.
-  Variable* v = new Variable(new VariableName(std::move(var_name)));
+  auto* v = new Variable(new VariableName(std::move(var_name)));
   var_list_->push_back(v);
   return v;
 }
 
-ConstantValue* EntityFactory::CreateConstantValue(std::string const_val) {
-  ConstantValue* val = new ConstantValue(std::move(const_val));
+Constant* EntityFactory::CreateConstant(const std::string& const_val) {
+  auto* val = new Constant(new ConstantValue(const_val));
   const_list_->push_back(val);
   return val;
 }
@@ -231,7 +225,7 @@ Procedure* EntityFactory::RetrieveProcedure(std::string proc_name) {
 Variable* EntityFactory::RetrieveVariable(std::string var_name) {
   VariableName temp_var_name = VariableName(var_name);
   for (auto const& var: * var_list_) {
-    if (* var->GetName() == temp_var_name) { // uses the overloaded ==
+    if (* var->GetVariableName() == temp_var_name) { // uses the overloaded ==
       return var;
     }
   }

@@ -5,7 +5,7 @@
  */
 #include "SyntaxValidator.h"
 #include <cassert>
-#include <datatype/RegexPatterns.h>
+#include <util/RegexPatterns.h>
 
 using std::string;
 using std::vector;
@@ -141,7 +141,8 @@ bool SyntaxValidator::ValidateAssignmentSentenceSyntax(const vector<Token>& stat
   // validate the tokens to the right of the assignment operator as an expression;
   int assignment_operator_idx = Token::GetFirstMatchingTokenIdx(statement_tokens, TokenTag::kAssignmentOperator);
   int right_boundary = statement_tokens.size() - 2; // left of the semicolon
-  if (right_boundary <= assignment_operator_idx) {
+  bool second_token_is_assignment_operator = statement_tokens.at(1).GetTokenTag()==TokenTag::kAssignmentOperator;
+  if (right_boundary <= assignment_operator_idx || !second_token_is_assignment_operator) {
     return false; // boundary invariant check
   }
   return IsExpr(statement_tokens, assignment_operator_idx + 1, right_boundary);

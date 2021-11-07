@@ -15,11 +15,11 @@ TEST_CASE("1.Model.Statement.IfEntity.ElseEntity") {
 
   /// Other object creation
   Variable* var_x = new Variable(new VariableName("x"));
-  ConstantValue* cv_3 = new ConstantValue("3");
+  Constant* cv_3 = new Constant(new ConstantValue("3"));
 
   std::string condition = "x == 3";
   std::vector<Variable*> expr_var{};
-  std::vector<ConstantValue*> expr_constants{cv_3};
+  std::vector<Constant*> expr_constants{cv_3};
 
   IfEntity* if1 = new IfEntity(condition, expr_var, expr_constants);
 
@@ -33,8 +33,8 @@ TEST_CASE("1.Model.Statement.IfEntity.ElseEntity") {
 
   SECTION ("Check Conditional Elements") {
     REQUIRE(if1->GetCondExpr()->GetExpressionString() == ConditionalExpression(condition, expr_var).GetExpressionString());
-    REQUIRE(if1->GetExpressionVariables() == expr_var);
-    REQUIRE(if1->GetExpressionConstants() == expr_constants);
+    REQUIRE(if1->GetControlVariables() == expr_var);
+    REQUIRE(if1->GetControlConstants() == expr_constants);
   }
 
   SECTION ("If Container") {
@@ -110,18 +110,18 @@ TEST_CASE("1.Model.Statement.WhileEntity") {
 
   /// Other object creation
   Variable* var_x = new Variable(new VariableName("x"));
-  ConstantValue* cv_1 = new ConstantValue("1");
-  ConstantValue* cv_10 = new ConstantValue("10");
+  Constant* cv_1 = new Constant(new ConstantValue("1"));
+  Constant* cv_10 = new Constant(new ConstantValue("10"));
 
   std::string condition = "x < 10";
   std::vector<Variable*> expr_var{var_x};
-  std::vector<ConstantValue*> expr_constants{cv_10};
+  std::vector<Constant*> expr_constants{cv_10};
 
   WhileEntity* while_entity = new WhileEntity(condition, expr_var, expr_constants);
 
   std::string expression = "x + 1";
   std::vector<Variable*> expr_a_var{var_x};
-  std::vector<ConstantValue*> expr_a_constants{cv_1};
+  std::vector<Constant*> expr_a_constants{cv_1};
 
   AssignEntity* assign_entity = new AssignEntity(var_x, expression, expr_a_var, expr_a_constants);
   while_entity->AddStatement(assign_entity);
@@ -129,8 +129,8 @@ TEST_CASE("1.Model.Statement.WhileEntity") {
   SECTION ("Check Conditional Elements") {
     REQUIRE(
         while_entity->GetCondExpr()->GetExpressionString() == ConditionalExpression(condition, expr_a_var).GetExpressionString());
-    REQUIRE(while_entity->GetExpressionVariables() == expr_var);
-    REQUIRE(while_entity->GetExpressionConstants() == expr_constants);
+    REQUIRE(while_entity->GetControlVariables() == expr_var);
+    REQUIRE(while_entity->GetControlConstants() == expr_constants);
   }
 
   SECTION ("While Container") {
@@ -173,23 +173,23 @@ TEST_CASE("1.Model.Statement.AssignEntity") {
   Variable* var_x = new Variable(new VariableName("x"));
   Variable* var_y = new Variable(new VariableName("y"));
   Variable* var_z = new Variable(new VariableName("z"));
-  ConstantValue* cv_100 = new ConstantValue("100");
+  Constant* cv_100 = new Constant(new ConstantValue("100"));
 
   std::string expression = "x + y + 100 + z";
   std::vector<Variable*> expr_var{var_x, var_y, var_z};
-  std::vector<ConstantValue*> expr_constants{cv_100};
+  std::vector<Constant*> expr_constants{cv_100};
 
   AssignEntity* assign_entity = new AssignEntity(var_x, expression, expr_var, expr_constants);
 
   SECTION ("Check Elements") {
-    REQUIRE(assign_entity->GetVariable() == var_x);
+    REQUIRE(assign_entity->GetVariableObj() == var_x);
     REQUIRE(assign_entity->GetAssignmentExpr()->GetExpressionString()
                 == AssignmentExpression(expression).GetExpressionString());
 
     REQUIRE(assign_entity->GetAssignmentExpr()->CheckExact(expression));
 
-    REQUIRE(assign_entity->GetExpressionVariables() == expr_var);
-    REQUIRE(assign_entity->GetExpressionConstants() == expr_constants);
+    REQUIRE(assign_entity->GetExprVariables() == expr_var);
+    REQUIRE(assign_entity->GetExprConstants() == expr_constants);
   }
 
   SECTION ("Casting to Statement and back") {
@@ -224,7 +224,7 @@ TEST_CASE("1.Model.Statement.CallEntity") {
   CallEntity* call_entity = new CallEntity(proc_x);
 
   SECTION ("Check Elements") {
-    REQUIRE(call_entity->GetProcedure() == proc_x);
+    REQUIRE(call_entity->GetCalledProcedure() == proc_x);
   }
 
   SECTION ("Casting to Statement and back") {
@@ -259,7 +259,7 @@ TEST_CASE("1.Model.Statement.PrintEntity") {
   PrintEntity* print_entity = new PrintEntity(var_x);
 
   SECTION ("Check Elements") {
-    REQUIRE(print_entity->GetVariable() == var_x);
+    REQUIRE(print_entity->GetVariableObj() == var_x);
   }
 
   SECTION ("Casting to Statement and back") {
@@ -294,7 +294,7 @@ TEST_CASE("1.Model.Statement.ReadEntity") {
   ReadEntity* read_entity = new ReadEntity(var_x);
 
   SECTION ("Check Elements") {
-    REQUIRE(read_entity->GetVariable() == var_x);
+    REQUIRE(read_entity->GetVariableObj() == var_x);
   }
 
   SECTION ("Casting to Statement and back") {
@@ -336,11 +336,11 @@ TEST_CASE("1.Model.Statement") {
 
   //while (x == 1) {
   Variable* var_x = new Variable(new VariableName("x"));
-  ConstantValue* cv_1 = new ConstantValue("1");
+  Constant* cv_1 = new Constant(new ConstantValue("1"));
 
   std::string condition = "x == 1";
   std::vector<Variable*> expr_var{var_x};
-  std::vector<ConstantValue*> expr_constants{cv_1};
+  std::vector<Constant*> expr_constants{cv_1};
 
   WhileEntity* while_entity = new WhileEntity(condition, expr_var, expr_constants);
   while_entity->SetStatementNumber(new StatementNumber(1));
@@ -372,17 +372,17 @@ TEST_CASE("1.Model.Statement") {
   print_z->SetBeforeNode(while_entity);
 
   SECTION ("Test StatementNumber") {
-    REQUIRE(* while_entity->GetStatementNumber() == StatementNumber(1));
-    REQUIRE(* read_x->GetStatementNumber() == StatementNumber(2));
-    REQUIRE(* read_y->GetStatementNumber() == StatementNumber(3));
-    REQUIRE(* print_z->GetStatementNumber() == StatementNumber(4));
+    REQUIRE(* while_entity->GetStatementNumberObj() == StatementNumber(1));
+    REQUIRE(* read_x->GetStatementNumberObj() == StatementNumber(2));
+    REQUIRE(* read_y->GetStatementNumberObj() == StatementNumber(3));
+    REQUIRE(* print_z->GetStatementNumberObj() == StatementNumber(4));
   }
 
   SECTION ("Test LineNumber") {
-    REQUIRE(* while_entity->GetLineNumber() == LineNumber(1));
-    REQUIRE(* read_x->GetLineNumber() == LineNumber(2));
-    REQUIRE(* read_y->GetLineNumber() == LineNumber(3));
-    REQUIRE(* print_z->GetLineNumber() == LineNumber(4));
+    REQUIRE(* while_entity->GetLineNumberObj() == LineNumber(1));
+    REQUIRE(* read_x->GetLineNumberObj() == LineNumber(2));
+    REQUIRE(* read_y->GetLineNumberObj() == LineNumber(3));
+    REQUIRE(* print_z->GetLineNumberObj() == LineNumber(4));
   }
 
   SECTION ("Test ParentNode") {

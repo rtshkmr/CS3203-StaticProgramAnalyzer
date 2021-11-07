@@ -1,123 +1,172 @@
+#include <model/Statement.h>
 #include "catch.hpp"
 #include "component/QueryProcessor/types/QueryEvaluatorTable.h"
+#include "../../../../utils/EntityUtils.h"
+
+using namespace entity_utils;
 
 TEST_CASE("3.QueryEvaluatorTable.Target synonym is statement") {
-  std::string target = "s1";
-  QueryEvaluatorTable table(target);
-  REQUIRE(table.GetSize() == 0);
+  auto *read_synonym = new Synonym("test", DesignEntity::kRead);
+  auto *read_synonym_2 = new Synonym("test2", DesignEntity::kRead);
+  QueryEvaluatorTable table(read_synonym);
+  REQUIRE(table.GetRowSize() == 0);
 
-  std::list<std::string> synonym_list = {"2", "3", "4"};
-  bool outcome = table.AddTargetSynonym(synonym_list);
+  ReadEntity* stmt1 = GetReadX();
+  ReadEntity* stmt2 = GetReadY();
+  ReadEntity* stmt3 = GetReadZ();
+
+  auto *assign_syn = new Synonym("a1", DesignEntity::kAssign);
+  AssignEntity* stmt4 = GetAssign1();
+  AssignEntity* stmt5 = GetAssign2();
+  AssignEntity* stmt6 = GetAssign3();
+
+  std::vector<Entity *> synonym_list = {stmt1, stmt2, stmt3};
+  bool outcome = table.AddTargetSynonymValues(read_synonym, synonym_list);
   REQUIRE(outcome);
-  REQUIRE(table.GetSize() == 1);
-  REQUIRE(table.GetResults()[1] == "3");
+  REQUIRE(table.GetColumnSize() == 1);
+  REQUIRE(table.GetResults()[0][1] == stmt2);
 
   SECTION("Remove a valid row") {
-    bool outcome = table.DeleteRow(1);
+    outcome = table.DeleteRow(1);
     REQUIRE(outcome);
-    REQUIRE(table.GetSize() == 1);
-    REQUIRE(table.GetResults().size() == 2);
-    REQUIRE(table.GetResults()[1] == "4");
+    REQUIRE(table.GetColumnSize() == 1);
+
+    REQUIRE(table.GetResults()[0].size() == 2);
+    REQUIRE(table.GetResults()[0][1] == stmt3);
   }
 
   SECTION("Remove an invalid row") {
-    bool outcome = table.DeleteRow(3);
+    outcome = table.DeleteRow(3);
     REQUIRE_FALSE(outcome);
-    REQUIRE(table.GetResults().size() == 3);
+    REQUIRE(table.GetResults()[0].size() == 3);
   }
 
   SECTION("Add synonym column and values") {
-    bool outcome = table.AddColumn("assignment");
+    outcome = table.AddColumn(assign_syn);
     REQUIRE(outcome);
-    REQUIRE(table.GetSize() == 2);
+    REQUIRE(table.GetColumnSize() == 2);
 
     SECTION("Added values are valid") {
-      outcome = table.AddRow("assignment", 0, "100");
+      outcome = table.AddRow(assign_syn, 0, stmt4);
       REQUIRE(outcome);
-      outcome = table.AddRow("assignment", 1, "101");
+      outcome = table.AddRow(assign_syn, 1, stmt5);
       REQUIRE(outcome);
-      REQUIRE(table.GetColumn("assignment").size() == 2);
+      REQUIRE(table.GetColumn(assign_syn).size() == 2);
     }
 
     SECTION("Added values are valid but have invalid index positions") {
-      outcome = table.AddRow("assignment", 0, "100");
+      outcome = table.AddRow(assign_syn, 0, stmt6);
       REQUIRE(outcome);
-      outcome = table.AddRow("assignment", 0, "101");
+      outcome = table.AddRow(assign_syn, 0, stmt5);
       REQUIRE_FALSE(outcome);
+    }
+
+    SECTION("Check columns present") {
+      REQUIRE(table.ContainsColumn(read_synonym));
+      REQUIRE(table.ContainsColumn(assign_syn));
+      REQUIRE_FALSE(table.ContainsColumn(read_synonym_2));
     }
   }
 }
 
-TEST_CASE("3.QueryEvaluatorTable.Target synonym is a variable") {
-  std::string target = "v";
-  QueryEvaluatorTable table(target);
-  REQUIRE(table.GetSize() == 0);
+TEST_CASE("3.QueryEvaluatorTable.Multiple Target Synonyms") {
+  auto *variable_synonym = new Synonym("v1", DesignEntity::kRead);
+  auto *assign_synonym = new Synonym("a1", DesignEntity::kAssign);
+  auto *prog_line_synonym = new Synonym("pl", DesignEntity::kProgLine);
+  auto *constant_synonym = new Synonym("const1", DesignEntity::kConstant);
+  std::vector<Synonym *> target_synonyms = {variable_synonym, assign_synonym};
+  QueryEvaluatorTable table(target_synonyms);
+  REQUIRE(table.GetColumnSize() == 0);
+  REQUIRE(table.GetRowSize() == 0);
 
-  std::list<std::string> synonymList = {"x", "count", "p4p"};
-  bool outcome = table.AddTargetSynonym(synonymList);
-  REQUIRE(outcome);
-  REQUIRE(table.GetSize() == 1);
-  REQUIRE(table.GetResults()[2] == "p4p");
+  Variable* var_x = GetVarX();
+  Variable* var_z = GetVarZ();
+  Variable* var_i = GetVarI();
+  std::vector<Entity *> variable_values = {var_x, var_z, var_i};
+  AssignEntity *assign_1 = GetAssign1();
+  AssignEntity *assign_2 = GetAssign2();
+  AssignEntity *assign_3 = GetAssign3();
+  std::vector<Entity *> assign_values = {assign_1, assign_2, assign_3};
 
-  outcome = table.AddColumn("s1");
-  REQUIRE(outcome);
-  REQUIRE(table.GetSize() == 2);
+  table.AddTargetSynonymValues(variable_synonym, variable_values);    // Init, and is first column
 
-  SECTION("Add a valid new column") {
-    REQUIRE(table.AddColumn("s2"));
-  }
+  REQUIRE(table.GetColumnSize() == 1);
+  REQUIRE(table.GetResults()[0][2] == var_i);
 
   SECTION("Add an invalid new column") {
-    REQUIRE_FALSE(table.AddColumn("s1"));
-    REQUIRE_FALSE(table.AddColumn("v"));
-    REQUIRE(table.GetSize() == 2);
+    REQUIRE_FALSE(table.AddColumn(variable_synonym));
   }
 
+  SECTION("Add multiple rows") {
+    table.AddColumn(assign_synonym);
+    table.AddMultipleRowForAllColumn(assign_synonym, 0, assign_1, 0);
+    table.AddMultipleRowForAllColumn(assign_synonym, 0, assign_2, 1);
+    table.AddMultipleRowForAllColumn(assign_synonym, 2, assign_2, 0);
+    table.AddMultipleRowForAllColumn(assign_synonym, 3, assign_1, 0);
+    table.AddMultipleRowForAllColumn(assign_synonym, 3, assign_2, 1);
+    table.AddMultipleRowForAllColumn(assign_synonym, 3, assign_3, 2);
+    REQUIRE(table.GetRowSize() == 6);
+    std::vector<std::vector<Entity*>> results = table.GetResults();
+    REQUIRE(results[0][1] == var_x);
+    REQUIRE(results[0][2] == var_z);
+    REQUIRE(results[0][5] == var_i);
+    REQUIRE(results[1][1] == assign_2);
+    REQUIRE(results[1][3] == assign_1);
+    REQUIRE(results[1][5] == assign_3);
+
+    SECTION("Delete a valid row with no empty column") {
+      table.DeleteRow(0);
+      std::vector<std::vector<Entity*>> curr_results = table.GetResults();
+      bool output = curr_results[0][1] == var_z;
+      REQUIRE(output);
+      REQUIRE(curr_results[1][0] == assign_2);
+    }
+  }
+
+  table.AddColumn(assign_synonym);
+  table.AddMultipleRowForAllColumn(assign_synonym, 0, assign_1, 0);
+  table.AddMultipleRowForAllColumn(assign_synonym, 0, assign_2, 1);
+  table.AddMultipleRowForAllColumn(assign_synonym, 2, assign_2, 0);
+  table.AddMultipleRowForAllColumn(assign_synonym, 3, assign_1, 0);
+  table.AddMultipleRowForAllColumn(assign_synonym, 3, assign_2, 1);
+  table.AddMultipleRowForAllColumn(assign_synonym, 3, assign_3, 2);
+
+  SECTION("Cross Product column") {
+    std::vector<Synonym *> synonyms = {constant_synonym};
+    Entity *first_const = GetConst0();
+    Entity *second_const = GetConst1();
+    Entity *third_const = GetConst3();
+    std::vector<Entity *> constant_values = {first_const, second_const, third_const};
+    std::vector<std::vector<Entity *>> values = {constant_values};
+    table.CrossProductColumns(synonyms, values);
+    REQUIRE(table.GetColumnSize() == 3);
+    REQUIRE(table.GetRowSize() == 18);
+  }
+
+  table.AddColumn(prog_line_synonym);
+
   SECTION("Delete a row with an empty column") {
-    outcome = table.DeleteRow(0);
+    bool outcome = table.DeleteRow(5);
     REQUIRE(outcome);
-    REQUIRE(table.GetResults().size() == 2);
+    REQUIRE(table.GetRowSize() == 5);
+    REQUIRE(table.GetColumnSize() == 3);
   }
 
   SECTION("Retrieve an empty column") {
-    REQUIRE(table.GetColumn("s1").empty());
+    REQUIRE(table.GetColumn(prog_line_synonym).empty());
   }
 
-  SECTION("Empty a valid column") {
-    REQUIRE(table.RemoveColumn("v"));
-    REQUIRE(table.GetResults().empty());
+  SECTION("Retrieve a column") {
+    REQUIRE(table.GetColumn(assign_synonym)[0] == assign_1);
   }
 
-  SECTION("Empty an invalid column") {
-    REQUIRE_FALSE(table.RemoveColumn("null"));
+  SECTION("Add a valid column") {
+    REQUIRE(table.AddColumn(constant_synonym));
   }
-}
 
-TEST_CASE("3.QueryEvaluatorTable.Add Multiple Rows") {
-  std::string target = "s1";
-  QueryEvaluatorTable table(target);
-
-  std::list<std::string> synonym_list = {"2", "3", "4", "5"};
-  bool outcome = table.AddTargetSynonym(synonym_list);
-  REQUIRE(outcome);
-  table.AddColumn("v1");
-  table.AddRow("v1", 0, "x");
-  bool result = table.AddRow("v1", 2, "x");
-  REQUIRE_FALSE(result);
-  table.AddRow("v1", 1, "y");
-  table.AddRow("v1", 2, "QWERT");
-  table.AddRow("v1", 3, "p2p");
-  table.AddColumn("test");
-  table.AddMultipleRowForAllColumn("test", 0, "a", 0);
-  table.AddMultipleRowForAllColumn("test", 0, "b", 1);
-  table.AddMultipleRowForAllColumn("test", 0, "c", 2);
-  table.AddMultipleRowForAllColumn("test", 0, "d", 3);
-  REQUIRE(table.GetRowSize() == 7);
-  std::vector<std::string> expected = {"2", "2", "2", "2", "3", "4", "5"};
-  REQUIRE(table.GetResults() == expected);
-  table.AddColumn("test2");
-  table.AddRowForAllColumn("test2", 0, "new input");
-  expected = {"2", "2", "2", "2", "2", "3", "4", "5"};
-  REQUIRE(table.GetResults() == expected);
-  REQUIRE(table.GetRowSize() == 8);
+  SECTION("Get target synonyms") {
+    std::vector<Synonym *> target_synonym_in_table = table.GetTargetSynonymList();
+    REQUIRE(target_synonym_in_table[0] == variable_synonym);
+    REQUIRE(target_synonym_in_table[1] == assign_synonym);
+  }
 }

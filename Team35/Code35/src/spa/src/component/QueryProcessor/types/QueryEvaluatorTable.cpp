@@ -1,68 +1,35 @@
 #include "QueryEvaluatorTable.h"
 
-QueryEvaluatorTable::QueryEvaluatorTable(std::string target) {
-  target_synonym = target;
+#include <utility>
+#include <cassert>
+
+bool QueryEvaluatorTable::AddTargetSynonymValues(Synonym *target, std::vector<Entity *> entity_list) {
+  synonym_to_entity_map[target] = std::move(entity_list);
+  return true;
 }
 
-// Add column to table
-bool QueryEvaluatorTable::AddColumn(std::string synonym) {
-  if (um.find(synonym) == um.end()) {
-    std::vector<std::string> synonym_list;
-    um.insert(std::make_pair(synonym, synonym_list));
+
+bool QueryEvaluatorTable::AddColumn(Synonym *synonym) {
+  if (synonym_to_entity_map.find(synonym) == synonym_to_entity_map.end()) {
+    std::vector<Entity *> synonym_list;
+    synonym_to_entity_map.insert(std::make_pair(synonym, synonym_list));
     return true;
   } else {
     return false;
   }
 }
 
-// Add target synonym column with values to table
-bool QueryEvaluatorTable::AddTargetSynonym(std::list<std::string> synonym_list) {
-  std::vector<std::string> synonym_vector;
-  // TODO: Change internal pql API input to be a vector instead of a list to avoid this.
-  for (std::string const& value: synonym_list) {
-    synonym_vector.push_back(value);
-  }
-  um[target_synonym] = synonym_vector;
-  return true;
-
+bool QueryEvaluatorTable::ContainsColumn(Synonym *synonym) {
+  auto search = synonym_to_entity_map.find(synonym);
+  return search != synonym_to_entity_map.end();
 }
 
-// Delete row
-bool QueryEvaluatorTable::DeleteRow(int index) {
-  if (um[target_synonym].size() - 1 < index) {
-    return false;
-  }
-  for (auto iter = um.begin(); iter != um.end(); ++iter) {
-    std::vector<std::string> current_column = iter->second;
-    unsigned long size = current_column.size();
-    if (index < size) {
-      current_column.erase(current_column.begin() + index);
-      iter->second = current_column;
-    }
-  }
-  return true;
-}
-
-// Add row (and new col)
-bool QueryEvaluatorTable::AddRow(std::string synonym, int index, std::string value) {
+bool QueryEvaluatorTable::AddRow(Synonym *synonym, int index, Entity *entity) {
   // assert that index == size
-  if (index != um[synonym].size()) {
+  if (index != synonym_to_entity_map[synonym].size()) {
     return false;
   }
-  um[synonym].push_back(value);
-  return true;
-}
-
-bool QueryEvaluatorTable::AddRowForAllColumn(std::string synonym, int index, std::string value) {
-  for (auto tableIterator = um.begin(); tableIterator != um.end(); tableIterator++) {
-    if (tableIterator->first == synonym) {
-      AddRow(synonym, index, value);
-    } else {
-      std::vector<std::string> currList = tableIterator->second;
-      currList.insert(currList.begin() + index, currList[index]);
-      tableIterator->second = currList;
-    }
-  }
+  synonym_to_entity_map[synonym].push_back(entity);
   return true;
 }
 
@@ -71,94 +38,140 @@ bool QueryEvaluatorTable::AddRowForAllColumn(std::string synonym, int index, std
  * Each subsequent time a row is added (i.e repeat_count > 0), the value for all other rows are copied, and the value
  * is added to the column under 'synonym'.
  *
- * @param synonym The name of the synonym which acts as the column header.
- * @param index The position to insert the row in the table. This should be the same across repeated rows.
- * @param value The value to be inserted into the column.
- * @param repeat_count The number of times this call has been repeated for the same values in all other columns.
- * @return false if there is an error with adding values into the table or if the synonym column does not exist.
- * True otherwise.
+ * @param synonym
+ * @param index
+ * @param entity
+ * @param count
+ * @return
  */
-bool QueryEvaluatorTable::AddMultipleRowForAllColumn(std::string synonym,
-                                                     int index,
-                                                     std::string value,
-                                                     int repeat_count) {
+bool QueryEvaluatorTable::AddMultipleRowForAllColumn(Synonym *synonym, int index, Entity *entity, int repeat_count) {
   if (!ContainsColumn(synonym)) {
     return false;
   }
 
-  for (auto tableIterator = um.begin(); tableIterator != um.end(); tableIterator++) {
-    if (tableIterator->first == synonym) {
-      AddRow(synonym, index + repeat_count, value);
+  for (auto & tableIterator : synonym_to_entity_map) {
+    if (tableIterator.first == synonym) {
+      AddRow(synonym, index + repeat_count, entity);
     } else {
       if (repeat_count > 0) {
-        std::vector<std::string> currList = tableIterator->second;
+        std::vector<Entity *> currList = tableIterator.second;
         currList.insert(currList.begin() + index + repeat_count, currList[index]);
-        tableIterator->second = currList;
+        tableIterator.second = currList;
       }
     }
   }
   return true;
 }
 
-// Return vector of target synonym
-std::vector<std::string> QueryEvaluatorTable::GetResults() {
-  auto search = um.find(target_synonym);
-  //assert search != um.end()
-  return search->second;
-}
-
-// Return vector of specified synonym
-std::vector<std::string> QueryEvaluatorTable::GetColumn(std::string synonym) {
-  auto search = um.find(synonym);
-  //assert search != um.end()
-  return search->second;
-}
-
-// Empty column
-bool QueryEvaluatorTable::RemoveColumn(std::string synonym) {
-  auto search = um.find(synonym);
-  if (search == um.end()) {
+bool QueryEvaluatorTable::DeleteRow(int index) {
+  if (synonym_to_entity_map[target_synonym_list[0]].size() - 1 < index) {
     return false;
-  } else {
-    search->second.clear();
-    return true;
   }
+  for (auto & iter : synonym_to_entity_map) {
+    std::vector<Entity *> current_column = iter.second;
+    unsigned long size = current_column.size();
+    if (index < size) {
+      current_column.erase(current_column.begin() + index);
+      iter.second = current_column;
+    }
+  }
+  return true;
 }
 
-bool QueryEvaluatorTable::ContainsColumn(std::string synonym) {
-  auto search = um.find(synonym);
-  return search != um.end();
+std::vector<Entity *> QueryEvaluatorTable::GetColumn(Synonym *synonym) {
+  auto search = synonym_to_entity_map.find(synonym);
+  if (search == synonym_to_entity_map.end()) return {};
+  return search->second;
 }
 
-int QueryEvaluatorTable::GetSize() {
-  return um.size();
+int QueryEvaluatorTable::GetColumnSize() {
+  return (int) synonym_to_entity_map.size();
 }
 
+/**
+ * The row size of the table is calculated from the number of rows for the first target synonym. This is because
+ * the table is assumed to contain the first row first.
+ * @return
+ */
 int QueryEvaluatorTable::GetRowSize() {
-  auto search = um.find(target_synonym);
-  //assert search != um.end()
-  return search->second.size();
+  auto search = synonym_to_entity_map.find(target_synonym_list[0]);
+
+  if(search == synonym_to_entity_map.end()) return 0;
+  return (int) search->second.size();
 }
 
-std::string QueryEvaluatorTable::GetStatementSynonym(std::unordered_map<std::string,
-                                                                        DesignEntity> synonym_design_entity_map) {
-  bool is_statement = false;
-  for (auto tableIterator = um.begin(); tableIterator != um.end(); tableIterator++) {
-    DesignEntity current_design_entity = synonym_design_entity_map[tableIterator->first];
-    switch (current_design_entity) {
-      case DesignEntity::kStmt:
-      case DesignEntity::kAssign:
-      case DesignEntity::kCall:
-      case DesignEntity::kPrint:
-      case DesignEntity::kRead:
-      case DesignEntity::kIf:
-      case DesignEntity::kWhile:is_statement = true;
-        break;
-      default:break;
-    }
-    if (is_statement) {
-      return tableIterator->first;
+/**
+ * Gets a vector of columns in this table, whose column headers(synonyms) are in the target synonym list.
+ * Order of columns will be kept the same as the target synonym list.
+ *
+ * @return Vector of columns which are vectors of Entity*
+ */
+std::vector<std::vector<Entity*>> QueryEvaluatorTable::GetResults() {
+  std::vector<std::vector<Entity *>> target_table;
+  for (auto synonym : target_synonym_list) {
+    if (synonym_to_entity_map.count(synonym) > 0) {
+      std::vector<Entity*> column = synonym_to_entity_map.find(synonym)->second;
+      target_table.push_back(column);
     }
   }
-  return "";
+
+  return target_table;
+}
+
+std::vector<Synonym*> QueryEvaluatorTable::GetTargetSynonymList() {
+  return target_synonym_list;
+}
+
+/**
+ * Creates the new column and populate the table and the new column(s) with the cross producted rows.
+ * @param synonyms
+ * @param values
+ */
+void
+QueryEvaluatorTable::CrossProductColumns(std::vector<Synonym *> synonyms, std::vector<std::vector<Entity *>> values) {
+  assert(synonyms.size() == values.size());
+  for (int i = 0; i < synonyms.size(); i++) {
+    AddColumn(synonyms[i]);
+    CrossProductSingleColumn(synonyms[i], values[i]);
+  }
+}
+
+void QueryEvaluatorTable::CrossProductSingleColumn(Synonym *synonym, const std::vector<Entity *>& values) {
+  int number_of_repeat = 0;
+  int current_index = 0;
+  int original_number_of_rows = GetRowSize();
+  for (auto value : values) {
+    if (number_of_repeat > 0) {
+      DuplicateTableForCrossProduct(original_number_of_rows, synonym);
+    }
+    InsertValuesForCrossProduct(synonym, value, original_number_of_rows);
+    current_index += original_number_of_rows;
+    number_of_repeat++;
+  }
+}
+
+QueryEvaluatorTable::QueryEvaluatorTable(Synonym *target) {
+  std::vector<Synonym *> list = {target};
+  target_synonym_list = list;
+}
+
+QueryEvaluatorTable::QueryEvaluatorTable(std::vector<Synonym *> target_list) {
+  target_synonym_list = std::move(target_list);
+}
+
+void QueryEvaluatorTable::DuplicateTableForCrossProduct(int original_size, Synonym *synonym_to_add) {
+  for (auto & iter : synonym_to_entity_map) {
+    if (iter.first == synonym_to_add) continue;
+    std::vector<Entity *> current_column = iter.second;
+    for (int i = 0; i < original_size; i++) {
+      current_column.push_back(current_column[i]);
+    }
+    iter.second = current_column;
+  }
+}
+
+void QueryEvaluatorTable::InsertValuesForCrossProduct(Synonym *synonym_column, Entity *value, int original_size) {
+  for (int i = 0; i < original_size; i++) {
+    synonym_to_entity_map[synonym_column].push_back(value);
+  }
 }

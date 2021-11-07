@@ -1,0 +1,106 @@
+procedure Main {
+1.	alpha = 1;
+2.	beta = 2;
+3.	charlie = 3;
+4.	delta = 4;
+5.	null = null + 1;
+6.	if (zebra > lion) then {
+7.		call loopies;
+	} else {
+8.		null = alpha;
+9.		call PrinterWithoutInk;
+10.		while (lion > tiger) {
+11.			charlie = charlie % delta;
+12.			call LoopWrapper;
+13.			delta = charlie % alpha;
+		}
+14.		read delta;
+	}
+
+15.	charlie = delta;
+16.	delta = beta + erik;
+17.	call ResetBetaCharlie;
+
+18.	while (submodule == submodule) {
+19.		beta = null + beta;
+20.		charlie = erik;
+21.		null = null + delta;
+
+22.		while (!(submodule == submodule)) {
+23.			null = null;
+24.			call ResetAllExceptNull;
+		}
+25.		delta = null;
+	}
+26.	global = alpha + beta + charlie + delta + erik + null;
+}
+
+procedure LoopWrapper {
+27.	call loopies;
+}
+
+procedure loopies {
+28.	while (true == 1) {
+29.		alpha = beta + charlie + delta;
+30.		beta = charlie + delta + alpha;
+31.		charlie = delta + alpha + beta;
+32.		delta = delta + 1;
+	}
+}
+
+procedure ResetAllExceptNull {
+33.	if (reset == true) then {
+34.		alpha = 1;
+35.		beta = 2;
+36.		charlie = 3;
+37.		delta = 4;
+	} else {
+38.		call PrinterWithoutInk;
+	}
+}
+
+procedure PrinterWithoutInk {
+39.	print alpha;
+40.	print beta;
+41.	print charlie;
+42.	print delta;
+}
+
+procedure ResetBetaCharlie {
+43.	read beta;
+44. read charlie; 
+}
+
+Affects: 
+(1,8),(1,26),
+(2,16),
+(3,11),
+(4,11),
+(5,19),(5,21),(5,26),
+(8,19),(8,21),(8,26),
+(13,11),
+(16,21),(16,26),
+(19,19),(19,26),
+(20,26),
+(21,19),(21,21),(21,23),(21,25),(21,26),
+(23,19),(23,21),(23,23),(23,25),(23,26),
+(25,21),(25,26)
+++++++++++++++++++++++++++++++++++++
+(29,30), (29,31),
+(30,29), (30,31),
+(31,29), (31,30),
+(32,29), (32,30), (32,31), (32,32)
+====================================
+
+Transitive: 
+(1,19),(1,21),(1,23),(1,25),
+(2,19),(2,21),(2,23),(2,25),(2,26),
+(5,23),(5,25),
+(8,23),(8,25),
+(16,19),(16,23),(16,25),
+(25,19),(25,23),(25,25)
+++++++++++++++++++++++++++++++++++++
+(29,29),
+(30,30),
+(31,31)
+====================================

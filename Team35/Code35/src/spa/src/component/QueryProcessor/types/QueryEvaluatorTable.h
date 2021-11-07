@@ -1,52 +1,54 @@
-#ifndef INC_21S1_CP_SPA_TEAM_35_QUERYEVALUATORTABLE_H
-#define INC_21S1_CP_SPA_TEAM_35_QUERYEVALUATORTABLE_H
+#ifndef AUTOTESTER_QUERYEVALUATORTABLE_H
+#define AUTOTESTER_QUERYEVALUATORTABLE_H
 
+//#include <synonym_to_entity_map>
+//#include <string>
+//#include <vector>
+//#include <utility>
+//#include <model/Entity.h>
+//#include "Types.h"
+
+#include <model/Entity.h>
 #include <unordered_map>
-#include <string>
-#include <vector>
-#include <utility>
-#include <list>
 #include "Types.h"
 
 class QueryEvaluatorTable {
- public:
-  QueryEvaluatorTable(std::string target);
+  public:
+    explicit QueryEvaluatorTable(Synonym *target);
+    explicit QueryEvaluatorTable(std::vector<Synonym *> target_list);
 
-  // Add column to table
-  bool AddColumn(std::string synonym);
+    // Add target synonym column with values to table
+    bool AddTargetSynonymValues(Synonym *target, std::vector<Entity *> entity_list);
+    // Add column to table
+    bool AddColumn(Synonym *synonym);
+    // Check if the table contains the column based on the synonym*
+    virtual bool ContainsColumn(Synonym *synonym);
+    // Add Rows to table
+    bool AddMultipleRowForAllColumn(Synonym *synonym, int index, Entity *entity, int repeat_count);
+    // Delete row
+    bool DeleteRow(int index);
+    // Return vector of specified synonym
+    std::vector<Entity *> GetColumn(Synonym *synonym);
+    // Return the number of columns
+    int GetColumnSize();
+    // Return the number of rows in the table
+    int GetRowSize();
+    // Return vector of target synonym results
+    std::vector<std::vector<Entity*>> GetResults();
+    // Return the vector of target synonyms in the table.
+    std::vector<Synonym*> GetTargetSynonymList();
+    // Add row (and new col)
+    bool AddRow(Synonym *synonym, int index, Entity *entity);
+    // Cross product a new synonyms' columns with the values in the table
+    void CrossProductColumns(std::vector<Synonym *> synonyms, std::vector<std::vector<Entity *>> values);
 
-  bool AddRowForAllColumn(std::string synonym, int index, std::string value);
+  private:
+    std::unordered_map<Synonym *, std::vector<Entity *>> synonym_to_entity_map;
+    std::vector<Synonym *> target_synonym_list;
 
-  bool AddMultipleRowForAllColumn(std::string synonym, int index, std::string value, int count);
-
-  // Add target synonym column with values to table
-  bool AddTargetSynonym(std::list<std::string> synonymList);
-
-  // Delete row
-  bool DeleteRow(int index);
-
-  // Add row (and new col)
-  bool AddRow(std::string synonym, int index, std::string value);
-
-  // Return vector of target synonym
-  std::vector<std::string> GetResults();
-
-  // Return vector of specified synonym
-  std::vector<std::string> GetColumn(std::string synonym);
-
-  // Empty column but keep the synonym (header) in the table
-  bool RemoveColumn(std::string synonym);
-
-  bool ContainsColumn(std::string synonym);
-
-  int GetSize();
-
-  int GetRowSize();
-
-  std::string GetStatementSynonym(std::unordered_map<std::string, DesignEntity> synonym_design_entity_map);
- private:
-  std::unordered_map<std::string, std::vector<std::string>> um;
-  std::string target_synonym;
+    void CrossProductSingleColumn(Synonym *synonym, const std::vector<Entity *>& values);
+    void DuplicateTableForCrossProduct(int original_size, Synonym *synonym_to_add);
+    void InsertValuesForCrossProduct(Synonym *synonym_column, Entity *value, int original_size);
 };
 
-#endif //INC_21S1_CP_SPA_TEAM_35_QUERYEVALUATORTABLE_H
+#endif //AUTOTESTER_QUERYEVALUATORTABLE_H

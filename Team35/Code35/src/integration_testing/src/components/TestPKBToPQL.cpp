@@ -24,7 +24,7 @@ Deliverable* SetUpDeliverable_Week4() {
   proc_list->push_back(proc);
 
   std::list<Variable*>* var_list = deliverable->GetVariableList();
-  std::list<ConstantValue*>* const_list = deliverable->GetConstantValueList();
+  std::list<Constant*>* const_list = deliverable->GetConstantList();
 
   // read x
   Variable* var_x = new Variable(new VariableName("x"));
@@ -35,7 +35,7 @@ Deliverable* SetUpDeliverable_Week4() {
   proc->AddStatement(stmt1);
   deliverable->AddStatement(stmt1);
   deliverable->AddReadEntity(stmt1);
-  deliverable->AddModifiesRelationship(stmt1, stmt1->GetVariable());
+  deliverable->AddModifiesRelationship(stmt1, stmt1->GetVariableObj());
 
   // print x
   PrintEntity* stmt2 = new PrintEntity(var_x);
@@ -44,17 +44,17 @@ Deliverable* SetUpDeliverable_Week4() {
   proc->AddStatement(stmt2);
   deliverable->AddStatement(stmt2);
   deliverable->AddPrintEntity(stmt2);
-  deliverable->AddUsesRelationship(stmt2, stmt2->GetVariable());
+  deliverable->AddUsesRelationship(stmt2, stmt2->GetVariableObj());
 
   // y = 1
-  ConstantValue* cv1 = new ConstantValue("1");
+  Constant* cv1 = new Constant(new ConstantValue("1"));
   const_list->push_back(cv1);
   Variable* var_y = new Variable(new VariableName("y"));
   var_list->push_back(var_y);
 
   std::string stmt3_s = "1";
   std::vector<Variable*> stmt3_var_expr;
-  std::vector<ConstantValue*> stmt3_cv_expr;
+  std::vector<Constant*> stmt3_cv_expr;
   stmt3_cv_expr.push_back(cv1);
 
   AssignEntity* stmt3 = new AssignEntity(var_y, stmt3_s, stmt3_var_expr, stmt3_cv_expr);
@@ -63,21 +63,21 @@ Deliverable* SetUpDeliverable_Week4() {
   proc->AddStatement(stmt3);
   deliverable->AddStatement(stmt3);
   deliverable->AddAssignEntity(stmt3);
-  deliverable->AddModifiesRelationship(stmt3, stmt3->GetVariable());
+  deliverable->AddModifiesRelationship(stmt3, stmt3->GetVariableObj());
 
-  for (Variable* v: stmt3->GetExpressionVariables()) {
+  for (Variable* v: stmt3->GetExprVariables()) {
     deliverable->AddUsesRelationship(stmt3, v);
   }
 
   // z = 3
-  ConstantValue* cv2 = new ConstantValue("3");
+  Constant* cv2 = new Constant(new ConstantValue("3"));
   const_list->push_back(cv2);
   Variable* var_z = new Variable(new VariableName("z"));
   var_list->push_back(var_z);
 
   std::string stmt4_s = "3";
   std::vector<Variable*> stmt4_var_expr;
-  std::vector<ConstantValue*> stmt4_cv_expr;
+  std::vector<Constant*> stmt4_cv_expr;
   stmt4_cv_expr.push_back(cv2);
 
   AssignEntity* stmt4 = new AssignEntity(var_z, stmt4_s, stmt4_var_expr, stmt4_cv_expr);
@@ -86,21 +86,21 @@ Deliverable* SetUpDeliverable_Week4() {
   proc->AddStatement(stmt4);
   deliverable->AddStatement(stmt4);
   deliverable->AddAssignEntity(stmt4);
-  deliverable->AddModifiesRelationship(stmt4, stmt4->GetVariable());
+  deliverable->AddModifiesRelationship(stmt4, stmt4->GetVariableObj());
 
-  for (Variable* v: stmt4->GetExpressionVariables()) {
+  for (Variable* v: stmt4->GetExprVariables()) {
     deliverable->AddUsesRelationship(stmt4, v);
   }
 
   // z = x + y + 3;
-  ConstantValue* cv3 = new ConstantValue("3"); //note that ConstantValue is not unique.
+  Constant* cv3 = new Constant(new ConstantValue("3")); //note that ConstantValue is not unique.
   const_list->push_back(cv3);
 
   std::string stmt5_s = "x + y + 3";
   std::vector<Variable*> stmt5_var_expr;
   stmt5_var_expr.push_back(var_x);
   stmt5_var_expr.push_back(var_y);
-  std::vector<ConstantValue*> stmt5_cv_expr;
+  std::vector<Constant*> stmt5_cv_expr;
   stmt5_cv_expr.push_back(cv3);
 
   AssignEntity* stmt5 = new AssignEntity(var_z, stmt5_s, stmt5_var_expr, stmt5_cv_expr);
@@ -109,9 +109,9 @@ Deliverable* SetUpDeliverable_Week4() {
   proc->AddStatement(stmt5);
   deliverable->AddStatement(stmt5);
   deliverable->AddAssignEntity(stmt5);
-  deliverable->AddModifiesRelationship(stmt5, stmt5->GetVariable());
+  deliverable->AddModifiesRelationship(stmt5, stmt5->GetVariableObj());
 
-  for (Variable* v: stmt5->GetExpressionVariables()) {
+  for (Variable* v: stmt5->GetExprVariables()) {
     deliverable->AddUsesRelationship(stmt5, v);
   }
 
@@ -163,7 +163,7 @@ TEST_CASE("5. Miscellaneous entity and relationship retrievals") {
 //            "read r; print p; assign a; Select p such that Follows(p, r) such that Follows(p, a)", // should get "", Get "2 instead
   };
 
-  std::vector<std::list<std::string>> answer_list = {
+  std::vector<std::vector<std::string>> answer_list = {
       {"x", "y", "z"},
       {"3", "4", "5"},
       {"1"},
@@ -179,7 +179,7 @@ TEST_CASE("5. Miscellaneous entity and relationship retrievals") {
   };
   for (int i = 0; i < query_list.size(); i++) {
     std::string* query = & query_list.at(i);
-    std::list<std::string> answer = QuerySystemController::Evaluate(query, & pkb);
+    std::vector<std::string> answer = QuerySystemController::Evaluate(query, & pkb);
     REQUIRE(answer == answer_list[i]);
   }
 }

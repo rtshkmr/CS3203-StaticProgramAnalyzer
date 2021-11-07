@@ -44,7 +44,7 @@ TEST_CASE("1.DataType.ConditionalExpression") {
     
     // This test below is to check if variable in CondExpr is sorted. 
     // Naturally if CondExpr is not sorted, BST may not work. 
-    REQUIRE(if8->GetExpressionVariables() == std::vector<Variable*> { var_z_, var_y_, var_x_ }); 
+    REQUIRE(if8->GetControlVariables() == std::vector<Variable*> {var_z_, var_y_, var_x_ });
     REQUIRE(if8->GetCondExpr()->GetVariableList() == std::vector<Variable*>{ var_x_, var_y_, var_z_ });
     
     REQUIRE(if8->GetCondExpr()->CheckExist(var_x_));

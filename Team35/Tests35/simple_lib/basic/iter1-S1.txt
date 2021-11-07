@@ -1,0 +1,23 @@
+procedure a {
+     a = 1;
+     a = a + 1;
+     a = aa;
+     a = a1 * a2 + a3 / a4 % a5 + ((((a6)))) * (a7 - a8);
+     a = a9;
+     read a10;
+     while (((a11 > 0) && (a12 < 0)) || ((a13 == 0) && (!((!(a > 0)) && (a15 < 0))))) {
+         read aa;
+         read a16;
+        while (((a17 + a18 + a19) > (a20 + (a21 + a22))) && (a23 > (a + a25))) {
+            a = a26 * a27 + a28 / (a % a29) + ((((a30)))) * (a - a31);
+            if(a32 * a33 + a34 % (a35 % a36) < a37 - a38 * (a39 / a) + a40 / a41) then {
+                a = a42 + aa;
+                read a;
+            } else {
+                print a47;
+                print a48;
+            }
+        }
+    }
+}
+

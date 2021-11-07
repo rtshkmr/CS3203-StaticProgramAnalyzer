@@ -4,25 +4,31 @@
 
 #include "Statement.h"
 
+#include <utility>
+
 using std::string;
 using std::vector;
 
-IfEntity::IfEntity(std::string condition, vector<Variable*> expr_variables, vector<ConstantValue*> expr_constants) {
+IfEntity::IfEntity(std::string condition, vector<Variable*> control_variables,
+                   vector<Constant*> control_constants) {
   type = EntityEnum::kIfEntity;
-  cond_expr_ = new ConditionalExpression(condition, expr_variables);
-  this->control_variables = std::move(expr_variables);
-  this->control_constants = std::move(expr_constants);
+  cond_expr_ = new ConditionalExpression(std::move(condition), control_variables);
+  this->control_variables = std::move(control_variables);
+  this->control_constants = std::move(control_constants);
+  for(auto* variable : this->control_variables) {
+    variable->AddStatement(this);
+  }
 }
 
 ConditionalExpression* IfEntity::GetCondExpr() {
   return cond_expr_;
 }
 
-vector<Variable*> IfEntity::GetExpressionVariables() {
+vector<Variable*> IfEntity::GetControlVariables() {
   return control_variables;
 }
 
-vector<ConstantValue*> IfEntity::GetExpressionConstants() {
+vector<Constant*> IfEntity::GetControlConstants() {
   return control_constants;
 }
 
@@ -37,44 +43,58 @@ void IfEntity::SetElseEntity(ElseEntity* else_entity) {
 std::list<Statement*>* IfEntity::GetElseStmtList() {
   return else_entity_->GetStatementList();
 }
+void IfEntity::AddStatementToElseEntity(Statement* statement) {
+  else_entity_->AddStatement(statement);
+}
+int IfEntity::GetElseStatementListSize() {
+  return else_entity_->GetStatementList()->size();
+}
 
 ElseEntity::ElseEntity() {
   type = EntityEnum::kElseEntity;
 }
 
 WhileEntity::WhileEntity(std::string condition,
-                         vector<Variable*> expr_variables,
-                         vector<ConstantValue*> expr_constants) {
+                         vector<Variable*> control_variables,
+                         vector<Constant*> control_constants) {
   type = EntityEnum::kWhileEntity;
-  cond_expr_ = new ConditionalExpression(condition, expr_variables);
-  this->control_variables = std::move(expr_variables);
-  this->control_constants = std::move(expr_constants);
+  cond_expr_ = new ConditionalExpression(std::move(condition), control_variables);
+  this->control_variables = std::move(control_variables);
+  this->control_constants = std::move(control_constants);
+  for(auto* variable : this->control_variables) {
+    variable->AddStatement(this);
+  }
 }
 
 ConditionalExpression* WhileEntity::GetCondExpr() {
   return cond_expr_;
 }
 
-vector<Variable*> WhileEntity::GetExpressionVariables() {
+vector<Variable*> WhileEntity::GetControlVariables() {
   return control_variables;
 }
 
-vector<ConstantValue*> WhileEntity::GetExpressionConstants() {
+vector<Constant*> WhileEntity::GetControlConstants() {
   return control_constants;
 }
 
 AssignEntity::AssignEntity(Variable* var,
                            std::string expression,
                            vector<Variable*> expr_variables,
-                           vector<ConstantValue*> expr_constants) {
+                           vector<Constant*> expr_constants) {
   type = EntityEnum::kAssignEntity;
   assigned_to_ = var;
-  expr_ = new AssignmentExpression(expression);
+  expr_ = new AssignmentExpression(std::move(expression));
   this->expr_variables = std::move(expr_variables);
   this->expr_constants = std::move(expr_constants);
+
+  var->AddStatement(this);
+  for(auto* variable : this->expr_variables) {
+    variable->AddStatement(this);
+  }
 }
 
-Variable* AssignEntity::GetVariable() {
+Variable* AssignEntity::GetVariableObj() {
   return assigned_to_;
 }
 
@@ -82,37 +102,48 @@ AssignmentExpression* AssignEntity::GetAssignmentExpr() {
   return expr_;
 }
 
-vector<Variable*> AssignEntity::GetExpressionVariables() {
+vector<Variable*> AssignEntity::GetExprVariables() {
   return expr_variables;
 }
 
-vector<ConstantValue*> AssignEntity::GetExpressionConstants() {
+vector<Constant*> AssignEntity::GetExprConstants() {
   return expr_constants;
+}
+std::string AssignEntity::GetVariableString() {
+  return assigned_to_->GetName();
 }
 
 CallEntity::CallEntity(Procedure* proc_name) {
   type = EntityEnum::kCallEntity;
-  proc_name_ = proc_name;
+  called_proc_name_ = proc_name;
 }
 
-Procedure* CallEntity::GetProcedure() {
-  return proc_name_;
+Procedure* CallEntity::GetCalledProcedure() {
+  return called_proc_name_;
 }
 
 PrintEntity::PrintEntity(Variable* var_name) {
   type = EntityEnum::kPrintEntity;
   var_name_ = var_name;
+  var_name_->AddStatement(this);
 }
 
-Variable* PrintEntity::GetVariable() {
+Variable* PrintEntity::GetVariableObj() {
   return var_name_;
+}
+std::string PrintEntity::GetVariableString() {
+  return var_name_->GetName();
 }
 
 ReadEntity::ReadEntity(Variable* var_name) {
   type = EntityEnum::kReadEntity;
   var_name_ = var_name;
+  var_name_->AddStatement(this);
 }
 
-Variable* ReadEntity::GetVariable() {
+Variable* ReadEntity::GetVariableObj() {
   return var_name_;
+}
+std::string ReadEntity::GetVariableString() {
+  return var_name_->GetName();
 }

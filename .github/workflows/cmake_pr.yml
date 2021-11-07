@@ -1,0 +1,122 @@
+name: CMake_PR
+
+on:
+  pull_request:
+    branches:
+     - '**' #run for all PR
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+  working-directory: ${{github.workspace}}/Team35/Code35
+
+jobs:
+  build_and_test:
+    runs-on: self-hosted
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Check Path
+      run: echo ${{env.working-directory}}
+
+    - name: Configure CMake
+      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+      run: cmake -S ${{env.working-directory}} -B ${{env.working-directory}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: Build SPA
+      # Build your program with the given configuration
+      run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target spa -- -j 8
+      
+    - name: Build Unit Test
+      run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target unit_testing -- -j 8
+
+    - name: Run Unit Test
+      #Running Catch2 natively on terminal
+      run: |
+        cd ${{env.working-directory}}/build/src/unit_testing/
+        ./unit_testing
+
+    - name: Build Integration Test
+      run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target integration_testing -- -j 4
+
+    - name: Run Integration Test
+      run: |
+        cp -r ${{env.working-directory}}/tests/integration_test_files ${{env.working-directory}}/build/src/integration_testing/
+        cd ${{env.working-directory}}/build/src/integration_testing/
+        ./integration_testing
+  
+    - name: Build AutoTester # GUI is excluded
+      run:  cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target autotester -- -j 4
+      
+    - name: Run AutoTester - Throws
+      if: always()
+      run: | 
+        cp -r ${{github.workspace}}/Team35/Tests35 ${{env.working-directory}}/build/src/autotester
+        cd ${{env.working-directory}}/build/src/autotester/Tests35/simple_lib/throw
+        chmod +x ./run_autotester_suite.sh
+        ./run_autotester_suite.sh
+        
+    - name: Run AutoTester - PQL_Single
+      if: always()
+      run: | 
+        cd ${{env.working-directory}}/build/src/autotester/Tests35/simple_lib/pql_single
+        chmod +x ./run_autotester_suite.sh
+        ./run_autotester_suite.sh
+        
+    - name: Run AutoTester - PQL_Multiple
+      if: always()
+      run: | 
+        cd ${{env.working-directory}}/build/src/autotester/Tests35/simple_lib/pql_multiple
+        chmod +x ./run_autotester_suite.sh
+        ./run_autotester_suite.sh
+    
+    - name: Run AutoTester - Basic
+      if: always()
+      run: | 
+        cd ${{env.working-directory}}/build/src/autotester/Tests35/simple_lib/basic
+        chmod +x ./run_autotester_suite.sh
+        ./run_autotester_suite.sh
+    
+    - name: Run AutoTester - Advanced
+      if: always()
+      run: | 
+        cd ${{env.working-directory}}/build/src/autotester/Tests35/simple_lib/adv
+        chmod +x ./run_autotester_suite.sh
+        ./run_autotester_suite.sh
+        
+    - name: Run AutoTester - Timed
+      if: always()
+      run: | 
+        cd ${{env.working-directory}}/build/src/autotester/Tests35/simple_lib/timed
+        chmod +x ./run_autotester_suite.sh
+        ./run_autotester_suite.sh
+        
+    - name: Zip result logs
+      if: always()
+      run: | 
+        cd ${{env.working-directory}}/build/src/autotester/Tests35/simple_lib
+        cp analysis.xsl basic/
+        cp analysis.xsl adv/
+        cp analysis.xsl pql_single/
+        cp analysis.xsl pql_multiple/
+        cp analysis.xsl timed/
+        zip -v basic.zip basic/log_*.txt basic/output_*.xml basic/Team35_SPA_*.log basic/analysis.xsl
+        zip -v adv.zip adv/log_*.txt adv/output_*.xml adv/Team35_SPA_*.log adv/analysis.xsl
+        zip -v single.zip pql_single/log_*.txt pql_single/output_*.xml pql_single/Team35_SPA_*.log pql_single/analysis.xsl
+        zip -v multiple.zip pql_multiple/log_*.txt pql_multiple/output_*.xml pql_multiple/Team35_SPA_*.log pql_multiple/analysis.xsl
+        zip -v timed.zip timed/log_*.txt timed/output_*.xml timed/Team35_SPA_*.log timed/analysis.xsl
+        
+    - uses: actions/upload-artifact@v2
+      if: always()
+      with: 
+        name: output_final
+        path: |
+            ${{env.working-directory}}/build/src/autotester/Tests35/simple_lib/basic.zip 
+            ${{env.working-directory}}/build/src/autotester/Tests35/simple_lib/adv.zip 
+            ${{env.working-directory}}/build/src/autotester/Tests35/simple_lib/single.zip 
+            ${{env.working-directory}}/build/src/autotester/Tests35/simple_lib/multiple.zip 
+            ${{env.working-directory}}/build/src/autotester/Tests35/simple_lib/timed.zip 
+
+    - name: Build All # Take all previous build and build autotester_gui for completeness
+      run: cmake --build ${{env.working-directory}}/build --config ${{env.BUILD_TYPE}} --target all
