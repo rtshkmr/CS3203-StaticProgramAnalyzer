@@ -296,7 +296,6 @@ bool Cluster::CheckScopeClusterForAffects(Cluster* scoped_cluster,
   return found;
 }
 
-
 /**
  * Traverses a scoped cluster moving from first_stmt towards second_stmt in the target range and checks if the lhs_var remains unmodified along the way
  * @param scoped_cluster a scoped cluster is guaranteed to have the target second statement inside it.
