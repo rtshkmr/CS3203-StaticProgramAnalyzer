@@ -5,6 +5,7 @@
 #include "../../../utils/EntityUtils.h"
 
 void AddColumn(QueryEvaluatorTable* table, Synonym* syn, std::vector<Entity*> entities) {
+  if (!table->ContainsColumn(syn)) table->AddColumn(syn);
   for (int i = 0; i < entities.size(); ++i) {
     table->AddRow(syn, i, entities[i]);
   }

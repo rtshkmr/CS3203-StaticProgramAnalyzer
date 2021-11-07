@@ -2,7 +2,6 @@
 #include "RuntimeExtractor.h"
 
 RuntimeExtractor::RuntimeExtractor(PKB* pkb) {
-  pkb_ = pkb;
   next_t_extractor_ = NextTExtractor(pkb);
   affects_extractor_ = AffectsExtractor(this, pkb);
   next_bip_extractor_ = NextBipExtractor(pkb);

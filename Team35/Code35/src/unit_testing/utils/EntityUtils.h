@@ -61,6 +61,9 @@ inline Constant* GetConst2() {
 inline Constant* GetConst3() {
   return const_3_;
 }
+inline Constant* GetPlaceholderEntity() {
+  return const_0_;
+}
 
 // Procedures
 inline Procedure* GetProc1() {

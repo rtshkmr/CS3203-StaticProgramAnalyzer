@@ -65,7 +65,6 @@ class RuntimeExtractor : public RuntimeMediator {
                                                                       ScopeIndication scope_indication,
                                                                       type_combo types);
  private:
-  PKB* pkb_;
   NextTExtractor next_t_extractor_;
   AffectsExtractor affects_extractor_;
   AffectsTExtractor affects_t_extractor_;
