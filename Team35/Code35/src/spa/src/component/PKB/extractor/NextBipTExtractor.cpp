@@ -1,3 +1,4 @@
+#include <util/Utility.h>
 #include "NextBipTExtractor.h"
 #include "RuntimeExtractor.h"
 
@@ -51,7 +52,8 @@ void NextBipTExtractor::PopulateRelationships() {
     rtm_->HasRelationship(PKBRelRefs::kNextBip);
   }
   auto non_t_string_map = pkb_->GetRelationshipMap(PKBRelRefs::kNextBip);
-  non_t_map_ = *pkb_->ConvertStringToEntityMapping(non_t_string_map);
+  std::vector<Entity*> stmt_list = pkb_->GetDesignEntities(DesignEntity::kStmt);
+  non_t_map_ = *Utility::ConvertStringToEntityMapping(stmt_list, non_t_string_map);
   PopulateNextBipT();
   pkb_->PopulateRelationship(&t_map_, PKBRelRefs::kNextBipT);
   pkb_->PopulateRelationship(&reverse_t_map_, PKBRelRefs::kPrevBipT);

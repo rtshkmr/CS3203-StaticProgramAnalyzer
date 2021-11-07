@@ -12,11 +12,11 @@
  * @return The integer value after being converted.
  * @throws SyntaxException when a non-integer in passed in or when integers that had exceeded the range.
  */
-int Utility::ConvertStringToInt(const std::string& input) {
+int Utility::ConvertStringToInt(const std::string &input) {
   size_t num_chars = 0;
   int value;
   try {
-    value = stoi(input, & num_chars);
+    value = stoi(input, &num_chars);
   } catch (std::exception ia) {
     throw SyntaxException("Argument is not smaller that max int.");
   }
@@ -50,4 +50,22 @@ AssignEntity* Utility::GetAssignEntityFromStmtNum(PKB* pkb, int target) {
  */
 bool Utility::IsAssignDesignEntity(DesignEntity de) {
   return de == DesignEntity::kAssign || de == DesignEntity::kStmt || de == DesignEntity::kProgLine;
+}
+
+/**
+ * Converts hashmap of string mapping into string mapping.
+ * @param map Hashmap mapping string to vector of Entities.
+ * @return Mapping of Entity to list of Entities.
+ */
+std::unordered_map<Entity*, std::list<Entity*>*>* Utility::ConvertStringToEntityMapping(
+    std::vector<Entity*> stmt_list,
+    const std::unordered_map<std::string, std::vector<Entity*>> &map) {
+  auto* entity_map = new std::unordered_map<Entity*, std::list<Entity*>*>{};
+  for (auto[key, value] : map) {
+    Entity* first_arg = stmt_list[Utility::ConvertStringToInt(key) - 1];
+    auto* second_arg = new std::list<Entity*>{};
+    second_arg->insert(second_arg->end(), value.begin(), value.end());
+    entity_map->insert({first_arg, second_arg});
+  }
+  return entity_map;
 }

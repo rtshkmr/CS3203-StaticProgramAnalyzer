@@ -116,10 +116,6 @@ class PKB {
   template<typename X, typename Y>
   void PopulateRelationship(std::unordered_map<X*, std::list<Y*>*>* hash, PKBRelRefs ref);
 
-  std::unordered_map<Entity*, std::list<Entity*>*>* ConvertStringToEntityMapping(const std::unordered_map<std::string,
-                                                                                                          std::vector<
-                                                                                                              Entity*>>& pkb_map);
-
   Program* GetProgram();
 
  private:

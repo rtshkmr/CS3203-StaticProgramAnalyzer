@@ -22,6 +22,9 @@ class Utility {
   static int ConvertStringToInt(const std::string& input);
   static AssignEntity* GetAssignEntityFromStmtNum(PKB* pkb, int target);
   static bool IsAssignDesignEntity(DesignEntity de);
+  static std::unordered_map<Entity*, std::list<Entity*>*>* ConvertStringToEntityMapping(
+      std::vector<Entity*> stmt_list,
+      const std::unordered_map<std::string, std::vector<Entity*>>& pkb_map);
   template <typename T>
   static std::vector<Entity*> ConvertListToVector(std::list<T*> list);
 };

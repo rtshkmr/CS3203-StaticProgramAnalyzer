@@ -66,8 +66,8 @@ bool NextBipExtractor::HasRelationship(RelDirection dir, DesignEntity first, Des
 
 void NextBipExtractor::PopulateBipMaps() {
   if (pkb_->HasRelationship(PKBRelRefs::kNextBip)) return;
-  next_bip_map_ = pkb_->ConvertStringToEntityMapping(pkb_->GetRelationshipMap(PKBRelRefs::kNext));
-  prev_bip_map_ = pkb_->ConvertStringToEntityMapping(pkb_->GetRelationshipMap(PKBRelRefs::kPrevious));
+  next_bip_map_ = Utility::ConvertStringToEntityMapping(stmt_list_, pkb_->GetRelationshipMap(PKBRelRefs::kNext));
+  prev_bip_map_ = Utility::ConvertStringToEntityMapping(stmt_list_, pkb_->GetRelationshipMap(PKBRelRefs::kPrevious));
   for (Entity* call_entity : call_list_) {
     if (auto* call_statement = dynamic_cast<Statement*>(call_entity)) {
       std::list<Entity*> next_entities = GetRelFromMap(call_entity, PKBRelRefs::kNextBip);
@@ -200,6 +200,6 @@ PKBRelRefs NextBipExtractor::GetPKBRelRef(RelDirection dir) {
 }
 
 void NextBipExtractor::Delete() {
-  delete(next_bip_map_);
-  delete(prev_bip_map_);
+  delete (next_bip_map_);
+  delete (prev_bip_map_);
 }
