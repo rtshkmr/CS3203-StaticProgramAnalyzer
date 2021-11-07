@@ -1,10 +1,6 @@
 #include <cassert>
 #include "VariableTExtractor.h"
 
-VariableTExtractor::VariableTExtractor(Deliverable* deliverable) {
-  deliverable_ = deliverable;
-}
-
 /**
  * Extracts transitive Modifies/Uses relationship from nested containers and called procedures.
  * For e.g. there can be a while container contained in another while container.
@@ -20,7 +16,8 @@ VariableTExtractor::VariableTExtractor(Deliverable* deliverable) {
  *    else: base case: no inner stmt list
  *    return list of var from curr container
  */
-void VariableTExtractor::Extract(VariableRel rel_type) {
+void VariableTExtractor::Extract(Deliverable* deliverable, VariableRel rel_type) {
+  deliverable_ = deliverable;
   rel_type_ = rel_type;
   InitRelMaps();
 
