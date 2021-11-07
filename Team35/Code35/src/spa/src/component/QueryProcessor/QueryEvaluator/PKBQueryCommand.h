@@ -35,6 +35,21 @@ class PKBQueryReceiver {
   IntermediateTable* QueryEntityAttributeMatch(DesignEntity design_entity, Attribute attribute, std::string value);
 };
 
+//struct EntityPairComparator {
+//  // "less than"
+//  template<typename T>
+//  bool lt(const T &lhs, const T &rhs) {
+//    return std::less<T>()(lhs, rhs);
+//  }
+//
+//  bool operator()(std::pair<Entity *, Entity *> &lhs, std::pair<Entity *, Entity *> &rhs) {
+//    return lt(lhs.first, rhs.first)
+//    || (!lt(rhs.first, lhs.first) && lt(lhs.second, rhs.second));
+//  }
+//};
+
+
+
 class PKBQueryCommand {
  public:
   virtual void SetReceiver(PKBQueryReceiver* receiver) = 0;
