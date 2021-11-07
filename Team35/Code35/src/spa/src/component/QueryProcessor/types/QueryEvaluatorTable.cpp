@@ -26,8 +26,10 @@ bool QueryEvaluatorTable::ContainsColumn(Synonym *synonym) {
 }
 
 bool QueryEvaluatorTable::AddRow(Synonym *synonym, int index, Entity *entity) {
-  synonym_to_entity_map[synonym][index] = entity;
-  return index == synonym_to_entity_map[synonym].size();
+  bool result = index == synonym_to_entity_map[synonym].size();
+  if (index >= GetRowSize()) synonym_to_entity_map[synonym].push_back(entity);
+  else synonym_to_entity_map[synonym][index] = entity;
+  return result;
 }
 
 /**

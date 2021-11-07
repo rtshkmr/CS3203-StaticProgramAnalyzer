@@ -47,15 +47,15 @@ TEST_CASE("3.QueryEvaluatorTable.Target synonym is statement") {
     REQUIRE(table.GetColumnSize() == 2);
 
     SECTION("Added values are valid") {
-      outcome = table.AddRow(assign_syn, 0, stmt4);
+      outcome = table.AddRow(assign_syn, 3, stmt4);
       REQUIRE(outcome);
-      outcome = table.AddRow(assign_syn, 1, stmt5);
+      outcome = table.AddRow(assign_syn, 4, stmt5);
       REQUIRE(outcome);
-      REQUIRE(table.GetColumn(assign_syn).size() == 2);
+      REQUIRE(table.GetColumn(assign_syn).size() == 5);
     }
 
     SECTION("Added values are valid but have invalid index positions") {
-      outcome = table.AddRow(assign_syn, 0, stmt6);
+      outcome = table.AddRow(assign_syn, 3, stmt6);
       REQUIRE(outcome);
       outcome = table.AddRow(assign_syn, 0, stmt5);
       REQUIRE_FALSE(outcome);
