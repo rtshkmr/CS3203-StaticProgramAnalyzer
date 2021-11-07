@@ -10,7 +10,6 @@ TEST_CASE("0.Utils.Testing time util") {
   std::string file_name_date_time = TimeUtil::GetDateTimeFileNameStr();
   std::cout << ("date time is: " + date_time + "\n");
   std::cout << ("file name version of date time is:" + file_name_date_time + "\n");
-  int x = 1;
 }
 
 TEST_CASE("0.Testing basic LOG function") {
@@ -26,6 +25,5 @@ TEST_CASE("0.Testing basic LOG function") {
   LOG
   (spa_logger << "sup boiss i'm a procedure newww: " << (* dummy_proc).GetName());
   LoggerTerminate();
-  int x = 1;
 }
 
