@@ -180,7 +180,7 @@ class Token {
                                       const std::regex& desired_pattern,
                                       int left_boundary_idx,
                                       int right_boundary_idx);
-  [[maybe_unused]] static int GetFirstMatchingTokenIdx(const std::vector<Token>& tokens,
+  static int GetFirstMatchingTokenIdx(const std::vector<Token>& tokens,
                                                        const std::regex& desired_pattern);
   static int GetFirstMatchingTokenIdx(const std::vector<Token>& tokens, TokenTag target_token_tag);
   static int GetLastMatchingTokenIdx(const std::vector<Token>& tokens,

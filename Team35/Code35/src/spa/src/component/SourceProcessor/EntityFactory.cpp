@@ -1,4 +1,3 @@
-#include <cassert>
 #include <stdexcept>
 #include <utility>
 #include "EntityFactory.h"
@@ -24,7 +23,6 @@ Entity* EntityFactory::CreateEntity(vector<Token> tokens) {
   Token first_token = tokens.front();
   switch (first_token.GetTokenTag()) {
     case TokenTag::kProcedureKeyword: {
-      assert(tokens[1].GetTokenTag() == TokenTag::kName);
       std::string proc_token_string = tokens[1].GetTokenString();
       return RetrieveProcedure(proc_token_string);
     }
@@ -54,19 +52,16 @@ Entity* EntityFactory::CreateEntity(vector<Token> tokens) {
 }
 
 Entity* EntityFactory::CreateReadEntity(std::vector<Token> tokens) {
-  assert(tokens[1].GetTokenTag() == TokenTag::kName);
   std::string read_var_string = tokens[1].GetTokenString();
   return new ReadEntity(RetrieveVariable(read_var_string));
 }
 
 Entity* EntityFactory::CreatePrintEntity(std::vector<Token> tokens) {
-  assert(tokens[1].GetTokenTag() == TokenTag::kName);
   std::string print_var_string = tokens[1].GetTokenString();
   return new PrintEntity(RetrieveVariable(print_var_string));
 }
 
 Entity* EntityFactory::CreateCallEntity(std::vector<Token> tokens) {
-  assert(tokens[1].GetTokenTag() == TokenTag::kName);
   std::string call_proc_string = tokens[1].GetTokenString();
   return new CallEntity(RetrieveProcedure(call_proc_string));
 }
@@ -80,7 +75,6 @@ Entity* EntityFactory::CreateCallEntity(std::vector<Token> tokens) {
  * @return IfEntity or WhileEntity.
  */
 Entity* EntityFactory::CreateConditionalEntity(vector<Token> tokens, TokenTag entity_type) {
-  assert(tokens[1].GetTokenTag() == TokenTag::kOpenBracket);
 
   vector<Token> expression_tokens = GetExpressionTokens(tokens, TokenTag::kOpenBracket, TokenTag::kCloseBracket);
   std::string expression_string = ConvertTokensToString(expression_tokens);
@@ -104,7 +98,6 @@ Entity* EntityFactory::CreateConditionalEntity(vector<Token> tokens, TokenTag en
  * @return AssignEntity.
  */
 Entity* EntityFactory::CreateAssignEntity(vector<Token> tokens) {
-  assert(tokens[1].GetTokenTag() == TokenTag::kAssignmentOperator);
 
   vector<Token> expression_tokens = GetExpressionTokens(tokens, TokenTag::kAssignmentOperator, TokenTag::kSemicolon);
   std::string expression_string = ConvertTokensToString(expression_tokens);

@@ -39,8 +39,6 @@ void VariableTExtractor::InitRelMaps() {
   } else if (rel_type_ == VariableRel::kUses) {
     rel_map_ = deliverable_->GetUseCMap();
     reverse_rel_map_ = deliverable_->GetUsedByCMap();
-  } else {
-    assert(false);
   }
 }
 
