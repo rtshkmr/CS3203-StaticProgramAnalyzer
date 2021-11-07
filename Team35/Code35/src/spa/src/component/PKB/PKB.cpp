@@ -87,7 +87,8 @@ void PKB::PopulateEntities(DesignEntity design_entity, T& entity_list) {
       entity_to_attribute_type_map_[entity][attribute.second] = attribute.first;
       attribute_string_to_entity_map_[attribute.second].insert(entity);
     }
-    if (pattern_entities_.find(design_entity) != pattern_entities_.end()) {
+    auto pattern_entities = GetPatternEntitySet();
+    if (pattern_entities.find(design_entity) != pattern_entities.end()) {
       pattern_maps_[design_entity][entity_name].push_back(entity);
 
       std::vector<Variable*> pattern_variables;
@@ -149,15 +150,18 @@ std::vector<Entity*> PKB::GetFirstEntityOfRelationship(PKBRelRefs ref, DesignEnt
   return first_param_by_types_table_[ref][{d1, d2}];
 }
 
-std::vector<Entity*> PKB::GetFirstEntityOfRelationship(PKBRelRefs ref, DesignEntity d) {
-  if (d == DesignEntity::kProgLine) d = DesignEntity::kStmt;
-  if (second_param_is_stmt.find(ref) != second_param_is_stmt.end()) {
-    return first_param_by_types_table_[ref][{d, DesignEntity::kStmt}];
+std::vector<Entity*> PKB::GetFirstEntityOfRelationship(PKBRelRefs ref, DesignEntity design_entity) {
+  if (design_entity == DesignEntity::kProgLine) design_entity = DesignEntity::kStmt;
+  auto second_param_valid_statement_set = GetSecondParamValidStatementSet();
+  if (second_param_valid_statement_set.find(ref) != second_param_valid_statement_set.end()) {
+    return first_param_by_types_table_[ref][{design_entity, DesignEntity::kStmt}];
   } else {
+    auto second_param_is_var = GetSecondParamVarSet();
+    auto second_param_is_proc = GetSecondParamProcSet();
     if (second_param_is_var.find(ref) != second_param_is_var.end()) {
-      return first_param_by_types_table_[ref][{d, DesignEntity::kVariable}];
+      return first_param_by_types_table_[ref][{design_entity, DesignEntity::kVariable}];
     } else if (second_param_is_proc.find(ref) != second_param_is_proc.end()) {
-      return first_param_by_types_table_[ref][{d, DesignEntity::kProcedure}];
+      return first_param_by_types_table_[ref][{design_entity, DesignEntity::kProcedure}];
     } else {
       return std::vector<Entity*>{};
     }
@@ -331,7 +335,8 @@ std::string PKB::GetAttributeFromEntity(Entity* entity, Attribute attribute) {
 
 std::vector<DesignEntity> PKB::GetApplicableTypes(DesignEntity de) {
   std::vector<DesignEntity> types {de};
-  if (stmt_design_entities_.find(de) != stmt_design_entities_.end()) {
+  auto stmt_design_entities = GetStmtDesignEntitySet();
+  if (stmt_design_entities.find(de) != stmt_design_entities.end()) {
     types.push_back(DesignEntity::kStmt);
     types.push_back(DesignEntity::kProgLine);
   }

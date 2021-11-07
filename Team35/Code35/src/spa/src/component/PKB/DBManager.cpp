@@ -82,7 +82,8 @@ std::vector<std::tuple<Entity*, Entity*>> DBManager::GetRelationshipByTypes(PKBR
     return GetRelationshipByTypes(ref, first_de, second_de);
   } else {
     // Check if pkb contains the relationship type
-    const bool pkb_ref = preprocessed_rel_refs.find(ref) != preprocessed_rel_refs.end();
+    auto preproc_rel_refs = GetPreprocRelRefsSet();
+    const bool pkb_ref = preproc_rel_refs.find(ref) != preproc_rel_refs.end();
     if (pkb_ref) {
       if (scope_indication == ScopeIndication::kAllScope) {
         std::vector<std::tuple<Entity*, Entity*>> results(left_scoped_entities.size());

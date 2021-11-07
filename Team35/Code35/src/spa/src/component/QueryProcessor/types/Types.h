@@ -104,82 +104,101 @@ RelRef GetRelRef(std::string reference);
 Attribute GetAttribute(std::string attr_string);
 Attribute GetDefaultAttribute(DesignEntity de);
 
-const std::unordered_set<DesignEntity> stmt_design_entities_ = {
-  DesignEntity::kRead,
-  DesignEntity::kPrint,
-  DesignEntity::kCall,
-  DesignEntity::kWhile,
-  DesignEntity::kIf,
-  DesignEntity::kAssign
-};
 
-const std::unordered_set<DesignEntity> pattern_entities_ = {
-  DesignEntity::kWhile,
-  DesignEntity::kIf,
-  DesignEntity::kAssign
-};
+static std::unordered_set<DesignEntity> GetStmtDesignEntitySet() {
+  return {
+      DesignEntity::kRead,
+      DesignEntity::kPrint,
+      DesignEntity::kCall,
+      DesignEntity::kWhile,
+      DesignEntity::kIf,
+      DesignEntity::kAssign
+  };
+}
 
-const std::unordered_set<PKBRelRefs> preprocessed_rel_refs = {
-  PKBRelRefs::kFollows,
-  PKBRelRefs::kFollowsT,
-  PKBRelRefs::kFollowedBy,
-  PKBRelRefs::kFollowedByT,
-  PKBRelRefs::kParent,
-  PKBRelRefs::kParentT,
-  PKBRelRefs::kChild,
-  PKBRelRefs::kChildT,
-  PKBRelRefs::kCalls,
-  PKBRelRefs::kCalledBy,
-  PKBRelRefs::kCallsT,
-  PKBRelRefs::kCalledByT,
-  PKBRelRefs::kUses,
-  PKBRelRefs::kUsedBy,
-  PKBRelRefs::kModifies,
-  PKBRelRefs::kModifiedBy,
-  PKBRelRefs::kNext,
-  PKBRelRefs::kPrevious
-};
 
-const std::unordered_set<PKBRelRefs> second_param_is_stmt = {
-  PKBRelRefs::kFollows,
-  PKBRelRefs::kFollowsT,
-  PKBRelRefs::kFollowedBy,
-  PKBRelRefs::kFollowedByT,
-  PKBRelRefs::kParent,
-  PKBRelRefs::kParentT,
-  PKBRelRefs::kChild,
-  PKBRelRefs::kChildT,
-  PKBRelRefs::kUsedBy,
-  PKBRelRefs::kModifiedBy,
-  PKBRelRefs::kNext,
-  PKBRelRefs::kPrevious,
-  PKBRelRefs::kNextT,
-  PKBRelRefs::kPreviousT,
-  PKBRelRefs::kAffects,
-  PKBRelRefs::kAffectedBy,
-  PKBRelRefs::kAffectsT,
-  PKBRelRefs::kAffectedByT,
-  PKBRelRefs::kNextBip,
-  PKBRelRefs::kPrevBip,
-  PKBRelRefs::kNextBipT,
-  PKBRelRefs::kPrevBipT,
-  PKBRelRefs::kAffectsBip,
-  PKBRelRefs::kAffectedByBip,
-  PKBRelRefs::kAffectsBipT,
-  PKBRelRefs::kAffectedByBipT
-};
+static std::unordered_set<DesignEntity> GetPatternEntitySet() {
+  return {
+      DesignEntity::kWhile,
+      DesignEntity::kIf,
+      DesignEntity::kAssign
+  };
 
-const std::unordered_set<PKBRelRefs> second_param_is_var = {
-  PKBRelRefs::kUses,
-  PKBRelRefs::kModifies
-};
+}
 
-const std::unordered_set<PKBRelRefs> second_param_is_proc = {
-  PKBRelRefs::kCalls,
-  PKBRelRefs::kCalledBy,
-  PKBRelRefs::kCallsT,
-  PKBRelRefs::kCalledByT
-};
+
+static std::unordered_set<PKBRelRefs> GetPreprocRelRefsSet() {
+  return {
+      PKBRelRefs::kFollows,
+      PKBRelRefs::kFollowsT,
+      PKBRelRefs::kFollowedBy,
+      PKBRelRefs::kFollowedByT,
+      PKBRelRefs::kParent,
+      PKBRelRefs::kParentT,
+      PKBRelRefs::kChild,
+      PKBRelRefs::kChildT,
+      PKBRelRefs::kCalls,
+      PKBRelRefs::kCalledBy,
+      PKBRelRefs::kCallsT,
+      PKBRelRefs::kCalledByT,
+      PKBRelRefs::kUses,
+      PKBRelRefs::kUsedBy,
+      PKBRelRefs::kModifies,
+      PKBRelRefs::kModifiedBy,
+      PKBRelRefs::kNext,
+      PKBRelRefs::kPrevious
+  };
+
+}
+
+static std::unordered_set<PKBRelRefs> GetSecondParamValidStatementSet() {
+  return {
+      PKBRelRefs::kFollows,
+      PKBRelRefs::kFollowsT,
+      PKBRelRefs::kFollowedBy,
+      PKBRelRefs::kFollowedByT,
+      PKBRelRefs::kParent,
+      PKBRelRefs::kParentT,
+      PKBRelRefs::kChild,
+      PKBRelRefs::kChildT,
+      PKBRelRefs::kUsedBy,
+      PKBRelRefs::kModifiedBy,
+      PKBRelRefs::kNext,
+      PKBRelRefs::kPrevious,
+      PKBRelRefs::kNextT,
+      PKBRelRefs::kPreviousT,
+      PKBRelRefs::kAffects,
+      PKBRelRefs::kAffectedBy,
+      PKBRelRefs::kAffectsT,
+      PKBRelRefs::kAffectedByT,
+      PKBRelRefs::kNextBip,
+      PKBRelRefs::kPrevBip,
+      PKBRelRefs::kNextBipT,
+      PKBRelRefs::kPrevBipT,
+      PKBRelRefs::kAffectsBip,
+      PKBRelRefs::kAffectedByBip,
+      PKBRelRefs::kAffectsBipT,
+      PKBRelRefs::kAffectedByBipT
+  };
+
+}
+
+static std::unordered_set<PKBRelRefs> GetSecondParamVarSet() {
+  return {
+      PKBRelRefs::kUses,
+      PKBRelRefs::kModifies
+  };
+}
+
+
+static std::unordered_set<PKBRelRefs> GetSecondParamProcSet() {
+ return {
+     PKBRelRefs::kCalls,
+     PKBRelRefs::kCalledBy,
+     PKBRelRefs::kCallsT,
+     PKBRelRefs::kCalledByT
+ };
+}
 
 class Synonym {
  private:
@@ -243,7 +262,7 @@ struct With : Clause {
     if (this->GetType() == other_obj->GetType()) {
       With* obj = (With*) & other_obj;
       return (
-              this->left_hand_side == obj->left_hand_side &&
+          this->left_hand_side == obj->left_hand_side &&
               this->right_hand_side == obj->right_hand_side &&
               this->left_attribute == obj->left_attribute &&
               this->right_attribute == obj->right_attribute &&
@@ -251,7 +270,7 @@ struct With : Clause {
               this->right_is_synonym == obj->right_is_synonym &&
               this->left_is_prog_line == obj->left_is_prog_line &&
               this->right_is_prog_line == obj->right_is_prog_line
-              );
+      );
     } else {
       return false;
     }
@@ -355,7 +374,9 @@ class Group {
   Group(std::vector<Clause*> clauses, bool has_target_synonym) :
       has_target_synonym(has_target_synonym), clauses(std::move(std::move(clauses))) {};
   Group(std::vector<Clause*> clauses, bool has_target_synonym, std::vector<Synonym*> target_synonyms) :
-  has_target_synonym(has_target_synonym), clauses(std::move(std::move(clauses))), target_synonyms(std::move(std::move(target_synonyms))) {};
+      has_target_synonym(has_target_synonym),
+      clauses(std::move(std::move(clauses))),
+      target_synonyms(std::move(std::move(target_synonyms))) {};
   void AddSynToTargetSyns(Synonym* s);
   void AddClauseToVector(Clause* clause);
   std::vector<Clause*> GetClauses();
@@ -411,25 +432,26 @@ struct WithHash {
 struct SuchThatComparator {
   bool operator()(const SuchThat& c1, const SuchThat& c2) const {
     return c1.rel_ref == c2.rel_ref && c1.left_hand_side == c2.left_hand_side &&
-    c1.right_hand_side == c2.right_hand_side && c1.left_is_synonym == c2.left_is_synonym &&
-    c1.right_is_synonym == c2.right_is_synonym;
+        c1.right_hand_side == c2.right_hand_side && c1.left_is_synonym == c2.left_is_synonym &&
+        c1.right_is_synonym == c2.right_is_synonym;
   }
 };
 
 struct PatternComparator {
   bool operator()(const Pattern& c1, const Pattern& c2) const {
     return c1.pattern_type == c2.pattern_type && c1.left_hand_side == c2.left_hand_side &&
-    c1.right_hand_side == c2.right_hand_side && c1.left_is_synonym == c2.left_is_synonym &&
-    c1.right_is_synonym == c2.right_is_synonym && c1.is_exact == c2.is_exact && c1.assign_synonym == c2.assign_synonym;
+        c1.right_hand_side == c2.right_hand_side && c1.left_is_synonym == c2.left_is_synonym &&
+        c1.right_is_synonym == c2.right_is_synonym && c1.is_exact == c2.is_exact
+        && c1.assign_synonym == c2.assign_synonym;
   }
 };
 
 struct WithComparator {
   bool operator()(const With& c1, const With& c2) const {
     return c1.left_hand_side == c2.left_hand_side && c1.right_hand_side == c2.right_hand_side &&
-    c1.left_is_synonym == c2.left_is_synonym && c1.right_is_synonym == c2.right_is_synonym &&
-    c1.left_attribute == c2.left_attribute && c1.right_attribute == c2.right_attribute &&
-    c1.left_is_prog_line == c2.left_is_prog_line && c1.right_is_prog_line == c2.right_is_prog_line;
+        c1.left_is_synonym == c2.left_is_synonym && c1.right_is_synonym == c2.right_is_synonym &&
+        c1.left_attribute == c2.left_attribute && c1.right_attribute == c2.right_attribute &&
+        c1.left_is_prog_line == c2.left_is_prog_line && c1.right_is_prog_line == c2.right_is_prog_line;
   }
 };
 

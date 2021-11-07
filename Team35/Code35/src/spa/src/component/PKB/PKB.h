@@ -65,7 +65,7 @@ class PKB {
 
   // Returns a vector of entities of type dee such that the ref relationship holds between
   // the specified entity and another entity of any type
-  std::vector<Entity*> GetFirstEntityOfRelationship(PKBRelRefs ref, DesignEntity de);
+  std::vector<Entity*> GetFirstEntityOfRelationship(PKBRelRefs ref, DesignEntity design_entity);
 
   // Returns a vector of entities of type de
   std::vector<Entity*> GetDesignEntities(DesignEntity de);
@@ -226,7 +226,7 @@ class PKB {
 
   void ProcessEntitiesWithMatchingAttributes();
 
-  std::vector<DesignEntity> GetApplicableTypes(DesignEntity de);
+  static std::vector<DesignEntity> GetApplicableTypes(DesignEntity de);
 };
 
 
