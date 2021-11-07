@@ -17,8 +17,8 @@ std::vector<Entity*> AffectsBipTExtractor::GetFirstEntityOfRelationship(RelDirec
 }
 
 std::vector<std::tuple<Entity*, Entity*>> AffectsBipTExtractor::GetRelationshipByTypes(RelDirection dir,
-                                                                                      DesignEntity first,
-                                                                                      DesignEntity second) {
+                                                                                       DesignEntity first,
+                                                                                       DesignEntity second) {
   PKBRelRefs selector = (dir == RelDirection::kForward) ? PKBRelRefs::kAffectsT : PKBRelRefs::kAffectedByT;
   return rte_->GetRelationshipByTypes(selector, first, second);
 }

@@ -43,7 +43,7 @@ std::vector<Entity*> RuntimeExtractor::GetFirstEntityOfRelationship(PKBRelRefs r
  * @param scoped_entities
  * @return
  */
-std::vector<Entity*> RuntimeExtractor::GetScopedFirstEntities(PKBRelRefs ref, std::vector<Entity*> scoped_entities) {
+std::vector<Entity*> RuntimeExtractor::GetScopedFirstEntities(PKBRelRefs ref, const std::vector<Entity*>& scoped_entities) {
   std::vector<Entity*> results;
   for (Entity* entity : scoped_entities) {
     std::string name = PKB::GetNameFromEntity(entity);

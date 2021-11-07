@@ -1,4 +1,3 @@
-#include <cassert>
 #include <util/Utility.h>
 #include "AffectsExtractor.h"
 #include "../../../model/CFG.h"
@@ -11,7 +10,7 @@ AffectsExtractor::AffectsExtractor(RuntimeMediator* rte, PKB* pkb) {
 std::vector<Entity*> AffectsExtractor::GetRelationship(RelDirection dir, int target) {
   AssignEntity* target_ae = Utility::GetAssignEntityFromStmtNum(pkb_, target);
 
-  if (!target_ae) return std::vector<Entity*>();
+  if (!target_ae) return {};
   return (dir == RelDirection::kForward) ? GetAffects(target_ae) : GetAffectedBy(target_ae);
 }
 
@@ -35,7 +34,7 @@ std::vector<std::tuple<Entity*, Entity*>> AffectsExtractor::GetRelationshipByTyp
     for (auto pair : affects_map_) {
       std::vector<Entity*> this_key_entity = GetAffects(pair.first);
       for (auto val: this_key_entity) {
-        retList.push_back(std::make_tuple(pair.first, val));
+        retList.emplace_back(pair.first, val);
       }
     }
     return retList;
@@ -43,14 +42,14 @@ std::vector<std::tuple<Entity*, Entity*>> AffectsExtractor::GetRelationshipByTyp
 
   std::vector<Entity*> assign_list = pkb_->GetDesignEntities(DesignEntity::kAssign);
   for (auto* entity : assign_list) {
-    AssignEntity* ae = dynamic_cast<AssignEntity*>(entity);
+    auto* ae = dynamic_cast<AssignEntity*>(entity);
     std::vector<Entity*> all_affected_by_ae = GetAffects(ae);
     for (auto* affected : all_affected_by_ae) {
-      retList.push_back(std::make_tuple(entity, affected));
+      retList.emplace_back(entity, affected);
     }
   }
 
-  if (retList.size() > 0) {
+  if (!retList.empty()) {
     retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
   }
   cacheIndication = ScopeIndication::kAllScope;
@@ -59,12 +58,12 @@ std::vector<std::tuple<Entity*, Entity*>> AffectsExtractor::GetRelationshipByTyp
 
 
 bool AffectsExtractor::HasRelationship(RelDirection dir) {
-  if(affects_map_.size() > 0) return true;
+  if(!affects_map_.empty()) return true;
 
   std::vector<Entity*> all_assign_list = pkb_->GetDesignEntities(DesignEntity::kAssign);
 
   for (auto* assign : all_assign_list) {
-    AssignEntity* ae_to_check = dynamic_cast<AssignEntity*>(assign);
+    auto* ae_to_check = dynamic_cast<AssignEntity*>(assign);
     if (HasAffects(ae_to_check)) {
       return true;
     }
@@ -107,13 +106,13 @@ std::vector<Entity*> AffectsExtractor::GetAllAffects() {
 
   std::vector<Entity*> assign_list = pkb_->GetDesignEntities(DesignEntity::kAssign);
   for (auto* entity : assign_list) {
-    AssignEntity* ae = dynamic_cast<AssignEntity*>(entity);
+    auto* ae = dynamic_cast<AssignEntity*>(entity);
     if (HasAffects(ae)) { //TODO change to Entity type?
       retList.push_back(entity);
     }
   }
 
-  if (retList.size() > 0) {
+  if (!retList.empty()) {
     retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
   }
 
@@ -140,13 +139,13 @@ std::vector<Entity*> AffectsExtractor::GetAllAffectedBy() {
 
   std::vector<Entity*> assign_list = pkb_->GetDesignEntities(DesignEntity::kAssign);
   for (auto* entity : assign_list) {
-    AssignEntity* ae = dynamic_cast<AssignEntity*>(entity);
+    auto* ae = dynamic_cast<AssignEntity*>(entity);
     if (HasAffectedBy(ae)) {
       retList.push_back(entity);
     }
   }
 
-  if (retList.size() > 0) {
+  if (!retList.empty()) {
     retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
   }
 
@@ -176,13 +175,13 @@ std::vector<Entity*> AffectsExtractor::GetAffects(AssignEntity* target) {
       ? GetAllAffectedBy() : pkb_->GetDesignEntities(DesignEntity::kAssign);
 
   for (auto* entity : assign_list) {
-    AssignEntity* ae = dynamic_cast<AssignEntity*>(entity);
+    auto* ae = dynamic_cast<AssignEntity*>(entity);
     if (HasAffects(target, ae)) {
       retList.push_back(entity);
     }
   }
 
-  if (retList.size() > 0) {
+  if (!retList.empty()) {
     retList.erase(std::unique(retList.begin(), retList.end()), retList.end());
   }
   return retList;
@@ -220,7 +219,7 @@ bool AffectsExtractor::HasAffects(AssignEntity* target_ae) {
   auto itr = affects_map_.find(target_ae);
   if (itr != affects_map_.end()) {
     std::list<AssignEntity*>* values = itr->second;
-    if (values->size() > 0) {
+    if (!values->empty()) {
       return true;
     } else if (cacheIndication == ScopeIndication::kAllScope || cacheIndication == ScopeIndication::kLeftScope) {
       return false;
@@ -240,7 +239,7 @@ bool AffectsExtractor::HasAffects(AssignEntity* target_ae) {
       continue;
     }
 
-    AssignEntity* ae_to_check = dynamic_cast<AssignEntity*>(assign);
+    auto* ae_to_check = dynamic_cast<AssignEntity*>(assign);
     if (ae_to_check->GetProcedureNode() != target_proc) {
       continue;
     }
@@ -257,7 +256,7 @@ bool AffectsExtractor::HasAffectedBy(AssignEntity* target_assign_entity) {
   auto iter = affected_by_map_.find(target_assign_entity);
   if (iter != affected_by_map_.end()) {
     std::list<AssignEntity*>* values = iter->second;
-    if (values->size() > 0) {
+    if (!values->empty()) {
       return true;
     } else if (cacheIndication == ScopeIndication::kAllScope || cacheIndication == ScopeIndication::kRightScope) {
       return false;
@@ -350,13 +349,13 @@ std::set<AssignEntity*, AffectsExtractor::AssignEntityComparator> AffectsExtract
 
   // Have a PQ per var.
   for (Variable* var: rhs_varlist) {
-    VariableName* variable_name = const_cast<VariableName*>(var->GetVariableName());
+    auto* variable_name = const_cast<VariableName*>(var->GetVariableName());
     std::vector<Entity*> ent = pkb_->GetRelationship(PKBRelRefs::kModifiedBy, variable_name->GetName());
 
     //filter vector<Entity> into only AssignEntity as it can only take assign in LHS
     for (Entity* e: ent) {
       if (e->GetEntityEnum() == EntityEnum::kAssignEntity) {
-        AssignEntity* ae = dynamic_cast<AssignEntity*>(e);
+        auto* ae = dynamic_cast<AssignEntity*>(e);
         if (ae->GetProcedureNode() == target->GetProcedureNode()) {
           affected_set.insert(ae);
         }
