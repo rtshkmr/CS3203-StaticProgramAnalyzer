@@ -7,8 +7,8 @@ static const int per_synonym_penalty = 15;
 static const int type_with_penalty = 0;
 static const int type_default_penalty = 10;
 static const std::unordered_map<RelRef, int> type_relref_penalty = {
-        {RelRef::kParent, 10}, {RelRef::kFollows, 10}, {RelRef::kModifiesS, 10}, {RelRef::kUsesS, 10},
-        {RelRef::kModifiesP, 20}, {RelRef::kUsesP, 20}, {RelRef::kCalls, 20}, {RelRef::kNext, 30},
+        {RelRef::kParent, 30}, {RelRef::kFollows, 30}, {RelRef::kModifiesS, 30}, {RelRef::kUsesS, 30},
+        {RelRef::kModifiesP, 30}, {RelRef::kUsesP, 30}, {RelRef::kCalls, 30}, {RelRef::kNext, 30},
         {RelRef::kFollowsT, 50}, {RelRef::kParentT, 50}, {RelRef::kCallsT, 50}, {RelRef::kNextT, 5000},
         {RelRef::kAffects, 10000}, {RelRef::kAffectsT, 15000}
 };
