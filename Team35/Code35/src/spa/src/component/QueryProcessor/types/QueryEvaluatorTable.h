@@ -42,6 +42,8 @@ class QueryEvaluatorTable {
   void CrossProductSingleColumn(Synonym* synonym, const std::vector<Entity*>& values);
   void DuplicateTableForCrossProduct(int original_size, Synonym* synonym_to_add);
   void InsertValuesForCrossProduct(Synonym* synonym_column, Entity* value, int original_size);
+  // Remove values in the column
+  void ClearColumn(Synonym *synonym);
 };
 
 #endif //AUTOTESTER_QUERYEVALUATORTABLE_H
