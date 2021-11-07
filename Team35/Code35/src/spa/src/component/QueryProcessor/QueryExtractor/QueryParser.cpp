@@ -126,8 +126,9 @@ std::pair<Synonym*, Attribute> QueryParser::ParseElem(bool is_first_pass) {
     throw PQLParseException("Incorrect target synonym for \'Select\' query.");
   }
 
-  Synonym* s = QueryParser::GetSynonymInfo(target, & synonyms);
-  Attribute attr = GetDefaultAttribute(s->GetType());
+  Synonym* s = QueryParser::GetSynonymInfo(target, &synonyms);
+  Attribute attr = Attribute::kInvalid;
+
   // handle case where we need to parse attrRef
   if (lookahead.GetTokenTag() == TokenTag::kDot) {
     Eat(TokenTag::kDot);
@@ -399,6 +400,16 @@ void QueryParser::ParseAttrCompare() {
   bool r_is_syn = rhs_return_type == "SYNONYM";
   bool l_is_pl = l_is_syn && (lhs_syn->GetType() == DesignEntity::kProgLine);
   bool r_is_pl = r_is_syn && (rhs_syn->GetType() == DesignEntity::kProgLine);
+
+  // populating clause with default attribute type
+  if (l_is_syn && !l_has_attr) {
+    l_has_attr = true;
+    lhs_attr = GetDefaultAttribute(lhs_syn->GetType());
+  }
+  if (r_is_syn && !r_has_attr) {
+    r_has_attr = true;
+    rhs_attr = GetDefaultAttribute(rhs_syn->GetType());
+  }
 
   Clause* cl = new With(l_is_syn, r_is_syn, lhs_return_string,
                         rhs_return_string, lhs_attr, rhs_attr, l_is_pl, r_is_pl);
