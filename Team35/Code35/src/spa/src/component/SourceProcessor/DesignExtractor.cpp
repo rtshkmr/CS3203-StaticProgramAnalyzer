@@ -25,9 +25,9 @@ void DesignExtractor::ExtractDesignAbstractions() {
                               deliverable_->GetFollowedByTMap(),
                               deliverable_->GetFollowsMap());
 
-  auto variable_t_extractor = VariableTExtractor(deliverable_);
-  variable_t_extractor.Extract(VariableRel::kUses);
-  variable_t_extractor.Extract(VariableRel::kModifies);
+  VariableTExtractor variable_t_extractor{};
+  variable_t_extractor.Extract(deliverable_, VariableRel::kUses);
+  variable_t_extractor.Extract(deliverable_, VariableRel::kModifies);
 
   NextExtractor next_extractor{};
   next_extractor.Extract(deliverable_);

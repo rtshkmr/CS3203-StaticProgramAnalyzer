@@ -44,9 +44,9 @@ TEST_CASE("1.VariableTExtractor.Extract variables basic conditions") {
     };
     deliverable->GetModifiesCMap()->insert(std::make_pair(proc2, &proc_var_list2));
 
-    auto variable_t_extractor = VariableTExtractor(deliverable);
-    variable_t_extractor.Extract(VariableRel::kUses);
-    variable_t_extractor.Extract(VariableRel::kModifies);
+    auto variable_t_extractor = VariableTExtractor();
+    variable_t_extractor.Extract(deliverable, VariableRel::kUses);
+    variable_t_extractor.Extract(deliverable, VariableRel::kModifies);
 
     SECTION("Uses") {
       std::list<Variable*> actual_var_list = *deliverable->GetUseCMap()->find(proc1)->second;
@@ -83,8 +83,8 @@ TEST_CASE("1.VariableTExtractor.Extract variables basic conditions") {
       deliverable->GetProcList()->push_back(proc1);
       deliverable->GetProcList()->push_back(proc2);
 
-      auto variable_t_extractor = VariableTExtractor(deliverable);
-      variable_t_extractor.Extract(VariableRel::kUses);
+      auto variable_t_extractor = VariableTExtractor();
+      variable_t_extractor.Extract(deliverable, VariableRel::kUses);
 
       CHECK(deliverable->GetUseCMap()->count(proc1) == 0);
       CHECK(deliverable->GetUseCMap()->count(proc2) == 0);
@@ -110,8 +110,8 @@ TEST_CASE("1.VariableTExtractor.Extract variables basic conditions") {
       deliverable->GetProcList()->push_back(proc1);
       deliverable->GetProcList()->push_back(proc2);
 
-      auto variable_t_extractor = VariableTExtractor(deliverable);
-      variable_t_extractor.Extract(VariableRel::kModifies);
+      auto variable_t_extractor = VariableTExtractor();
+      variable_t_extractor.Extract(deliverable, VariableRel::kModifies);
 
       CHECK(deliverable->GetModifiesCMap()->count(proc1) == 0);
       CHECK(deliverable->GetModifiesCMap()->count(proc2) == 0);
@@ -167,9 +167,9 @@ TEST_CASE("1.VariableTExtractor.Extract variables basic conditions") {
     };
     deliverable->GetModifiesCMap()->insert(std::make_pair(if_1_, &if_mod_list));
 
-    auto variable_t_extractor = VariableTExtractor(deliverable);
-    variable_t_extractor.Extract(VariableRel::kUses);
-    variable_t_extractor.Extract(VariableRel::kModifies);
+    auto variable_t_extractor = VariableTExtractor();
+    variable_t_extractor.Extract(deliverable, VariableRel::kUses);
+    variable_t_extractor.Extract(deliverable, VariableRel::kModifies);
 
     std::list<Variable*> actual_use_list = *deliverable->GetUseCMap()->find(proc1)->second;
     std::list<Variable*> expected_use_list = {var_y_, var_x_, var_z_, var_i_};
@@ -238,9 +238,9 @@ TEST_CASE("1.VariableTExtractor.Extract variables basic conditions") {
     };
     deliverable->GetModifiesCMap()->insert(std::make_pair(while_1_, &while_mod_list));
 
-    auto variable_t_extractor = VariableTExtractor(deliverable);
-    variable_t_extractor.Extract(VariableRel::kUses);
-    variable_t_extractor.Extract(VariableRel::kModifies);
+    auto variable_t_extractor = VariableTExtractor();
+    variable_t_extractor.Extract(deliverable, VariableRel::kUses);
+    variable_t_extractor.Extract(deliverable, VariableRel::kModifies);
 
     std::list<Variable*> actual_use_list = *deliverable->GetUseCMap()->find(proc2)->second;
     std::list<Variable*> expected_use_list = {var_y_, var_z_, var_x_, var_i_};
@@ -295,9 +295,9 @@ TEST_CASE("1.VariableTExtractor.Extract variables basic conditions") {
     };
     deliverable->GetModifiesCMap()->insert(std::make_pair(proc4, &proc4_mod_list));
 
-    auto variable_t_extractor = VariableTExtractor(deliverable);
-    variable_t_extractor.Extract(VariableRel::kUses);
-    variable_t_extractor.Extract(VariableRel::kModifies);
+    auto variable_t_extractor = VariableTExtractor();
+    variable_t_extractor.Extract(deliverable, VariableRel::kUses);
+    variable_t_extractor.Extract(deliverable, VariableRel::kModifies);
 
     // use
     std::list<Variable*> actual_use_list = *deliverable->GetUseCMap()->find(proc3)->second;
@@ -411,9 +411,9 @@ TEST_CASE("1.VariableTExtractor.Extract variables nested containers") {
     };
     deliverable->GetUseCMap()->insert(std::make_pair(if_3_, &if3_use_list));
 
-    auto variable_t_extractor = VariableTExtractor(deliverable);
-    variable_t_extractor.Extract(VariableRel::kUses);
-    variable_t_extractor.Extract(VariableRel::kModifies);
+    auto variable_t_extractor = VariableTExtractor();
+    variable_t_extractor.Extract(deliverable, VariableRel::kUses);
+    variable_t_extractor.Extract(deliverable, VariableRel::kModifies);
 
     // mod
     std::list<Variable*> actual_mod_list = *deliverable->GetModifiesCMap()->find(if_1_)->second;
@@ -492,9 +492,9 @@ TEST_CASE("1.VariableTExtractor.Extract variables nested containers") {
     };
     deliverable->GetUseCMap()->insert(std::make_pair(while_3_, &while3_use_list));
 
-    auto variable_t_extractor = VariableTExtractor(deliverable);
-    variable_t_extractor.Extract(VariableRel::kUses);
-    variable_t_extractor.Extract(VariableRel::kModifies);
+    auto variable_t_extractor = VariableTExtractor();
+    variable_t_extractor.Extract(deliverable, VariableRel::kUses);
+    variable_t_extractor.Extract(deliverable, VariableRel::kModifies);
 
     //mod
     std::list<Variable*> actual_mod_list = *deliverable->GetModifiesCMap()->find(while_1_)->second;
@@ -565,9 +565,9 @@ TEST_CASE("1.VariableTExtractor.Extract variables nested containers") {
     };
     deliverable->GetUseCMap()->insert(std::make_pair(proc2, &proc2_use_list));
 
-    auto variable_t_extractor = VariableTExtractor(deliverable);
-    variable_t_extractor.Extract(VariableRel::kUses);
-    variable_t_extractor.Extract(VariableRel::kModifies);
+    auto variable_t_extractor = VariableTExtractor();
+    variable_t_extractor.Extract(deliverable, VariableRel::kUses);
+    variable_t_extractor.Extract(deliverable, VariableRel::kModifies);
 
     // mod
     std::list<Variable*> actual_mod_list = *deliverable->GetModifiesCMap()->find(proc3)->second;
@@ -637,9 +637,9 @@ TEST_CASE("1.VariableTExtractor.Extract variables nested containers") {
     };
     deliverable->GetUseCMap()->insert(std::make_pair(while_1_, &while_use_list));
 
-    auto variable_t_extractor = VariableTExtractor(deliverable);
-    variable_t_extractor.Extract(VariableRel::kUses);
-    variable_t_extractor.Extract(VariableRel::kModifies);
+    auto variable_t_extractor = VariableTExtractor();
+    variable_t_extractor.Extract(deliverable, VariableRel::kUses);
+    variable_t_extractor.Extract(deliverable, VariableRel::kModifies);
 
     // mod
     CHECK(*deliverable->GetModifiesCMap()->find(while_1_)->second
@@ -803,9 +803,9 @@ TEST_CASE("1.VariableTExtractor.Extract variables nested calls") {
     deliverable->GetProcList()->push_back(proc4);
     deliverable->GetProcList()->push_back(proc5);
 
-    auto variable_t_extractor = VariableTExtractor(deliverable);
-    variable_t_extractor.Extract(VariableRel::kUses);
-    variable_t_extractor.Extract(VariableRel::kModifies);
+    auto variable_t_extractor = VariableTExtractor();
+    variable_t_extractor.Extract(deliverable, VariableRel::kUses);
+    variable_t_extractor.Extract(deliverable, VariableRel::kModifies);
 
     // mod
     CHECK(*deliverable->GetModifiesCMap()->find(proc3)->second == proc3_mod_list); // no change to inner container
@@ -856,9 +856,9 @@ TEST_CASE("1.VariableTExtractor.Extract variables nested calls") {
     deliverable->GetProcList()->push_back(proc2);
     deliverable->GetProcList()->push_back(proc1);
 
-    auto variable_t_extractor = VariableTExtractor(deliverable);
-    variable_t_extractor.Extract(VariableRel::kUses);
-    variable_t_extractor.Extract(VariableRel::kModifies);
+    auto variable_t_extractor = VariableTExtractor();
+    variable_t_extractor.Extract(deliverable, VariableRel::kUses);
+    variable_t_extractor.Extract(deliverable, VariableRel::kModifies);
 
     // mod
     CHECK(*deliverable->GetModifiesCMap()->find(proc3)->second == proc3_mod_list); // no change to inner container
