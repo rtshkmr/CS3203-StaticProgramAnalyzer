@@ -169,7 +169,7 @@ void Cluster::UpdateRange(Cluster* nested_cluster) {
   }
 }
 std::pair<int, int> Cluster::GetStartEndRange() const {
-  return std::pair<int, int>(this->start_, this->end_);
+  return {this->start_, this->end_};
 }
 
 void Cluster::UpdateClusterRange() {
@@ -265,7 +265,6 @@ bool Cluster::CheckScopeClusterForAffects(Cluster* scoped_cluster,
                                           std::pair<int, int> target_range,
                                           PKB* pkb,
                                           const std::string& lhs_var) {
-  // todo: put the goal stmt here
   const std::pair<int,int> goal_range = std::make_pair(target_range.first, target_range.second);
 
   Cluster* current_scope = scoped_cluster;

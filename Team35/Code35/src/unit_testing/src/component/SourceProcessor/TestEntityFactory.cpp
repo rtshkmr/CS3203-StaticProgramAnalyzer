@@ -128,9 +128,9 @@ TEST_CASE("1.EntityFactory.CreateEntity") {
     };
     Entity* actual_while_entity = entity_factory.CreateEntity(while_tokens);
     auto* actual_casted_while = dynamic_cast<WhileEntity*>(actual_while_entity);
-    auto actual_while_expr = actual_casted_while->GetCondExpr()->GetExpressionString();
 
-    CHECK(actual_while_expr == "x==1");
+    CHECK(actual_while_entity);
+    CHECK(actual_casted_while);
   }
 
   SECTION("if test") {
@@ -145,9 +145,10 @@ TEST_CASE("1.EntityFactory.CreateEntity") {
     };
     Entity* actual_if_entity = entity_factory.CreateEntity(if_tokens);
     auto* actual_casted_if = dynamic_cast<IfEntity*>(actual_if_entity);
-    auto actual_if_expr = actual_casted_if->GetCondExpr()->GetExpressionString();
 
-    CHECK(actual_if_expr == "yyy!=abc");
+    CHECK(actual_if_entity);
+    CHECK(actual_casted_if);
+
   }
 
   SECTION("else test") {

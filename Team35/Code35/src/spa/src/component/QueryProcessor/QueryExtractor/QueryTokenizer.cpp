@@ -6,33 +6,33 @@
 #include <util/RegexPatterns.h>
 #include <exception/SpaException.h>
 
-static std::unordered_set<std::string> exact_tokens { "*", ";", "(", ")", ",", "_", "<", ">", ".", "=",
-                                                      "stmt#", "prog_line", "such that", "\"" };
+static std::unordered_set<std::string> exact_tokens{"*", ";", "(", ")", ",", "_", "<", ">", ".", "=",
+                                                    "stmt#", "prog_line", "such that", "\""};
 
-std::vector<std::string> insertion_order = { "SPACINGS", "IDENT", "INTEGER" };
-static std::unordered_map<std::string, std::regex> spec_table {
+std::vector<std::string> insertion_order = {"SPACINGS", "IDENT", "INTEGER"};
+static std::unordered_map<std::string, std::regex> spec_table{
     {"INTEGER", RegexPatterns::GetIntegerPatternNonTerminating()},
     {"IDENT", RegexPatterns::GetNamePattern()}, // IDENT is TokenTag:kName
     {"SPACINGS", std::regex(R"(^[\s\n\r\t]+)", std::regex_constants::optimize)},
 };
 
-static std::unordered_map<std::string, TokenTag> spec_type_to_tag_table {
-  {"stmt#", TokenTag::kStmtHash},
-  {"*", TokenTag::kTimes},
-  {"\"", TokenTag::kStringQuote},
-  {"INTEGER", TokenTag::kInteger},
-  {"prog_line", TokenTag::kProgLine},
-  {"such that", TokenTag::kSuchThat},
-  {"IDENT", TokenTag::kName},
-  {";", TokenTag::kSemicolon},
-  {"(", TokenTag::kOpenBracket},
-  {")", TokenTag::kCloseBracket},
-  {",", TokenTag::kComma},
-  {"_", TokenTag::kUnderscore},
-  {"<", TokenTag::kOpenKarat},
-  {">", TokenTag::kCloseKarat},
-  {".", TokenTag::kDot},
-  {"=", TokenTag::kEquals}
+static std::unordered_map<std::string, TokenTag> spec_type_to_tag_table{
+    {"stmt#", TokenTag::kStmtHash},
+    {"*", TokenTag::kTimes},
+    {"\"", TokenTag::kStringQuote},
+    {"INTEGER", TokenTag::kInteger},
+    {"prog_line", TokenTag::kProgLine},
+    {"such that", TokenTag::kSuchThat},
+    {"IDENT", TokenTag::kName},
+    {";", TokenTag::kSemicolon},
+    {"(", TokenTag::kOpenBracket},
+    {")", TokenTag::kCloseBracket},
+    {",", TokenTag::kComma},
+    {"_", TokenTag::kUnderscore},
+    {"<", TokenTag::kOpenKarat},
+    {">", TokenTag::kCloseKarat},
+    {".", TokenTag::kDot},
+    {"=", TokenTag::kEquals}
 };
 
 static std::regex string_end_regex("^[^\"]*", std::regex_constants::optimize);
@@ -42,7 +42,7 @@ static std::regex string_end_regex("^[^\"]*", std::regex_constants::optimize);
  * @param type is a string corresponding to a valid key in spec_table.
  * @return a TokenTag enum type.
  */
-TokenTag QueryTokenizer::GetPqlTokenType(std::string type) {
+TokenTag QueryTokenizer::GetPqlTokenType(const std::string& type) {
   std::unordered_map<std::string, TokenTag>::const_iterator got = spec_type_to_tag_table.find(type);
   if (got == spec_type_to_tag_table.end()) {
     return TokenTag::kInvalid;
@@ -61,7 +61,7 @@ bool QueryTokenizer::HasMoreTokens() {
  */
 Token QueryTokenizer::GetNextToken() {
   if (!HasMoreTokens()) {
-    return Token("", TokenTag::kInvalid);
+    return {"", TokenTag::kInvalid};
   }
   std::string curr_string = query.substr(cursor);
   // try matching known exact tokens first
@@ -80,21 +80,21 @@ Token QueryTokenizer::GetNextToken() {
       continue;
     }
     cursor += match[0].str().size();
-    if (spec.first.compare("SPACINGS") == 0) {
+    if (spec.first == "SPACINGS") {
       return GetNextToken();
     }
-    return Token(match[0].str(), GetPqlTokenType(spec.first));
+    return {match[0].str(), GetPqlTokenType(spec.first)};
   }
 
   throw PQLTokenizeException("No patterns matched. Error in tokenizing pql.");
 }
 
-std::pair<bool, Token> QueryTokenizer::EvaluateExactTokenMatch(std::string curr_string) {
+std::pair<bool, Token> QueryTokenizer::EvaluateExactTokenMatch(const std::string& curr_string) {
   std::string match;
   std::unordered_set<std::string>::const_iterator got;
   // "such that" / "prog_line" are 9 chars long, "stmt#" is 5, "\"" is 2. Rest are 1.
   std::vector<int> lengths = {1, 2, 5, 9};
-  for (int i : lengths) {
+  for (int i: lengths) {
     match = curr_string.substr(0, i);
     got = exact_tokens.find(match);
     if (got != exact_tokens.end()) return {true, Token(match, spec_type_to_tag_table.at(match))};

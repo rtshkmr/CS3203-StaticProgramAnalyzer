@@ -26,7 +26,6 @@ enum class ClusterTag {
   kNormalBlock // default tags since clusters will be tagged
 };
 
-//class Variable;
 class Cluster {
 
  protected:
@@ -36,7 +35,7 @@ class Cluster {
   Cluster* parent_cluster_;
 
  public:
-  Cluster() {};
+  Cluster() = default;;
   int size() const;
   std::pair<int, int> GetStartEndRange() const;
   ClusterTag GetClusterTag() const;
@@ -73,7 +72,7 @@ class Cluster {
                                               std::pair<int, int> target_range,
                                               PKB* pkb,
                                               const std::string& lhs_var,
-                                              const std::pair<int, int> goal_range);
+                                              std::pair<int, int> goal_range);
 };
 
 class Block : public Cluster {
@@ -82,7 +81,7 @@ class Block : public Cluster {
   std::set<Block*> prev_blocks_ = {};
 
  public:
-  Block() {};
+  Block() = default;;
   ~Block();
   static Block* GetNewExitBlock();
   static bool IsExitBlock(Block* block);
@@ -99,15 +98,15 @@ class ConditionalBlock : public Block {
   //       to act as a negative list instead
 
  public:
-  ~ConditionalBlock();
-  ConditionalBlock() {};
+  ~ConditionalBlock() override;
+  ConditionalBlock() = default;;
 };
 
 class BodyBlock : public Block {
 
  public:
-  ~BodyBlock();
-  BodyBlock() {};
+  ~BodyBlock() override;
+  BodyBlock() = default;;
 };
 
 #endif //AUTOTESTER_SRC_SPA_SRC_MODEL_CFG_H_

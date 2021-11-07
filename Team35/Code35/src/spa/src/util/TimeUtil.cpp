@@ -11,11 +11,6 @@
  * @return  string format of the current day, date, month, year,seconds
  */
 std::string TimeUtil::FormatDateTime(const tm* tm) {
-//  auto now = std::chrono::system_clock::now();
-//  std::time_t current_time = std::chrono::system_clock::to_time_t(now);
-//  std::ctime(&current_time);
-
-
 
   static std::string date_delim = "/";
   static std::string time_delim = ":";

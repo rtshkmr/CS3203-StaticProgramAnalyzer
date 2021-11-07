@@ -54,11 +54,35 @@ IntermediateTable* PKBQueryReceiver::QueryPKBTwoSynonyms(PKBRelRefs rel, Synonym
   std::vector<Entity*> first_list = table->GetColumn(first_synonym);
   std::vector<Entity*> second_list =table->GetColumn(second_synonym);
   ScopeIndication scoping = GetDoubleSynonymScoping(first_list, second_list);
+  std::set<std::pair<Entity*, Entity*>> temp_set;
+  std::vector<Entity*> filtered_first_list;
+  std::vector<Entity*> filtered_second_list;
+  switch (scoping) {
+    case ScopeIndication::kAllScope: {
+      for (unsigned i = 0; i < first_list.size(); i++) {
+        if (temp_set.find(std::make_pair(first_list[i], second_list[i])) == temp_set.end()) {
+          temp_set.insert(std::make_pair(first_list[i], second_list[i]));
+          filtered_first_list.push_back(first_list[i]);
+          filtered_second_list.push_back(second_list[i]);
+        }
+      }
+    } break;
+    case ScopeIndication::kLeftScope: {
+      std::set<Entity*> first_entity_set(first_list.begin(), first_list.end());
+      std::copy(first_entity_set.begin(), first_entity_set.end(), std::back_inserter(filtered_first_list));
+    } break;
+    case ScopeIndication::kRightScope: {
+      std::set<Entity*> second_entity_set(second_list.begin(), second_list.end());
+      std::copy(second_entity_set.begin(), second_entity_set.end(), std::back_inserter(filtered_second_list));
+    } break;
+  }
+
+
   std::vector<std::tuple<Entity *, Entity *>> output = db_manager->GetRelationshipByTypes(rel,
                                                                                           first_synonym->GetType(),
                                                                                           second_synonym->GetType(),
-                                                                                          first_list,
-                                                                                          second_list,
+                                                                                          filtered_first_list,
+                                                                                          filtered_second_list,
                                                                                           scoping);
   auto *intermediate_table = new IntermediateTable();
   intermediate_table->InsertData(output);
@@ -209,7 +233,7 @@ IntermediateTable *
 PKBQueryReceiver::QueryAttributeMatch(type_attribute_pair first_attr_pair, type_attribute_pair second_attr_pair) {
   auto *table = new IntermediateTable();
   std::vector<std::tuple<Entity*, Entity*>> result = db_manager->
-          GetEntitiesWithMatchingAttributes(first_attr_pair, second_attr_pair);
+          GetEntitiesWithMatchingAttributes(std::move(first_attr_pair), second_attr_pair);
   table->InsertData(result);
   return table;
 }
@@ -223,8 +247,8 @@ PKBQueryReceiver::QueryEntityAttributeMatch(DesignEntity design_entity, Attribut
 }
 
 ScopeIndication
-PKBQueryReceiver::GetDoubleSynonymScoping(std::vector<Entity *> first_entity_list,
-                                          std::vector<Entity *> second_entity_list) {
+PKBQueryReceiver::GetDoubleSynonymScoping(const std::vector<Entity *>& first_entity_list,
+                                          const std::vector<Entity *>& second_entity_list) {
   if (!first_entity_list.empty() && !second_entity_list.empty()) {
     return ScopeIndication::kAllScope;
   } else if (!first_entity_list.empty()) {
@@ -347,8 +371,8 @@ void QueryWithOneSynonymCommand::SetReceiver(PKBQueryReceiver *receiver) {
   this->receiver = receiver;
 }
 
-IntermediateTable *QueryWithOneSynonymCommand::ExecuteQuery(Clause *clause) {
-  auto* with_clause = dynamic_cast<With*>(clause);
+IntermediateTable *QueryWithOneSynonymCommand::ExecuteQuery(Clause *input_clause) {
+  auto* with_clause = dynamic_cast<With*>(input_clause);
   bool synonym_is_first_param = with_clause->left_is_synonym;
   DesignEntity design_entity_to_check = synonym_is_first_param ? with_clause->GetFirstSynonymType()
           : with_clause->GetSecondSynonymType();

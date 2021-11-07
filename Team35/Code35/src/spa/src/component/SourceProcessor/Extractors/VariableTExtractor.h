@@ -10,13 +10,13 @@ enum class VariableRel {
 
 class VariableTExtractor {
  public:
-  VariableTExtractor(Deliverable* deliverable);
-  void Extract(VariableRel rel_type);
+  VariableTExtractor() = default;
+  void Extract(Deliverable* deliverable, VariableRel rel_type);
  private:
-  Deliverable* deliverable_;
-  VariableRel rel_type_;
-  std::unordered_map<Container*, std::list<Variable*>*>* rel_map_;
-  std::unordered_map<Variable*, std::list<Container*>*>* reverse_rel_map_;
+  Deliverable* deliverable_{};
+  VariableRel rel_type_{};
+  std::unordered_map<Container*, std::list<Variable*>*>* rel_map_{};
+  std::unordered_map<Variable*, std::list<Container*>*>* reverse_rel_map_{};
 
   void InitRelMaps();
   std::list<Variable*>* ExtractFromContainer(Container* container, std::vector<Procedure*>* extracted_procedures);
