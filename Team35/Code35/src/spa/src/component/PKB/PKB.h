@@ -194,9 +194,20 @@ class PKB {
   template<typename T>
   void PopulateEntities(DesignEntity design_entity, T& entity_list);
 
+  void PopulatePatternVariables(Entity* entity);
+
   void ProcessEntitiesWithMatchingAttributes();
 
   static std::vector<DesignEntity> GetApplicableTypes(DesignEntity de);
+
+  void PopulateMatchingEntities(std::vector<Entity*>& entities, std::string& attribute_string);
+
+  void PopulateMatchingEntities(Entity* entity_one,
+                                Entity* entity_two,
+                                Attribute& attribute_one,
+                                Attribute& attribute_two,
+                                std::vector<DesignEntity>& first_entity_types,
+                                std::vector<DesignEntity>& second_entity_types);
 };
 
 /**
