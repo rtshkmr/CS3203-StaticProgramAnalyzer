@@ -169,7 +169,7 @@ void Cluster::UpdateRange(Cluster* nested_cluster) {
   }
 }
 std::pair<int, int> Cluster::GetStartEndRange() const {
-  return std::pair<int, int>(this->start_, this->end_);
+  return {this->start_, this->end_};
 }
 
 void Cluster::UpdateClusterRange() {

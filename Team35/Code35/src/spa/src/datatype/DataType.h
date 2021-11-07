@@ -126,7 +126,6 @@ enum class TokenTag {
   kCloseBracket,
   kSemicolon, // statement terminator
   kInvalid,
-  // TODO: consider placing the following tags into a subclassed enum, since its specific to pql and not frontend.
   kStringQuote, // "my_var"
   kComma,
   kSuchThat,

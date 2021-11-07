@@ -10,10 +10,8 @@
 
 class ConditionalExpression {
  private:
-  std::string actual_expression_; // TODO: check if it is required.
+  std::string actual_expression_;
   std::vector<Variable*> var_list_;
-
-  std::vector<Variable*> SortVariable(std::vector<Variable*> var_list);
 
  public:
   ConditionalExpression(std::string expr, std::vector<Variable*> var_list);
