@@ -213,7 +213,6 @@ class Synonym {
   bool operator==(const Synonym& other) const;
 };
 
-// TODO: Need to refactor this to use the .cpp file instead, also the method name needs to be capitalized.
 struct Clause {
   std::string left_hand_side;
   std::string right_hand_side;

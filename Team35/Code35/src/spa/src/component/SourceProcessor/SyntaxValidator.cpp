@@ -167,7 +167,7 @@ bool SyntaxValidator::IsFactor(const std::vector<Token>& statement_tokens,
       && (first_token_tag == TokenTag::kName || first_token_tag == TokenTag::kInteger)) {
     return true;
   } else if (first_token_tag
-      == TokenTag::kOpenBracket) { // todo: check if the allowing of redundant brackets makes this code unreachable
+      == TokenTag::kOpenBracket) {
     if (last_token_tag == TokenTag::kCloseBracket) {
       bool is_expression = IsExpr(statement_tokens,
                                   left_boundary_idx + 1,

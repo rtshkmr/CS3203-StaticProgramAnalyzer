@@ -5,9 +5,6 @@
 using namespace entity_utils;
 
 TEST_CASE("1.DataType.ConditionalExpression") {
-  // TODO: Should not affect test coverage but - Add While variants.
-
-  // if6 (1 == 2) - no variable style
   SECTION("0 variable") {
     IfEntity* if6 = GetIf6();
     REQUIRE(if6->GetCondExpr()->GetVariableList().empty());

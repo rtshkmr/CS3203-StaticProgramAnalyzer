@@ -94,8 +94,6 @@ class Block : public Cluster {
 };
 
 class ConditionalBlock : public Block {
-  // todo: as an optimisation strat, see what can be kept in condi block to and body block
-  //       to act as a negative list instead
 
  public:
   ~ConditionalBlock() override;

@@ -124,7 +124,7 @@ std::vector<Entity*> AffectsExtractor::GetAllAffects() {
   std::vector<Entity*> assign_list = pkb_->GetDesignEntities(DesignEntity::kAssign);
   for (auto* entity : assign_list) {
     auto* ae = dynamic_cast<AssignEntity*>(entity);
-    if (HasAffects(ae)) { //TODO change to Entity type?
+    if (HasAffects(ae)) {
       retList.push_back(entity);
     }
   }
@@ -247,7 +247,6 @@ bool AffectsExtractor::HasAffects(AssignEntity* target_ae) {
   std::string target_var = target_ae->GetVariableString();
 
   //check against the entire procedure's assign
-  // TODO: create new PKB API, Given Procedure, Get all assign (Uses / Modifies)
   std::vector<Entity*> affected_list =
       pkb_->GetRelationship(PKBRelRefs::kUsedBy, target_var);
 

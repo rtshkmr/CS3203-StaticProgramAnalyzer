@@ -435,7 +435,6 @@ bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
           target_range.first = std::min(child_range.second, target_range.second);
         }
       } else {
-        // todo: test this case: have to call in if{while{...}}else{..}
         return TraverseScopedClusterForAffects(child, target_range, pkb, lhs_var, goal_range);
       }
     } else { // it's a simple block, no alternative paths to consider:

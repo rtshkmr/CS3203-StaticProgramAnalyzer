@@ -152,7 +152,7 @@ bool Tokenizer::IsWhiteSpace(string& test_string) {
  * Based on the other tokens in the same sentence, determines if a token is an actual keyword.
  * This is a whitelist routine instead of blacklist.
  * Note that the ideal way would have been to judge in the same routine instead of create a separate routine for retagging,
- * but this is intended to be a quick fix. TODO [COSMETIC]: iter 2, improve data flow
+ * but this is intended to be a quick fix.
  * @param token_string
  * @param token_idx the idx of the token string with respect to the statement
  * @param token_strings

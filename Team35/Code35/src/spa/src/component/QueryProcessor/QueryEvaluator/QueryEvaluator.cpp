@@ -109,7 +109,6 @@ void QueryEvaluator::PreprocessNonBooleanGroup(Group* group, QueryEvaluatorTable
   ProcessGroup(table, group);
 }
 
-// TODO: fix this after fix for pattern is done
 Synonym* QueryEvaluator::GetMainSynonymFromClause(Clause* clause) {
   if (typeid(* clause) == typeid(Pattern)) return clause->first_synonym;
   if (clause->left_is_synonym) {

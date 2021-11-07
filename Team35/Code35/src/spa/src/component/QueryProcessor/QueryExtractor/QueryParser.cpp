@@ -31,7 +31,6 @@ Token QueryParser::Eat(TokenTag token_type) {
  * @return a Synonym object with the corresponding information, or a dummy Synonym with invalid fields if not exists.
  */
 Synonym* QueryParser::GetSynonymInfo(const std::string& syn_name, std::list<Synonym*>* synonyms) {
-  // Todo: Optimize.
   for (auto t: * synonyms) {
     if (t->GetName() == syn_name) {
       return t;
