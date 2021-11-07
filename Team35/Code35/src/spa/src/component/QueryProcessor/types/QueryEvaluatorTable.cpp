@@ -142,6 +142,8 @@ void QueryEvaluatorTable::CrossProductSingleColumn(Synonym *synonym, const std::
   for (auto value : values) {
     if (number_of_repeat > 0) {
       DuplicateTableForCrossProduct(original_number_of_rows, synonym);
+    } else {
+      ClearColumn(synonym);
     }
     InsertValuesForCrossProduct(synonym, value, original_number_of_rows);
     current_index += original_number_of_rows;
@@ -173,4 +175,10 @@ void QueryEvaluatorTable::InsertValuesForCrossProduct(Synonym *synonym_column, E
   for (int i = 0; i < original_size; i++) {
     synonym_to_entity_map[synonym_column].push_back(value);
   }
+}
+
+void QueryEvaluatorTable::ClearColumn(Synonym *synonym) {
+  auto search = synonym_to_entity_map.find(synonym);
+  if (search == synonym_to_entity_map.end()) return;
+  search->second.clear();
 }
