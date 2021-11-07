@@ -1,0 +1,47 @@
+stateDiagram-v2
+    %[*] --> TraverseScopedClusterForAffects
+
+    state child_tag_is <<choice>>
+    TraverseScopedClusterForAffects--> child_tag_is : for every nested child
+    note right of TraverseScopedClusterForAffects
+     The core Traversal Function
+    end note
+    % normal block 
+    child_tag_is --> NormalBlock
+    NormalBlock --> TraverseNormalBlockForAffects
+    note right of TraverseNormalBlockForAffects
+    For every statment number in the block, 
+    check if that statement modifies the statement 
+    end note
+    child_tag_is --> WhileBody 
+    child_tag_is --> IfOrElseBody 
+    child_tag_is --> IfCluster 
+
+
+
+    child_tag_is --> WhileCluster
+    state TargetIsInWhileCluster <<choice>> 
+    WhileCluster --> TargetIsInWhileCluster
+    TargetIsInWhileCluster --> TraverseScopedClusterForAffects:recurse if target is within while
+    TargetIsInWhileCluster --> TraverseScopedClusterForAffects: if only start stmt in while
+    TargetIsInWhileCluster --> TraverseScopedClusterForAffects: if only end stmt in while
+
+    state TargetIsInIfCluster <<choice>>
+    IfCluster -->TargetIsInIfCluster
+    TargetIsInIfCluster --> TraverseScopedClusterForAffects: recurse if target is in if-cluster
+    TargetIsInIfCluster --> CheckForUnmodPathInBodies: traverse thru, try finding 
+    CheckForUnmodPathInBodies --> TraverseScopedClusterForAffects: continue traversal 
+
+    WhileBody --> TraverseScopedClusterForAffects: recurse into while body
+
+    state IsNormalBlock <<choice>>
+    IfOrElseBody --> IsNormalBlock
+    IsNormalBlock --> NormalBlock : IsNormalBlock
+    IsNormalBlock --> TraverseScopedClusterForAffects: recurse into body
+
+
+
+
+
+
+   
