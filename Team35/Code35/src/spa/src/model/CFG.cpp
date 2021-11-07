@@ -200,6 +200,7 @@ void Cluster::SetClusterTag(ClusterTag cluster_tag) {
   this->cluster_tag_ = cluster_tag;
 }
 
+
 /**
  * Traverses cluster from first to second statement number, using the given pkb to retrieve
  * data where necessary. Is recursive in nature, where we try to call on a small subproblem by
