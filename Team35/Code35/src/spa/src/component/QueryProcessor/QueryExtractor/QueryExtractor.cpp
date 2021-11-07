@@ -1,9 +1,6 @@
 #include "QueryExtractor.h"
 #include "QueryGrouper.h"
-#include "QueryOptimizer.h"
 #include "QueryParser.h"
-#include "QueryTokenizer.h"
-
 /**
  * QueryExtractor is a Facade class for the frontend of Query Subsystem that calls subcomponents for
  * parsing of input, grouping of clauses and optimizations.

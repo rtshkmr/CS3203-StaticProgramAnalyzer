@@ -2,6 +2,8 @@
 #define AUTOTESTER_QUERYPARSER_H
 
 #include <string>
+#include <utility>
+#include <utility>
 #include <vector>
 #include <list>
 #include <unordered_set>
@@ -57,7 +59,7 @@ class QueryParser {
               std::vector<std::pair<Synonym*, Attribute>>& target_syn_attrs_list,
               std::unordered_map<std::string, Synonym*>& target_synonyms_map, QueryTokenizer tokenizer) :
       clauses(clauses), synonyms(synonyms), was_query_boolean(was_query_boolean),
-      target_syn_attrs_list(target_syn_attrs_list), target_synonyms_map(target_synonyms_map), tokenizer(tokenizer) {};
+      target_syn_attrs_list(target_syn_attrs_list), target_synonyms_map(target_synonyms_map), tokenizer(std::move(std::move(tokenizer))) {};
   void Parse();
   static Synonym* GetSynonymInfo(const std::string& syn_name, std::list<Synonym*>* synonyms);
 };
