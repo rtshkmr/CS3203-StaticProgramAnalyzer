@@ -203,9 +203,9 @@ struct Clause {
   virtual std::vector<std::string> GetAllSynonymNamesOfClause() { return {}; };
   Synonym* first_synonym;
   Synonym* second_synonym;
-  virtual std::string getType() { return ""; };
-  virtual bool isEqual(Clause toObj) { return 1; };
-  virtual ~Clause() {};
+  virtual std::string GetType() { return ""; };
+  virtual bool IsEqual(Clause other_clause) { return true; };
+  virtual ~Clause() = default;;
 };
 
 struct With : Clause {
@@ -239,10 +239,10 @@ struct With : Clause {
     if (right_is_synonym) v.push_back(right_hand_side);
     return v;
   };
-  std::string getType() const { return typeid(this).name(); }
-  bool isEqual(Clause* toObj) {
-    if (this->getType() == toObj->getType()) {
-      With* obj = (With*) & toObj;
+  std::string GetType() const { return typeid(this).name(); }
+  bool IsEqual(Clause* other_obj) {
+    if (this->GetType() == other_obj->GetType()) {
+      With* obj = (With*) & other_obj;
       return (
               this->left_hand_side == obj->left_hand_side &&
               this->right_hand_side == obj->right_hand_side &&
@@ -284,10 +284,10 @@ struct SuchThat : Clause {
     if (right_is_synonym) v.push_back(right_hand_side);
     return v;
   };
-  std::string getType() const { return typeid(this).name(); }
-  bool isEqual(Clause* toObj) {
-    if (this->getType() == toObj->getType()) {
-      SuchThat* obj = (SuchThat*) & toObj;
+  std::string GetType() const { return typeid(this).name(); }
+  bool IsEqual(Clause* other_obj) {
+    if (this->GetType() == other_obj->GetType()) {
+      SuchThat* obj = (SuchThat*) & other_obj;
       return (
           this->left_hand_side == obj->left_hand_side &&
               this->right_hand_side == obj->right_hand_side &&
@@ -328,10 +328,10 @@ struct Pattern : Clause {
     v.push_back(first_synonym->GetName());
     return v;
   };
-  std::string getType() const { return typeid(this).name(); }
-  bool isEqual(Clause* toObj) {
-    if (this->getType() == toObj->getType()) {
-      Pattern* obj = (Pattern*) & toObj;
+  std::string GetType() const { return typeid(this).name(); }
+  bool IsEqual(Clause* other_obj) {
+    if (this->GetType() == other_obj->GetType()) {
+      Pattern* obj = (Pattern*) & other_obj;
       return (
           this->left_hand_side == obj->left_hand_side &&
               this->right_hand_side == obj->right_hand_side &&

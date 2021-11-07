@@ -18,7 +18,7 @@ bool AreGroupsEqual(Group* g1, Group* g2) {
   while (it1 != c1.end() && it2 != c2.end()) {
     auto _c1 = * it1;
     auto _c2 = * it2;
-    REQUIRE(_c1->isEqual(* _c2));
+    REQUIRE(_c1->IsEqual(* _c2));
     it1++;
     it2++;
   }

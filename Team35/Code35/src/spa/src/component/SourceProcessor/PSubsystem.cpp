@@ -167,7 +167,6 @@ void PSubsystem::CloseElseBlock() {
 void PSubsystem::CloseWhileBlock() {
   auto* while_body_block = dynamic_cast<Block*>(block_stack_.top());
   block_stack_.pop(); // link the last stmt to the while_cond_block block, and pop it.
-  //todo: change from Block* to ConditionalBlock*
   auto* while_cond_block = dynamic_cast<Block*>(block_stack_.top());
   while_cond_block->SetClusterTag(ClusterTag::kWhileCondBlock);
   assert(while_cond_block);

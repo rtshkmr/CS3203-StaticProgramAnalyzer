@@ -88,7 +88,6 @@ bool SyntaxValidator::ValidateIfStatementSyntax(const vector<Token>& tokens) {
   if (!contains_single_then_keyword || !terminal_token_is_open_brace) {
     return false;
   }
-  // [TODO iter 2]: [cosmetic] probably no need to use counting, need to see what the finder function returns if it doesn't exist
   int then_keyword_idx = Token::GetFirstMatchingTokenIdx(tokens, TokenTag::kThenKeyword);
   int first_open_bracket = Token::GetFirstMatchingTokenIdx(tokens, TokenTag::kOpenBracket);
   int last_close_bracket = Token::GetLastMatchingTokenIdx(tokens, TokenTag::kCloseBracket);
