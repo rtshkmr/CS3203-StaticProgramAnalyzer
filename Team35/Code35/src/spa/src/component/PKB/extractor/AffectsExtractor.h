@@ -51,6 +51,8 @@ class AffectsExtractor : public RuntimeColleague {
   bool HasAffects(AssignEntity* target);
   bool HasAffectedBy(AssignEntity* target);
   bool HasAffects(AssignEntity* first_stmt, AssignEntity* second_stmt);
+  std::pair<bool, bool> CheckAgainstCache(AssignEntity* first_stmt, AssignEntity* second_stmt);
+  bool VerifyAffectsStmtConditions(AssignEntity* first_stmt, AssignEntity* second_stmt);
 };
 
 #endif //AUTOTESTER_CODE35_SRC_SPA_SRC_COMPONENT_PKB_AFFECTSEXTRACTOR_H_
