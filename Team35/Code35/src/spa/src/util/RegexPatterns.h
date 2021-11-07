@@ -6,7 +6,6 @@
 
 #include <regex>
 
-// todo: shift RegexPatterns to utils
 class RegexPatterns {
 
  public:

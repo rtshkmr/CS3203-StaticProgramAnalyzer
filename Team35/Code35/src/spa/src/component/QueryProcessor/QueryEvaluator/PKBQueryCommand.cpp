@@ -209,7 +209,7 @@ IntermediateTable *
 PKBQueryReceiver::QueryAttributeMatch(type_attribute_pair first_attr_pair, type_attribute_pair second_attr_pair) {
   auto *table = new IntermediateTable();
   std::vector<std::tuple<Entity*, Entity*>> result = db_manager->
-          GetEntitiesWithMatchingAttributes(first_attr_pair, second_attr_pair);
+          GetEntitiesWithMatchingAttributes(std::move(first_attr_pair), second_attr_pair);
   table->InsertData(result);
   return table;
 }
@@ -223,8 +223,8 @@ PKBQueryReceiver::QueryEntityAttributeMatch(DesignEntity design_entity, Attribut
 }
 
 ScopeIndication
-PKBQueryReceiver::GetDoubleSynonymScoping(std::vector<Entity *> first_entity_list,
-                                          std::vector<Entity *> second_entity_list) {
+PKBQueryReceiver::GetDoubleSynonymScoping(const std::vector<Entity *>& first_entity_list,
+                                          const std::vector<Entity *>& second_entity_list) {
   if (!first_entity_list.empty() && !second_entity_list.empty()) {
     return ScopeIndication::kAllScope;
   } else if (!first_entity_list.empty()) {
@@ -347,8 +347,8 @@ void QueryWithOneSynonymCommand::SetReceiver(PKBQueryReceiver *receiver) {
   this->receiver = receiver;
 }
 
-IntermediateTable *QueryWithOneSynonymCommand::ExecuteQuery(Clause *clause) {
-  auto* with_clause = dynamic_cast<With*>(clause);
+IntermediateTable *QueryWithOneSynonymCommand::ExecuteQuery(Clause *input_clause) {
+  auto* with_clause = dynamic_cast<With*>(input_clause);
   bool synonym_is_first_param = with_clause->left_is_synonym;
   DesignEntity design_entity_to_check = synonym_is_first_param ? with_clause->GetFirstSynonymType()
           : with_clause->GetSecondSynonymType();

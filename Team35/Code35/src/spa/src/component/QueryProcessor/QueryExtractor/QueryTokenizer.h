@@ -14,11 +14,11 @@ class QueryTokenizer {
  private:
   std::string query;
   std::int16_t cursor = 0;
-  TokenTag GetPqlTokenType(std::string type);
-  std::pair<bool, Token> EvaluateExactTokenMatch(std::string curr_string);
+  static TokenTag GetPqlTokenType(const std::string& type);
+  static std::pair<bool, Token> EvaluateExactTokenMatch(const std::string& curr_string);
  public:
-  QueryTokenizer() {};
-  void SetQueryString(std::string* query) { this->query = * query; };
+  QueryTokenizer() = default;;
+  void SetQueryString(std::string* input_query) { this->query = * input_query; };
   bool HasMoreTokens();
   Token GetNextToken();
   std::string SkipTokenizerTillStringQuoteDelimiter();

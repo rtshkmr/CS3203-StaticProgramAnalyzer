@@ -4,7 +4,6 @@
 #include <component/QueryProcessor/QueryExtractor/QueryExtractor.h>
 #include <util/Logger.h>
 #include <exception/SpaException.h>
-#include <component/PKB/DBManager.h>
 
 constexpr auto L = [](auto msg) {
   LOG
@@ -19,17 +18,16 @@ std::vector<std::string> QuerySystemController::Evaluate(std::string* query, PKB
   } catch (const PQLValidationException) {
     bool was_query_boolean = query_extractor.WasQueryBoolean();
     std::vector<std::string> result;
-    if (was_query_boolean) result.push_back("FALSE");
+    if (was_query_boolean) result.emplace_back("FALSE");
     return result;
   } catch (const std::runtime_error& error) {
     return {};
   }
 
-  DBManager* dbm = new DBManager(pkb);
+  auto* dbm = new DBManager(pkb);
   auto query_evaluator = QueryEvaluator(dbm);
 
   L("[ENTER] Query Evaluator Evaluate Query");
-  // TODO: change this
   UnformattedQueryResult unformatted_results = query_evaluator.EvaluateQuery(query_extractor.GetGroupsList());
 
   L("[EXIT] Query Evaluator Evaluate Query ");
@@ -41,5 +39,5 @@ std::vector<std::string> QuerySystemController::Evaluate(std::string* query, PKB
   dbm->Delete();
   delete dbm;
   return populated_result_list;
-};
+}
 

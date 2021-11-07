@@ -65,7 +65,7 @@ class PKB {
 
   // Returns a vector of entities of type dee such that the ref relationship holds between
   // the specified entity and another entity of any type
-  std::vector<Entity*> GetFirstEntityOfRelationship(PKBRelRefs ref, DesignEntity de);
+  std::vector<Entity*> GetFirstEntityOfRelationship(PKBRelRefs ref, DesignEntity design_entity);
 
   // Returns a vector of entities of type de
   std::vector<Entity*> GetDesignEntities(DesignEntity de);
@@ -91,10 +91,10 @@ class PKB {
   bool HasRelationship(PKBRelRefs, DesignEntity, DesignEntity);
 
   // Returns true if the relationship exists with the first entity specified by the string, false otherwise
-  bool HasRelationship(PKBRelRefs, std::string);
+  bool HasRelationship(PKBRelRefs, const std::string&);
 
   // Returns true if the relationship exists between the two entities specified by strings, false otherwise
-  bool HasRelationship(PKBRelRefs, std::string, std::string);
+  bool HasRelationship(PKBRelRefs, std::string, const std::string&);
 
   // Returns the name of any entity in string format
   // (statements - statement number, variables - variable name, procedures - procedure name, constant - value)
@@ -226,7 +226,7 @@ class PKB {
 
   void ProcessEntitiesWithMatchingAttributes();
 
-  std::vector<DesignEntity> GetApplicableTypes(DesignEntity de);
+  static std::vector<DesignEntity> GetApplicableTypes(DesignEntity de);
 };
 
 

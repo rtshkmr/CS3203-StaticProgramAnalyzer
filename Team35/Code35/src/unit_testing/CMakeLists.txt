@@ -25,7 +25,6 @@ add_executable(unit_testing ${srcs}
         src/component/SourceProcessor/Extractors/TestNextRelationship.cpp
         src/component/SourceProcessor/TestParser.cpp
         src/component/PKB/TestNextTExtractor.cpp
-#        src/component/SourceProcessor/Extractors/TestCallsTExtractor.cpp
         src/component/SourceProcessor/Extractors/TestTransitiveExtractor/TestCallsT.cpp
         src/model/TestVariableMapping.cpp
         src/component/PKB/TestAffectsExtractor.cpp

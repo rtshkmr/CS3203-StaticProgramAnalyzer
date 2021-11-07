@@ -3,6 +3,7 @@
  * Acknowledgement:
  * - Logger design is an adaptation of the reference code here: https://levelup.gitconnected.com/logging-in-c-60cd1571df15 */
 #include "Logger.h"
+#include "Utility.h"
 
 Logger spa_logger;
 static std::string marker = "~~~~~~~~~~~~~~~~~";
