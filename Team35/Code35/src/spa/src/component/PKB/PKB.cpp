@@ -295,6 +295,7 @@ DesignEntity PKB::GetDesignEntityFromEntity(Entity* entity) {
       return DesignEntity::kConstant;
     case (EntityEnum::kElseEntity):
     case (EntityEnum::kNone):
+    default:
       return DesignEntity::kInvalid;
   }
 }
@@ -320,6 +321,8 @@ std::vector<Attribute> PKB::GetAttributeTypes(Entity* entity) {
     case (EntityEnum::kPrintEntity):
     case (EntityEnum::kReadEntity):
       return std::vector<Attribute> {Attribute::kStmtNumber, Attribute::kVarName};
+    default:
+      return std::vector<Attribute> {};
   }
 }
 
