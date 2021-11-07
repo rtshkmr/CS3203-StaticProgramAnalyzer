@@ -10,24 +10,19 @@
 
   participant DBManager
   participant RuntimeExtractor
-  participant NextTExtractor
   participant AffectsExtractor
   participant AffectsTExtractor
 
   create RuntimeExtractor
   DBManager -> RuntimeExtractor: RuntimeExtractor(PKB*)
 
-  DBManager -> RuntimeExtractor ++: GetRelationship(RelRef, string)
-  alt next/previous relationship
-    RuntimeExtractor -> NextTExtractor ++: GetRelationship(RelDirection, string)
-    NextTExtractor --> RuntimeExtractor --: vector<Entity*>
-  else affects/affectedBy
-    RuntimeExtractor -> AffectsExtractor ++: GetRelationship(RelDirection, string)
-    AffectsExtractor --> RuntimeExtractor --: vector<Entity*>
-  else affectsT/affectedByT
-    RuntimeExtractor -> AffectsTExtractor ++: GetRelationship(RelDirection, string)
+  DBManager -> RuntimeExtractor ++: GetRelationship(PKBRelRef::kAffectsT, string)
+    RuntimeExtractor -> AffectsTExtractor ++: GetRelationship(RelDirection::kForward, string)
+      AffectsTExtractor -> RuntimeExtractor ++: GetRelationship(PKBRelRef::kAffects, string)
+        RuntimeExtractor -> AffectsExtractor ++: GetRelationship(RelDirection::kForward, string)
+        AffectsExtractor --> RuntimeExtractor --: vector<Entity*>
+      RuntimeExtractor --> AffectsTExtractor --: vector<Entity*>
     AffectsTExtractor --> RuntimeExtractor --: vector<Entity*>
-  end
   RuntimeExtractor --> DBManager --: vector<Entity*>
 
 @enduml

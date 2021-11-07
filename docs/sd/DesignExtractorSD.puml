@@ -10,33 +10,38 @@
 
   participant SourceProcessor
   participant DesignExtractor
-  participant TransitiveExtractor
-  participant VariableTExtractor
-  participant NextExtractor
 
   create DesignExtractor
   SourceProcessor -> DesignExtractor: DesignExtractor(deliverable)
   SourceProcessor -> DesignExtractor: ExtractDesignAbstractions()
   activate DesignExtractor
 
-  DesignExtractor -> TransitiveExtractor: Extract(CallsT map, \nCalledByT map, \nCalls map)
-  activate TransitiveExtractor
-  TransitiveExtractor --> DesignExtractor
-  deactivate TransitiveExtractor
-  DesignExtractor -> TransitiveExtractor: Extract(FollowsT map, \nCalledByT map, \nCalls map)
-  activate TransitiveExtractor
-  TransitiveExtractor --> DesignExtractor
-  deactivate TransitiveExtractor
-  DesignExtractor -> TransitiveExtractor: Extract(CallsT map, \nCalledByT map, \nCalls map)
-  activate TransitiveExtractor
-  TransitiveExtractor --> DesignExtractor
-  deactivate TransitiveExtractor
+  create "procedure_extractor : \nTransitiveExtractor"
+  DesignExtractor -> "procedure_extractor : \nTransitiveExtractor": TransitiveExtractor<Procedure>()
+  DesignExtractor -> "procedure_extractor : \nTransitiveExtractor": Extract(CallsT map, \nCalledByT map, \nCalls map)
+  activate  "procedure_extractor : \nTransitiveExtractor"
+   "procedure_extractor : \nTransitiveExtractor" --> DesignExtractor
+  deactivate  "procedure_extractor : \nTransitiveExtractor"
 
-  DesignExtractor -> VariableTExtractor: Extract(VariableRel::kUses)
+  create "statement_extractor : \nTransitiveExtractor"
+  DesignExtractor -> "statement_extractor : \nTransitiveExtractor": TransitiveExtractor<Statement>()
+  DesignExtractor -> "statement_extractor : \nTransitiveExtractor": Extract(ParentT map, \nChildT map, \nParent map)
+  activate "statement_extractor : \nTransitiveExtractor"
+  "statement_extractor : \nTransitiveExtractor" --> DesignExtractor
+  deactivate "statement_extractor : \nTransitiveExtractor"
+  DesignExtractor -> "statement_extractor : \nTransitiveExtractor": Extract(FollowsT map, \nFollowedByT map, \nFollows map)
+  activate "statement_extractor : \nTransitiveExtractor"
+  "statement_extractor : \nTransitiveExtractor" --> DesignExtractor
+  deactivate "statement_extractor : \nTransitiveExtractor"
+
+  participant VariableTExtractor
+  participant NextExtractor
+
+  DesignExtractor -> VariableTExtractor: Extract(deliverable, VariableRel::kUses)
   activate VariableTExtractor
   VariableTExtractor --> DesignExtractor
   deactivate VariableTExtractor
-  DesignExtractor -> VariableTExtractor: Extract(VariableRel::kModifies)
+  DesignExtractor -> VariableTExtractor: Extract(deliverable, VariableRel::kModifies)
   activate VariableTExtractor
   VariableTExtractor --> DesignExtractor
   deactivate VariableTExtractor
