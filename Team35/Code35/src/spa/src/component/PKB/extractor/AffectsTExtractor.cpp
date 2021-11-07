@@ -15,7 +15,7 @@ std::vector<Entity*> AffectsTExtractor::GetRelationship(RelDirection dir, int ta
   std::unordered_map<int, std::list<int>*>* mapToCheck = (dir == RelDirection::kForward) ? &affects_t_map_ : &affected_by_t_map_;
 
   std::list<int> toCheck = {target};
-  while (toCheck.size() > 0) {
+  while (!toCheck.empty()) {
     int check = toCheck.front();
     toCheck.pop_front();
 
@@ -71,7 +71,7 @@ std::vector<std::tuple<Entity*, Entity*>> AffectsTExtractor::GetRelationshipByTy
     AssignEntity* ae = Utility::GetAssignEntityFromStmtNum(pkb_, pair.first);
 
     for (auto val: this_key_entity) {
-      intermediate_table.push_back(std::make_tuple(ae, val));
+      intermediate_table.emplace_back(ae, val);
     }
   }
 
@@ -80,7 +80,7 @@ std::vector<std::tuple<Entity*, Entity*>> AffectsTExtractor::GetRelationshipByTy
 
 bool AffectsTExtractor::HasRelationship(RelDirection dir) {
   if (!isCached) InitCache();
-  return affects_t_map_.size() > 0;
+  return !affects_t_map_.empty();
 }
 
 bool AffectsTExtractor::HasRelationship(RelDirection dir, int target) {
@@ -99,7 +99,7 @@ bool AffectsTExtractor::HasRelationship(RelDirection dir, int first, int second)
 
   std::set<int> checked = {};
   std::list<int> toCheck = {first};
-  while (toCheck.size() > 0) {
+  while (!toCheck.empty()) {
     int check = toCheck.front();
     toCheck.pop_front();
 
@@ -144,8 +144,8 @@ void AffectsTExtractor::InitCache() {
 
   std::vector<std::tuple<Entity*, Entity*>> all_pairs = rte_->GetRelationshipByTypes(PKBRelRefs::kAffects, DesignEntity::kAssign, DesignEntity::kAssign);
   for (auto pair : all_pairs) {
-    AssignEntity* ae1 = dynamic_cast<AssignEntity*>(std::get<0>(pair));
-    AssignEntity* ae2 = dynamic_cast<AssignEntity*>(std::get<1>(pair));
+    auto* ae1 = dynamic_cast<AssignEntity*>(std::get<0>(pair));
+    auto* ae2 = dynamic_cast<AssignEntity*>(std::get<1>(pair));
     assert(ae1 && ae2);
 
     Deliverable::AddRelationshipToMap(&affects_t_map_,
@@ -156,7 +156,7 @@ void AffectsTExtractor::InitCache() {
   isCached = true;
 }
 
-std::vector<Entity*> AffectsTExtractor::ConvertIntToEntity(std::set<int> set_to_convert) {
+std::vector<Entity*> AffectsTExtractor::ConvertIntToEntity(const std::set<int>& set_to_convert) {
   std::vector<Entity*> retList = {};
   for (auto item : set_to_convert) {
     retList.push_back(Utility::GetAssignEntityFromStmtNum(pkb_, item));

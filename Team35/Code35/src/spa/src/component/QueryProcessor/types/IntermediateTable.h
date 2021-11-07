@@ -14,10 +14,10 @@ class IntermediateTable {
     IntermediateTable();
     void InsertData(std::vector<Entity *> data);
     void InsertData(std::vector<std::tuple<Entity *, Entity *>> data);
-    void InsertData(bool has_relationship);
+    void InsertData(bool has_relation);
     std::vector<Entity *> GetRelationships();
     std::vector<std::tuple<Entity *, Entity *>> GetRelationshipsByType();
-    bool GetExistenceResult();
+    bool GetExistenceResult() const;
 };
 
 #endif //AUTOTESTER_INTERMEDIATETABLE_H

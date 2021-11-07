@@ -1,5 +1,7 @@
 #include "IntermediateTable.h"
 
+#include <utility>
+
 IntermediateTable::IntermediateTable() {
   std::vector<Entity *> empty_relationships_vector;
   relationships = empty_relationships_vector;
@@ -11,15 +13,15 @@ IntermediateTable::IntermediateTable() {
 };
 
 void IntermediateTable::InsertData(std::vector<Entity *> data) {
-  relationships = data;
+  relationships = std::move(data);
 }
 
 void IntermediateTable::InsertData(std::vector<std::tuple<Entity *, Entity *>> data) {
-  relationships_by_type = data;
+  relationships_by_type = std::move(data);
 }
 
-void IntermediateTable::InsertData(bool has_relationship) {
-  this->has_relationship = has_relationship;
+void IntermediateTable::InsertData(bool has_relation) {
+  this->has_relationship = has_relation;
 }
 
 std::vector<Entity *> IntermediateTable::GetRelationships() {
@@ -30,6 +32,6 @@ std::vector<std::tuple<Entity *, Entity *>> IntermediateTable::GetRelationshipsB
   return relationships_by_type;
 }
 
-bool IntermediateTable::GetExistenceResult() {
+bool IntermediateTable::GetExistenceResult() const {
   return has_relationship;
 }

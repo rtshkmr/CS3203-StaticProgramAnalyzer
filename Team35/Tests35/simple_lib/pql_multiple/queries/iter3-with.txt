@@ -58,3 +58,8 @@ stmt s1; assign a1; variable v1; procedure pr1; prog_line pl; print p1; read r1;
 Select v1 pattern w1("d", _) with w1.stmt# = pl such that Uses(pl, v1)
 none
 5000
+13 - Semantic Error
+stmt s;
+Select BOOLEAN with s = 4
+FALSE
+5000

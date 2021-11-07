@@ -122,7 +122,7 @@ std::vector<Synonym*> QueryEvaluatorTable::GetTargetSynonymList() {
 }
 
 /**
- * Creates the new column and populate the table and the new column(s) with the cross producted rows.
+ * Creates the new column and populate the table and the new column(s) with the cross produced rows.
  * @param synonyms
  * @param values
  */

@@ -28,7 +28,7 @@ class AffectsTExtractor : public RuntimeColleague {
   std::unordered_map<int, std::list<int>*> affects_t_map_ = {};
   std::unordered_map<int, std::list<int>*> affected_by_t_map_ = {};
   void InitCache();
-  std::vector<Entity*> ConvertIntToEntity(std::set<int> set_to_convert);
+  std::vector<Entity*> ConvertIntToEntity(const std::set<int>& set_to_convert);
 };
 
 #endif //AUTOTESTER_CODE35_SRC_SPA_SRC_COMPONENT_PKB_AFFECTSTEXTRACTOR_H_

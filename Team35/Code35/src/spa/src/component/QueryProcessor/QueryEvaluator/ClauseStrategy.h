@@ -28,21 +28,21 @@ class ClauseContext {
 
 class SuchThatStrategy : public ClauseStrategy {
   public:
-    SuchThatStrategy() {};
+    SuchThatStrategy() = default;;
     std::tuple<PKBQueryCommand *, ClauseCommand *>
     DetermineClauseCommand(Clause *clause, QueryEvaluatorTable *table) override;
 };
 
 class PatternStrategy : public ClauseStrategy {
   public:
-    PatternStrategy() {};
+    PatternStrategy() = default;;
     std::tuple<PKBQueryCommand *, ClauseCommand *>
     DetermineClauseCommand(Clause *clause, QueryEvaluatorTable *table) override;
 };
 
 class WithStrategy : public ClauseStrategy {
   public:
-    WithStrategy() {};
+    WithStrategy() = default;;
     std::tuple<PKBQueryCommand *, ClauseCommand *>
     DetermineClauseCommand(Clause *clause, QueryEvaluatorTable *table) override;
 };

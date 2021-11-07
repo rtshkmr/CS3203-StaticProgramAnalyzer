@@ -3,6 +3,8 @@
  */
 
 #include <model/Entity.h>
+
+#include <utility>
 #include "ConditionalExpression.h"
 
 /**
@@ -12,17 +14,8 @@
  * @param expr The actual expression found in source file.
  * @param var_list The variables within the actual expression.
  */
-ConditionalExpression::ConditionalExpression(std::string expr, std::vector<Variable*> var_list) {
-  actual_expression_ = expr;
-  var_list_ = Variable::SortVariableVector(var_list);
-}
-
-/**
- * Gets the actual expression string as found in SIMPLE source file.
- * @return actual expression string.
- */
-std::string ConditionalExpression::GetExpressionString() {
-  return actual_expression_;
+ConditionalExpression::ConditionalExpression(const std::string& expr, std::vector<Variable*> var_list) {
+  var_list_ = Variable::SortVariableVector(std::move(var_list));
 }
 
 /**

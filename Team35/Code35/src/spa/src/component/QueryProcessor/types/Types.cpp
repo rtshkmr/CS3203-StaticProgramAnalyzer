@@ -18,7 +18,7 @@ static std::unordered_map<std::string, RelRef> _relref_map = {{"ModifiesP", RelR
                                                               {"Affects", RelRef::kAffects},
                                                               {"Affects*", RelRef::kAffectsT}};
 
-RelRef GetRelRef(std::string reference) {
+RelRef GetRelRef(const std::string& reference) {
   std::unordered_map<std::string, RelRef>::const_iterator iter = _relref_map.find(reference);
   if (iter != _relref_map.end()) {
     return iter->second;
@@ -30,7 +30,7 @@ static std::unordered_map<std::string, Attribute> _attribute_map = {{"procName",
                                                                     {"varName", Attribute::kVarName},
                                                                     {"value", Attribute::kValue},
                                                                     {"stmt#", Attribute::kStmtNumber}};
-Attribute GetAttribute(std::string attr_string) {
+Attribute GetAttribute(const std::string& attr_string) {
   std::unordered_map<std::string, Attribute>::const_iterator iter = _attribute_map.find(attr_string);
   if (iter != _attribute_map.end()) {
     return iter->second;
@@ -63,7 +63,7 @@ static std::unordered_map<std::string, DesignEntity> _de_map = {{"stmt", DesignE
                                                           {"procedure", DesignEntity::kProcedure},
                                                           {"prog_line", DesignEntity::kProgLine}};
 
-DesignEntity GetDesignEntity(std::string reference) {
+DesignEntity GetDesignEntity(const std::string& reference) {
   std::unordered_map<std::string, DesignEntity>::const_iterator iter = _de_map.find(reference);
   if (iter != _de_map.end()) {
     return iter->second;
@@ -96,7 +96,7 @@ std::vector<Synonym*> Group::GetTargetSynonyms() {
 }
 
 void Group::UpdateHasTargetSynonymAttr() {
-  has_target_synonym = target_synonyms.size() > 0 ? true : false;
+  has_target_synonym = !target_synonyms.empty() ? true : false;
 }
 
 int Group::GetGroupSize() {

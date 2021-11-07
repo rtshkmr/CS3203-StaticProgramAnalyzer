@@ -13,7 +13,6 @@ class SyntaxValidator {
 
  public:
   SyntaxValidator();
-  // todo: majority of the functions here may be made private, kept it public for testing mainly
   static bool ValidateSyntax(std::vector<Token> statement_tokens);
   static bool ValidateProcedureSyntax(const std::vector<Token>& tokens);
   static bool ValidateMacroFunctionSyntax(const std::vector<Token>& tokens);

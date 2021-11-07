@@ -9,7 +9,6 @@
 #include <iostream>
 #include <string>
 #include <util/TimeUtil.h>
-#include <util/util.h>
 
 class Logger;
 extern Logger spa_logger;
