@@ -99,9 +99,9 @@ enum class ScopeIndication {
   kAllScope
 };
 
-DesignEntity GetDesignEntity(std::string reference);
-RelRef GetRelRef(std::string reference);
-Attribute GetAttribute(std::string attr_string);
+DesignEntity GetDesignEntity(const std::string& reference);
+RelRef GetRelRef(const std::string& reference);
+Attribute GetAttribute(const std::string& attr_string);
 Attribute GetDefaultAttribute(DesignEntity de);
 
 
