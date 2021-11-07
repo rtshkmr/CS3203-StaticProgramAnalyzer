@@ -59,14 +59,12 @@ class RuntimeExtractor : public RuntimeMediator {
   void Delete();
   static bool IsRuntimeRelationship(PKBRelRefs ref);
 
-  std::vector<Entity*> GetScopedFirstEntities(PKBRelRefs ref, const std::vector<Entity*>& scoped_entities);
   std::vector<std::tuple<Entity*, Entity*>> GetAllRelationshipsScoped(PKBRelRefs ref,
                                                                       std::vector<Entity*> left_entities,
                                                                       std::vector<Entity*> right_entities,
                                                                       ScopeIndication scope_indication,
                                                                       type_combo types);
  private:
-  PKB* pkb_;
   NextTExtractor next_t_extractor_;
   AffectsExtractor affects_extractor_;
   AffectsTExtractor affects_t_extractor_;
