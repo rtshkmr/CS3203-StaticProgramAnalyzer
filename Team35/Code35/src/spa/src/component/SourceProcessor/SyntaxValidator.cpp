@@ -202,7 +202,7 @@ bool SyntaxValidator::IsTerm(const vector<Token>& statement_tokens, int left_bou
   /// case 2: <term><operator><factor>
   int middle_ptr = SyntaxValidator::FindSplitPoint(statement_tokens, left_boundary_idx, right_boundary_idx, RegexPatterns::GetTermDelimiterPattern());
   if (middle_ptr <= left_boundary_idx) {
-    return false; // todo: check if need recurse
+    return false;
   }
   bool right_part_is_factor = IsFactor(statement_tokens, middle_ptr + 1, right_boundary_idx);
   bool left_part_is_term = IsTerm(statement_tokens, left_boundary_idx, middle_ptr - 1);
@@ -295,9 +295,6 @@ bool SyntaxValidator::IsRelExpr(const vector<Token>& statement_tokens, int left_
 }
 
 bool SyntaxValidator::IsCondExpr(const vector<Token>& statement_tokens, int left_boundary_idx, int right_boundary_idx) {
-  //               (cond_expr) <bool> (cond_expr) because removing the outer ones
-  //               will give unequal bracketing
-
   const Token& first_token = statement_tokens.at(left_boundary_idx);
   const Token& last_token = statement_tokens.at(right_boundary_idx);
   bool first_token_is_binary_bool_delim =
@@ -318,7 +315,7 @@ bool SyntaxValidator::IsCondExpr(const vector<Token>& statement_tokens, int left
                                                      left_boundary_idx,
                                                      right_boundary_idx,
                                                      RegexPatterns::GetBinaryBooleanOperatorPattern());
-    if (middle_ptr <= left_boundary_idx) { // iterate thru, nothing hits // todo: change this
+    if (middle_ptr <= left_boundary_idx) { // iterate thru, nothing hits
       return IsRelExpr(statement_tokens, left_boundary_idx, right_boundary_idx);
       // rel expr
     } else {
@@ -382,7 +379,6 @@ int SyntaxValidator::FindSplitPoint(const vector<Token>& statement_tokens,
  * @return
  */
 bool SyntaxValidator::StatementPassesCommonBlacklistRules(const vector<Token>& statement_tokens) {
-  // todo: check bracket using a stack instead of pure counting
   const Token& last_token = statement_tokens.at(statement_tokens.size() - 1);
   bool valid_last_token
       = std::regex_match(last_token.GetTokenString(), RegexPatterns::GetValidStatementTerminalToken());

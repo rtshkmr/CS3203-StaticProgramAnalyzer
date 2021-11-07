@@ -10,13 +10,10 @@
 
 class ConditionalExpression {
  private:
-  std::string actual_expression_;
   std::vector<Variable*> var_list_;
 
  public:
   ConditionalExpression(std::string expr, std::vector<Variable*> var_list);
-
-  std::string GetExpressionString();
 
   std::vector<Variable*> GetVariableList();
 
