@@ -3,33 +3,8 @@
 #include <datatype/Deliverable.h>
 #include <model/Statement.h>
 #include <component/QueryProcessor/types/Types.h>
-
 #include <cstdio>
 #include <iostream>
-
-typedef std::tuple<DesignEntity, DesignEntity> type_combo;
-
-struct type_combo_hash {
-  std::size_t operator()(const type_combo& combo) const {
-    return static_cast<std::size_t>(std::get<0>(combo))
-        * static_cast<std::size_t>(DesignEntity::kInvalid)
-        + static_cast<std::size_t>(std::get<1>(combo));
-  }
-};
-
-typedef std::tuple<DesignEntity, Attribute> type_attribute_pair;
-
-struct attribute_hash {
-  std::size_t operator()(const std::tuple<DesignEntity, Attribute>& combo) const {
-    return static_cast<std::size_t>(std::get<0>(combo))
-        * static_cast<std::size_t>(DesignEntity::kInvalid)
-        + static_cast<std::size_t>(std::get<1>(combo));
-  }
-};
-
-typedef std::tuple<Entity*, Entity*> entity_pair;
-
-typedef std::tuple<PKBRelRefs, std::string, std::string> relationship;
 
 class PKB {
  public:
@@ -60,7 +35,7 @@ class PKB {
   // the specified entity and another entity of type de2
   std::vector<Entity*> GetFirstEntityOfRelationship(PKBRelRefs ref, DesignEntity de1, DesignEntity de2);
 
-  // Returns a vector of entities of type dee such that the ref relationship holds between
+  // Returns a vector of entities of type design_entity such that the ref relationship holds between
   // the specified entity and another entity of any type
   std::vector<Entity*> GetFirstEntityOfRelationship(PKBRelRefs ref, DesignEntity design_entity);
 
@@ -113,12 +88,9 @@ class PKB {
   // Constructor
   PKB() = default;
 
+  // Populates data structures within the PKB relevant to the specified relationship
   template<typename X, typename Y>
   void PopulateRelationship(std::unordered_map<X*, std::list<Y*>*>* hash, PKBRelRefs ref);
-
-  std::unordered_map<Entity*, std::list<Entity*>*>* ConvertStringToEntityMapping(const std::unordered_map<std::string,
-                                                                                                          std::vector<
-                                                                                                              Entity*>>& pkb_map);
 
   Program* GetProgram();
 
@@ -222,9 +194,20 @@ class PKB {
   template<typename T>
   void PopulateEntities(DesignEntity design_entity, T& entity_list);
 
+  void PopulatePatternVariables(Entity* entity);
+
   void ProcessEntitiesWithMatchingAttributes();
 
   static std::vector<DesignEntity> GetApplicableTypes(DesignEntity de);
+
+  void PopulateMatchingEntities(std::vector<Entity*>& entities, std::string& attribute_string);
+
+  void PopulateMatchingEntities(Entity* entity_one,
+                                Entity* entity_two,
+                                Attribute& attribute_one,
+                                Attribute& attribute_two,
+                                std::vector<DesignEntity>& first_entity_types,
+                                std::vector<DesignEntity>& second_entity_types);
 };
 
 /**

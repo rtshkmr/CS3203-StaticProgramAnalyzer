@@ -9,8 +9,6 @@ TEST_CASE("1.PSubsystem.Basic Single Line Creation") {
   PSubsystem p_subsystem;
   p_subsystem.InitDataStructures();
 
-  //TODO: expand on other single line
-  //TODO: do test case with all kinds of statement
   SECTION("Procedure Test with 1 Assign") {
     p_subsystem.ProcessStatement("procedure firstProc {");
     p_subsystem.ProcessStatement("x = x + 100;");

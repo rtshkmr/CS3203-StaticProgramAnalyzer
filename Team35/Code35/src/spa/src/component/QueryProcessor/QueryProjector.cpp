@@ -76,7 +76,7 @@ std::vector<std::string> QueryProjector::FormatQuery(UnformattedQueryResult unfo
 /**
  * Stringifies each Entity in the entity_table according to its DesignEntity type as required by SPA.
  *
- * @param synonyms Vector of Synonyms that represent the type of each column of the table.
+ * @param syn_attrs Vector of Synonyms, Attribute pairs that represent the type of each column of the table.
  * @param entity_table Vector of vector of Entities.
  * @return Stringified table.
  */
@@ -157,8 +157,8 @@ std::vector<std::string> QueryProjector::FormatMultipleTables(std::vector<std::v
  * Assumes that all columns in 1 table has the same number of rows.
  * Ensures that rows within a table will stay in their column-wise order.
  *
- * @param t1
- * @param t2
+ * @param t1 first table.
+ * @param t2 second table.
  * @return Table of all combinations.
  */
 std::vector<std::vector<std::string>> QueryProjector::CrossProductTables(std::vector<std::vector<std::string>> t1,
@@ -184,8 +184,8 @@ std::vector<std::vector<std::string>> QueryProjector::CrossProductTables(std::ve
  * Assumes that when the desired order and current order does not have the same size, it means there are
  * multiple similar synonyms.
  *
- * @param desired_order List of synonyms in the desired order.
- * @param current_order List of synonyms in the current order.
+ * @param desired_order Pairs of synonyms, Attributes in the desired order.
+ * @param current_order Vector of synonyms in the current order.
  * @param table Table to reorder.
  * @return Reordered table.
  */

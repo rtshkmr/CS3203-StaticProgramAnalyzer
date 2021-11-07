@@ -4,7 +4,6 @@
  *  within PSubsystem from within this class.
  */
 #include "SyntaxValidator.h"
-#include <cassert>
 #include <util/RegexPatterns.h>
 
 using std::string;
@@ -34,9 +33,8 @@ bool SyntaxValidator::ValidateSyntax(vector<Token> statement_tokens) {
       case TokenTag::kIfKeyword:return ValidateIfStatementSyntax(statement_tokens);
       case TokenTag::kElseKeyword:return ValidateElseKeyword(statement_tokens);
       case TokenTag::kWhileKeyword:return ValidateWhileKeyword(statement_tokens);
-      default: {
-        assert(false);
-      }
+      default:
+        break;
     }
   } else if (first_token.GetTokenTag() == TokenTag::kName) { // it's an assignment statement
     return ValidateAssignmentSentenceSyntax(statement_tokens);
@@ -81,7 +79,6 @@ bool SyntaxValidator::ValidateMacroFunctionSyntax(const vector<Token>& tokens) {
  */
 bool SyntaxValidator::ValidateIfStatementSyntax(const vector<Token>& tokens) {
   bool guarantee = tokens.at(0).GetTokenTag() == TokenTag::kIfKeyword;
-  assert(guarantee);
 
   bool contains_single_then_keyword = Token::CountTokens(tokens, TokenTag::kThenKeyword) == 1;
   bool terminal_token_is_open_brace = tokens.at(tokens.size() - 1).GetTokenTag() == TokenTag::kOpenBrace;
@@ -111,7 +108,6 @@ bool SyntaxValidator::ValidateElseKeyword(const vector<Token>& tokens) {
 
 bool SyntaxValidator::ValidateWhileKeyword(const vector<Token>& tokens) {
   bool guarantee = tokens.at(0).GetTokenTag() == TokenTag::kWhileKeyword;
-  assert(guarantee);
   int first_open_bracket_idx = Token::GetFirstMatchingTokenIdx(tokens, TokenTag::kOpenBracket);
   int last_close_bracket_idx = Token::GetLastMatchingTokenIdx(tokens, TokenTag::kCloseBracket);
   bool terminal_token_is_open_brace = tokens.at(tokens.size() - 1).GetTokenTag() == TokenTag::kOpenBrace;
@@ -167,7 +163,7 @@ bool SyntaxValidator::IsFactor(const std::vector<Token>& statement_tokens,
       && (first_token_tag == TokenTag::kName || first_token_tag == TokenTag::kInteger)) {
     return true;
   } else if (first_token_tag
-      == TokenTag::kOpenBracket) { // todo: check if the allowing of redundant brackets makes this code unreachable
+      == TokenTag::kOpenBracket) {
     if (last_token_tag == TokenTag::kCloseBracket) {
       bool is_expression = IsExpr(statement_tokens,
                                   left_boundary_idx + 1,

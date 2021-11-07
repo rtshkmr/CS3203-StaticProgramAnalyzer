@@ -224,7 +224,6 @@ bool Cluster::TraverseScopedCluster(PKBRelRefs rel_ref,
     default: {
       return false;
     }
-
   }
   return false;
 }
@@ -243,8 +242,6 @@ std::pair<bool, bool> TraverseNormalBlockForAffects(Cluster* child,
                                                     PKB* pkb,
                                                     const std::string& lhs_var,
                                                     const std::pair<int, int> goal_range) {
-  // =================================== HANDLE CHILDREN THAT ARE SIMPLE BLOCKS =======================
-//  assert(child->GetClusterTag() == ClusterTag::kNormalBlock);
   bool child_does_not_modify_var = true;
   bool is_modifier_the_goal_stmt = false;
   auto child_range = child->GetStartEndRange();
@@ -258,7 +255,6 @@ std::pair<bool, bool> TraverseNormalBlockForAffects(Cluster* child,
     if (!child_does_not_modify_var) break; // break this for loop for normal block if child actually modifies var
   }
   return std::make_pair(child_does_not_modify_var, is_modifier_the_goal_stmt);
-//      ========================  END OF TRAVERSING NORMAL BLOCK FOR AFFECTS =============
 }
 
 bool Cluster::CheckScopeClusterForAffects(Cluster* scoped_cluster,
@@ -299,7 +295,6 @@ bool Cluster::CheckScopeClusterForAffects(Cluster* scoped_cluster,
   }
   return found;
 }
-
 
 /**
  * Traverses a scoped cluster moving from first_stmt towards second_stmt in the target range and checks if the lhs_var remains unmodified along the way
@@ -440,7 +435,6 @@ bool Cluster::TraverseScopedClusterForAffects(Cluster* scoped_cluster,
           target_range.first = std::min(child_range.second, target_range.second);
         }
       } else {
-        // todo: test this case: have to call in if{while{...}}else{..}
         return TraverseScopedClusterForAffects(child, target_range, pkb, lhs_var, goal_range);
       }
     } else { // it's a simple block, no alternative paths to consider:

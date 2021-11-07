@@ -70,7 +70,6 @@ std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetAllRelationshipsS
     std::vector<Entity*> to_iter = scope_indication == ScopeIndication::kLeftScope ? left_entities : right_entities;
     if (scope_indication == ScopeIndication::kRightScope) ref = ReverseRelationship(ref);
     for (Entity* scoped_entity : to_iter) {
-      // todo: See if can replace the below with a single function that returns vector<entity_pair>
       std::vector<Entity*> add = GetRelationship(ref, PKB::GetNameFromEntity(scoped_entity));
       for (Entity* unscoped_entity : add) {
         DesignEntity unscoped_type = PKB::GetDesignEntityFromEntity(unscoped_entity);

@@ -509,7 +509,7 @@ int Token::GetLastMatchingTokenIdx(const std::vector<Token>& tokens,
  * @param desired_pattern
  * @return
  */
-[[maybe_unused]] int Token::GetFirstMatchingTokenIdx(const std::vector<Token>& tokens, const std::regex& desired_pattern) {
+int Token::GetFirstMatchingTokenIdx(const std::vector<Token>& tokens, const std::regex& desired_pattern) {
   assert(!tokens.empty());
   auto delim_iterator = GetTokenMatchForwardIterator(tokens,
                                                      desired_pattern,

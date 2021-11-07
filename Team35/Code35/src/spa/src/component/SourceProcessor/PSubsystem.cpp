@@ -252,7 +252,7 @@ void PSubsystem::ProcessParentNodeType(Container* current_nest) {
 void PSubsystem::HandleCloseBrace() {
   //enforce that every stmtList must have at least 1 statement
   if (current_node_->GetStatementList()->empty()) {
-    throw SyntaxException("Empty statement list found"); //TODO check for ELSE.empty_stmtList;
+    throw SyntaxException("Empty statement list found");
   }
   
   //assertion: case 1: close brace for procedure --> type = 0 & parent_stack = empty

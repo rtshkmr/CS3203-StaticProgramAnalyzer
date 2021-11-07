@@ -56,6 +56,23 @@ std::vector<std::tuple<Entity*, Entity*>> AffectsExtractor::GetRelationshipByTyp
   return retList;
 }
 
+std::pair<bool, bool> AffectsExtractor::CheckAgainstCache(AssignEntity* first_stmt, AssignEntity* second_stmt) {
+  //check positive cache
+  auto itr = affects_map_.find(first_stmt);
+  if (itr != affects_map_.end()) {
+    std::list<AssignEntity*>* values = itr->second;
+    auto itr2 = std::find(values->begin(), values->end(), second_stmt);
+    if (itr2 != values->end()) return {true, true};
+  }
+  //check negative cache
+  itr = not_affects_map_.find(first_stmt);
+  if (itr != not_affects_map_.end()) {
+    std::list<AssignEntity*>* values = itr->second;
+    auto itr2 = std::find(values->begin(), values->end(), second_stmt);
+    if (itr2 != values->end()) return {true,false};
+  }
+  return {false, true};
+}
 
 bool AffectsExtractor::HasRelationship(RelDirection dir) {
   if(!affects_map_.empty()) return true;
@@ -107,7 +124,7 @@ std::vector<Entity*> AffectsExtractor::GetAllAffects() {
   std::vector<Entity*> assign_list = pkb_->GetDesignEntities(DesignEntity::kAssign);
   for (auto* entity : assign_list) {
     auto* ae = dynamic_cast<AssignEntity*>(entity);
-    if (HasAffects(ae)) { //TODO change to Entity type?
+    if (HasAffects(ae)) {
       retList.push_back(entity);
     }
   }
@@ -230,7 +247,6 @@ bool AffectsExtractor::HasAffects(AssignEntity* target_ae) {
   std::string target_var = target_ae->GetVariableString();
 
   //check against the entire procedure's assign
-  // TODO: create new PKB API, Given Procedure, Get all assign (Uses / Modifies)
   std::vector<Entity*> affected_list =
       pkb_->GetRelationship(PKBRelRefs::kUsedBy, target_var);
 
@@ -283,46 +299,20 @@ bool AffectsExtractor::HasAffectedBy(AssignEntity* target_assign_entity) {
  * @return
  */
 bool AffectsExtractor::HasAffects(AssignEntity* first_stmt, AssignEntity* second_stmt) {
+  auto cache_results = CheckAgainstCache(first_stmt, second_stmt);
+  if(cache_results.first) return cache_results.second;
 
-  //check positive cache
-  auto itr = affects_map_.find(first_stmt);
-  if (itr != affects_map_.end()) {
-    std::list<AssignEntity*>* values = itr->second;
-    auto itr2 = std::find(values->begin(), values->end(), second_stmt);
-    if (itr2 != values->end()) return true;
-  }
-
-  //check negative cache
-  itr = not_affects_map_.find(first_stmt);
-  if (itr != not_affects_map_.end()) {
-    std::list<AssignEntity*>* values = itr->second;
-    auto itr2 = std::find(values->begin(), values->end(), second_stmt);
-    if (itr2 != values->end()) return false;
-  }
-
-  // get the modified variable v from the lhs of first statement
-  Variable* modified_var = first_stmt->GetVariableObj();
-  std::vector<Variable*> vars_used_by_second_stmt =
-      second_stmt->GetExprVariables();
-  // check Uses(second_stmt, v)
-  bool var_is_used = false;
-  for (auto* var: vars_used_by_second_stmt) {
-    if (modified_var == var) {
-      var_is_used = true;
-      break;
-    }
-  }
-  if (!var_is_used) return false;
-
-  bool ret = HasValidUnmodifiedPath(first_stmt, second_stmt);
-  if (ret) {
+  bool are_affects_conditions_met = VerifyAffectsStmtConditions(first_stmt, second_stmt);
+  if(!are_affects_conditions_met) return false;
+  if (HasValidUnmodifiedPath(first_stmt, second_stmt)) {
     Deliverable::AddRelationshipToMap(&affects_map_, first_stmt, second_stmt);
     Deliverable::AddRelationshipToMap(&affected_by_map_, second_stmt, first_stmt);
+    return true;
   } else {
     Deliverable::AddRelationshipToMap(&not_affects_map_, first_stmt, second_stmt);
     Deliverable::AddRelationshipToMap(&not_affected_by_map_, second_stmt, first_stmt);
+    return false;
   }
-  return ret;
 }
 
 /*
@@ -373,4 +363,21 @@ void AffectsExtractor::Delete() {
   not_affects_map_ = {};
   not_affected_by_map_ = {};
 }
+
+bool AffectsExtractor::VerifyAffectsStmtConditions(AssignEntity* first_stmt, AssignEntity* second_stmt) {
+  // get the modified variable v from the lhs of first statement
+  Variable* modified_var = first_stmt->GetVariableObj();
+  std::vector<Variable*> vars_used_by_second_stmt =
+      second_stmt->GetExprVariables();
+  // check Uses(second_stmt, v)
+  bool var_is_used = false;
+  for (auto* var: vars_used_by_second_stmt) {
+    if (modified_var == var) {
+      var_is_used = true;
+      break;
+    }
+  }
+  return var_is_used;
+}
+
 

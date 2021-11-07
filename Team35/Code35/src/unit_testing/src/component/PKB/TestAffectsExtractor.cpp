@@ -94,7 +94,6 @@ TEST_CASE("2.PKB.Affects.adv_spa_lecture") {
     CHECK_FALSE(dbm->HasRelationship(PKBRelRefs::kAffects, "2", "3"));
     CHECK_FALSE(dbm->HasRelationship(PKBRelRefs::kAffects, "9", "6"));
 
-    //TODO: Lack of cross-procedure tests
   }
 
   SECTION ("2 - Has AffectedBy, reverse of section 1") {
