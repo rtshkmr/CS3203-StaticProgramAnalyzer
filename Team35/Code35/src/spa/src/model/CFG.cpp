@@ -224,7 +224,6 @@ bool Cluster::TraverseScopedCluster(PKBRelRefs rel_ref,
     default: {
       return false;
     }
-
   }
   return false;
 }
@@ -243,8 +242,6 @@ std::pair<bool, bool> TraverseNormalBlockForAffects(Cluster* child,
                                                     PKB* pkb,
                                                     const std::string& lhs_var,
                                                     const std::pair<int, int> goal_range) {
-  // =================================== HANDLE CHILDREN THAT ARE SIMPLE BLOCKS =======================
-//  assert(child->GetClusterTag() == ClusterTag::kNormalBlock);
   bool child_does_not_modify_var = true;
   bool is_modifier_the_goal_stmt = false;
   auto child_range = child->GetStartEndRange();
@@ -258,7 +255,6 @@ std::pair<bool, bool> TraverseNormalBlockForAffects(Cluster* child,
     if (!child_does_not_modify_var) break; // break this for loop for normal block if child actually modifies var
   }
   return std::make_pair(child_does_not_modify_var, is_modifier_the_goal_stmt);
-//      ========================  END OF TRAVERSING NORMAL BLOCK FOR AFFECTS =============
 }
 
 bool Cluster::CheckScopeClusterForAffects(Cluster* scoped_cluster,

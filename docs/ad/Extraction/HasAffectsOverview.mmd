@@ -1,0 +1,24 @@
+stateDiagram-v2
+    %% logic for conditional expression
+    [*] --> HasAffects(#,#)
+    note left of [*]
+    3 Cases:
+    HasAffects(AssignEntity*, AssignEntity*) 
+    HasAffects(AssignEntity*)
+    HasAffectedBy(AssignEntity*)
+    end note
+        
+    HasAffects(#,#) --> CheckAgainstCache
+    CheckAgainstCache --> VerifyAffectsStmtConditions
+    note right of CheckAgainstCache
+    Verifies against: 
+    positive cache (stmts that have affects r/s) 
+    negative cache (stmts w/o affects r/s)
+    end note
+
+    VerifyAffectsStmtConditions-->HasValidUnmodifiedPath
+
+    note right of HasValidUnmodifiedPath
+    Checks if there exists a valid path between 
+    2 statements where the variable is unmodified 
+    end note
