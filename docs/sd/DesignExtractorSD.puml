@@ -10,42 +10,41 @@
 
   participant SourceProcessor
   participant DesignExtractor
-  participant CallsTExtractor
-  participant UsesExtractor
-  participant ModifiesExtractor
-  participant ParentTExtractor
-  participant FollowsTExtractor
-  participant NextExtractor
 
   create DesignExtractor
   SourceProcessor -> DesignExtractor: DesignExtractor(deliverable)
   SourceProcessor -> DesignExtractor: ExtractDesignAbstractions()
   activate DesignExtractor
 
-  DesignExtractor -> CallsTExtractor: Extract(deliverable)
-  activate CallsTExtractor
-  CallsTExtractor --> DesignExtractor
-  deactivate CallsTExtractor
+  create "procedure_extractor : \nTransitiveExtractor"
+  DesignExtractor -> "procedure_extractor : \nTransitiveExtractor": TransitiveExtractor<Procedure>()
+  DesignExtractor -> "procedure_extractor : \nTransitiveExtractor": Extract(CallsT map, \nCalledByT map, \nCalls map)
+  activate  "procedure_extractor : \nTransitiveExtractor"
+   "procedure_extractor : \nTransitiveExtractor" --> DesignExtractor
+  deactivate  "procedure_extractor : \nTransitiveExtractor"
 
-  DesignExtractor -> UsesExtractor: Extract(deliverable)
-  activate UsesExtractor
-  UsesExtractor --> DesignExtractor
-  deactivate UsesExtractor
+  create "statement_extractor : \nTransitiveExtractor"
+  DesignExtractor -> "statement_extractor : \nTransitiveExtractor": TransitiveExtractor<Statement>()
+  DesignExtractor -> "statement_extractor : \nTransitiveExtractor": Extract(ParentT map, \nChildT map, \nParent map)
+  activate "statement_extractor : \nTransitiveExtractor"
+  "statement_extractor : \nTransitiveExtractor" --> DesignExtractor
+  deactivate "statement_extractor : \nTransitiveExtractor"
+  DesignExtractor -> "statement_extractor : \nTransitiveExtractor": Extract(FollowsT map, \nFollowedByT map, \nFollows map)
+  activate "statement_extractor : \nTransitiveExtractor"
+  "statement_extractor : \nTransitiveExtractor" --> DesignExtractor
+  deactivate "statement_extractor : \nTransitiveExtractor"
 
-  DesignExtractor -> ModifiesExtractor: Extract(deliverable)
-  activate ModifiesExtractor
-  ModifiesExtractor --> DesignExtractor
-  deactivate ModifiesExtractor
+  participant VariableTExtractor
+  participant NextExtractor
 
-  DesignExtractor -> ParentTExtractor: Extract(deliverable)
-  activate ParentTExtractor
-  ParentTExtractor --> DesignExtractor
-  deactivate ParentTExtractor
-
-  DesignExtractor -> FollowsTExtractor: Extract(deliverable)
-  activate FollowsTExtractor
-  FollowsTExtractor --> DesignExtractor
-  deactivate FollowsTExtractor
+  DesignExtractor -> VariableTExtractor: Extract(deliverable, VariableRel::kUses)
+  activate VariableTExtractor
+  VariableTExtractor --> DesignExtractor
+  deactivate VariableTExtractor
+  DesignExtractor -> VariableTExtractor: Extract(deliverable, VariableRel::kModifies)
+  activate VariableTExtractor
+  VariableTExtractor --> DesignExtractor
+  deactivate VariableTExtractor
 
   DesignExtractor -> NextExtractor: Extract(deliverable)
   activate NextExtractor

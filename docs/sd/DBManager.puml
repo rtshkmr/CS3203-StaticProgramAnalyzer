@@ -1,0 +1,32 @@
+@startuml rte
+  skinparam shadowing false
+  skinparam sequence {
+    ArrowColor black
+    LifeLineBorderColor grey
+    LifeLineBackgroundColor lightgray
+    ParticipantBorderColor lavender
+    ParticipantBackgroundColor lavender
+  }
+
+  participant Controller
+  participant PKBQueryReceiver
+  participant DBManager
+  participant RuntimeExtractor
+  participant PKB
+
+  create DBManager
+  Controller -> DBManager: DBManager(PKB*)
+  create RuntimeExtractor
+  DBManager -> RuntimeExtractor: RuntimeExtractor(PKB*)
+
+  PKBQueryReceiver -> DBManager ++: GetRelationship(PKBRelRef, string)
+    alt runtime rs
+      DBManager -> RuntimeExtractor ++: GetRelationship(PKBRelRef, string)
+      RuntimeExtractor --> DBManager --: vector<Entity*>
+    else pkb rs
+      DBManager -> PKB ++: GetRelationship(PKBRelRef, string)
+      PKB --> DBManager --: vector<Entity*>
+    end
+  DBManager --> PKBQueryReceiver --: vector<Entity*>
+
+@enduml

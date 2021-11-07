@@ -1,0 +1,34 @@
+classDiagram
+    RuntimeMediator <|.. RuntimeExtractor
+    RuntimeMediator <-- RuntimeColleague
+    RuntimeColleague <|.. NextTExtractor
+    RuntimeColleague <|.. AffectsExtractor
+    RuntimeColleague <|.. AffectsTExtractor
+    RuntimeColleague <|.. NextBipExtractor
+    RuntimeColleague <|.. NextBipTExtractor
+    RuntimeColleague <|.. AffectsBipExtractor
+    RuntimeColleague <|.. AffectsBipTExtractor
+
+    class RuntimeMediator {
+        <<interface>>
+        +GetRelationship(PKBRelRefs, int)
+        +GetFirstEntityOfRelationship(PKBRelRefs, DesignEntity)
+        +GetRelationshipByTypes(PKBRelRefs, DesignEntity, DesignEntity)
+
+        +HasRelationship(PKBRelRefs)
+        +HasRelationship(PKBRelRefs, int)
+        +HasRelationship(PKBRelRefs int, int)
+        +HasRelationship(PKBRelRefs, DesignEntity, DesignEntity)
+    }
+
+    class RuntimeColleague {
+        <<interface>>
+        +GetRelationship(RelDirection, int)
+        +GetFirstEntityOfRelationship(RelDirection, DesignEntity)
+        +GetRelationshipByTypes(RelDirection, DesignEntity, DesignEntity)
+
+        +HasRelationship(RelDirection)
+        +HasRelationship(RelDirection, int)
+        +HasRelationship(RelDirection int, int)
+        +HasRelationship(RelDirection, DesignEntity, DesignEntity)
+    }
