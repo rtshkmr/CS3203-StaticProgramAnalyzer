@@ -2,7 +2,6 @@
 #include "QuerySemanticValidator.h"
 #include <component/SourceProcessor/Tokenizer.h>
 #include <component/SourceProcessor/SyntaxValidator.h>
-#include <util/RegexPatterns.h>
 #include <unordered_set>
 #include <sstream>
 #include <exception/SpaException.h>
@@ -31,15 +30,15 @@ Token QueryParser::Eat(TokenTag token_type) {
  * @param synonyms is a reference to a list of synonym pointers.
  * @return a Synonym object with the corresponding information, or a dummy Synonym with invalid fields if not exists.
  */
-Synonym* QueryParser::GetSynonymInfo(std::string syn_name, std::list<Synonym*>* synonyms) {
+Synonym* QueryParser::GetSynonymInfo(const std::string& syn_name, std::list<Synonym*>* synonyms) {
   // Todo: Optimize.
   for (auto t: * synonyms) {
-    if (t->GetName().compare(syn_name) == 0) {
+    if (t->GetName() == syn_name) {
       return t;
     }
   }
   return new Synonym("", DesignEntity::kInvalid);
-};
+}
 
 /**
  * Parses the given synonyms within a synonym declaration.
@@ -88,7 +87,7 @@ void QueryParser::ParseDeclarations() {
   // a syntactically valid synonym list contains > 0 synonym declarations, each followed by a semicolon.
   ParseDeclaration();
   Eat(TokenTag::kSemicolon);
-  while (lookahead.GetTokenString().compare("Select") != 0 && lookahead.GetTokenTag() != TokenTag::kInvalid) {
+  while (lookahead.GetTokenString() != "Select" && lookahead.GetTokenTag() != TokenTag::kInvalid) {
     ParseDeclaration();
     Eat(TokenTag::kSemicolon);
   }
@@ -102,11 +101,11 @@ Attribute QueryParser::ParseAttrName(Synonym* s) {
     attr = Attribute::kStmtNumber;
     Eat(TokenTag::kStmtHash);
   } else if (lookahead.GetTokenTag() == TokenTag::kName) {
-      attr = GetAttribute(lookahead.GetTokenString());
-      if (attr == Attribute::kInvalid) {
-        throw PQLParseException("Received unknown attrName: " + lookahead.GetTokenString());
-      }
-      Eat(TokenTag::kName);
+    attr = GetAttribute(lookahead.GetTokenString());
+    if (attr == Attribute::kInvalid) {
+      throw PQLParseException("Received unknown attrName: " + lookahead.GetTokenString());
+    }
+    Eat(TokenTag::kName);
   } else {
     throw PQLParseException("Received unknown attrName: " + lookahead.GetTokenString());
   }
@@ -127,7 +126,7 @@ std::pair<Synonym*, Attribute> QueryParser::ParseElem(bool is_first_pass) {
     throw PQLParseException("Incorrect target synonym for \'Select\' query.");
   }
 
-  Synonym* s = QueryParser::GetSynonymInfo(target, &synonyms);
+  Synonym* s = QueryParser::GetSynonymInfo(target, & synonyms);
   Attribute attr = GetDefaultAttribute(s->GetType());
   // handle case where we need to parse attrRef
   if (lookahead.GetTokenTag() == TokenTag::kDot) {
@@ -135,7 +134,7 @@ std::pair<Synonym*, Attribute> QueryParser::ParseElem(bool is_first_pass) {
     attr = ParseAttrName(s);
   }
   if (is_first_pass) {
-    this->target_syn_attrs_list.push_back(std::make_pair(s, attr));
+    this->target_syn_attrs_list.emplace_back(s, attr);
     this->target_synonyms_map.emplace(std::make_pair(s->GetName(), s));
   }
 
@@ -163,7 +162,7 @@ void QueryParser::ParseTuple() {
  * Parses the target synonyms.
  */
 void QueryParser::ParseTarget() {
-  if (lookahead.GetTokenTag() == TokenTag::kName && lookahead.GetTokenString().compare("BOOLEAN") == 0) {
+  if (lookahead.GetTokenTag() == TokenTag::kName && lookahead.GetTokenString() == "BOOLEAN") {
     // parse boolean but only if there is no declared syn called 'BOOLEAN'
     if (synonyms_name_set.find(lookahead.GetTokenString()) == synonyms_name_set.end()) {
       Eat(TokenTag::kName);
@@ -222,7 +221,7 @@ std::tuple<std::string, bool, bool, bool> QueryParser::ParseStmtOrEntRef() {
     if (synonyms_name_set.find(curr_lookahead) == synonyms_name_set.end()) {
       throw PQLParseException("Unknown synonym supplied in clause.");
     }
-    DesignEntity de = QueryParser::GetSynonymInfo(curr_lookahead, &synonyms)->GetType();
+    DesignEntity de = QueryParser::GetSynonymInfo(curr_lookahead, & synonyms)->GetType();
     is_uses_or_modifies_p = de == DesignEntity::kProcedure || de == DesignEntity::kCall;
   }
 
@@ -253,7 +252,7 @@ std::tuple<std::string, bool, bool, bool> QueryParser::ParseStmtOrEntRef() {
 std::pair<Clause*, bool> QueryParser::ParseRelRef() {
   std::unordered_set<std::string> relRefs = {"Follows", "Parent", "Uses", "Modifies",
                                              "Calls", "Next", "NextBip", "Affects"};
-  std::unordered_set<std::string>::const_iterator got = relRefs.find(lookahead.GetTokenString());
+  auto got = relRefs.find(lookahead.GetTokenString());
   if (got == relRefs.end()) {
     throw PQLParseException("Invalid relRef in such that clause.");
   }
@@ -280,11 +279,9 @@ std::pair<Clause*, bool> QueryParser::ParseRelRef() {
     lhs = tok.GetTokenString();
     is_lhs_syn = is_case_syn && IsValidSynonym(tok);
     is_lhs_tgt_syn = is_lhs_syn && target_synonyms_map.find(tok.GetTokenString()) != target_synonyms_map.end();
-  }
-  else if (rel_type == "Uses" || rel_type == "Modifies") {
+  } else if (rel_type == "Uses" || rel_type == "Modifies") {
     std::tie(lhs, is_lhs_syn, is_lhs_tgt_syn, is_uses_or_modifies_p) = ParseStmtOrEntRef();
-  }
-  else {
+  } else {
     std::tie(lhs, is_lhs_syn, is_lhs_tgt_syn) = ParseStmtRef();
   }
 
@@ -309,7 +306,7 @@ std::pair<Clause*, bool> QueryParser::ParseRelRef() {
     std::tie(rhs, is_rhs_syn, is_rhs_tgt_syn) = ParseStmtRef();
   }
 
-  if (rel_type.compare("Modifies") == 0 || rel_type.compare("Uses") == 0) {
+  if (rel_type == "Modifies" || rel_type == "Uses") {
     rel_type = is_uses_or_modifies_p ? std::string(rel_type + "P") : std::string(rel_type + "S");
   }
 
@@ -317,17 +314,17 @@ std::pair<Clause*, bool> QueryParser::ParseRelRef() {
 
   // semantic validation of relRef.
   if (!QuerySemanticValidator::Is_Semantically_Valid_RelRef(lhs, rhs, GetRelRef(rel_type),
-                                                    is_lhs_syn, is_rhs_syn, & synonyms)) {
+                                                            is_lhs_syn, is_rhs_syn, & synonyms)) {
     throw PQLValidationException("Received semantically invalid " + rel_type + " cl.");
   }
 
   // create clause object
   Clause* cl = new SuchThat(lhs, rhs, GetRelRef(rel_type), is_lhs_syn, is_rhs_syn);
   if (is_lhs_syn) {
-    cl->first_synonym = QueryParser::GetSynonymInfo(lhs, &synonyms);
+    cl->first_synonym = QueryParser::GetSynonymInfo(lhs, & synonyms);
   }
   if (is_rhs_syn) {
-    cl->second_synonym = QueryParser::GetSynonymInfo(rhs, &synonyms);
+    cl->second_synonym = QueryParser::GetSynonymInfo(rhs, & synonyms);
   }
   return std::make_pair(cl, is_lhs_tgt_syn || is_rhs_tgt_syn);
 }
@@ -342,7 +339,7 @@ void QueryParser::ParseSuchThat() {
   std::pair<Clause*, bool> clause_info = ParseRelRef();
   clauses.emplace_back(clause_info.first);
   // check for multiple relRefs (separated by 'and')
-  while (lookahead.GetTokenTag() == TokenTag::kName && lookahead.GetTokenString().compare("and") == 0) {
+  while (lookahead.GetTokenTag() == TokenTag::kName && lookahead.GetTokenString() == "and") {
     Eat(TokenTag::kName);
     clause_info = ParseRelRef();
     clauses.emplace_back(clause_info.first);
@@ -382,7 +379,7 @@ void QueryParser::ParseAttrCompare() {
   std::string lhs_return_string;
   // metadata for rhs ref
   Synonym* rhs_syn = nullptr;
-  Attribute rhs_attr = Attribute::kInvalid;;
+  Attribute rhs_attr = Attribute::kInvalid;
   std::string rhs_return_type;
   std::string rhs_return_string;
 
@@ -391,12 +388,12 @@ void QueryParser::ParseAttrCompare() {
   std::tie(rhs_return_type, rhs_return_string, rhs_syn, rhs_attr) = ParseRef();
 
   if (!QuerySemanticValidator::Is_Semantically_Valid_AttrCompare(lhs_syn, lhs_attr, lhs_return_type,
-                                                         rhs_syn, rhs_attr, rhs_return_type)) {
+                                                                 rhs_syn, rhs_attr, rhs_return_type)) {
     throw PQLValidationException("Received semantically invalid AttrCompare in with clause");
   }
 
   // create clause object
-  bool l_has_attr = lhs_attr != Attribute::kInvalid;;
+  bool l_has_attr = lhs_attr != Attribute::kInvalid;
   bool r_has_attr = rhs_attr != Attribute::kInvalid;
   bool l_is_syn = lhs_return_type == "SYNONYM";
   bool r_is_syn = rhs_return_type == "SYNONYM";
@@ -404,7 +401,7 @@ void QueryParser::ParseAttrCompare() {
   bool r_is_pl = r_is_syn && (rhs_syn->GetType() == DesignEntity::kProgLine);
 
   Clause* cl = new With(l_is_syn, r_is_syn, lhs_return_string,
-                        rhs_return_string,lhs_attr, rhs_attr, l_is_pl, r_is_pl);
+                        rhs_return_string, lhs_attr, rhs_attr, l_is_pl, r_is_pl);
   if (l_is_syn) cl->first_synonym = lhs_syn;
   if (r_is_syn) cl->second_synonym = rhs_syn;
   clauses.emplace_back(cl);
@@ -415,9 +412,9 @@ void QueryParser::ParseAttrCompare() {
  */
 void QueryParser::ParseWith() {
   Eat(TokenTag::kName);
-  ParseAttrCompare();;
+  ParseAttrCompare();
   // check for multiple relRefs (separated by 'and')
-  while (lookahead.GetTokenTag() == TokenTag::kName && lookahead.GetTokenString().compare("and") == 0) {
+  while (lookahead.GetTokenTag() == TokenTag::kName && lookahead.GetTokenString() == "and") {
     Eat(TokenTag::kName);
     ParseAttrCompare();
   }
@@ -512,18 +509,18 @@ std::pair<std::string, bool> QueryParser::ParseExpressionSpec() {
   return std::make_pair(rhs_ss.str(), is_exact_match);
 }
 
-bool QueryParser::IsValidSynonym(Token token) {
+bool QueryParser::IsValidSynonym(const Token& token) {
   if (token.GetTokenTag() != TokenTag::kName) {
-    return 0;
+    return false;
   }
   std::string syn_name = token.GetTokenString();
   // syn_name must be a known synonym.
   return synonyms_name_set.find(syn_name) != synonyms_name_set.end();
 }
 
-bool QueryParser::IsValidSynonym(Token token, DesignEntity de) {
+bool QueryParser::IsValidSynonym(const Token& token, DesignEntity de) {
   if (token.GetTokenTag() != TokenTag::kName) {
-    return 0;
+    return false;
   }
   std::string syn_name = token.GetTokenString();
   // syn_name must be a known synonym, and of permitted type.
@@ -535,9 +532,9 @@ bool QueryParser::IsValidSynonym(Token token, DesignEntity de) {
     }
   }
   if (!is_valid) {
-    return 0;
+    return false;
   }
-  return 1;
+  return true;
 }
 
 // while : syn-while ‘(’ entRef ‘,’ ‘_’ ‘)’
@@ -559,12 +556,12 @@ void QueryParser::ParseWhilePattern() {
 
   // create clause object
   Clause* cl = new Pattern(lhs, "_", DesignEntity::kWhile, lhs_is_syn, false);
-  cl->first_synonym = QueryParser::GetSynonymInfo(while_tok.GetTokenString(), &synonyms);
+  cl->first_synonym = QueryParser::GetSynonymInfo(while_tok.GetTokenString(), & synonyms);
   if (lhs_is_syn) {
-    cl->second_synonym = QueryParser::GetSynonymInfo(lhs, &synonyms);
+    cl->second_synonym = QueryParser::GetSynonymInfo(lhs, & synonyms);
   }
   clauses.emplace_back(cl);
-};
+}
 
 // assign : syn-assign ‘(‘ entRef ‘,’ expression-spec ‘)’
 void QueryParser::ParseAssignPattern() {
@@ -585,12 +582,12 @@ void QueryParser::ParseAssignPattern() {
 
   // create clause object
   Clause* cl = new Pattern(lhs, rhs_info.first, DesignEntity::kAssign, lhs_is_syn, rhs_info.second);
-  cl->first_synonym = QueryParser::GetSynonymInfo(assn_tok.GetTokenString(), &synonyms);
+  cl->first_synonym = QueryParser::GetSynonymInfo(assn_tok.GetTokenString(), & synonyms);
   if (lhs_is_syn) {
-    cl->second_synonym = QueryParser::GetSynonymInfo(lhs, &synonyms);
+    cl->second_synonym = QueryParser::GetSynonymInfo(lhs, & synonyms);
   }
   clauses.emplace_back(cl);
-};
+}
 
 // if : syn-if ‘(’ entRef ‘,’ ‘_’ ‘,’ ‘_’ ‘)’
 void QueryParser::ParseIfPattern() {
@@ -613,12 +610,12 @@ void QueryParser::ParseIfPattern() {
 
   // create clause object
   Clause* cl = new Pattern(lhs, "_", DesignEntity::kIf, lhs_is_syn, false);
-  cl->first_synonym = QueryParser::GetSynonymInfo(if_tok.GetTokenString(), &synonyms);
+  cl->first_synonym = QueryParser::GetSynonymInfo(if_tok.GetTokenString(), & synonyms);
   if (lhs_is_syn) {
-    cl->second_synonym = QueryParser::GetSynonymInfo(lhs, &synonyms);
+    cl->second_synonym = QueryParser::GetSynonymInfo(lhs, & synonyms);
   }
   clauses.emplace_back(cl);
-};
+}
 
 /**
  * Parses the PatternCond section of a pattern clause.
@@ -627,7 +624,7 @@ void QueryParser::ParsePatternCond() {
   // ensure that lookahead is either matching kAssign, kIf or kWhile.
   DesignEntity pattern_syn = DesignEntity::kInvalid;
   std::vector<DesignEntity> pattern_syn_whitelist = {DesignEntity::kAssign, DesignEntity::kIf, DesignEntity::kWhile};
-  for (DesignEntity _de : pattern_syn_whitelist) {
+  for (DesignEntity _de: pattern_syn_whitelist) {
     if (IsValidSynonym(lookahead, _de)) {
       pattern_syn = _de;
       break;
@@ -639,17 +636,13 @@ void QueryParser::ParsePatternCond() {
 
   // happy path: dispatch pattern parsing based on pattern type
   switch (pattern_syn) {
-    case DesignEntity::kAssign:
-      ParseAssignPattern();
+    case DesignEntity::kAssign:ParseAssignPattern();
       break;
-    case DesignEntity::kIf:
-      ParseIfPattern();
+    case DesignEntity::kIf:ParseIfPattern();
       break;
-    case DesignEntity::kWhile:
-      ParseWhilePattern();
+    case DesignEntity::kWhile:ParseWhilePattern();
       break;
-    default:
-      return;
+    default:return;
   }
 }
 
@@ -662,7 +655,7 @@ void QueryParser::ParsePattern() {
   Eat(TokenTag::kName); // eat 'pattern' keyword
   ParsePatternCond();
   // check for multiple relRefs (separated by 'and')
-  while (lookahead.GetTokenTag() == TokenTag::kName && lookahead.GetTokenString().compare("and") == 0) {
+  while (lookahead.GetTokenTag() == TokenTag::kName && lookahead.GetTokenString() == "and") {
     Eat(TokenTag::kName);
     ParsePatternCond();
   }
@@ -672,7 +665,7 @@ void QueryParser::ParsePattern() {
  * Parses the select clause.
  */
 void QueryParser::ParseSelect() {
-  if (lookahead.GetTokenString().compare("Select") != 0) {
+  if (lookahead.GetTokenString() != "Select") {
     throw PQLParseException("Expected \'Select\' keyword, instead got " + lookahead.GetTokenString());
   }
   Eat(TokenTag::kName); // 'Select' is tokenized as a name.
@@ -683,11 +676,11 @@ void QueryParser::ParseSelect() {
       ParseSuchThat();
       continue;
     }
-    if (lookahead.GetTokenTag() == TokenTag::kName && lookahead.GetTokenString().compare("pattern") == 0) {
+    if (lookahead.GetTokenTag() == TokenTag::kName && lookahead.GetTokenString() == "pattern") {
       ParsePattern();
       continue;
     }
-    if (lookahead.GetTokenTag() == TokenTag::kName && lookahead.GetTokenString().compare("with") == 0) {
+    if (lookahead.GetTokenTag() == TokenTag::kName && lookahead.GetTokenString() == "with") {
       ParseWith();
       continue;
     }
@@ -700,7 +693,7 @@ void QueryParser::ParseSelect() {
  */
 void QueryParser::ParseQuery() {
   // parse synonym declarations first, if they exist.
-  if (lookahead.GetTokenString().compare("Select") != 0) {
+  if (lookahead.GetTokenString() != "Select") {
     ParseDeclarations();
   }
   // parse select clause

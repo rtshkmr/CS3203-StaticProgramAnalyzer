@@ -50,8 +50,8 @@ class QueryParser {
   std::pair<std::string, bool> ParseExpressionSpec();
   std::vector<Token> ParseSynonyms();
 
-  bool IsValidSynonym(Token token);
-  bool IsValidSynonym(Token token, DesignEntity de);
+  bool IsValidSynonym(const Token& token);
+  bool IsValidSynonym(const Token& token, DesignEntity de);
  public:
   QueryParser(std::vector<Clause*>& clauses, std::list<Synonym*>& synonyms, bool& was_query_boolean,
               std::vector<std::pair<Synonym*, Attribute>>& target_syn_attrs_list,
@@ -59,7 +59,7 @@ class QueryParser {
       clauses(clauses), synonyms(synonyms), was_query_boolean(was_query_boolean),
       target_syn_attrs_list(target_syn_attrs_list), target_synonyms_map(target_synonyms_map), tokenizer(tokenizer) {};
   void Parse();
-  static Synonym* GetSynonymInfo(std::string syn_name, std::list<Synonym*>* synonyms);
+  static Synonym* GetSynonymInfo(const std::string& syn_name, std::list<Synonym*>* synonyms);
 };
 
 #endif //AUTOTESTER_QUERYPARSER_H
