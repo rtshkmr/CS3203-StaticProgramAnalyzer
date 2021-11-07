@@ -20,6 +20,7 @@ class QueryParser {
   std::unordered_set<std::string> synonyms_name_set;
   std::vector<Clause*>& clauses;
   std::list<Synonym*>& synonyms;
+  bool& was_query_boolean;
   std::vector<std::pair<Synonym*, Attribute>>& target_syn_attrs_list;
   std::unordered_map<std::string, Synonym*>& target_synonyms_map;
 
@@ -57,7 +58,7 @@ class QueryParser {
   QueryParser(std::vector<Clause*>& clauses, std::list<Synonym*>& synonyms, bool& was_query_boolean,
               std::vector<std::pair<Synonym*, Attribute>>& target_syn_attrs_list,
               std::unordered_map<std::string, Synonym*>& target_synonyms_map, QueryTokenizer tokenizer) :
-      clauses(clauses), synonyms(synonyms),
+      clauses(clauses), synonyms(synonyms), was_query_boolean(was_query_boolean),
       target_syn_attrs_list(target_syn_attrs_list), target_synonyms_map(target_synonyms_map), tokenizer(std::move(std::move(tokenizer))) {};
   void Parse();
   static Synonym* GetSynonymInfo(const std::string& syn_name, std::list<Synonym*>* synonyms);
