@@ -193,11 +193,11 @@ bool PKB::HasRelationship(PKBRelRefs ref, DesignEntity d1, DesignEntity d2) {
   return !relationship_by_types_table_[ref][{d1, d2}].empty();
 }
 
-bool PKB::HasRelationship(PKBRelRefs ref, std::string e) {
+bool PKB::HasRelationship(PKBRelRefs ref, const std::string& e) {
   return !relationship_table_[ref][e].empty();
 }
 
-bool PKB::HasRelationship(PKBRelRefs ref, std::string e1, std::string e2) {
+bool PKB::HasRelationship(PKBRelRefs ref, std::string e1, const std::string& e2) {
   return relationship_set_.find({ref, e1, e2}) != relationship_set_.end();
 }
 
@@ -231,18 +231,18 @@ void PKB::ProcessEntitiesWithMatchingAttributes() {
 std::string PKB::GetNameFromEntity(Entity* entity) {
   EntityEnum e = entity->GetEntityEnum();
   if (e == EntityEnum::kProcedureEntity) {
-    Procedure* proc = dynamic_cast<Procedure*>(entity);
-    ProcedureName* proc_name = const_cast<ProcedureName*>(proc->GetName());
+    auto* proc = dynamic_cast<Procedure*>(entity);
+    auto* proc_name = const_cast<ProcedureName*>(proc->GetName());
     return proc_name->GetName();
   } else if (e == EntityEnum::kVariableEntity) {
-    Variable* var = dynamic_cast<Variable*>(entity);
-    VariableName* variable_name = const_cast<VariableName*>(var->GetVariableName());
+    auto* var = dynamic_cast<Variable*>(entity);
+    auto* variable_name = const_cast<VariableName*>(var->GetVariableName());
     return variable_name->GetName();
   } else if (e == EntityEnum::kConstantEntity) {
-    Constant* constant = dynamic_cast<Constant*>(entity);
-    ConstantValue* cv = const_cast<ConstantValue*>(constant->GetValue());
+    auto* constant = dynamic_cast<Constant*>(entity);
+    auto* cv = const_cast<ConstantValue*>(constant->GetValue());
     return std::to_string(cv->GetValue());
-  } else if (Statement* stmt = dynamic_cast<Statement*>(entity)) {
+  } else if (auto* stmt = dynamic_cast<Statement*>(entity)) {
     auto* k_number = const_cast<StatementNumber*>(stmt->GetStatementNumberObj());
     return std::to_string(k_number->GetNum());
   } else {
@@ -316,13 +316,13 @@ std::string PKB::GetAttributeFromEntity(Entity* entity, Attribute attribute) {
   if (attribute == Attribute::kStmtNumber) {
     return GetNameFromEntity(entity);
   } else if (entity_enum == EntityEnum::kCallEntity) {
-    CallEntity* call_entity = dynamic_cast<CallEntity*>(entity);
+    auto* call_entity = dynamic_cast<CallEntity*>(entity);
     return GetNameFromEntity(call_entity->GetCalledProcedure());
   } else if (entity_enum == EntityEnum::kPrintEntity) {
-    PrintEntity* print_entity = dynamic_cast<PrintEntity*>(entity);
+    auto* print_entity = dynamic_cast<PrintEntity*>(entity);
     return GetNameFromEntity(print_entity->GetVariableObj());
   } else if (entity_enum == EntityEnum::kReadEntity) {
-    ReadEntity* read_entity = dynamic_cast<ReadEntity*>(entity);
+    auto* read_entity = dynamic_cast<ReadEntity*>(entity);
     return GetNameFromEntity(read_entity->GetVariableObj());
   } else {
     return GetNameFromEntity(entity);

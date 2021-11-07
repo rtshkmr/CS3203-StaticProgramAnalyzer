@@ -2,6 +2,7 @@
 #define AUTOTESTER_TYPES_H
 
 #include <string>
+#include <utility>
 #include <vector>
 #include <array>
 #include <unordered_set>
@@ -76,8 +77,6 @@ enum class RelRef {
   kNextBipT,
   kAffects,
   kAffectsT,
-  kAffectsBip,
-  kAffectsBipT,
   kInvalid
 };
 
@@ -187,8 +186,8 @@ class Synonym {
   std::string name;
   DesignEntity type;
  public:
-  Synonym() {};
-  Synonym(std::string name, DesignEntity type) : name(name), type(type) {};
+  Synonym() = default;;
+  Synonym(std::string name, DesignEntity type) : name(std::move(name)), type(type) {};
   std::string GetName() { return name; };
   DesignEntity GetType() { return type; };
   bool operator==(const Synonym& other) const;
@@ -213,13 +212,13 @@ struct With : Clause {
   Attribute right_attribute = Attribute::kInvalid;
   bool left_is_prog_line;
   bool right_is_prog_line;
-  With() {};
+  With() = default;;
   With(bool l_is_syn, bool r_is_syn, std::string lhs, std::string rhs, Attribute left_attr, Attribute right_attr,
        bool left_is_pl, bool right_is_pl) {
     left_is_synonym = l_is_syn;
     right_is_synonym = r_is_syn;
-    left_hand_side = lhs;
-    right_hand_side = rhs;
+    left_hand_side = std::move(lhs);
+    right_hand_side = std::move(rhs);
     left_attribute = left_attr;
     right_attribute = right_attr;
     left_is_prog_line = left_is_pl;
@@ -228,12 +227,12 @@ struct With : Clause {
   With(bool l_is_syn, bool r_is_syn, std::string lhs, std::string rhs, bool left_is_pl, bool right_is_pl) {
     left_is_synonym = l_is_syn;
     right_is_synonym = r_is_syn;
-    left_hand_side = lhs;
-    right_hand_side = rhs;
+    left_hand_side = std::move(lhs);
+    right_hand_side = std::move(rhs);
     left_is_prog_line = left_is_pl;
     right_is_prog_line = right_is_pl;
   };
-  std::vector<std::string> GetAllSynonymNamesOfClause() {
+  std::vector<std::string> GetAllSynonymNamesOfClause() override {
     std::vector<std::string> v;
     if (left_is_synonym) v.push_back(left_hand_side);
     if (right_is_synonym) v.push_back(right_hand_side);
@@ -270,15 +269,15 @@ struct With : Clause {
 
 struct SuchThat : Clause {
   RelRef rel_ref;
-  SuchThat() {};
+  SuchThat() = default;;
   SuchThat(std::string lhs, std::string rhs, RelRef rf, bool lhs_is_syn, bool rhs_is_syn) {
-    left_hand_side = lhs;
-    right_hand_side = rhs;
+    left_hand_side = std::move(lhs);
+    right_hand_side = std::move(rhs);
     rel_ref = rf;
     left_is_synonym = lhs_is_syn;
     right_is_synonym = rhs_is_syn;
   }
-  std::vector<std::string> GetAllSynonymNamesOfClause() {
+  std::vector<std::string> GetAllSynonymNamesOfClause() override {
     std::vector<std::string> v;
     if (left_is_synonym) v.push_back(left_hand_side);
     if (right_is_synonym) v.push_back(right_hand_side);
@@ -287,7 +286,7 @@ struct SuchThat : Clause {
   std::string GetType() const { return typeid(this).name(); }
   bool IsEqual(Clause* other_obj) {
     if (this->GetType() == other_obj->GetType()) {
-      SuchThat* obj = (SuchThat*) & other_obj;
+      auto* obj = (SuchThat*) & other_obj;
       return (
           this->left_hand_side == obj->left_hand_side &&
               this->right_hand_side == obj->right_hand_side &&
@@ -307,22 +306,22 @@ struct Pattern : Clause {
   bool is_exact = false;
   Pattern() { right_is_synonym = false; };
   Pattern(std::string lhs, std::string rhs, std::string assn_syn, bool lhs_is_syn, bool is_ext) {
-    left_hand_side = lhs;
-    right_hand_side = rhs;
-    assign_synonym = assn_syn;
+    left_hand_side = std::move(lhs);
+    right_hand_side = std::move(rhs);
+    assign_synonym = std::move(assn_syn);
     left_is_synonym = lhs_is_syn;
     right_is_synonym = false;
     is_exact = is_ext;
   }
   Pattern(std::string lhs, std::string rhs, DesignEntity de, bool lhs_is_syn, bool is_ext) {
-    left_hand_side = lhs;
-    right_hand_side = rhs;
+    left_hand_side = std::move(lhs);
+    right_hand_side = std::move(rhs);
     pattern_type = de;
     left_is_synonym = lhs_is_syn;
     right_is_synonym = false;
     is_exact = is_ext;
   }
-  std::vector<std::string> GetAllSynonymNamesOfClause() {
+  std::vector<std::string> GetAllSynonymNamesOfClause() override {
     std::vector<std::string> v;
     if (left_is_synonym) v.push_back(left_hand_side);
     v.push_back(first_synonym->GetName());
@@ -331,7 +330,7 @@ struct Pattern : Clause {
   std::string GetType() const { return typeid(this).name(); }
   bool IsEqual(Clause* other_obj) {
     if (this->GetType() == other_obj->GetType()) {
-      Pattern* obj = (Pattern*) & other_obj;
+      auto* obj = (Pattern*) & other_obj;
       return (
           this->left_hand_side == obj->left_hand_side &&
               this->right_hand_side == obj->right_hand_side &&
@@ -352,11 +351,11 @@ class Group {
   std::vector<Clause*> clauses;
   bool has_target_synonym = false;
  public:
-  Group() {};
+  Group() = default;;
   Group(std::vector<Clause*> clauses, bool has_target_synonym) :
-      has_target_synonym(has_target_synonym), clauses(clauses) {};
+      has_target_synonym(has_target_synonym), clauses(std::move(std::move(clauses))) {};
   Group(std::vector<Clause*> clauses, bool has_target_synonym, std::vector<Synonym*> target_synonyms) :
-  has_target_synonym(has_target_synonym), clauses(clauses), target_synonyms(target_synonyms) {};
+  has_target_synonym(has_target_synonym), clauses(std::move(std::move(clauses))), target_synonyms(std::move(std::move(target_synonyms))) {};
   void AddSynToTargetSyns(Synonym* s);
   void AddClauseToVector(Clause* clause);
   std::vector<Clause*> GetClauses();

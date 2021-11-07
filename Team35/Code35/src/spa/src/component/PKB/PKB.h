@@ -91,10 +91,10 @@ class PKB {
   bool HasRelationship(PKBRelRefs, DesignEntity, DesignEntity);
 
   // Returns true if the relationship exists with the first entity specified by the string, false otherwise
-  bool HasRelationship(PKBRelRefs, std::string);
+  bool HasRelationship(PKBRelRefs, const std::string&);
 
   // Returns true if the relationship exists between the two entities specified by strings, false otherwise
-  bool HasRelationship(PKBRelRefs, std::string, std::string);
+  bool HasRelationship(PKBRelRefs, std::string, const std::string&);
 
   // Returns the name of any entity in string format
   // (statements - statement number, variables - variable name, procedures - procedure name, constant - value)
