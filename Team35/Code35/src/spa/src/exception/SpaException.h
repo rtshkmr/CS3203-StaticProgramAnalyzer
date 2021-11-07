@@ -53,10 +53,10 @@ class PQLTokenizeException : public SyntaxException {
 };
 
 //! Represents an error that occurs during the validation of a PQL query
-class PQLValidationException : public SyntaxException {
+class PQLValidationException : public SemanticException {
  public:
   explicit PQLValidationException(const std::string& msg = "")
-      : SyntaxException(msg.c_str()) {}
+      : SemanticException(msg.c_str()) {}
 };
 
 //! Represents an error that occurs during the population of or retrieval from the PKB
