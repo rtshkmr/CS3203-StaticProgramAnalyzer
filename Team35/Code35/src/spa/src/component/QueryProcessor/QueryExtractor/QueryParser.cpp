@@ -403,6 +403,16 @@ void QueryParser::ParseAttrCompare() {
   bool l_is_pl = l_is_syn && (lhs_syn->GetType() == DesignEntity::kProgLine);
   bool r_is_pl = r_is_syn && (rhs_syn->GetType() == DesignEntity::kProgLine);
 
+  // populating clause with default attribute type
+  if (l_is_syn && !l_has_attr) {
+    l_has_attr = true;
+    lhs_attr = GetDefaultAttribute(lhs_syn->GetType());
+  }
+  if (r_is_syn && !r_has_attr) {
+    r_has_attr = true;
+    rhs_attr = GetDefaultAttribute(rhs_syn->GetType());
+  }
+
   Clause* cl = new With(l_is_syn, r_is_syn, lhs_return_string,
                         rhs_return_string,lhs_attr, rhs_attr, l_is_pl, r_is_pl);
   if (l_is_syn) cl->first_synonym = lhs_syn;
