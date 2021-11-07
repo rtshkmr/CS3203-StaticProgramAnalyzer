@@ -1,7 +1,7 @@
 #include <component/PKB/PKB.h>
 #include "TestUtil.h"
 
-bool test_util::AreEntityListsEqual(const std::list<std::tuple<EntityEnum, std::string>> &l1, std::vector<Entity*> l2) {
+bool test_util::AreEntityListsEqual(const std::list<std::tuple<EntityEnum, std::string>> &l1, const std::vector<Entity*>& l2) {
   for (Entity* a: l2) {
     bool found_a = false;
     for (std::tuple<EntityEnum, std::string> b: l1) {
@@ -15,9 +15,9 @@ bool test_util::AreEntityListsEqual(const std::list<std::tuple<EntityEnum, std::
   return l2.size() == l1.size();
 }
 
-bool test_util::AreAllPairsEqual(std::list<std::tuple<std::tuple<EntityEnum, std::string>,
-                                                      std::tuple<EntityEnum, std::string>>> l1,
-                                 std::vector<std::tuple<Entity*, Entity*>> l2) {
+bool test_util::AreAllPairsEqual(const std::list<std::tuple<std::tuple<EntityEnum, std::string>,
+                                                      std::tuple<EntityEnum, std::string>>>& l1,
+                                 const std::vector<std::tuple<Entity*, Entity*>>& l2) {
   for (std::tuple<Entity*, Entity*> a: l2) {
     bool found_a = false;
     Entity* first_entity = std::get<0>(a);

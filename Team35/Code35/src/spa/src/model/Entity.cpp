@@ -3,6 +3,7 @@
  */
 
 #include <list>
+#include <utility>
 #include "Entity.h"
 #include "CFG.h"
 
@@ -27,7 +28,7 @@ const ProcedureName* Procedure::GetName() {
   return procedure_name_;
 }
 
-const void Procedure::SetClusterRoot(Cluster* cluster) {
+void Procedure::SetClusterRoot(Cluster* cluster) {
   this->cluster_root_ = cluster;
 }
 const Cluster* Procedure::GetClusterRoot() {
@@ -36,11 +37,11 @@ const Cluster* Procedure::GetClusterRoot() {
 const Block* Procedure::GetBlockRoot() {
   return this->block_root_;
 }
-const void Procedure::SetBlockRoot(Block* block_root) {
+void Procedure::SetBlockRoot(Block* block_root) {
   this->block_root_ = block_root;
 }
 
-const void Procedure::SetBlockTail(Block* block_tail) {
+void Procedure::SetBlockTail(Block* block_tail) {
   this->block_tail_ = block_tail;
 }
 /**
@@ -111,12 +112,12 @@ std::vector<std::set<Statement*>> Variable::GetStatementTable() {
 * @return The vector<Variable*> after sorting.
 */
 std::vector<Variable*> Variable::SortVariableVector(std::vector<Variable*> var_list) {
-  std::vector<Variable*> var_list_copy = var_list;
+  std::vector<Variable*> var_list_copy = std::move(var_list);
   std::sort(var_list_copy.begin(), var_list_copy.end(),
             [](Variable* a, Variable* b) { return * a->GetVariableName() < * b->GetVariableName(); });
   return var_list_copy;
 }
-const std::string Variable::GetName() const {
+std::string Variable::GetName() const {
   return variable_name_->GetName();
 }
 
@@ -209,9 +210,6 @@ int Statement::GetStatementNumber() {
 
 LineNumber* Statement::GetLineNumberObj() {
   return line_number_;
-}
-std::string Statement::GetLineNumberString() {
-  return std::to_string(line_number_->GetNum());
 }
 
 Procedure* Statement::GetProcedureNode() {

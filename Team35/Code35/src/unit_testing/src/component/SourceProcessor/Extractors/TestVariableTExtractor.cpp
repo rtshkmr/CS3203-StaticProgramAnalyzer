@@ -26,7 +26,7 @@ TEST_CASE("1.VariableTExtractor.Extract variables basic conditions") {
      *  read x;
      * }
      */
-    Procedure* proc1 = new Procedure(new ProcedureName("proc1"));
+    auto* proc1 = new Procedure(new ProcedureName("proc1"));
     proc1->AddStatement(new PrintEntity(var_x_));
 
     deliverable->GetProcList()->push_back(proc1);
@@ -35,7 +35,7 @@ TEST_CASE("1.VariableTExtractor.Extract variables basic conditions") {
     };
     deliverable->GetUseCMap()->insert(std::make_pair(proc1, &proc_var_list));
 
-    Procedure* proc2 = new Procedure(new ProcedureName("proc1"));
+    auto* proc2 = new Procedure(new ProcedureName("proc1"));
     proc2->AddStatement(new ReadEntity(var_x_));
 
     deliverable->GetProcList()->push_back(proc2);
@@ -74,9 +74,9 @@ TEST_CASE("1.VariableTExtractor.Extract variables basic conditions") {
        *  read x;
        * }
        */
-      Procedure* proc1 = new Procedure(new ProcedureName("proc1"));
-      Procedure* proc2 = new Procedure(new ProcedureName("proc2"));
-      CallEntity* call2 = new CallEntity(proc2);
+      auto* proc1 = new Procedure(new ProcedureName("proc1"));
+      auto* proc2 = new Procedure(new ProcedureName("proc2"));
+      auto* call2 = new CallEntity(proc2);
       proc2->AddStatement(new ReadEntity(var_x_));
       proc1->AddStatement(call2);
 
@@ -101,9 +101,9 @@ TEST_CASE("1.VariableTExtractor.Extract variables basic conditions") {
        *  print x;
        * }
        */
-      Procedure* proc1 = new Procedure(new ProcedureName("proc1"));
-      Procedure* proc2 = new Procedure(new ProcedureName("proc2"));
-      CallEntity* call2 = new CallEntity(proc2);
+      auto* proc1 = new Procedure(new ProcedureName("proc1"));
+      auto* proc2 = new Procedure(new ProcedureName("proc2"));
+      auto* call2 = new CallEntity(proc2);
       proc2->AddStatement(new PrintEntity(var_x_));
       proc1->AddStatement(call2);
 
@@ -133,7 +133,7 @@ TEST_CASE("1.VariableTExtractor.Extract variables basic conditions") {
      *  }
      * }
      */
-    Procedure* proc1 = new Procedure(new ProcedureName("proc1"));
+    auto* proc1 = new Procedure(new ProcedureName("proc1"));
     proc1->AddStatement(new ReadEntity(var_x_));
     proc1->AddStatement(new PrintEntity(var_y_));
     proc1->AddStatement(assign_1_);
@@ -203,7 +203,7 @@ TEST_CASE("1.VariableTExtractor.Extract variables basic conditions") {
      *  print y;
      * }
      */
-    Procedure* proc2 = new Procedure(new ProcedureName("proc2"));
+    auto* proc2 = new Procedure(new ProcedureName("proc2"));
     proc2->AddStatement(assign_1_);
     proc2->AddStatement(assign_7_);
     while_1_->AddStatement(assign_4_);
@@ -269,10 +269,10 @@ TEST_CASE("1.VariableTExtractor.Extract variables basic conditions") {
      * z = y
      * }
      */
-    Procedure* proc3 = new Procedure(new ProcedureName("proc3"));
-    Procedure* proc4 = new Procedure(new ProcedureName("proc4"));
+    auto* proc3 = new Procedure(new ProcedureName("proc3"));
+    auto* proc4 = new Procedure(new ProcedureName("proc4"));
     proc3->AddStatement(assign_4_);
-    CallEntity* call4 = new CallEntity(proc4);
+    auto* call4 = new CallEntity(proc4);
     proc3->AddStatement(call4);
     proc4->AddStatement(assign_5_);
 
@@ -377,7 +377,7 @@ TEST_CASE("1.VariableTExtractor.Extract variables nested containers") {
     if_3_->SetElseEntity(else_3_);
     else_2_->AddStatement(if_3_);
 
-    Procedure* proc1 = new Procedure(new ProcedureName("proc1"));
+    auto* proc1 = new Procedure(new ProcedureName("proc1"));
     proc1->AddStatement(if_1_);
 
     deliverable->GetProcList()->push_back(proc1);
@@ -456,7 +456,7 @@ TEST_CASE("1.VariableTExtractor.Extract variables nested containers") {
      *  }
      * }
      */
-    Procedure* proc2 = new Procedure(new ProcedureName("proc2"));
+    auto* proc2 = new Procedure(new ProcedureName("proc2"));
     while_1_->AddStatement(assign_4_);
     while_2_->AddStatement(assign_5_);
     while_3_->AddStatement(assign_11_);
@@ -530,11 +530,11 @@ TEST_CASE("1.VariableTExtractor.Extract variables nested containers") {
      * m=n
      * }
      */
-    Procedure* proc3 = new Procedure(new ProcedureName("proc3"));
-    Procedure* proc4 = new Procedure(new ProcedureName("proc4"));
-    Procedure* proc2 = new Procedure(new ProcedureName("proc2"));
-    CallEntity* call4 = new CallEntity(proc4);
-    CallEntity* call2 = new CallEntity(proc2);
+    auto* proc3 = new Procedure(new ProcedureName("proc3"));
+    auto* proc4 = new Procedure(new ProcedureName("proc4"));
+    auto* proc2 = new Procedure(new ProcedureName("proc2"));
+    auto* call4 = new CallEntity(proc4);
+    auto* call2 = new CallEntity(proc2);
     proc3->AddStatement(assign_4_);
     proc3->AddStatement(call4);
     proc4->AddStatement(assign_3_);
@@ -609,7 +609,7 @@ TEST_CASE("1.VariableTExtractor.Extract variables nested containers") {
      *  }
      * }
      */
-    Procedure* proc1 = new Procedure(new ProcedureName("proc1"));
+    auto* proc1 = new Procedure(new ProcedureName("proc1"));
     if_1_->AddStatement(assign_4_);
     else_1_->AddStatement(assign_6_);
     if_1_->SetElseEntity(else_1_);
@@ -700,15 +700,15 @@ TEST_CASE("1.VariableTExtractor.Extract variables nested calls") {
      *  procedure 5
      *  readn
      */
-  Procedure* proc1 = new Procedure(new ProcedureName("proc1"));
-  Procedure* proc2 = new Procedure(new ProcedureName("proc2"));
-  Procedure* proc3 = new Procedure(new ProcedureName("proc3"));
-  Procedure* proc4 = new Procedure(new ProcedureName("proc4"));
-  Procedure* proc5 = new Procedure(new ProcedureName("proc5"));
-  CallEntity* call2 = new CallEntity(proc2);
-  CallEntity* call3 = new CallEntity(proc3);
-  CallEntity* call4 = new CallEntity(proc4);
-  CallEntity* call5 = new CallEntity(proc5);
+  auto* proc1 = new Procedure(new ProcedureName("proc1"));
+  auto* proc2 = new Procedure(new ProcedureName("proc2"));
+  auto* proc3 = new Procedure(new ProcedureName("proc3"));
+  auto* proc4 = new Procedure(new ProcedureName("proc4"));
+  auto* proc5 = new Procedure(new ProcedureName("proc5"));
+  auto* call2 = new CallEntity(proc2);
+  auto* call3 = new CallEntity(proc3);
+  auto* call4 = new CallEntity(proc4);
+  auto* call5 = new CallEntity(proc5);
 
   while_1->AddStatement(call2);
   while_1->AddStatement(assign_4_);

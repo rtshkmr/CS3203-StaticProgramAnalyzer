@@ -8,14 +8,14 @@
 
 class QueryProjector {
  public:
-  QueryProjector(std::vector<std::pair<Synonym*, Attribute>> target_syn_attr_list);
+  QueryProjector(const std::vector<std::pair<Synonym*, Attribute>>& target_syn_attr_list);
   std::vector<std::string> FormatQuery(UnformattedQueryResult unformatted_results);
 
   static std::vector<std::vector<std::string>> StringifyTable(std::vector<std::pair<Synonym*, Attribute>> syn_attrs,
                                                               std::vector<std::vector<Entity*>> entity_table);
   static std::vector<std::vector<std::string>> CrossProductTables(std::vector<std::vector<std::string>> t1,
                                                                   std::vector<std::vector<std::string>> t2);
-  static std::vector<std::vector<std::string>> ReorderTable(std::vector<std::pair<Synonym*, Attribute>> desired_order,
+  static std::vector<std::vector<std::string>> ReorderTable(const std::vector<std::pair<Synonym*, Attribute>>& desired_order,
                                                             std::vector<Synonym*> current_order,
                                                             std::vector<std::vector<std::string>> table);
   static std::vector<std::string> JoinTuples(std::vector<std::vector<std::string>> table);

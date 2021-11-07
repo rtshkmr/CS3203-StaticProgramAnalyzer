@@ -42,7 +42,7 @@ class LineNumber {
  public:
   explicit LineNumber(int ln);
 
-  int GetNum();
+  int GetNum() const;
 
   bool operator<(const LineNumber& other) const;
 
@@ -58,13 +58,13 @@ class ProcedureName {
   std::string name_;
 
  public:
-  ProcedureName(std::string pName);
+  ProcedureName(const std::string& pName);
 
   std::string GetName();
 
   bool operator<(const ProcedureName& other) const;
 
-  bool operator==(ProcedureName other) const;
+  bool operator==(const ProcedureName& other) const;
 };
 
 /**
@@ -76,7 +76,7 @@ class VariableName {
   std::string name_;
 
  public:
-  VariableName(std::string vName);
+  VariableName(const std::string& vName);
 
   std::string GetName() const;
 
@@ -98,7 +98,7 @@ class ConstantValue {
  public:
   ConstantValue(const std::string& constant);
 
-  int GetValue();
+  int GetValue() const;
 
   bool operator<(const ConstantValue& other) const;
 

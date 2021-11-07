@@ -89,9 +89,9 @@ inline std::vector<std::tuple<EntityEnum, std::string>> tp_source_tuples = {
     {EntityEnum::kAssignEntity, "19"},
 };
 
-bool AreEntityListsEqual(const std::list<std::tuple<EntityEnum, std::string>> &l1, std::vector<Entity*> l2);
-bool AreAllPairsEqual(std::list<std::tuple<std::tuple<EntityEnum, std::string>,
-                                           std::tuple<EntityEnum, std::string>>> l1,
-                      std::vector<std::tuple<Entity*, Entity*>> l2);
+bool AreEntityListsEqual(const std::list<std::tuple<EntityEnum, std::string>> &l1, const std::vector<Entity*>& l2);
+bool AreAllPairsEqual(const std::list<std::tuple<std::tuple<EntityEnum, std::string>,
+                                           std::tuple<EntityEnum, std::string>>>& l1,
+                      const std::vector<std::tuple<Entity*, Entity*>>& l2);
 }
 #endif //AUTOTESTER_CODE35_SRC_INTEGRATION_TESTING_UTIL_TESTUTIL_H_

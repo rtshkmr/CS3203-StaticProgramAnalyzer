@@ -23,7 +23,7 @@ vector<Token> Tokenizer::CreateTokens(const string& statement_string) {
  */
 vector<string> Tokenizer::SplitSentenceIntoStringTokens(const string& statement_string) {
   vector<string> final_token_strings;
-  vector<string> split_strings_by_space = SplitString(" ", statement_string, false);
+  vector<string> split_strings_by_space = SplitString(" ", statement_string);
   for (auto& string_token: split_strings_by_space) {
     if (!IsWhiteSpace(string_token)) {
       vector<string> split_sub_tokens_strings = SplitSubTokenStrings(string_token);
@@ -58,10 +58,9 @@ Token* Tokenizer::CreateToken(const string& token_string,
  *  Splits a given string via the single delimiter provided and retains the delimiter if retain_delimiter is true
  * @param delimiter string representation of the delimiter to split the string by
  * @param input the reference string to split
- * @param retain_delimiter  retains the delimiter within the result vector if set to true
  * @return a vector of strings representing the input string split at the delimiters
  */
-vector<string> Tokenizer::SplitString(const string& delimiter, const string& input, bool retain_delimiter) {
+vector<string> Tokenizer::SplitString(const string& delimiter, const string& input) {
   vector<string> split_strings;
   auto left = 0U;
   auto right = input.find(delimiter);

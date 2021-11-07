@@ -40,17 +40,17 @@ class PKB {
 
   // Returns a vector of all entities in a relationship with the specified entity
   // E.g. GetRelationship(kFollows, 1) returns a vector with one Entity with statement number 2
-  std::vector<Entity*> GetRelationship(PKBRelRefs ref, std::string entity);
+  std::vector<Entity*> GetRelationship(PKBRelRefs ref, const std::string& entity);
 
   // Returns a vector of 2-tuples of entities in which the first element of the tuple is specified
   // by entity and the second element is any element for which the ref relationship holds with entity
   // Both types are determined by de1 and de2 respectively
-  std::vector<entity_pair> GetRelationshipByFirst(PKBRelRefs ref, std::string entity, type_combo t_c);
+  std::vector<entity_pair> GetRelationshipByFirst(PKBRelRefs ref, const std::string& entity, const type_combo& t_c);
 
   // Returns a vector of 2-tuples of entities in which the second element of the tuple is specified
   // by entity and the first element is any element for which the ref relationship holds with entity
   // Both types are determined by de1 and de2 respectively
-  std::vector<entity_pair> GetRelationshipBySecond(PKBRelRefs ref, std::string entity, type_combo t_c);
+  std::vector<entity_pair> GetRelationshipBySecond(PKBRelRefs ref, const std::string& entity, const type_combo& t_c);
 
   // Returns a vector of 2-tuples of entities in which the first element of the tuple is of type de1,
   // the second elements is of type de2, and the ref relationship holds between them
@@ -72,10 +72,10 @@ class PKB {
   // returns a vector with one Entity with the specified statement number.
   // Otherwise, return either AssignEntities that modify the specified variable or WhileEntities/IfEntities
   // that have the specified variable in their condition.
-  std::vector<Entity*> GetPatternEntities(DesignEntity de, std::string var_or_stmt);
+  std::vector<Entity*> GetPatternEntities(DesignEntity de, const std::string& var_or_stmt);
 
   // Returns a vector of entities of type de whose attribute attribute matches the value
-  std::vector<Entity*> GetEntitiesWithAttributeValue(DesignEntity de, Attribute attribute, std::string value);
+  std::vector<Entity*> GetEntitiesWithAttributeValue(DesignEntity de, Attribute attribute, const std::string& value);
 
   // Returns a vector of 2-tuples of entities in which the type and attribute of the first element is defined by type_one,
   // and that of the second elements is defined by de2
@@ -92,7 +92,7 @@ class PKB {
   bool HasRelationship(PKBRelRefs, const std::string&);
 
   // Returns true if the relationship exists between the two entities specified by strings, false otherwise
-  bool HasRelationship(PKBRelRefs, std::string, const std::string&);
+  bool HasRelationship(PKBRelRefs, const std::string&, const std::string&);
 
   // Returns the name of any entity in string format
   // (statements - statement number, variables - variable name, procedures - procedure name, constant - value)

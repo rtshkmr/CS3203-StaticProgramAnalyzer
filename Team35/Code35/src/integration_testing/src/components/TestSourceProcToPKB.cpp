@@ -2,7 +2,6 @@
 #include <component/PKB/DBManager.h>
 #include "catch.hpp"
 #include "component/SourceProcessor/SourceProcessor.h"
-#include "component/SourceProcessor/Parser.h"
 #include "../../util/TestUtil.h"
 
 using namespace test_util;
@@ -41,11 +40,11 @@ TEST_CASE("SP to PKB basic retrieval") {
   }
 
   SECTION("If") {
-    REQUIRE(pkb->GetDesignEntities(DesignEntity::kIf).size() == 0);
+    REQUIRE(pkb->GetDesignEntities(DesignEntity::kIf).empty());
   }
 
   SECTION("While") {
-    REQUIRE(pkb->GetDesignEntities(DesignEntity::kWhile).size() == 0);
+    REQUIRE(pkb->GetDesignEntities(DesignEntity::kWhile).empty());
   }
 
   SECTION("Assign") {
@@ -57,7 +56,7 @@ TEST_CASE("SP to PKB basic retrieval") {
   }
 
   SECTION("Call") {
-    REQUIRE(pkb->GetDesignEntities(DesignEntity::kCall).size() == 0);
+    REQUIRE(pkb->GetDesignEntities(DesignEntity::kCall).empty());
   }
 
   SECTION("Print") {
@@ -94,7 +93,7 @@ TEST_CASE("SP to PKB basic retrieval") {
     REQUIRE(dynamic_cast<AssignEntity*>(follows_list.at(0)) != nullptr);
 
     follows_list = pkb->GetRelationship(PKBRelRefs::kFollows, "5");
-    REQUIRE(follows_list.size() == 0);
+    REQUIRE(follows_list.empty());
   }
 }
 

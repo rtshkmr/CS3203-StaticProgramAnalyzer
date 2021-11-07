@@ -5,11 +5,11 @@
 
 /// 1. Test Variable
 TEST_CASE("1.Model.Entity.Variable") {
-  VariableName* variable_vtester = new VariableName("Vtester");
-  VariableName* variable_xtester = new VariableName("xtesteR");
+  auto* variable_vtester = new VariableName("Vtester");
+  auto* variable_xtester = new VariableName("xtesteR");
 
-  Variable* var_vtester = new Variable(variable_vtester);
-  Variable* var_xtester = new Variable(variable_xtester);
+  auto* var_vtester = new Variable(variable_vtester);
+  auto* var_xtester = new Variable(variable_xtester);
 
   SECTION("GetVariableName") {
     REQUIRE(var_vtester->GetVariableName() == variable_vtester);
@@ -20,13 +20,13 @@ TEST_CASE("1.Model.Entity.Variable") {
   }
 
   SECTION("Casting to Entity and back") {
-    Entity* entity_var_vtester = dynamic_cast<Entity*>(var_vtester);
-    Entity* entity_var_xtester = dynamic_cast<Entity*>(var_xtester);
+    auto* entity_var_vtester = dynamic_cast<Entity*>(var_vtester);
+    auto* entity_var_xtester = dynamic_cast<Entity*>(var_xtester);
     REQUIRE(entity_var_vtester);
     REQUIRE(entity_var_xtester);
 
-    Variable* cast_var_vtester = dynamic_cast<Variable*>(entity_var_vtester);
-    Variable* cast_var_xtester = dynamic_cast<Variable*>(entity_var_xtester);
+    auto* cast_var_vtester = dynamic_cast<Variable*>(entity_var_vtester);
+    auto* cast_var_xtester = dynamic_cast<Variable*>(entity_var_xtester);
     REQUIRE(cast_var_vtester);
     REQUIRE(cast_var_xtester);
 
@@ -37,11 +37,11 @@ TEST_CASE("1.Model.Entity.Variable") {
 
 /// 2. Test Procedure
 TEST_CASE("1.Model.Entity.Procedure") {
-  ProcedureName* pname_vtester = new ProcedureName("Vtester");
-  ProcedureName* pname_xtester = new ProcedureName("xtesteR");
+  auto* pname_vtester = new ProcedureName("Vtester");
+  auto* pname_xtester = new ProcedureName("xtesteR");
 
-  Procedure* proc_vtester = new Procedure(pname_vtester);
-  Procedure* proc_xtester = new Procedure(pname_xtester);
+  auto* proc_vtester = new Procedure(pname_vtester);
+  auto* proc_xtester = new Procedure(pname_xtester);
 
   SECTION("GetVariableName") {
     REQUIRE(proc_vtester->GetName() == pname_vtester);
@@ -52,13 +52,13 @@ TEST_CASE("1.Model.Entity.Procedure") {
   }
 
   SECTION("Casting to Entity and back") {
-    Entity* entity_proc_vtester = dynamic_cast<Entity*>(proc_vtester);
-    Entity* entity_proc_xtester = dynamic_cast<Entity*>(proc_xtester);
+    auto* entity_proc_vtester = dynamic_cast<Entity*>(proc_vtester);
+    auto* entity_proc_xtester = dynamic_cast<Entity*>(proc_xtester);
     REQUIRE(entity_proc_vtester);
     REQUIRE(entity_proc_xtester);
 
-    Procedure* cast_proc_vtester = dynamic_cast<Procedure*>(entity_proc_vtester);
-    Procedure* cast_proc_xtester = dynamic_cast<Procedure*>(entity_proc_xtester);
+    auto* cast_proc_vtester = dynamic_cast<Procedure*>(entity_proc_vtester);
+    auto* cast_proc_xtester = dynamic_cast<Procedure*>(entity_proc_xtester);
     REQUIRE(cast_proc_vtester);
     REQUIRE(cast_proc_xtester);
 
@@ -67,13 +67,13 @@ TEST_CASE("1.Model.Entity.Procedure") {
   }
 
   SECTION("Casting to Container and back") {
-    Container* container_proc_vtester = dynamic_cast<Container*>(proc_vtester);
-    Container* container_proc_xtester = dynamic_cast<Container*>(proc_xtester);
+    auto* container_proc_vtester = dynamic_cast<Container*>(proc_vtester);
+    auto* container_proc_xtester = dynamic_cast<Container*>(proc_xtester);
     REQUIRE(container_proc_vtester);
     REQUIRE(container_proc_xtester);
 
-    Procedure* cast_proc_vtester = dynamic_cast<Procedure*>(container_proc_vtester);
-    Procedure* cast_proc_xtester = dynamic_cast<Procedure*>(container_proc_xtester);
+    auto* cast_proc_vtester = dynamic_cast<Procedure*>(container_proc_vtester);
+    auto* cast_proc_xtester = dynamic_cast<Procedure*>(container_proc_xtester);
     REQUIRE(cast_proc_vtester);
     REQUIRE(cast_proc_xtester);
 
@@ -82,12 +82,12 @@ TEST_CASE("1.Model.Entity.Procedure") {
   }
 
   SECTION("Cast to Container and AddStmt") {
-    Container* container_proc_vtester = dynamic_cast<Container*>(proc_vtester);
+    auto* container_proc_vtester = dynamic_cast<Container*>(proc_vtester);
 
     // 3 sample statements
-    ReadEntity* stmt1 = new ReadEntity(new Variable(new VariableName("aaa")));
-    PrintEntity* stmt2 = new PrintEntity(new Variable(new VariableName("bbb")));
-    CallEntity* stmt3 = new CallEntity(proc_xtester);
+    auto* stmt1 = new ReadEntity(new Variable(new VariableName("aaa")));
+    auto* stmt2 = new PrintEntity(new Variable(new VariableName("bbb")));
+    auto* stmt3 = new CallEntity(proc_xtester);
 
     container_proc_vtester->AddStatement(stmt1);
     container_proc_vtester->AddStatement(stmt2);
@@ -104,11 +104,11 @@ TEST_CASE("1.Model.Entity.Procedure") {
 
 /// 3. Test Program
 TEST_CASE("1.Model.Entity.Program") {
-  Procedure* proc1 = new Procedure(new ProcedureName("HellO"));
-  Procedure* proc2 = new Procedure(new ProcedureName("MellO"));
-  Procedure* proc3 = new Procedure(new ProcedureName("KellO"));
+  auto* proc1 = new Procedure(new ProcedureName("HellO"));
+  auto* proc2 = new Procedure(new ProcedureName("MellO"));
+  auto* proc3 = new Procedure(new ProcedureName("KellO"));
 
-  Program* program = new Program(proc1);
+  auto* program = new Program(proc1);
   program->AddProcedure(proc2);
   program->AddProcedure(proc3);
 

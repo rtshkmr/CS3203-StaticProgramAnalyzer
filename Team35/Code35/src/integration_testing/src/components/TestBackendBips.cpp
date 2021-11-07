@@ -121,7 +121,7 @@ TEST_CASE("NextBipExtractor more procedures") {
     std::list<std::tuple<std::tuple<EntityEnum, std::string>, std::tuple<EntityEnum, std::string>>>
         expected_reverse_list;
     for (int i = 0; i < expected_next_bip_lists.size(); ++i) {
-      for (auto tuple : expected_next_bip_lists[i]) {
+      for (const auto& tuple : expected_next_bip_lists[i]) {
         expected_forward_list.emplace_back(tp_source_tuples[i + 1], tuple);
         expected_reverse_list.emplace_back(tuple, tp_source_tuples[i + 1]);
       }

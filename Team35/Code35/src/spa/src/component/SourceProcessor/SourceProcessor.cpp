@@ -1,9 +1,7 @@
 #include <util/Logger.h>
 #include <exception/SpaException.h>
 #include "SourceProcessor.h"
-#include "Parser.h"
 #include "DesignExtractor.h"
-#include "../PKB/PKB.h"
 
 using namespace sp;
 
@@ -53,6 +51,6 @@ PKB* SourceProcessor::ProcessSourceFile(const std::string& file_name) {
 void SourceProcessor::Terminate(const std::string& msg) {
   std::string logger_output = msg + "\n [ERROR] TERMINATING PROGRAM";
   L(logger_output);
-  LoggerTerminate();
+  LoggerTerminate()
   std::exit(EXIT_FAILURE);
 }

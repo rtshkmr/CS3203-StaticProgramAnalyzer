@@ -65,9 +65,9 @@ TEST_CASE("1.CFG.Block.Linkage") {
 TEST_CASE("1.CFG.Cluster") {
   SECTION("Basic class hierarchies") {
     SECTION("AddChildClusterToBack and AddSiblingCluster functions") {
-      Cluster* outer_cluster = new Cluster();
-      Cluster* child_cluster = new Cluster();
-      Cluster* sibling_cluster = new Cluster();
+      auto* outer_cluster = new Cluster();
+      auto* child_cluster = new Cluster();
+      auto* sibling_cluster = new Cluster();
       outer_cluster->AddChildClusterToBack(child_cluster);
       REQUIRE(child_cluster->GetParentCluster() == outer_cluster); // auto links to parent
       child_cluster->AddSiblingCluster(sibling_cluster);
@@ -87,11 +87,11 @@ TEST_CASE("1.CFG.Cluster") {
   SECTION("Navigation Convenience Helpers") {
 
     // set up valid if cluster with constituents
-    Cluster* if_cluster = new Cluster();
+    auto* if_cluster = new Cluster();
     if_cluster->SetClusterTag(ClusterTag::kIfCluster);
-    Cluster* if_cond = new Cluster();
-    Cluster* if_body = new Cluster();
-    Cluster* else_body = new Cluster();
+    auto* if_cond = new Cluster();
+    auto* if_body = new Cluster();
+    auto* else_body = new Cluster();
     if_cond->SetClusterTag(ClusterTag::kIfCondBlock);
     if_body->SetClusterTag(ClusterTag::kIfBody);
     else_body->SetClusterTag(ClusterTag::kElseBody);
@@ -101,9 +101,9 @@ TEST_CASE("1.CFG.Cluster") {
 
 
     // setup valid while cluster with constituents
-    Cluster* while_cluster = new Cluster();
-    Cluster* while_cond = new Cluster();
-    Cluster* while_body = new Cluster();
+    auto* while_cluster = new Cluster();
+    auto* while_cond = new Cluster();
+    auto* while_body = new Cluster();
     while_cluster->SetClusterTag(ClusterTag::kWhileCluster);
     while_cond->SetClusterTag(ClusterTag::kWhileCondBlock);
     while_body->SetClusterTag(ClusterTag::kWhileBody);
@@ -157,7 +157,6 @@ TEST_CASE("1.CFG.Cluster") {
       REQUIRE(output_4_7);
       Cluster* inner_cluster_13_15 = proc->GetInnermostCluster(13, 15, nullptr);
       auto range_for_13_15 = inner_cluster_13_15->GetStartEndRange();
-      bool output_13_15 = range_for_13_15.first == 11 && range_for_13_15.second == 15;
       Cluster* inner_cluster_16_19 = proc->GetInnermostCluster(16, 19, nullptr);
       auto range_for_16_19 = inner_cluster_16_19->GetStartEndRange();
       bool output_16_19 = range_for_16_19.first == 1 && range_for_16_19.second == 23;

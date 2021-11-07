@@ -319,7 +319,7 @@ inline WhileEntity* GetWhileEntity3() {
 
 // util
 inline Statement* CreateStatement(Entity* entity, int stmt_num) {
-  Statement* stmt = dynamic_cast<Statement*>(entity);
+  auto* stmt = dynamic_cast<Statement*>(entity);
   stmt->SetStatementNumber(new StatementNumber(stmt_num));
   return stmt;
 }

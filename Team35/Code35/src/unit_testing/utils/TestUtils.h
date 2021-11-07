@@ -11,12 +11,11 @@
 
 class TestUtils {
  public:
-  std::vector<std::string> GetBasicSourceLines();
 
-  static bool AreListsEqual(std::list<Statement*> as, std::list<Statement*> bs);
-  static bool AreVectorsEqual(std::vector<Entity*> as, std::vector<Entity*> bs);
-  static bool AreListsEqual(std::list<Procedure*> a, std::list<Procedure*> b);
-  static bool AreVectorsEqual(std::vector<std::tuple<Entity*, Entity*>> as, std::vector<std::tuple<Entity*, Entity*>> bs);
+  static bool AreListsEqual(const std::list<Statement*>& as, const std::list<Statement*>& bs);
+  static bool AreVectorsEqual(const std::vector<Entity*>& as, const std::vector<Entity*>& bs);
+  static bool AreListsEqual(const std::list<Procedure*>& a, const std::list<Procedure*>& b);
+  static bool AreVectorsEqual(const std::vector<std::tuple<Entity*, Entity*>>& as, const std::vector<std::tuple<Entity*, Entity*>>& bs);
   static void AddStatementList(Container* container, const std::list<Statement*>& stmt_list);
 };
 

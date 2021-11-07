@@ -7,7 +7,7 @@
 
 TEST_CASE("2.PKB.AffectsBy") {
   PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/basic_source.txt");
-  DBManager* dbm = new DBManager(pkb);
+  auto* dbm = new DBManager(pkb);
   std::vector<Entity*> rs = dbm->GetRelationship(PKBRelRefs::kAffectedBy, "5");
   REQUIRE(rs.size() == 1);
   REQUIRE(dynamic_cast<AssignEntity*>(rs[0])->GetStatementNumberObj()->GetNum() == 3);
@@ -15,8 +15,8 @@ TEST_CASE("2.PKB.AffectsBy") {
 
 TEST_CASE("2.PKB.Affects") {
   PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/basic_source.txt");
-  DBManager* dbm = new DBManager(pkb);
-  AffectsExtractor* affects_extractor = new AffectsExtractor(nullptr, pkb);
+  auto* dbm = new DBManager(pkb);
+  auto* affects_extractor = new AffectsExtractor(nullptr, pkb);
   SECTION("HasAffects(#,#)") {
     std::vector<Entity*> rs_1 = pkb->GetPatternEntities(DesignEntity::kAssign, "3");
     std::vector<Entity*> rs_2 = pkb->GetPatternEntities(DesignEntity::kAssign, "5");
@@ -31,7 +31,7 @@ TEST_CASE("2.PKB.Affects") {
 TEST_CASE("2.PKB.Affects.Negative Testing") {
 
   PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/adv_spa_lecture_source.txt");
-  DBManager* dbm = new DBManager(pkb);
+  auto* dbm = new DBManager(pkb);
 
   SECTION ("0 - Negative Testing") {
     REQUIRE_FALSE(dbm->HasRelationship(PKBRelRefs::kAffects, "-1", "0"));
@@ -75,7 +75,7 @@ TEST_CASE("2.PKB.Affects.adv_spa_lecture") {
    ///endregion
    
   PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/adv_spa_lecture_source.txt");
-  DBManager* dbm = new DBManager(pkb);
+  auto* dbm = new DBManager(pkb);
 
   SECTION ("1 - Has Affects : (#,#)") {
     CHECK(dbm->HasRelationship(PKBRelRefs::kAffects, "2", "6"));
@@ -234,7 +234,7 @@ TEST_CASE("2.PKB.Affects.adv_spa_lecture") {
 TEST_CASE("2.PKB.Affects.Non_BIP_Tester") {
 // The classic test given in lecture where Modifies is abstracted out into another procedure
 PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/affects_source.txt");
-DBManager* dbm = new DBManager(pkb);
+auto* dbm = new DBManager(pkb);
 
 CHECK(dbm->HasRelationship(PKBRelRefs::kAffects, "1", "5"));
 CHECK_FALSE(dbm->HasRelationship(PKBRelRefs::kAffects, "6", "8"));
@@ -242,7 +242,7 @@ CHECK_FALSE(dbm->HasRelationship(PKBRelRefs::kAffects, "6", "8"));
 
 TEST_CASE("2.PKB.Affects.mixed_loops_source") {
   PKB* pkb = sp::SourceProcessor::ProcessSourceFile("./../../../tests/integration_test_files/mixed_loops_source.txt");
-  DBManager* dbm = new DBManager(pkb);
+  auto* dbm = new DBManager(pkb);
 
   /// region Affects
   /// (1, 12)

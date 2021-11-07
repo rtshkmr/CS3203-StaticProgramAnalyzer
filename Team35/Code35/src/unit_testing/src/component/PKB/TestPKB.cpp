@@ -1,27 +1,26 @@
 #include "catch.hpp"
 #include <iostream>
 #include <component/PKB/PKB.h>
-#include <datatype/Deliverable.h>
 
 TEST_CASE("2.PKB.PKB population and retrieval") {
 
   Deliverable d1_ = Deliverable();
 
-  Procedure* p1_ = new Procedure(new ProcedureName("p1"));
-  Variable* v1_ = new Variable(new VariableName("v1"));
-  Variable* v2_ = new Variable(new VariableName("v2"));
-  Constant* const1_ = new Constant(new ConstantValue("1"));
-  Constant* const2_ = new Constant(new ConstantValue("2"));
+  auto* p1_ = new Procedure(new ProcedureName("p1"));
+  auto* v1_ = new Variable(new VariableName("v1"));
+  auto* v2_ = new Variable(new VariableName("v2"));
+  auto* const1_ = new Constant(new ConstantValue("1"));
+  auto* const2_ = new Constant(new ConstantValue("2"));
 
-  ReadEntity* read1_ = new ReadEntity(v1_);
-  AssignEntity* a1_ = new AssignEntity
+  auto* read1_ = new ReadEntity(v1_);
+  auto* a1_ = new AssignEntity
       (v1_,
        "v1=1+2+v2",
        std::vector<Variable*>{v2_},
        std::vector<Constant*>{const1_, const2_}
       );
-  CallEntity* call1_ = new CallEntity(p1_);
-  PrintEntity* print1_ = new PrintEntity(v1_);
+  auto* call1_ = new CallEntity(p1_);
+  auto* print1_ = new PrintEntity(v1_);
 
   read1_->SetStatementNumber(new StatementNumber(1));
   a1_->SetStatementNumber(new StatementNumber(2));
@@ -77,9 +76,9 @@ TEST_CASE("2.PKB.PKB population and retrieval") {
     SECTION("Constant") {
       std::vector<Entity*> pkb_const = pkb.GetDesignEntities(DesignEntity::kConstant);
       REQUIRE(pkb_const.size() == 2);
-      Constant* const1 = (Constant*) pkb_const.at(0);
+      auto* const1 = (Constant*) pkb_const.at(0);
       REQUIRE(const1 == const1_);
-      Constant* const2 = (Constant*) pkb_const.at(1);
+      auto* const2 = (Constant*) pkb_const.at(1);
       REQUIRE(const2 == const2_);
     }
 

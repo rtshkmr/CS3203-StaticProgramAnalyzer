@@ -27,7 +27,7 @@ int QueryOptimizer::GetTypePenalty(Clause* cl) {
   } else {
     return type_with_penalty;
   }
-};
+}
 
 int QueryOptimizer::GetNumberOfSynonymsPenalty(Clause* cl) {
   int num_syns = cl->GetAllSynonymNamesOfClause().size();
@@ -62,7 +62,7 @@ void QueryOptimizer::RemoveDuplicateClauses() {
 void QueryOptimizer::PopulateSynAdjacencyList() {
   for (int i = 0; i < clauses.size(); i++) {
     std::vector<std::string> syns = clauses[i]->GetAllSynonymNamesOfClause();
-    for (std::string s : syns) {
+    for (const std::string& s : syns) {
       if (this->map_of_syn_to_clause_indices.find(s) != this->map_of_syn_to_clause_indices.end()) {
         this->map_of_syn_to_clause_indices.at(s).push_back(i);
       } else {
@@ -85,11 +85,11 @@ void QueryOptimizer::PopulateWeightedClausesList() {
 bool QueryOptimizer::HasClauseBeenSeen(Clause* cl) {
   bool is_seen;
   if (typeid(*cl) == typeid(SuchThat)) {
-    SuchThat* such_that = dynamic_cast<SuchThat *>(cl);
+    auto* such_that = dynamic_cast<SuchThat *>(cl);
     seen_suchthat_set.find(*such_that);
     is_seen = seen_suchthat_set.find(*such_that) != seen_suchthat_set.end();
   } else if (typeid(*cl) == typeid(Pattern)) {
-    Pattern* pattern = dynamic_cast<Pattern *>(cl);
+    auto* pattern = dynamic_cast<Pattern *>(cl);
     seen_pattern_set.find(*pattern);
     is_seen = seen_pattern_set.find(*pattern) != seen_pattern_set.end();
   } else {
@@ -102,10 +102,10 @@ bool QueryOptimizer::HasClauseBeenSeen(Clause* cl) {
 
 void QueryOptimizer::SeeClause(Clause* cl) {
   if (typeid(*cl) == typeid(SuchThat)) {
-    SuchThat* such_that = dynamic_cast<SuchThat *>(cl);
+    auto* such_that = dynamic_cast<SuchThat *>(cl);
     seen_suchthat_set.insert(*such_that);
   } else if (typeid(*cl) == typeid(Pattern)) {
-    Pattern* pattern = dynamic_cast<Pattern *>(cl);
+    auto* pattern = dynamic_cast<Pattern *>(cl);
     seen_pattern_set.insert(*pattern);
   } else {
     With* with = dynamic_cast<With *>(cl);
@@ -146,8 +146,8 @@ void QueryOptimizer::ReorderClausesWithinWeightedGroups() {
   auto comparator = [](WeightedClause* const& c1, WeightedClause* const& c2) -> bool {
     return c1->GetWeight() < c2->GetWeight();
   };
-  for (int i = 0; i < weighted_groups.size(); i++) {
-    std::sort(weighted_groups[i]->weighted_clauses.begin(),weighted_groups[i]->weighted_clauses.end(), comparator);
+  for (auto & weighted_group : weighted_groups) {
+    std::sort(weighted_group->weighted_clauses.begin(),weighted_group->weighted_clauses.end(), comparator);
   }
 }
 

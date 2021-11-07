@@ -23,7 +23,7 @@ TEST_CASE("1.DataType.ValidateName") {
 
 TEST_CASE("1.DataType.StatementNumber") {
   SECTION("Creation and Getters") {
-    StatementNumber sn = StatementNumber(39);
+    auto sn = StatementNumber(39);
     StatementNumber sn2(10);
 
     REQUIRE(sn.GetNum() == 39);
@@ -33,9 +33,9 @@ TEST_CASE("1.DataType.StatementNumber") {
   }
 
   SECTION("Operators") {
-    StatementNumber sn = StatementNumber(50);
-    StatementNumber sn2 = StatementNumber(50);
-    StatementNumber sn3 = StatementNumber(51);
+    auto sn = StatementNumber(50);
+    auto sn2 = StatementNumber(50);
+    auto sn3 = StatementNumber(51);
 
     ///operator=
     REQUIRE(sn == sn2);
@@ -53,7 +53,7 @@ TEST_CASE("1.DataType.StatementNumber") {
 
 TEST_CASE("1.DataType.LineNumber") {
   SECTION("Creation and Getters") {
-    LineNumber ln = LineNumber(39);
+    auto ln = LineNumber(39);
     LineNumber ln2(10);
 
     REQUIRE(ln.GetNum() == 39);
@@ -63,9 +63,9 @@ TEST_CASE("1.DataType.LineNumber") {
   }
 
   SECTION("Operators") {
-    LineNumber ln = LineNumber(50);
-    LineNumber ln2 = LineNumber(50);
-    LineNumber ln3 = LineNumber(51);
+    auto ln = LineNumber(50);
+    auto ln2 = LineNumber(50);
+    auto ln3 = LineNumber(51);
 
     ///operator=
     REQUIRE(ln == ln2);

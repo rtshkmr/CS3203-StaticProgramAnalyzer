@@ -10,7 +10,7 @@ IntermediateTable::IntermediateTable() {
   relationships_by_type = empty_relationships_by_type_vector;
 
   has_relationship = false;
-};
+}
 
 void IntermediateTable::InsertData(std::vector<Entity *> data) {
   relationships = std::move(data);

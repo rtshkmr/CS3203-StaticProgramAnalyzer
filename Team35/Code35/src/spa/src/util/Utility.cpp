@@ -14,7 +14,7 @@
  */
 int Utility::ConvertStringToInt(const std::string& input) {
   size_t num_chars = 0;
-  int value = 0;
+  int value;
   try {
     value = stoi(input, & num_chars);
   } catch (std::exception ia) {
@@ -36,7 +36,7 @@ AssignEntity* Utility::GetAssignEntityFromStmtNum(PKB* pkb, int target) {
   std::vector<Entity*> ae_vec_target =
       pkb->GetPatternEntities(DesignEntity::kAssign, std::to_string(target));
 
-  if (ae_vec_target.size() == 0) //target given is not an assign entity.
+  if (ae_vec_target.empty()) //target given is not an assign entity.
     return nullptr;
 
   assert (ae_vec_target.size() == 1); // must be 1

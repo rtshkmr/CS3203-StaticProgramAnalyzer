@@ -82,7 +82,7 @@ std::set<std::tuple<RelRef, DesignEntity, DesignEntity>> valid_relref_args = {
     {RelRef::kAffectsT, DesignEntity::kAssign, DesignEntity::kAssign},
 };
 
-bool QuerySemanticValidator::IsValid_LhsStmt_RhsStmt(const std::string& l, std::string r, bool lhs_is_syn,
+bool QuerySemanticValidator::IsValid_LhsStmt_RhsStmt(const std::string& l, const std::string& r, bool lhs_is_syn,
                                                      bool rhs_is_syn, std::list<Synonym*>* synonyms) {
   // Synonyms involved in relationships between statements cannot be variable, procedure, or constant.
   std::unordered_set<DesignEntity> stmt_blacklist = {DesignEntity::kVariable,
@@ -113,7 +113,7 @@ bool QuerySemanticValidator::IsValid_LhsStmt_RhsStmt(const std::string& l, std::
  * @param synonyms is a reference to the list of synonyms.
  * @return true if RelRef has semantically valid left and right arguments, false otherwise.
  */
-bool QuerySemanticValidator::Is_Semantically_Valid_RelRef(const std::string& l, std::string r, RelRef rf, bool lhs_is_syn,
+bool QuerySemanticValidator::Is_Semantically_Valid_RelRef(const std::string& l, const std::string& r, RelRef rf, bool lhs_is_syn,
                                                           bool rhs_is_syn, std::list<Synonym*>* synonyms) {
   // if neither lhs nor rhs is a synonym, no semantic validation is needed
 // note that the same kInvalid enum is used differently by the front and the backend code. 

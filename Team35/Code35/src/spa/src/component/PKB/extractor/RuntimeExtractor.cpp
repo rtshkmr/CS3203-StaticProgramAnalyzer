@@ -38,23 +38,6 @@ std::vector<Entity*> RuntimeExtractor::GetFirstEntityOfRelationship(PKBRelRefs r
 }
 
 /**
- * Gets relationships for 1 type-specified entity, e.g. Affects(s, _) where s are entities in the scoped vector.
- * @param ref
- * @param scoped_entities
- * @return
- */
-std::vector<Entity*> RuntimeExtractor::GetScopedFirstEntities(PKBRelRefs ref, const std::vector<Entity*>& scoped_entities) {
-  std::vector<Entity*> results;
-  for (Entity* entity : scoped_entities) {
-    std::string name = PKB::GetNameFromEntity(entity);
-    if (HasRelationship(ref, name)) {
-      results.push_back(entity);
-    }
-  }
-  return results;
-}
-
-/**
  * Gets relationships for 2 type-specified entities, e.g. Uses(p, v)
  * @param ref Relationship type
  * @param first Type of first entity
@@ -66,7 +49,7 @@ std::vector<std::tuple<Entity*, Entity*>> RuntimeExtractor::GetRelationshipByTyp
                                                                                    DesignEntity second) {
   std::pair<RuntimeColleague*,RelDirection> pair = GetExtractorAndDirection(ref);
   return (pair.first) ? pair.first->GetRelationshipByTypes(pair.second, first, second)
-                      : std::vector<std::tuple<Entity*, Entity*>>{};;
+                      : std::vector<std::tuple<Entity*, Entity*>>{};
 }
 
 /**

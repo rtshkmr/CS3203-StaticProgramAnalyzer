@@ -1,6 +1,5 @@
 #include "catch.hpp"
 #include "component/QueryProcessor/QueryExtractor/QueryExtractor.h"
-#include "component/QueryProcessor/types/Types.h"
 
 bool AreSynonymsEqual(Synonym s1, Synonym s2) {
   return s1.GetType() == s2.GetType() && s1.GetName() == s2.GetName();
@@ -128,8 +127,8 @@ TEST_CASE("3.QueryExtractor.Extract multiple synonyms + select BOOLEAN; should P
   auto target_syn_attrs = query_extractor.GetTargetSynAttrPairs();
   // we have already tested that parsing of declaration synonyms works, so focus on checking target_synonyms_list
   REQUIRE(synonyms.size() == 5);
-  REQUIRE(groups.size() == 0);
-  REQUIRE(target_syn_attrs.size() == 0);
+  REQUIRE(groups.empty());
+  REQUIRE(target_syn_attrs.empty());
 }
 
 TEST_CASE("3.QueryExtractor.Extract multiple synonyms + select tuple of declared synonyms; should PASS") {
@@ -751,7 +750,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that Calls; should pass") {
     Clause* expected_cl = new SuchThat("p", "q", RelRef::kCalls, true, false);
     std::vector<Clause*> clauses;
     clauses.push_back(expected_cl);
-    Group* expected_group = new Group(clauses, true);;
+    auto* expected_group = new Group(clauses, true);
 
     REQUIRE(AreGroupsEqual(expected_group, actual_group));
   }
@@ -767,7 +766,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that Calls; should pass") {
     Clause* expected_cl = new SuchThat("Example", "p", RelRef::kCallsT, false, true);
     std::vector<Clause*> clauses;
     clauses.push_back(expected_cl);
-    Group* expected_group = new Group(clauses, true);;
+    auto* expected_group = new Group(clauses, true);
 
     REQUIRE(AreGroupsEqual(expected_group, actual_group));
   }
@@ -783,7 +782,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that Calls; should pass") {
     Clause* expected_cl = new SuchThat("First", "Second", RelRef::kCalls, false, false);
     std::vector<Clause*> clauses;
     clauses.push_back(expected_cl);
-    Group* expected_group = new Group(clauses, false);;
+    auto* expected_group = new Group(clauses, false);
 
     REQUIRE(AreGroupsEqual(expected_group, actual_group));
   }
@@ -799,7 +798,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that Calls; should pass") {
     Clause* expected_cl = new SuchThat("p", "q", RelRef::kCallsT, true, true);
     std::vector<Clause*> clauses;
     clauses.push_back(expected_cl);
-    Group* expected_group = new Group(clauses, true);;
+    auto* expected_group = new Group(clauses, true);
 
     REQUIRE(AreGroupsEqual(expected_group, actual_group));
   }
@@ -817,7 +816,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that Next; should pass") {
     Clause* expected_cl = new SuchThat("2", "3", RelRef::kNext, false, false);
     std::vector<Clause*> clauses;
     clauses.push_back(expected_cl);
-    Group* expected_group = new Group(clauses, false);;
+    auto* expected_group = new Group(clauses, false);
 
     REQUIRE(AreGroupsEqual(expected_group, actual_group));
   }
@@ -833,7 +832,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that Next; should pass") {
     Clause* expected_cl = new SuchThat("60", "n", RelRef::kNextT, false, true);
     std::vector<Clause*> clauses;
     clauses.push_back(expected_cl);
-    Group* expected_group = new Group(clauses, false);;
+    auto* expected_group = new Group(clauses, false);
 
     REQUIRE(AreGroupsEqual(expected_group, actual_group));
   }
@@ -849,7 +848,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that Next; should pass") {
     Clause* expected_cl = new SuchThat("60", "n", RelRef::kNext, false, true);
     std::vector<Clause*> clauses;
     clauses.push_back(expected_cl);
-    Group* expected_group = new Group(clauses, false);;
+    auto* expected_group = new Group(clauses, false);
 
     REQUIRE(AreGroupsEqual(expected_group, actual_group));
   }
@@ -866,7 +865,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that Next; should pass") {
     Clause* expected_cl = new SuchThat("60", "a", RelRef::kNextT, false, true);
     std::vector<Clause*> clauses;
     clauses.push_back(expected_cl);
-    Group* expected_group = new Group(clauses, true);;
+    auto* expected_group = new Group(clauses, true);
 
     REQUIRE(AreGroupsEqual(expected_group, actual_group));
   }
@@ -884,7 +883,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that NextBip; should pass") 
     Clause* expected_cl = new SuchThat("2", "3", RelRef::kNextBip, false, false);
     std::vector<Clause*> clauses;
     clauses.push_back(expected_cl);
-    Group* expected_group = new Group(clauses, false);;
+    auto* expected_group = new Group(clauses, false);
 
     REQUIRE(AreGroupsEqual(expected_group, actual_group));
   }
@@ -900,7 +899,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that NextBip; should pass") 
     Clause* expected_cl = new SuchThat("60", "n", RelRef::kNextBipT, false, true);
     std::vector<Clause*> clauses;
     clauses.push_back(expected_cl);
-    Group* expected_group = new Group(clauses, false);;
+    auto* expected_group = new Group(clauses, false);
 
     REQUIRE(AreGroupsEqual(expected_group, actual_group));
   }
@@ -916,7 +915,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that NextBip; should pass") 
     Clause* expected_cl = new SuchThat("60", "n", RelRef::kNextBip, false, true);
     std::vector<Clause*> clauses;
     clauses.push_back(expected_cl);
-    Group* expected_group = new Group(clauses, false);;
+    auto* expected_group = new Group(clauses, false);
 
     REQUIRE(AreGroupsEqual(expected_group, actual_group));
   }
@@ -933,7 +932,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that NextBip; should pass") 
     Clause* expected_cl = new SuchThat("60", "a", RelRef::kNextBipT, false, true);
     std::vector<Clause*> clauses;
     clauses.push_back(expected_cl);
-    Group* expected_group = new Group(clauses, true);;
+    auto* expected_group = new Group(clauses, true);
 
     REQUIRE(AreGroupsEqual(expected_group, actual_group));
   }
@@ -951,7 +950,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that Affects; should pass") 
     Clause* expected_cl = new SuchThat("2", "3", RelRef::kAffects, false, false);
     std::vector<Clause*> clauses;
     clauses.push_back(expected_cl);
-    Group* expected_group = new Group(clauses, false);;
+    auto* expected_group = new Group(clauses, false);
 
     REQUIRE(AreGroupsEqual(expected_group, actual_group));
   }
@@ -967,7 +966,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that Affects; should pass") 
     Clause* expected_cl = new SuchThat("a", "10", RelRef::kAffectsT, true, false);
     std::vector<Clause*> clauses;
     clauses.push_back(expected_cl);
-    Group* expected_group = new Group(clauses, true);;
+    auto* expected_group = new Group(clauses, true);
 
     REQUIRE(AreGroupsEqual(expected_group, actual_group));
   }
@@ -983,7 +982,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed such that Affects; should pass") 
     Clause* expected_cl = new SuchThat("s", "10", RelRef::kAffectsT, true, false);
     std::vector<Clause*> clauses;
     clauses.push_back(expected_cl);
-    Group* expected_group = new Group(clauses, true);
+    auto* expected_group = new Group(clauses, true);
 
     REQUIRE(AreGroupsEqual(expected_group, actual_group));
   }
@@ -1001,7 +1000,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed if-pattern") {
     Clause* expected_cl = new Pattern("ifs", "v", DesignEntity::kIf, true, false);
     std::vector<Clause*> clauses;
     clauses.push_back(expected_cl);
-    Group* expected_group = new Group(clauses, true);
+    auto* expected_group = new Group(clauses, true);
 
     REQUIRE(AreGroupsEqual(expected_group, actual_group));
   }
@@ -1023,7 +1022,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed if-pattern") {
     Clause* expected_cl = new Pattern("ifs", "_", DesignEntity::kIf, true, false);
     std::vector<Clause*> clauses;
     clauses.push_back(expected_cl);
-    Group* expected_group = new Group(clauses, true);
+    auto* expected_group = new Group(clauses, true);
 
     REQUIRE(AreGroupsEqual(expected_group, actual_group));
   }
@@ -1037,7 +1036,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed if-pattern") {
     Clause* expected_cl = new Pattern("ifs", "v", DesignEntity::kIf, true, false);
     std::vector<Clause*> clauses;
     clauses.push_back(expected_cl);
-    Group* expected_group = new Group(clauses, true);
+    auto* expected_group = new Group(clauses, true);
 
     REQUIRE(AreGroupsEqual(expected_group, actual_group));
   }
@@ -1052,7 +1051,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed if-pattern") {
     auto query_extractor = QueryExtractor(& query);
     REQUIRE_THROWS_WITH(query_extractor.ExtractQuery(),
                         Catch::Contains("Unexpected token"));
-  };
+  }
 }
 
 TEST_CASE("3.QueryExtractor.Single well-formed while-pattern") {
@@ -1066,7 +1065,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed while-pattern") {
     Clause* expected_cl = new Pattern("w", "v", DesignEntity::kWhile, true, false);
     std::vector<Clause*> clauses;
     clauses.push_back(expected_cl);
-    Group* expected_group = new Group(clauses, true);
+    auto* expected_group = new Group(clauses, true);
 
     REQUIRE(AreGroupsEqual(expected_group, actual_group));
   }
@@ -1086,7 +1085,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed while-pattern") {
     Clause* expected_cl = new Pattern("_", "_", DesignEntity::kWhile, false, false);
     std::vector<Clause*> clauses;
     clauses.push_back(expected_cl);
-    Group* expected_group = new Group(clauses, true);
+    auto* expected_group = new Group(clauses, true);
 
     REQUIRE(AreGroupsEqual(expected_group, actual_group));
   }
@@ -1100,7 +1099,7 @@ TEST_CASE("3.QueryExtractor.Single well-formed while-pattern") {
     Clause* expected_cl = new Pattern("w", "x", DesignEntity::kWhile, false, false);
     std::vector<Clause*> clauses;
     clauses.push_back(expected_cl);
-    Group* expected_group = new Group(clauses, true);
+    auto* expected_group = new Group(clauses, true);
 
     REQUIRE(AreGroupsEqual(expected_group, actual_group));
   }
@@ -1126,7 +1125,7 @@ TEST_CASE("3.QueryExtractor.Single with clause + lhs prog_line + rhs INTEGER") {
   std::vector<Clause*> clauses;
   clauses.push_back(expected_cl_1);
   clauses.push_back(expected_cl_2);
-  Group* expected_group = new Group(clauses, true);
+  auto* expected_group = new Group(clauses, true);
 
   REQUIRE(AreGroupsEqual(expected_group, actual_group));
 }

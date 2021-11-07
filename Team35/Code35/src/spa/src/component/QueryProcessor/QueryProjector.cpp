@@ -3,7 +3,7 @@
 #include <model/Statement.h>
 #include "QueryProjector.h"
 
-QueryProjector::QueryProjector(std::vector<std::pair<Synonym*, Attribute>> target_syn_attr_list)
+QueryProjector::QueryProjector(const std::vector<std::pair<Synonym*, Attribute>>& target_syn_attr_list)
     : target_syn_attr_list(target_syn_attr_list) {
   for (auto p : target_syn_attr_list) {
     if (syn_to_attrs_map.find(p.first->GetName()) == syn_to_attrs_map.end()) {
@@ -51,7 +51,7 @@ std::vector<std::string> QueryProjector::FormatQuery(UnformattedQueryResult unfo
       auto column = temp_table[i];
       auto attrs = syn_to_attrs_map[t->GetName()];
       for (auto a : attrs) {
-        table_target_syn_list.push_back({t, a});
+        table_target_syn_list.emplace_back(t, a);
         entity_table.push_back(column);
       }
     }
@@ -150,7 +150,7 @@ std::vector<std::string> QueryProjector::FormatMultipleTables(std::vector<std::v
                                                                      crossed_table);
   std::vector<std::string> query_ans = JoinTuples(ordered_table);
   return query_ans;
-};
+}
 
 /**
  * Makes all combinations of the rows of the 2 tables into 1.
@@ -189,7 +189,7 @@ std::vector<std::vector<std::string>> QueryProjector::CrossProductTables(std::ve
  * @param table Table to reorder.
  * @return Reordered table.
  */
-std::vector<std::vector<std::string>> QueryProjector::ReorderTable(std::vector<std::pair<Synonym*, Attribute>> desired_order,
+std::vector<std::vector<std::string>> QueryProjector::ReorderTable(const std::vector<std::pair<Synonym*, Attribute>>& desired_order,
                                                                    std::vector<Synonym*> current_order,
                                                                    std::vector<std::vector<std::string>> table) {
   std::vector<std::vector<std::string>> reordered_table(desired_order.size());
@@ -205,7 +205,7 @@ std::vector<std::vector<std::string>> QueryProjector::ReorderTable(std::vector<s
         if (*current_order[_t] == *syn) {
           current_index = _t;
           break;
-        };
+        }
       }
       assert(current_index != -1);
       reordered_table[i] = table[current_index];

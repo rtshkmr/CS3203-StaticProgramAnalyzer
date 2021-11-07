@@ -10,7 +10,7 @@ TEST_CASE("1.DataType.ConditionalExpression") {
   // if6 (1 == 2) - no variable style
   SECTION("0 variable") {
     IfEntity* if6 = GetIf6();
-    REQUIRE(if6->GetCondExpr()->GetVariableList() == std::vector<Variable*>{ });
+    REQUIRE(if6->GetCondExpr()->GetVariableList().empty());
     REQUIRE_FALSE(if6->GetCondExpr()->CheckExist(var_i_));
     REQUIRE_FALSE(if6->GetCondExpr()->CheckExist(var_x_));
   }

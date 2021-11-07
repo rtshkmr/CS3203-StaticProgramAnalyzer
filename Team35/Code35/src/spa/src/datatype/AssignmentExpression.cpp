@@ -8,7 +8,7 @@
 #include "AssignmentExpression.h"
 
 #define CLOSE_BRACKET 7
-#define OPEN_BRACKET -1
+#define OPEN_BRACKET (-1)
 
 /**
  * This is the constructor for AssignmentExpression.

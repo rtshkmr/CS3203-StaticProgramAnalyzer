@@ -16,9 +16,9 @@ Deliverable* SetUpDeliverable_Week4() {
   /// Using ./tests/basic_source.txt as input
 
   // procedure
-  Deliverable* deliverable = new Deliverable();
-  Procedure* proc = new Procedure(new ProcedureName("Week4"));
-  Program* program = new Program(proc);
+  auto* deliverable = new Deliverable();
+  auto* proc = new Procedure(new ProcedureName("Week4"));
+  auto* program = new Program(proc);
   deliverable->SetProgram(program);
   std::list<Procedure*>* proc_list = deliverable->GetProcList();
   proc_list->push_back(proc);
@@ -27,10 +27,10 @@ Deliverable* SetUpDeliverable_Week4() {
   std::list<Constant*>* const_list = deliverable->GetConstantList();
 
   // read x
-  Variable* var_x = new Variable(new VariableName("x"));
+  auto* var_x = new Variable(new VariableName("x"));
   var_list->push_back(var_x);
 
-  ReadEntity* stmt1 = new ReadEntity(var_x);
+  auto* stmt1 = new ReadEntity(var_x);
   stmt1->SetStatementNumber(new StatementNumber(1));
   proc->AddStatement(stmt1);
   deliverable->AddStatement(stmt1);
@@ -38,7 +38,7 @@ Deliverable* SetUpDeliverable_Week4() {
   deliverable->AddModifiesRelationship(stmt1, stmt1->GetVariableObj());
 
   // print x
-  PrintEntity* stmt2 = new PrintEntity(var_x);
+  auto* stmt2 = new PrintEntity(var_x);
   stmt2->SetStatementNumber(new StatementNumber(2));
   stmt2->SetBeforeNode(stmt1);
   proc->AddStatement(stmt2);
@@ -47,9 +47,9 @@ Deliverable* SetUpDeliverable_Week4() {
   deliverable->AddUsesRelationship(stmt2, stmt2->GetVariableObj());
 
   // y = 1
-  Constant* cv1 = new Constant(new ConstantValue("1"));
+  auto* cv1 = new Constant(new ConstantValue("1"));
   const_list->push_back(cv1);
-  Variable* var_y = new Variable(new VariableName("y"));
+  auto* var_y = new Variable(new VariableName("y"));
   var_list->push_back(var_y);
 
   std::string stmt3_s = "1";
@@ -57,7 +57,7 @@ Deliverable* SetUpDeliverable_Week4() {
   std::vector<Constant*> stmt3_cv_expr;
   stmt3_cv_expr.push_back(cv1);
 
-  AssignEntity* stmt3 = new AssignEntity(var_y, stmt3_s, stmt3_var_expr, stmt3_cv_expr);
+  auto* stmt3 = new AssignEntity(var_y, stmt3_s, stmt3_var_expr, stmt3_cv_expr);
   stmt3->SetStatementNumber(new StatementNumber(3));
   stmt3->SetBeforeNode(stmt2);
   proc->AddStatement(stmt3);
@@ -70,9 +70,9 @@ Deliverable* SetUpDeliverable_Week4() {
   }
 
   // z = 3
-  Constant* cv2 = new Constant(new ConstantValue("3"));
+  auto* cv2 = new Constant(new ConstantValue("3"));
   const_list->push_back(cv2);
-  Variable* var_z = new Variable(new VariableName("z"));
+  auto* var_z = new Variable(new VariableName("z"));
   var_list->push_back(var_z);
 
   std::string stmt4_s = "3";
@@ -80,7 +80,7 @@ Deliverable* SetUpDeliverable_Week4() {
   std::vector<Constant*> stmt4_cv_expr;
   stmt3_cv_expr.push_back(cv2);
 
-  AssignEntity* stmt4 = new AssignEntity(var_z, stmt4_s, stmt4_var_expr, stmt4_cv_expr);
+  auto* stmt4 = new AssignEntity(var_z, stmt4_s, stmt4_var_expr, stmt4_cv_expr);
   stmt4->SetStatementNumber(new StatementNumber(4));
   stmt4->SetBeforeNode(stmt3);
   proc->AddStatement(stmt4);
@@ -93,7 +93,7 @@ Deliverable* SetUpDeliverable_Week4() {
   }
 
   // z = x + y + 3;
-  Constant* cv3 = new Constant(new ConstantValue("3")); //note that Constant is not unique.
+  auto* cv3 = new Constant(new ConstantValue("3")); //note that Constant is not unique.
   const_list->push_back(cv3);
 
   std::string stmt5_s = "x + y + 3";
@@ -103,7 +103,7 @@ Deliverable* SetUpDeliverable_Week4() {
   std::vector<Constant*> stmt5_cv_expr;
   stmt3_cv_expr.push_back(cv2);
 
-  AssignEntity* stmt5 = new AssignEntity(var_z, stmt5_s, stmt5_var_expr, stmt5_cv_expr);
+  auto* stmt5 = new AssignEntity(var_z, stmt5_s, stmt5_var_expr, stmt5_cv_expr);
   stmt5->SetStatementNumber(new StatementNumber(5));
   stmt5->SetBeforeNode(stmt4);
   proc->AddStatement(stmt5);
@@ -136,64 +136,64 @@ Deliverable* SetUpDeliverable_Week4() {
  */
 Deliverable* SetUpDeliverable_Transitive() {
   // Create Deliverable object
-  Deliverable* deliverable = new Deliverable();
+  auto* deliverable = new Deliverable();
 
   // Create entities
 
   // procedure
-  Procedure* Transitive = new Procedure(new ProcedureName("Transitive"));
+  auto* Transitive = new Procedure(new ProcedureName("Transitive"));
 
   // variables
-  Variable* var_y = new Variable(new VariableName("y"));
-  Variable* var_q = new Variable(new VariableName("q"));
-  Variable* var_z = new Variable(new VariableName("z"));
-  Variable* var_x = new Variable(new VariableName("x"));
-  Variable* var_p = new Variable(new VariableName("p"));
+  auto* var_y = new Variable(new VariableName("y"));
+  auto* var_q = new Variable(new VariableName("q"));
+  auto* var_z = new Variable(new VariableName("z"));
+  auto* var_x = new Variable(new VariableName("x"));
+  auto* var_p = new Variable(new VariableName("p"));
 
   // constants
-  Constant* cv_2 = new Constant(new ConstantValue("2"));
-  Constant* cv_1 = new Constant(new ConstantValue("1"));
-  Constant* cv_24 = new Constant(new ConstantValue("24"));
-  Constant* cv_0 = new Constant(new ConstantValue("0"));
-  Constant* cv_5 = new Constant(new ConstantValue("5"));
+  auto* cv_2 = new Constant(new ConstantValue("2"));
+  auto* cv_1 = new Constant(new ConstantValue("1"));
+  auto* cv_24 = new Constant(new ConstantValue("24"));
+  auto* cv_0 = new Constant(new ConstantValue("0"));
+  auto* cv_5 = new Constant(new ConstantValue("5"));
 
   // assign
   // 1
   std::vector<Variable*> var_list_1 ({var_z});
   std::vector<Constant*> cv_list_1 ({cv_2});
-  AssignEntity* stmt1 = new AssignEntity(var_y, "y=2*z", var_list_1, cv_list_1);
+  auto* stmt1 = new AssignEntity(var_y, "y=2*z", var_list_1, cv_list_1);
 
   // 3
   std::vector<Variable*> var_list_3 ({var_x});
   std::vector<Constant*> cv_list_3 ({cv_24});
-  AssignEntity* stmt3 = new AssignEntity(var_z, "z=x*24", var_list_3, cv_list_3);
+  auto* stmt3 = new AssignEntity(var_z, "z=x*24", var_list_3, cv_list_3);
 
   // 5
   std::vector<Variable*> var_list_5 ({var_x, var_q});
   std::vector<Constant*> cv_list_5 ({cv_5});
-  AssignEntity* stmt5 = new AssignEntity(var_y, "y=x*q-5", var_list_5, cv_list_5);
+  auto* stmt5 = new AssignEntity(var_y, "y=x*q-5", var_list_5, cv_list_5);
 
   // 6
   std::vector<Variable*> var_list_6 ({var_x, var_y, var_z, var_p, var_q});
   std::vector<Constant*> cv_list_6 ({});
-  AssignEntity* stmt6 = new AssignEntity(var_y, "y=x+y*z+p*q", var_list_6, cv_list_6);
+  auto* stmt6 = new AssignEntity(var_y, "y=x+y*z+p*q", var_list_6, cv_list_6);
 
   // while
   // 4
   std::vector<Variable*> var_list_4 ({var_z});
   std::vector<Constant*> cv_list_4 ({cv_0});
-  WhileEntity* stmt4 = new WhileEntity("z<0", var_list_4, cv_list_4);
+  auto* stmt4 = new WhileEntity("z<0", var_list_4, cv_list_4);
   stmt4->AddStatement(stmt5);
 
   // if
   // else
-  ElseEntity* stmt2_else = new ElseEntity();
+  auto* stmt2_else = new ElseEntity();
   stmt2_else->AddStatement(stmt4);
   stmt2_else->AddStatement(stmt6);
 
   std::vector<Variable*> var_list_2 ({var_q});
   std::vector<Constant*> cv_list_2 ({cv_1});
-  IfEntity* stmt2 = new IfEntity("q!=1", var_list_2, cv_list_2);
+  auto* stmt2 = new IfEntity("q!=1", var_list_2, cv_list_2);
   stmt2->AddStatement(stmt3);
   stmt2->SetElseEntity(stmt2_else);
 
@@ -202,7 +202,7 @@ Deliverable* SetUpDeliverable_Transitive() {
   Transitive->AddStatement(stmt1);
   Transitive->AddStatement(stmt2);
 
-  Program* program = new Program(Transitive);
+  auto* program = new Program(Transitive);
   deliverable->SetProgram(program);
 
   // Add entities to Deliverable

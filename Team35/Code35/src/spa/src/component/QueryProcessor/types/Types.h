@@ -380,7 +380,7 @@ class Group {
   void AddSynToTargetSyns(Synonym* s);
   void AddClauseToVector(Clause* clause);
   std::vector<Clause*> GetClauses();
-  bool ContainsTargetSynonym();
+  bool ContainsTargetSynonym() const;
   std::vector<Synonym*> GetTargetSynonyms();
   void UpdateHasTargetSynonymAttr();
   int GetGroupSize();

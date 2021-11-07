@@ -167,7 +167,6 @@ void QueryParser::ParseTarget() {
     // parse boolean but only if there is no declared syn called 'BOOLEAN'
     if (synonyms_name_set.find(lookahead.GetTokenString()) == synonyms_name_set.end()) {
       Eat(TokenTag::kName);
-      was_query_boolean = true;
       return;
     }
   }
