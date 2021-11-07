@@ -4,12 +4,12 @@ sequenceDiagram
     participant QueryParser
     participant QueryTokenizer
     participant QuerySemanticValidator
-    participant QueryGrouper
+    participant QueryOptimizer
 
     %% This sd is for per query (PQL statement) basis.
     QueryExtractor->>QueryTokenizer: init()
     QueryTokenizer-->>QueryExtractor: QueryTokenizer tokenizer
-    QueryExtractor->>QueryParser: init(vector<Clause*> clauses, list<Synonym*> synonyms, <br>vector<Synonym*> target_synonyms, tokenizer)
+    QueryExtractor->>QueryParser: init(vector<Clause*> clauses, <br>VECTOR_OF_PAIRS<Synonym*, Attribute> target_syn_attributes, <br>map<string, Synonym*> target_synonyms, tokenizer)
     QueryParser-->>QueryExtractor: QueryParser parser
     QueryExtractor->>QueryParser: parser.Parse()
     Note right of QueryParser: Calls multiple handlers according to <br> grammar rules (recursive descent)
@@ -29,7 +29,8 @@ sequenceDiagram
         end
     end
     QueryParser-->>QueryExtractor:
-        QueryExtractor->>QueryExtractor: PopulateSynAdjacencyList(<br>Map<string, vector<int>* adj_list, <br>vector<Clause*> clauses)
-    Note right of QueryExtractor: Populates data structure for QueryGrouper
-    QueryExtractor->>QueryGrouper: GroupClauses(clauses, groups, target_synonyms, adj_list)
-    QueryGrouper-->>QueryExtractor:
+    QueryExtractor-->>QueryOptimizer: init(clauses, vector<Group*> groups, target_syn_attributes, target_synonyms)
+    QueryOptimizer-->>QueryExtractor: QueryOptimizer optimizer
+    QueryExtractor-->>QueryOptimizer: optimizer.optimize()
+    Note right of QueryExtractor: Applies performance optimizations on query objects <br> (refer to SD for Optimizer)
+    QueryOptimizer-->>QueryExtractor:
