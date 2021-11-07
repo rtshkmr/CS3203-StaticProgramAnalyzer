@@ -233,7 +233,7 @@ IntermediateTable *
 PKBQueryReceiver::QueryAttributeMatch(type_attribute_pair first_attr_pair, type_attribute_pair second_attr_pair) {
   auto *table = new IntermediateTable();
   std::vector<std::tuple<Entity*, Entity*>> result = db_manager->
-          GetEntitiesWithMatchingAttributes(std::move(first_attr_pair), second_attr_pair);
+          GetEntitiesWithMatchingAttributes(std::move(first_attr_pair), std::move(second_attr_pair));
   table->InsertData(result);
   return table;
 }

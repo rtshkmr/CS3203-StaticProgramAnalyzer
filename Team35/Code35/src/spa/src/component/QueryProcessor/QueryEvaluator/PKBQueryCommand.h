@@ -17,7 +17,7 @@ class PKBQueryReceiver {
 
   void PopulateAssignDoubleSynonym(IntermediateTable* table);
   void PopulatePatternDoubleSynonym(IntermediateTable* table, DesignEntity design_entity);
-  ScopeIndication GetDoubleSynonymScoping(const std::vector<Entity*>& first_entity_list,
+  static ScopeIndication GetDoubleSynonymScoping(const std::vector<Entity*>& first_entity_list,
                                           const std::vector<Entity*>& second_entity_list);
  public:
   PKBQueryReceiver(DBManager* db_manager);

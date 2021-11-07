@@ -2,12 +2,10 @@
  * This body file contains the different function implementation used for datatype.
  */
 
-#include <string>
 #include <stdexcept>
 #include "DataType.h"
 #include <util/RegexPatterns.h>
 #include <cassert>
-#include <exception/SpaException.h>
 #include "../util/Utility.h"
 
 /**
@@ -76,7 +74,7 @@ LineNumber::LineNumber(int ln) {
  * Gets the line number.
  * @return [Not Null] The line number
  */
-int LineNumber::GetNum() {
+int LineNumber::GetNum() const {
   return num_;
 }
 
@@ -106,7 +104,7 @@ bool LineNumber::operator==(LineNumber other) const {
  * @param pName [NOT NULL] The procedure name (in string) as extracted from SIMPLE program
  * @throws invalid_argument when an invalid procedure name is passed in.
  */
-ProcedureName::ProcedureName(std::string pName) {
+ProcedureName::ProcedureName(const std::string& pName) {
   if (ValidateName(pName)) {
     name_ = pName;
   } else {
@@ -139,7 +137,7 @@ bool ProcedureName::operator<(const ProcedureName& other) const {
  * @param other The ProcedureName object to compare to
  * @return true if this.name_ is equal to other.name_
  */
-bool ProcedureName::operator==(ProcedureName other) const {
+bool ProcedureName::operator==(const ProcedureName& other) const {
   return this->name_ == other.name_;
 }
 
@@ -149,7 +147,7 @@ bool ProcedureName::operator==(ProcedureName other) const {
  * @param vName [NOT NULL] The variable name (in string) as extracted from SIMPLE program
  * @throws invalid_argument when an invalid variable name is passed in.
  */
-VariableName::VariableName(std::string vName) {
+VariableName::VariableName(const std::string& vName) {
   if (ValidateName(vName)) {
     name_ = vName;
   } else {
@@ -200,7 +198,7 @@ ConstantValue::ConstantValue(const std::string& constant) {
  * Gets the constant value.
  * @return [Not Null] The constant value
  */
-int ConstantValue::GetValue() {
+int ConstantValue::GetValue() const {
   return value_;
 }
 
@@ -343,7 +341,7 @@ TokenTag Token::TagStringWithToken(const std::string& reference) {
  * @return
  */
 int Token::CountTokens(std::vector<Token> tokens, TokenTag target_tag) {
-  int count = std::count_if(tokens.begin(), tokens.end(), [&target_tag](Token t) {
+  int count = std::count_if(tokens.begin(), tokens.end(), [&target_tag](const Token& t) {
     return t.GetTokenTag() == target_tag;
   });
   return count;
@@ -357,7 +355,7 @@ int Token::CountTokens(std::vector<Token> tokens, TokenTag target_tag) {
  * @return
  */
 int Token::CountTokens(std::vector<Token> tokens, TokenTag target_tag, std::string target_string) {
-  int count = std::count_if(tokens.begin(), tokens.end(), [&target_tag, &target_string](Token t) {
+  int count = std::count_if(tokens.begin(), tokens.end(), [&target_tag, &target_string](const Token& t) {
     return t.GetTokenTag() == target_tag
         && t.GetTokenString() == target_string;
   });

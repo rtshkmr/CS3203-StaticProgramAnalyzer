@@ -26,7 +26,7 @@ TEST_CASE("1.PSubsystem.Basic Single Line Creation") {
     REQUIRE(* (* deliverable->GetVariableList()->front()).GetVariableName() == vname);
 
     REQUIRE(deliverable->GetConstantList()->size() == 1);
-    ConstantValue* constant_list_front = const_cast<ConstantValue*>(deliverable->GetConstantList()->front()->GetValue());
+    auto* constant_list_front = const_cast<ConstantValue*>(deliverable->GetConstantList()->front()->GetValue());
     REQUIRE(constant_list_front->GetValue() == 100);
 
     //ensure StmtList and AssignList holds the same object

@@ -48,7 +48,7 @@ class Cluster {
   void AddStmt(StatementNumber statement_number);
   void RemoveStmt(StatementNumber statement_number);
   bool CheckIfStatementInRange(StatementNumber sn) const;
-  bool CheckIfStmtNumInRange(int num);
+  bool CheckIfStmtNumInRange(int num) const;
   bool CheckIfStatementsInRange(int first_stmt, int second_stmt) const;
   Cluster* GetParentCluster();
   std::list<Cluster*> GetNestedClusters() const;
@@ -82,7 +82,7 @@ class Block : public Cluster {
 
  public:
   Block() = default;;
-  ~Block();
+  ~Block() override;
   static Block* GetNewExitBlock();
   static bool IsExitBlock(Block* block);
   static void PatchEmptyBlocks(Block* redundant, Block* to);

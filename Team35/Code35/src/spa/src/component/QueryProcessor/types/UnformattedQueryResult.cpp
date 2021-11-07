@@ -6,7 +6,7 @@ void UnformattedQueryResult::SetBooleanResult(bool result) {
   passed_all_boolean_group = result;
 }
 
-bool UnformattedQueryResult::GetBooleanResult() {
+bool UnformattedQueryResult::GetBooleanResult() const {
   return passed_all_boolean_group;
 }
 

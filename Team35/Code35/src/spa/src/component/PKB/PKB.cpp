@@ -1,8 +1,6 @@
 #include <exception/SpaException.h>
 #include "PKB.h"
-#include <stdio.h>
 #include <iostream>
-#include <util/Logger.h>
 #include <util/Utility.h>
 
 constexpr auto L = [](auto msg) {
@@ -93,20 +91,20 @@ void PKB::PopulateEntities(DesignEntity design_entity, T& entity_list) {
 
       std::vector<Variable*> pattern_variables;
 
-      Entity* casted_entity = reinterpret_cast<Entity*>(entity);
+      auto* casted_entity = reinterpret_cast<Entity*>(entity);
       EntityEnum entity_enum = casted_entity->GetEntityEnum();
 
       switch (entity_enum) {
         case EntityEnum::kWhileEntity: {
-          WhileEntity* while_entity = reinterpret_cast<WhileEntity*>(entity);
+          auto* while_entity = reinterpret_cast<WhileEntity*>(entity);
           pattern_variables = while_entity->GetControlVariables();
         } break;
         case EntityEnum::kIfEntity: {
-          IfEntity* if_entity = reinterpret_cast<IfEntity*>(entity);
+          auto* if_entity = reinterpret_cast<IfEntity*>(entity);
           pattern_variables = if_entity->GetControlVariables();
         } break;
         case EntityEnum::kAssignEntity: {
-          AssignEntity* assign_entity = reinterpret_cast<AssignEntity*>(entity);
+          auto* assign_entity = reinterpret_cast<AssignEntity*>(entity);
           pattern_variables.push_back(assign_entity->GetVariableObj());
         } break;
         default: {
@@ -126,15 +124,15 @@ std::unordered_map<std::string, std::vector<Entity*>> PKB::GetRelationshipMap(PK
   return relationship_table_[ref];
 }
 
-std::vector<Entity*> PKB::GetRelationship(PKBRelRefs ref, std::string entity) {
+std::vector<Entity*> PKB::GetRelationship(PKBRelRefs ref, const std::string& entity) {
   return relationship_table_[ref][entity];
 }
 
-std::vector<entity_pair> PKB::GetRelationshipByFirst(PKBRelRefs ref, std::string entity, type_combo t_c) {
+std::vector<entity_pair> PKB::GetRelationshipByFirst(PKBRelRefs ref, const std::string& entity, const type_combo& t_c) {
   return relationship_by_first_entity_table_[ref][entity][t_c];
 }
 
-std::vector<entity_pair> PKB::GetRelationshipBySecond(PKBRelRefs ref, std::string entity, type_combo t_c) {
+std::vector<entity_pair> PKB::GetRelationshipBySecond(PKBRelRefs ref, const std::string& entity, const type_combo& t_c) {
   return relationship_by_second_entity_table_[ref][entity][t_c];
 }
 
@@ -173,11 +171,11 @@ std::vector<Entity*> PKB::GetDesignEntities(DesignEntity de) {
   return type_to_entity_map_[de];
 }
 
-std::vector<Entity*> PKB::GetPatternEntities(DesignEntity de, std::string var_or_stmt) {
+std::vector<Entity*> PKB::GetPatternEntities(DesignEntity de, const std::string& var_or_stmt) {
   return pattern_maps_[de][var_or_stmt];
 }
 
-std::vector<Entity*> PKB::GetEntitiesWithAttributeValue(DesignEntity design_entity, Attribute attribute, std::string value) {
+std::vector<Entity*> PKB::GetEntitiesWithAttributeValue(DesignEntity design_entity, Attribute attribute, const std::string& value) {
   return attribute_to_entity_map_[{design_entity, attribute}][value];
 }
 
@@ -201,7 +199,7 @@ bool PKB::HasRelationship(PKBRelRefs ref, const std::string& e) {
   return !relationship_table_[ref][e].empty();
 }
 
-bool PKB::HasRelationship(PKBRelRefs ref, std::string e1, const std::string& e2) {
+bool PKB::HasRelationship(PKBRelRefs ref, const std::string& e1, const std::string& e2) {
   return relationship_set_.find({ref, e1, e2}) != relationship_set_.end();
 }
 

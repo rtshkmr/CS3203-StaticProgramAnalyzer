@@ -1,19 +1,18 @@
 #include <datatype/DataType.h>
 #include <model/Entity.h>
-#include <model/Statement.h>
 #include "component/SourceProcessor/PSubsystem.h"
 #include "catch.hpp"
 
-void MatchRequiredWithAnswer(std::vector<std::tuple<std::string, std::vector<std::vector<int>>>> required_list,
+void MatchRequiredWithAnswer(const std::vector<std::tuple<std::string, std::vector<std::vector<int>>>>& required_list,
                              std::list<Variable*> var_list) {
   for (auto tup : required_list) {
     std::string var = std::get<0>(tup);
     std::vector<std::vector<int>> table = std::get<1>(tup);
 
-    for (auto i = var_list.begin(); i != var_list.end(); ++i) {
-      VariableName v_name = * (* i)->GetVariableName();
+    for (auto & i : var_list) {
+      VariableName v_name = * i->GetVariableName();
       if (v_name.GetName() == var) {
-        std::vector<std::set<Statement*>> var_stmt_table = (*i)->GetStatementTable();
+        std::vector<std::set<Statement*>> var_stmt_table = i->GetStatementTable();
 
         for (int j = 0; j < table.size(); j++) {
           std::vector<int> row = table.at(j);

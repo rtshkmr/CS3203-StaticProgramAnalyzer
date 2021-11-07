@@ -1,7 +1,6 @@
 #include "catch.hpp"
 #include "component/QueryProcessor/QueryExtractor/QueryExtractor.h"
 #include "component/QueryProcessor/QueryExtractor/QueryOptimizer.h"
-#include "component/QueryProcessor/types/Types.h"
 #include <sstream>
 
 std::string GetMemoryAddress(Group* g) {
@@ -55,8 +54,8 @@ TEST_CASE("3.QueryOptimizer.Some boolean and some non-boolean groups; boolean gr
   REQUIRE(groups.size() == 4);
   // QueryOptimizer should ensure that boolean groups come before non-boolean groups.
   int bool_count = 0;
-  for (int i = 0; i < groups.size(); i++) {
-    if (!groups[i]->ContainsTargetSynonym()) {
+  for (auto & group : groups) {
+    if (!group->ContainsTargetSynonym()) {
       bool_count++;
       continue;
     }

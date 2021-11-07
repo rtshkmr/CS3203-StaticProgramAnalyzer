@@ -386,8 +386,7 @@ bool SyntaxValidator::StatementPassesCommonBlacklistRules(const vector<Token>& s
   }
   bool brackets_are_balanced = true;
   int stack_indicator = 0;
-  for (int i = 0; i < statement_tokens.size(); i++) {
-    Token current_token = statement_tokens.at(i);
+  for (const auto& current_token : statement_tokens) {
     TokenTag current_tag = current_token.GetTokenTag();
     if (current_tag == TokenTag::kOpenBracket) {
       stack_indicator++;

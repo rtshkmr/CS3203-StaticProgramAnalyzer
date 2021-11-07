@@ -390,7 +390,6 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
 
     string post_sub_line = " while (a>=(1*(1/(10)))) ";
     vector<Token> post_tokens = Tokenizer::CreateTokens(post_sub_line);
-    int x = 1;
 
 //    [0] = {Token} {token_string_="while", token_tag_=kName}
 //    [1] = {Token} {token_string_="(", token_tag_=kOpenBracket}
@@ -432,7 +431,6 @@ TEST_CASE("1.SyntaxValidator.Test helper functions") {
 //    [15] = {Token} {token_string_=")", token_tag_=kCloseBracket}
     bool check_true_2 = SyntaxValidator::IsCondExpr(post_tokens_2, 2, 14);
     REQUIRE(check_true_2);
-    int y  = 1;
   }
   SECTION("Check StatementPassesCommonBlacklistRules function") {
 

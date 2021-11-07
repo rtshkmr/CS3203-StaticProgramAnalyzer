@@ -1,4 +1,6 @@
 #include "DBManager.h"
+
+#include <utility>
 #include "util/Utility.h"
 
 DBManager::DBManager(PKB* pkb) {
@@ -21,7 +23,7 @@ void DBManager::TurnOffOptimization() {
  * @param entity String form of entity to query
  * @return Entities that are on the RHS of the relationship with this entity.
  */
-std::vector<Entity*> DBManager::GetRelationship(PKBRelRefs ref, std::string entity) {
+std::vector<Entity*> DBManager::GetRelationship(PKBRelRefs ref, const std::string& entity) {
   if (RuntimeExtractor::IsRuntimeRelationship(ref)) {
     return runtime_extractor_->GetRelationship(ref, entity);
   } else {
@@ -155,7 +157,7 @@ bool DBManager::HasRelationship(PKBRelRefs ref, DesignEntity first, DesignEntity
  * @return true if any relationship with the specified types exists.
  * @throws SyntaxException - when it is not an integer or outside of 2^32-1
  */
-bool DBManager::HasRelationship(PKBRelRefs ref, std::string entity) {
+bool DBManager::HasRelationship(PKBRelRefs ref, const std::string& entity) {
   if (RuntimeExtractor::IsRuntimeRelationship(ref)) {
     return runtime_extractor_->HasRelationship(ref, entity);
   } else {
@@ -171,7 +173,7 @@ bool DBManager::HasRelationship(PKBRelRefs ref, std::string entity) {
  * @return true if relationship between the prog_line / assignment exists.
  * @throws SyntaxException - when it is not an integer or outside of 2^32-1
  */
-bool DBManager::HasRelationship(PKBRelRefs ref, std::string first, std::string second) {
+bool DBManager::HasRelationship(PKBRelRefs ref, const std::string& first, const std::string& second) {
   if (RuntimeExtractor::IsRuntimeRelationship(ref)) {
     return runtime_extractor_->HasRelationship(ref, first, second);
   } else {
@@ -184,11 +186,7 @@ std::vector<Entity*> DBManager::GetDesignEntities(DesignEntity de) {
 }
 
 std::vector<Entity*> DBManager::GetPatternEntities(DesignEntity de, std::string var_or_stmt) {
-  return pkb_->GetPatternEntities(de, var_or_stmt);
-}
-
-DesignEntity DBManager::GetDesignEntityFromEntity(Entity* entity) {
-  return pkb_->GetDesignEntityFromEntity(entity);
+  return pkb_->GetPatternEntities(de, std::move(var_or_stmt));
 }
 
 std::string DBManager::GetNameFromEntity(Entity* entity) {
@@ -198,10 +196,10 @@ std::string DBManager::GetNameFromEntity(Entity* entity) {
 std::vector<Entity*> DBManager::GetEntitiesWithAttributeValue(DesignEntity design_entity,
                                                               Attribute attribute,
                                                               std::string value) {
-  return pkb_->GetEntitiesWithAttributeValue(design_entity, attribute, value);
+  return pkb_->GetEntitiesWithAttributeValue(design_entity, attribute, std::move(value));
 }
 
 std::vector<entity_pair> DBManager::GetEntitiesWithMatchingAttributes(type_attribute_pair type_one,
                                                                       type_attribute_pair type_two) {
-  return pkb_->GetEntitiesWithMatchingAttributes(type_one, type_two);
+  return pkb_->GetEntitiesWithMatchingAttributes(std::move(type_one), std::move(type_two));
 }

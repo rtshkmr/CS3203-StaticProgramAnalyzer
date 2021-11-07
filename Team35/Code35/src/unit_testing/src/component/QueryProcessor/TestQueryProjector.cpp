@@ -55,9 +55,9 @@ TEST_CASE("3.QueryProjector.Stringify tables") {
   }
 
   SECTION("mixed things") {
-    Procedure* proc1 = new Procedure(new ProcedureName("proc1"));
-    Procedure* proc2 = new Procedure(new ProcedureName("proc2"));
-    Procedure* proc3 = new Procedure(new ProcedureName("proc3"));
+    auto* proc1 = new Procedure(new ProcedureName("proc1"));
+    auto* proc2 = new Procedure(new ProcedureName("proc2"));
+    auto* proc3 = new Procedure(new ProcedureName("proc3"));
     Variable* vx = entity_utils::var_x_;
     Variable* vz = entity_utils::var_z_;
     Variable* vi = entity_utils::var_i_;
@@ -222,8 +222,8 @@ TEST_CASE("3.QueryProjector.Join tuples of tables") {
 TEST_CASE("3.QueryProjector.1 target synonym") {
   SECTION("empty list") {
     std::vector<Entity*> col1 = std::vector<Entity*>{};
-    Synonym* target_syn1 = new Synonym("a", DesignEntity::kAssign);
-    QueryEvaluatorTable* table1 = new QueryEvaluatorTable(target_syn1);
+    auto* target_syn1 = new Synonym("a", DesignEntity::kAssign);
+    auto* table1 = new QueryEvaluatorTable(target_syn1);
     table1->AddTargetSynonymValues(target_syn1, col1);
     UnformattedQueryResult uqr = UnformattedQueryResult(true);
     uqr.AddTable(table1);
@@ -268,14 +268,14 @@ TEST_CASE("3.QueryProjector.1 target synonym") {
         a7, a8, a9
     };
 
-    Synonym* syn1 = new Synonym("a", DesignEntity::kAssign);
-    QueryEvaluatorTable* table1 = new QueryEvaluatorTable(syn1);
+    auto* syn1 = new Synonym("a", DesignEntity::kAssign);
+    auto* table1 = new QueryEvaluatorTable(syn1);
     AddColumn(table1, syn1, col1);
-    Synonym* syn2 = new Synonym("b", DesignEntity::kVariable);
-    QueryEvaluatorTable* table2 = new QueryEvaluatorTable(syn2);
+    auto* syn2 = new Synonym("b", DesignEntity::kVariable);
+    auto* table2 = new QueryEvaluatorTable(syn2);
     AddColumn(table2, syn2, col2);
-    Synonym* syn3 = new Synonym("c", DesignEntity::kAssign);
-    QueryEvaluatorTable* table3 = new QueryEvaluatorTable(syn3);
+    auto* syn3 = new Synonym("c", DesignEntity::kAssign);
+    auto* table3 = new QueryEvaluatorTable(syn3);
     AddColumn(table3, syn3, col3);
 
     UnformattedQueryResult uqr = UnformattedQueryResult(true);
@@ -296,7 +296,7 @@ TEST_CASE("3.QueryProjector.1 target synonym") {
 TEST_CASE("3.QueryProjector.no target synonym") {
   SECTION("boolean false") {
     UnformattedQueryResult uqr = UnformattedQueryResult(false);
-    Synonym* target_syn1 = new Synonym("a", DesignEntity::kIf);
+    auto* target_syn1 = new Synonym("a", DesignEntity::kIf);
     auto target_syn_attrs = std::vector<std::pair<Synonym*, Attribute>>{
       std::make_pair(target_syn1, Attribute::kStmtNumber)
     };
@@ -358,10 +358,10 @@ TEST_CASE("3.QueryProjector.multiple target synonym") {
         i4, i5, i6
     };
 
-    Synonym* syn1 = new Synonym("a", DesignEntity::kAssign);
-    Synonym* syn2 = new Synonym("b", DesignEntity::kVariable);
-    Synonym* syn3 = new Synonym("c", DesignEntity::kIf);
-    QueryEvaluatorTable* table1 = new QueryEvaluatorTable(std::vector<Synonym*>{syn2, syn3});
+    auto* syn1 = new Synonym("a", DesignEntity::kAssign);
+    auto* syn2 = new Synonym("b", DesignEntity::kVariable);
+    auto* syn3 = new Synonym("c", DesignEntity::kIf);
+    auto* table1 = new QueryEvaluatorTable(std::vector<Synonym*>{syn2, syn3});
     AddColumn(table1, syn1, col1);
     AddColumn(table1, syn2, col2);
     AddColumn(table1, syn3, col3);
@@ -419,18 +419,18 @@ TEST_CASE("3.QueryProjector.multiple target synonym") {
         a7, a8, a9
     };
 
-    Synonym* syn1 = new Synonym("a", DesignEntity::kAssign);
-    Synonym* syn2 = new Synonym("b", DesignEntity::kVariable);
-    QueryEvaluatorTable* table1 = new QueryEvaluatorTable(std::vector<Synonym*>{syn2});
+    auto* syn1 = new Synonym("a", DesignEntity::kAssign);
+    auto* syn2 = new Synonym("b", DesignEntity::kVariable);
+    auto* table1 = new QueryEvaluatorTable(std::vector<Synonym*>{syn2});
     AddColumn(table1, syn1, col1);
     AddColumn(table1, syn2, col2);
 
-    Synonym* syn3 = new Synonym("c", DesignEntity::kIf);
-    QueryEvaluatorTable* table2 = new QueryEvaluatorTable(syn3);
+    auto* syn3 = new Synonym("c", DesignEntity::kIf);
+    auto* table2 = new QueryEvaluatorTable(syn3);
     AddColumn(table2, syn3, col3);
 
-    Synonym* syn4 = new Synonym("d", DesignEntity::kAssign);
-    QueryEvaluatorTable* table3 = new QueryEvaluatorTable(syn4);
+    auto* syn4 = new Synonym("d", DesignEntity::kAssign);
+    auto* table3 = new QueryEvaluatorTable(syn4);
     AddColumn(table3, syn4, col4);
 
     UnformattedQueryResult uqr = UnformattedQueryResult(true);
@@ -492,15 +492,15 @@ TEST_CASE("3.QueryProjector.multiple target synonym") {
         a7, a8, a9
     };
 
-    Synonym* syn1 = new Synonym("a", DesignEntity::kAssign);
-    Synonym* syn2 = new Synonym("b", DesignEntity::kVariable);
-    Synonym* syn3 = new Synonym("c", DesignEntity::kIf);
-    QueryEvaluatorTable* table1 = new QueryEvaluatorTable(std::vector<Synonym*>{syn3});
+    auto* syn1 = new Synonym("a", DesignEntity::kAssign);
+    auto* syn2 = new Synonym("b", DesignEntity::kVariable);
+    auto* syn3 = new Synonym("c", DesignEntity::kIf);
+    auto* table1 = new QueryEvaluatorTable(std::vector<Synonym*>{syn3});
     AddColumn(table1, syn1, col1);
     AddColumn(table1, syn2, col2);
     AddColumn(table1, syn3, col3);
-    Synonym* syn4 = new Synonym("d", DesignEntity::kAssign);
-    QueryEvaluatorTable* table2 = new QueryEvaluatorTable(syn4);
+    auto* syn4 = new Synonym("d", DesignEntity::kAssign);
+    auto* table2 = new QueryEvaluatorTable(syn4);
     AddColumn(table2, syn4, col4);
 
     UnformattedQueryResult uqr = UnformattedQueryResult(true);
@@ -559,15 +559,15 @@ TEST_CASE("3.QueryProjector.multiple target synonym") {
       a7, a8, a9
     };
 
-    Synonym* syn1 = new Synonym("a", DesignEntity::kAssign);
-    Synonym* syn2 = new Synonym("b", DesignEntity::kVariable);
-    Synonym* syn3 = new Synonym("c", DesignEntity::kIf);
-    QueryEvaluatorTable* table1 = new QueryEvaluatorTable(std::vector<Synonym*>{syn3});
+    auto* syn1 = new Synonym("a", DesignEntity::kAssign);
+    auto* syn2 = new Synonym("b", DesignEntity::kVariable);
+    auto* syn3 = new Synonym("c", DesignEntity::kIf);
+    auto* table1 = new QueryEvaluatorTable(std::vector<Synonym*>{syn3});
     AddColumn(table1, syn1, col1);
     AddColumn(table1, syn2, col2);
     AddColumn(table1, syn3, col3);
-    Synonym* syn4 = new Synonym("d", DesignEntity::kAssign);
-    QueryEvaluatorTable* table2 = new QueryEvaluatorTable(syn4);
+    auto* syn4 = new Synonym("d", DesignEntity::kAssign);
+    auto* table2 = new QueryEvaluatorTable(syn4);
     AddColumn(table2, syn4, col4);
 
     UnformattedQueryResult uqr = UnformattedQueryResult(true);

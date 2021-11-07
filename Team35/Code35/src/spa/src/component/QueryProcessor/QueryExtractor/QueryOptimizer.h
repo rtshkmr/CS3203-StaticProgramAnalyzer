@@ -12,7 +12,7 @@ struct WeightedClause {
   int weight = 0;
   int subgroup_penalty = 0;
   WeightedClause(Clause* cl) { clause = cl; };
-  int GetWeight() { return weight + subgroup_penalty; };
+  int GetWeight() const { return weight + subgroup_penalty; };
   void UpdateClauseWeight(int w) { weight = w; };
 };
 
@@ -50,8 +50,8 @@ class QueryOptimizer {
     void ReorderClausesWithinWeightedGroups();
     void UpdateClauseWeights();
     void UpdateClauseWeight(WeightedClause* cl);
-    int GetTypePenalty(Clause* cl);
-    int GetNumberOfSynonymsPenalty(Clause* cl);
+    static int GetTypePenalty(Clause* cl);
+    static int GetNumberOfSynonymsPenalty(Clause* cl);
     void PopulateGroupsList();
     void FreeWeightedLists();
   public:

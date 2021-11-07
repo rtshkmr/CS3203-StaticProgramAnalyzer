@@ -29,7 +29,7 @@ class Entity {
  protected:
   EntityEnum type;
  public:
-  virtual ~Entity() {};
+  virtual ~Entity() = default;;
   EntityEnum GetEntityEnum();
 };
 
@@ -49,7 +49,7 @@ class Statement : public Entity {
   Container* parent_node_;
   Statement* before_node_;
  public:
-  virtual ~Statement() {};
+  ~Statement() override = default;;
   void SetLineNumber(LineNumber* ln);
   void SetStatementNumber(StatementNumber* sn);
   void SetProcedureNode(Procedure* procedure);
@@ -58,7 +58,6 @@ class Statement : public Entity {
   StatementNumber* GetStatementNumberObj();
   int GetStatementNumber();
   LineNumber* GetLineNumberObj();
-  std::string GetLineNumberString();
   Procedure* GetProcedureNode();
   Container* GetParentNode();
   Statement* GetBeforeNode();
@@ -73,7 +72,7 @@ class Container {
  private:
   std::list<Statement*> statement_list_;
  public:
-  virtual ~Container() {};
+  virtual ~Container() = default;;
 
   void AddStatement(Statement* stmt);
 
@@ -96,9 +95,9 @@ class Procedure : public Entity, public Container {
   Procedure(ProcedureName* procedureName);
   const ProcedureName* GetName();
   Cluster* GetInnermostCluster(int first_stmt, int second_stmt, Cluster* prev_cluster);
-  const void SetClusterRoot(Cluster* cluster);
-  const void SetBlockRoot(Block* block_root);
-  const void SetBlockTail(Block* block_tail);
+  void SetClusterRoot(Cluster* cluster);
+  void SetBlockRoot(Block* block_root);
+  void SetBlockTail(Block* block_tail);
   const Cluster* GetClusterRoot();
   const Block* GetBlockRoot();
   std::set<Block*> GetTailBlocks();
@@ -116,7 +115,7 @@ class Variable : public Entity {
 
   const VariableName* GetVariableName();
 
-  const std::string GetName() const;
+  std::string GetName() const;
 
   std::string GetNameInString();
 
@@ -153,7 +152,6 @@ class Program {
   std::list<Procedure*>* GetProcedureList();
   Cluster* GetProcClusterForLineNum(int line_num);
   Procedure* GetProcForLineNum(int line_num);
-  Cluster* GetEncapsulatingCluster(int first_stmt, int second_stmt, Cluster* prev_cluster);
 
   void AddProcedure(Procedure* p);
 };

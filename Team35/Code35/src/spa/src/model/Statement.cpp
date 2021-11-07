@@ -9,10 +9,10 @@
 using std::string;
 using std::vector;
 
-IfEntity::IfEntity(std::string condition, vector<Variable*> control_variables,
+IfEntity::IfEntity(const std::string& condition, vector<Variable*> control_variables,
                    vector<Constant*> control_constants) {
   type = EntityEnum::kIfEntity;
-  cond_expr_ = new ConditionalExpression(std::move(condition), control_variables);
+  cond_expr_ = new ConditionalExpression(condition, control_variables);
   this->control_variables = std::move(control_variables);
   this->control_constants = std::move(control_constants);
   for(auto* variable : this->control_variables) {
@@ -54,11 +54,11 @@ ElseEntity::ElseEntity() {
   type = EntityEnum::kElseEntity;
 }
 
-WhileEntity::WhileEntity(std::string condition,
+WhileEntity::WhileEntity(const std::string& condition,
                          vector<Variable*> control_variables,
                          vector<Constant*> control_constants) {
   type = EntityEnum::kWhileEntity;
-  cond_expr_ = new ConditionalExpression(std::move(condition), control_variables);
+  cond_expr_ = new ConditionalExpression(condition, control_variables);
   this->control_variables = std::move(control_variables);
   this->control_constants = std::move(control_constants);
   for(auto* variable : this->control_variables) {

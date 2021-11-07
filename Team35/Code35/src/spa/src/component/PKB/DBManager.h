@@ -16,7 +16,7 @@ class DBManager {
   // PKB API
 
   // Getting relationships from PKB
-  std::vector<Entity*> GetRelationship(PKBRelRefs ref, std::string entity);
+  std::vector<Entity*> GetRelationship(PKBRelRefs ref, const std::string& entity);
 
   std::vector<Entity*> GetFirstEntityOfRelationship(PKBRelRefs ref, DesignEntity de);
 
@@ -48,10 +48,8 @@ class DBManager {
   // Check if relationship exists
   bool HasRelationship(PKBRelRefs ref);
   bool HasRelationship(PKBRelRefs ref, DesignEntity first, DesignEntity second);
-  bool HasRelationship(PKBRelRefs ref, std::string first, std::string second);
-  bool HasRelationship(PKBRelRefs ref, std::string ident_string);
-
-  DesignEntity GetDesignEntityFromEntity(Entity* entity);
+  bool HasRelationship(PKBRelRefs ref, const std::string& first, const std::string& second);
+  bool HasRelationship(PKBRelRefs ref, const std::string& ident_string);
 
   static std::string GetNameFromEntity(Entity* entity);
 

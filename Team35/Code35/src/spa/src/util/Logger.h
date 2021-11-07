@@ -43,7 +43,7 @@ class Logger {
   template<typename T>
   Logger& operator<<(T t);
   Logger& operator<<(std::ostream& (* fun)(std::ostream&));
-  [[nodiscard]] std::string AddPrefix(const std::string& file, const int line, const std::string& function) const;
+  [[nodiscard]] std::string AddPrefix(const std::string& file, int line, const std::string& function) const;
   static std::string Prettify(const std::string& original_mesage);
 };
 

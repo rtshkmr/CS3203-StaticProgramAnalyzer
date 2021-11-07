@@ -12,7 +12,7 @@ class UnformattedQueryResult {
   public:
     UnformattedQueryResult(bool boolean_result);
     void SetBooleanResult(bool result);
-    bool GetBooleanResult();
+    bool GetBooleanResult() const;
     std::vector<QueryEvaluatorTable *> GetTables();
     void AddTable(QueryEvaluatorTable *);
 };

@@ -87,7 +87,7 @@ std::vector<Clause*> Group::GetClauses() {
   return clauses;
 }
 
-bool Group::ContainsTargetSynonym() {
+bool Group::ContainsTargetSynonym() const {
   return has_target_synonym;
 }
 
@@ -96,7 +96,7 @@ std::vector<Synonym*> Group::GetTargetSynonyms() {
 }
 
 void Group::UpdateHasTargetSynonymAttr() {
-  has_target_synonym = !target_synonyms.empty() ? true : false;
+  has_target_synonym = !target_synonyms.empty();
 }
 
 int Group::GetGroupSize() {

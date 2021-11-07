@@ -61,7 +61,7 @@ bool Cluster::CheckIfStatementInRange(StatementNumber sn) const {
   return start_ <= num && num <= end_;
 }
 
-bool Cluster::CheckIfStmtNumInRange(int num) {
+bool Cluster::CheckIfStmtNumInRange(int num) const {
   return start_ <= num && num <= end_;
 }
 
@@ -104,7 +104,7 @@ Cluster* Cluster::GetPrevSiblingCluster() {
   Cluster* parent_cluster = this->GetParentCluster();
   if (parent_cluster != nullptr) { // i.e. not outmost cluster:
     std::list<Cluster*> siblings = parent_cluster->GetNestedClusters();
-    std::list<Cluster*>::iterator itr = std::find(siblings.begin(), siblings.end(), this);
+    auto itr = std::find(siblings.begin(), siblings.end(), this);
     if (itr != end(siblings)) { // i.e. this exists, i can find myself using my parent
       int prev_sibling_idx = std::distance(siblings.begin(), itr) - 1;
       if (prev_sibling_idx < 0) {
@@ -220,10 +220,10 @@ bool Cluster::TraverseScopedCluster(PKBRelRefs rel_ref,
   switch (rel_ref) {
     case PKBRelRefs::kAffects: {
       return Cluster::CheckScopeClusterForAffects(scoped_cluster, target_range, pkb, lhs_var);
-    };
+    }
     default: {
       return false;
-    };
+    }
 
   }
   return false;
@@ -478,27 +478,27 @@ Cluster* Cluster::GetClusterConstituent(ClusterTag constituent_tag) {
       assert(cluster_tag_ == ClusterTag::kIfCluster);
       assert(first_constituent->GetClusterTag() == ClusterTag::kIfCondBlock);
       return first_constituent;
-    };
+    }
     case ClusterTag::kIfBody: {
       assert(cluster_tag_ == ClusterTag::kIfCluster);
       assert(first_constituent->GetClusterTag() == ClusterTag::kIfCondBlock);
       return first_constituent->FindNextSibling(ClusterTag::kIfBody);
-    };
+    }
     case ClusterTag::kElseBody: {
       assert(cluster_tag_ == ClusterTag::kIfCluster);
       assert(first_constituent->GetClusterTag() == ClusterTag::kIfCondBlock);
       return first_constituent->FindNextSibling(ClusterTag::kElseBody);
-    };
+    }
     case ClusterTag::kWhileCondBlock: {
       assert(cluster_tag_ == ClusterTag::kWhileCluster);
       assert(first_constituent->GetClusterTag() == ClusterTag::kWhileCondBlock);
       return first_constituent;
-    };
+    }
     case ClusterTag::kWhileBody: {
       assert(cluster_tag_ == ClusterTag::kWhileCluster);
       assert(first_constituent->GetClusterTag() == ClusterTag::kWhileCondBlock);
       return first_constituent->FindNextSibling(ClusterTag::kWhileBody);
-    };
+    }
     default: {
       assert(false);
     }
@@ -533,7 +533,7 @@ BodyBlock::~BodyBlock() = default;
  * @return
  */
 Block* Block::GetNewExitBlock() {
-  Block* exit_block = new Block();
+  auto* exit_block = new Block();
   exit_block->start_ = -1;
   exit_block->end_ = -1;
   return exit_block;

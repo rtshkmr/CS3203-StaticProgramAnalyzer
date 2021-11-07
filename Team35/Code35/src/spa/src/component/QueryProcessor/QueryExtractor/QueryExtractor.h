@@ -27,7 +27,7 @@ class QueryExtractor {
   std::vector<Group*> GetGroupsList() { return groups; };
   std::list<Synonym*> GetSynonymsList() { return synonyms; };
   std::vector<std::pair<Synonym*, Attribute>> GetTargetSynAttrPairs();
-  bool WasQueryBoolean() { return was_query_boolean; };
+  bool WasQueryBoolean() const { return was_query_boolean; };
 };
 
 #endif //INC_21S1_CP_SPA_TEAM_35_QUERYEXTRACTOR_H

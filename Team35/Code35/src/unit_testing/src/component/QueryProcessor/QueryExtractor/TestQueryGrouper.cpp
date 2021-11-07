@@ -1,6 +1,5 @@
 #include "catch.hpp"
 #include "component/QueryProcessor/QueryExtractor/QueryExtractor.h"
-#include "component/QueryProcessor/types/Types.h"
 
 Group* Get(std::vector<Group*>* list, int index){
   auto it = list->begin();
@@ -37,7 +36,7 @@ TEST_CASE("3.QueryGrouper.No and + multiple queries + common non-target synonym"
   REQUIRE(groups.size() == 2);
   Group* g1 = Get(&groups, 1);
   Group* g2 = Get(&groups, 0);
-  REQUIRE(g1->GetClauses().size() == 0);
+  REQUIRE(g1->GetClauses().empty());
   REQUIRE(g1->ContainsTargetSynonym());
   REQUIRE(g2->GetClauses().size() == 4);
   REQUIRE(g2->ContainsTargetSynonym() == false);

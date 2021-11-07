@@ -158,7 +158,8 @@ void AffectsTExtractor::InitCache() {
 
 std::vector<Entity*> AffectsTExtractor::ConvertIntToEntity(const std::set<int>& set_to_convert) {
   std::vector<Entity*> retList = {};
-  for (auto item : set_to_convert) {
+  retList.reserve(set_to_convert.size());
+for (auto item : set_to_convert) {
     retList.push_back(Utility::GetAssignEntityFromStmtNum(pkb_, item));
   }
   return retList;

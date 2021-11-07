@@ -33,7 +33,7 @@ class IfEntity : public Statement, public Container {
   ElseEntity* else_entity_ = nullptr;
 
  public:
-  IfEntity(std::string condition, std::vector<Variable*> control_variables, std::vector<Constant*> control_constants);
+  IfEntity(const std::string& condition, std::vector<Variable*> control_variables, std::vector<Constant*> control_constants);
 
   ConditionalExpression* GetCondExpr();
 
@@ -76,7 +76,7 @@ class WhileEntity : public Statement, public Container {
   std::vector<Variable*> control_variables;
   std::vector<Constant*> control_constants;
  public:
-  WhileEntity(std::string condition, std::vector<Variable*> control_variables, std::vector<Constant*> control_constants);
+  WhileEntity(const std::string& condition, std::vector<Variable*> control_variables, std::vector<Constant*> control_constants);
 
   ConditionalExpression* GetCondExpr();
 
