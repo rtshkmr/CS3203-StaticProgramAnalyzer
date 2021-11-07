@@ -25,3 +25,12 @@ void QueryExtractor::ExtractQuery(bool should_optimize) {
     optimizer.Optimize();
   }
 }
+
+std::vector<std::pair<Synonym*, Attribute>> QueryExtractor::GetTargetSynAttrPairs() {
+  for (int i = 0; i < target_syn_attrs.size(); i++) {
+    if (target_syn_attrs[i].second == Attribute::kInvalid) {
+      target_syn_attrs[i].second = GetDefaultAttribute(target_syn_attrs[i].first->GetType());
+    }
+  }
+  return target_syn_attrs;
+}
