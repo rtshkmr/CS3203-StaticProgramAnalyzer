@@ -1,0 +1,15 @@
+1 - Dummy query
+stmt s1, s2; variable v1;
+Select BOOLEAN such that Uses(s1, v1)
+TRUE
+5000
+2 - Dummy query
+stmt s1, s2; variable v1; assign a1;
+Select BOOLEAN such that Uses(s1, v1) and Modifies(s2, v1)
+TRUE
+20000
+3 - Dummy query
+stmt s1, s2, s3; variable v1, v2; assign a1;
+Select BOOLEAN such that Uses(s1, v1) and Modifies(s2, v1) and Follows(s2, s3)
+TRUE
+40000

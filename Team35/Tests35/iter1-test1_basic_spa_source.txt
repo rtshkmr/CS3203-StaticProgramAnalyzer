@@ -1,0 +1,23 @@
+procedure  Bumblebee  {
+    read     x;
+    print x;
+    y = 2 * z;
+    z = p - y;
+    if (q != 1) then    {
+        z = x + 24;
+    }
+ else
+    {
+        while (z > 0) {
+            y = x * q - 5;
+            z = z - 1;
+        }
+        if (q != z) then {
+            x = 1 ;
+        } else {
+            print x;
+        }
+        y = x + y * z + p * q;
+    }
+    i = x + j + z;
+}
