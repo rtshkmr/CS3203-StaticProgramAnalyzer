@@ -40,7 +40,6 @@ add_library(spa ${srcs} ${headers}
         src/component/QueryProcessor/QueryProjector.h src/component/QueryProcessor/QueryProjector.cpp
         src/component/QueryProcessor/QuerySystemController.h src/component/QueryProcessor/QuerySystemController.cpp
         src/util/Logger.cpp src/util/Logger.h
-        src/util/util.h
         src/util/TimeUtil.cpp src/util/TimeUtil.h
         ../unit_testing/utils/PKBStub.cpp ../unit_testing/utils/PKBStub.h src/model/CFG.cpp src/model/CFG.h
         src/component/PKB/extractor/RuntimeExtractor.cpp src/component/PKB/extractor/RuntimeExtractor.h

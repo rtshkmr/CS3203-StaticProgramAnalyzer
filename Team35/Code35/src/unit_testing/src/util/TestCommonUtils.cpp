@@ -16,7 +16,7 @@ TEST_CASE("0.Utils.Testing time util") {
 TEST_CASE("0.Testing basic LOG function") {
   LoggerSettings logger_settings;
   logger_settings.can_overwrite_file_ = true;
-  logger_settings.out_to_stdout_ = true;
+  logger_settings.out_to_stdout_ = false;
   logger_settings.out_to_file_ = true;
 
   LoggerInit(logger_settings);
