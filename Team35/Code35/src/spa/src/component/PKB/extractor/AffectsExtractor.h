@@ -32,9 +32,9 @@ class AffectsExtractor : public RuntimeColleague {
 
   void Delete();
  private:
-  [[maybe_unused]] RuntimeMediator* rte_;
+  RuntimeMediator* rte_;
   PKB* pkb_;
-  [[maybe_unused]] static constexpr auto cmp = [](AssignEntity* left, AssignEntity* right) {
+  static constexpr auto cmp = [](AssignEntity* left, AssignEntity* right) {
     return left->GetStatementNumber() < right->GetStatementNumber();
   };
   ScopeIndication cacheIndication = ScopeIndication::kNoScope;
