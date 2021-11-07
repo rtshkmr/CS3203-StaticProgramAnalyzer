@@ -10,11 +10,8 @@
 
   participant SourceProcessor
   participant DesignExtractor
-  participant CallsTExtractor
-  participant UsesExtractor
-  participant ModifiesExtractor
-  participant ParentTExtractor
-  participant FollowsTExtractor
+  participant TransitiveExtractor
+  participant VariableTExtractor
   participant NextExtractor
 
   create DesignExtractor
@@ -22,30 +19,27 @@
   SourceProcessor -> DesignExtractor: ExtractDesignAbstractions()
   activate DesignExtractor
 
-  DesignExtractor -> CallsTExtractor: Extract(deliverable)
-  activate CallsTExtractor
-  CallsTExtractor --> DesignExtractor
-  deactivate CallsTExtractor
+  DesignExtractor -> TransitiveExtractor: Extract(CallsT map, \nCalledByT map, \nCalls map)
+  activate TransitiveExtractor
+  TransitiveExtractor --> DesignExtractor
+  deactivate TransitiveExtractor
+  DesignExtractor -> TransitiveExtractor: Extract(FollowsT map, \nCalledByT map, \nCalls map)
+  activate TransitiveExtractor
+  TransitiveExtractor --> DesignExtractor
+  deactivate TransitiveExtractor
+  DesignExtractor -> TransitiveExtractor: Extract(CallsT map, \nCalledByT map, \nCalls map)
+  activate TransitiveExtractor
+  TransitiveExtractor --> DesignExtractor
+  deactivate TransitiveExtractor
 
-  DesignExtractor -> UsesExtractor: Extract(deliverable)
-  activate UsesExtractor
-  UsesExtractor --> DesignExtractor
-  deactivate UsesExtractor
-
-  DesignExtractor -> ModifiesExtractor: Extract(deliverable)
-  activate ModifiesExtractor
-  ModifiesExtractor --> DesignExtractor
-  deactivate ModifiesExtractor
-
-  DesignExtractor -> ParentTExtractor: Extract(deliverable)
-  activate ParentTExtractor
-  ParentTExtractor --> DesignExtractor
-  deactivate ParentTExtractor
-
-  DesignExtractor -> FollowsTExtractor: Extract(deliverable)
-  activate FollowsTExtractor
-  FollowsTExtractor --> DesignExtractor
-  deactivate FollowsTExtractor
+  DesignExtractor -> VariableTExtractor: Extract(VariableRel::kUses)
+  activate VariableTExtractor
+  VariableTExtractor --> DesignExtractor
+  deactivate VariableTExtractor
+  DesignExtractor -> VariableTExtractor: Extract(VariableRel::kModifies)
+  activate VariableTExtractor
+  VariableTExtractor --> DesignExtractor
+  deactivate VariableTExtractor
 
   DesignExtractor -> NextExtractor: Extract(deliverable)
   activate NextExtractor

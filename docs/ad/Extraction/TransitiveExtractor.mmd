@@ -1,0 +1,31 @@
+stateDiagram
+  s1: 1. Iterate through Calls relationships <br/>in non-transitive map passed in
+  s2: 2. Call recursive method with Calling Procedure <br/> if not visited
+  s3: 3. Return list of Called Procedures from <br/>Calls* of Calling Procedure if found <br/> in transitive map
+
+  s4: 4. Record this Procedure as visited
+  s5: 5. Iterate through each Called Procedure
+
+  s6: 6. Return list of Calls* of this Calling Procedure
+  s7: 7. Add Calls* relationship between <br/>Calling Procedure and the Procedure list returned by <br/>the recursive method to transitive maps
+
+  state stmt_if <<choice>>
+  state rec_if <<choice>>
+  state proc_end <<choice>>
+
+  [*] --> s1
+  s1 --> s2
+  s2 --> s3
+  s3 --> s4
+  s4 --> s5
+  s5 --> stmt_if
+
+
+  stmt_if --> s6: [if end of Statement list]
+  stmt_if --> s2: [else]
+  s6 --> s7
+  s7 --> rec_if
+  rec_if --> s5: [Recursive method called by intermediate Calls]
+  rec_if --> proc_end: [Recursive method called by first Calls]
+  proc_end --> s1: [else]
+  proc_end --> [*]: [if end of Calls relationships]
