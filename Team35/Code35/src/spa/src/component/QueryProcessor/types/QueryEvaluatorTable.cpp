@@ -49,7 +49,11 @@ bool QueryEvaluatorTable::AddMultipleRowForAllColumn(Synonym *synonym, int index
   for (auto & tableIterator : synonym_to_entity_map) {
     if (repeat_count > 0) {
       std::vector<Entity *> currList = tableIterator.second;
-      currList.push_back(currList[index]);
+      if (tableIterator.first == synonym) {
+        currList.push_back(entity);
+      } else {
+        currList.push_back(currList[index]);
+      }
       tableIterator.second = currList;
     } else if (tableIterator.first == synonym) {
       AddRow(synonym, index, entity);
@@ -65,10 +69,8 @@ bool QueryEvaluatorTable::DeleteRow(int index) {
   for (auto & iter : synonym_to_entity_map) {
     std::vector<Entity *> current_column = iter.second;
     unsigned long size = current_column.size();
-    if (index < size) {
-      current_column.erase(current_column.begin() + index);
-      iter.second = current_column;
-    }
+    current_column.erase(current_column.begin() + index);
+    iter.second = current_column;
   }
   return true;
 }

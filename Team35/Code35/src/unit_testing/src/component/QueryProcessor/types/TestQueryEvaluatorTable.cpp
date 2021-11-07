@@ -101,23 +101,23 @@ TEST_CASE("3.QueryEvaluatorTable.Multiple Target Synonyms") {
     table.AddColumn(assign_synonym);
     table.AddMultipleRowForAllColumn(assign_synonym, 0, assign_1, 0);
     table.AddMultipleRowForAllColumn(assign_synonym, 0, assign_2, 1);
-    table.AddMultipleRowForAllColumn(assign_synonym, 2, assign_2, 0);
-    table.AddMultipleRowForAllColumn(assign_synonym, 3, assign_1, 0);
-    table.AddMultipleRowForAllColumn(assign_synonym, 3, assign_2, 1);
-    table.AddMultipleRowForAllColumn(assign_synonym, 3, assign_3, 2);
+    table.AddMultipleRowForAllColumn(assign_synonym, 1, assign_2, 0);
+    table.AddMultipleRowForAllColumn(assign_synonym, 2, assign_1, 0);
+    table.AddMultipleRowForAllColumn(assign_synonym, 2, assign_2, 1);
+    table.AddMultipleRowForAllColumn(assign_synonym, 2, assign_3, 2);
     REQUIRE(table.GetRowSize() == 6);
     std::vector<std::vector<Entity*>> results = table.GetResults();
-    REQUIRE(results[0][1] == var_x);
-    REQUIRE(results[0][2] == var_z);
-    REQUIRE(results[0][5] == var_i);
-    REQUIRE(results[1][1] == assign_2);
-    REQUIRE(results[1][3] == assign_1);
+    REQUIRE(results[0][1] == var_z);
+    REQUIRE(results[0][2] == var_i);
+    REQUIRE(results[0][3] == var_x);
+    REQUIRE(results[1][2] == assign_1);
+    REQUIRE(results[1][3] == assign_2);
     REQUIRE(results[1][5] == assign_3);
 
     SECTION("Delete a valid row with no empty column") {
       table.DeleteRow(0);
       std::vector<std::vector<Entity*>> curr_results = table.GetResults();
-      bool output = curr_results[0][1] == var_z;
+      bool output = curr_results[0][0] == var_z;
       REQUIRE(output);
       REQUIRE(curr_results[1][0] == assign_2);
     }
@@ -150,10 +150,6 @@ TEST_CASE("3.QueryEvaluatorTable.Multiple Target Synonyms") {
     REQUIRE(outcome);
     REQUIRE(table.GetRowSize() == 5);
     REQUIRE(table.GetColumnSize() == 3);
-  }
-
-  SECTION("Retrieve an empty column") {
-    REQUIRE(table.GetColumn(prog_line_synonym).empty());
   }
 
   SECTION("Retrieve a column") {
