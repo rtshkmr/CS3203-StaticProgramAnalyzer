@@ -1,4 +1,5 @@
-# Team 35
+# Team 35 [CS3203: Software Engineering Project](https://github.com/nus-cs3203/project-wiki/wiki/)
+
 
 ## Target Environment
 
@@ -8,17 +9,12 @@ OS | Cross-Platform (Fedora Build)
 Toolchain | CLion + CMake 3.20.5
 C++ Standard | C++17
 
-### Additional Build Instructions
-
-No additional instructions required.
+Use your favourite IDE and load the CMake config. 
 
 # Team Members
-
-Name | Mobile | Email | Development OS/Toolchain
--:|:-:|:-|-|
-Oliver Cheok | 97986364 | olivercheok20@gmail.com | MacOS/CLion
-Hemanshu Gandhi | 97126133 | hemanshu.gandhi@gmail.com | MacOS/CLion
-Tan Wei Jie | 82983785 | tanweijie123@gmail.com | Windows/CLion
-Lim Jun Xue | 83661066 | junxue1@gmail.com | Windows/CLion
-Max Ng Kai Shen | 94506714 | maxngkaishen@gmail.com | MacOS/CLion
-Ritesh Kumar | 81867752 | ritesh@emerald.pink | Windows/CLion
+* [Tan Wei Jie](https://github.com/tanweijie123)  
+* [Oliver Cheok](https://github.com/olivercheok20)  
+* [Lim Junxue](https://github.com/LimJunxue)  
+* [Hemanshu Gandhi](https://github.com/HemanshuGandhi)  
+* [Max Ng](https://github.com/maxxng)  
+* [Ritesh Kumar](https://github.com/rtshkmr)  
